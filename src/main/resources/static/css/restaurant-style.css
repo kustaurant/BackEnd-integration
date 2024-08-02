@@ -1,0 +1,549 @@
+@import "variables.css";
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'NanumSquare', sans-serif;
+}
+img {
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+body {
+    background-color: #FFF;
+}
+
+div {
+    display: block;
+}
+
+a {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+input {
+    appearance: none;
+    border-radius: 0px;
+    background: #FFF;
+    vertical-align: middle;
+    margin: 0px;
+    outline: none;
+}
+
+ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+li {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    display: list-item;
+    text-align: -webkit-match-parent;
+
+}
+
+.button {
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+}
+
+/* header 이후 새로운 부분 시작 */
+/* TABLET */
+@media only screen and (max-width: 1023px) {
+    #outerContainer {
+        margin: 110px var(--mobile-outer-container-side-width) 0 var(--mobile-outer-container-side-width);
+        min-width: var(--min-width);
+        line-height: normal;
+        color: black;
+    }
+
+    header {
+        min-width: var(--min-width);
+        line-height: normal;
+        color: black;
+    }
+}
+/* PC */
+@media only screen and (min-width: 1024px) {
+    #outerContainer {
+        width: var(--pc-outer-container-width);
+        max-width: var(--max-width);
+        margin-top: 110px;
+        line-height: normal;
+        color: black;
+    }
+
+    header {
+        line-height: normal;
+        color: black;
+    }
+}
+
+.left-justified {
+    text-align: left;
+}
+
+div.outer-container {
+    margin: 110px auto 0;
+    text-align: center;
+}
+
+.inner-container {
+    background-color: #fff;
+    border: #EBEEF1 solid 1px;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 6px;
+    width: 100%;
+}
+
+.section-title {
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: left;
+    margin-bottom: 10px;
+}
+
+/* div.basic-info 부분 (메인사진, 식당이름, 주소, 전화번호) */
+div.basic-info {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+div.basic-info > img {
+    max-height: 120px;
+    max-width: 120px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+div.basic-info > div.texts {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 10px;
+}
+
+div.basic-info > div.texts > span {
+    display: block;
+}
+#restaurantNameOuter {
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+}
+@media screen and (min-width: 831px) {
+    #restaurantName {
+        font-size: 25px;
+        max-width: 100%;
+        font-weight: 900;
+        color: #000;
+    }
+}
+@media screen and (max-width: 830px) {
+    #restaurantName {
+        font-size: 3vw;
+        max-width: 100%;
+        font-weight: 900;
+        color: #000;
+    }
+}
+@media screen and (max-width: 700px) {
+    #restaurantName {
+        font-size: 22px;
+        max-width: 100%;
+        font-weight: 900;
+        color: #000;
+    }
+}
+#favoriteContainer {
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 7px;
+    border: 1px solid #bbb;
+}
+#favoriteImg {
+    width: 28px;
+    min-width: 28px;
+    height: 28px;
+    min-height: 28px;
+}
+#restaurantType {
+    font-size: 14px;
+    font-weight: normal;
+    color: #666;
+    margin-bottom: 12px;
+}
+#restaurantAddress {
+    font-size: 14px;
+    color: #000;
+}
+#restaurantTel {
+    font-size: 14px;
+    color: #000;
+}
+.before-favorite {
+    background-color: #FFF;
+    border: 1px solid #bbb;
+}
+.after-favorite {
+    background-color: #E28400;
+    border: 1px solid #E28400;
+}
+#naverMapLink {
+    width: fit-content;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 18px;
+    color: #089f0d;
+    padding: 4px;
+}
+#naverMapLink:hover {
+    font-size: 14px;
+    font-weight: 600;
+    background-color: #43a646;
+    color: #eee;
+}
+
+/* 티어 정보 */
+.tier1 {
+    background-color: var(--tier1-color);
+}
+.tier2 {
+    background-color: var(--tier2-color);
+}
+.tier3 {
+    background-color: var(--tier3-color);
+}
+.tier4 {
+    background-color: var(--tier4-color);
+}
+.tier5 {
+    background-color: var(--tier5-color);
+}
+.tier-1 {
+    background-color: var(--main-color);
+}
+/* Cuisine Tier */
+.cuisine-tier-info {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+.cuisine-tier-info > .cuisine-tier {
+    white-space: nowrap;
+    display: inline-block;
+    margin: 5px 10px 5px 0;
+    padding: 7px 10px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 17px;
+    line-height: 18px;
+    font-weight: 570;
+}
+.tier-cuisine-img {
+    width: 20px;
+    height: 20px;
+}
+/* Situation Tier */
+.situation-tier-info {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.situation-tier-info .situation-tier {
+    white-space: nowrap;
+    display: inline-block;
+    margin: 4px 4px 4px 0;
+    padding: 6px 11px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 15px;
+    font-weight: 570;
+}
+.tier-situation-img {
+    width: 16px;
+    height: 16px;
+}
+
+/* 통계 정보 */
+.stats-info {
+    margin-top: 10px;
+    display: flex;
+    align-self: flex-end;
+}
+
+.stats-info > .stat-data {
+    padding: 0 8px 0 12px;
+    border-left: 1px solid #777;
+}
+
+.stat-data > .stat-name {
+    font-size: 12px;
+    color: #666;
+    text-align: left;
+}
+
+.stat-data > .stat-value {
+    font-size: 14px;
+    color: #000;
+    text-align: left;
+}
+
+/* 식당 메뉴 */
+#menuContainer {
+    position: relative;
+}
+.menu-ul > li {
+    display: flex;
+}
+.menu-ul li:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+/* 메뉴 이미지 */
+.menu-ul > li img {
+    width: 100px;
+    height: 100px;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+/* 메뉴 글자 */
+.menu-ul > li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.menu-ul > li .menu-text-container {
+    flex: 1;
+    text-align: left;
+}
+.menu-ul > li .menu-name {
+    font-size: 17px;
+    color: #222;
+    margin-top: 7px;
+}
+.menu-ul > li .menu-price {
+    margin-bottom: 7px;
+}
+.menu-ul > li em {
+    font-size: 15px;
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* 네이버 지도 */
+#map {
+    width: 100%;
+    height: 150px;
+    border-radius: 4px 4px 0 0;
+}
+#mapContainer {
+    position: relative;
+}
+
+.unfold-button {
+    margin-top: 5px;
+    width: 100%;
+    height: 25px;
+    border-radius: 0 0 4px 4px;
+    background-color: #ddd;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.unfold-button:hover {
+    background-color: #e5e5e5;
+}
+
+/* 평가하기 버튼 */
+.evaluation-button {
+    display: inline-block; /* 또는 display: block; */
+    width: 100%; /* 또는 다른 너비 값 설정 */
+    color: #fff;
+    background-color: var(--main-color);
+    font-size: 15px;
+    font-weight: 570;
+}
+.evaluation-button:hover {
+    color: #fff;
+    background-color: var(--main-hover-color);
+}
+
+/* 댓글 */
+/* 댓글 입력창 */
+.comment-container {
+    background-color: #fff;
+    border-radius: 5px 5px 0 0;
+    border: #EBEEF1 solid 1px;
+    padding: 10px;
+    margin-top: 6px;
+    width: 100%;
+}
+
+.input-container {
+    display: flex;
+    width: 100%;
+    height: 90px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f2f4f7;
+}
+
+.input-container > button {
+    border-radius: 5px;
+    width: 50px;
+    height: 100%;
+    margin-left: 10px;
+}
+
+.input-container > div {
+    flex: 1;
+}
+
+.input-container > div > span {
+    color: #FF0000;
+}
+
+#commentInput {
+    color: #333;
+    padding: 5px;
+    line-height: 20px;
+    resize: none;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 5px;
+    background-color: #0000;
+    outline: none;
+    caret-color: black;
+}
+
+/* 댓글 인기순 최신순 버튼 */
+.sort-toggle-buttons {
+    display: flex;
+}
+
+.sort-toggle-buttons button {
+    font-size: 13px;
+    padding: 5px 10px;
+    margin-right: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+    color: #000;
+    background-color: #fff;
+    border: #ffffffff solid 1px;;
+    border-radius: 4px;
+}
+
+.sort-toggle-buttons button.active {
+    border: var(--main-color) solid 1px;
+    color: var(--main-color);
+    font-weight: bold;
+}
+
+/* 댓글 리스트 */
+#commentList > li {
+    display: flex;
+    background-color: #F9F9F9;
+    margin-top: 2px;
+    padding: 6px 12px;
+}
+#commentList > li > .body-div {
+    flex: 1;
+}
+.like-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    width: 32px;
+    font-size: 14px;
+    color: #666;
+}
+.like-div > button {
+    height: 15px;
+    width: 15px;
+    border: none;
+    background-color: #00000000;
+}
+.comment-up > img, .comment-down > img {
+    width: 100%;
+    height: 100%;
+}
+.nick-date-div {
+    display: flex;
+    font-size: 13px;
+    line-height: 29.5px;
+    justify-content: space-between;
+    align-items: center;
+}
+.nick-date-div > img {
+    height: 22px;
+    width: 22px;
+    margin-right: 5px;
+}
+.nick-span {
+    font-weight: 550;
+    margin-right: 10px;
+}
+.date-span {
+    color: #5A5A5A;
+    margin-right: auto;
+}
+.delete-button {
+    background-color: #00000000;
+    color: #777;
+    border: none;
+    padding: 5px;
+    font-size: 13px;
+}
+.delete-button:hover {
+    background-color: #ddd;
+    border-radius: 5px;
+    color: #999;
+}
+.real-comment-container {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    padding-right: 10px;
+    padding-bottom: 12px;
+    white-space: pre;
+    width: 100%;
+}
+.real-comment-container span {
+    font-size: 13px;
+    line-height: 20px;
+    text-align: left;
+    white-space: pre-wrap;
+    width: 100%;
+}
+/* 텍스트 커서 깜빡임 없애기 */
+body{
+    caret-color: transparent;
+}

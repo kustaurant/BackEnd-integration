@@ -1,0 +1,26 @@
+<li th:each="restaurantComment, iterStat : ${restaurantComments}" th:style="${iterStat.last ? 'border-radius: 0 0 7px 7px;' : ''}">
+    <div class="like-div">
+        <button class="comment-up" type="button" onclick="commentLike(this)" th:data-id="${restaurantComment[0].commentId}">
+            <img th:if="${restaurantComment[2]}" src="/img/community/up-green.png">
+            <img th:unless="${restaurantComment[2]}" src="/img/community/up.png">
+        </button>
+        <span th:text="${restaurantComment[1]}"></span>
+        <button class="comment-down" type="button" onclick="commentDislike(this)" th:data-id="${restaurantComment[0].commentId}">
+            <img th:if="${restaurantComment[3]}" src="/img/community/down-red.png">
+            <img th:unless="${restaurantComment[3]}" src="/img/community/down.png">
+        </button>
+    </div>
+    <div class="body-div">
+        <div class="nick-date-div">
+            <span class="nick-span" th:text="${restaurantComment[0].getUser.getUserNickname()}"></span>
+            <span class="date-span" th:text="${restaurantComment[0].calculateTimeAgo()}"></span>
+            <!-- Button trigger modal -->
+            <button type="button" th:if="${restaurantComment[0].getUser() == user}" th:data-id="${restaurantComment[0].commentId}" class="delete-button btn btn-primary" onclick="deleteComment(this)" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                삭제
+            </button>
+        </div>
+        <div class="real-comment-container">
+            <span th:text="${restaurantComment[0].getCommentBody()}"></span>
+        </div>
+    </div>
+</li>

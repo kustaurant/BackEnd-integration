@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C47HQ74QCF"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-C47HQ74QCF');
+    </script>
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({
+            'gtm.start':
+                new Date().getTime(), event: 'gtm.js'
+        });
+        var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-T2CX8XG3');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>쿠스토랑 - 게시글 수정</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/community_update.css">
+    <!-- 파비콘 -->
+    <link rel="icon" type="image/x-icon" href="/img/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+            crossorigin="anonymous"></script>
+    <script src="/js/communityUpdateScript.js"></script>
+    <script src="https://cdn.tiny.cloud/1/digg1r45hnwpvnziectokoy8wzl63w48rw4t7rxio2tgwkue/tinymce/6/tinymce.min.js"
+            referrerpolicy="origin"></script>
+
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T2CX8XG3"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+<!-- End Google Tag Manager (noscript) -->
+<main>
+
+    <div>
+        <form method="post" action="/api/community/post/create" enctype="multipart/form-data" th:data-id="${post.postId}">
+            <div class="top-banner">
+                <button id="back-button" type="button"><img src="/img/community/back-button.png"></button>
+
+                <h1 class="writeText">게시글 수정</h1>
+                <button id="complete-button" type="submit"><img src="/img/community/check.png"></button>
+            </div>
+            <select name="postCategory">
+                <option value="" disabled hidden>채널 선택</option>
+                <option value="자유게시판" th:selected="${post.postCategory == '자유게시판'}">자유게시판</option>
+                <option value="칼럼게시판" th:selected="${post.postCategory == '칼럼게시판'}">칼럼게시판</option>
+                <option value="건의게시판" th:selected="${post.postCategory == '건의게시판'}">건의게시판</option>
+            </select>
+            <input name="title" placeholder="제목" th:value="${post.postTitle}">
+            <div class="post-body">
+                <div class="post-body-inner">
+                    <textarea th:utext="${post.postBody}" class="post-content" id="tiny-editor" maxlength="2000"></textarea>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+
+
+</main>
+
+<script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
+<script type="text/javascript">
+    if (!wcs_add) var wcs_add = {};
+    wcs_add["wa"] = "14b5af05d120a20";
+    if (window.wcs) {
+        wcs_do();
+    }
+</script>
+</body>
+</html>

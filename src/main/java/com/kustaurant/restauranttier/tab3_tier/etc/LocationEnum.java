@@ -1,0 +1,14 @@
+package com.kustaurant.restauranttier.tab3_tier.etc;
+
+import lombok.Getter;
+
+@Getter
+public enum LocationEnum {
+    ALL("전체"), L1("건입~중문"), L2("중문~어대"), L3("후문"), L4("정문"), L5("구의역");
+
+    private final String value;
+
+    LocationEnum(String value) {
+        this.value = value;
+    }
+}

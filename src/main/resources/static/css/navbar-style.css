@@ -1,0 +1,268 @@
+/*!* 리스트의 아이템 중 클릭 상태인 것(홈) *!*/
+/*div.header-bottom ul.menu-list > li > a > div.home {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    color: #FFF;*/
+/*    border-bottom: 3px solid #FFF;*/
+/*    font-size: 15px;*/
+/*    box-sizing: border-box;*/
+/*    line-height: 22px;*/
+/*    padding: 6px 0 5px;*/
+/*}*/
+
+/*!* 리스트의 아이템 중 클릭 상태가 아닌 것(홈 제외 나머지) *!*/
+/*.tier:hover, .rank:hover, .community:hover, .recommend:hover {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    color: #FFF;*/
+/*    border-bottom: 3px solid #FFF;*/
+/*    font-size: 15px;*/
+/*    box-sizing: border-box;*/
+/*    line-height: 22px;*/
+/*    padding: 6px 0 5px;*/
+/*}*/
+
+/*!* 리스트의 아이템 중 클릭 상태가 아닌 것(홈 제외 나머지) *!*/
+/*.tier, .rank, .community, .recommend {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    color: #B3CDFF;*/
+/*    border-bottom: 3px solid transparent;*/
+/*    font-size: 15px;*/
+/*    box-sizing: border-box;*/
+/*    line-height: 22px;*/
+/*    padding: 6px 0 5px;*/
+/*}*/
+
+/* 위 코드를 navbar에 붙여 넣은 html의 css에 작성해줘야함, 그래야 해당 페이지에 하얀색 언더바 처리가 됨 */
+
+
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+body {
+    background-color: #EBEEF1;
+}
+
+div {
+    padding: 0;
+    margin: 0;
+    display: block;
+}
+
+a {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+input {
+    appearance: none;
+    border-radius: 0px;
+    background: #FFF;
+    vertical-align: middle;
+    margin: 0px;
+    outline: none;
+}
+
+ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+
+li {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+    display: list-item;
+    text-align: -webkit-match-parent;
+
+}
+
+button {
+    cursor: pointer;
+    text-decoration: none;
+    line-height: normal;
+    text-align: center;
+}
+
+header {
+    min-width: 300px;
+}
+
+/* header top: 로고와 로그인 버튼 부분*/
+div.header-top {
+    height: 40px;
+    width: 100%;
+    background-color: #28344E;
+    display: flex;
+    align-items: center;
+}
+
+/* 로고 */
+div.header-top > a.logo {
+    display: flex;
+    top: 0;
+    left: 0;
+    height: 40px;
+    background-color: #5383E8;
+    align-items: center;
+}
+/* 로고 안 이미지 */
+div.header-top > a.logo > img {
+    border: 0px;
+    height: 60%;
+    margin: auto 10px;
+    object-fit: contain;
+}
+
+/* 로그인 버튼 부분 */
+div.header-top > div.login {
+    height: 40px;
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
+    align-items: center;
+}
+/* 로그인 버튼 */
+.login-button{
+    margin: 1rem;
+    display: block;
+    padding: 5px 12px;
+    line-height: 18px;
+    font-size: 13px;
+    background-color: #5383E8;
+    color: #FFF;
+    border-radius: 4px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* header middle 검색창 부분*/
+div.header-middle {
+    width: 100%;
+    background-color: #5383E8;
+}
+
+div.header-middle > div.search-outer {
+    display: flex;
+    margin: 0 auto;
+    width: 70%;
+    min-width: 240px;
+    max-width: 900px;
+}
+
+div.header-middle div.search-box {
+    flex: 1;
+    display: flex;
+    margin: 9px 0;
+    align-items: center;
+}
+
+div.header-middle div.search-box > div {
+    flex: 1;
+    position: relative;
+}
+
+div.header-middle div.search-box > div > form.search-form {
+    background-color: #FFF;
+    border-radius: 4px;
+    display: flex;
+    position: relative;
+    align-items: center;
+}
+
+div.header-middle div.search-box > div > form.search-form > div.search-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+div.header-middle div.search-box > div > form.search-form > button {
+    background-color: #28344E;
+    color: #FFF;
+    height: 33px;
+    font-size: 14px;
+    padding: 0 7px;
+    margin: 0 3px;
+    border-radius: 3px;
+    width: 50px;
+    border: none;
+}
+
+div.header-middle div.search-box > div > form.search-form > button:hover{
+    background-color: #000;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#search {
+    width: 100%;
+    height: 38px;
+    padding: 7px;
+    display: block;
+    transition: width 0.2s;
+    border: 0;
+    box-sizing: border-box;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    font-size: 14px;
+    line-height: 18px;
+    color: #202D37;
+}
+
+/* header bottom 상단 메뉴바 부분 */
+div.header-bottom {
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    background-color: #5383E8;
+    border-bottom: 1.5px solid #4171D6;
+}
+
+div.header-bottom > div.menu-outer {
+    display: flex;
+    width: 80%;
+    min-width: 222px;
+}
+
+div.header-bottom nav.menu {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* 리스트 */
+div.header-bottom ul.menu-list {
+    display: flex;
+    align-items: center;
+}
+
+div.header-bottom ul.menu-list > li.menu-item-first {
+    margin-left: 0;
+}
+
+div.header-bottom ul.menu-list > li.menu-item {
+    margin-left: 24px;
+}
+
+/* 추가 */
+#myPage{
+    width: 20px;
+    height: 20px;
+    background-color: #28344E;
+    vertical-align: middle;
+
+}
+.link{
+    display: inline-block;
+    line-height: 20px;
+    background-color: #28344E;
+}
+

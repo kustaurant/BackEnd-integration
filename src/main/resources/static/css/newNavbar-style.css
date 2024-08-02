@@ -1,0 +1,58 @@
+@import "variables.css";
+.default-logo {
+    height: 42px;
+}
+.alt-logo {
+    height: 38px;
+}
+.mobile-logo {
+    height: 34px;
+}
+
+#myPageToggleButton {
+    z-index: 201;
+}
+.header-button {
+    position: relative;
+}
+.my-page-button {
+    padding: 4px;
+    border: none;
+    background-color: #00000000;
+}
+.my-menu-div {
+    z-index: 201;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+
+    top: 85px;
+    right: 40px;
+    padding: 10px;
+    border: #666 solid 1px;
+    border-radius: 5px;
+    background-color: #ffffffff;
+}
+.my-menu-div a {
+    line-height: 25px;
+    margin-bottom: 7px;
+    font-size: 16px;
+    padding: 5px 7px;
+    color: #222;
+    display: block;
+}
+.my-menu-div a:hover {
+    color: #FFF;
+    background-color: #ccc;
+    border-radius: 5px;
+}
+#myPageToggleBackdrop {
+    z-index: 200;
+    position: fixed;
+    display: none;
+    top:0;
+    bottom:0;
+    right:0;
+    left:0;
+    opacity: 0;
+}

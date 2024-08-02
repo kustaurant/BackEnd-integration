@@ -1,0 +1,91 @@
+<!--하단 푸터-->
+<!--<script src="/js/feedbackScript.js" defer></script>-->
+<footer th:fragment="footerFragment"
+        class="sm-pt-50px pt-2 mt-2 pb-0 bg-very-light-gray cover-background background-position-center-top sm-background-image-none footer-class">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-lg-4 row-cols-sm-2 justify-content-center mt-6 md-mt-15 sm-mt-0 mb-5 sm-mb-50px">
+
+            <div class="col icon-with-text-style-03 md-mb-30px">
+                <div class="feature-box ps-8 pe-8 lg-ps-0 lg-pe-0 overflow-hidden">
+                    <div class="feature-box-icon">
+                        <i class="bi bi-chat-square-text d-inline-block icon-medium text-dark-gray mb-15px"></i>
+                    </div>
+                    <div class="feature-box-content last-paragraph-no-margin">
+                        <span class="fw-700 text-dark-gray fs-15 text-uppercase">About our service</span>
+                        <p class="w-90 md-w-70 sm-w-80 xs-w-70 mx-auto">Konkuk University exclusive restaurant information service</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col icon-with-text-style-03 md-mb-30px">
+                <a href="/announcement">
+                <div class="feature-box ps-8 pe-8 lg-ps-0 lg-pe-0 overflow-hidden">
+                    <div class="feature-box-icon">
+                        <i class="bi bi-megaphone-fill d-inline-block icon-medium text-dark-gray mb-15px"></i>
+                    </div>
+                    <div class="feature-box-content last-paragraph-no-margin">
+                        <span class="fw-700 text-dark-gray fs-15 text-uppercase">ANNOUNCEMENT</span>
+                        <div class="w-100 d-block">
+                            <span class="d-block">쿠스토랑 공지사항<br>(개발자 패치노트 등)</span>
+                        </div>
+                    </div>
+                </div>
+                </a>
+            </div>
+
+
+            <div class="col icon-with-text-style-03 xs-mb-30px">
+                <div class="feature-box ps-8 pe-8 lg-ps-0 lg-pe-0 overflow-hidden">
+                    <div class="feature-box-icon">
+                        <i class="bi bi-envelope-open d-inline-block icon-medium text-dark-gray mb-15px"></i>
+                    </div>
+                    <div class="feature-box-content last-paragraph-no-margin">
+                        <span class="fw-700 text-dark-gray fs-15 text-uppercase">Any questions or suggestions</span>
+                        <div class="w-100 d-block">
+                            <a href="mailto:tierchart@gmail.com">tierchart@gmail.com</a><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col icon-with-text-style-03">
+                <div class="feature-box ps-8 pe-8 lg-ps-0 lg-pe-0 overflow-hidden">
+                    <div class="feature-box-icon">
+                        <i class="bi bi-geo-alt d-inline-block icon-medium text-dark-gray mb-15px"></i>
+                    </div>
+                    <div class="feature-box-content last-paragraph-no-margin">
+                        <span class="fw-700 text-dark-gray fs-15 text-uppercase">Contact us</span>
+                        <p class="md-w-60 sm-w-90 xs-w-70 mx-auto">Konkuk Univ. <br>CSE students Class of 21 Kim, Shim, Im</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="border-top border-color-transparent-dark-very-light pt-25px pb-25px">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4 col-sm-6 fs-15 last-paragraph-no-margin text-center text-sm-start order-3 order-sm-2 order-md-1">
+                    <p>© Copyright 2024 <a href="#" target="_blank"
+                                           class="text-dark-gray fw-600">Konkuk</a></p>
+                </div>
+                <div class="col-md-4 text-center order-1 order-md-2 sm-mb-20px">
+                    <a href="/" class="footer-logo d-inline-block">
+                        <img data-cfsrc="/img/home/main_logo.png" data-at2x="/img/home/main_logo.png"
+                             alt="" class="default-logo" src="/img/home/main_logo.png" height="34" style="object-fit: cover;">
+                    </a>
+                </div>
+                <div class="col-md-4 col-sm-6 fs-15 last-paragraph-no-margin text-center text-sm-end order-2 order-sm-3 order-md-3">
+                    <div class="d-inline-block mx-3">
+                        <span id="feedbackButton" class="feedback-button text-decoration-line-bottom text-dark-gray fw-600" onclick="isLogin()">Feedback</span>
+                    </div>
+                    <div class="d-inline-block mx-3">
+                        <p><a href="/terms_of_use" class="text-decoration-line-bottom text-dark-gray fw-600">이용약관</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

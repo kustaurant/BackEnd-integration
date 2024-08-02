@@ -1,0 +1,551 @@
+@import "variables.css";
+
+
+#mainContents {
+    display: flex;
+    flex-direction: column;
+}
+
+.hidden {
+    display: none;
+}
+
+/*----------------------- 음식 이미지 슬라이드 ------------------------*/
+#ImgSlideBar {
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 1px;
+}
+
+.animation-list {
+    display: flex;
+}
+
+.img-list {
+    display: flex;
+}
+
+
+.animation {
+    animation-name: infinite_slide;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    /* animation-play-state: paused; */
+}
+
+@keyframes infinite_slide {
+    0% {
+        transform: translateX(0%)
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/*----------------------- 랜덤추천 선택 UI ------------------------*/
+#recommendPage {
+    background-color: white;
+}
+
+#recommendPage hr {
+    margin: 0;
+}
+
+.title {
+    font-size: 17px;
+    font-weight: 600;
+    padding: 8px;
+    margin-bottom: 0px;
+    color: black;
+
+}
+
+.title-icon {
+    width: 20px;
+}
+
+
+.option-area {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.option-area > p {
+    margin: 30px;
+    letter-spacing: 2px;
+    color: black;
+    border-radius: 30px;
+}
+
+.info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin: 10px 15px 20px 0px;
+}
+
+.info > p {
+    font-size: 12px;
+    margin-bottom: 0px;
+}
+
+.colorbox {
+    width: 40px;
+    height: 30px;
+    border-radius: 3px;
+    background-color: #F0F0F0;
+    margin-right: 5px;
+    filter: brightness(0.9);
+
+}
+
+
+.option div button {
+    border: none;
+    color: black;
+    border-radius: 10px;
+
+}
+
+.cell-button {
+    background: none;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.mobile-cuisine-name {
+    font-family: 'NanumSquare', sans-serif;
+    color: black;
+}
+
+.selected {
+    background-color: #eee;
+!important;
+}
+
+
+.btn-area {
+    margin: 2rem auto 0;
+    width: 300px;
+    display: flex;
+    justify-content: center;
+
+}
+
+.btn-style {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+
+    background-color: var(--main-color);
+    font-weight: bold;
+    letter-spacing: 2px;
+
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-style2 {
+    width: 130px;
+    height: 50px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+
+    background-color: var(--main-color);
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* --------------- 랜덤추천 결과 페이지 --------------- */
+
+#resultPage hr {
+    margin: 0;
+}
+
+#resultPage p {
+    margin-bottom: 0;
+}
+
+/*----------------------- 랜덤추천 결과 슬라이더 ------------------------*/
+.result-img-slideBar {
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 1px;
+    position: relative;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#SelectedBox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* 요소의 중심을 부모 요소의 가운데로 이동 */
+
+    border: 3px solid var(--main-color);
+    border-radius: 4px;
+
+    background-size: cover; /* 배경 이미지를 요소의 크기에 맞게 늘리거나 축소하여 보여줌 */
+    background-position: center; /* 배경 이미지를 요소의 가운데로 정렬 */
+    background-repeat: no-repeat; /* 배경 이미지 반복 없앰 */
+}
+
+
+.result-animation {
+    animation-name: result_infinite_slide;
+    animation-duration: 2s;
+    animation-timing-function: ease-out;
+    animation-iteration-count: 1;
+    animation-direction: alternate;
+    animation-fill-mode: forwards;
+}
+
+@keyframes result_infinite_slide {
+    0% {
+        transform: translateX(0%)
+    }
+    100% {
+        transform: translateX(-80%);
+    }
+}
+
+/*----------------------- 추천된 가게 정보표시 UI ------------------------*/
+
+#resultInfoPage {
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s;
+
+    margin-top: 3rem;
+}
+
+.image-container {
+    width: 100%; /* 또는 원하는 너비 */
+    position: relative;
+}
+
+
+#storeInfo p {
+    color: black;
+    font-size: 20px;
+    margin: 10px;
+}
+
+
+#imgInfoText {
+    color: gray;
+    font-size: 10px;
+    margin: auto;
+}
+
+/*----------------------- 다시하기 버튼 UI ------------------------*/
+
+#restartBtn {
+    margin-right: 10px;
+
+    opacity: 0;
+    transition: opacity 0.5s;
+
+}
+
+#restartDirectBtn {
+    margin-left: 10px;
+
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+
+/* 반응형 */
+
+@media only screen and (max-width: 767px) {
+    /* 모바일화면 */
+    .top-banner {
+        height: 200px;
+    }
+
+    .mobile-cuisine-name {
+        font-size: 10px;
+    }
+
+
+}
+
+
+@media only screen and (min-width: 768px) {
+    /* 태블릿화면 */
+    .top-banner {
+        height: 250px;
+    }
+
+}
+
+@media only screen and (min-width: 992px) {
+    /* pc화면 */
+    .top-banner {
+        height: 300px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    /* 모바일화면 */
+    #mainContents {
+        margin: 0 auto;
+        width: 98%;
+        height: 700px;
+
+    }
+}
+
+@media only screen and (min-width: 768px) {
+    /* 모바일화면 */
+    #mainContents {
+        margin: 0 auto;
+        width: 70%;
+        height: 700px;
+
+    }
+}
+
+@media only screen and (max-width: 991px) {
+
+
+    #mainContents .cell-button img {
+        padding: 1rem;
+    }
+
+    .btn-style {
+        height: 40px;
+
+    }
+
+    .option .col .col-12 {
+        width: 90%;
+        height: 40px;
+        font-size: 13px;
+    }
+
+    .option-area hr {
+        width: 100px;
+    }
+
+    #restartBtn, #restartDirectBtn {
+        font-size: 15px !important;
+    }
+
+    .result-animation-list {
+        display: flex;
+
+        width: 6000px;
+    }
+
+    .result-img-list {
+        display: flex;
+
+        width: 3000px;
+    }
+
+    .animation-list {
+        width: 2800px;
+
+    }
+
+    .img-list {
+        width: 1400px;
+    }
+
+    .result-img-slideBar {
+        width: 300px;
+        margin: 10px auto;
+    }
+
+
+    .img-list > img, #SelectedBox, .result-img-list > img {
+        width: 100px;
+        height: 100px;
+    }
+
+    #ImgSlideBar, .result-img-slideBar {
+        height: 100px;
+    }
+
+    .animation {
+        animation-duration: 30s;
+    }
+
+    #resultImg {
+        width: 300px;
+        height: 300px;
+        border-radius: 8px;
+    }
+
+
+    .col {
+        margin-top: 5px;
+        margin-bottom: 5px;
+
+    }
+
+    .option {
+        margin: 5px 0;
+    }
+
+    .option-area > p {
+        font-size: 24px;
+    }
+
+
+}
+
+.row {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+@media only screen and (min-width: 992px) {
+    /* pc화면 */
+    #mainContents {
+        width: 1050px;
+        height: 800px;
+        margin: 0 auto;
+    }
+
+    .cell-button {
+        padding: 1rem;
+    }
+
+    .col-lg-custom {
+        flex: 0 0 12.5%;
+        max-width: 12.5%;
+    }
+
+    .animation-list {
+        width: 4200px;
+
+    }
+
+    .img-list {
+        width: 2100px;
+    }
+
+    .img-list > img, #SelectedBox, .result-img-list > img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .animation {
+        animation-duration: 40s;
+    }
+
+    #ImgSlideBar, .result-img-slideBar {
+        height: 150px;
+    }
+
+    #resultImg {
+        width: 300px;
+        height: 300px;
+        border-radius: 10px;
+    }
+
+    .result-animation-list {
+        display: flex;
+        width: 9000px;
+    }
+
+    .result-img-list {
+        display: flex;
+        width: 4500px;
+    }
+
+
+    .top-banner {
+        height: 300px;
+    }
+
+    .col {
+        margin-top: 7px;
+        margin-bottom: 7px;
+    }
+
+    .option {
+        margin: 10px 0;
+    }
+
+    .option-area hr {
+        width: 100%;
+    }
+
+    .option-area > p {
+        font-size: 30px;
+    }
+
+}
+
+.col {
+    padding: 0;
+}
+
+section h2 {
+    color: var(--main-color);
+}
+
+hr {
+    border-width: 1px 0 0 0;
+    border-color: #000000;
+}
+
+/*화면 꽉 채우고, 푸터 아래에 붙이기 */
+html {
+    height: 100vh; /* 뷰포트 높이의 100%로 설정 */
+}
+
+body {
+    caret-color: transparent;
+    min-height: 100vh; /* 최소 높이를 뷰포트 높이의 100%로 설정 */
+    margin: 0; /* 기본 마진 제거 */
+    padding: 0; /* 기본 패딩 제거 */
+    display: flex;
+    flex-direction: column;
+}
+
+footer {
+    flex: 1;
+}
+
+.row {
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+#recommendBtn {
+
+    width: 30%;
+    max-width: 200px;
+}
+
+.dropdown {
+    margin-left: 2rem;
+}
+
+/* 드롭다운*/
+.dropdown-menu {
+    --bs-dropdown-link-active-bg: var(--main-color);
+}
+
+.dropdown-item:hover {
+    background-color: var(--main-color); /* 여기서 main color로 설정 */
+    color: white;
+}
+
+#dropdownMenuButton {
+    border: none;
+}
+
+.mobile-cuisine-name span {
+    white-space: nowrap;
+}

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C47HQ74QCF"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-C47HQ74QCF');
+    </script>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T2CX8XG3');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>쿠스토랑</title>
+    <meta name="naver-site-verification" content="cf8606b1792de0b05f90519dea57422727d03272"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 검색 태그 -->
+    <meta name="description" content="건대(건국대) 주변 맛집에 대해 평가하고 의견을 나누는 사이트입니다.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="쿠스토랑: 건대 맛집">
+    <meta property="og:description" content="건대(건국대) 주변 맛집에 대해 평가하고 의견을 나누는 사이트입니다.">
+    <meta property="og:image" content="https://kustaurant.com/img/home/logo.jpg">
+    <meta property="og:url" content="https://kustaurant.com">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="쿠스토랑: 건대 맛집">
+    <meta name="twitter:description" content="건대(건국대) 주변 맛집에 대해 평가하고 의견을 나누는 사이트입니다.">
+    <meta name="twitter:image" content="https://kustaurant.com/img/home/logo.jpg">
+    <meta name="twitter:domain" content="쿠스토랑: 건대 맛집">
+
+    <!-- 아이콘 라이브러리-->
+    <script src="https://kit.fontawesome.com/0c60714712.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <!-- 탭 관련 라이브러리 / 순서 지켜야함 -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/library/vendors.min.css">
+    <link rel="stylesheet" href="/css/library/style.min.css">
+    <link rel="stylesheet" href="/css/library/responsive.min.css">
+    <link rel="stylesheet" href="/css/library/restaurant.css">
+    <link rel="stylesheet" href="/css/recommend-style.css">
+    <link rel="stylesheet" href="/css/home-style.css">
+    <!-- 파비콘 -->
+    <link rel="icon" type="image/x-icon" href="/img/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
+
+</head>
+
+
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T2CX8XG3"
+                  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<!--상단 탭 fragment 붙여넣기-->
+<header th:replace="~{navbar-new :: navbarFragment}"></header>
+<!-- 검색엔진 노출용 -->
+<h1 style="font-size: 1px; color:#ffffff00; margin:0;padding:0;line-height: 1px;">쿠스토랑 : 건대 맛집</h1>
+<h2 style="font-size: 1px; color:#ffffff00; margin:0;padding:0;line-height: 1px;">건대(건국대) 주변 맛집에 대해 평가하고 의견을 나누는 사이트입니다. 건대 맛집 모음. 건대 맛집 순위 모음.</h2>
+<main class="container-fluid alt-font p-0">
+    <!--홈화면 배너-->
+    <section
+            class="mt-0 top-banner mb-1 age-title-big-typography cover-background p-0 md-background-position-left-center"
+            style="background-image: url('/img/home/background.jpg');">
+        <div class="container">
+            <div class="row align-items-center justify-content-center small-screen">
+                <div class="col-lg-6 col-md-8 position-relative text-center page-title-extra-large appear anime-child anime-complete alt-font"
+                     data-anime="{ &quot;el&quot;: &quot;childs&quot;, &quot;translateY&quot;: [30, 0], &quot;opacity&quot;: [0,1], &quot;duration&quot;: 600, &quot;delay&quot;: 0, &quot;staggervalue&quot;: 200, &quot;easing&quot;: &quot;easeOutQuad&quot; }">
+                    <h2 class="main-page-title alt-font text-dark-gray text-uppercase ls-minus-1px mb-0">메뉴를 선택해주세요</h2>
+                    <h2 class="m-auto fw-600 text-uppercase mb-0 firstSectionComment">건대 주변의 관련 맛집을 볼 수 있습니다</h2>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- 음식 이미지 버튼 모아둔 그리드   -->
+    <section class="button-grid pb-0">
+        <div class="container fluid icon-grid">
+<!--      홈 건들기 전 백업      -->
+            <!--     이미지 버튼 모아둔 그리드      -->
+            <div class="home row row-cols-4 row-cols-md-4 row-cols-xl-6 mt-2 home-grid">
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=전체" class="cell-button col-12 p-0 "><img class="img col-12"
+                                                                                    src="/img/home/전체.png" alt="쿠스토랑 건대 맛집 전체">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>전체</span>
+                    </div>
+
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=한식" class="cell-button col-12 p-0">
+                        <img class="img col-12"
+                             src="/img/home/한식.png" alt="쿠스토랑 건대 맛집 한식">
+
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>한식</span>
+                    </div>
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=일식" class="cell-button col-12 p-0">
+                        <img class="img col-12" src="/img/home/일식.png" alt="쿠스토랑 건대 맛집 일식">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>일식</span>
+                    </div>
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=중식" class="cell-button col-12 p-0"><img class="img col-12"
+                                                                                   src="/img/home/중식.png" alt="쿠스토랑 건대 맛집 중식">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>중식</span>
+                    </div>
+
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=양식" class="cell-button col-12 p-0"><img class="img col-12"
+                                                                                   src="/img/home/양식.png" alt="쿠스토랑 건대 맛집 양식">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>양식</span>
+                    </div>
+
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=아시안" class="cell-button col-12 p-0"><img class="img col-12"
+                                                                                    src="/img/home/아시안.png" alt="쿠스토랑 건대 맛집 아시안">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>아시안</span>
+                    </div>
+
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=고기" class="cell-button col-12 p-0"><img class="img col-12"
+                                                                                   src="/img/home/고기.png" alt="쿠스토랑 건대 맛집 고기">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>고기</span>
+                    </div>
+
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=치킨" class="cell-button col-12 p-0"><img class="img col-12"
+                                                                                   src="/img/home/치킨.png" alt="쿠스토랑 건대 맛집 치킨">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>치킨</span>
+                    </div>
+
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=해산물" class="cell-button col-12 p-0"><img class="img col-12"
+                                                                                    src="/img/home/해산물.png" alt="쿠스토랑 건대 맛집 해산물">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>해산물</span>
+                    </div>
+
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=햄버거/피자" class="cell-button col-12 p-0 "><img class="img col-12"
+                                                                                        src="/img/home/햄버거.png" alt="쿠스토랑 건대 맛집 햄버거/피자">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>햄버거/피자</span>
+                    </div>
+
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=분식" class="cell-button col-12 p-0"><img class="img col-12"
+                                                                                   src="/img/home/분식.png" alt="쿠스토랑 건대 맛집 분식">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>분식</span>
+                    </div>
+
+                </div>
+
+
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=술집" class="cell-button col-12 p-0"><img class="img col-12"
+                                                                                   src="/img/home/술집.png" alt="쿠스토랑 건대 맛집 술집">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>술집</span>
+                    </div>
+
+                </div>
+
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=카페/디저트" class="cell-button col-12 p-0"><img class="img col-12"
+                                                                                       src="/img/home/카페.png" alt="쿠스토랑 건대 맛집 카페/디저트">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>카페/디저트</span>
+                    </div>
+
+                </div>
+                <div class="cell col  position-relative">
+                    <a href="/tier?cuisine=베이커리" class="cell-button col-12 p-0 "><img class="img col-12"
+                                                                                      src="/img/home/베이커리.png" alt="쿠스토랑 건대 맛집 베이커리">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>베이커리</span>
+                    </div>
+
+                </div>
+                <div class="cell col  position-relative">
+                    <a href="/tier?cuisine=샐러드" class="cell-button col-12 p-0 "><img class="img col-12"
+                                                                                      src="/img/home/샐러드.png" alt="쿠스토랑 건대 맛집 샐러드">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>샐러드</span>
+                    </div>
+
+                </div>
+                <div class="cell col position-relative">
+                    <a href="/tier?cuisine=기타" class="cell-button col-12 p-0 "><img class="img col-12"
+                                                                                    src="/img/home/기타.png" alt="쿠스토랑 건대 맛집 기타">
+
+                    </a>
+                    <div class="mobile-cuisine-name">
+                        <span>기타</span>
+                    </div>
+
+                </div>
+
+
+
+            </div>
+        </div>
+    </section>
+
+    <!--뽑기 배너-->
+    <section
+            class="mt-0 top-banner mb-1 age-title-big-typography cover-background p-0 md-background-position-left-center"
+            style="background-image: url('/img/home/background.jpg');">
+        <div class="container">
+            <div class="row align-items-center justify-content-center small-screen">
+                <div class="col-lg-6 col-md-8 position-relative text-center page-title-extra-large appear anime-child anime-complete alt-font">
+                    <h2 class="main-page-title alt-font text-dark-gray text-uppercase ls-minus-1px mb-0">랜덤 맛집 뽑기</h2>
+                    <h2 class="m-auto fw-600 text-uppercase mb-0 firstSectionComment">랜덤으로 한 맛집을 추천받을 수 있습니다</h2>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="mainContents" class="alt-font ">
+        <div class="dropdown">
+            <button class="btn btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                <span>지역 : 전체</span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li class="dropdown-item">
+                    전체
+                </li>
+                <li class="dropdown-item">
+                    건입~중문
+                </li>
+                <li class="dropdown-item">
+                    중문~어대
+                </li>
+                <li class="dropdown-item">
+                    후문
+                </li>
+                <li class="dropdown-item">
+                    정문
+                </li>
+                <li class="dropdown-item">
+                    구의역
+                </li>
+            </ul>
+        </div>
+        <div id="recommendPage">
+            <div class="option-area">
+                <div class="row option">
+                    <!-- 음식 이미지 버튼 모아둔 그리드   -->
+                    <div class="container fluid icon-grid">
+                        <div class="row mt-2 p-2 home-grid">
+                            <div class="cell col-3 col-lg-custom" th:each="cuisine : ${cuisines}">
+                                <button class="cell-button col-12" th:attr="data-cuisine=${cuisine}">
+                                    <img class="img col-12" th:src="@{/img/home/{cuisine}.png(cuisine=${cuisine})}"
+                                         th:alt="'쿠스토랑 건대 맛집 ' + ${cuisine}">
+                                </button>
+                                <div class="mobile-cuisine-name">
+                                    <span th:text="${cuisine}"></span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="btn-area">
+            <button id="recommendBtn" class="btn-style">뽑기</button>
+        </div>
+
+
+        <div id="resultPage" class="hidden">
+            <hr>
+            <p id="processingTitle" class="title">
+                맛집을 고르는 중...
+                <img class="title-icon" src="/img/recommend/wondering.png" alt="wondering_img">
+            </p>
+            <hr>
+            <div class="result-img-slideBar">
+
+                <div class="result-animation-list result-animation">
+                    <div class="result-img-list"></div>
+                    <div class="result-img-list"></div>
+                </div>
+                <div id="SelectedBox"></div>
+                <hr>
+            </div>
+
+        </div>
+
+        <div id="resultInfoPage" class="hidden">
+            <div class="resultImgContainer">
+                <div class="image-container">
+                    <a id="storeHref" href="">
+                        <img id="resultImg" src="/" alt="이미지가 들어올 예정입니다">
+                    </a>
+                </div>
+                <div id="storeInfo">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="btn-area">
+            <button id="restartBtn" class="btn-style2 hidden alt-font">재설정</button>
+            <button id="restartDirectBtn" class="btn-style2 hidden alt-font">다시 뽑기</button>
+        </div>
+
+
+
+    </div>
+    <!--    &lt;!&ndash;  인기 식당 탭  &ndash;&gt;-->
+    <!--    <section class="overflow-hidden overlap-height position-relative">-->
+    <!--        &lt;!&ndash; 문구  &ndash;&gt;-->
+    <!--        <div class="container-fluid overlap-gap-section">-->
+    <!--            <div class="row justify-content-center mb-2">-->
+    <!--                <div class="col-lg-7 text-center alt-font">-->
+    <!--                    <h2 class="text-dark-gray mb-0 main-page-title">건대 TOP 맛집</h2>-->
+    <!--                    <span class="fs-15 fw-600 text-red text-uppercase mb-10px d-block secondSectionComment">-->
+    <!--                    가장 좋은 평가를 받은 맛집을 확인하세요-->
+    <!--                </span>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--            &lt;!&ndash;    슬라이더 부분        &ndash;&gt;-->
+    <!--            <div class="row slider-row">-->
+    <!--                <div class="col-md-12 position-relative feather-shadow sm-feather-shadow-none">-->
+    <!--                    <div class="outside-box-right-15 outside-box-left-15 sm-outside-box-right-0 sm-outside-box-left-0">-->
+    <!--                        <div class="swiper swiper-dark-pagination swiper-line-pagination-style-01 magic-cursor swiper-initialized swiper-horizontal swiper-backface-hidden">-->
+    <!--                            <div class="swiper-wrapper">-->
+    <!--                                &lt;!&ndash; Dynamic restaurant slides &ndash;&gt;-->
+    <!--                                <div>-->
+
+    <!--                                </div>-->
+    <!--                                <div th:each="restaurant, iterStat : ${restaurants}" class="swiper-slide">-->
+    <!--                                    <div class="services-box-style-01 hover-box last-paragraph-no-margin">-->
+    <!--                                        &lt;!&ndash;슬라이더 이미지 &ndash;&gt;-->
+    <!--                                        <a th:href="@{/restaurants/{restaurantId}(restaurantId=${restaurant.restaurantId})}">-->
+    <!--                                            <div class="position-relative box-image border-radius-6px"-->
+    <!--                                                 id="restaurantImageContainer">-->
+    <!--                                                <img id="restaurantImage" class="w-100 border-radius-6px"-->
+    <!--                                                     th:src="${restaurant.restaurantImgUrl}" alt="쿠스토랑 건대 맛집 인기">-->
+    <!--                                                <div class="box-overlay bg-dark-gray"></div>-->
+    <!--                                            </div>-->
+    <!--                                        </a>-->
+    <!--                                        &lt;!&ndash; 문구 !&ndash;&gt;-->
+    <!--                                        <div class="pt-30px bg-white text-center alt-font">-->
+    <!--                                            <span class="d-inline-block text-dark-gray fs-19 fw-600"-->
+    <!--                                                  th:text="${restaurant.restaurantName}">Restaurant Name</span>-->
+    <!--                                            <div class="w-100">-->
+    <!--                                                <span class="d-inline-block align-middle"-->
+    <!--                                                      th:text="${restaurant.restaurantType}">Type</span>-->
+    <!--                                                <span class="d-inline-block align-middle ms-10px me-10px fs-12 opacity-5"-->
+    <!--                                                      th:if="${restaurant.restaurantEvaluationCount}">◍</span>-->
+    <!--                                                <span class="d-inline-block align-middle"-->
+    <!--                                                      th:if="${restaurant.restaurantEvaluationCount}"-->
+    <!--                                                      th:text="${restaurant.getMainScoreMaxTen()}"></span>-->
+    <!--                                            </div>-->
+    <!--                                        </div>-->
+    <!--                                    </div>-->
+    <!--                                </div>-->
+
+    <!--                            </div>-->
+    <!--                            &lt;!&ndash;                            <div class="slider-four-slide-pagination-1 swiper-pagination-clickable swiper-pagination-bullets"></div>&ndash;&gt;-->
+    <!--                        </div>-->
+    <!--                    </div>-->
+    <!--                </div>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </section>-->
+
+
+    <!-- Modal -->
+<!--    <div class="modal" id="modal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">-->
+<!--        <div class="modal-dialog modal-dialog-centered ">-->
+<!--            <div class="modal-content">-->
+<!--                <div class="modal-header">-->
+<!--                    <h1 class="modal-title fs-5 text-primary" id="exampleModalLabel">쿠스토랑 평가하고 카페쿠폰받자!</h1>-->
+<!--                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--                </div>-->
+<!--                <div class="modal-body text-dark">-->
+<!--                    방문한 음식점에대한 평가를 해주세요!<br>-->
+<!--                    평가를 10개이상 하신분들을 대상으로<br>-->
+<!--                    "커피쿠폰 5천원권(스타벅스/레스티오 중1)"을 드립니다!-->
+<!--                </div>-->
+<!--                <div class="modal-footer">-->
+<!--                    <div class="form-check">-->
+<!--                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">-->
+<!--                        <label class="form-check-label" for="flexCheckChecked">-->
+<!--                            일주일동안 보지 않기-->
+<!--                        </label>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+
+    <footer th:replace="~{footer::footerFragment}">
+
+    </footer>
+
+    <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
+    <script type="text/javascript">
+        if(!wcs_add) var wcs_add = {};
+        wcs_add["wa"] = "14b5af05d120a20";
+        if(window.wcs) {
+            wcs_do();
+        }
+    </script>
+</main>
+
+</body>
+<script type="text/javascript" src="/js/library/jquery.js"></script>
+<script type="text/javascript" src="/js/library/vendors.min.js"></script>
+<script type="text/javascript" src="/js/library/main.js"></script>
+<script type="text/javascript" src="/js/homeScript.js"></script>
+<script type="text/javascript" src="/js/recommendScript.js"></script>
+
+</html>

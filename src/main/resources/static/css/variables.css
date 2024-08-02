@@ -1,0 +1,19 @@
+:root {
+    /* 색깔 */
+    --main-color: #1d8058;
+    --main-light-color: #d6faea;
+    --main-hover-color: #0e5d3c;
+
+    /* 티어 색깔 */
+    --tier1-color: #0093FF;
+    --tier2-color: #00BBA3;
+    --tier3-color: #FFB900;
+    --tier4-color: #9AA4AF;
+    --tier5-color: #A88A67;
+
+    /* 전체 화면 가로 서식 */
+    --max-width: 900px;
+    --min-width: 280px;
+    --pc-outer-container-width: 70%;
+    --mobile-outer-container-side-width: 10px;
+}

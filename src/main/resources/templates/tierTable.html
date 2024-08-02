@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+<table>
+  <colgroup>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+    <col>
+  </colgroup>
+  <thead>
+  <tr>
+    <th scope="col"></th>
+    <th scope="col"></th>
+    <th scope="col"></th>
+    <th scope="col"></th>
+    <th scope="col"></th>
+    <th scope="col"></th>
+    <th scope="col"></th>
+  </tr>
+  </thead>
+  <tbody id="tierTableBody">
+  <tr th:each="restaurantTierData,loop :${paging}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantTierData.getRestaurant().restaurantId})} + '\''">
+    <td class="td-rank" th:text="${restaurantTierData.getRanking()}" style="min-width: 32px"></td>
+    <td id="restaurantTierDateNameOuter" class="td-center" th:attr="data-favorite=${restaurantTierData.getIsFavorite()}" style="min-width: 58px; position: relative;">
+      <div style="width: fit-content; height: fit-content; padding: 0; margin: auto; position: relative;">
+        <img class="favorite-icon restaurant-img-bottom-icon" th:if="${restaurantTierData.getIsEvaluation() and restaurantTierData.getIsFavorite()}" src="/img/tier/check.png">
+        <img class="favorite-icon restaurant-img-top-icon" th:if="${restaurantTierData.getIsEvaluation() and !restaurantTierData.getIsFavorite()}" src="/img/tier/check.png">
+        <img class="favorite-icon restaurant-img-top-icon" th:if="${restaurantTierData.getIsFavorite()}" src="/img/tier/star.png">
+        <img th:if="${restaurantTierData.getRestaurant().getRestaurantImgUrl() != 'no_img'}" class="td-main-img" th:src="${restaurantTierData.getRestaurant().getRestaurantImgUrl()}">
+        <img th:if="${restaurantTierData.getRestaurant().getRestaurantImgUrl() == 'no_img'}" data-cuisine="전체" class="td-main-img" src="/img/restaurant/no_img.png">
+      </div>
+    </td>
+    <td class="td-name">
+      <div class="td-name-outer">
+        <span class="td-inner-name" th:text="${restaurantTierData.getRestaurant().getRestaurantName()}"></span>
+        <span class="td-inner-type" th:text="${restaurantTierData.getRestaurant().getRestaurantType()}"></span>
+        <span class="td-inner-type" th:text="'위치: ' + ${restaurantTierData.getRestaurant().getRestaurantPosition()}"></span>
+      </div>
+    </td>
+    <td th:unless="${cuisine == '전체' and situation != '전체'}" class="td-center" style="min-width: 42px">
+      <img th:if="${restaurantTierData.getRestaurant().getMainTier() > 0}" class="td-tier-img" th:src="${restaurantTierData.getRestaurant().getTierImgUrl(restaurantTierData.getRestaurant().getMainTier())}">
+      <span th:if="${restaurantTierData.getRestaurant().getMainTier() < 1}" style="padding-right: 10px;">-</span>
+    </td>
+    <td th:if="${situation != '전체'}" class="td-center" style="min-width: 42px">
+      <img th:unless="${restaurantTierData.getSituationTier() == 0}" class="td-tier-img" th:src="'/img/tier/'+${restaurantTierData.getSituationTier()}+'tier.png'">
+    </td>
+    <td style="min-width: 46px">
+      <div class="td-cuisine-outer">
+        <img class="td-cuisine-img" th:src="${restaurantTierData.getRestaurant().getCuisineImgUrl(restaurantTierData.getRestaurant().getRestaurantCuisine())}">
+        <span class="td-cuisine-span" th:text="${restaurantTierData.getRestaurant().getRestaurantCuisine()}"></span>
+      </div>
+    </td>
+    <td class="td-situation">
+      <div class="td-situations-outer">
+        <img th:each="situationEl :${restaurantTierData.getRestaurantSituationRelationList()}" th:src="'/img/tier/'+${situationEl.getSituation().getSituationName()}+'.png'">
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

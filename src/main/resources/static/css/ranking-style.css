@@ -1,0 +1,127 @@
+@import "variables.css";
+
+ul li a.nav-link:nth-of-type(4) {
+    opacity: 0.6;
+}
+
+/* 시작 */
+body{
+    caret-color: transparent;
+}
+/* TABLET */
+@media only screen and (max-width: 1023px) {
+    .ranking-container {
+        margin: 0 var(--mobile-outer-container-side-width);
+        min-width: var(--min-width);
+        line-height: normal;
+        color: black;
+    }
+}
+/* PC */
+@media only screen and (min-width: 1024px) {
+    .ranking-container {
+        width: var(--pc-outer-container-width);
+        max-width: var(--max-width);
+        margin: 10px auto;
+        line-height: normal;
+        color: black;
+    }
+}
+
+section h2 {
+    color: var(--main-color);
+}
+
+/* 내 정보 설명 */
+.user-description-outer {
+    margin-bottom: 10px;
+}
+.user-description {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+}
+.green-rectangle {
+    margin: 3px;
+    padding: 6px 13px;
+    border: var(--main-color) solid 3px;
+}
+.span-outer {
+    margin-left: 4px;
+    font-size: 14px;
+}
+
+/* 표 */
+.tier-table {
+    width: 100%;
+}
+th {
+    padding: 4px;
+}
+tr {
+    margin-bottom: 4px;
+}
+.my-rank {
+    border: var(--main-color) solid 3px;
+    border-radius: 4px;
+}
+.rank-first {
+    background-color: rgba(255, 220, 31, 0.75);
+    font-weight: 800;
+}
+.rank-second {
+    background-color: rgba(192, 192, 192, 0.75);
+    font-weight: 600;
+}
+.rank-third {
+    background-color: rgba(246, 164, 86, 0.91);
+}
+td {
+    padding: 4px 0;
+    border-top: #ccc solid 1px;
+}
+.td-img {
+    width: 35px;
+}
+.td-img > div {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    padding: 1px 9px 1px 0;
+}
+.td-img img {
+    height: 24px;
+    width: 24px;
+}
+.td-rank {
+    padding-left: 10px;
+}
+.td-eval-count > div {
+    width: 50px;
+    text-align: right;
+}
+
+
+
+
+/*배너 높이*/
+@media only screen and (max-width: 767px) {
+    /* 모바일화면 */
+    .top-banner{
+        height: 210px;
+    }
+
+}
+@media only screen and (min-width: 768px) {
+    /* 모바일화면 */
+    .top-banner{
+        height: 265px;
+    }
+
+}
+@media only screen and (min-width: 1024px) {
+    /* pc화면 */
+    .top-banner{
+        height: 300px;
+    }
+}

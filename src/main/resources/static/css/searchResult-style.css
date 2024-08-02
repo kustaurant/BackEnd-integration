@@ -1,0 +1,13 @@
+/* 내용이 없을 경우 */
+.no-result {
+    margin-top: 60px;
+    margin-bottom: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.no-result > span {
+    font-size: 20px;
+    color: #444;
+}
+

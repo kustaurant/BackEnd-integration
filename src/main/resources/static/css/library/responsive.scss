@@ -1,0 +1,85 @@
+/* -------------------------------------------------------
+
+    Theme Name: Crafto - The Multipurpose HTML5 Template
+    Theme URL: https://craftohtml.themezaa.com/
+    Description: Elevate your online presence with Crafto - a modern, versatile, multipurpose Bootstrap 5 responsive HTML5, SCSS template using highly creative 48+ ready demos.
+    Author: ThemeZaa - https://www.themezaa.com/
+    Author ThemeForest URL: https://themeforest.net/user/themezaa
+    Copyright(c) 2024 themezaa.com
+    Version: 1.0
+
+------------------------------------------------------- */
+
+// Initialize
+@import "variables"; // For SCSS variables 
+@import "mixins/mixins";
+
+// Core CSS 
+@import "theme-responsive/core/reset";
+@import "theme-responsive/core/typography";
+@import "theme-responsive/core/classes";
+@import "theme-responsive/core/loop"; 
+
+// Header
+@import "theme-responsive/header/header";
+
+// Page title
+@import "theme-responsive/titlebar/page-titles";
+
+// Layouts
+@import "theme-responsive/layouts/sidebar";
+@import "theme-responsive/layouts/grid";
+
+// Elements
+@import "theme-responsive/elements/accordions-and-toggles";
+@import "theme-responsive/elements/alert-box";
+@import "theme-responsive/elements/blockquote";
+@import "theme-responsive/elements/buttons";
+@import "theme-responsive/elements/clients";
+@import "theme-responsive/elements/columns";
+@import "theme-responsive/elements/contact-form";
+@import "theme-responsive/elements/content-carousel";
+@import "theme-responsive/elements/countdown";
+@import "theme-responsive/elements/counters";
+@import "theme-responsive/elements/divider";
+@import "theme-responsive/elements/drop-caps";
+@import "theme-responsive/elements/event";
+@import "theme-responsive/elements/fancy-heading";
+@import "theme-responsive/elements/fancy-text-box";
+@import "theme-responsive/elements/google-map";
+@import "theme-responsive/elements/heading"; 
+@import "theme-responsive/elements/highlights";
+@import "theme-responsive/elements/icon-with-text";
+@import "theme-responsive/elements/image-gallery";
+@import "theme-responsive/elements/instagram";
+@import "theme-responsive/elements/interactive-banners";
+@import "theme-responsive/elements/lists";
+@import "theme-responsive/elements/media";
+@import "theme-responsive/elements/modal-popup";
+@import "theme-responsive/elements/parallax-scrolling";
+@import "theme-responsive/elements/particles";
+@import "theme-responsive/elements/pie-chart";
+@import "theme-responsive/elements/pricing-table";
+@import "theme-responsive/elements/process-step";
+@import "theme-responsive/elements/progress-bar";
+@import "theme-responsive/elements/reviews";
+@import "theme-responsive/elements/rotate-box";
+@import "theme-responsive/elements/services";
+@import "theme-responsive/elements/sliding-box";
+@import "theme-responsive/elements/social-icons";
+@import "theme-responsive/elements/subscribe";
+@import "theme-responsive/elements/tab";
+@import "theme-responsive/elements/team";
+@import "theme-responsive/elements/testimonials";
+
+// Blog
+@import "theme-responsive/blog/blog";
+
+// Portfolio
+@import "theme-responsive/portfolio/portfolio";
+
+// Shop
+@import "theme-responsive/shop/shop";
+
+// Footer
+@import "theme-responsive/footer/footer";

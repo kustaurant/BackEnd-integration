@@ -1,0 +1,110 @@
+/* -------------------------------------------------------
+
+    Theme Name: Crafto - The Multipurpose HTML5 Template
+    Theme URL: https://craftohtml.themezaa.com/
+    Description: Elevate your online presence with Crafto - a modern, versatile, multipurpose Bootstrap 5 responsive HTML5, SCSS template using highly creative 48+ ready demos.
+    Author: ThemeZaa - https://www.themezaa.com/
+    Author ThemeForest URL: https://themeforest.net/user/themezaa
+    Copyright(c) 2024 themezaa.com
+    Version: 1.0
+
+------------------------------------------------------- */
+
+/*
+
+Table of contents
+
+    01. Google font
+    02. CSS color variable
+    03. Reset
+    04. Typography
+    05. General
+    06. Background and border
+    07. Width
+    08. Height
+    09. Loop
+    10. Header
+    11. Page title
+    12. Layout
+    13. Elements
+    14. Blog
+    15. Portfolio
+    16. Shop
+    17. Footer
+ 
+*/
+
+// Initialize
+@import "variables"; // For SCSS variables
+@import "theme-vars"; // For CSS variables
+@import "mixins/mixins";
+
+// Core CSS
+@import "core/reset";
+@import "core/typography";
+@import "core/classes";
+@import "core/loop";
+
+// Header
+@import "header/header";
+
+// Page title
+@import "titlebar/page-titles";
+
+// Layouts
+@import "layouts/sidebar";
+@import "layouts/grid";
+
+// Elements
+@import "elements/accordions-and-toggles";
+@import "elements/alert-box";
+@import "elements/blockquote";
+@import "elements/buttons";
+@import "elements/clients";
+@import "elements/columns";
+@import "elements/contact-form";
+@import "elements/content-carousel";
+@import "elements/countdown";
+@import "elements/counters";
+@import "elements/divider";
+@import "elements/drop-caps";
+@import "elements/event";
+@import "elements/fancy-heading";
+@import "elements/fancy-text-box";
+@import "elements/google-map";
+@import "elements/heading"; 
+@import "elements/highlights";
+@import "elements/icon-with-text";
+@import "elements/image-gallery";
+@import "elements/instagram";
+@import "elements/interactive-banners";
+@import "elements/lists";
+@import "elements/media";
+@import "elements/modal-popup";
+@import "elements/parallax-scrolling";
+@import "elements/particles";
+@import "elements/pie-chart";
+@import "elements/pricing-table";
+@import "elements/process-step";
+@import "elements/progress-bar";
+@import "elements/reviews";
+@import "elements/rotate-box";
+@import "elements/services";
+@import "elements/sliding-box";
+@import "elements/social-icons";
+@import "elements/subscribe";
+@import "elements/tab";
+@import "elements/team";
+@import "elements/testimonials";
+
+// Blog
+@import "blog/blog";
+
+// Portfolio
+@import "portfolio/portfolio";
+
+// Shop
+@import "shop/shop";
+
+// Footer
+@import "footer/footer";
