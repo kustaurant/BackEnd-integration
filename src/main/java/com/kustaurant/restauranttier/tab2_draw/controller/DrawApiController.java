@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab2_draw.controller;
 
+import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +31,7 @@ public class DrawApiController {
             @ApiResponse(responseCode = "404", description = "draw response fail", content = {@Content(mediaType = "application/json")})
     })
     @GetMapping("/api/v1/draw")
-    public ResponseEntity<List<Restaurant>> getRestaurantListForCuisine(
+    public ResponseEntity<List<RestaurantTierDTO>> getRestaurantListForCuisine(
             @RequestParam(value = "cuisine", defaultValue = "전체") String cuisine, @RequestParam(value = "location",defaultValue = "전체") String location, @RequestParam(value = "evaluation",defaultValue = "전체") String evaluation
     ) {
         String[] cuisinesArray = cuisine.split("-");
@@ -43,7 +44,11 @@ public class DrawApiController {
             combinedRestaurantList.addAll(retaurantList);
         }
         // 랜덤으로 30개 선택
-        return new ResponseEntity<>(getRandomSubList(combinedRestaurantList, 30), HttpStatus.OK);
+        List<Restaurant> combined30RestaurantList = getRandomSubList(combinedRestaurantList, 30);
+        List<RestaurantTierDTO> drawRestaurantListDTOs = combined30RestaurantList.stream()
+                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant,null,null,null))
+                .toList();
+        return new ResponseEntity<>(drawRestaurantListDTOs, HttpStatus.OK);
 
     }
 

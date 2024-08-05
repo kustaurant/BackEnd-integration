@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab1_home.dto;
 
+import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RestaurantListsResponse {
-    private List<RestaurantHomeDTO> topRestaurantsByRating;
-    private List<RestaurantHomeDTO> restaurantsForMe;
+    private List<RestaurantTierDTO> topRestaurantsByRating;
+    private List<RestaurantTierDTO> restaurantsForMe;
 }

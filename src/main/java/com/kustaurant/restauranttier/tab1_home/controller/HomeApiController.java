@@ -2,6 +2,7 @@ package com.kustaurant.restauranttier.tab1_home.controller;
 
 import com.kustaurant.restauranttier.tab1_home.dto.RestaurantHomeDTO;
 import com.kustaurant.restauranttier.tab1_home.dto.RestaurantListsResponse;
+import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,29 +32,15 @@ public class HomeApiController {
     public ResponseEntity<RestaurantListsResponse> home() {
         List<Restaurant> topRestaurantsByRating = restaurantApiService.getTopRestaurants(); // 점수 높은 순으로 총 16개
         List<Restaurant> restaurantsForMe = restaurantApiService.getTopRestaurants(); // 임시로 설정
-
-        // Convert to RestaurantHomeDTO
-        List<RestaurantHomeDTO> topRestaurantsByRatingDTOs = topRestaurantsByRating.stream()
-                .map(this::toHomeDTO)
+        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = restaurantsForMe.stream()
+                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant,null,null,null))
                 .collect(Collectors.toList());
-
-        List<RestaurantHomeDTO> restaurantsForMeDTOs = restaurantsForMe.stream()
-                .map(this::toHomeDTO)
+        List<RestaurantTierDTO> restaurantsForMeDTOs = restaurantsForMe.stream()
+                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant,null,null,null))
                 .collect(Collectors.toList());
 
         RestaurantListsResponse response = new RestaurantListsResponse(topRestaurantsByRatingDTOs, restaurantsForMeDTOs);
         return ResponseEntity.ok(response);
     }
-    // Convert Restaurant to RestaurantHomeDT
-    private RestaurantHomeDTO toHomeDTO(Restaurant restaurant) {
-        return new RestaurantHomeDTO(
-                restaurant.getRestaurantId(),
-                restaurant.getRestaurantName(),
-                restaurant.getRestaurantCuisine(),
-                restaurant.getRestaurantPosition(),
-                restaurant.getRestaurantImgUrl(),
-                restaurant.getMainTier(),
-                "컴공 10%할인",4.5
-        );
-    }
+
 }
