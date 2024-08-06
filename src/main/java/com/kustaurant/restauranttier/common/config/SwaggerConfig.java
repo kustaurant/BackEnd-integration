@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
     private static final String API_NAME = "Kustaurant Mobile Application API";
-    private static final String API_VERSION = "v1.0.6";
+    private static final String API_VERSION = "v1.0.9";
     private static final String API_DESCRIPTION = """
     쿠스토랑 모바일 앱 API 문서입니다.
 
@@ -42,6 +42,12 @@ public class SwaggerConfig {
     **Version 1.0.8 (2024-08-05)**
     - 커뮤니티 api 구현 완료.
         - 로그인된 유저 불러오는 로직은 특정 유저(임재)로 하드코딩한 상황입니다.
+        
+    **Version 1.0.9 (2024-08-05)**
+    - 티어표와 티어표 지도 api 파라미터가 변경되었습니다!!!!!
+        - situation을 입력할 때 ONE,TWO 이런식으로 입력하던 것을 1,2로 숫자로 입력하게 수정했습니다.
+    - 지도 api기능이 구현되었습니다.
+        - 티어표는 현재 난관을 만나서 곧 구현하겠습니다.
     """;
 
 
