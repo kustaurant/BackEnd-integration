@@ -1,10 +1,18 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
+import com.kustaurant.restauranttier.tab3_tier.etc.CuisineEnum;
+import com.kustaurant.restauranttier.tab3_tier.etc.LocationEnum;
+import com.kustaurant.restauranttier.tab3_tier.etc.SituationEnum;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
+import com.kustaurant.restauranttier.tab3_tier.specification.RestaurantSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,5 +53,35 @@ public class RestaurantApiService {
             return restaurantApiRepository.findByRestaurantCuisineAndStatusAndRestaurantPosition(cuisine, "ACTIVE", location);
         }
 
+    }
+
+    public List<Restaurant> getRestaurantsByCuisinesAndLocations(String cuisines, String locations, Integer tierInfo, boolean isOrderByScore) {
+        List<String> cuisineList = cuisines.contains("ALL") ? null : Arrays.stream(cuisines.split(",")).map(c -> CuisineEnum.valueOf(c).getValue()).toList();
+        List<String> locationList = locations.contains("ALL") ? null : Arrays.stream(locations.split(",")).map(l -> LocationEnum.valueOf(l).getValue()).toList();
+
+        if (cuisineList != null && cuisineList.contains("JH")) {
+            cuisineList = List.of("JH");
+        }
+
+        return restaurantApiRepository.findAll(RestaurantSpecification.withCuisinesAndLocations(cuisineList, locationList, "ACTIVE", tierInfo, isOrderByScore));
+    }
+
+    public Page<Restaurant> getRestaurantsByCuisinesAndLocationsWithPage(String cuisines, String locations, Integer tierInfo, boolean isOrderByScore, int page, int size) {
+        List<String> cuisineList = cuisines.contains("ALL") ? null : Arrays.stream(cuisines.split(",")).map(c -> CuisineEnum.valueOf(c).getValue()).toList();
+        List<String> locationList = locations.contains("ALL") ? null : Arrays.stream(locations.split(",")).map(l -> LocationEnum.valueOf(l).getValue()).toList();
+
+        if (cuisineList != null && cuisineList.contains("JH")) {
+            cuisineList = List.of("JH");
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return restaurantApiRepository.findAll(RestaurantSpecification.withCuisinesAndLocations(cuisineList, locationList, "ACTIVE", tierInfo, isOrderByScore), pageable);
+    }
+
+    public boolean isSituationContainRestaurant(List<Integer> situationList, Restaurant restaurant) {
+        // TODO: 여기서 상황 기준 설정
+        return restaurant.getRestaurantSituationRelationList().stream()
+                .anyMatch(el -> situationList.contains(el.getSituation().getSituationId()) && el.getDataCount() > 3);
     }
 }

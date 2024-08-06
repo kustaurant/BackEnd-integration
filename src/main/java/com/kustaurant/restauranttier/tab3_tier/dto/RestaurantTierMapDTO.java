@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.dto;
 
+import com.kustaurant.restauranttier.tab3_tier.etc.MapVariable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.util.List;
 @Schema(description = "restaurant tier map entity")
 public class RestaurantTierMapDTO {
     @Schema(description = "지도의 최소 줌입니다. (활용이 힘들다면 말씀해주세요.")
-    Integer minZoom = 13;
+    Integer minZoom = MapVariable.MIN_ZOOM;
 
     @Schema(description = "즐겨찾기를 한 식당 리스트입니다.")
     List<RestaurantTierDTO> favoriteRestaurants;
@@ -24,44 +25,12 @@ public class RestaurantTierMapDTO {
     List<ZoomAndRestaurants> nonTieredRestaurants;
 
     @Schema(description = "실선으로 표시되는 폴리곤 좌표 리스트의 리스트입니다.")
-    List<List<Coordinate>> solidPolygonCoordsList = List.of(
-            List.of(new Coordinate(37.5421627,127.071636),
-                    new Coordinate(37.5427753,127.0710213),
-                    new Coordinate(37.5422156,127.0707644),
-                    new Coordinate(37.5441201,127.0651452),
-                    new Coordinate(37.5482696,127.0674957),
-                    new Coordinate(37.5478196,127.0716092),
-                    new Coordinate(37.5472574,127.0740324),
-                    new Coordinate(37.5459136,127.0733675))
-    );
+    List<List<Coordinate>> solidPolygonCoordsList = new ArrayList<>();
     @Schema(description = "점선으로 표시되는 폴리곤 좌표 리스트의 리스트입니다.")
-    List<List<Coordinate>> dashedPolygonCoordsList = List.of(
-            List.of(new Coordinate(37.5401732,127.062852),
-                    new Coordinate(37.5378977,127.0696049),
-                    new Coordinate(37.5421627,127.071636),
-                    new Coordinate(37.5427753,127.0710213),
-                    new Coordinate(37.5422156,127.0707644),
-                    new Coordinate(37.5441201,127.0651452)),
-            List.of(new Coordinate(37.5445367,127.0728555),
-                    new Coordinate(37.5444815,127.0731477),
-                    new Coordinate(37.5447132,127.0739129),
-                    new Coordinate(37.5445797,127.0747749),
-                    new Coordinate(37.544736,127.0754595),
-                    new Coordinate(37.5445765,127.0755668),
-                    new Coordinate(37.5449818,127.0800863),
-                    new Coordinate(37.545327,127.0799778),
-                    new Coordinate(37.5453925,127.0793721),
-                    new Coordinate(37.5458133,127.0773484),
-                    new Coordinate(37.547219,127.0741961))
-    );
+    List<List<Coordinate>> dashedPolygonCoordsList = new ArrayList<>();
 
     @Schema(description = "지도에 보여야 하는 위도와 경도 범위 입니다. (순서대로 최소 위도/최대 위도/최소 경도/ 최대 경도)")
-    List<Double> visibleBounds = List.of(
-            37.5421,
-            37.5483,
-            127.0651,
-            127.0741
-    );
+    List<Double> visibleBounds;
 
     @Data
     @AllArgsConstructor
