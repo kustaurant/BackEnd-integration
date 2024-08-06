@@ -13,4 +13,6 @@ import java.util.List;
 public class RestaurantListsResponse {
     private List<RestaurantTierDTO> topRestaurantsByRating;
     private List<RestaurantTierDTO> restaurantsForMe;
+    private List<String> photoUrls;
+
 }
