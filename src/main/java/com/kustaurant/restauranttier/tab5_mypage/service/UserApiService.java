@@ -29,7 +29,7 @@ public class UserApiService {
     private EntityManager entityManager;
 
     private final UserApiRepository userApiRepository;
-    private User findUserById(Integer userid) {
+    public User findUserById(Integer userid) {
         return userApiRepository.findById(userid).orElse(null);
     }
 
@@ -255,4 +255,6 @@ public class UserApiService {
 
         return postCommentDTOList;
     }
+
+
 }
