@@ -15,6 +15,8 @@ import com.kustaurant.restauranttier.tab4_community.service.PostApiService;
 import com.kustaurant.restauranttier.tab4_community.service.StorageApiService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserApiRepository;
+import com.kustaurant.restauranttier.tab5_mypage.service.UserApiService;
+import com.kustaurant.restauranttier.tab5_mypage.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -53,9 +55,8 @@ public class CommunityApiController {
     private final UserApiRepository userApiRepository;
     private final PostCommentApiRepository postCommentApiRepository;
     private final PostApiRepository postApiRepository;
-
-    //    User tempUser = customOAuth2UserService.getUser(principal.getName());
-    User tempUser = new User();
+    private final UserApiService userApiService;
+    //    User userApiService.findUserById(24); = customOAuth2UserService.getUser(principal.getName());
     // 커뮤니티 메인 화면
     @GetMapping
     @Operation(summary = "커뮤니티 메인화면의 글 리스트 불러오기", description = "게시판 종류와 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다.")
@@ -159,7 +160,7 @@ public class CommunityApiController {
     }
     // 댓글 or 대댓글 생성
     @PostMapping("/comments")
-    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "댓글 생성, 대댓글 생성", description = "게시글 ID와 내용을 입력받아 댓글을 생성합니다. 대댓글의 경우 부모 댓글의 id를 파라미터로 받아야 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "create success", content = @Content),
@@ -171,7 +172,7 @@ public class CommunityApiController {
             @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
             Model model, Principal principal) {
         Integer postIdInt = Integer.valueOf(postId);
-        User user = tempUser;
+        User user = userApiService.findUserById(24);;
         Post post = postApiService.getPost(postIdInt);
         PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), post, user);
         PostComment savedPostComment = postCommentApiRepository.save(postComment);
@@ -194,7 +195,7 @@ public class CommunityApiController {
 
     // 게시글 좋아요 생성
     @PostMapping("/{postId}/likes")
-    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "게시글 좋아요", description = "게시글 ID를 입력받아 좋아요를 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "like success", content = @Content),
@@ -202,7 +203,7 @@ public class CommunityApiController {
     })
     public ResponseEntity<Map<String, Object>> postLikeCreate(@PathVariable String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = tempUser;
+        User user = userApiService.findUserById(24);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.likeCreateOrDelete(post, user);
         response.put("likeCount", post.getLikeUserList().size());
@@ -213,7 +214,7 @@ public class CommunityApiController {
 
     // 게시글 싫어요 생성
     @PostMapping("/{postId}/dislikes")
-    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "게시글 싫어요", description = "게시글 ID를 입력받아 싫어요를 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "dislike success", content = @Content),
@@ -221,7 +222,7 @@ public class CommunityApiController {
     })
     public ResponseEntity<Map<String, Object>> postDislikeCreate(@PathVariable String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = tempUser;
+        User user = userApiService.findUserById(24);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.dislikeCreateOrDelete(post, user);
         response.put("dislikeCount", post.getDislikeUserList().size());
@@ -229,17 +230,17 @@ public class CommunityApiController {
         return ResponseEntity.ok(response);
     }
 
-    // 게시글 스크랩
+    // 게시글 스크랩 (구현완료)
     @PostMapping("/{postId}/scraps")
-    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @Operation(summary = "게시글 스크랩", description = "게시글 ID를 입력받아 스크랩을 생성합니다.")
+//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+    @Operation(summary = "게시글 스크랩 ", description = "게시글 ID를 입력받아 스크랩을 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "scrap success", content = @Content),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
     public ResponseEntity<Map<String, Object>> postScrap(@PathVariable String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = tempUser;
+        User user = userApiService.findUserById(24);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postScrapApiService.scrapCreateOrDelete(post, user);
         return ResponseEntity.ok(response);
@@ -266,7 +267,7 @@ public class CommunityApiController {
 
     // 게시글 댓글 좋아요
     @PostMapping("/comments/{commentId}/likes")
-    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "댓글 좋아요", description = "댓글 ID를 입력받아 좋아요를 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "like success", content = @Content),
@@ -275,7 +276,7 @@ public class CommunityApiController {
     public ResponseEntity<Map<String, Object>> likeComment(@PathVariable String commentId, Principal principal) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
-        User user = tempUser;
+        User user = userApiService.findUserById(24);;
         Map<String, Object> response = postApiCommentService.likeCreateOrDelete(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
@@ -283,7 +284,7 @@ public class CommunityApiController {
 
     // 게시글 댓글 싫어요
     @PostMapping("/comments/{commentId}/dislikes")
-    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "댓글 싫어요", description = "댓글 ID를 입력받아 싫어요를 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "dislike success", content = @Content),
@@ -292,7 +293,7 @@ public class CommunityApiController {
     public ResponseEntity<Map<String, Object>> dislikeComment(@PathVariable String commentId, Principal principal) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
-        User user = tempUser;
+        User user = userApiService.findUserById(24);;
         Map<String, Object> response = postApiCommentService.dislikeCreateOrDelete(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
@@ -300,8 +301,8 @@ public class CommunityApiController {
 
     // 게시글 생성
     @PostMapping("/posts")
-    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @Operation(summary = "게시글 생성", description = "게시글 제목,카테고리,내용,이미지를 입력받아 게시글을 생성합니다.")
+//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+    @Operation(summary = "게시글 생성", description = "게시글 제목,카테고리,내용,이미지를 입력받아 게시글을 생성합니다. 이미지 저장은 아직 미구현 상태입니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "create success", content = @Content),
             @ApiResponse(responseCode = "404", description = "user not found", content = @Content)
@@ -310,27 +311,26 @@ public class CommunityApiController {
             @RequestParam("title") String title,
             @RequestParam("postCategory") String postCategory,
             @RequestParam("content") String content,
-            @RequestParam("imgUrl") String imgUrl,
-
+            @RequestParam(value= "imgUrl" ,required = false) String imgUrl,
             Principal principal) throws IOException {
 
         // 게시글 객체 생성
         Post post = new Post(title, content, postCategory, "ACTIVE", LocalDateTime.now());
-        User user = tempUser;
+        User user = userApiService.findUserById(24);;
         postApiService.create(post, user);
 
-        // TinyMCE 컨텐츠에서 <img> 태그를 파싱
-        Document doc = Jsoup.parse(content);
-        Elements imgTags = doc.select("img");
+//        // TinyMCE 컨텐츠에서 <img> 태그를 파싱
+//        Document doc = Jsoup.parse(content);
+//        Elements imgTags = doc.select("img");
 
-        // 이미지 파일 처리
-        PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-        postPhoto.setPost(post); // 게시글과 이미지 연관관계 설정
-        post.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
-        postPhotoApiRepository.save(postPhoto); // 이미지 정보 저장
+//        // 이미지 파일 처리
+//        PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
+//        postPhoto.setPost(post); // 게시글과 이미지 연관관계 설정
+//        post.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
+//        postPhotoApiRepository.save(postPhoto); // 이미지 정보 저장
 
 
-        // 게시글 정
+        // 게시글 저장
         postApiRepository.save(post);
 
         return ResponseEntity.ok("글이 성공적으로 저장되었습니다.");
@@ -338,7 +338,7 @@ public class CommunityApiController {
 
     // 게시글 수정
     @PatchMapping("/posts/{postId}")
-    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "게시글 수정", description = "게시글 ID와 내용을 입력받아 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "update success", content = @Content),
