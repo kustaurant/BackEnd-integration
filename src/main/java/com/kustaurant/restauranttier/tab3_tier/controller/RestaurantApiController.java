@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
+import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantComment;
@@ -7,6 +8,7 @@ import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantDetailDTO;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -63,6 +65,7 @@ public class RestaurantApiController {
     // 즐겨찾기
     @PostMapping("/{restaurantId}/favorite-toggle")
     @Operation(summary = "(기능 작동x) 즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태를 반환합니다.\n\n눌러서 즐겨찾기가 해제된 경우 -> false반환")
+    @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))})
     public ResponseEntity<Boolean> restaurantFavoriteToggle(
             @PathVariable Integer restaurantId
     ) {
@@ -72,6 +75,7 @@ public class RestaurantApiController {
     // 이전 평가 데이터 가져오기
     @GetMapping("/{restaurantId}/evaluation")
     @Operation(summary = "(기능 작동x) 평가 하기로 갈 때 이전 평가 데이터가 있을 경우 불러오기", description = "평가하기에서 사용하는 형식과 동일합니다. 유저가 이전에 해당 식당을 평가했을 경우 이전 평가 데이터를 불러와서 이전에 평가했던 사항을 보여줍니다.")
+    @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EvaluationDTO.class))})
     public ResponseEntity<EvaluationDTO> getPreEvaluationInfo(
             @PathVariable Integer restaurantId
     ) {
@@ -87,6 +91,7 @@ public class RestaurantApiController {
     // 평가하기
     @PostMapping("/{restaurantId}/evaluation")
     @Operation(summary = "(기능 작동x) 평가하기", description = "평가하기 입니다.")
+    @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))})
     public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
             @PathVariable Integer restaurantId,
             @RequestBody EvaluationDTO evaluationDTO,
@@ -102,6 +107,7 @@ public class RestaurantApiController {
     // 리뷰 불러오기
     @GetMapping("/{restaurantId}/comments")
     @Operation(summary = "(기능 작동x) 리뷰 불러오기", description = "인기순 -> sort=popularity \n\n최신순 -> sort=latest")
+    @ApiResponse(responseCode = "200", description = "댓글 리스트입니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantComment.class)))})
     public ResponseEntity<List<RestaurantComment>> getReviewList(
             @PathVariable Integer restaurantId,
             @RequestParam(defaultValue = "popularity")
@@ -112,8 +118,9 @@ public class RestaurantApiController {
     }
 
     // 리뷰 추천하기
-    @PostMapping("/{restaurantId}/comment/{commentId}/like")
+    @PostMapping("/{restaurantId}/comments/{commentId}/like")
     @Operation(summary = "(기능 작동x) 리뷰 추천하기", description = "추천을 누른 후의 추천 수를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "리뷰 추천하기 누르고 난 후의 추천 수를 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class))})
     public ResponseEntity<Integer> likeComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId
@@ -122,8 +129,9 @@ public class RestaurantApiController {
     }
 
     // 리뷰 비추천하기
-    @PostMapping("/{restaurantId}/comment/{commentId}/dislike")
+    @PostMapping("/{restaurantId}/comments/{commentId}/dislike")
     @Operation(summary = "(기능 작동x) 리뷰 비추천하기", description = "비추천을 누른 후의 비추천 수를 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "리뷰 비추천하기 누르고 난 후의 비추천 수를 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class))})
     public ResponseEntity<Integer> dislikeComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId
@@ -132,8 +140,9 @@ public class RestaurantApiController {
     }
 
     // 식당 대댓글 달기
-    @PostMapping("/{restaurantId}/comment/{commentId}")
+    @PostMapping("/{restaurantId}/comments/{commentId}")
     @Operation(summary = "(기능 작동x) 식당 대댓글 달기", description = "작성한 대댓글을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "작성한 대댓글을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantComment.class))})
     public ResponseEntity<RestaurantComment> postReply(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
