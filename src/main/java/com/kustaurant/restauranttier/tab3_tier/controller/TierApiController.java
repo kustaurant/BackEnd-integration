@@ -66,7 +66,7 @@ public class TierApiController {
             @RequestParam(defaultValue = "30") Integer limit
     ) {
         List<RestaurantTierDTO> responseList = new ArrayList<>();
-        Page<Restaurant> restaurants = restaurantApiService.getRestaurantsByCuisinesAndLocationsWithPage(cuisines, locations, 1, true, page, limit);
+        Page<Restaurant> restaurants = restaurantApiService.getRestaurantsByCuisinesAndLocationsWithPage(cuisines, locations, null, true, page, limit);
 
         for (int i = 0; i < limit; i++) {
             try {
