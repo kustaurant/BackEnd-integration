@@ -1,16 +1,25 @@
 package com.kustaurant.restauranttier.tab3_tier.specification;
 
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
-import com.kustaurant.restauranttier.tab3_tier.etc.TierVariable;
+import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantSituationRelation;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RestaurantSpecification {
-    public static Specification<Restaurant> withCuisinesAndLocations(List<String> cuisines, List<String> locations, String status, Integer tierInfo, boolean isOrderByScore) {
+    // TODO: 상황 기준 작성 해야됨.
+    public static Specification<Restaurant> withCuisinesAndLocationsAndSituations(
+            List<String> cuisines,
+            List<String> locations,
+            List<Integer> situationList,
+            String status,
+            Integer tierInfo,
+            boolean isOrderByScore
+    ) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -30,6 +39,26 @@ public class RestaurantSpecification {
                 predicates.add(root.get("restaurantPosition").in(locations));
             }
 
+            // null인 경우 전체임
+            if (situationList != null && !situationList.isEmpty()) {
+                // 서브쿼리 생성
+                Subquery<Long> subquery = query.subquery(Long.class);
+                Root<RestaurantSituationRelation> subRoot = subquery.from(RestaurantSituationRelation.class);
+
+                // 서브쿼리 조건: situationId가 situationList에 속하고, dataCount가 3보다 큰 항목
+                Predicate situationPredicate = subRoot.get("situation").get("situationId").in(situationList);
+                Predicate dataCountPredicate = criteriaBuilder.gt(subRoot.get("dataCount"), 3);
+
+                // Restaurant과 RestaurantSituationRelation 간의 조인
+                Predicate joinPredicate = criteriaBuilder.equal(subRoot.get("restaurant"), root);
+
+                subquery.select(criteriaBuilder.count(subRoot))
+                        .where(criteriaBuilder.and(situationPredicate, dataCountPredicate, joinPredicate));
+
+                // 서브쿼리가 0보다 큰지 확인하는 조건 추가
+                predicates.add(criteriaBuilder.greaterThan(subquery, 0L));
+            }
+
             // 1인 경우 티어가 있는 식당만. -1인 경우 티어가 없는 식당만.
             if (tierInfo != null) {
                 if (tierInfo == 1) {
@@ -44,7 +73,7 @@ public class RestaurantSpecification {
                 query.orderBy(
                         criteriaBuilder.desc(
                                 criteriaBuilder.selectCase()
-                                        .when(criteriaBuilder.lt(root.get("restaurantEvaluationCount"), TierVariable.minNumberOfEvaluations), 0)
+                                        .when(criteriaBuilder.lt(root.get("mainTier"), 0), 0)
                                         .otherwise(criteriaBuilder.quot(root.get("restaurantScoreSum"), root.get("restaurantEvaluationCount"))))
                 );
             }

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
     private static final String API_NAME = "Kustaurant Mobile Application API";
-    private static final String API_VERSION = "v1.0.9";
+    private static final String API_VERSION = "v1.1.1";
     private static final String API_DESCRIPTION = """
     쿠스토랑 모바일 앱 API 문서입니다.
 
@@ -52,6 +52,12 @@ public class SwaggerConfig {
     - 식당 평가하기, 댓글 관련 api의 반환 형식을 Swagger에서 간단하게나마 보이게 했습니다.
     - 식당 상세 정보 api에서 식당 티어의 음식 종류 아이콘 이미지 url을 같이 반환합니다. (restaurantCuisineImgUrl)
         - 현재는 제대로 안 보이는 이미지도 있을 수 있습니다.
+        
+    **Version 1.1.1 (2024-08-10)**
+    - 로그인이 필요한 식당 API에 대해 "/api/v1" 뒤에 "/auth"를 추가하였습니다.
+    - 티어표 API (/api/v1/tier) 구현 완료
+        - 반환 형식에서 티어가 없는 식당의 경우 restaurantRanking을 null을 반환하게 했습니다.
+    - 지도 API (/api/v1/tier/map) 구현 완료
     """;
 
 
