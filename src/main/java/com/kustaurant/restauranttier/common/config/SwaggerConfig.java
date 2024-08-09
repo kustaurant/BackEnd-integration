@@ -54,7 +54,7 @@ public class SwaggerConfig {
     - 식당 상세 정보 api에서 식당 티어의 음식 종류 아이콘 이미지 url을 같이 반환합니다. (restaurantCuisineImgUrl)
         - 현재는 제대로 안 보이는 이미지도 있을 수 있습니다.
         
-    **Version 1.0.9 (2024-08-09)**
+    **Version 1.0.10 (2024-08-09)**
     - 뽑기화면의 api의 파라미터 타입을 수정하였고 swagger 설명을 추가하였습니다.
         -cuisine, location을 티어 화면의 api 파라미터와 같이 KO, L1 이런식으로 영어 키워드로 설정하였습니다.
     """;
