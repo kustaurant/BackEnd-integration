@@ -49,11 +49,14 @@ public class SwaggerConfig {
     - 지도 api기능이 구현되었습니다.
         - 티어표는 현재 난관을 만나서 곧 구현하겠습니다.
     - 식당 댓글 관련 api 엔드 포인트를 "comment"에서 "comments"로 수정했습니다.
-    - 식당 상세화면 api의 반환형식을 간단하게나마 보이게 했습니다.
-    
+
+    - 식당 평가하기, 댓글 관련 api의 반환 형식을 Swagger에서 간단하게나마 보이게 했습니다.
+    - 식당 상세 정보 api에서 식당 티어의 음식 종류 아이콘 이미지 url을 같이 반환합니다. (restaurantCuisineImgUrl)
+        - 현재는 제대로 안 보이는 이미지도 있을 수 있습니다.
+        
     **Version 1.0.9 (2024-08-09)**
     - 뽑기화면의 api의 파라미터 타입을 수정하였고 swagger 설명을 추가하였습니다.
-        -cuisine, location을 티어화면과 같이 KO, L1 이런식으로 영어 키워드로 설정하였습니다.
+        -cuisine, location을 티어 화면의 api 파라미터와 같이 KO, L1 이런식으로 영어 키워드로 설정하였습니다.
     """;
 
 
