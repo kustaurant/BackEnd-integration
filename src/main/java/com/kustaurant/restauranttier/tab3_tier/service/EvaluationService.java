@@ -4,7 +4,7 @@ import com.kustaurant.restauranttier.tab3_tier.controller.TierController;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.common.etc.JsonData;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
-import com.kustaurant.restauranttier.tab5_mypage.service.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab3_tier.repository.*;
 import lombok.RequiredArgsConstructor;

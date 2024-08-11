@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.kustaurant.restauranttier.common.MainController;
 import com.kustaurant.restauranttier.common.etc.JsonData;
 import com.kustaurant.restauranttier.tab3_tier.repository.EvaluationRepository;
-import com.kustaurant.restauranttier.tab5_mypage.service.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantService;
 import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 

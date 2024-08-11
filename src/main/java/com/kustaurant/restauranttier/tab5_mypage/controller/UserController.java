@@ -1,8 +1,7 @@
 package com.kustaurant.restauranttier.tab5_mypage.controller;
 
-import com.kustaurant.restauranttier.tab5_mypage.service.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.common.user.UserCreateForm;
-import com.kustaurant.restauranttier.tab5_mypage.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -27,7 +26,6 @@ import java.util.Random;
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserService userService;
     private final HttpSession httpSesseion;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -60,6 +58,7 @@ public class UserController {
         model.addAttribute("imgUrl", imgUrl);
         return "login_form";
     }
+
     public static String selectRandomString(List<String> stringList) {
         // 빈 리스트인 경우 null을 반환하거나 예외 처리를 수행할 수 있습니다.
         if (stringList == null || stringList.isEmpty()) {

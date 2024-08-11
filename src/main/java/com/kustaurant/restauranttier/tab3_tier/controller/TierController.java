@@ -10,7 +10,7 @@ import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.repository.EvaluationRepository;
 import com.kustaurant.restauranttier.tab3_tier.repository.SituationRepository;
-import com.kustaurant.restauranttier.tab5_mypage.service.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 import lombok.RequiredArgsConstructor;

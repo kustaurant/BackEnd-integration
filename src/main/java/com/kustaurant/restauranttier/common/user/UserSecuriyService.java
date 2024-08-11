@@ -1,4 +1,4 @@
-package com.kustaurant.restauranttier.tab5_mypage.service;
+package com.kustaurant.restauranttier.common.user;
 
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;

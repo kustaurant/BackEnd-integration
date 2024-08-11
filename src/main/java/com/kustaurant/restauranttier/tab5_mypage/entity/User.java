@@ -28,7 +28,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
     @Column(unique = true, nullable = false)
-    private String userTokenId;
+    private String naverProviderId;
+
+    @Column(unique = true)
+    private String accessToken;
+    @Column(unique = true)
+    private String refreshToken;
 
     private String userPassword;
     @Column(unique = true, nullable = false)
@@ -86,8 +91,8 @@ public class User {
     private List<PostScrap> scrapList = new ArrayList<>();
 
     @Builder
-    public User(String userTokenId, String loginApi, String userPassword, String userEmail, String userPhoneNumber, String userNickname, UserRole userRole, String status, LocalDateTime createdAt) {
-        this.userTokenId = userTokenId;
+    public User(String naverProviderId, String loginApi, String userPassword, String userEmail, String userPhoneNumber, String userNickname, UserRole userRole, String status, LocalDateTime createdAt) {
+        this.naverProviderId = naverProviderId;
         this.loginApi = loginApi;
         this.userPassword = userPassword;
         this.userEmail = userEmail;
@@ -96,7 +101,11 @@ public class User {
         this.userRole = userRole;
         this.status = status;
         this.createdAt = createdAt;
+
+        
     }
+
+
 
     public User updateUserEmail(String userEmail) {
         this.userEmail = userEmail;

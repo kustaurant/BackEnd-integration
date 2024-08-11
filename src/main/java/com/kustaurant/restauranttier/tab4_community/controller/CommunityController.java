@@ -12,7 +12,7 @@ import com.kustaurant.restauranttier.tab4_community.service.StorageService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostScrapRepository;
-import com.kustaurant.restauranttier.tab5_mypage.service.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab4_community.repository.PostPhotoRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostRepository;
 import jakarta.transaction.Transactional;

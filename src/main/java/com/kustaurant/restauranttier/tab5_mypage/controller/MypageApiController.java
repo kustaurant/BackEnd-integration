@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/mypage/users/{userid}")
+@RequestMapping("/api/v1/mypage/users/{userId}")
 public class MypageApiController {
 
     private final UserApiService userApiService;
@@ -23,7 +23,7 @@ public class MypageApiController {
             description = "마이페이지 화면에 필요한 정보들이 반환됩니다."
     )
     @GetMapping
-    public ResponseEntity<MypageMainDTO> getMypageView(@PathVariable("userid") Integer userid){
+    public ResponseEntity<MypageMainDTO> getMypageView(@PathVariable("userId") Integer userid){
         MypageMainDTO mypageMainDTO = userApiService.getMypageInfo(userid);
         return new ResponseEntity<>(mypageMainDTO, HttpStatus.OK);
     }
@@ -34,7 +34,7 @@ public class MypageApiController {
             description = ""
     )
     @GetMapping("/profile")
-    public ResponseEntity<ProfileDTO> getMypageProfile(@PathVariable("userid") Integer userid){
+    public ResponseEntity<ProfileDTO> getMypageProfile(@PathVariable("userId") Integer userid){
         ProfileDTO profileDTO = userApiService.getProfileInfo(userid);
         return new ResponseEntity<>(profileDTO, HttpStatus.OK);
     }
@@ -46,7 +46,7 @@ public class MypageApiController {
     )
     @PatchMapping("/profile")
     public ResponseEntity<?> updateMypageProfile(
-            @PathVariable("userid") Integer userid,
+            @PathVariable("userId") Integer userid,
             @RequestBody ProfileDTO receivedProfileDTO
     ){
         try {
@@ -66,7 +66,7 @@ public class MypageApiController {
     )
     @GetMapping("/evaluate-restuarnt-list")
     public ResponseEntity<List<EvaluateRestaurantInfoDTO>> getEvaluateRestaurantList(
-            @PathVariable("userid") Integer userId
+            @PathVariable("userId") Integer userId
     ){
         List<EvaluateRestaurantInfoDTO> userEvaluateRestaurantList = userApiService.getUserEvaluateRestaurantList(userId);
         return new ResponseEntity<>(userEvaluateRestaurantList, HttpStatus.OK);
@@ -90,7 +90,7 @@ public class MypageApiController {
     )
     @GetMapping("/favorite-restuarnt-list")
     public ResponseEntity<List<FavoriteRestaurantInfoDTO>> getFavoriteRestaurantList(
-            @PathVariable("userid") Integer userId
+            @PathVariable("userId") Integer userId
     ){
         List<FavoriteRestaurantInfoDTO> userFavoriteRestaurantList = userApiService.getUserFavoriteRestaurantList(userId);
         return new ResponseEntity<>(userFavoriteRestaurantList, HttpStatus.OK);
@@ -103,7 +103,7 @@ public class MypageApiController {
     )
     @GetMapping("community-scrap-list")
     public ResponseEntity<List<MypagePostDTO>> getCommunityScrapList(
-            @PathVariable("userid") Integer userid
+            @PathVariable("userId") Integer userid
     ){
         List<MypagePostDTO> postScrapsDTO = userApiService.getScrappedUserPosts(userid);
         return new ResponseEntity<>(postScrapsDTO, HttpStatus.OK);
@@ -116,7 +116,7 @@ public class MypageApiController {
     )
     @GetMapping("community-comment-list")
     public ResponseEntity<List<MypagePostCommentDTO>> getCommunityCommentList(
-            @PathVariable("userid") Integer userid
+            @PathVariable("userId") Integer userid
     ){
         List<MypagePostCommentDTO> commentedUserPosts = userApiService.getCommentedUserPosts(userid);
         return new ResponseEntity<>(commentedUserPosts, HttpStatus.OK);

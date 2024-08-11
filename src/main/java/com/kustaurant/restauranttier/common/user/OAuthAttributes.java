@@ -11,19 +11,19 @@ import java.util.Map;
 @Getter
 public class OAuthAttributes {
     private Map<String, Object> attributes;
-    private String userTokenId;
+    private String userProviderId;
     private String loginApi;
     private String userEmail;
     private String nameAttributeKey;
 
     @Builder
     public OAuthAttributes(Map<String, Object> attributes,
-                           String userTokenId,
+                           String userProviderId,
                            String loginApi,
                            String userEmail,
                            String nameAttributeKey) {
         this.attributes = attributes;
-        this.userTokenId = userTokenId;
+        this.userProviderId = userProviderId;
         this.loginApi = loginApi;
         this.userEmail = userEmail;
         this.nameAttributeKey = nameAttributeKey;
@@ -46,7 +46,7 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .userEmail((String) response.get("email"))
                 .loginApi("NAVER")
-                .userTokenId((String) response.get("id"))
+                .userProviderId((String) response.get("id"))
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
@@ -55,16 +55,16 @@ public class OAuthAttributes {
     private static OAuthAttributes ofGoogle(String userNameAttributeName,
                                             Map<String, Object> attributes) {
         return OAuthAttributes.builder()
-                .userTokenId((String) attributes.get("userTokenId"))
+                .userProviderId((String) attributes.get("userTokenId"))
                 .loginApi((String) attributes.get("loginApi"))
                 .userEmail((String) attributes.get("userEmail"))
                 .nameAttributeKey(userNameAttributeName)
                 .build();
     }
 
-    public User toEntity() {
+    public User webToEntity() {
         return User.builder()
-                .userTokenId(userTokenId)
+                .naverProviderId(userProviderId)
                 .loginApi(loginApi)
                 .userEmail(userEmail)
                 .userNickname(StringUtils.substringBefore(userEmail, "@"))
