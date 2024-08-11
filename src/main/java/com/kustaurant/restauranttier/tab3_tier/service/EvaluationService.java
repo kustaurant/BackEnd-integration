@@ -1,6 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
-import com.kustaurant.restauranttier.tab3_tier.controller.TierController;
+import com.kustaurant.restauranttier.tab3_tier.controller.TierWebController;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.common.etc.JsonData;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
@@ -255,8 +255,8 @@ public class EvaluationService {
             return;
         }
         if ( // 현재 페이지만 연산
-                index >= TierController.tierPageSize * page
-                        && index < TierController.tierPageSize * (page + 1)
+                index >= TierWebController.tierPageSize * page
+                        && index < TierWebController.tierPageSize * (page + 1)
         ) {
             User user = customOAuth2UserService.getUser(principal.getName());
             // 로그인 된 경우에 즐찾, 평가 여부 저장

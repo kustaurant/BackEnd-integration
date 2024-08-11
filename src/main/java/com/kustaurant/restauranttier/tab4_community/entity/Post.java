@@ -54,10 +54,10 @@ public class Post {
     }
 
     @ManyToMany
-    @JoinTable(name="post_likes_tbl",joinColumns = @JoinColumn(name="post_id"),inverseJoinColumns = @JoinColumn(name="user_id"))
+    @JoinTable(name="post_dislikes_tbl",joinColumns = @JoinColumn(name="post_id"),inverseJoinColumns = @JoinColumn(name="user_id"))
     private List<User> dislikeUserList = new ArrayList<>();
     @ManyToMany
-    @JoinTable(name="post_dislikes_tbl",joinColumns = @JoinColumn(name="post_id"),inverseJoinColumns = @JoinColumn(name="user_id"))
+    @JoinTable(name="post_likes_tbl",joinColumns = @JoinColumn(name="post_id"),inverseJoinColumns = @JoinColumn(name="user_id"))
     private List<User> likeUserList = new ArrayList<>();
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();

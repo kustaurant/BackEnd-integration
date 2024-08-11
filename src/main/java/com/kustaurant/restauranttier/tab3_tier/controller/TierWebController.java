@@ -1,3 +1,4 @@
+
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -9,7 +10,7 @@ import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.repository.EvaluationRepository;
 import com.kustaurant.restauranttier.tab3_tier.repository.SituationRepository;
-import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.tab5_mypage.service.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
-public class TierController {
+public class TierWebController {
     //
     private final SituationRepository situationRepository;
     private final EvaluationRepository evaluationRepository;
@@ -41,7 +42,6 @@ public class TierController {
     private float[] latitudeArray = {37.542318f, 37.541518f, 37.545520f, 37.545750f, 37.538512f, 37.537962f};
     private float[] longitudeArray = {127.076467f, 127.069190f, 127.069550f, 127.076875f, 127.077239f, 127.085855f};
     private int[] zoomArray = {15, 15, 15, 15, 15, 16};
-
     private int getPositionIndex(String position) {
         if (position.equals("전체"))
             return 0;
@@ -57,7 +57,6 @@ public class TierController {
             return 5;
         return 0;
     }
-
     public String convertObjectToJson(Object object) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -125,7 +124,7 @@ public class TierController {
         }
         model.addAttribute("situationQueryParameter", situation);
         model.addAttribute("positionQueryParameter", position);
-        model.addAttribute("currentPage", "tier");
+        model.addAttribute("currentPage","tier");
         model.addAttribute("cuisine", cuisine);
         model.addAttribute("position", position);
         model.addAttribute("evaluationsCount", evaluationRepository.countAllByStatus("ACTIVE"));

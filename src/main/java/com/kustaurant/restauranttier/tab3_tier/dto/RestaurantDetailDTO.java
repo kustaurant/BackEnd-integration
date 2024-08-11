@@ -24,6 +24,8 @@ public class RestaurantDetailDTO {
     private Integer mainTier;
     @Schema(description = "식당 음식 종류", example = "한식")
     private String restaurantCuisine;
+    @Schema(description = "식당 음식 종류 이미지 URL", example = "https://kustaurant.com/img/home/%EA%B3%A0%EA%B8%B0.png")
+    private String restaurantCuisineImgUrl;
     @Schema(description = "식당 위치", example = "건입~중문")
     private String restaurantPosition;
     @Schema(description = "식당 이름", example = "제주곤이칼국수 건대점")
@@ -60,6 +62,8 @@ public class RestaurantDetailDTO {
                 restaurant.getRestaurantImgUrl(),
                 restaurant.getMainTier(),
                 restaurant.getRestaurantCuisine() + "-" + restaurant.getRestaurantType(),
+                // TODO: 식당 음식 종류 이미지 아이콘 url 반환해야함.
+                "https://kustaurant.com/img/home/" + restaurant.getRestaurantCuisine() + ".png",
                 restaurant.getRestaurantPosition(),
                 restaurant.getRestaurantName(),
                 restaurant.getRestaurantAddress(),

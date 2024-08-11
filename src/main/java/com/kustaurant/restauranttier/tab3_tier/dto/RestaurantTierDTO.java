@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+
 @Data
 @AllArgsConstructor
 @Schema(description = "restaurant tier entity")
@@ -37,6 +40,9 @@ public class RestaurantTierDTO {
     private Double restaurantScore;
 
     public static RestaurantTierDTO convertRestaurantToTierDTO(Restaurant restaurant, Integer ranking, Boolean isEvaluated, Boolean isFavorite) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        Double score = restaurant.getRestaurantEvaluationCount() != 0 ? Double.parseDouble(df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())) : 0;
         return new RestaurantTierDTO(
                 restaurant.getRestaurantId(),
                 ranking,
@@ -50,7 +56,7 @@ public class RestaurantTierDTO {
                 restaurant.getRestaurantLongitude(),
                 restaurant.getRestaurantLatitude(),
                 "건대생 공짜!!!!!!!",
-                restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount()
+                score
         );
     }
 }

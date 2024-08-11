@@ -38,6 +38,7 @@ public class Restaurant {
     private String restaurantCuisine;
     private String restaurantLatitude;
     private String restaurantLongitude;
+    private String partnershipInfo;
 
     private String status;
     @JsonIgnore
