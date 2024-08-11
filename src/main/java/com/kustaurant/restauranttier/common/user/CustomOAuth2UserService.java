@@ -1,10 +1,11 @@
-package com.kustaurant.restauranttier.tab5_mypage.service;
+package com.kustaurant.restauranttier.common.user;
 
 import com.kustaurant.restauranttier.common.exception.DataNotFoundException;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import com.kustaurant.restauranttier.common.user.OAuthAttributes;
 import com.kustaurant.restauranttier.common.user.SessionUser;
+import groovy.util.logging.Slf4j;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,8 +20,9 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.Optional;
 
-@RequiredArgsConstructor
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final UserRepository userRepository;
     private final HttpSession httpSesseion;
