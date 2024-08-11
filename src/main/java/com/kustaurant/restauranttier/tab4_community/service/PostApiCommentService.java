@@ -7,7 +7,7 @@ import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
-import com.kustaurant.restauranttier.tab5_mypage.repository.UserApiRepository;
+import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -23,7 +23,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PostApiCommentService {
     private final PostCommentApiRepository postCommentApiRepository;
-    private final UserApiRepository userApiRepository;
+    private final UserRepository userRepository;
     private final PostApiRepository postApiRepository;
     private final PostApiService postApiService;
 
@@ -31,14 +31,14 @@ public class PostApiCommentService {
     public void create(Post post, User user, PostComment postComment) {
         user.getPostCommentList().add(postComment);
         post.getPostCommentList().add(postComment);
-        userApiRepository.save(user);
+        userRepository.save(user);
         postApiRepository.save(post);
     }
 
     // 대댓글 생성
     public void replyCreate(User user, PostComment postComment) {
         user.getPostCommentList().add(postComment);
-        userApiRepository.save(user);
+        userRepository.save(user);
     }
 
     // 댓글 조회
@@ -99,7 +99,7 @@ public class PostApiCommentService {
 
         }
         postCommentApiRepository.save(postcomment);
-        userApiRepository.save(user);
+        userRepository.save(user);
         return status;
     }
 
@@ -138,7 +138,7 @@ public class PostApiCommentService {
             status.put("dislikeCreated", true);
         }
         postCommentApiRepository.save(postcomment);
-        userApiRepository.save(user);
+        userRepository.save(user);
         return status;
     }
 

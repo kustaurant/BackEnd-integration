@@ -6,7 +6,7 @@ import com.kustaurant.restauranttier.tab4_community.entity.PostScrap;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostScrapApiRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
-import com.kustaurant.restauranttier.tab5_mypage.repository.UserApiRepository;
+import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ import java.util.Optional;
 public class PostScrapApiService {
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostApiRepository postApiRepository;
-    private final UserApiRepository userApiRepository;
+    private final UserRepository userRepository;
     public Map<String, Object> scrapCreateOrDelete(Post post, User user){
         List<PostScrap> postScrapList =post.getPostScrapList();
         List<PostScrap> userScrapList =user.getScrapList();
@@ -43,7 +43,7 @@ public class PostScrapApiService {
 
         }
         postApiRepository.save(post);
-        userApiRepository.save(user);
+        userRepository.save(user);
         return status;
     }
 
