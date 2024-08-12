@@ -1,11 +1,13 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
+import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.TierParamException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.etc.CuisineEnum;
 import com.kustaurant.restauranttier.tab3_tier.etc.LocationEnum;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
 import com.kustaurant.restauranttier.tab3_tier.specification.RestaurantSpecification;
+import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 @Service
 @Slf4j
@@ -24,6 +27,14 @@ public class RestaurantApiService {
     private final RestaurantApiRepository restaurantApiRepository;
 
     public static final Integer evaluationCount = 2;
+
+    public Restaurant findRestaurantById(Integer restaurantId) {
+        Optional<Restaurant> restaurantOptional = restaurantApiRepository.findByRestaurantIdAndStatus(restaurantId, "ACTIVE");
+        if (restaurantOptional.isEmpty()) {
+            throw new OptionalNotExistException(restaurantId + " 식당이 없습니다.");
+        }
+        return restaurantOptional.get();
+    }
 
     public List<Restaurant> getTopRestaurants() {
         // 모든 'ACTIVE' 상태의 식당을 불러온다.
@@ -120,5 +131,17 @@ public class RestaurantApiService {
         System.out.println(restaurant);
         return restaurant.getRestaurantSituationRelationList().stream()
                 .anyMatch(el -> situationList.contains(el.getSituation().getSituationId()) && el.getDataCount() >= 3);
+    }
+
+    // 해당 식당을 해당 유저가 평가 했는가?
+    public boolean isEvaluated(Restaurant restaurant, User user) {
+        return user.getEvaluationList().stream()
+                .anyMatch(evaluation -> evaluation.getRestaurant().equals(restaurant));
+    }
+
+    // 해당 식당을 해당 유저가 즐겨찾기 했는가?
+    public boolean isFavorite(Restaurant restaurant, User user) {
+        return user.getRestaurantFavoriteList().stream()
+                .anyMatch(restaurantFavorite -> restaurantFavorite.getRestaurant().equals(restaurant));
     }
 }

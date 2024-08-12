@@ -1,11 +1,18 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
+import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantComment;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantDetailDTO;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
+import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
+import com.kustaurant.restauranttier.tab3_tier.service.RestaurantFavoriteService;
+import com.kustaurant.restauranttier.tab3_tier.service.RestaurantService;
+import com.kustaurant.restauranttier.tab5_mypage.entity.User;
+import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
+import com.kustaurant.restauranttier.tab5_mypage.service.UserApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -36,7 +43,11 @@ import java.util.Optional;
         @ApiResponse(responseCode = "400", description = "Bad request - Invalid parameters provided", content = {@Content(mediaType = "application/json")})
 })
 public class RestaurantApiController {
-    private final RestaurantApiRepository restaurantApiRepository;
+    private final UserApiService userApiService;
+    private final RestaurantApiService restaurantApiService;
+    private final RestaurantFavoriteService restaurantFavoriteService;
+
+    private final int userId = 23;
 
     @Operation(summary = "식당 상세 화면 정보 불러오기", description = "식당 하나에 대한 상세 정보가 반환됩니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)")
     @ApiResponses(value = {
@@ -47,61 +58,72 @@ public class RestaurantApiController {
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetail(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId
     ) {
-        Optional<Restaurant> restaurantOptional = restaurantApiRepository.findById(restaurantId);
-        if (restaurantOptional.isEmpty()) { // 없을 경우 404
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        if (!restaurantOptional.get().getStatus().equals("ACTIVE")) { // status가 ACTIVE가 아닐 경우 404
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        Restaurant restaurant = restaurantOptional.get();
-        DecimalFormat df = new DecimalFormat("#.0");
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
 
-        RestaurantDetailDTO responseData = RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, TierApiController.randomBoolean(), TierApiController.randomBoolean());
+        // TODO: 로그인 구현 후 수정
+        User user = userApiService.findUserById(userId);
+        boolean isFavorite = false;
+        boolean isEvaluated = false;
+        if (user != null) {
+            isFavorite = restaurantApiService.isFavorite(restaurant, user);
+            isEvaluated = restaurantApiService.isEvaluated(restaurant, user);
+        }
+
+        RestaurantDetailDTO responseData = RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, isEvaluated, isFavorite);
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     // 즐겨찾기
     @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle")
-    @Operation(summary = "(기능 작동x) 즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태를 반환합니다.\n\n눌러서 즐겨찾기가 해제된 경우 -> false반환")
+    @Operation(summary = "즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태를 반환합니다.\n\n눌러서 즐겨찾기가 해제된 경우 -> false반환")
     @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))})
     public ResponseEntity<Boolean> restaurantFavoriteToggle(
             @PathVariable Integer restaurantId
     ) {
-        return new ResponseEntity<>(true, HttpStatus.OK);
+        // TODO: 로그인 구현 후 수정
+        User user = userApiService.findUserById(userId);
+        if (user == null) {
+            throw new OptionalNotExistException(userId + " 유저가 존재하지 않습니다.");
+        }
+
+        boolean result = restaurantFavoriteService.toggleFavorite(user.getNaverProviderId(), restaurantId);
+        return ResponseEntity.ok(result);
     }
 
     // 이전 평가 데이터 가져오기
     @GetMapping("/auth/restaurants/{restaurantId}/evaluation")
-    @Operation(summary = "(기능 작동x) 평가 하기로 갈 때 이전 평가 데이터가 있을 경우 불러오기", description = "평가하기에서 사용하는 형식과 동일합니다. 유저가 이전에 해당 식당을 평가했을 경우 이전 평가 데이터를 불러와서 이전에 평가했던 사항을 보여줍니다.")
-    @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EvaluationDTO.class))})
+    @Operation(summary = "평가 하기로 갈 때 이전 평가 데이터가 있을 경우 불러오기", description = "평가하기에서 사용하는 형식과 동일합니다. 유저가 이전에 해당 식당을 평가했을 경우 이전 평가 데이터를 불러와서 이전에 평가했던 사항을 보여줍니다. " +
+            "\n\n이전 데이터가 없을 경우 아무것도 반환하지 않습니다.\n\n현재 restaurantId 599, 631에 데이터 있습니다.")
+    @ApiResponse(responseCode = "200", description = "success\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EvaluationDTO.class))})
     public ResponseEntity<EvaluationDTO> getPreEvaluationInfo(
             @PathVariable Integer restaurantId
     ) {
-        EvaluationDTO evaluationData = new EvaluationDTO(
-                4.5d,
-                List.of("혼밥", "데이트"),
-                "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNDA3MDlfMTI0%2FMDAxNzIwNDYzNTMyMDY0.P6NfUsNuS1RZNhOijag4lq8-gKW3DunI95D2B_n2hc4g.7NRJfKXXTyfoQqeZoWWKePG7dQNA5M9tWXnexIxX_k8g.JPEG%2Foutput_3125420507.jpg&type=sc960_832",
-                "맛있다~~~~~~~~~!!!!!!!!!!!!!!!"
-        );
-        return new ResponseEntity<>(evaluationData, HttpStatus.OK);
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        User user = userApiService.findUserById(userId);
+        if (user == null) {
+            throw new OptionalNotExistException(userId + " 유저가 없습니다.");
+        }
+
+        return user.getEvaluationList().stream()
+                .filter(evaluation -> evaluation.getRestaurant().equals(restaurant))
+                .findFirst()
+                .map(evaluation -> ResponseEntity.ok(EvaluationDTO.convertEvaluation(evaluation)))
+                .orElse(ResponseEntity.ok(null));
     }
 
     // 평가하기
     @PostMapping("/auth/restaurants/{restaurantId}/evaluation")
-    @Operation(summary = "(기능 작동x) 평가하기", description = "평가하기 입니다.")
+    @Operation(summary = "(기능 작동x) 평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
     @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))})
     public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
             @PathVariable Integer restaurantId,
             @RequestBody EvaluationDTO evaluationDTO,
             @RequestParam(required = false) MultipartFile image
             ) {
-        Optional<Restaurant> restaurantOptional = restaurantApiRepository.findById(restaurantId);
-        if (restaurantOptional.isEmpty()) {
-            return new ResponseEntity<>(null, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurantOptional.get(), TierApiController.randomBoolean(), TierApiController.randomBoolean()), HttpStatus.OK);
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+
+        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, TierApiController.randomBoolean(), TierApiController.randomBoolean()), HttpStatus.OK);
     }
 
     // 리뷰 불러오기

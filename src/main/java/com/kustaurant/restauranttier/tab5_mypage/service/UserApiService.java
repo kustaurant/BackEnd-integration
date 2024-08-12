@@ -30,7 +30,7 @@ public class UserApiService {
 
     private final UserRepository userRepository;
     public User findUserById(Integer userid) {
-        return userRepository.findById(userid).orElse(null);
+        return userRepository.findByUserIdAndStatus(userid, "ACTIVE").orElse(null);
     }
 
 

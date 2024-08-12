@@ -281,15 +281,10 @@ public class RestaurantController {
     // 식당 즐겨찾기
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/restaurants/{restaurantId}/favorite/toggle")
-    public ResponseEntity<String> toggleFavorite(
+    public ResponseEntity<Boolean> toggleFavorite(
             @PathVariable Integer restaurantId,
             Principal principal
     ) {
-        String returnValue = restaurantFavoriteService.toggleFavorite(principal.getName(), restaurantId);
-        if (returnValue.equals("fail")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        } else {
-            return ResponseEntity.ok(returnValue);
-        }
+        return ResponseEntity.ok(restaurantFavoriteService.toggleFavorite(principal.getName(), restaurantId));
     }
 }

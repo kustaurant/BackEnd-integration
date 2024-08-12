@@ -65,6 +65,12 @@ public class SwaggerConfig {
     - 티어표 API (/api/v1/tier) 구현 완료
         - 반환 형식에서 티어가 없는 식당의 경우 restaurantRanking을 null을 반환하게 했습니다.
     - 지도 API (/api/v1/tier/map) 구현 완료
+    
+    **Version 1.2.1 (2024-08-13)**
+    - 식당 상세 화면 API
+        - /evaluation GET, POST 두 개의 api 모두 evaluationSituations를 문자열 리스트에서 정수형 리스트로 변환했습니다.
+        - 즐겨찾기 토글 기능 구현
+        - 이전 평가 데이터 불러오기 구현
     """;
 
 

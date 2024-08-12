@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.common.exception.advice;
 
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
+import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.TierParamException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,5 +32,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleTierParamException(TierParamException e) {
         log.error("[TierParamException]", e);
         return new ResponseEntity<>(new ErrorResponse("BAD REQUEST", e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OptionalNotExistException.class)
+    public ResponseEntity<ErrorResponse> handleOptionalNotExistException(OptionalNotExistException e) {
+        log.error("[OptionalNotExistException]", e);
+        return new ResponseEntity<>(new ErrorResponse("NOT FOUND", e.getMessage()), HttpStatus.NOT_FOUND);
     }
 }

@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
+import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantFavorite;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
@@ -18,24 +19,30 @@ public class RestaurantFavoriteService {
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
-    public String toggleFavorite(String userTokenId, Integer restaurantId) {
+    public boolean toggleFavorite(String userTokenId, Integer restaurantId) {
         Optional<User> userOptional = userRepository.findByNaverProviderId(userTokenId);
-        Restaurant restaurant = restaurantRepository.findByRestaurantId(restaurantId);
+        Optional<Restaurant> restaurantOptional = restaurantRepository.findByRestaurantIdAndStatus(restaurantId, "ACTIVE");
+
+        if (restaurantOptional.isEmpty()) {
+            throw new OptionalNotExistException(restaurantId + " 식당을 찾지 못했습니다.");
+        }
+        Restaurant restaurant = restaurantOptional.get();
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             Optional<RestaurantFavorite> restaurantFavoriteOptional = restaurantFavoriteRepository.findByUserAndRestaurant(user, restaurant);
             if (restaurantFavoriteOptional.isPresent()) { // 즐겨찾기가 되어 있었던 경우
                 deleteFavorite(restaurantFavoriteOptional.get());
-                return "delete";
+                return false;
             } else { // 즐겨찾기가 되어 있지 않았던 경우
                 addFavorite(user, restaurant);
-                return "add";
+                return true;
             }
         } else {
-            return "fail";
+            throw new OptionalNotExistException(userTokenId + " 유저를 찾지 못했습니다.");
         }
     }
+
     public void addFavorite(User user, Restaurant restaurant) {
         RestaurantFavorite restaurantFavorite = new RestaurantFavorite();
         restaurantFavorite.setUser(user);

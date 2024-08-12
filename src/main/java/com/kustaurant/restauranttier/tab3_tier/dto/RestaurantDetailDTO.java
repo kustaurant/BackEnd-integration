@@ -72,11 +72,11 @@ public class RestaurantDetailDTO {
                 restaurant.getRestaurantUrl(),
                 Arrays.asList("혼밥", "소개팅"),
                 "학생증 제시 시에 전메뉴 10% 할인 대박!!!!",
-                100,
+                restaurant.getRestaurantEvaluationCount(),
                 df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount()),
                 isEvaluated,
                 isFavorite,
-                99,
+                restaurant.getRestaurantFavorite().size(),
                 restaurant.getRestaurantMenuList()
         );
     }

@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<User,Integer> {
             "WHERE SIZE(u.evaluationList) > 0 " +
             "ORDER BY SIZE(u.evaluationList) DESC")
     List<User> findUsersWithEvaluationCountDescending();
+
+    Optional<User> findByUserIdAndStatus(Integer userId, String status);
 }
