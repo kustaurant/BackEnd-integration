@@ -56,7 +56,7 @@ public class SwaggerConfig {
         
     **Version 1.0.10 (2024-08-09)**
     - 뽑기화면의 api의 파라미터 타입을 수정하였고 swagger 설명을 추가하였습니다.
-        -cuisine, location을 티어 화면의 api 파라미터와 같이 KO, L1 이런식으로 영어 키워드로 설정하였습니다.
+        - cuisine, location을 티어 화면의 api 파라미터와 같이 KO, L1 이런식으로 영어 키워드로 설정하였습니다.
     """;
 
 
