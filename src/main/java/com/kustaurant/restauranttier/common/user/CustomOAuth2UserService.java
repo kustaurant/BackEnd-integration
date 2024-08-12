@@ -1,6 +1,6 @@
 package com.kustaurant.restauranttier.common.user;
 
-import com.kustaurant.restauranttier.common.exception.DataNotFoundException;
+import com.kustaurant.restauranttier.common.exception.exception.DataNotFoundException;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import groovy.util.logging.Slf4j;

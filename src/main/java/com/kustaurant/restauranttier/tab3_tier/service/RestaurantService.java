@@ -1,6 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
-import com.kustaurant.restauranttier.common.exception.DataNotFoundException;
+import com.kustaurant.restauranttier.common.exception.exception.DataNotFoundException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantHashtag;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantMenu;

@@ -1,6 +1,6 @@
 package com.kustaurant.restauranttier.tab4_community.service;
 
-import com.kustaurant.restauranttier.common.exception.DataNotFoundException;
+import com.kustaurant.restauranttier.common.exception.exception.DataNotFoundException;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostRepository;

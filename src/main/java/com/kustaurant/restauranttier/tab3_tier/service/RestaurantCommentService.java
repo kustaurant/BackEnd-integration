@@ -10,7 +10,7 @@ import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantCommentRepos
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
-import com.kustaurant.restauranttier.common.exception.DataNotFoundException;
+import com.kustaurant.restauranttier.common.exception.exception.DataNotFoundException;
 import com.kustaurant.restauranttier.tab3_tier.etc.EnumSortComment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

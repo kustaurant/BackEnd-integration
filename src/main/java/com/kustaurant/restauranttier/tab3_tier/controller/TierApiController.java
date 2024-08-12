@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
+import com.kustaurant.restauranttier.common.exception.exception.TierParamException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierMapDTO;
@@ -67,15 +68,10 @@ public class TierApiController {
         page--;
         // 예외 처리
         if (cuisines.contains("ALL") && cuisines.contains(("JH"))) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new TierParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
         }
         // DB 조회
-        List<Restaurant> restaurants;
-        try {
-            restaurants = restaurantApiService.getRestaurantsByCuisinesAndLocationsAndSituationsWithPage(cuisines, locations, situations, null, true, page, limit).toList();
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        List<Restaurant> restaurants = restaurantApiService.getRestaurantsByCuisinesAndLocationsAndSituationsWithPage(cuisines, locations, situations, null, true, page, limit).toList();
 
         if (restaurants.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
@@ -126,6 +122,10 @@ public class TierApiController {
             @Parameter(example = "L1,L2,L3 또는 ALL", description = "위치입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, L1:건입~중문, L2:중문~어대, L3:후문, L4:정문, L5:구의역")
             String locations
     ) {
+        // 예외 처리
+        if (cuisines.contains("ALL") && cuisines.contains(("JH"))) {
+            throw new TierParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
+        }
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
         List<Restaurant> tieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndLocations(cuisines, locations, 1, false);
         List<Restaurant> nonTieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndLocations(cuisines, locations, -1, false);
@@ -150,7 +150,7 @@ public class TierApiController {
                         .map(res -> RestaurantTierDTO.convertRestaurantToTierDTO(res, null, randomBoolean(), randomBoolean()))
                         .toList();
             } catch (NumberFormatException e) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                throw new TierParamException("situations 파라미터 입력이 올바르지 않습니다.");
             }
         } else {
             tieredRestaurantTierDTOs = tieredRestaurants.stream()
@@ -202,7 +202,7 @@ public class TierApiController {
                     }
                 }
             } catch (NumberFormatException e) {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                throw new TierParamException("locations 파라미터 입력이 올바르지 않습니다.");
             }
         } else {
             response.setSolidPolygonCoordsList(MapVariable.LIST_OF_COORD_LIST);

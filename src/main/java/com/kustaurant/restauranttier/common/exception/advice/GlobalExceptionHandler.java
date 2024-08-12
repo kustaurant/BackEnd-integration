@@ -1,5 +1,8 @@
-package com.kustaurant.restauranttier.common.exception;
+package com.kustaurant.restauranttier.common.exception.advice;
 
+import com.kustaurant.restauranttier.common.exception.ErrorResponse;
+import com.kustaurant.restauranttier.common.exception.exception.TierParamException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +14,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
  * @since 2024.7.10.
  * description: 프로젝트 전역의 RestController에서 발생할 수 있는 오류에 대한 예외 처리를 하는 클래스입니다.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     /**
@@ -23,11 +27,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * description: parameter로 enum value가 올바르지 않은 것이 들어왔을 경우
-     */
-    @ExceptionHandler(InvalidEnumValueException.class)
-    public ResponseEntity<String> handleInvalidEnumValueException(InvalidEnumValueException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(TierParamException.class)
+    public ResponseEntity<ErrorResponse> handleTierParamException(TierParamException e) {
+        log.error("[TierParamException]", e);
+        return new ResponseEntity<>(new ErrorResponse("BAD REQUEST", e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
