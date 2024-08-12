@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
     private static final String API_NAME = "Kustaurant Mobile Application API";
-    private static final String API_VERSION = "v1.0.9";
+    private static final String API_VERSION = "v1.1.1";
     private static final String API_DESCRIPTION = """
     쿠스토랑 모바일 앱 API 문서입니다.
 
@@ -56,7 +56,15 @@ public class SwaggerConfig {
         
     **Version 1.0.10 (2024-08-09)**
     - 뽑기화면의 api의 파라미터 타입을 수정하였고 swagger 설명을 추가하였습니다.
-        - cuisine, location을 티어 화면의 api 파라미터와 같이 KO, L1 이런식으로 영어 키워드로 설정하였습니다.
+
+        -cuisine, location을 티어 화면의 api 파라미터와 같이 KO, L1 이런식으로 영어 키워드로 설정하였습니다.
+    
+    **Version 1.1.1 (2024-08-10)**
+    - 로그인이 필요한 기능은 "/api/v1/auth"로 시작합니다.
+        - 로그인이 필요한 식당 API에 대해 "/api/v1" 뒤에 "/auth"를 추가하였습니다.
+    - 티어표 API (/api/v1/tier) 구현 완료
+        - 반환 형식에서 티어가 없는 식당의 경우 restaurantRanking을 null을 반환하게 했습니다.
+    - 지도 API (/api/v1/tier/map) 구현 완료
     """;
 
 

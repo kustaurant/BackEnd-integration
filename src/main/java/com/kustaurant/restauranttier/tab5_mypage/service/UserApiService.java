@@ -6,8 +6,8 @@ import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.entity.PostScrap;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
-import com.kustaurant.restauranttier.tab5_mypage.repository.UserApiRepository;
 import com.kustaurant.restauranttier.tab5_mypage.dto.*;
+import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +28,9 @@ public class UserApiService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private final UserApiRepository userApiRepository;
+    private final UserRepository userRepository;
     public User findUserById(Integer userid) {
-        return userApiRepository.findById(userid).orElse(null);
+        return userRepository.findById(userid).orElse(null);
     }
 
 
@@ -90,7 +90,7 @@ public class UserApiService {
             throw new IllegalArgumentException("프로필 변경에 실패하였습니다!");
         }
 
-        userApiRepository.save(user);
+        userRepository.save(user);
         return new ProfileDTO(user.getUserNickname(), user.getUserEmail(), user.getPhoneNumber());
     }
 
@@ -106,7 +106,7 @@ public class UserApiService {
         }
 
         // 닉네임이 이미 존재하는 경우
-        Optional<User> userOptional = userApiRepository.findByUserNickname(newNickname);
+        Optional<User> userOptional = userRepository.findByUserNickname(newNickname);
         if (userOptional.isPresent() && !newNickname.equals(user.getUserNickname())) {
             throw new IllegalArgumentException("해당 닉네임이 이미 존재합니다.");
         }

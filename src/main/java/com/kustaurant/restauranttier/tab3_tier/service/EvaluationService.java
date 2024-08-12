@@ -4,7 +4,7 @@ import com.kustaurant.restauranttier.tab3_tier.controller.TierWebController;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.common.etc.JsonData;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
-import com.kustaurant.restauranttier.tab5_mypage.service.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab3_tier.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -157,29 +157,35 @@ public class EvaluationService {
 
     // 모든 평가 기록에 대해서 티어를 다시 계산함.
     public void calculateAllTier() {
-        // TODO: 현재 티어 계산을 막아놨습니다.
-//        // 가게 메인 티어 계산
-//        List<Restaurant> restaurantList = restaurantRepository.getAllRestaurantsOrderedByAvgScore(minNumberOfEvaluations, "전체");
-//        for (Restaurant restaurant: restaurantList) {
-//            if (restaurant.getRestaurantEvaluationCount() >= minNumberOfEvaluations) {
-//                EnumTier tier = EnumTier.calculateTierOfRestaurant(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount());
-//                restaurant.setMainTier(tier.getValue());
-//            } else {
-//                restaurant.setMainTier(-1);
-//            }
-//            restaurantRepository.save(restaurant);
-//        }
-//        // 가게 상황 티어 계산
-//        List<RestaurantSituationRelation> restaurantSituationRelationList = restaurantSituationRelationRepository.findAll();
-//        for (RestaurantSituationRelation restaurantSituationRelation: restaurantSituationRelationList) {
-//            if (restaurantSituationRelation.getDataCount() >= minNumberOfEvaluations) {
-//                Double AvgScore = restaurantSituationRelation.getScoreSum() / restaurantSituationRelation.getDataCount();
-//                restaurantSituationRelation.setSituationTier(EnumTier.calculateSituationTierOfRestaurant(AvgScore).getValue());
-//            } else {
-//                restaurantSituationRelation.setSituationTier(-1);
-//            }
-//            restaurantSituationRelationRepository.save(restaurantSituationRelation);
-//        }
+        // 가게 메인 티어 계산
+        List<Restaurant> restaurantList = restaurantRepository.getAllRestaurantsOrderedByAvgScore(minNumberOfEvaluations, "전체");
+        for (Restaurant restaurant: restaurantList) {
+            if (restaurant.getRestaurantEvaluationCount() >= minNumberOfEvaluations) {
+                restaurant.setMainTier(
+                        calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
+                );
+            } else {
+                restaurant.setMainTier(-1);
+            }
+            restaurantRepository.save(restaurant);
+        }
+    }
+
+    // TODO: 티어 산출 기준 로직 수정
+    private int calculateRestaurantTier(double averageScore) {
+        if (averageScore >= 4.3) {
+            return 1;
+        } else if (averageScore > 3.9) {
+            return 2;
+        } else if (averageScore > 3.3) {
+            return 3;
+        } else if (averageScore > 2.5) {
+            return 4;
+        } else if (averageScore >= 1.0) {
+            return 5;
+        } else {
+            return -1;
+        }
     }
 
     public List<RestaurantTierDataClass> getAllRestaurantTierDataClassList(String position, Principal principal, int page, Boolean isSearching) {

@@ -3,6 +3,7 @@ package com.kustaurant.restauranttier.tab3_tier.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantFavorite;
 import com.kustaurant.restauranttier.tab3_tier.entity.Situation;
 import com.kustaurant.restauranttier.tab3_tier.etc.EnumSituation;
@@ -10,7 +11,6 @@ import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.repository.EvaluationRepository;
 import com.kustaurant.restauranttier.tab3_tier.repository.SituationRepository;
-import com.kustaurant.restauranttier.tab5_mypage.service.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 import lombok.RequiredArgsConstructor;

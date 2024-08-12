@@ -8,7 +8,7 @@ import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostScrapApiRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
-import com.kustaurant.restauranttier.tab5_mypage.repository.UserApiRepository;
+import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostApiService {
     private final PostApiRepository postApiRepository;
-    private final UserApiRepository userApiRepository;
+    private final UserRepository userRepository;
     private final PostScrapApiRepository postScrapApiRepository;
     // 인기순 제한 기준 숫자
     public static  final int POPULARCOUNT = 5;
@@ -85,7 +85,7 @@ public class PostApiService {
         post.setUser(user);
         Post savedpost = postApiRepository.save(post);
         user.getPostList().add(savedpost);
-        userApiRepository.save(user);
+        userRepository.save(user);
     }
     // 게시물 리스트에 대한 시간 경과 리스트로 반환하는 함수.
     public List<String> getTimeAgoList(Page<PostDTO> postList) {
@@ -160,7 +160,7 @@ public class PostApiService {
         // 상태 반환
 
         postApiRepository.save(post);
-        userApiRepository.save(user);
+        userRepository.save(user);
         return status;
     }
 
@@ -196,7 +196,7 @@ public class PostApiService {
             status.put("dislikeCreated", true);
         }
         postApiRepository.save(post);
-        userApiRepository.save(user);
+        userRepository.save(user);
         return status;
     }
 

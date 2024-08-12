@@ -1,13 +1,11 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
-import com.kustaurant.restauranttier.tab3_tier.dto.Coordinate;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierMapDTO;
-import com.kustaurant.restauranttier.tab3_tier.etc.LocationEnum;
 import com.kustaurant.restauranttier.tab3_tier.etc.MapVariable;
-import com.kustaurant.restauranttier.tab3_tier.etc.SituationEnum;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
+import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantSituationRelationRepository;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,20 +34,20 @@ import java.util.stream.IntStream;
  * @since 2024.7.10.
  * description: tier controller
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/tier")
 @RequiredArgsConstructor
-@ApiResponses(value = {
-        @ApiResponse(responseCode = "400", description = "Bad request - Invalid parameters provided", content = {@Content(mediaType = "application/json")})
-})
 public class TierApiController {
 
     private final RestaurantApiRepository restaurantApiRepository;
     private final RestaurantApiService restaurantApiService;
+    private final RestaurantSituationRelationRepository restaurantSituationRelationRepository;
 
     @Operation(summary = "티어표 리스트 불러오기", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantTierDTO.class)))})
+            @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantTierDTO.class)))}),
+            @ApiResponse(responseCode = "400", description = "요청 파라미터가 잘못됨.")
     })
     @GetMapping
     public ResponseEntity<List<RestaurantTierDTO>> getTierChartList(
@@ -62,16 +60,36 @@ public class TierApiController {
             @RequestParam(defaultValue = "ALL")
             @Parameter(example = "L1,L2,L3 또는 ALL", description = "위치입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, L1:건입~중문, L2:중문~어대, L3:후문, L4:정문, L5:구의역")
             String locations,
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "30") Integer limit
+            @RequestParam(defaultValue = "1") @Parameter(description = "페이지는 1부터 시작입니다.") Integer page,
+            @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit
     ) {
+        // page 0부터 시작하게 수정
+        page--;
+        // 예외 처리
+        if (cuisines.contains("ALL") && cuisines.contains(("JH"))) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        // DB 조회
+        List<Restaurant> restaurants;
+        try {
+            restaurants = restaurantApiService.getRestaurantsByCuisinesAndLocationsAndSituationsWithPage(cuisines, locations, situations, null, true, page, limit).toList();
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (restaurants.isEmpty()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        }
+        //-----------------
         List<RestaurantTierDTO> responseList = new ArrayList<>();
-        Page<Restaurant> restaurants = restaurantApiService.getRestaurantsByCuisinesAndLocationsWithPage(cuisines, locations, null, true, page, limit);
 
         for (int i = 0; i < limit; i++) {
             try {
-                int ranking = (page - 1) * limit + i + 1;
-                Restaurant restaurant = restaurants.toList().get(i);
+                Integer ranking = null;
+                Restaurant restaurant = restaurants.get(i);
+                if (restaurant.getMainTier() > 0) {
+                    ranking = page * limit + i + 1;
+                }
                 responseList.add(RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, ranking, randomBoolean(), randomBoolean()));
             } catch (IndexOutOfBoundsException ignored) {
 
@@ -83,7 +101,7 @@ public class TierApiController {
 
     public static boolean randomBoolean() {
         Random random = new Random();
-        return random.nextDouble() < 0.4; // 30% 확률로 true, 70% 확률로 false
+        return random.nextDouble() < 0.4; // 40% 확률로 true, 60% 확률로 false
     }
 
     @Operation(summary = "지도 식당 정보 불러오기", description = "[설명]" +
