@@ -22,6 +22,8 @@ public class Evaluation {
 
     private String evaluationComment;
 
+    private String evaluationImgUrl;
+
     private Double evaluationScore;
 
     private String status="ACTIVE";

@@ -37,6 +37,7 @@ public class RestaurantComment {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Integer parentCommentId;
 
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();
