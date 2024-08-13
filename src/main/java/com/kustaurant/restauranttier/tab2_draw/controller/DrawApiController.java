@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab2_draw.controller;
 
+import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.tab2_draw.dto.DrawResponse;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
@@ -30,7 +31,7 @@ public class DrawApiController {
     @Operation(summary = "뽑기 버튼 클릭 시 조건에 맞는 식당 리스트 반환", description = "위치와 음식 종류에 맞는 식당 중 랜덤으로 30개를 추출하여 반환합니다. 이 30개 중에서 하나를 뽑는 방식으로 뽑기가 진행되고 뽑는 방식은 클라이언트에서 진행됩니다. 조건이 맞는 식당이 30개가 안될 경우 조건에 맞는 식당을 중복으로 추가하여 30개 수량을 맞추고 랜덤으로 섞어서 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "해당 조건에 맞는 맛집이 성공적으로 반환되었습니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantTierDTO.class)))}),
-            @ApiResponse(responseCode = "404", description = "해당 조건에 맞는 맛집이 존재하지 않습니다.", content = {@Content(mediaType = "application/json")})
+            @ApiResponse(responseCode = "404", description = "해당 조건에 맞는 맛집이 존재하지 않습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class) )})
     })
     @GetMapping("/api/v1/draw")
     public ResponseEntity<Object> getRestaurantListForCuisine(
