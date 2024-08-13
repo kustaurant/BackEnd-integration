@@ -55,7 +55,7 @@ public class RestaurantTierDTO {
                 restaurant.getRestaurantId(),
                 ranking,
                 restaurant.getRestaurantName(),
-                restaurant.getRestaurantCuisine() + "-" + restaurant.getRestaurantType(),
+                restaurant.getRestaurantCuisine(),
                 restaurant.getRestaurantPosition(),
                 image,
                 restaurant.getMainTier(),

@@ -61,7 +61,7 @@ public class RestaurantDetailDTO {
                 restaurant.getRestaurantId(),
                 restaurant.getRestaurantImgUrl(),
                 restaurant.getMainTier(),
-                restaurant.getRestaurantCuisine() + "-" + restaurant.getRestaurantType(),
+                restaurant.getRestaurantCuisine(),
                 "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + restaurant.getRestaurantCuisine().replaceAll("/", "") + ".svg",
                 restaurant.getRestaurantPosition(),
                 restaurant.getRestaurantName(),
