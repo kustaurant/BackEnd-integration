@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,9 +43,16 @@ public class HomeApiController {
                 .collect(Collectors.toList());
 
         // 홈화면의 배너 이미지 (현재는 하드코딩된 상태)
-        List<String> homePhotoUrls = topRestaurantsByRating.stream().limit(5)
+        List<String> homePhotoUrls = new ArrayList<>();
+
+        String imagePath = "/img/home/배너1.png";
+        // 서버의 도메인 주소와 이미지 경로를 합쳐서 전체 URL을 생성합니다.
+        String imageUrl = "http://3.35.154.191:8080" + imagePath;
+        homePhotoUrls.add(imageUrl);
+        List<String> tempUrls = topRestaurantsByRating.stream().limit(4)
                 .map(Restaurant::getRestaurantImgUrl)
                 .collect(Collectors.toList());
+        homePhotoUrls.addAll(tempUrls);
         RestaurantListsResponse response = new RestaurantListsResponse(topRestaurantsByRatingDTOs, restaurantsForMeDTOs, homePhotoUrls);
         return ResponseEntity.ok(response);
     }

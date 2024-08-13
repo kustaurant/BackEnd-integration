@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab2_draw.controller;
 
+import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.tab2_draw.dto.DrawResponse;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
@@ -45,8 +46,7 @@ public class DrawApiController {
         // 조건에 맞는 식당이 없을 경우 404 에러 반환
         // 조건에 맞는 식당이 없을 경우 404 에러와 메시지 반환
         if (restaurantList.isEmpty()) {
-            DrawResponse drawResponse = new DrawResponse("해당 조건에 맞는 맛집이 존재하지 않습니다.",null);
-            return new ResponseEntity<>(drawResponse, HttpStatus.NOT_FOUND);
+            throw new OptionalNotExistException("해당 조건에 맞는 맛집이 존재하지 않습니다.");
         }
 
         // 랜덤으로 30개의 식당 선택
