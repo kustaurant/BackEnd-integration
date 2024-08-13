@@ -25,7 +25,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -151,30 +153,52 @@ public class RestaurantApiController {
 
     // 리뷰 추천하기
     @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}/like")
-    @Operation(summary = "(기능 작동x) 리뷰 추천하기", description = "추천을 누른 후의 추천 수를 반환합니다.")
+    @Operation(summary = "(기능 작동x) 리뷰 추천하기", description = "추천을 누른 후의 추천수와 비추천수를 반환합니다.\n\n반환 형식은 리뷰와 동일합니다.")
     @ApiResponse(responseCode = "200", description = "리뷰 추천하기 누르고 난 후의 추천 수를 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class))})
-    public ResponseEntity<Integer> likeComment(
+    public ResponseEntity<RestaurantCommentDTO> likeComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId
     ) {
-        return new ResponseEntity<>(123, HttpStatus.OK);
+        // TODO: 로그인 구현 후 수정
+        User user = userApiService.findUserById(userId);
+        if (user == null) {
+            throw new OptionalNotExistException(userId + "해당 유저가 없습니다.");
+        }
+
+        RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
+
+        Map<String, String> responseMap = new HashMap<>();
+        restaurantCommentService.likeComment(user, restaurantComment, responseMap);
+
+        return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, user));
     }
 
     // 리뷰 비추천하기
     @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}/dislike")
-    @Operation(summary = "(기능 작동x) 리뷰 비추천하기", description = "비추천을 누른 후의 비추천 수를 반환합니다.")
+    @Operation(summary = "리뷰 비추천하기", description = "비추천을 누른 후의 추천수와 비추천수를 반환합니다.\n\n반환 형식은 댓글과 동일합니다.")
     @ApiResponse(responseCode = "200", description = "리뷰 비추천하기 누르고 난 후의 비추천 수를 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class))})
-    public ResponseEntity<Integer> dislikeComment(
+    public ResponseEntity<RestaurantCommentDTO> dislikeComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId
     ) {
-        return new ResponseEntity<>(33, HttpStatus.OK);
+        // TODO: 로그인 구현 후 수정
+        User user = userApiService.findUserById(userId);
+        if (user == null) {
+            throw new OptionalNotExistException(userId + "해당 유저가 없습니다.");
+        }
+
+        RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
+
+        Map<String, String> responseMap = new HashMap<>();
+        restaurantCommentService.dislikeComment(user, restaurantComment, responseMap);
+
+        return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, user));
     }
 
     // 식당 대댓글 달기
     @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
-    @Operation(summary = "(기능 작동x) 식당 대댓글 달기", description = "작성한 대댓글을 반환합니다.")
-    @ApiResponse(responseCode = "200", description = "작성한 대댓글을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantCommentDTO.class))})
+    @Operation(summary = "식당 대댓글 달기", description = "작성한 대댓글의 부모 댓글을 반환합니다.")
+    @ApiResponse(responseCode = "200", description = "작성한 대댓글의 부모 댓글을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantCommentDTO.class))})
     public ResponseEntity<RestaurantCommentDTO> postReply(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,

@@ -83,4 +83,6 @@ public interface RestaurantCommentRepository extends JpaRepository<RestaurantCom
     Optional<RestaurantComment> findByParentEvaluationIdAndStatus(Integer parentEvaluationId, String status);
 
     List<RestaurantComment> findByParentCommentIdAndStatus(Integer parentCommentId, String status);
+
+    Optional<RestaurantComment> findByCommentIdAndStatus(Integer commentId, String active);
 }
