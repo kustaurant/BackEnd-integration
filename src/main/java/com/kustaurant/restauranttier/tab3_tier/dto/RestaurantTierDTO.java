@@ -43,13 +43,21 @@ public class RestaurantTierDTO {
         DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.HALF_UP);
         Double score = restaurant.getRestaurantEvaluationCount() != 0 ? Double.parseDouble(df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())) : 0;
+        String image;
+        if(restaurant.getRestaurantImgUrl().equals("no_img")){
+            image = "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/"+"쿠스토랑로고.png";
+            System.out.println("대체이미지 반환");
+        }else{
+            image = restaurant.getRestaurantImgUrl();
+        }
+
         return new RestaurantTierDTO(
                 restaurant.getRestaurantId(),
                 ranking,
                 restaurant.getRestaurantName(),
                 restaurant.getRestaurantCuisine() + "-" + restaurant.getRestaurantType(),
                 restaurant.getRestaurantPosition(),
-                restaurant.getRestaurantImgUrl(),
+                image,
                 restaurant.getMainTier(),
                 isEvaluated,
                 isFavorite,

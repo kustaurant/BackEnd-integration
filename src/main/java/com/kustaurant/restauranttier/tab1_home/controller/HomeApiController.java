@@ -15,7 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,9 +34,14 @@ public class HomeApiController {
     @GetMapping("/api/v1/home")
     public ResponseEntity<RestaurantListsResponse> home() {
         List<Restaurant> topRestaurantsByRating = restaurantApiService.getTopRestaurants(); // 점수 높은 순으로 총 16개
-        List<Restaurant> restaurantsForMe = restaurantApiService.getTopRestaurants(); // 임시로 설정
+        List<Restaurant> restaurantsForMe = restaurantApiService.getRestaurantsByCuisinesAndLocations("ALL","ALL",null,false); // 임시로 설정
+        Random rand = new Random();
 
+        // 결과 리스트를 랜덤으로 섞음
+        Collections.shuffle(restaurantsForMe, rand);
+        restaurantsForMe.subList(0,15);
 
+        
         List<RestaurantTierDTO> topRestaurantsByRatingDTOs = topRestaurantsByRating.stream()
                 .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant,null,null,null))
                 .collect(Collectors.toList());
@@ -41,10 +49,29 @@ public class HomeApiController {
                 .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant,null,null,null))
                 .collect(Collectors.toList());
 
-        // 홈화면의 배너 이미지 (현재는 하드코딩된 상태)
-        List<String> homePhotoUrls = topRestaurantsByRating.stream().limit(5)
+        // TODO:토큰을 통해 로그인 되어있는지 확인하고 로그인되어있으면 즐겨찾기 기반 추천, 안되어있을 시 랜덤 추천
+//        if (token != null && jwtTokenProvider.validateToken(token)) {
+//            // 유저 ID를 토큰에서 추출
+//            Long userId = jwtTokenProvider.getUserIdFromToken(token);
+//            // 로그인된 유저의 즐겨찾기 기반 추천
+//            restaurantsForMe = restaurantApiService.getRecommendedRestaurantsForUser(userId);
+//        } else {
+//            // 비로그인 유저를 위한 랜덤 추천
+//            restaurantsForMe = restaurantApiService.getRandomRestaurants();
+//        }
+
+        // 홈화면의 배너 이미지 TODO: 현재 임시이미지고 실제로 구현해야함
+        List<String> homePhotoUrls = new ArrayList<>();
+
+        String imagePath = "/img/home/배너1.png";
+        // 서버의 도메인 주소와 이미지 경로를 합쳐서 전체 URL을 생성합니다.
+        String imageUrl = "http://3.35.154.191:8080" + imagePath;
+        homePhotoUrls.add(imageUrl);
+        // 임시 배너 이미지 추가
+        List<String> tempUrls = topRestaurantsByRating.stream().limit(4)
                 .map(Restaurant::getRestaurantImgUrl)
-                .collect(Collectors.toList());
+                .toList();
+        homePhotoUrls.addAll(tempUrls);
         RestaurantListsResponse response = new RestaurantListsResponse(topRestaurantsByRatingDTOs, restaurantsForMeDTOs, homePhotoUrls);
         return ResponseEntity.ok(response);
     }
