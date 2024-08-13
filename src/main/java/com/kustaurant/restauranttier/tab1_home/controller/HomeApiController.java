@@ -41,11 +41,11 @@ public class HomeApiController {
         Collections.shuffle(restaurantsForMe, rand);
         restaurantsForMe.subList(0,15);
 
-        
+
         List<RestaurantTierDTO> topRestaurantsByRatingDTOs = topRestaurantsByRating.stream()
                 .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant,null,null,null))
                 .collect(Collectors.toList());
-        List<RestaurantTierDTO> restaurantsForMeDTOs = topRestaurantsByRating.stream()
+        List<RestaurantTierDTO> restaurantsForMeDTOs = restaurantsForMe.stream()
                 .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant,null,null,null))
                 .collect(Collectors.toList());
 
