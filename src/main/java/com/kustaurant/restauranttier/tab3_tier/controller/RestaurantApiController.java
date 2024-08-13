@@ -1,17 +1,15 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
-import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
-import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantComment;
+import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantDetailDTO;
-import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
+import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
+import com.kustaurant.restauranttier.tab3_tier.service.RestaurantCommentService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantFavoriteService;
-import com.kustaurant.restauranttier.tab3_tier.service.RestaurantService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
-import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import com.kustaurant.restauranttier.tab5_mypage.service.UserApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,9 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -46,6 +42,7 @@ public class RestaurantApiController {
     private final UserApiService userApiService;
     private final RestaurantApiService restaurantApiService;
     private final RestaurantFavoriteService restaurantFavoriteService;
+    private final RestaurantCommentService restaurantCommentService;
 
     private final int userId = 23;
 
@@ -108,7 +105,10 @@ public class RestaurantApiController {
         return user.getEvaluationList().stream()
                 .filter(evaluation -> evaluation.getRestaurant().equals(restaurant))
                 .findFirst()
-                .map(evaluation -> ResponseEntity.ok(EvaluationDTO.convertEvaluation(evaluation)))
+                .map(evaluation -> {
+                    RestaurantComment comment = restaurantCommentService.findCommentByEvaluationId(evaluation.getEvaluationId());
+                    return ResponseEntity.ok(EvaluationDTO.convertEvaluation(evaluation, comment));
+                })
                 .orElse(ResponseEntity.ok(null));
     }
 
@@ -129,8 +129,8 @@ public class RestaurantApiController {
     // 리뷰 불러오기
     @GetMapping("/restaurants/{restaurantId}/comments")
     @Operation(summary = "(기능 작동x) 리뷰 불러오기", description = "인기순 -> sort=popularity \n\n최신순 -> sort=latest")
-    @ApiResponse(responseCode = "200", description = "댓글 리스트입니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantComment.class)))})
-    public ResponseEntity<List<RestaurantComment>> getReviewList(
+    @ApiResponse(responseCode = "200", description = "댓글 리스트입니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCommentDTO.class)))})
+    public ResponseEntity<List<RestaurantCommentDTO>> getReviewList(
             @PathVariable Integer restaurantId,
             @RequestParam(defaultValue = "popularity")
             @Parameter(example = "popularity 또는 latest", description = "인기순: popularity, 최신순: latest")
@@ -164,8 +164,8 @@ public class RestaurantApiController {
     // 식당 대댓글 달기
     @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
     @Operation(summary = "(기능 작동x) 식당 대댓글 달기", description = "작성한 대댓글을 반환합니다.")
-    @ApiResponse(responseCode = "200", description = "작성한 대댓글을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantComment.class))})
-    public ResponseEntity<RestaurantComment> postReply(
+    @ApiResponse(responseCode = "200", description = "작성한 대댓글을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantCommentDTO.class))})
+    public ResponseEntity<RestaurantCommentDTO> postReply(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
             @RequestBody String commentBody

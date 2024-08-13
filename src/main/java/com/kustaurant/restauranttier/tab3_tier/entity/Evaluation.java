@@ -20,10 +20,6 @@ public class Evaluation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer evaluationId;
 
-    private String evaluationComment;
-
-    private String evaluationImgUrl;
-
     private Double evaluationScore;
 
     private String status="ACTIVE";

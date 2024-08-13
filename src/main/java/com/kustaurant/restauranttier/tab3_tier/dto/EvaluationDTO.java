@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.dto;
 
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
+import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,12 +22,13 @@ public class EvaluationDTO {
     @Schema(description = "리뷰 멘트", example = "오 좀 맛있는데?")
     private String evaluationComment;
 
-    public static EvaluationDTO convertEvaluation(Evaluation evaluation) {
+    public static EvaluationDTO convertEvaluation(Evaluation evaluation, RestaurantComment comment) {
         return new EvaluationDTO(
+                // TODO: 여기 수정
                 evaluation.getEvaluationScore(),
                 evaluation.getEvaluationItemScoreList().stream().map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationId()).collect(Collectors.toList()),
-                evaluation.getEvaluationImgUrl(),
-                evaluation.getEvaluationComment()
+                comment.getCommentBody(),
+                comment.getCommentImgUrl()
         );
     }
 }

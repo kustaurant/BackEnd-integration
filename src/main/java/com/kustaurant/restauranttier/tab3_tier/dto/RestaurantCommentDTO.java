@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Schema(description = "evaluation data dto entity")
-public class RestaurantComment {
+public class RestaurantCommentDTO {
     @Schema(description = "평가 id", example = "3")
     private Integer commentId;
     @Schema(description = "평가 별점", example = "4.5")
@@ -31,5 +31,5 @@ public class RestaurantComment {
     @Schema(description = "비추천 개수", example = "3")
     private Integer commentDislikeCount;
     @Schema(description = "대댓글 리스트")
-    private List<RestaurantComment> commentReplies;
+    private List<RestaurantCommentDTO> commentReplies;
 }

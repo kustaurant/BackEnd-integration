@@ -79,4 +79,6 @@ public interface RestaurantCommentRepository extends JpaRepository<RestaurantCom
     Integer findLikeDislikeDiffByCommentId(@Param("commentId") Integer commentId);
 
     Optional<RestaurantComment> findByCommentId(Integer commentId);
+
+    Optional<RestaurantComment> findByParentEvaluationIdAndStatus(Integer parentEvaluationId, String status);
 }

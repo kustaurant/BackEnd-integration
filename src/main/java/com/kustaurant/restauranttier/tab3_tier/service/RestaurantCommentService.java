@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
+import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantCommentdislike;
@@ -29,6 +30,12 @@ public class RestaurantCommentService {
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+
+    public RestaurantComment findCommentByEvaluationId(Integer evaluationId) {
+        return restaurantCommentRepository.findByParentEvaluationIdAndStatus(evaluationId, "ACTIVE").orElse(null);
+    }
+
+    //public List<RestaurantCommentDTO> getRestaurantCommentList
 
     public String addComment(Integer restaurantId, String userTokenId, String commentBody) {
         RestaurantComment restaurantComment = new RestaurantComment();

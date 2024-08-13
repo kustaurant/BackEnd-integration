@@ -34,10 +34,12 @@ public class RestaurantComment {
     private List<RestaurantCommentdislike> restaurantCommentdislikeList=new ArrayList<>();
 
     private String commentBody;
+    private String commentImgUrl;
+    private Integer parentEvaluationId;
+    private Integer parentCommentId;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Integer parentCommentId;
 
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();
