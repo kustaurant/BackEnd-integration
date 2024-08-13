@@ -1,7 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Data
@@ -50,7 +48,7 @@ public class RestaurantCommentDTO {
                 comment.calculateTimeAgo(),
                 comment.getCommentImgUrl(),
                 comment.getCommentBody(),
-                isUserLikeDisLike(comment, user),
+                isUserLikeDisLikeStatus(comment, user),
                 comment.getRestaurantCommentlikeList().size(),
                 comment.getRestaurantCommentdislikeList().size(),
                 null,
@@ -58,7 +56,17 @@ public class RestaurantCommentDTO {
         );
     }
 
-    private static int isUserLikeDisLike(RestaurantComment comment, User user) {
+    // 추천수와 비추천 수만 반환하는 생성자
+    public static RestaurantCommentDTO convertCommentWhenLikeDislike(RestaurantComment comment, User user) {
+        return new RestaurantCommentDTO(
+                null, null, null, null, null, null, null,
+                isUserLikeDisLikeStatus(comment, user),
+                comment.getRestaurantCommentlikeList().size(),
+                comment.getRestaurantCommentdislikeList().size(), null, null
+        );
+    }
+
+    private static int isUserLikeDisLikeStatus(RestaurantComment comment, User user) {
         if (user == null) {
             return 0;
         }

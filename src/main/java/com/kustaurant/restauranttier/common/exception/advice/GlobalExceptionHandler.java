@@ -39,4 +39,10 @@ public class GlobalExceptionHandler {
         log.error("[OptionalNotExistException]", e);
         return new ResponseEntity<>(new ErrorResponse("NOT FOUND", e.getMessage()), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e) {
+        log.error("[IllegalStateException]", e);
+        return new ResponseEntity<>(new ErrorResponse("SERVER STATE ERROR", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
