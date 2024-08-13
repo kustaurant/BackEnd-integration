@@ -71,6 +71,11 @@ public class SwaggerConfig {
         - /evaluation GET, POST 두 개의 api 모두 evaluationSituations를 문자열 리스트에서 정수형 리스트로 변환했습니다.
         - 즐겨찾기 토글 기능 구현
         - 이전 평가 데이터 불러오기 구현
+        
+    **Version 1.2.2 (2024-08-13)**
+    - 뽑기 화면 API
+        - 조건에 맞는 식당이 없을 때 404 에러 메시지 반환
+        - no_img일때 대체이미지로 변환해서 반환
     """;
 
 
