@@ -39,7 +39,7 @@ public class RestaurantCommentDTO {
     @JsonIgnore
     private LocalDateTime date;
 
-    public static RestaurantCommentDTO convertEvaluationAndComment(RestaurantComment comment, Double evaluationScore, User user) {
+    public static RestaurantCommentDTO convertComment(RestaurantComment comment, Double evaluationScore, User user) {
         return new RestaurantCommentDTO(
                 comment.getCommentId(),
                 evaluationScore,

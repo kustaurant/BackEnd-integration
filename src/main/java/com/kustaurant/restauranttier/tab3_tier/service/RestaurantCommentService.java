@@ -54,7 +54,7 @@ public class RestaurantCommentService {
                     return comment != null ? new AbstractMap.SimpleEntry<>(evaluation, comment) : null;
                 })
                 .filter(Objects::nonNull)
-                .map(entry -> RestaurantCommentDTO.convertEvaluationAndComment(
+                .map(entry -> RestaurantCommentDTO.convertComment(
                         entry.getValue(),          // comment
                         entry.getKey().getEvaluationScore(), // evaluationScore
                         user
@@ -69,12 +69,13 @@ public class RestaurantCommentService {
             mainCommentList.sort(Comparator.comparing(RestaurantCommentDTO::getDate).reversed());
         }
 
-        // 대댓글 추가를 위한 새로운 리스트 생성
+        // 각 댓글에 대댓글 추가해서 반환
         return mainCommentList.stream()
                 .peek(mainComment ->
                         mainComment.setCommentReplies(
                                 findCommentsByParentCommentId(mainComment.getCommentId()).stream()
-                                        .map(comment -> RestaurantCommentDTO.convertEvaluationAndComment(comment, null, user))
+                                        .map(comment -> RestaurantCommentDTO.convertComment(comment, null, user))
+                                        .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
                                         .collect(Collectors.toList())
                         )
                 )
@@ -102,6 +103,22 @@ public class RestaurantCommentService {
         } else {
             return "userTokenId";
         }
+    }
+
+    public RestaurantComment addSubComment(Restaurant restaurant, User user, String commentBody, Integer parentCommentId) {
+        RestaurantComment restaurantComment = new RestaurantComment();
+
+        restaurantComment.setUser(user);
+        restaurantComment.setRestaurant(restaurant);
+        restaurantComment.setCommentBody(commentBody);
+        restaurantComment.setStatus("ACTIVE");
+        restaurantComment.setCreatedAt(LocalDateTime.now());
+        restaurantComment.setParentCommentId(parentCommentId);
+        restaurantComment.setCommentLikeCount(0);
+
+        restaurantCommentRepository.save(restaurantComment);
+
+        return restaurantComment;
     }
 
     public RestaurantComment getComment(int commentId) {

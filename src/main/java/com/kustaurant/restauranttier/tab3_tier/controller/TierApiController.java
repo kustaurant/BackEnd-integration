@@ -1,6 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
-import com.kustaurant.restauranttier.common.exception.exception.TierParamException;
+import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierMapDTO;
@@ -68,7 +68,7 @@ public class TierApiController {
         page--;
         // 예외 처리
         if (cuisines.contains("ALL") && cuisines.contains(("JH"))) {
-            throw new TierParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
+            throw new ParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
         }
         // DB 조회
         List<Restaurant> restaurants = restaurantApiService.getRestaurantsByCuisinesAndLocationsAndSituationsWithPage(cuisines, locations, situations, null, true, page, limit).toList();
@@ -124,7 +124,7 @@ public class TierApiController {
     ) {
         // 예외 처리
         if (cuisines.contains("ALL") && cuisines.contains(("JH"))) {
-            throw new TierParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
+            throw new ParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
         }
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
         List<Restaurant> tieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndLocations(cuisines, locations, 1, false);
@@ -150,7 +150,7 @@ public class TierApiController {
                         .map(res -> RestaurantTierDTO.convertRestaurantToTierDTO(res, null, randomBoolean(), randomBoolean()))
                         .toList();
             } catch (NumberFormatException e) {
-                throw new TierParamException("situations 파라미터 입력이 올바르지 않습니다.");
+                throw new ParamException("situations 파라미터 입력이 올바르지 않습니다.");
             }
         } else {
             tieredRestaurantTierDTOs = tieredRestaurants.stream()
@@ -202,7 +202,7 @@ public class TierApiController {
                     }
                 }
             } catch (NumberFormatException e) {
-                throw new TierParamException("locations 파라미터 입력이 올바르지 않습니다.");
+                throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
             }
         } else {
             response.setSolidPolygonCoordsList(MapVariable.LIST_OF_COORD_LIST);

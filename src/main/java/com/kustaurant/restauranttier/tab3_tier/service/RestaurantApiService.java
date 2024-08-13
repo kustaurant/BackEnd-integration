@@ -1,7 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
-import com.kustaurant.restauranttier.common.exception.exception.TierParamException;
+import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.etc.CuisineEnum;
 import com.kustaurant.restauranttier.tab3_tier.etc.LocationEnum;
@@ -74,12 +74,12 @@ public class RestaurantApiService {
         try {
             cuisineList = cuisines.contains("ALL") ? null : Arrays.stream(cuisines.split(",")).map(c -> CuisineEnum.valueOf(c).getValue()).toList();
         } catch (IllegalArgumentException e) {
-            throw new TierParamException("cuisines 파라미터 입력이 올바르지 않습니다.");
+            throw new ParamException("cuisines 파라미터 입력이 올바르지 않습니다.");
         }
         try {
             locationList = locations.contains("ALL") ? null : Arrays.stream(locations.split(",")).map(l -> LocationEnum.valueOf(l).getValue()).toList();
         } catch (IllegalArgumentException e) {
-            throw new TierParamException("locations 파라미터 입력이 올바르지 않습니다.");
+            throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
         }
 
         if (cuisineList != null && cuisineList.contains("JH")) {
@@ -104,17 +104,17 @@ public class RestaurantApiService {
         try {
             cuisineList = cuisines.contains("ALL") ? null : Arrays.stream(cuisines.split(",")).map(c -> CuisineEnum.valueOf(c.trim()).getValue()).toList();
         } catch (IllegalArgumentException e) {
-            throw new TierParamException("cuisines 파라미터 입력이 올바르지 않습니다.");
+            throw new ParamException("cuisines 파라미터 입력이 올바르지 않습니다.");
         }
         try {
             locationList = locations.contains("ALL") ? null : Arrays.stream(locations.split(",")).map(l -> LocationEnum.valueOf(l.trim()).getValue()).toList();
         } catch (IllegalArgumentException e) {
-            throw new TierParamException("locations 파라미터 입력이 올바르지 않습니다.");
+            throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
         }
         try {
             situationList = situations.contains("ALL") ? null : Arrays.stream(situations.split(",")).map(s -> Integer.parseInt(s.trim())).toList();
         } catch (IllegalArgumentException e) {
-            throw new TierParamException("situations 파라미터 입력이 올바르지 않습니다.");
+            throw new ParamException("situations 파라미터 입력이 올바르지 않습니다.");
         }
 
         if (cuisineList != null && cuisineList.contains("제휴업체")) {

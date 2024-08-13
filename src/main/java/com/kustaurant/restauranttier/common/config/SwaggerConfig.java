@@ -71,6 +71,10 @@ public class SwaggerConfig {
         - /evaluation GET, POST 두 개의 api 모두 evaluationSituations를 문자열 리스트에서 정수형 리스트로 변환했습니다.
         - 즐겨찾기 토글 기능 구현
         - 이전 평가 데이터 불러오기 구현
+        - 댓글 불러오기 구현
+        - 댓글 추천 비추천 구현
+        - 대댓글 달기 구현
+        (평가하기와 댓글 및 대댓글 삭제하기는 아직 구현되지 않았습니다.)
     """;
 
 

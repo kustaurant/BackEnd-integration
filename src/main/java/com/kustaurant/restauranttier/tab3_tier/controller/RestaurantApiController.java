@@ -1,7 +1,8 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
+import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
-import com.kustaurant.restauranttier.common.exception.exception.TierParamException;
+import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
@@ -38,9 +39,6 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-@ApiResponses(value = {
-        @ApiResponse(responseCode = "400", description = "Bad request - Invalid parameters provided", content = {@Content(mediaType = "application/json")})
-})
 public class RestaurantApiController {
     private final UserApiService userApiService;
     private final RestaurantApiService restaurantApiService;
@@ -77,7 +75,10 @@ public class RestaurantApiController {
     // 즐겨찾기
     @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle")
     @Operation(summary = "즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태를 반환합니다.\n\n눌러서 즐겨찾기가 해제된 경우 -> false반환")
-    @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+            @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    })
     public ResponseEntity<Boolean> restaurantFavoriteToggle(
             @PathVariable Integer restaurantId
     ) {
@@ -95,7 +96,10 @@ public class RestaurantApiController {
     @GetMapping("/auth/restaurants/{restaurantId}/evaluation")
     @Operation(summary = "평가 하기로 갈 때 이전 평가 데이터가 있을 경우 불러오기", description = "평가하기에서 사용하는 형식과 동일합니다. 유저가 이전에 해당 식당을 평가했을 경우 이전 평가 데이터를 불러와서 이전에 평가했던 사항을 보여줍니다. " +
             "\n\n이전 데이터가 없을 경우 아무것도 반환하지 않습니다.\n\n현재 restaurantId 599, 631에 데이터 있습니다.")
-    @ApiResponse(responseCode = "200", description = "success\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EvaluationDTO.class))})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "success\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EvaluationDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    })
     public ResponseEntity<EvaluationDTO> getPreEvaluationInfo(
             @PathVariable Integer restaurantId
     ) {
@@ -132,7 +136,11 @@ public class RestaurantApiController {
     // 리뷰 불러오기
     @GetMapping("/restaurants/{restaurantId}/comments")
     @Operation(summary = "리뷰 불러오기", description = "인기순 -> sort=popularity \n\n최신순 -> sort=latest")
-    @ApiResponse(responseCode = "200", description = "댓글 리스트입니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCommentDTO.class)))})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "댓글 리스트입니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCommentDTO.class)))}),
+            @ApiResponse(responseCode = "400", description = "sort 파라미터 입력값이 올바르지 않을 때 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    })
     public ResponseEntity<List<RestaurantCommentDTO>> getReviewList(
             @PathVariable Integer restaurantId,
             @RequestParam(defaultValue = "popularity")
@@ -140,7 +148,7 @@ public class RestaurantApiController {
             String sort
     ) {
         if (!sort.equals("popularity") && !sort.equals("latest")) {
-            throw new TierParamException("sort 파라미터 입력 값이 올바르지 않습니다.");
+            throw new ParamException("sort 파라미터 입력 값이 올바르지 않습니다.");
         }
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // TODO 나중에 수정
@@ -153,12 +161,23 @@ public class RestaurantApiController {
 
     // 리뷰 추천하기
     @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}/like")
-    @Operation(summary = "(기능 작동x) 리뷰 추천하기", description = "추천을 누른 후의 추천수와 비추천수를 반환합니다.\n\n반환 형식은 리뷰와 동일합니다.")
-    @ApiResponse(responseCode = "200", description = "리뷰 추천하기 누르고 난 후의 추천 수를 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class))})
+    @Operation(summary = "리뷰 추천하기", description = "추천을 누른 후의 추천수와 비추천수를 반환합니다.\n\n반환 형식은 리뷰와 동일합니다." +
+            "\n\n추천과 비추천은 동시에 눌릴 수 없고, 비추천을 누른 상태로 추천을 누르면 자동으로 비추천이 해제되고 추천이 누른 상태가 됩니다." +
+            "\n\ncommentLikeStatus가 1이면 현재 추천을 누른 상태, -1이면 비추천을 누른 상태, 0이면 아무것도 누르지 않은 상태입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 추천하기 누르고 난 후의 추천 수를 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantCommentDTO.class))}),
+            @ApiResponse(responseCode = "400", description = "해당 식당에 해당 comment Id를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없거나 commentId에 해당하는 comment가 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "500", description = "없는 경우겠지만 만에 하나 DB 일관성에 문제가 생겼을 경우 500을 반환하게 했습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    })
     public ResponseEntity<RestaurantCommentDTO> likeComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId
     ) {
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
+        checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+
         // TODO: 로그인 구현 후 수정
         User user = userApiService.findUserById(userId);
         if (user == null) {
@@ -175,12 +194,21 @@ public class RestaurantApiController {
 
     // 리뷰 비추천하기
     @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}/dislike")
-    @Operation(summary = "리뷰 비추천하기", description = "비추천을 누른 후의 추천수와 비추천수를 반환합니다.\n\n반환 형식은 댓글과 동일합니다.")
-    @ApiResponse(responseCode = "200", description = "리뷰 비추천하기 누르고 난 후의 비추천 수를 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class))})
+    @Operation(summary = "리뷰 비추천하기", description = "비추천을 누른 후의 추천수와 비추천수를 반환합니다.\n\n반환 형식은 댓글과 동일합니다.\n\n추천과 비추천은 동시에 눌릴 수 없고, 추천을 누른 상태로 비추천을 누르면 자동으로 추천이 해제되고 비추천이 누른 상태가 됩니다.\n\ncommentLikeStatus가 1이면 현재 추천을 누른 상태, -1이면 비추천을 누른 상태, 0이면 아무것도 누르지 않은 상태입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리뷰 비추천하기 누르고 난 후의 비추천 수를 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantCommentDTO.class))}),
+            @ApiResponse(responseCode = "400", description = "해당 식당에 해당 commentId를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없거나 commentId에 해당하는 comment가 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "500", description = "없는 경우겠지만 만에 하나 DB 일관성에 문제가 생겼을 경우 500을 반환하게 했습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    })
     public ResponseEntity<RestaurantCommentDTO> dislikeComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId
     ) {
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
+        checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+
         // TODO: 로그인 구현 후 수정
         User user = userApiService.findUserById(userId);
         if (user == null) {
@@ -198,13 +226,52 @@ public class RestaurantApiController {
     // 식당 대댓글 달기
     @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
     @Operation(summary = "식당 대댓글 달기", description = "작성한 대댓글의 부모 댓글을 반환합니다.")
-    @ApiResponse(responseCode = "200", description = "작성한 대댓글의 부모 댓글을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantCommentDTO.class))})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "작성한 대댓글의 부모 댓글을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantCommentDTO.class))}),
+            @ApiResponse(responseCode = "400", description = "댓글 내용이 없거나 공백류만 있는 경우와, 해당 식당에 해당 comment Id를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    })
     public ResponseEntity<RestaurantCommentDTO> postReply(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
             @RequestBody String commentBody
     ) {
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        // 댓글 내용 없는 경우 예외 처리
+        if (commentBody.trim().isEmpty()) {
+            throw new ParamException("대댓글 내용이 없습니다.");
+        }
+
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
+        checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+        // TODO: 로그인 구현 후 수정
+        User user = userApiService.findUserById(userId);
+        if (user == null) {
+            throw new OptionalNotExistException(userId + "해당 유저가 없습니다.");
+        }
+
+        RestaurantComment restaurantComment = restaurantCommentService.addSubComment(restaurant, user, commentBody, commentId);
+
+        return new ResponseEntity<>(RestaurantCommentDTO.convertComment(restaurantComment, null, null), HttpStatus.OK);
+    }
+
+    private void checkRestaurantIdAndCommentId(Restaurant restaurant, int restaurantId, int commentId) {
+        if (restaurant.getRestaurantCommentList().stream().noneMatch(comment -> comment.getCommentId().equals(commentId))) {
+            throw new ParamException(restaurantId + " 식당에는 " + commentId + " id를 가진 comment가 없습니다.");
+        }
+    }
+
+    // 식당 댓글 및 대댓글 삭제하기
+    @DeleteMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
+    @Operation(summary = "(기능 작동x) 식당 댓글 및 대댓글 삭제하기", description = "식당 댓글 및 대댓글 삭제하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제에 성공했습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))})
+    })
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable Integer restaurantId,
+            @PathVariable Integer commentId
+    ) {
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
