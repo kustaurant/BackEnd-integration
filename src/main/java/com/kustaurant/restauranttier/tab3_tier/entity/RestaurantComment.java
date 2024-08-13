@@ -37,6 +37,7 @@ public class RestaurantComment {
     private String commentImgUrl;
     private Integer parentEvaluationId;
     private Integer parentCommentId;
+    private Integer commentLikeCount;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

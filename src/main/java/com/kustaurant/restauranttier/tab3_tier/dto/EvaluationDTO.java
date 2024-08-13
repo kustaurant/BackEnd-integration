@@ -27,8 +27,8 @@ public class EvaluationDTO {
                 // TODO: 여기 수정
                 evaluation.getEvaluationScore(),
                 evaluation.getEvaluationItemScoreList().stream().map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationId()).collect(Collectors.toList()),
-                comment.getCommentBody(),
-                comment.getCommentImgUrl()
+                comment.getCommentImgUrl(),
+                comment.getCommentBody()
         );
     }
 }

@@ -62,8 +62,7 @@ public class RestaurantDetailDTO {
                 restaurant.getRestaurantImgUrl(),
                 restaurant.getMainTier(),
                 restaurant.getRestaurantCuisine() + "-" + restaurant.getRestaurantType(),
-                // TODO: 식당 음식 종류 이미지 아이콘 url 반환해야함.
-                "https://kustaurant.com/img/home/" + restaurant.getRestaurantCuisine() + ".png",
+                "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + restaurant.getRestaurantCuisine().replaceAll("/", "") + ".svg",
                 restaurant.getRestaurantPosition(),
                 restaurant.getRestaurantName(),
                 restaurant.getRestaurantAddress(),

@@ -1,10 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
-import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
-import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
-import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantCommentdislike;
-import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantCommentlike;
+import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantCommentDislikeRepository;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantCommentLikeRepository;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantCommentRepository;
@@ -14,15 +11,16 @@ import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import com.kustaurant.restauranttier.common.exception.exception.DataNotFoundException;
 import com.kustaurant.restauranttier.tab3_tier.etc.EnumSortComment;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class RestaurantCommentService {
 
     private final RestaurantCommentRepository restaurantCommentRepository;
@@ -35,7 +33,44 @@ public class RestaurantCommentService {
         return restaurantCommentRepository.findByParentEvaluationIdAndStatus(evaluationId, "ACTIVE").orElse(null);
     }
 
-    //public List<RestaurantCommentDTO> getRestaurantCommentList
+    public List<RestaurantComment> findCommentsByParentCommentId(Integer parentCommentId) {
+        return restaurantCommentRepository.findByParentCommentIdAndStatus(parentCommentId, "ACTIVE");
+    }
+
+    public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular) {
+        // 평가 데이터 및 댓글 가져오기
+        List<RestaurantCommentDTO> mainCommentList = new ArrayList<>(restaurant.getEvaluationList().stream()
+                .map(evaluation -> {
+                    RestaurantComment comment = findCommentByEvaluationId(evaluation.getEvaluationId());
+                    return comment != null ? new AbstractMap.SimpleEntry<>(evaluation, comment) : null;
+                })
+                .filter(Objects::nonNull)
+                .map(entry -> RestaurantCommentDTO.convertEvaluationAndComment(
+                        entry.getValue(),          // comment
+                        entry.getKey().getEvaluationScore(), // evaluationScore
+                        user
+                ))
+                .toList());
+
+        // 정렬
+        if (sortPopular) {
+            mainCommentList.sort(Comparator.comparing(RestaurantCommentDTO::getCommentLikeCount).reversed());
+        } else {
+            // TODO: 평가 정렬을 UpdateAt을 반영해야됨
+            mainCommentList.sort(Comparator.comparing(RestaurantCommentDTO::getDate).reversed());
+        }
+
+        // 대댓글 추가를 위한 새로운 리스트 생성
+        return mainCommentList.stream()
+                .peek(mainComment ->
+                        mainComment.setCommentReplies(
+                                findCommentsByParentCommentId(mainComment.getCommentId()).stream()
+                                        .map(comment -> RestaurantCommentDTO.convertEvaluationAndComment(comment, null, user))
+                                        .collect(Collectors.toList())
+                        )
+                )
+                .toList();
+    }
 
     public String addComment(Integer restaurantId, String userTokenId, String commentBody) {
         RestaurantComment restaurantComment = new RestaurantComment();

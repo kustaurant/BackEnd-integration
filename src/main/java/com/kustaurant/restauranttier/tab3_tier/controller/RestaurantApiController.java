@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.common.exception.exception.TierParamException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
@@ -128,7 +129,7 @@ public class RestaurantApiController {
 
     // 리뷰 불러오기
     @GetMapping("/restaurants/{restaurantId}/comments")
-    @Operation(summary = "(기능 작동x) 리뷰 불러오기", description = "인기순 -> sort=popularity \n\n최신순 -> sort=latest")
+    @Operation(summary = "리뷰 불러오기", description = "인기순 -> sort=popularity \n\n최신순 -> sort=latest")
     @ApiResponse(responseCode = "200", description = "댓글 리스트입니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCommentDTO.class)))})
     public ResponseEntity<List<RestaurantCommentDTO>> getReviewList(
             @PathVariable Integer restaurantId,
@@ -136,7 +137,16 @@ public class RestaurantApiController {
             @Parameter(example = "popularity 또는 latest", description = "인기순: popularity, 최신순: latest")
             String sort
     ) {
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        if (!sort.equals("popularity") && !sort.equals("latest")) {
+            throw new TierParamException("sort 파라미터 입력 값이 올바르지 않습니다.");
+        }
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        // TODO 나중에 수정
+        User user = userApiService.findUserById(userId);
+
+        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurant, user, sort.equals("popularity"));
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // 리뷰 추천하기
