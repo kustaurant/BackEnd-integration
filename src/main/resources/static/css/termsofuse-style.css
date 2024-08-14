@@ -1,3 +1,4 @@
+@import "variables.css";
 
 html{
     margin: 0;
@@ -20,12 +21,34 @@ body {
     flex-direction: column;
 }
 
+/* TABLET */
+@media only screen and (max-width: 1023px) {
+    article {
+        padding: 0 var(--mobile-outer-container-side-width);
+        margin: 10px 0;
+        min-width: var(--min-width);
+        width: 100%;
+        line-height: normal;
+        font-size: 14px;
+        color: #222;
+    }
+}
+/* PC */
+@media only screen and (min-width: 1024px) {
+    article {
+        width: var(--pc-outer-container-width);
+        max-width: var(--max-width);
+        margin: 10px auto;
+        line-height: normal;
+        font-size: 14px;
+        color: #222;
+    }
+}
+
 footer{
     flex:1;
 }
-article{
-    margin: 20px;
-}
+
 /*배너 높이*/
 @media only screen and (max-width: 767px) {
     /* 모바일화면 */

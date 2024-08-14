@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>쿠스토랑 - 개인정보 처리방침</title>
+
+    <!-- 아이콘 라이브러리-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <!-- 탭 관련 라이브러리 / 순서 지켜야함 -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/library/vendors.min.css">
+    <link rel="stylesheet" href="/css/library/style.min.css">
+    <link rel="stylesheet" href="/css/library/responsive.min.css">
+    <link rel="stylesheet" href="/css/library/restaurant.css">
+    <link rel="stylesheet" href="/css/termsofuse-style.css">
+
+    <script type="text/javascript" src="/js/library/jquery.js"></script>
+    <script type="text/javascript" src="/js/library/vendors.min.js"></script>
+    <script type="text/javascript" src="/js/library/main.js"></script>
+</head>
+
+
+<body>
+
+<header th:replace="~{navbar-new :: navbarFragment}"></header>
+
+<main class="container-fluid alt-font p-0">
+    <section
+            class="mt-0 top-banner mb-1 age-title-big-typography cover-background p-0 md-background-position-left-center"
+            style="background-image: url('/img/home/background.jpg');">
+        <div class="container">
+            <div class="row align-items-center justify-content-center small-screen">
+                <div class="col-lg-6 col-md-8 position-relative text-center page-title-extra-large appear anime-child anime-complete alt-font"
+                     data-anime="{ &quot;el&quot;: &quot;childs&quot;, &quot;translateY&quot;: [30, 0], &quot;opacity&quot;: [0,1], &quot;duration&quot;: 600, &quot;delay&quot;: 0, &quot;staggervalue&quot;: 200, &quot;easing&quot;: &quot;easeOutQuad&quot; }">
+                    <h2 class="main-page-title alt-font text-dark-gray text-uppercase ls-minus-1px mb-0">개인정보 처리방침</h2>
+                    <h2 class="m-auto fw-600 text-uppercase mb-0 firstSectionComment">알기 쉬운 개인정보 처리방침</h2>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<article>
+    <h6>1. 쿠스토랑 개인정보 처리방침</h6>
+    <p>“개인정보 처리방침”이란 이용자가 안심하고 서비스를 이용할 수 있도록 회사가 준수해야 할 지침을 의미합니다.<br>쿠스토랑은 회원가입 시에 이용자의 동의를 기반으로 사용자 식별을 위한 최소한의 데이터만 수집합니다.</p>
+    <hr>
+    <h6>2. 개인정보 수집</h6>
+    <p>
+        <strong>서비스 제공을 위한 최소한의 개인정보만을 수집합니다.</strong><br><br>
+        [쿠스토랑 가입 시]<br>
+        쿠스토랑 서비스는 네이버 API를 통해 회원가입을 진행합니다.<br>
+        이때 이용자의 동의 하에 네이버에 등록된 유저의 이메일만 제공받습니다.<br>
+        [필수] 이메일<br><br>
+        [마이페이지 개인정보 수정]<br>
+        마이페이지의 개인정보 수정에서 휴대전화 번호를 입력할 수 있습니다.<br>
+        [선택] 휴대전호 번호
+    </p>
+    <hr>
+    <h6>3. 개인정보 이용</h6>
+    <p>
+        [이메일]<br>
+        - 회원가입 시에 유저 닉네임 생성을 위해 활용합니다.<br>
+        - 유저가 이벤트를 응모했고, 당첨됐을 경우 상품 제공을 위해 활용합니다.<br><br>
+        [휴대전화 번호]<br>
+        - 유저가 이벤트를 응모했고, 당첨됐을 경우 상품 제공을 위해 활용합니다.
+    </p>
+    <hr>
+    <h6>4. 개인정보 제공</h6>
+    <p>
+        <strong>쿠스토랑은 이용자의 개인정보를 제3자에게 제공하지 않습니다.</strong>
+    </p>
+</article>
+
+
+<footer th:replace="~{footer::footerFragment}"></footer>
+
+</body>
+
+</html>

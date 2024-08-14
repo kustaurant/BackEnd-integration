@@ -70,6 +70,18 @@ public class MainController {
         return "announcement";
     }
 
+    // 개인정보 처리방침
+    @GetMapping("/privacy-policy")
+    public String privacyPolicy() {
+        return "privacy-policy";
+    }
+
+    // 마케팅
+    @GetMapping("/marketing")
+    public String marketing() {
+        return "marketing";
+    }
+
 
     // 검색 결과 화면
     @GetMapping("/search")
