@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
     private static final String API_NAME = "Kustaurant Mobile Application API";
-    private static final String API_VERSION = "v1.1.1";
+    private static final String API_VERSION = "v1.2.3";
     private static final String API_DESCRIPTION = """
     쿠스토랑 모바일 앱 API 문서입니다.
 
@@ -80,6 +80,11 @@ public class SwaggerConfig {
     - 뽑기 화면 API
         - 조건에 맞는 식당이 없을 때 404 에러 메시지 반환
         - no_img일때 대체이미지로 변환해서 반환
+        
+    **Version 1.2.3 (2024-08-16)**
+    - 식당 상세 화면 API
+        - 식당 상세 정보 api(/api/v1/restaurant/{restaurantId})에서 restaurantScore 필드를 String에서 Double로 바꿨습니다.
+        - 위의 점수가 0일 경우(평가가 1개도 없는 경우) null을 반환합니다.
     """;
 
 
