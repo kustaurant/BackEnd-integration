@@ -13,6 +13,8 @@ public interface UserRepository extends JpaRepository<User,Integer> {
 
     Optional<User> findByUserNickname(String userNickname);
 
+    Optional<User> findByUserEmail(String userEmail);
+
     @Query("SELECT u " +
             "FROM User u " +
             "WHERE SIZE(u.evaluationList) > 0 " +
