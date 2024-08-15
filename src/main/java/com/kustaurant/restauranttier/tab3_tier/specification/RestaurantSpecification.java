@@ -11,6 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantSpecification {
+    // TODO:
+    // TODO: 상황 기준 작성 해야됨.
+    public static boolean hasSituation(RestaurantSituationRelation restaurantSituationRelation) {
+        return restaurantSituationRelation.getDataCount() > 3;
+    }
     // TODO: 상황 기준 작성 해야됨.
     public static Specification<Restaurant> withCuisinesAndLocationsAndSituations(
             List<String> cuisines,

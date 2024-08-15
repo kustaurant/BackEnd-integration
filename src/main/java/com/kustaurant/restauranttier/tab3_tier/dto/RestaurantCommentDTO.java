@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,7 +44,7 @@ public class RestaurantCommentDTO {
         return new RestaurantCommentDTO(
                 comment.getCommentId(),
                 evaluationScore,
-                comment.getCommentImgUrl(),
+                RestaurantConstants.getIconImgUrl(comment),
                 comment.getUser().getUserNickname(),
                 comment.calculateTimeAgo(),
                 comment.getCommentImgUrl(),

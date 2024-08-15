@@ -1,15 +1,17 @@
 package com.kustaurant.restauranttier.tab3_tier.dto;
 
+import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantMenu;
+import com.kustaurant.restauranttier.tab3_tier.specification.RestaurantSpecification;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -45,7 +47,7 @@ public class RestaurantDetailDTO {
     @Schema(description = "평가 수", example = "100")
     private Integer evaluationCount;
     @Schema(description = "식당 평점", example = "4.4")
-    private String restaurantScore;
+    private Double restaurantScore;
     @Schema(description = "식당 평가 여부", example = "false")
     private Boolean isEvaluated;
     @Schema(description = "식당 즐겨찾기 여부", example = "false")
@@ -59,24 +61,28 @@ public class RestaurantDetailDTO {
         DecimalFormat df = new DecimalFormat("#.0");
         return new RestaurantDetailDTO(
                 restaurant.getRestaurantId(),
-                restaurant.getRestaurantImgUrl(),
+                restaurant.getRestaurantImgUrl() == null || restaurant.getRestaurantImgUrl().equals("no_img") ? RestaurantConstants.REPLACE_IMG_URL : restaurant.getRestaurantImgUrl(),
                 restaurant.getMainTier(),
                 restaurant.getRestaurantCuisine(),
                 "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + restaurant.getRestaurantCuisine().replaceAll("/", "") + ".svg",
-                restaurant.getRestaurantPosition(),
+                restaurant.getRestaurantPosition() == null ? "건대 주변" : restaurant.getRestaurantPosition(),
                 restaurant.getRestaurantName(),
-                restaurant.getRestaurantAddress(),
+                restaurant.getRestaurantAddress() == null || restaurant.getRestaurantAddress().equals("no_address") ? "주소가 없습니다." : restaurant.getRestaurantAddress(),
                 true,
-                "오늘 10:00~20:00",
+                "영업중 오늘 10:00~20:00",
                 restaurant.getRestaurantUrl(),
-                Arrays.asList("혼밥", "소개팅"),
-                "학생증 제시 시에 전메뉴 10% 할인 대박!!!!",
+                restaurant.getRestaurantSituationRelationList().stream().filter(RestaurantSpecification::hasSituation).map(el -> el.getSituation().getSituationName()).collect(Collectors.toList()),
+                restaurant.getPartnershipInfo(),
                 restaurant.getRestaurantEvaluationCount(),
-                df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount()),
+                restaurant.getRestaurantEvaluationCount() == 0 ? null : Double.parseDouble(df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())),
                 isEvaluated,
                 isFavorite,
                 restaurant.getRestaurantFavorite().size(),
-                restaurant.getRestaurantMenuList()
+                restaurant.getRestaurantMenuList().stream().peek(restaurantMenu -> {
+                    if (restaurantMenu.getMenuImgUrl().equals("no_img")) {
+                        restaurantMenu.setMenuImgUrl(RestaurantConstants.REPLACE_IMG_URL);
+                    }
+                }).collect(Collectors.toList())
         );
     }
 }

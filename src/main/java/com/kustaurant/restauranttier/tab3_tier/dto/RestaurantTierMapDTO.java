@@ -1,6 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.dto;
 
-import com.kustaurant.restauranttier.tab3_tier.etc.MapVariable;
+import com.kustaurant.restauranttier.tab3_tier.constants.MapConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,14 +15,14 @@ import java.util.List;
 @Schema(description = "restaurant tier map entity")
 public class RestaurantTierMapDTO {
     @Schema(description = "지도의 최소 줌입니다. (활용이 힘들다면 말씀해주세요.")
-    Integer minZoom = MapVariable.MIN_ZOOM;
+    Integer minZoom = MapConstants.MIN_ZOOM;
 
     @Schema(description = "즐겨찾기를 한 식당 리스트입니다.")
-    List<RestaurantTierDTO> favoriteRestaurants;
+    List<RestaurantTierDTO> favoriteRestaurants = new ArrayList<>();
     @Schema(description = "티어가 있는 식당 리스트입니다. 이 리스트의 식당은 지도에 항상 표시됩니다.")
-    List<RestaurantTierDTO> tieredRestaurants;
+    List<RestaurantTierDTO> tieredRestaurants = new ArrayList<>();
     @Schema(description = "평가 수의 부족으로 티어가 없는 식당 리스트입니다. 줌 별로 표시되는 식당 리스트가 주어집니다. 현재 지도의 줌보다 같거나 작은 줌의 식당을 표시하시면 됩니다.")
-    List<ZoomAndRestaurants> nonTieredRestaurants;
+    List<ZoomAndRestaurants> nonTieredRestaurants = new ArrayList<>();
 
     @Schema(description = "실선으로 표시되는 폴리곤 좌표 리스트의 리스트입니다.")
     List<List<Coordinate>> solidPolygonCoordsList = new ArrayList<>();

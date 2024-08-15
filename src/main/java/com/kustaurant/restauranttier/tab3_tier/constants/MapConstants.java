@@ -1,11 +1,10 @@
-package com.kustaurant.restauranttier.tab3_tier.etc;
+package com.kustaurant.restauranttier.tab3_tier.constants;
 
 import com.kustaurant.restauranttier.tab3_tier.dto.Coordinate;
-import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 
 import java.util.List;
 
-public class MapVariable {
+public class MapConstants {
     public static final Integer MIN_ZOOM = 13;
     public static final List<List<Coordinate>> LIST_OF_COORD_LIST = List.of(
             // 건입~정문

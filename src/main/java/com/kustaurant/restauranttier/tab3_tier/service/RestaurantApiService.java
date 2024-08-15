@@ -128,7 +128,6 @@ public class RestaurantApiService {
 
     public boolean isSituationContainRestaurant(List<Integer> situationList, Restaurant restaurant) {
         // TODO: 여기서 상황 기준 설정
-        System.out.println(restaurant);
         return restaurant.getRestaurantSituationRelationList().stream()
                 .anyMatch(el -> situationList.contains(el.getSituation().getSituationId()) && el.getDataCount() >= 3);
     }

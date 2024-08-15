@@ -4,7 +4,7 @@ import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierMapDTO;
-import com.kustaurant.restauranttier.tab3_tier.etc.MapVariable;
+import com.kustaurant.restauranttier.tab3_tier.constants.MapConstants;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantSituationRelationRepository;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
@@ -45,7 +45,22 @@ public class TierApiController {
     private final RestaurantApiService restaurantApiService;
     private final RestaurantSituationRelationRepository restaurantSituationRelationRepository;
 
-    @Operation(summary = "티어표 리스트 불러오기", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)")
+    @Operation(summary = "티어표 리스트 불러오기", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
+            "- 반환 값 보충 설명\n\n" +
+            "   - restaurantId: not null\n\n" +
+            "   - restaurantRanking: **null일 수 있습니다.**\n\n" +
+            "   - restaurantName: not null\n\n" +
+            "   - restaurantCuisine: not null\n\n" +
+            "   - restaurantPosition: not null\n\n" +
+            "   - restaurantImgUrl: not null\n\n" +
+            "   - mainTier: not null\n\n" +
+            "   - isEvaluated: not null\n\n" +
+            "   - isFavorite: not null\n\n" +
+            "   - x: not null\n\n" +
+            "   - y: not null\n\n" +
+            "   - partnershipInfo: **null일 수 있습니다.**\n\n" +
+            "   - restaurantScore: **null일 수 있습니다.**\n\n" +
+            "")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantTierDTO.class)))}),
             @ApiResponse(responseCode = "400", description = "요청 파라미터가 잘못됨.")
@@ -106,7 +121,30 @@ public class TierApiController {
             "\n\n티어가 없는 식당은 zoom에 따라 보이는게 달라집니다. " +
             "\n\n티어가 없는 식당(nonTieredRestaurants)은 zoom과 식당 리스트가 함께 주어집니다. " +
             "\n\n현재 지도의 zoom이 17이라면 zoom이 17보다 같거나 작은(.., 16, 17) 식당 리스트를 지도에 표시하시면 됩니다." +
-            "\n\n즐겨찾기 리스트에 있는 식당은 지도에서 즐겨찾기 마커로 보여야합니다. (티어 마커나 다른 마커가 아닌 즐겨찾기 마커로 보여야함)")
+            "\n\n즐겨찾기 리스트에 있는 식당은 지도에서 즐겨찾기 마커로 보여야합니다. (티어 마커나 다른 마커가 아닌 즐겨찾기 마커로 보여야함)\n\n" +
+            "- 반환 값 보충 설명\n\n" +
+            "   - minZoom: not null\n\n" +
+            "   - favoriteRestaurants: **빈 배열일 수 있습니다. not null**\n\n" +
+            "   - tieredRestaurants: **빈 배열일 수 있습니다. not null**\n\n" +
+            "   - nonTieredRestaurants: **빈 배열일 수 있습니다. not null**\n\n" +
+            "       - restaurantId: not null\n\n" +
+            "       - restaurantRanking: **null일 수 있습니다.**\n\n" +
+            "       - restaurantName: not null\n\n" +
+            "       - restaurantCuisine: not null\n\n" +
+            "       - restaurantPosition: not null\n\n" +
+            "       - restaurantImgUrl: not null\n\n" +
+            "       - mainTier: not null\n\n" +
+            "       - isEvaluated: not null\n\n" +
+            "       - isFavorite: not null\n\n" +
+            "       - x: not null\n\n" +
+            "       - y: not null\n\n" +
+            "       - partnershipInfo: **null일 수 있습니다.**\n\n" +
+            "       - restaurantScore: **null일 수 있습니다.**\n\n" +
+            "   - solidPolygonCoordsList: not null\n\n" +
+            "   - dashedPolygonCoordsList: **빈 배열일 수 있습니다. not null**\n\n" +
+            "       - x: not null\n\n" +
+            "       - y: not null\n\n" +
+            "   - visibleBounds: not null\n\n")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantTierMapDTO.class))})
     })
@@ -194,21 +232,21 @@ public class TierApiController {
                 List<Integer> locationList = Arrays.stream(locations.split(","))
                         .map(el -> Integer.parseInt(el.substring(1)))
                         .toList();
-                for (int i = 0; i < MapVariable.LIST_OF_COORD_LIST.size(); i++) {
+                for (int i = 0; i < MapConstants.LIST_OF_COORD_LIST.size(); i++) {
                     if (locationList.contains(i + 1)) {
-                        response.getSolidPolygonCoordsList().add(MapVariable.LIST_OF_COORD_LIST.get(i));
+                        response.getSolidPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
                     } else {
-                        response.getDashedPolygonCoordsList().add(MapVariable.LIST_OF_COORD_LIST.get(i));
+                        response.getDashedPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
                     }
                 }
             } catch (NumberFormatException e) {
                 throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
             }
         } else {
-            response.setSolidPolygonCoordsList(MapVariable.LIST_OF_COORD_LIST);
+            response.setSolidPolygonCoordsList(MapConstants.LIST_OF_COORD_LIST);
         }
         // 3.5 지도에 보여야 하는 좌표 범위
-        response.setVisibleBounds(MapVariable.findMinMaxCoordinates(response.getSolidPolygonCoordsList()));
+        response.setVisibleBounds(MapConstants.findMinMaxCoordinates(response.getSolidPolygonCoordsList()));
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

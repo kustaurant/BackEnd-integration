@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.dto;
 
+import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -42,28 +43,21 @@ public class RestaurantTierDTO {
     public static RestaurantTierDTO convertRestaurantToTierDTO(Restaurant restaurant, Integer ranking, Boolean isEvaluated, Boolean isFavorite) {
         DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.HALF_UP);
-        Double score = restaurant.getRestaurantEvaluationCount() != 0 ? Double.parseDouble(df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())) : 0;
-        String image;
-        if(restaurant.getRestaurantImgUrl().equals("no_img")){
-            image = "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/"+"쿠스토랑로고.png";
-            System.out.println("대체이미지 반환");
-        }else{
-            image = restaurant.getRestaurantImgUrl();
-        }
+        Double score = restaurant.getRestaurantEvaluationCount() != 0 ? Double.parseDouble(df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())) : null;
 
         return new RestaurantTierDTO(
                 restaurant.getRestaurantId(),
                 ranking,
                 restaurant.getRestaurantName(),
                 restaurant.getRestaurantCuisine(),
-                restaurant.getRestaurantPosition(),
-                image,
+                restaurant.getRestaurantPosition() == null ? "건대 주변" : restaurant.getRestaurantPosition(),
+                restaurant.getRestaurantImgUrl() == null || restaurant.getRestaurantImgUrl().equals("no_img") ? RestaurantConstants.REPLACE_IMG_URL : restaurant.getRestaurantImgUrl(),
                 restaurant.getMainTier(),
                 isEvaluated,
                 isFavorite,
                 restaurant.getRestaurantLongitude(),
                 restaurant.getRestaurantLatitude(),
-                "건대생 공짜!!!!!!!",
+                restaurant.getPartnershipInfo(),
                 score
         );
     }

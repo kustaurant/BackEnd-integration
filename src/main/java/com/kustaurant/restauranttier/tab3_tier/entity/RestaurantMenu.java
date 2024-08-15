@@ -3,8 +3,10 @@ package com.kustaurant.restauranttier.tab3_tier.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @Table(name="restaurant_menus_tbl")
 public class RestaurantMenu {
