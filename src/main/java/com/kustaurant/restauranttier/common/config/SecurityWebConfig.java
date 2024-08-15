@@ -102,7 +102,7 @@ public class SecurityWebConfig {
     private final CustomLoginSuccessHandler customLoginSuccessHandler;
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
-    @Bean
+    @Bean(name = "filterChainWeb")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf

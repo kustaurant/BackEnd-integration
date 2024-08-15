@@ -20,7 +20,7 @@ public class SecurityApiConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
-    @Bean
+    @Bean(name = "filterChainApi")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .httpBasic(httpBasic -> httpBasic.disable()) // HTTP 기본 인증 비활성화
