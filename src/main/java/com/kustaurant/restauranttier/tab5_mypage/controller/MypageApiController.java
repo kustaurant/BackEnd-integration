@@ -1,6 +1,6 @@
 package com.kustaurant.restauranttier.tab5_mypage.controller;
 
-import com.kustaurant.restauranttier.tab5_mypage.service.UserApiService;
+import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import com.kustaurant.restauranttier.tab5_mypage.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +12,10 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/mypage/users/{userId}")
+@RequestMapping("/api/v1/auth/mypage/users/{userId}")
 public class MypageApiController {
 
-    private final UserApiService userApiService;
+    private final MypageApiService mypageApiService;
 
     //1
     @Operation(
@@ -24,7 +24,7 @@ public class MypageApiController {
     )
     @GetMapping
     public ResponseEntity<MypageMainDTO> getMypageView(@PathVariable("userId") Integer userid){
-        MypageMainDTO mypageMainDTO = userApiService.getMypageInfo(userid);
+        MypageMainDTO mypageMainDTO = mypageApiService.getMypageInfo(userid);
         return new ResponseEntity<>(mypageMainDTO, HttpStatus.OK);
     }
 
@@ -35,7 +35,7 @@ public class MypageApiController {
     )
     @GetMapping("/profile")
     public ResponseEntity<ProfileDTO> getMypageProfile(@PathVariable("userId") Integer userid){
-        ProfileDTO profileDTO = userApiService.getProfileInfo(userid);
+        ProfileDTO profileDTO = mypageApiService.getProfileInfo(userid);
         return new ResponseEntity<>(profileDTO, HttpStatus.OK);
     }
 
@@ -50,7 +50,7 @@ public class MypageApiController {
             @RequestBody ProfileDTO receivedProfileDTO
     ){
         try {
-            ProfileDTO updatedProfile = userApiService.updateUserProfile(userid, receivedProfileDTO);
+            ProfileDTO updatedProfile = mypageApiService.updateUserProfile(userid, receivedProfileDTO);
             return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             MypageErrorDTO profileError = new MypageErrorDTO();
@@ -68,7 +68,7 @@ public class MypageApiController {
     public ResponseEntity<List<EvaluateRestaurantInfoDTO>> getEvaluateRestaurantList(
             @PathVariable("userId") Integer userId
     ){
-        List<EvaluateRestaurantInfoDTO> userEvaluateRestaurantList = userApiService.getUserEvaluateRestaurantList(userId);
+        List<EvaluateRestaurantInfoDTO> userEvaluateRestaurantList = mypageApiService.getUserEvaluateRestaurantList(userId);
         return new ResponseEntity<>(userEvaluateRestaurantList, HttpStatus.OK);
     }
 
@@ -79,7 +79,7 @@ public class MypageApiController {
     )
     @GetMapping("/community-list")
     public ResponseEntity<List<MypagePostDTO>> getWrittenUserPostsList(@PathVariable("userid") Integer userid){
-        List<MypagePostDTO> writtenUserPostsDTOList = userApiService.getWrittenUserPosts(userid);
+        List<MypagePostDTO> writtenUserPostsDTOList = mypageApiService.getWrittenUserPosts(userid);
         return new ResponseEntity<>(writtenUserPostsDTOList, HttpStatus.OK);
     }
 
@@ -92,7 +92,7 @@ public class MypageApiController {
     public ResponseEntity<List<FavoriteRestaurantInfoDTO>> getFavoriteRestaurantList(
             @PathVariable("userId") Integer userId
     ){
-        List<FavoriteRestaurantInfoDTO> userFavoriteRestaurantList = userApiService.getUserFavoriteRestaurantList(userId);
+        List<FavoriteRestaurantInfoDTO> userFavoriteRestaurantList = mypageApiService.getUserFavoriteRestaurantList(userId);
         return new ResponseEntity<>(userFavoriteRestaurantList, HttpStatus.OK);
     }
 
@@ -105,7 +105,7 @@ public class MypageApiController {
     public ResponseEntity<List<MypagePostDTO>> getCommunityScrapList(
             @PathVariable("userId") Integer userid
     ){
-        List<MypagePostDTO> postScrapsDTO = userApiService.getScrappedUserPosts(userid);
+        List<MypagePostDTO> postScrapsDTO = mypageApiService.getScrappedUserPosts(userid);
         return new ResponseEntity<>(postScrapsDTO, HttpStatus.OK);
     }
 
@@ -118,7 +118,7 @@ public class MypageApiController {
     public ResponseEntity<List<MypagePostCommentDTO>> getCommunityCommentList(
             @PathVariable("userId") Integer userid
     ){
-        List<MypagePostCommentDTO> commentedUserPosts = userApiService.getCommentedUserPosts(userid);
+        List<MypagePostCommentDTO> commentedUserPosts = mypageApiService.getCommentedUserPosts(userid);
         return new ResponseEntity<>(commentedUserPosts, HttpStatus.OK);
     }
 }

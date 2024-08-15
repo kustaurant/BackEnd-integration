@@ -12,7 +12,7 @@ import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantCommentService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantFavoriteService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
-import com.kustaurant.restauranttier.tab5_mypage.service.UserApiService;
+import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -40,7 +40,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class RestaurantApiController {
-    private final UserApiService userApiService;
+    private final MypageApiService mypageApiService;
     private final RestaurantApiService restaurantApiService;
     private final RestaurantFavoriteService restaurantFavoriteService;
     private final RestaurantCommentService restaurantCommentService;
@@ -79,7 +79,7 @@ public class RestaurantApiController {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
 
         // TODO: 로그인 구현 후 수정
-        User user = userApiService.findUserById(userId);
+        User user = mypageApiService.findUserById(userId);
         boolean isFavorite = false;
         boolean isEvaluated = false;
         if (user != null) {
@@ -105,7 +105,7 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId
     ) {
         // TODO: 로그인 구현 후 수정
-        User user = userApiService.findUserById(userId);
+        User user = mypageApiService.findUserById(userId);
         if (user == null) {
             throw new OptionalNotExistException(userId + " 유저가 존재하지 않습니다.");
         }
@@ -132,7 +132,7 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId
     ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
-        User user = userApiService.findUserById(userId);
+        User user = mypageApiService.findUserById(userId);
         if (user == null) {
             throw new OptionalNotExistException(userId + " 유저가 없습니다.");
         }
@@ -192,7 +192,7 @@ public class RestaurantApiController {
         }
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // TODO 나중에 수정
-        User user = userApiService.findUserById(userId);
+        User user = mypageApiService.findUserById(userId);
 
         List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurant, user, sort.equals("popularity"));
 
@@ -231,7 +231,7 @@ public class RestaurantApiController {
         checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
 
         // TODO: 로그인 구현 후 수정
-        User user = userApiService.findUserById(userId);
+        User user = mypageApiService.findUserById(userId);
         if (user == null) {
             throw new OptionalNotExistException(userId + "해당 유저가 없습니다.");
         }
@@ -276,7 +276,7 @@ public class RestaurantApiController {
         checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
 
         // TODO: 로그인 구현 후 수정
-        User user = userApiService.findUserById(userId);
+        User user = mypageApiService.findUserById(userId);
         if (user == null) {
             throw new OptionalNotExistException(userId + "해당 유저가 없습니다.");
         }
@@ -323,7 +323,7 @@ public class RestaurantApiController {
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
         checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
         // TODO: 로그인 구현 후 수정
-        User user = userApiService.findUserById(userId);
+        User user = mypageApiService.findUserById(userId);
         if (user == null) {
             throw new OptionalNotExistException(userId + "해당 유저가 없습니다.");
         }

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserApiService {
+public class MypageApiService {
 
     @PersistenceContext
     private EntityManager entityManager;
