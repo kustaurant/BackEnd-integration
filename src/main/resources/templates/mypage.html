@@ -275,8 +275,6 @@
         <div id="area6Contents" class="gray-border-circular">
             <p class="text-center" th:if="${#lists.isEmpty(postCommentList)}">저장된 정보가 없습니다.</p>
             <ul class="postul" th:unless="${#lists.isEmpty(postCommentList)}">
-
-                <!--                    <li th:each="post,iterStat: ${paging}" class="postli">-->
                 <li th:each="commentlist:${postCommentList}" class="postli">
                     <hr>
                     <span class="recommend-tab">

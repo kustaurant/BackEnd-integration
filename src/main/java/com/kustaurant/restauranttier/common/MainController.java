@@ -75,12 +75,6 @@ public class MainController {
         return "terms_of_use";
     }
 
-    // 공지사항
-    @GetMapping("/announcement")
-    public String announcement(){
-        return "announcement";
-    }
-
     // 개인정보 처리방침
     @GetMapping("/privacy-policy")
     public String privacyPolicy() {

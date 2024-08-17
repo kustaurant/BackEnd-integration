@@ -1,0 +1,85 @@
+/*배너 높이*/
+@media only screen and (max-width: 767px) {
+    /* 모바일화면 */
+    .top-banner{
+        height: 200px;
+    }
+
+}
+
+@media only screen and (min-width: 768px) {
+    /* 모바일화면 */
+    .top-banner{
+        height: 250px;
+    }
+
+}
+
+.firstSectionComment,.secondSectionComment {
+    color: var(--main-color);
+}
+
+/* 메인 글자를 h1에서 h2로 바꿔서 글자 크기가 알아서 안바뀌는것같아서 media query 추가함 */
+@media only screen and (min-width: 992px) {
+    h2.main-page-title {
+        font-size: 48px;
+        line-height:80px;
+        color: #2a2a2a;
+    }
+}
+@media only screen and (max-width: 991px) {
+    h2.main-page-title {
+        font-size: 42px;
+        line-height:70px;
+        color: #2a2a2a;
+    }
+}
+@media only screen and (max-width: 767px) {
+    h2.main-page-title {
+        font-size: 36px;
+        line-height:60px;
+        color: #2a2a2a;
+    }
+}
+@media only screen and (max-width: 420px) {
+    h2.main-page-title {
+        font-size: 30px;
+        line-height:55px;
+        color: #2a2a2a;
+    }
+}
+
+/* TABLET */
+@media only screen and (max-width: 1023px) {
+    .notice-card{
+        width: 95%;
+    }
+}
+/* PC */
+@media only screen and (min-width: 1024px) {
+    .notice-card{
+        width: 70%;
+    }
+}
+
+/*-----------------------------*/
+.cardlist{
+    margin-top: 30px;
+}
+.notice-card{
+    border: 1px solid rgba(0, 128, 0, 0.3);
+    border-radius: 5px;
+    padding: 10px 10px 5px 10px;
+    margin: 10px auto;
+    background-color: rgba(0, 128, 0, 0.1);
+}
+.notice-title{
+    color: black;
+    margin-bottom: 0px;
+}
+.notice-created-at{
+    color: black;
+    font-size: 14px;
+    opacity: 0.5;
+    margin-bottom: 0px;
+}
