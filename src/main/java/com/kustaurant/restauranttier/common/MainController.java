@@ -60,8 +60,6 @@ public class MainController {
 
         HomeModal homeModal = HomeModalRepository.getHomeModalByModalId(1);
 
-        System.out.println(homeModal);
-
         model.addAttribute("cuisines", cuisines);
         model.addAttribute("restaurants",restaurants);
         model.addAttribute("currentPage","home");

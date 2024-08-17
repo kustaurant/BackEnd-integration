@@ -24,7 +24,6 @@ public class RestaurantCommentlike {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="comment_id")
     private RestaurantComment restaurantComment;

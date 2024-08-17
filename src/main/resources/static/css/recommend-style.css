@@ -315,7 +315,7 @@
 
 
     #mainContents .cell-button img {
-        padding: 1rem;
+        padding: 0.5rem;
     }
 
     .btn-style {
@@ -519,7 +519,6 @@ footer {
 .row {
     margin: 0;
     display: flex;
-    align-items: center;
 }
 
 #recommendBtn {

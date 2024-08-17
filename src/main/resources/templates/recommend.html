@@ -120,7 +120,7 @@
                     <div class="row mt-2 p-2">
                         <div class="cell col-3 col-lg-custom" th:each="cuisine : ${cuisines}">
                             <button class="cell-button col-12" th:attr="data-cuisine=${cuisine}">
-                                <img class="img col-12" th:src="@{/img/recommend/아이콘/{cuisine}.png(cuisine=${cuisine})}"
+                                <img class="img col-12" th:src="@{/img/recommend/아이콘/{cuisine}-선택.png(cuisine=${cuisine})}"
                                      th:alt="'쿠스토랑 건대 맛집 ' + ${cuisine}">
                             </button>
                             <div class="mobile-cuisine-name">
