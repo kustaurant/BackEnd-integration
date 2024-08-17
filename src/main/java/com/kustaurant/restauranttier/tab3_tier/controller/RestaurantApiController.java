@@ -171,7 +171,7 @@ public class RestaurantApiController {
             "   - commentNickname: not null\n\n" +
             "   - commentTime: not null\n\n" +
             "   - commentImgUrl: **null일 수 있습니다.**\n\n" +
-            "   - commentBody: **null일 수 없습니다.**\n\n" +
+            "   - commentBody: not null\n\n" +
             "   - commentLikeStatus: not null\n\n" +
             "   - commentLikeCount: not null\n\n" +
             "   - commentDislikeCount: not null\n\n" +
@@ -291,7 +291,7 @@ public class RestaurantApiController {
 
     // 식당 대댓글 달기
     @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
-    @Operation(summary = "식당 대댓글 달기", description = "작성한 대댓글의 부모 댓글을 반환합니다.\n\n" +
+    @Operation(summary = "식당 대댓글 달기", description = "작성한 대댓글을 반환합니다.\n\n" +
             "- 반환 값 보충 설명\n\n" +
             "   - commentId: not null\n\n" +
             "   - commentScore: **null입니다.**\n\n" +
