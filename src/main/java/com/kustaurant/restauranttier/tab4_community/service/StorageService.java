@@ -21,7 +21,8 @@ public class StorageService {
     // 아마존 s3에 이미지 저장하는 함수
     public String storeImage(MultipartFile file) throws IOException {
         try {
-            String fileName = file.getOriginalFilename();
+            String folderPath = "community/"; // 새 폴더 경로
+            String fileName = folderPath + file.getOriginalFilename();
             String fileUrl = "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + fileName;
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(file.getContentType());

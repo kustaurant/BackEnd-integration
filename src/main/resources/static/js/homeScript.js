@@ -1,37 +1,30 @@
 document.addEventListener('DOMContentLoaded', function () {
+    var modal = document.getElementById("modal");
+    var closeButton = document.querySelector('#modal button[data-bs-dismiss="modal"]');
+    var hideCheckbox = document.getElementById("flexCheckChecked");
 
-    // var modal = new bootstrap.Modal(document.getElementById("modal"));
+    var expiredElement = document.getElementById('ExpiredData');
+    var expiredAtString = expiredElement.getAttribute('data-expired');
+    var expiredAt = new Date(expiredAtString);
+    var currentDate = new Date();
 
-    // modal.show();
-    //
-    // function setCookie( name, value, expiredays ) {  // 쿠키저장
-    //     var todayDate = new Date();  //date객체 생성 후 변수에 저장
-    //     todayDate.setDate( todayDate.getDate() + expiredays );
-    //     // 시간지정(현재시간 + 지정시간)
-    //     document.cookie = name + "=" + value + "; path=/; expires=" + todayDate.toUTCString() + ";"
-    //     //위 정보를 쿠키에 굽는다
-    // }
+    closeButton.addEventListener("click", function() {
+        var expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 7); // 일주일 후의 날짜 설정
+        document.cookie = "hideModal=" + (hideCheckbox.checked ? "true" : "false") + "; expires=" + expiryDate.toUTCString(); // 쿠키 설정
+        modal.style.display = "none"; // 모달 닫기
+    });
 
-    // var modal = document.getElementById("modal");
-    // var closeButton = document.querySelector('#modal button[data-bs-dismiss="modal"]');
-    // var hideCheckbox = document.getElementById("flexCheckChecked");
-    //
-    // closeButton.addEventListener("click", function() {
-    //     var expiryDate = new Date();
-    //     expiryDate.setDate(expiryDate.getDate() + 7); // 일주일 후의 날짜 설정
-    //     document.cookie = "hideModal=" + (hideCheckbox.checked ? "true" : "false") + "; expires=" + expiryDate.toUTCString(); // 쿠키 설정
-    //     modal.style.display = "none"; // 모달 닫기
-    // });
-    //
-    // // 페이지 로드 시 쿠키 확인
-    // var cookies = document.cookie.split(";").map(cookie => cookie.trim());
-    // var hideModalCookie = cookies.find(cookie => cookie.startsWith("hideModal="));
-    //
-    // // 쿠키에 hideModal이 없거나 그 값이 false일 경우에만 모달을 보여줌
-    // if (!hideModalCookie || hideModalCookie.split("=")[1] !== "true") {
-    //     modal.style.display = "block";
-    // }
+    // 페이지 로드 시 쿠키 확인
+    var cookies = document.cookie.split(";").map(cookie => cookie.trim());
+    var hideModalCookie = cookies.find(cookie => cookie.startsWith("hideModal="));
 
+    // 쿠키에 hideModal이 없거나 그 값이 false일 경우에만 모달을 보여줌
+    if (!hideModalCookie || hideModalCookie.split("=")[1] !== "true") {
+        if (currentDate < expiredAt) {
+            modal.style.display = "block";
+        }
+    }
 
     var swiper = new Swiper('.swiper', {
         slidesPerView: 1,

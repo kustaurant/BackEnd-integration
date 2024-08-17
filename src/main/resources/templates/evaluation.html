@@ -69,18 +69,6 @@
     <p id="ratingComment">
         <span th:switch="${eval != null}">
             <span>아직 선택하지 않으셨습니다.</span>
-            <!--<span th:case="true">
-                <span th:switch="${eval.getEvaluationScore()}">
-                    <span th:case="1">다시 올 일은 없을 것 같습니다</span>
-                    <span th:case="2">음.. 다시 오고싶다는 생각은 딱히..</span>
-                    <span th:case="3">조금 아쉬운 가게에요</span>
-                    <span th:case="4">평범한 음식점이에요</span>
-                    <span th:case="5">괜찮아요. 다시 방문은 할겁니다</span>
-                    <span th:case="6">제법 괜찮아요. 무조건 재방문 합니다</span>
-                    <span th:case="7" th:class="${eval.getEvaluationScore() == 7} ? 'lv7' : ''">내 마음속 최고의 가게!</span>
-                </span>
-            </span>
-            <span th:case="false">아직 선택하지 않으셨습니다.</span>-->
         </span>
     </p>
 </div>
@@ -141,8 +129,6 @@
     <div id="keywordEvaluateSection">
         <div>
             <div class="keywordEvaluateArea hidden">
-<!--                <div class="keywordEvaluateArea" th:class="${#lists.isEmpty(evalItemList) || not #lists.exists(evalItemList, #this.situation.situationId == 1) ? 'hidden' : ''}">    -->
-
                 <div class="keyword-container">
                     <img class="keyword-img" src="/img/tier/혼밥.png">
                     <p class="keyword-name">혼밥</p>

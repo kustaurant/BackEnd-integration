@@ -1,5 +1,7 @@
 package com.kustaurant.restauranttier.common;
 
+import com.kustaurant.restauranttier.tab1_home.entity.HomeModal;
+import com.kustaurant.restauranttier.tab1_home.repository.HomeModalRepository;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantRepository;
@@ -26,6 +28,7 @@ public class MainController {
     private final FeedbackService feedbackService;
     private final RestaurantService restaurantService;
     private final EvaluationService evaluationService;
+    private final HomeModalRepository HomeModalRepository;
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     //@Value("#{'${restaurant.cuisines}'.split(',\\s*')}")
@@ -48,13 +51,21 @@ public class MainController {
 
     // 홈 화면
     @GetMapping("/")
-    public String root(Model model, Principal principal) {
+    public String root(
+            Model model,
+            Principal principal
+    ) {
         List<Restaurant> restaurants = restaurantService.getTopRestaurants();
         List<String> cuisines = new ArrayList<>(Arrays.asList("한식","일식","중식","양식","아시안","고기","치킨","햄버거","분식","해산물","술집","샐러드","카페","베이커리","기타","전체"));
+
+        HomeModal homeModal = HomeModalRepository.getHomeModalByModalId(1);
+
+        System.out.println(homeModal);
 
         model.addAttribute("cuisines", cuisines);
         model.addAttribute("restaurants",restaurants);
         model.addAttribute("currentPage","home");
+        model.addAttribute("homeModal", homeModal);
         return "home";
     }
 
