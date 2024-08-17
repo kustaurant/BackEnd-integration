@@ -31,7 +31,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         // 요청 헤더에서 Authorization 값을 가져옴
         String jwt = getJwtFromRequest(request);
 
@@ -56,6 +57,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * 요청에서 JWT 토큰을 추출하는 메서드.
+     *
+     * @param request 클라이언트의 HTTP 요청 객체.
+     * @return 요청 헤더에 포함된 JWT 토큰 문자열. 토큰이 존재하지 않거나 유효하지 않으면 null을 반환.
+     */
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
@@ -64,6 +71,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return null;
     }
 
+    /**
+     * 사용자 객체를 기반으로 Authentication 객체를 생성하는 메서드.
+     *
+     * @param user 인증에 사용할 User 객체.
+     * @return 생성된 Authentication 객체. 이는 스프링 시큐리티 컨텍스트에 저장되어 인증된 사용자를 나타내는 데 사용됨.
+     */
     private Authentication getAuthentication(User user) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserEmail());
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
