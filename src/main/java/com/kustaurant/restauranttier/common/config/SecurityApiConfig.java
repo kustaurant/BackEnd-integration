@@ -23,6 +23,7 @@ public class SecurityApiConfig {
     @Bean(name = "filterChainApi")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher("/api/**")
                 .httpBasic(httpBasic -> httpBasic.disable()) // HTTP 기본 인증 비활성화
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화
                 .csrf(csrf -> csrf.disable()) // CSRF 보호 기능 비활성화
