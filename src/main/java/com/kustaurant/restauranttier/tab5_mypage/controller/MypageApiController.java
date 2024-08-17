@@ -1,7 +1,11 @@
 package com.kustaurant.restauranttier.tab5_mypage.controller;
 
+import com.kustaurant.restauranttier.common.apiUser.JwtUtil;
+import com.kustaurant.restauranttier.common.apiUser.UserApiLoginService;
+import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import com.kustaurant.restauranttier.tab5_mypage.dto.*;
+import com.kustaurant.restauranttier.tab5_mypage.service.UserApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,10 +16,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auth/mypage/users/{userId}")
+@RequestMapping("/api/v1/auth/mypage/")
 public class MypageApiController {
 
     private final MypageApiService mypageApiService;
+    private final UserApiService userApiService;
+    private final JwtUtil jwtUtil;
+
 
     //1
     @Operation(
@@ -23,8 +30,11 @@ public class MypageApiController {
             description = "마이페이지 화면에 필요한 정보들이 반환됩니다."
     )
     @GetMapping
-    public ResponseEntity<MypageMainDTO> getMypageView(@PathVariable("userId") Integer userid){
-        MypageMainDTO mypageMainDTO = mypageApiService.getMypageInfo(userid);
+    public ResponseEntity<MypageMainDTO> getMypageView(@RequestHeader("Authorization") String token){
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        Integer userId = userApiService.getUserIdFromToken(jwtToken);
+
+        MypageMainDTO mypageMainDTO = mypageApiService.getMypageInfo(userId);
         return new ResponseEntity<>(mypageMainDTO, HttpStatus.OK);
     }
 
@@ -34,8 +44,11 @@ public class MypageApiController {
             description = ""
     )
     @GetMapping("/profile")
-    public ResponseEntity<ProfileDTO> getMypageProfile(@PathVariable("userId") Integer userid){
-        ProfileDTO profileDTO = mypageApiService.getProfileInfo(userid);
+    public ResponseEntity<ProfileDTO> getMypageProfile(@RequestHeader("Authorization") String token){
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        Integer userId = userApiService.getUserIdFromToken(jwtToken);
+
+        ProfileDTO profileDTO = mypageApiService.getProfileInfo(userId);
         return new ResponseEntity<>(profileDTO, HttpStatus.OK);
     }
 
@@ -46,11 +59,14 @@ public class MypageApiController {
     )
     @PatchMapping("/profile")
     public ResponseEntity<?> updateMypageProfile(
-            @PathVariable("userId") Integer userid,
+            @RequestHeader("Authorization") String token,
             @RequestBody ProfileDTO receivedProfileDTO
     ){
         try {
-            ProfileDTO updatedProfile = mypageApiService.updateUserProfile(userid, receivedProfileDTO);
+            String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+            Integer userId = userApiService.getUserIdFromToken(jwtToken);
+
+            ProfileDTO updatedProfile = mypageApiService.updateUserProfile(userId, receivedProfileDTO);
             return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             MypageErrorDTO profileError = new MypageErrorDTO();
@@ -66,8 +82,11 @@ public class MypageApiController {
     )
     @GetMapping("/evaluate-restuarnt-list")
     public ResponseEntity<List<EvaluateRestaurantInfoDTO>> getEvaluateRestaurantList(
-            @PathVariable("userId") Integer userId
+            @RequestHeader("Authorization") String token
     ){
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        Integer userId = userApiService.getUserIdFromToken(jwtToken);
+
         List<EvaluateRestaurantInfoDTO> userEvaluateRestaurantList = mypageApiService.getUserEvaluateRestaurantList(userId);
         return new ResponseEntity<>(userEvaluateRestaurantList, HttpStatus.OK);
     }
@@ -78,8 +97,11 @@ public class MypageApiController {
             description = "유저가 작성한 커뮤니티 글 리스트 정보들을 불러옵니다."
     )
     @GetMapping("/community-list")
-    public ResponseEntity<List<MypagePostDTO>> getWrittenUserPostsList(@PathVariable("userid") Integer userid){
-        List<MypagePostDTO> writtenUserPostsDTOList = mypageApiService.getWrittenUserPosts(userid);
+    public ResponseEntity<List<MypagePostDTO>> getWrittenUserPostsList(@RequestHeader("Authorization") String token){
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        Integer userId = userApiService.getUserIdFromToken(jwtToken);
+
+        List<MypagePostDTO> writtenUserPostsDTOList = mypageApiService.getWrittenUserPosts(userId);
         return new ResponseEntity<>(writtenUserPostsDTOList, HttpStatus.OK);
     }
 
@@ -90,8 +112,11 @@ public class MypageApiController {
     )
     @GetMapping("/favorite-restuarnt-list")
     public ResponseEntity<List<FavoriteRestaurantInfoDTO>> getFavoriteRestaurantList(
-            @PathVariable("userId") Integer userId
+            @RequestHeader("Authorization") String token
     ){
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        Integer userId = userApiService.getUserIdFromToken(jwtToken);
+
         List<FavoriteRestaurantInfoDTO> userFavoriteRestaurantList = mypageApiService.getUserFavoriteRestaurantList(userId);
         return new ResponseEntity<>(userFavoriteRestaurantList, HttpStatus.OK);
     }
@@ -103,9 +128,12 @@ public class MypageApiController {
     )
     @GetMapping("community-scrap-list")
     public ResponseEntity<List<MypagePostDTO>> getCommunityScrapList(
-            @PathVariable("userId") Integer userid
+            @RequestHeader("Authorization") String token
     ){
-        List<MypagePostDTO> postScrapsDTO = mypageApiService.getScrappedUserPosts(userid);
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        Integer userId = userApiService.getUserIdFromToken(jwtToken);
+
+        List<MypagePostDTO> postScrapsDTO = mypageApiService.getScrappedUserPosts(userId);
         return new ResponseEntity<>(postScrapsDTO, HttpStatus.OK);
     }
 
@@ -116,9 +144,12 @@ public class MypageApiController {
     )
     @GetMapping("community-comment-list")
     public ResponseEntity<List<MypagePostCommentDTO>> getCommunityCommentList(
-            @PathVariable("userId") Integer userid
+            @RequestHeader("Authorization") String token
     ){
-        List<MypagePostCommentDTO> commentedUserPosts = mypageApiService.getCommentedUserPosts(userid);
+        String jwtToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        Integer userId = userApiService.getUserIdFromToken(jwtToken);
+
+        List<MypagePostCommentDTO> commentedUserPosts = mypageApiService.getCommentedUserPosts(userId);
         return new ResponseEntity<>(commentedUserPosts, HttpStatus.OK);
     }
 }
