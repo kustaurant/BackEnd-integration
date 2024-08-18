@@ -23,17 +23,17 @@ public class RestaurantConstants {
             new StarComment(5.0, "인생 최고의 식당입니다.")
     );
 
-    public static String getIconImgUrl(RestaurantComment restaurantComment) {
+    public static String getIconImgUrl(RestaurantComment restaurantComment, boolean isIOS) {
         if (restaurantComment == null) {
-            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level1icon.svg";
+            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level1icon" + (isIOS ? ".svg" : ".png");
         }
         User user = restaurantComment.getUser();
         if (user.getEvaluationList().size() > 60) {
-            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level3icon.svg";
+            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level3icon" + (isIOS ? ".svg" : ".png");
         } else if (user.getEvaluationList().size() > 30) {
-            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level2icon.svg";
+            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level2icon" + (isIOS ? ".svg" : ".png");
         } else {
-            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level1icon.svg";
+            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level1icon" + (isIOS ? ".svg" : ".png");
         }
     }
 

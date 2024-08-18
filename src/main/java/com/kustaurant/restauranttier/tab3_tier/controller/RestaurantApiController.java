@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -74,7 +75,8 @@ public class RestaurantApiController {
     })
     @GetMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetail(
-            @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId
+            @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId,
+            @RequestHeader(value = HttpHeaders.USER_AGENT) String userAgent
     ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
 
@@ -87,9 +89,13 @@ public class RestaurantApiController {
             isEvaluated = restaurantApiService.isEvaluated(restaurant, user);
         }
 
-        RestaurantDetailDTO responseData = RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, isEvaluated, isFavorite);
+        RestaurantDetailDTO responseData = RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, isEvaluated, isFavorite, isIOS(userAgent));
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    private boolean isIOS(String userAgent) {
+        return userAgent.toLowerCase().contains("iphone") || userAgent.toLowerCase().contains("ipad") || userAgent.toLowerCase().contains("ios");
     }
 
     // 즐겨찾기
@@ -154,11 +160,12 @@ public class RestaurantApiController {
     public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
             @PathVariable Integer restaurantId,
             @RequestBody EvaluationDTO evaluationDTO,
-            @RequestParam(required = false) MultipartFile image
+            @RequestParam(required = false) MultipartFile image,
+            @RequestHeader(value = HttpHeaders.USER_AGENT) String userAgent
             ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
 
-        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, TierApiController.randomBoolean(), TierApiController.randomBoolean()), HttpStatus.OK);
+        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, TierApiController.randomBoolean(), TierApiController.randomBoolean(), isIOS(userAgent)), HttpStatus.OK);
     }
 
     // 리뷰 불러오기
@@ -185,7 +192,8 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId,
             @RequestParam(defaultValue = "popularity")
             @Parameter(example = "popularity 또는 latest", description = "인기순: popularity, 최신순: latest")
-            String sort
+            String sort,
+            @RequestHeader(value = HttpHeaders.USER_AGENT) String userAgent
     ) {
         if (!sort.equals("popularity") && !sort.equals("latest")) {
             throw new ParamException("sort 파라미터 입력 값이 올바르지 않습니다.");
@@ -194,7 +202,7 @@ public class RestaurantApiController {
         // TODO 나중에 수정
         User user = mypageApiService.findUserById(userId);
 
-        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurant, user, sort.equals("popularity"));
+        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurant, user, sort.equals("popularity"), isIOS(userAgent));
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -312,7 +320,8 @@ public class RestaurantApiController {
     public ResponseEntity<RestaurantCommentDTO> postReply(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
-            @RequestBody String commentBody
+            @RequestBody String commentBody,
+            @RequestHeader(value = HttpHeaders.USER_AGENT) String userAgent
     ) {
         // 댓글 내용 없는 경우 예외 처리
         if (commentBody.trim().isEmpty()) {
@@ -330,7 +339,7 @@ public class RestaurantApiController {
 
         RestaurantComment restaurantComment = restaurantCommentService.addSubComment(restaurant, user, commentBody, commentId);
 
-        return new ResponseEntity<>(RestaurantCommentDTO.convertComment(restaurantComment, null, null), HttpStatus.OK);
+        return new ResponseEntity<>(RestaurantCommentDTO.convertComment(restaurantComment, null, null, isIOS(userAgent)), HttpStatus.OK);
     }
 
     private void checkRestaurantIdAndCommentId(Restaurant restaurant, int restaurantId, int commentId) {

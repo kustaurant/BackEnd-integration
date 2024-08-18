@@ -46,7 +46,7 @@ public class RestaurantCommentService {
         return commentOptional.get();
     }
 
-    public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular) {
+    public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular, boolean isIOS) {
         // 평가 데이터 및 댓글 가져오기
         List<RestaurantCommentDTO> mainCommentList = new ArrayList<>(restaurant.getEvaluationList().stream()
                 .map(evaluation -> {
@@ -57,7 +57,8 @@ public class RestaurantCommentService {
                 .map(entry -> RestaurantCommentDTO.convertComment(
                         entry.getValue(),          // comment
                         entry.getKey().getEvaluationScore(), // evaluationScore
-                        user
+                        user,
+                        isIOS
                 ))
                 .toList());
 
@@ -74,7 +75,7 @@ public class RestaurantCommentService {
                 .peek(mainComment ->
                         mainComment.setCommentReplies(
                                 findCommentsByParentCommentId(mainComment.getCommentId()).stream()
-                                        .map(comment -> RestaurantCommentDTO.convertComment(comment, null, user))
+                                        .map(comment -> RestaurantCommentDTO.convertComment(comment, null, user, isIOS))
                                         .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
                                         .collect(Collectors.toList())
                         )
