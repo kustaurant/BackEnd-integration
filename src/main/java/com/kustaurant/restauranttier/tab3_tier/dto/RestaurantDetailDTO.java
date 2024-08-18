@@ -81,6 +81,8 @@ public class RestaurantDetailDTO {
                 restaurant.getRestaurantMenuList().stream().peek(restaurantMenu -> {
                     if (restaurantMenu.getMenuImgUrl().equals("no_img")) {
                         restaurantMenu.setMenuImgUrl(RestaurantConstants.REPLACE_IMG_URL);
+                    } else if (restaurantMenu.getMenuImgUrl().contains("https://g-place.pstatic.net/assets/shared/images/menu_icon_noimg_food.png")) {
+                        restaurantMenu.setMenuImgUrl(RestaurantConstants.REPLACE_IMG_URL);
                     }
                 }).collect(Collectors.toList())
         );
