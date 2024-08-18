@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 @Slf4j
 public class NaverApiService {
-    //액세스 토큰을 사용해 유저 정보를 불러오는 서비스이다.
+    //액세스 토큰을 사용해 네이버 유저 정보를 불러오는 서비스이다.
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;

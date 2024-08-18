@@ -1,9 +1,12 @@
 package com.kustaurant.restauranttier.common.apiUser;
 
+import com.kustaurant.restauranttier.tab5_mypage.entity.User;
+import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,6 +16,7 @@ import java.util.Base64;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
     @Value("${jwt.secret}")
     private String secretKey;
@@ -23,6 +27,8 @@ public class JwtUtil {
     // 리프레시 토큰 유효 시간
     @Value("${jwt.refreshTokenExpiration}")
     private long refreshTokenExpiration;
+
+    private final UserRepository userRepository;
 
     @PostConstruct
     protected void init() {
@@ -60,6 +66,14 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    // 이메일로 유저 아이디 반환
+    public Integer getUserIdFromToken(String token) {
+        String userEmail = getUserEmailFromToken(token);
+        User user = userRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        return user.getUserId();
     }
 
     // JWT 토큰의 유효성 검증

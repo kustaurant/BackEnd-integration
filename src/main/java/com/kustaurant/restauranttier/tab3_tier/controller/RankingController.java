@@ -24,7 +24,7 @@ public class RankingController {
             Principal principal
     ) {
 
-        // 평가 1개 이상한 유저 리스트
+        // 평가 1개 이상 한 유저 리스트
         List<User> userList = userRepository.findUsersWithEvaluationCountDescending();
         // 순위 리스트
         List<UserRank> userRankList = calculateRank(userList);

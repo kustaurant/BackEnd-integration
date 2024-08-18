@@ -45,6 +45,10 @@ public class UserApiLoginController {
     }
 
     // 토큰 검증을 위한 테스트용 엔드포인트
+    @Operation(
+            summary = "발급받은 토큰을 검증하는 테스트용 API입니다.",
+            description = "검증된토큰 : valid, 아니면 invalid 출력"
+    )
     @GetMapping("/verify-token")
     public ResponseEntity<?> verifyToken(@RequestParam String token) {
         boolean isValid = jwtUtil.validateToken(token);
