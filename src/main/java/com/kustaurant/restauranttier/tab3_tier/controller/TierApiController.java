@@ -41,7 +41,6 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class TierApiController {
 
-    private final RestaurantApiRepository restaurantApiRepository;
     private final RestaurantApiService restaurantApiService;
     private final RestaurantSituationRelationRepository restaurantSituationRelationRepository;
 
