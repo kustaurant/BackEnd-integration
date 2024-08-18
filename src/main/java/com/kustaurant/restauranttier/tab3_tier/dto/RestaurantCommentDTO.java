@@ -37,6 +37,8 @@ public class RestaurantCommentDTO {
     private Integer commentDislikeCount;
     @Schema(description = "대댓글 리스트")
     private List<RestaurantCommentDTO> commentReplies;
+    @Schema(description = "사용자가 단 댓글인지 여부", example = "true")
+    private Boolean isCommentMine;
     @JsonIgnore
     private LocalDateTime date;
 
@@ -53,6 +55,7 @@ public class RestaurantCommentDTO {
                 comment.getRestaurantCommentlikeList().size(),
                 comment.getRestaurantCommentdislikeList().size(),
                 null,
+                isCommentMine(user, comment),
                 comment.getUpdatedAt() == null ? comment.getCreatedAt() : comment.getUpdatedAt()
         );
     }
@@ -63,8 +66,15 @@ public class RestaurantCommentDTO {
                 null, null, null, null, null, null, null,
                 isUserLikeDisLikeStatus(comment, user),
                 comment.getRestaurantCommentlikeList().size(),
-                comment.getRestaurantCommentdislikeList().size(), null, null
+                comment.getRestaurantCommentdislikeList().size(), null, null, null
         );
+    }
+
+    public static boolean isCommentMine(User user, RestaurantComment comment) {
+        if (user == null) {
+            return false;
+        }
+        return comment.getUser().equals(user);
     }
 
     private static int isUserLikeDisLikeStatus(RestaurantComment comment, User user) {
