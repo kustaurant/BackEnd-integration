@@ -75,6 +75,12 @@ public class RestaurantCommentService {
         }
     }
 
+    public void deleteComment(Integer commentId) {
+        RestaurantComment comment = findCommentByCommentId(commentId);
+        comment.setStatus("DELETE");
+        restaurantCommentRepository.save(comment);
+    }
+
     public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular, boolean isIOS) {
         // 평가 데이터 및 댓글 가져오기
         List<RestaurantCommentDTO> mainCommentList = new ArrayList<>(restaurant.getEvaluationList().stream()

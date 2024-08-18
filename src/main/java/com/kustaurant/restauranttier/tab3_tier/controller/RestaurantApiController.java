@@ -161,8 +161,14 @@ public class RestaurantApiController {
 
     // 평가하기
     @PostMapping("/restaurants/{restaurantId}/evaluation")
-    @Operation(summary = "평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
-    @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))})
+    @Operation(summary = "평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)\n\n" +
+            "- 반환 값 보충 설명\n\n" +
+            "   - 식당 상세 화면 정보 불러오기 api와 동일합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "500", description = "데이터베이스 상에 문제가 있을 경우 500을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    })
     public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
             @PathVariable Integer restaurantId,
             @RequestBody EvaluationDTO evaluationDTO,
@@ -171,10 +177,16 @@ public class RestaurantApiController {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // TODO 나중에 수정
         User user = mypageApiService.findUserById(userId);
+        boolean isFavorite = false;
+        boolean isEvaluated = false;
+        if (user != null) {
+            isFavorite = restaurantApiService.isFavorite(restaurant, user);
+            isEvaluated = restaurantApiService.isEvaluated(restaurant, user);
+        }
 
         evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
 
-        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, TierApiController.randomBoolean(), TierApiController.randomBoolean(), isIOS(userAgent)), HttpStatus.OK);
+        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, isEvaluated, isFavorite, isIOS(userAgent)), HttpStatus.OK);
     }
 
     // 리뷰 불러오기
@@ -361,12 +373,19 @@ public class RestaurantApiController {
     @DeleteMapping("/restaurants/{restaurantId}/comments/{commentId}")
     @Operation(summary = "식당 댓글 및 대댓글 삭제하기", description = "식당 댓글 및 대댓글 삭제하기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "삭제에 성공했습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))})
+            @ApiResponse(responseCode = "200", description = "삭제에 성공했습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))}),
+            @ApiResponse(responseCode = "400", description = "restaurantId 식당에 해당 comment Id를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
     })
     public ResponseEntity<Void> deleteComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId
     ) {
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+
+        checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+
+        restaurantCommentService.deleteComment(commentId);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
