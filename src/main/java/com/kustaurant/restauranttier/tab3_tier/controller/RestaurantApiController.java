@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ import java.util.Map;
  * @since 2024.7.10.
  * description: restaurant controller
  */
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -76,7 +78,7 @@ public class RestaurantApiController {
     @GetMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetail(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId,
-            @RequestHeader(value = HttpHeaders.USER_AGENT) String userAgent
+            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
     ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
 
@@ -88,6 +90,8 @@ public class RestaurantApiController {
             isFavorite = restaurantApiService.isFavorite(restaurant, user);
             isEvaluated = restaurantApiService.isEvaluated(restaurant, user);
         }
+
+        log.info("{}", userAgent);
 
         RestaurantDetailDTO responseData = RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, isEvaluated, isFavorite, isIOS(userAgent));
 
@@ -161,7 +165,7 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId,
             @RequestBody EvaluationDTO evaluationDTO,
             @RequestParam(required = false) MultipartFile image,
-            @RequestHeader(value = HttpHeaders.USER_AGENT) String userAgent
+            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
             ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
 
@@ -193,7 +197,7 @@ public class RestaurantApiController {
             @RequestParam(defaultValue = "popularity")
             @Parameter(example = "popularity 또는 latest", description = "인기순: popularity, 최신순: latest")
             String sort,
-            @RequestHeader(value = HttpHeaders.USER_AGENT) String userAgent
+            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
     ) {
         if (!sort.equals("popularity") && !sort.equals("latest")) {
             throw new ParamException("sort 파라미터 입력 값이 올바르지 않습니다.");
@@ -321,7 +325,7 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
             @RequestBody String commentBody,
-            @RequestHeader(value = HttpHeaders.USER_AGENT) String userAgent
+            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
     ) {
         // 댓글 내용 없는 경우 예외 처리
         if (commentBody.trim().isEmpty()) {
