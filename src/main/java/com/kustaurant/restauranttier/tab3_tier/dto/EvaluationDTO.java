@@ -6,6 +6,7 @@ import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,8 @@ public class EvaluationDTO {
     private String evaluationComment;
     @Schema(description = "별점 멘트", example = "")
     private List<RestaurantConstants.StarComment> starComments;
+    @Schema(description = "새로운 이미지", example = "평가하기나 다시평가하기를 할 때 새로 등록한 이미지가 있을 경우에만 사용하는 필드입니다.")
+    private MultipartFile newImage;
 
     public static EvaluationDTO convertEvaluation(Evaluation evaluation, RestaurantComment comment) {
         return new EvaluationDTO(
@@ -32,13 +35,14 @@ public class EvaluationDTO {
                 evaluation.getEvaluationItemScoreList().stream().map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationId()).collect(Collectors.toList()),
                 comment == null ? null : comment.getCommentImgUrl(),
                 comment == null ? null : comment.getCommentBody(),
-                RestaurantConstants.STAR_COMMENTS
+                RestaurantConstants.STAR_COMMENTS,
+                null
         );
     }
 
     public static EvaluationDTO convertEvaluationWhenNoEvaluation() {
         return new EvaluationDTO(
-                null, null, null, null, RestaurantConstants.STAR_COMMENTS
+                null, null, null, null, RestaurantConstants.STAR_COMMENTS, null
         );
     }
 }

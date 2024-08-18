@@ -8,6 +8,7 @@ import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantDetailDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
+import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantCommentService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantFavoriteService;
@@ -47,6 +48,7 @@ public class RestaurantApiController {
     private final RestaurantApiService restaurantApiService;
     private final RestaurantFavoriteService restaurantFavoriteService;
     private final RestaurantCommentService restaurantCommentService;
+    private final EvaluationService evaluationService;
 
     private final int userId = 23;
 
@@ -159,15 +161,18 @@ public class RestaurantApiController {
 
     // 평가하기
     @PostMapping("/restaurants/{restaurantId}/evaluation")
-    @Operation(summary = "(기능 작동x) 평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
+    @Operation(summary = "평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
     @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))})
     public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
             @PathVariable Integer restaurantId,
             @RequestBody EvaluationDTO evaluationDTO,
-            @RequestParam(required = false) MultipartFile image,
             @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
             ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        // TODO 나중에 수정
+        User user = mypageApiService.findUserById(userId);
+
+        evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
 
         return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, TierApiController.randomBoolean(), TierApiController.randomBoolean(), isIOS(userAgent)), HttpStatus.OK);
     }
@@ -354,7 +359,7 @@ public class RestaurantApiController {
 
     // 식당 댓글 및 대댓글 삭제하기
     @DeleteMapping("/restaurants/{restaurantId}/comments/{commentId}")
-    @Operation(summary = "(기능 작동x) 식당 댓글 및 대댓글 삭제하기", description = "식당 댓글 및 대댓글 삭제하기")
+    @Operation(summary = "식당 댓글 및 대댓글 삭제하기", description = "식당 댓글 및 대댓글 삭제하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "삭제에 성공했습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))})
     })

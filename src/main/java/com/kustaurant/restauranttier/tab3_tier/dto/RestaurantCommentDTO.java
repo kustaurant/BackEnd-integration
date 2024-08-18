@@ -35,10 +35,10 @@ public class RestaurantCommentDTO {
     private Integer commentLikeCount;
     @Schema(description = "비추천 개수", example = "3")
     private Integer commentDislikeCount;
-    @Schema(description = "대댓글 리스트")
-    private List<RestaurantCommentDTO> commentReplies;
     @Schema(description = "사용자가 단 댓글인지 여부", example = "true")
     private Boolean isCommentMine;
+    @Schema(description = "대댓글 리스트")
+    private List<RestaurantCommentDTO> commentReplies;
     @JsonIgnore
     private LocalDateTime date;
 
@@ -54,8 +54,8 @@ public class RestaurantCommentDTO {
                 isUserLikeDisLikeStatus(comment, user),
                 comment.getRestaurantCommentlikeList().size(),
                 comment.getRestaurantCommentdislikeList().size(),
-                null,
                 isCommentMine(user, comment),
+                null,
                 comment.getUpdatedAt() == null ? comment.getCreatedAt() : comment.getUpdatedAt()
         );
     }
