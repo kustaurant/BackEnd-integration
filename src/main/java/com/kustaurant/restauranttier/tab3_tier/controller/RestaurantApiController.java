@@ -103,7 +103,7 @@ public class RestaurantApiController {
     }
 
     // 즐겨찾기
-    @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle")
+    @PostMapping("/restaurants/{restaurantId}/favorite-toggle")
     @Operation(summary = "즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태를 반환합니다.\n\n눌러서 즐겨찾기가 해제된 경우 -> false반환\n\n" +
             "- 반환 값 보충 설명\n\n" +
             "   - boolean: not null")
@@ -125,7 +125,7 @@ public class RestaurantApiController {
     }
 
     // 이전 평가 데이터 가져오기
-    @GetMapping("/auth/restaurants/{restaurantId}/evaluation")
+    @GetMapping("/restaurants/{restaurantId}/evaluation")
     @Operation(summary = "평가 하기로 갈 때 이전 평가 데이터가 있을 경우 불러오기", description = "평가하기에서 사용하는 형식과 동일합니다. 유저가 이전에 해당 식당을 평가했을 경우 이전 평가 데이터를 불러와서 이전에 평가했던 사항을 보여줍니다. " +
             "\n\n이전 데이터가 없을 경우 아무것도 반환하지 않습니다.\n\n현재 restaurantId 599, 631에 데이터 있습니다.\n\n" +
             "- 반환 값 보충 설명\n\n" +
@@ -158,7 +158,7 @@ public class RestaurantApiController {
     }
 
     // 평가하기
-    @PostMapping("/auth/restaurants/{restaurantId}/evaluation")
+    @PostMapping("/restaurants/{restaurantId}/evaluation")
     @Operation(summary = "(기능 작동x) 평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
     @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))})
     public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
@@ -212,7 +212,7 @@ public class RestaurantApiController {
     }
 
     // 리뷰 추천하기
-    @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}/like")
+    @PostMapping("/restaurants/{restaurantId}/comments/{commentId}/like")
     @Operation(summary = "리뷰 추천하기", description = "추천을 누른 후의 추천수와 비추천수를 반환합니다.\n\n반환 형식은 리뷰와 동일합니다." +
             "\n\n추천과 비추천은 동시에 눌릴 수 없고, 비추천을 누른 상태로 추천을 누르면 자동으로 비추천이 해제되고 추천이 누른 상태가 됩니다." +
             "\n\ncommentLikeStatus가 1이면 현재 추천을 누른 상태, -1이면 비추천을 누른 상태, 0이면 아무것도 누르지 않은 상태입니다.\n\n" +
@@ -257,7 +257,7 @@ public class RestaurantApiController {
     }
 
     // 리뷰 비추천하기
-    @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}/dislike")
+    @PostMapping("/restaurants/{restaurantId}/comments/{commentId}/dislike")
     @Operation(summary = "리뷰 비추천하기", description = "비추천을 누른 후의 추천수와 비추천수를 반환합니다.\n\n" +
             "반환 형식은 댓글과 동일합니다.\n\n추천과 비추천은 동시에 눌릴 수 없고, 추천을 누른 상태로 비추천을 누르면 자동으로 추천이 해제되고 비추천이 누른 상태가 됩니다.\n\n" +
             "commentLikeStatus가 1이면 현재 추천을 누른 상태, -1이면 비추천을 누른 상태, 0이면 아무것도 누르지 않은 상태입니다.\n\n" +
@@ -302,7 +302,7 @@ public class RestaurantApiController {
     }
 
     // 식당 대댓글 달기
-    @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
+    @PostMapping("/restaurants/{restaurantId}/comments/{commentId}")
     @Operation(summary = "식당 대댓글 달기", description = "작성한 대댓글을 반환합니다.\n\n" +
             "- 반환 값 보충 설명\n\n" +
             "   - commentId: not null\n\n" +
@@ -353,7 +353,7 @@ public class RestaurantApiController {
     }
 
     // 식당 댓글 및 대댓글 삭제하기
-    @DeleteMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
+    @DeleteMapping("/restaurants/{restaurantId}/comments/{commentId}")
     @Operation(summary = "(기능 작동x) 식당 댓글 및 대댓글 삭제하기", description = "식당 댓글 및 대댓글 삭제하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "삭제에 성공했습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))})
