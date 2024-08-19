@@ -48,6 +48,11 @@ public class MainController {
         return "redirect:/";
     }
 
+    @GetMapping("/swagger-update")
+    public String swaggerUpdate() {
+        return "swagger-update";
+    }
+
 
     // 홈 화면
     @GetMapping("/")
