@@ -143,4 +143,9 @@ public class RestaurantApiService {
         return user.getRestaurantFavoriteList().stream()
                 .anyMatch(restaurantFavorite -> restaurantFavorite.getRestaurant().equals(restaurant));
     }
+
+    public List<Restaurant> getRecommendedRestaurantsForUser(Integer userId) {
+        // TODO:즐찾한 식당 카테고리 기반으로 식당추천
+        return null;
+    }
 }

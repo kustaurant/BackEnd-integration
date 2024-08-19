@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab4_community.controller;
 
+import com.kustaurant.restauranttier.common.apiUser.JwtToken;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
@@ -200,9 +201,9 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "like success", content = @Content),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> postLikeCreate(@PathVariable String postId, Model model, Principal principal) {
+    public ResponseEntity<Map<String, Object>> postLikeCreate(@PathVariable String postId, Model model, @JwtToken Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(24);;
+        User user = mypageApiService.findUserById(userId);
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.likeCreateOrDelete(post, user);
         response.put("likeCount", post.getLikeUserList().size());
