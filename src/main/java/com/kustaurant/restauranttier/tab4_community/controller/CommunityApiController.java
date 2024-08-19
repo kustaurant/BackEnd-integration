@@ -56,7 +56,6 @@ public class CommunityApiController {
     private final PostCommentApiRepository postCommentApiRepository;
     private final PostApiRepository postApiRepository;
     private final MypageApiService mypageApiService;
-    //    User userApiService.findUserById(24); = customOAuth2UserService.getUser(principal.getName());
     // 커뮤니티 메인 화면
     @GetMapping
     @Operation(summary = "커뮤니티 메인화면의 글 리스트 불러오기", description = "게시판 종류와 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다.")
@@ -76,6 +75,8 @@ public class CommunityApiController {
         }
 
         return ResponseEntity.ok(paging.getContent());
+        
+        //TODO: 랭킹 및 반환양식 통일
     }
 
     // 커뮤니티 게시글 상세 화면
@@ -100,7 +101,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "delete success", content = @Content),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
-    public ResponseEntity<String> postDelete(@PathVariable Integer postId) {
+    public ResponseEntity<String> postDelete(@PathVariable Integer postId,@JwtToken Integer userId) {
         Post post = postApiService.getPost(Integer.valueOf(postId));
 
         //게시글 지워지면 그 게시글의 댓글들도 DELETED 상태로 변경
@@ -134,7 +135,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "delete success", content = @Content),
             @ApiResponse(responseCode = "404", description = "comment not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> commentDelete(@PathVariable Integer commentId) {
+    public ResponseEntity<Map<String, Object>> commentDelete(@PathVariable Integer commentId,@JwtToken Integer userId) {
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
         postComment.setStatus("DELETED");
         List<PostComment> repliesList = postComment.getRepliesList();
@@ -160,7 +161,6 @@ public class CommunityApiController {
     }
     // 댓글 or 대댓글 생성
     @PostMapping("/comments")
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "댓글 생성, 대댓글 생성", description = "게시글 ID와 내용을 입력받아 댓글을 생성합니다. 대댓글의 경우 부모 댓글의 id를 파라미터로 받아야 합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "create success", content = @Content),
@@ -170,9 +170,9 @@ public class CommunityApiController {
             @RequestParam(name = "content", defaultValue = "") String content,
             @RequestParam(name = "postId") String postId,
             @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
-            Model model, Principal principal) {
+            Model model, @JwtToken Integer userId) {
         Integer postIdInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(24);;
+        User user = mypageApiService.findUserById(userId);;
         Post post = postApiService.getPost(postIdInt);
         PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), post, user);
         PostComment savedPostComment = postCommentApiRepository.save(postComment);
@@ -339,7 +339,7 @@ public class CommunityApiController {
     // 게시글 수정
     @PatchMapping("/posts/{postId}")
 //    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @Operation(summary = "게시글 수정", description = "게시글 ID와 내용을 입력받아 수정합니다.")
+    @Operation(summary = "게시글 수정 (미구현)", description = "게시글 ID와 내용을 입력받아 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "update success", content = @Content),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
@@ -352,7 +352,7 @@ public class CommunityApiController {
             @JwtToken Integer userId
     ) {
 
-
+        // TODO: 사진 업로드 구현
         Post post = postApiService.getPost(Integer.valueOf(postId));
         // 기존 연관된 사진 정보 삭제
         List<PostPhoto> existingPhotos = post.getPostPhotoList();

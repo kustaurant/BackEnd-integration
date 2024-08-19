@@ -7,6 +7,7 @@ import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,20 +36,8 @@ public class HomeApiController {
     @GetMapping("/api/v1/home")
     public ResponseEntity<RestaurantListsResponse> home(@JwtToken Integer userId) {
         List<Restaurant> topRestaurantsByRating = restaurantApiService.getTopRestaurants(); // 점수 높은 순으로 총 16개
-        Random rand = new Random();
-        List<Restaurant> restaurantsForMe = null;
-        if(userId == null){
-            // 미로그인 시 랜덤으로 반환
-            restaurantsForMe = restaurantApiService.getRestaurantsByCuisinesAndLocations("ALL","ALL",null,false); // 임시로 설정
-            Collections.shuffle(restaurantsForMe, rand);
-            restaurantsForMe.subList(0,15);
-        }else{
-            // TODO : 즐찾한 식당의 카테고리 기반으로 식당 추천
-            restaurantsForMe = restaurantApiService.getRecommendedRestaurantsForUser(userId);
-
-        }
-
-
+        // 로그인 여부에 따라 랜덤 식당 또는 추천 식당을 반환하는 서비스 메서드를 호출합니다.
+        List<Restaurant> restaurantsForMe = restaurantApiService.getRecommendedOrRandomRestaurants(userId);
 
         List<RestaurantTierDTO> topRestaurantsByRatingDTOs = topRestaurantsByRating.stream()
                 .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant,null,null,null))
