@@ -220,9 +220,9 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "dislike success", content = @Content),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> postDislikeCreate(@PathVariable String postId, Model model, Principal principal) {
+    public ResponseEntity<Map<String, Object>> postDislikeCreate(@PathVariable String postId, Model model, @JwtToken Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(24);;
+        User user = mypageApiService.findUserById(userId);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.dislikeCreateOrDelete(post, user);
         response.put("dislikeCount", post.getDislikeUserList().size());
@@ -238,9 +238,9 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "scrap success", content = @Content),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> postScrap(@PathVariable String postId, Model model, Principal principal) {
+    public ResponseEntity<Map<String, Object>> postScrap(@PathVariable String postId, Model model, @JwtToken Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(24);;
+        User user = mypageApiService.findUserById(userId);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postScrapApiService.scrapCreateOrDelete(post, user);
         return ResponseEntity.ok(response);
@@ -273,10 +273,10 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "like success", content = @Content),
             @ApiResponse(responseCode = "404", description = "comment not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> likeComment(@PathVariable String commentId, Principal principal) {
+    public ResponseEntity<Map<String, Object>> likeComment(@PathVariable String commentId, @JwtToken Integer userId) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
-        User user = mypageApiService.findUserById(24);;
+        User user = mypageApiService.findUserById(userId);;
         Map<String, Object> response = postApiCommentService.likeCreateOrDelete(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
@@ -290,10 +290,10 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "dislike success", content = @Content),
             @ApiResponse(responseCode = "404", description = "comment not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> dislikeComment(@PathVariable String commentId, Principal principal) {
+    public ResponseEntity<Map<String, Object>> dislikeComment(@PathVariable String commentId, @JwtToken Integer userId) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
-        User user = mypageApiService.findUserById(24);;
+        User user = mypageApiService.findUserById(userId);;
         Map<String, Object> response = postApiCommentService.dislikeCreateOrDelete(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
@@ -312,11 +312,11 @@ public class CommunityApiController {
             @RequestParam("postCategory") String postCategory,
             @RequestParam("content") String content,
             @RequestParam(value= "imgUrl" ,required = false) String imgUrl,
-            Principal principal) throws IOException {
+            @JwtToken Integer userId) throws IOException {
 
         // 게시글 객체 생성
         Post post = new Post(title, content, postCategory, "ACTIVE", LocalDateTime.now());
-        User user = mypageApiService.findUserById(24);;
+        User user = mypageApiService.findUserById(userId);;
         postApiService.create(post, user);
 
 //        // TinyMCE 컨텐츠에서 <img> 태그를 파싱
@@ -348,7 +348,8 @@ public class CommunityApiController {
             @PathVariable String postId,
             @RequestParam String title,
             @RequestParam String postCategory,
-            @RequestParam String content
+            @RequestParam String content,
+            @JwtToken Integer userId
     ) {
 
 
@@ -379,31 +380,6 @@ public class CommunityApiController {
         post.setPostBody(content);
         postApiRepository.save(post);
 
-//        List<PostPhoto> newPhotoList = new ArrayList<>();
-//        // TinyMCE 컨텐츠에서 <img> 태그를 파싱
-//        Document doc = Jsoup.parse(content);
-//        Elements imgTags = doc.select("img");
-//
-//        // 각 <img> 태그에 대해 이미지 생성하고 post에 추가
-//        for (Element img : imgTags) {
-//            String imgUrl = img.attr("src");
-//
-//            // 이미지 파일 처리
-//            if (!imgUrl.isEmpty()) {
-//                PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-//                postPhoto.setPost(post); // 게시글과 이미지 연관관계 설정
-//                newPhotoList.add(postPhoto); // post의 이미지 리스트에 추가
-//                postPhotoRepository.save(postPhoto); // 이미지 정보 저장
-//            }
-//        }
-//
-//        post.setPostPhotoList(newPhotoList);
-//        post.setPostTitle(title);
-//        post.setPostCategory(postCategory);
-//        post.setPostBody(content);
-//
-//
-//        postRepository.save(post);
 
 
         return ResponseEntity.ok("글이 성공적으로 수정되었습니다.");
@@ -444,12 +420,11 @@ public class CommunityApiController {
 
     // 댓글 입력창 포커스시 로그인 상태 확인
     @GetMapping("/api/v1/login/comment-write")
-    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "댓글 작성 로그인 확인", description = "댓글 입력창 포커스시 로그인 상태를 확인합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 확인 성공", content = @Content)
     })
-    public ResponseEntity<String> commentWriteLogin() {
+    public ResponseEntity<String> commentWriteLogin(@JwtToken Integer userId) {
         return ResponseEntity.ok("로그인이 성공적으로 되어있습니다.");
     }
 }
