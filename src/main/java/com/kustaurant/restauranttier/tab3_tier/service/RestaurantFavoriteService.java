@@ -20,7 +20,7 @@ public class RestaurantFavoriteService {
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
     public boolean toggleFavorite(String userTokenId, Integer restaurantId) {
-        Optional<User> userOptional = userRepository.findByNaverProviderId(userTokenId);
+        Optional<User> userOptional = userRepository.findByProviderId(userTokenId);
         Optional<Restaurant> restaurantOptional = restaurantRepository.findByRestaurantIdAndStatus(restaurantId, "ACTIVE");
 
         if (restaurantOptional.isEmpty()) {
@@ -56,7 +56,7 @@ public class RestaurantFavoriteService {
     }
 
     public boolean isFavoriteExist(String userTokenId, Integer restaurantId) {
-        Optional<User> userOptional = userRepository.findByNaverProviderId(userTokenId);
+        Optional<User> userOptional = userRepository.findByProviderId(userTokenId);
         Restaurant restaurant = restaurantRepository.findByRestaurantId(restaurantId);
 
         if (userOptional.isPresent()) {

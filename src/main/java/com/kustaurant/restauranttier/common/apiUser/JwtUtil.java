@@ -1,14 +1,17 @@
 package com.kustaurant.restauranttier.common.apiUser;
 
+import com.kustaurant.restauranttier.common.apiUser.apple.AppleSigningKeyResolver;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -104,6 +107,22 @@ public class JwtUtil {
             return expiration.before(new Date());
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    // Apple의 공개 키 URL
+    private static final String APPLE_PUBLIC_KEYS_URL = "https://appleid.apple.com/auth/keys";
+
+    public Claims verifyAppleIdentityToken(String identityToken) {
+        try {
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKeyResolver(new AppleSigningKeyResolver(APPLE_PUBLIC_KEYS_URL))
+                    .build()
+                    .parseClaimsJws(identityToken);
+            return claims.getBody();
+        } catch (JwtException e) {
+            log.error("Invalid Apple identity token", e);
+            throw new IllegalArgumentException("Invalid Apple identity token");
         }
     }
 

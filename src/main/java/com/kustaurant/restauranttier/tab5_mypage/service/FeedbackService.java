@@ -18,7 +18,7 @@ public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
 
     public String addFeedback(String feedbackBody, Principal principal) {
-        Optional<User> userOptional = userRepository.findByNaverProviderId(principal.getName());
+        Optional<User> userOptional = userRepository.findByProviderId(principal.getName());
 
         if (userOptional.isEmpty()) {
             return "fail";

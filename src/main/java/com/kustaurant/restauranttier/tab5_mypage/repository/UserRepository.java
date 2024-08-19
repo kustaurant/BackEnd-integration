@@ -9,11 +9,12 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User,Integer> {
 
-    Optional<User> findByNaverProviderId(String naverProviderId);
+    Optional<User> findByProviderId(String providerId);
 
     Optional<User> findByUserNickname(String userNickname);
 
     Optional<User> findByUserEmail(String userEmail);
+    Optional<User> findByUserId(Integer userId);
 
     @Query("SELECT u " +
             "FROM User u " +

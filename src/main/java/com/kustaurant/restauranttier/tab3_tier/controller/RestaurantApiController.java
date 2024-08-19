@@ -120,7 +120,7 @@ public class RestaurantApiController {
             throw new OptionalNotExistException(userId + " 유저가 존재하지 않습니다.");
         }
 
-        boolean result = restaurantFavoriteService.toggleFavorite(user.getNaverProviderId(), restaurantId);
+        boolean result = restaurantFavoriteService.toggleFavorite(user.getProviderId(), restaurantId);
         return ResponseEntity.ok(result);
     }
 

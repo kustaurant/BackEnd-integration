@@ -64,7 +64,7 @@ public class OAuthAttributes {
 
     public User webToEntity() {
         return User.builder()
-                .naverProviderId(userProviderId)
+                .providerId(userProviderId)
                 .loginApi(loginApi)
                 .userEmail(userEmail)
                 .userNickname(StringUtils.substringBefore(userEmail, "@"))

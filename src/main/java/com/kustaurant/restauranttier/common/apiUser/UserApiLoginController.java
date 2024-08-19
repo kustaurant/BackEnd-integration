@@ -2,8 +2,6 @@ package com.kustaurant.restauranttier.common.apiUser;
 
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +17,7 @@ public class UserApiLoginController {
 
     @Operation(
             summary = "네이버 로그인 api 입니다.",
-            description = "프로바이더,식별id,자체발행 액세스토큰을 받아 기존유저조회or회원가입 처리," +
-                    "액세스토큰을 발행해 리턴합니다."
+            description = "기존유저조회or회원가입 처리 후 액세스토큰을 발행해 리턴합니다."
     )
     @PostMapping("/naver-login")
     public ResponseEntity<?> loginWithNaver(@RequestParam String provider,
@@ -34,13 +31,26 @@ public class UserApiLoginController {
     }
 
     @Operation(
+            summary = "애플 로그인 api 입니다.",
+            description = "기존유저조회or회원가입 처리 후 액세스토큰을 발행해 리턴합니다."
+    )
+    @PostMapping("/apple-login")
+    public ResponseEntity<String> loginWithApple(@RequestParam String provider,
+                                                 @RequestParam String identityToken,
+                                                 @RequestParam String authorizationCode) {
+
+        String accessToken = userApiLoginService.processAppleLogin(provider, identityToken, authorizationCode);
+        return ResponseEntity.ok(accessToken);
+    }
+
+    @Operation(
             summary = "액세스 토큰 재발행 API입니다.",
             description = "서버에 있는 리프레시 토큰을 이용해 새로운 액세스토큰을 발급받아 리턴합니다."
     )
     @PostMapping("/auth/new-access-token")
-    public ResponseEntity<?> refreshAccessToken(@RequestParam String refreshToken) {
+    public ResponseEntity<?> refreshAccessToken(@RequestHeader("Authorization") String accessToken) {
         // 리프레시 토큰을 사용해 새로운 액세스 토큰 발급
-        String newAccessToken = userApiLoginService.refreshAccessToken(refreshToken);
+        String newAccessToken = userApiLoginService.refreshAccessToken(accessToken);
         return ResponseEntity.ok(newAccessToken);
     }
 
@@ -60,9 +70,9 @@ public class UserApiLoginController {
             description = "서버의 토큰정보들을 지웁니다. 클라이언트에서도 액세스 토큰 정보를 지워야합니다."
     )
     @PostMapping("/auth/logout")
-    public ResponseEntity<?> logout(@RequestParam String refreshToken) {
+    public ResponseEntity<?> logout(@JwtToken Integer userId) {
         try {
-            userApiLoginService.logoutUser(refreshToken);
+            userApiLoginService.logoutUser(userId);
             return ResponseEntity.ok("로그아웃이 완료되었습니다.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그아웃에 실패했습니다: " + e.getMessage());

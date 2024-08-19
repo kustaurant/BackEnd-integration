@@ -1,4 +1,4 @@
-package com.kustaurant.restauranttier.common.apiUser;
+package com.kustaurant.restauranttier.common.apiUser.naver;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

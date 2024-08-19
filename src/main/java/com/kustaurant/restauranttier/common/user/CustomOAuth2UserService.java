@@ -48,7 +48,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private User saveOrUpdate(OAuthAttributes attributes) {
-        User user = userRepository.findByNaverProviderId(attributes.getUserProviderId())
+        User user = userRepository.findByProviderId(attributes.getUserProviderId())
                 .map(entity -> entity.updateUserEmail(attributes.getUserEmail()))
                 .orElse(attributes.webToEntity());
 
@@ -56,7 +56,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     public User getUser(String userTokenId) {
-        Optional<User> user = userRepository.findByNaverProviderId(userTokenId);
+        Optional<User> user = userRepository.findByProviderId(userTokenId);
         if (user.isPresent()) {
             return user.get();
         } else {

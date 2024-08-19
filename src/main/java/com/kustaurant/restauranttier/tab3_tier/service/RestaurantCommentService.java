@@ -88,7 +88,7 @@ public class RestaurantCommentService {
 
         Restaurant restaurant = restaurantRepository.findByRestaurantId(restaurantId);
 
-        Optional<User> userOptional = userRepository.findByNaverProviderId(userTokenId);
+        Optional<User> userOptional = userRepository.findByProviderId(userTokenId);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
