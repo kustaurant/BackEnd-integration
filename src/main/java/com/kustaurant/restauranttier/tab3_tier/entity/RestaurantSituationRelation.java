@@ -2,12 +2,16 @@ package com.kustaurant.restauranttier.tab3_tier.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "restaurant_situation_relations_tbl")
 public class RestaurantSituationRelation {
     @Id
@@ -15,7 +19,6 @@ public class RestaurantSituationRelation {
     private Integer relationId;
 
     private Integer dataCount;
-    private Integer situationTier;
 
     @ManyToOne
     @JsonIgnore
@@ -25,4 +28,10 @@ public class RestaurantSituationRelation {
     @JsonIgnore
     @JoinColumn(name="restaurant_id")
     private Restaurant restaurant;
+
+    public RestaurantSituationRelation(Integer dataCount, Situation situation, Restaurant restaurant) {
+        this.dataCount = dataCount;
+        this.situation = situation;
+        this.restaurant = restaurant;
+    }
 }

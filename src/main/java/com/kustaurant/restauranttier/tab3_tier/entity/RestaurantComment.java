@@ -3,6 +3,7 @@ package com.kustaurant.restauranttier.tab3_tier.entity;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name="restaurant_comments_tbl")
+@NoArgsConstructor
 public class RestaurantComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +43,17 @@ public class RestaurantComment {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    public RestaurantComment(User user, Restaurant restaurant, String commentBody, String commentImgUrl, Integer parentEvaluationId, Integer commentLikeCount, String status, LocalDateTime createdAt) {
+        this.user = user;
+        this.restaurant = restaurant;
+        this.commentBody = commentBody;
+        this.commentImgUrl = commentImgUrl;
+        this.parentEvaluationId = parentEvaluationId;
+        this.commentLikeCount = commentLikeCount;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
 
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();

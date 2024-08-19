@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface EvaluationRepository extends JpaRepository<Evaluation,Integer>{
     Optional<Evaluation> findByUserAndRestaurant(User user, Restaurant restaurant);
+    Optional<Evaluation> findByUserAndRestaurantAndStatus(User user, Restaurant restaurant, String status);
 
     Integer countByRestaurant(Restaurant restaurant);
 

@@ -50,6 +50,15 @@ public class Evaluation {
     public Evaluation() {
 
     }
+
+    public Evaluation(Double evaluationScore, String status, LocalDateTime createdAt, User user, Restaurant restaurant) {
+        this.evaluationScore = evaluationScore;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.user = user;
+        this.restaurant = restaurant;
+    }
+
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime past = this.getCreatedAt();

@@ -85,6 +85,13 @@ public class SwaggerConfig {
     - 식당 상세 화면 API
         - 식당 상세 정보 api(/api/v1/restaurant/{restaurantId})에서 restaurantScore 필드를 String에서 Double로 바꿨습니다.
         - 위의 점수가 0일 경우(평가가 1개도 없는 경우) null을 반환합니다.
+        
+    **Version 1.2.3 (2024-08-19)**
+    - 식당 상세 화면 댓글 API
+        - 해당 댓글이 로그인 한 유저의 댓글인지 여부를 boolean으로 나타내는 필드(isCommentMine)를 추가했습니다.
+        - 영향 받는 api
+            - 댓글 불러오기: /api/v1/restaurants/{restaurantId}/comments
+            - 대댓글 달기: /api/v1/restaurants/{restaurantId}/comments/{commentId}
     """;
 
 

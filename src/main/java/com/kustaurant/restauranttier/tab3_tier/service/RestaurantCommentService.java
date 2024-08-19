@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantCommentDislikeRepository;
@@ -44,6 +45,40 @@ public class RestaurantCommentService {
             throw new OptionalNotExistException(commentId + " 코멘트가 없습니다.");
         }
         return commentOptional.get();
+    }
+
+    public void createRestaurantComment(User user, Restaurant restaurant, Evaluation evaluation, EvaluationDTO evaluationDTO) {
+        // TODO: 이미지 url로 변환해야됨.
+        String commentImgUrl = null;
+        RestaurantComment newComment = new RestaurantComment(
+                user, restaurant, evaluationDTO.getEvaluationComment(), commentImgUrl, evaluation.getEvaluationId(),
+                0, "ACTIVE", LocalDateTime.now()
+        );
+        restaurantCommentRepository.save(newComment);
+    }
+
+    public void updateRestaurantComment(EvaluationDTO evaluationDTO, RestaurantComment comment) {
+        comment.setUpdatedAt(LocalDateTime.now());
+        comment.setCommentBody(evaluationDTO.getEvaluationComment());
+        if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
+            // TODO: 이미지 url로 변환해야됨.
+            String commentImgUrl = null;
+            comment.setCommentImgUrl(commentImgUrl);
+        }
+        restaurantCommentRepository.save(comment);
+    }
+
+    public void deleteComment(RestaurantComment comment) {
+        if (comment != null) {
+            comment.setStatus("DELETED");
+            restaurantCommentRepository.save(comment);
+        }
+    }
+
+    public void deleteComment(Integer commentId) {
+        RestaurantComment comment = findCommentByCommentId(commentId);
+        comment.setStatus("DELETE");
+        restaurantCommentRepository.save(comment);
     }
 
     public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular, boolean isIOS) {
