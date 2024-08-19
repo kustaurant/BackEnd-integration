@@ -48,8 +48,10 @@ public class RestaurantCommentService {
     }
 
     public void createRestaurantComment(User user, Restaurant restaurant, Evaluation evaluation, EvaluationDTO evaluationDTO) {
-        // TODO: 이미지 url로 변환해야됨.
         String commentImgUrl = null;
+        if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
+            // TODO: 이미지 url로 변환해야됨.
+        }
         RestaurantComment newComment = new RestaurantComment(
                 user, restaurant, evaluationDTO.getEvaluationComment(), commentImgUrl, evaluation.getEvaluationId(),
                 0, "ACTIVE", LocalDateTime.now()

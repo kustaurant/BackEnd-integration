@@ -191,14 +191,16 @@ public class EvaluationService {
         }
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
         evaluationItemScoresService.deleteSituationsByEvaluation(evaluation);
-        for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {
-            // Evaluation Situation Item Table
-            situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation -> {
-                evaluationItemScoreRepository.save(new EvaluationItemScore(evaluation, newSituation));
-            });
-            // Restaurant Situation Relation Table
-            situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
-                    restaurantSituationRelationService.updateOrCreate(restaurant, newSituation, 1));
+        if (evaluationDTO.getEvaluationSituations() != null && !evaluationDTO.getEvaluationSituations().isEmpty()) {
+            for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {
+                // Evaluation Situation Item Table
+                situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation -> {
+                    evaluationItemScoreRepository.save(new EvaluationItemScore(evaluation, newSituation));
+                });
+                // Restaurant Situation Relation Table
+                situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
+                        restaurantSituationRelationService.updateOrCreate(restaurant, newSituation, 1));
+            }
         }
     }
 
@@ -213,13 +215,15 @@ public class EvaluationService {
             restaurantCommentService.createRestaurantComment(user, restaurant, evaluation, evaluationDTO);
         }
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
-        for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {
-            // Evaluation Situation Item Table
-            situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
-                    evaluationItemScoreRepository.save(new EvaluationItemScore(evaluation, newSituation)));
-            // Restaurant Situation Relation Table
-            situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
-                    restaurantSituationRelationService.updateOrCreate(restaurant, newSituation, 1));
+        if (evaluationDTO.getEvaluationSituations() != null && !evaluationDTO.getEvaluationSituations().isEmpty()) {
+            for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {
+                // Evaluation Situation Item Table
+                situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
+                        evaluationItemScoreRepository.save(new EvaluationItemScore(evaluation, newSituation)));
+                // Restaurant Situation Relation Table
+                situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
+                        restaurantSituationRelationService.updateOrCreate(restaurant, newSituation, 1));
+            }
         }
     }
 

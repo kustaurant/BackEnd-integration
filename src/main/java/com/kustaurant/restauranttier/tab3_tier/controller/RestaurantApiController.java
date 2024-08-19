@@ -162,10 +162,18 @@ public class RestaurantApiController {
     // 평가하기
     @PostMapping("/restaurants/{restaurantId}/evaluation")
     @Operation(summary = "평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)\n\n" +
+            "- 요청 형식 보충 설명\n\n" +
+            "   - evaluationScore: 필수\n\n" +
+            "   - evaluationSituations: 사용자가 상황을 선택했을 경우만. 없어도 됩니다.\n\n" +
+            "   - evaluationImgUrl: 사용 안함. 없어도 됩니다.\n\n" +
+            "   - evaluationComment: 사용자가 코멘트를 입력했을 경우만. 없어도 됩니다.\n\n" +
+            "   - starComments: 사용 안함. 없어도 됩니다.\n\n" +
+            "   - newImage: 사용자가 이미지를 추가했을 경우만. 없어도 됩니다.\n\n" +
             "- 반환 값 보충 설명\n\n" +
             "   - 식당 상세 화면 정보 불러오기 api와 동일합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))}),
+            @ApiResponse(responseCode = "400", description = "평가 점수가 없거나 0점인 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "500", description = "데이터베이스 상에 문제가 있을 경우 500을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
     })
@@ -174,6 +182,10 @@ public class RestaurantApiController {
             @RequestBody EvaluationDTO evaluationDTO,
             @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
             ) {
+        if (evaluationDTO.getEvaluationScore() == null || evaluationDTO.getEvaluationScore().equals(0d)) {
+            throw new ParamException("평가 점수가 필요합니다.");
+        }
+
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // TODO 나중에 수정
         User user = mypageApiService.findUserById(userId);
