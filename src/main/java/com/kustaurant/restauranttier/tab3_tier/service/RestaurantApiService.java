@@ -1,10 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
-import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
-import com.kustaurant.restauranttier.tab3_tier.etc.CuisineEnum;
-import com.kustaurant.restauranttier.tab3_tier.etc.LocationEnum;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
 import com.kustaurant.restauranttier.tab3_tier.specification.RestaurantSpecification;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
@@ -15,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -68,28 +64,14 @@ public class RestaurantApiService {
 
     }
 
-    public List<Restaurant> getRestaurantsByCuisinesAndLocations(String cuisines, String locations, Integer tierInfo, boolean isOrderByScore) {
-        List<String> cuisineList;
-        List<String> locationList;
-        try {
-            cuisineList = cuisines.contains("ALL") ? null : Arrays.stream(cuisines.split(",")).map(c -> CuisineEnum.valueOf(c).getValue()).toList();
-        } catch (IllegalArgumentException e) {
-            throw new ParamException("cuisines 파라미터 입력이 올바르지 않습니다.");
-        }
-        try {
-            locationList = locations.contains("ALL") ? null : Arrays.stream(locations.split(",")).map(l -> LocationEnum.valueOf(l).getValue()).toList();
-        } catch (IllegalArgumentException e) {
-            throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
-        }
-
-        if (cuisineList != null && cuisineList.contains("JH")) {
-            cuisineList = List.of("JH");
-        }
-
-        return restaurantApiRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, null, "ACTIVE", tierInfo, isOrderByScore));
+    public List<Restaurant> getRestaurantsByCuisinesAndSituationsAndLocations(
+            List<String> cuisineList, List<Integer> situationList, List<String> locationList,
+            Integer tierInfo, boolean isOrderByScore
+    ) {
+        return restaurantApiRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore));
     }
 
-    public Page<Restaurant> getRestaurantsByCuisinesAndLocationsAndSituationsWithPage(
+    public Page<Restaurant> getRestaurantsByCuisinesAndSituationsAndLocationsWithPage(
             List<String> cuisineList, List<Integer> situationList, List<String> locationList,
             Integer tierInfo, boolean isOrderByScore, int page, int size
     ) {

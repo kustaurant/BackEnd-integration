@@ -48,6 +48,7 @@ public class CuisineListArgumentResolver implements HandlerMethodArgumentResolve
             if (cuisineList.contains("제휴업체")) {
                 cuisineList = List.of("JH");
             }
+
             return cuisineList;
 
         } catch (IllegalArgumentException e) {

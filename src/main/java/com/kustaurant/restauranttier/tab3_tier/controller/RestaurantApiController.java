@@ -80,22 +80,17 @@ public class RestaurantApiController {
     @GetMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetail(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId,
-            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
     ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
 
         // TODO: 로그인 구현 후 수정
         User user = userService.findUserById(userId);
-        boolean isFavorite = false;
-        boolean isEvaluated = false;
-        if (user != null) {
-            isFavorite = restaurantApiService.isFavorite(restaurant, user);
-            isEvaluated = restaurantApiService.isEvaluated(restaurant, user);
-        }
 
         log.info("{}", userAgent);
 
-        RestaurantDetailDTO responseData = RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, isEvaluated, isFavorite, isIOS(userAgent));
+        RestaurantDetailDTO responseData = RestaurantDetailDTO.convertRestaurantToDetailDTO(
+                restaurant, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user), isIOS(userAgent));
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
@@ -181,7 +176,7 @@ public class RestaurantApiController {
     public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
             @PathVariable Integer restaurantId,
             @RequestBody EvaluationDTO evaluationDTO,
-            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
             ) {
         if (evaluationDTO.getEvaluationScore() == null || evaluationDTO.getEvaluationScore().equals(0d)) {
             throw new ParamException("평가 점수가 필요합니다.");
@@ -227,7 +222,7 @@ public class RestaurantApiController {
             @RequestParam(defaultValue = "popularity")
             @Parameter(example = "popularity 또는 latest", description = "인기순: popularity, 최신순: latest")
             String sort,
-            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
     ) {
         if (!sort.equals("popularity") && !sort.equals("latest")) {
             throw new ParamException("sort 파라미터 입력 값이 올바르지 않습니다.");
@@ -355,7 +350,7 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
             @RequestBody String commentBody,
-            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
     ) {
         // 댓글 내용 없는 경우 예외 처리
         if (commentBody.trim().isEmpty()) {

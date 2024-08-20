@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantFavorite;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
@@ -11,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -19,6 +22,8 @@ public class RestaurantFavoriteService {
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+    private final RestaurantApiService restaurantApiService;
+
     public boolean toggleFavorite(String userTokenId, Integer restaurantId) {
         Optional<User> userOptional = userRepository.findByProviderId(userTokenId);
         Optional<Restaurant> restaurantOptional = restaurantRepository.findByRestaurantIdAndStatus(restaurantId, "ACTIVE");
@@ -74,5 +79,19 @@ public class RestaurantFavoriteService {
 
     public Integer getFavoriteCountByRestaurant(Restaurant restaurant) {
         return restaurantFavoriteRepository.countByRestaurantAndStatus(restaurant, "ACTIVE");
+    }
+
+    // 유저의 즐겨찾기 식당 Tier DTO 리스트를 반환
+    public List<RestaurantTierDTO> getFavoriteRestaurantDtoList(User user) {
+        if (user == null) {
+            return null;
+        }
+        return user.getRestaurantFavoriteList().stream()
+                .map(restaurantFavorite -> RestaurantTierDTO.convertRestaurantToTierDTO(
+                        restaurantFavorite.getRestaurant(),
+                        null,
+                        restaurantApiService.isEvaluated(restaurantFavorite.getRestaurant(), user),
+                        restaurantApiService.isFavorite(restaurantFavorite.getRestaurant(), user)
+                )).collect(Collectors.toList());
     }
 }
