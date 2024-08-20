@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
     private static final String API_NAME = "Kustaurant Mobile Application API";
-    private static final String API_VERSION = "v1.2.4";
+    private static final String API_VERSION = "v1.3.1";
     private static final String SECURITY_SCHEME_NAME = "Authorization";
     private static final String API_DESCRIPTION = """
     
