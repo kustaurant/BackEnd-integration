@@ -1,7 +1,10 @@
 package com.kustaurant.restauranttier.common.apiUser;
 
+import com.kustaurant.restauranttier.common.apiUser.apple.AppleLoginRequest;
+import com.kustaurant.restauranttier.common.apiUser.naver.NaverLoginRequest;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +23,18 @@ public class UserApiLoginController {
             description = "기존유저조회or회원가입 처리 후 액세스토큰을 발행해 리턴합니다."
     )
     @PostMapping("/naver-login")
-    public ResponseEntity<?> loginWithNaver(@RequestParam String provider,
-                                            @RequestParam String providerId,
-                                            @RequestParam String naverAccessToken) {
-        // 로그인 처리 및 JWT 토큰 생성
-        User user = userApiLoginService.processNaverLogin(provider, providerId, naverAccessToken);
+    public ResponseEntity<TokenResponse> loginWithNaver(@RequestBody NaverLoginRequest request) {
+
+        User user = userApiLoginService.processNaverLogin(
+                request.getProvider(),
+                request.getProviderId(),
+                request.getNaverAccessToken()
+        );
         String accessToken = user.getAccessToken();
 
-        return ResponseEntity.ok(accessToken);
+        TokenResponse tokenResponse = new TokenResponse(accessToken);
+
+        return ResponseEntity.ok(tokenResponse);
     }
 
     @Operation(
@@ -35,12 +42,17 @@ public class UserApiLoginController {
             description = "기존유저조회or회원가입 처리 후 액세스토큰을 발행해 리턴합니다."
     )
     @PostMapping("/apple-login")
-    public ResponseEntity<String> loginWithApple(@RequestParam String provider,
-                                                 @RequestParam String identityToken,
-                                                 @RequestParam String authorizationCode) {
+    public ResponseEntity<TokenResponse> loginWithApple(@RequestBody AppleLoginRequest request) {
 
-        String accessToken = userApiLoginService.processAppleLogin(provider, identityToken, authorizationCode);
-        return ResponseEntity.ok(accessToken);
+        String accessToken = userApiLoginService.processAppleLogin(
+                request.getProvider(),
+                request.getIdentityToken(),
+                request.getAuthorizationCode()
+        );
+
+        TokenResponse tokenResponse = new TokenResponse(accessToken);
+
+        return ResponseEntity.ok(tokenResponse);
     }
 
     @Operation(
@@ -51,6 +63,7 @@ public class UserApiLoginController {
     public ResponseEntity<?> refreshAccessToken(@RequestHeader("Authorization") String accessToken) {
         // 리프레시 토큰을 사용해 새로운 액세스 토큰 발급
         String newAccessToken = userApiLoginService.refreshAccessToken(accessToken);
+
         return ResponseEntity.ok(newAccessToken);
     }
 
@@ -70,7 +83,10 @@ public class UserApiLoginController {
             description = "서버의 토큰정보들을 지웁니다. 클라이언트에서도 액세스 토큰 정보를 지워야합니다."
     )
     @PostMapping("/auth/logout")
-    public ResponseEntity<?> logout(@JwtToken Integer userId) {
+    public ResponseEntity<?> logout(
+            @Parameter(description = "해당 값은 앱 클라이언트에서 실제로 보낼 필요 없는 값입니다. 토큰만 헤더에 넣어서 보내면 자동으로 userId를 꺼내오는 로직으로 되어있습니다.")
+            @JwtToken Integer userId
+    ) {
         try {
             userApiLoginService.logoutUser(userId);
             return ResponseEntity.ok("로그아웃이 완료되었습니다.");
