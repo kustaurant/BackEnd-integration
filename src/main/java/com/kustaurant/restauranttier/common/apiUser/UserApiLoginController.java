@@ -49,7 +49,6 @@ public class UserApiLoginController {
                 request.getIdentityToken(),
                 request.getAuthorizationCode()
         );
-
         TokenResponse tokenResponse = new TokenResponse(accessToken);
 
         return ResponseEntity.ok(tokenResponse);

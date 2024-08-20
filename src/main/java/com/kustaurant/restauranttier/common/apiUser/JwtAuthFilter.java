@@ -10,16 +10,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Slf4j
 @Component
@@ -28,7 +30,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -78,7 +79,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * @return 생성된 Authentication 객체. 이는 스프링 시큐리티 컨텍스트에 저장되어 인증된 사용자를 나타내는 데 사용됨.
      */
     private Authentication getAuthentication(User user) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserEmail());
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(user.getUserRole().getValue()));
+
+        return new UsernamePasswordAuthenticationToken(user.getUserEmail(), null, authorities);
     }
 }
