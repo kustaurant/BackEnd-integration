@@ -1,11 +1,14 @@
 package com.kustaurant.restauranttier.tab4_community.dto;
 
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
+import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
+import com.kustaurant.restauranttier.tab4_community.entity.PostCommentDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,7 +31,7 @@ public class PostDTO {
 
     Integer likeCount;
     UserDTO user;
-
+    List<PostCommentDTO> postCommentList;
     public static PostDTO fromEntity(Post post) {
         PostDTO dto = new PostDTO();
         dto.setPostId(post.getPostId());
@@ -40,6 +43,9 @@ public class PostDTO {
         dto.setUpdatedAt(post.getUpdatedAt());
         dto.setLikeCount(post.getLikeCount());
         dto.setUser(UserDTO.fromEntity(post.getUser()));
+        dto.setPostCommentList(post.getPostCommentList().stream()
+                .map(PostCommentDTO::fromEntity)
+                .toList());
         return dto;
     }
 }

@@ -2,10 +2,12 @@ package com.kustaurant.restauranttier.tab4_community.controller;
 
 import com.kustaurant.restauranttier.common.apiUser.JwtToken;
 import com.kustaurant.restauranttier.common.apiUser.UserApiLoginService;
+import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.user.UserSecuriyService;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
 import com.kustaurant.restauranttier.tab4_community.dto.UserDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.*;
+import com.kustaurant.restauranttier.tab4_community.etc.PostCategory;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostPhotoApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
@@ -62,38 +64,49 @@ public class CommunityApiController {
     private final MypageApiService mypageApiService;
     // 커뮤니티 메인 화면
     @GetMapping("/posts")
-    @Operation(summary = "커뮤니티 메인화면의 글 리스트 불러오기", description = "게시판 종류와 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다.")
+    @Operation(summary = "커뮤니티 메인화면의 글 리스트 불러오기", description = "게시판 종류와 페이지, 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다, 현재 인기순으로 설정했을 때는 좋아요가 3이상인 게시글만 반환됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "community request success", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostDTO.class)))}),
             @ApiResponse(responseCode = "404", description = "community error", content = {@Content(mediaType = "application/json")})
     })
     public ResponseEntity<List<PostDTO>> community(
-            @RequestParam(defaultValue = "전체") String postCategory,
+            @RequestParam(defaultValue = "all")
+            @Parameter(example = "free", description = "게시판 종류입니다. (all:전체, free:자유게시판, column:칼럼게시판, suggestion:건의게시판)")
+            String postCategory,
+            @Parameter(example = "0", description = "페이지입니다. 페이지는 0부터 시작하고, 게시글은 페이지 단위로 불러올 수 있습니다")
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(defaultValue = "recent") String sort) {
+            @RequestParam(defaultValue = "recent")
+            @Parameter(example = "recent", description = "정렬 종류입니다. (recent:최신순, popular:인기순)")
+            String sort
+    ) {
+
         Page<PostDTO> paging;
-        if (postCategory.equals("전체")) {
+
+        // Enum으로 변환하고 한글 이름 추출
+        PostCategory categoryEnum = PostCategory.fromStringToEnum(postCategory);
+        String koreanCategory = categoryEnum.getKoreanName();
+
+        if (categoryEnum == PostCategory.FREE) {
             paging = postApiService.getList(page, sort);
         } else {
-            paging = postApiService.getListByPostCategory(postCategory, page, sort);
+            paging = postApiService.getListByPostCategory(koreanCategory, page, sort);
         }
 
         return ResponseEntity.ok(paging.getContent());
-        
-        //TODO: 랭킹 및 반환양식 통일
     }
 
     // 커뮤니티 게시글 상세 화면
     @GetMapping("/{postId}")
-    @Operation(summary = "게시글 상세 정보", description = "게시글 ID를 입력받고 해당 게시글의 상세 정보를 반환합니다.")
+    @Operation(summary = "게시글 상세 정보", description = "게시글 ID와 해당 게시물의 댓글의 정렬 방법을 입력받고 해당 게시글의 상세 정보를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "request success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostDTO.class))}),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
-    public ResponseEntity<PostDTO> post(@PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
+    public ResponseEntity<PostDTO> post(@PathVariable Integer postId, @RequestParam(defaultValue = "recent") String sort) {
         Post post = postApiService.getPost(postId);
         postApiService.increaseVisitCount(post);
         PostDTO postDTO = PostDTO.fromEntity(post);
+
         return ResponseEntity.ok(postDTO);
     }
 
@@ -424,7 +437,7 @@ public class CommunityApiController {
 
     // 댓글 입력창 포커스시 로그인 상태 확인
     @GetMapping("/login/comment-write")
-    @Operation(summary = "댓글 작성 로그인 확인", description = "댓글 입력창 포커스시 로그인 상태를 확인합니다.")
+    @Operation(summary = "댓글 작성 로그인 확인 (미구현)", description = "댓글 입력창 포커스시 로그인 상태를 확인합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 확인 성공", content = @Content)
     })
@@ -435,7 +448,7 @@ public class CommunityApiController {
     @GetMapping("/ranking")
     @Operation(summary = "커뮤니티-랭킹 탭에서 유저 랭킹 불러오기", description = "평가 수 기반의 유저 랭킹을 반환합니다. 분기순일 경우 sort 파라미터 값으로 quarterly, 누적순일 경우 cumulative를 설정하여 요청을 보냅니다.")
     @ApiResponse(responseCode = "200", description = "유저 랭킹 반환 성공", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))})
-    public List<UserDTO> ranking(@RequestParam @Parameter(example = "quarterly") String sort) {
+    public List<UserDTO> ranking(@RequestParam @Parameter(description = "랭킹 산정 기준입니다. 분기순:quarterly, 최신순:cumulative",example = "quarterly") String sort) {
         if ("cumulative".equals(sort)) {
             // 누적 기준으로 유저 리스트 가져오기
             List<User> userList = userRepository.findUsersWithEvaluationCountDescending();
@@ -452,7 +465,7 @@ public class CommunityApiController {
             // 분기별 순위 리스트 계산
             return calculateRankForQuarter(userList, currentYear, currentQuarter);
         } else {
-            throw new IllegalArgumentException("Invalid sort type");
+            throw new OptionalNotExistException("sort값이 잘못 입력되었습니다.");
         }
     }
 
