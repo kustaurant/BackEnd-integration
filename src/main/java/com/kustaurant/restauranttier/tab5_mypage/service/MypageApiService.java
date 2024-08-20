@@ -29,8 +29,11 @@ public class MypageApiService {
     private EntityManager entityManager;
 
     private final UserRepository userRepository;
-    public User findUserById(Integer userid) {
-        return userRepository.findByUserIdAndStatus(userid, "ACTIVE").orElse(null);
+    public User findUserById(Integer userId) {
+        if (userId == null) {
+            return null;
+        }
+        return userRepository.findByUserIdAndStatus(userId, "ACTIVE").orElse(null);
     }
 
 

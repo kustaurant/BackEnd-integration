@@ -93,37 +93,9 @@ public class RestaurantApiService {
     }
 
     public Page<Restaurant> getRestaurantsByCuisinesAndLocationsAndSituationsWithPage(
-            String cuisines,
-            String locations,
-            String situations,
-            Integer tierInfo,
-            boolean isOrderByScore,
-            int page,
-            int size
+            List<String> cuisineList, List<Integer> situationList, List<String> locationList,
+            Integer tierInfo, boolean isOrderByScore, int page, int size
     ) {
-        List<String> cuisineList;
-        List<String> locationList;
-        List<Integer> situationList;
-        try {
-            cuisineList = cuisines.contains("ALL") ? null : Arrays.stream(cuisines.split(",")).map(c -> CuisineEnum.valueOf(c.trim()).getValue()).toList();
-        } catch (IllegalArgumentException e) {
-            throw new ParamException("cuisines 파라미터 입력이 올바르지 않습니다.");
-        }
-        try {
-            locationList = locations.contains("ALL") ? null : Arrays.stream(locations.split(",")).map(l -> LocationEnum.valueOf(l.trim()).getValue()).toList();
-        } catch (IllegalArgumentException e) {
-            throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
-        }
-        try {
-            situationList = situations.contains("ALL") ? null : Arrays.stream(situations.split(",")).map(s -> Integer.parseInt(s.trim())).toList();
-        } catch (IllegalArgumentException e) {
-            throw new ParamException("situations 파라미터 입력이 올바르지 않습니다.");
-        }
-
-        if (cuisineList != null && cuisineList.contains("제휴업체")) {
-            cuisineList = List.of("JH");
-        }
-
         Pageable pageable = PageRequest.of(page, size);
 
         return restaurantApiRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore), pageable);
@@ -137,12 +109,18 @@ public class RestaurantApiService {
 
     // 해당 식당을 해당 유저가 평가 했는가?
     public boolean isEvaluated(Restaurant restaurant, User user) {
+        if (user == null || restaurant == null) {
+            return false;
+        }
         return user.getEvaluationList().stream()
                 .anyMatch(evaluation -> evaluation.getRestaurant().equals(restaurant));
     }
 
     // 해당 식당을 해당 유저가 즐겨찾기 했는가?
     public boolean isFavorite(Restaurant restaurant, User user) {
+        if (user == null || restaurant == null) {
+            return false;
+        }
         return user.getRestaurantFavoriteList().stream()
                 .anyMatch(restaurantFavorite -> restaurantFavorite.getRestaurant().equals(restaurant));
     }

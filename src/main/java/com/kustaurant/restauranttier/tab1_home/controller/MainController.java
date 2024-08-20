@@ -1,4 +1,4 @@
-package com.kustaurant.restauranttier.common;
+package com.kustaurant.restauranttier.tab1_home.controller;
 
 import com.kustaurant.restauranttier.tab1_home.entity.HomeModal;
 import com.kustaurant.restauranttier.tab1_home.repository.HomeModalRepository;

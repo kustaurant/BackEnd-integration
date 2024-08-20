@@ -1,13 +1,19 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
+import com.kustaurant.restauranttier.common.UserService;
+import com.kustaurant.restauranttier.common.apiUser.JwtToken;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
+import com.kustaurant.restauranttier.tab3_tier.argument_resolver.CuisineList;
+import com.kustaurant.restauranttier.tab3_tier.argument_resolver.LocationList;
+import com.kustaurant.restauranttier.tab3_tier.argument_resolver.SituationList;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierMapDTO;
 import com.kustaurant.restauranttier.tab3_tier.constants.MapConstants;
-import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantSituationRelationRepository;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
+import com.kustaurant.restauranttier.tab5_mypage.entity.User;
+import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -42,6 +48,7 @@ import java.util.stream.IntStream;
 public class TierApiController {
 
     private final RestaurantApiService restaurantApiService;
+    private final UserService userService;
     private final RestaurantSituationRelationRepository restaurantSituationRelationRepository;
 
     @Operation(summary = "티어표 리스트 불러오기", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
@@ -68,39 +75,39 @@ public class TierApiController {
     public ResponseEntity<List<RestaurantTierDTO>> getTierChartList(
             @RequestParam(defaultValue = "ALL")
             @Parameter(example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
-            String cuisines,
+            @CuisineList List<String> cuisines,
             @RequestParam(defaultValue = "ALL")
             @Parameter(example = "1,2 또는 ALL", description = "상황입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, 1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
-            String situations,
+            @SituationList List<Integer> situations,
             @RequestParam(defaultValue = "ALL")
             @Parameter(example = "L1,L2,L3 또는 ALL", description = "위치입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, L1:건입~중문, L2:중문~어대, L3:후문, L4:정문, L5:구의역")
-            String locations,
+            @LocationList List<String> locations,
             @RequestParam(defaultValue = "1") @Parameter(description = "페이지는 1부터 시작입니다.") Integer page,
-            @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit
+            @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit,
+            @JwtToken Integer userId
     ) {
+        User user = userService.findUserById(userId);
         // page 0부터 시작하게 수정
         page--;
-        // 예외 처리
-        if (cuisines.contains("ALL") && cuisines.contains(("JH"))) {
-            throw new ParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
-        }
         // DB 조회
-        List<Restaurant> restaurants = restaurantApiService.getRestaurantsByCuisinesAndLocationsAndSituationsWithPage(cuisines, locations, situations, null, true, page, limit).toList();
+        List<Restaurant> restaurants = restaurantApiService.getRestaurantsByCuisinesAndLocationsAndSituationsWithPage(cuisines, situations, locations, null, true, page, limit).toList();
 
         if (restaurants.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         }
-        //-----------------
+        // 순위 표시하기
         List<RestaurantTierDTO> responseList = new ArrayList<>();
 
         for (int i = 0; i < limit; i++) {
             try {
+                // 순위
                 Integer ranking = null;
                 Restaurant restaurant = restaurants.get(i);
                 if (restaurant.getMainTier() > 0) {
                     ranking = page * limit + i + 1;
                 }
-                responseList.add(RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, ranking, randomBoolean(), randomBoolean()));
+                responseList.add(RestaurantTierDTO.convertRestaurantToTierDTO(
+                        restaurant, ranking, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)));
             } catch (IndexOutOfBoundsException ignored) {
 
             }

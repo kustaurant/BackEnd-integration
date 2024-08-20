@@ -1,6 +1,9 @@
 package com.kustaurant.restauranttier.common.config;
 
 import com.kustaurant.restauranttier.common.apiUser.JwtTokenArgumentResolver;
+import com.kustaurant.restauranttier.tab3_tier.argument_resolver.CuisineListArgumentResolver;
+import com.kustaurant.restauranttier.tab3_tier.argument_resolver.LocationListArgumentResolver;
+import com.kustaurant.restauranttier.tab3_tier.argument_resolver.SituationListArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -19,6 +22,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(jwtTokenArgumentResolver);
+        resolvers.add(new CuisineListArgumentResolver());
+        resolvers.add(new SituationListArgumentResolver());
+        resolvers.add(new LocationListArgumentResolver());
     }
 
     @Override

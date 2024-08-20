@@ -1,9 +1,9 @@
 package com.kustaurant.restauranttier.tab4_community.controller;
 
+
+import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.common.apiUser.JwtToken;
-import com.kustaurant.restauranttier.common.apiUser.UserApiLoginService;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
-import com.kustaurant.restauranttier.common.user.UserSecuriyService;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
 import com.kustaurant.restauranttier.tab4_community.dto.UserDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.*;
@@ -18,7 +18,6 @@ import com.kustaurant.restauranttier.tab4_community.service.PostApiService;
 import com.kustaurant.restauranttier.tab4_community.service.StorageApiService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
-import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -61,7 +60,9 @@ public class CommunityApiController {
     private final UserRepository userRepository;
     private final PostCommentApiRepository postCommentApiRepository;
     private final PostApiRepository postApiRepository;
-    private final MypageApiService mypageApiService;
+
+    private final UserService userService;
+    //    User userApiService.findUserById(24); = customOAuth2UserService.getUser(principal.getName());
     // 커뮤니티 메인 화면
     @GetMapping("/posts")
     @Operation(summary = "커뮤니티 메인화면의 글 리스트 불러오기", description = "게시판 종류와 페이지, 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다, 현재 인기순으로 설정했을 때는 좋아요가 3이상인 게시글만 반환됩니다.")
@@ -189,7 +190,8 @@ public class CommunityApiController {
             @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
             Model model, @JwtToken Integer userId) {
         Integer postIdInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(userId);;
+
+        User user = userService.findUserById(userId);;
         Post post = postApiService.getPost(postIdInt);
         PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), post, user);
         PostComment savedPostComment = postCommentApiRepository.save(postComment);
@@ -220,7 +222,8 @@ public class CommunityApiController {
     })
     public ResponseEntity<Map<String, Object>> postLikeCreate(@PathVariable String postId, Model model, @JwtToken Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(userId);
+
+        User user = userService.findUserById(userId);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.likeCreateOrDelete(post, user);
         response.put("likeCount", post.getLikeUserList().size());
@@ -239,7 +242,8 @@ public class CommunityApiController {
     })
     public ResponseEntity<Map<String, Object>> postDislikeCreate(@PathVariable String postId, Model model, @JwtToken Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(userId);;
+
+        User user = userService.findUserById(userId);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.dislikeCreateOrDelete(post, user);
         response.put("dislikeCount", post.getDislikeUserList().size());
@@ -257,7 +261,8 @@ public class CommunityApiController {
     })
     public ResponseEntity<Map<String, Object>> postScrap(@PathVariable String postId, Model model, @JwtToken Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(userId);;
+
+        User user = userService.findUserById(userId);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postScrapApiService.scrapCreateOrDelete(post, user);
         return ResponseEntity.ok(response);
@@ -293,7 +298,8 @@ public class CommunityApiController {
     public ResponseEntity<Map<String, Object>> likeComment(@PathVariable String commentId, @JwtToken Integer userId) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
-        User user = mypageApiService.findUserById(userId);;
+
+        User user = userService.findUserById(userId);;
         Map<String, Object> response = postApiCommentService.likeCreateOrDelete(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
@@ -310,7 +316,8 @@ public class CommunityApiController {
     public ResponseEntity<Map<String, Object>> dislikeComment(@PathVariable String commentId, @JwtToken Integer userId) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
-        User user = mypageApiService.findUserById(userId);;
+
+        User user = userService.findUserById(userId);;
         Map<String, Object> response = postApiCommentService.dislikeCreateOrDelete(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
@@ -333,7 +340,8 @@ public class CommunityApiController {
 
         // 게시글 객체 생성
         Post post = new Post(title, content, postCategory, "ACTIVE", LocalDateTime.now());
-        User user = mypageApiService.findUserById(userId);;
+
+        User user = userService.findUserById(userId);;
         postApiService.create(post, user);
 
 //        // TinyMCE 컨텐츠에서 <img> 태그를 파싱

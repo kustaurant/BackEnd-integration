@@ -31,4 +31,5 @@ public interface UserRepository extends JpaRepository<User,Integer> {
             "ORDER BY COUNT(e) DESC")
     List<User> findUsersByEvaluationCountForQuarter(@Param("year") int year, @Param("quarter") int quarter);
 
+
 }
