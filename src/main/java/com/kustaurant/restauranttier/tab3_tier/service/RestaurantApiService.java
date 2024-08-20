@@ -2,9 +2,12 @@ package com.kustaurant.restauranttier.tab3_tier.service;
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
+import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantFavorite;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
+import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantFavoriteRepository;
 import com.kustaurant.restauranttier.tab3_tier.specification.RestaurantSpecification;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
+import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,12 +18,16 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class RestaurantApiService {
     private final RestaurantApiRepository restaurantApiRepository;
+    private final RestaurantFavoriteRepository restaurantFavoriteRepository;
+    private final UserRepository userRepository;
+
 
     public static final Integer evaluationCount = 2;
 
@@ -102,5 +109,48 @@ public class RestaurantApiService {
         }
         return user.getRestaurantFavoriteList().stream()
                 .anyMatch(restaurantFavorite -> restaurantFavorite.getRestaurant().equals(restaurant));
+    }
+
+    public List<Restaurant> getRecommendedRestaurantsForUser(Integer userId) {
+        // 1. 사용자의 정보를 가져옵니다.
+        User user = userRepository.findByUserId(userId).orElse(null);
+
+        // 2. 사용자의 즐겨찾기 목록을 가져옵니다.
+        List<RestaurantFavorite> favorites = restaurantFavoriteRepository.findByUser(user);
+
+        if (favorites.isEmpty()) {
+            // 즐겨찾기한 식당이 없을 경우 랜덤 식당 15개 추천
+            List<Restaurant> restaurants = getRestaurantsByCuisinesAndSituationsAndLocations(null, null, null, null, false);
+            Collections.shuffle(restaurants, new Random());
+
+            return restaurants.stream().limit(15).collect(Collectors.toList());
+
+        }
+
+        // 3. 식당들의 카테고리를 수집하여 가장 많이 즐겨찾기한 카테고리를 찾습니다.
+        Map<String, Long> cuisineFrequencyMap = favorites.stream()
+                .collect(Collectors.groupingBy(fav -> fav.getRestaurant().getRestaurantCuisine(), Collectors.counting()));
+
+        // 가장 많이 즐겨찾기된 카테고리 찾기
+        String favoriteCuisine = Collections.max(cuisineFrequencyMap.entrySet(), Map.Entry.comparingByValue()).getKey();
+        // 4. 해당 카테고리와 일치하는 식당을 검색합니다.
+        List<Restaurant> recommendedRestaurants = restaurantApiRepository.findByRestaurantCuisineAndStatus(favoriteCuisine, "ACTIVE");
+
+        // 5. 평점이 높은 순으로 정렬합니다.
+        recommendedRestaurants.sort(Comparator.comparingDouble(Restaurant::calculateAverageScore).reversed());
+
+        // 6. 원하는 개수만큼 자릅니다 (예: 15개).
+        return recommendedRestaurants.stream().limit(15).collect(Collectors.toList());
+    }
+    public List<Restaurant> getRecommendedOrRandomRestaurants(Integer userId) {
+        if (userId == null) {
+            // 미로그인 시: 랜덤으로 15개의 식당 반환
+            List<Restaurant> restaurants = getRestaurantsByCuisinesAndSituationsAndLocations(null, null, null, null, false);
+            Collections.shuffle(restaurants, new Random());
+            return restaurants.stream().limit(15).collect(Collectors.toList());
+        } else {
+            // 로그인 시: 즐겨찾기 기반 추천 식당 반환
+            return getRecommendedRestaurantsForUser(userId);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.common.apiUser;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.kustaurant.restauranttier.common.apiUser.apple.AppleApiService;
 import com.kustaurant.restauranttier.common.apiUser.naver.NaverApiService;
 import com.kustaurant.restauranttier.common.user.UserRole;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class UserApiLoginService {
     private final UserRepository userRepository;
     private final NaverApiService naverApiService;
+    private final AppleApiService appleApiService;
     private final JwtUtil jwtUtil;
 
 
@@ -62,7 +65,7 @@ public class UserApiLoginService {
     // 애플 로그인 처리
     public String processAppleLogin(String provider, String identityToken, String authorizationCode) {
         // identityToken 검증 및 사용자 정보 가져오기
-        Claims claims = jwtUtil.verifyAppleIdentityToken(identityToken);
+        Claims claims = appleApiService.verifyAppleIdentityToken(identityToken);
         String userEmail = claims.get("email", String.class);
         String userIdentifier = claims.getSubject(); // `sub` claim이 사용자 ID
 
@@ -130,6 +133,8 @@ public class UserApiLoginService {
         user.setAccessToken(null);
         userRepository.save(user);
     }
+
+
 }
 
 

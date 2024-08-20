@@ -40,15 +40,11 @@ public class HomeApiController {
             @ApiResponse(responseCode = "404", description = "restaurant not found", content = {@Content(mediaType = "application/json")})
     })
     @GetMapping("/api/v1/home")
-    public ResponseEntity<RestaurantListsResponse> home() {
+    public ResponseEntity<RestaurantListsResponse> home(@JwtToken Integer userId) {
         List<Restaurant> topRestaurantsByRating = restaurantApiService.getTopRestaurants(); // 점수 높은 순으로 총 16개
-        List<Restaurant> restaurantsForMe = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(null, null, null, null, false); // 임시로 설정
-        Random rand = new Random();
 
-        // 결과 리스트를 랜덤으로 섞음
-        Collections.shuffle(restaurantsForMe, rand);
-        restaurantsForMe.subList(0, 15);
-
+        // 로그인 여부에 따라 랜덤 식당 또는 추천 식당을 반환하는 서비스 메서드를 호출합니다.
+        List<Restaurant> restaurantsForMe = restaurantApiService.getRecommendedOrRandomRestaurants(userId);
 
         List<RestaurantTierDTO> topRestaurantsByRatingDTOs = topRestaurantsByRating.stream()
                 .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
@@ -57,18 +53,7 @@ public class HomeApiController {
                 .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
                 .collect(Collectors.toList());
 
-        // TODO:토큰을 통해 로그인 되어있는지 확인하고 로그인되어있으면 즐겨찾기 기반 추천, 안되어있을 시 랜덤 추천
-//        if (token != null && jwtTokenProvider.validateToken(token)) {
-//            // 유저 ID를 토큰에서 추출
-//            Long userId = jwtTokenProvider.getUserIdFromToken(token);
-//            // 로그인된 유저의 즐겨찾기 기반 추천
-//            restaurantsForMe = restaurantApiService.getRecommendedRestaurantsForUser(userId);
-//        } else {
-//            // 비로그인 유저를 위한 랜덤 추천
-//            restaurantsForMe = restaurantApiService.getRandomRestaurants();
-//        }
-
-        // 홈화면의 배너 이미지 TODO: 현재 임시이미지고 실제로 구현해야함
+        // 홈화면의 배너 이미지 TODO: 현재 임시이미지고 실제로 이미지를 넣어야함
         List<String> homePhotoUrls = new ArrayList<>();
 
         String imagePath = "/img/home/배너1.png";

@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab4_community.service;
 
 
+import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.tab4_community.DataNotFoundException;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
@@ -30,7 +31,7 @@ public class PostApiService {
     private final UserRepository userRepository;
     private final PostScrapApiRepository postScrapApiRepository;
     // 인기순 제한 기준 숫자
-    public static  final int POPULARCOUNT = 5;
+    public static  final int POPULARCOUNT = 3;
     // 페이지 숫자
     public static  final int PAGESIZE=10;
 
@@ -42,12 +43,14 @@ public class PostApiService {
             Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
             Page<Post> posts = this.postApiRepository.findByStatus("ACTIVE", pageable);
             return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
-        } else {
+        } else if(sort.equals("popular")){
             sorts.add(Sort.Order.desc("createdAt"));
             Specification<Post> spec = getSpecByPopularOver5();
             Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
             Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
             return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
+        }else{
+            throw new OptionalNotExistException("sort 파라미터 값이 올바르지 않습니다.");
         }
     }
 
@@ -69,6 +72,7 @@ public class PostApiService {
         sorts.add(Sort.Order.desc("createdAt"));
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
         Specification<Post> spec = getSpecByCategoryAndPopularOver5(postCategory, sort);
+        //spec의 인기순으로 먼저 정렬, 그다음 pageable의 최신순으로 두번째 정렬 기준 설정
         Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
         return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
     }
