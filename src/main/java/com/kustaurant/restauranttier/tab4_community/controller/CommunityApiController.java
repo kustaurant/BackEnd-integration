@@ -102,7 +102,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "request success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostDTO.class))}),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
-    public ResponseEntity<PostDTO> post(@PathVariable Integer postId, @RequestParam(defaultValue = "recent") String sort) {
+    public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id" ,example="69") Integer postId, @RequestParam(defaultValue = "recent") String sort) {
         Post post = postApiService.getPost(postId);
         postApiService.increaseVisitCount(post);
         PostDTO postDTO = PostDTO.fromEntity(post);
@@ -115,8 +115,8 @@ public class CommunityApiController {
     @Transactional
     @Operation(summary = "게시글 삭제", description = "게시글 ID를 입력받고 해당 게시글을 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "delete success", content = @Content),
-            @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
+            @ApiResponse(responseCode = "200", description = "삭제 완료", content = @Content),
+            @ApiResponse(responseCode = "404", description = "오류 발생 (삭제불가)", content = @Content)
     })
     public ResponseEntity<String> postDelete(@PathVariable Integer postId,@JwtToken Integer userId) {
         Post post = postApiService.getPost(Integer.valueOf(postId));
