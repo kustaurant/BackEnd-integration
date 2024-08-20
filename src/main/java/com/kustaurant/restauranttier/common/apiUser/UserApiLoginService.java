@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -130,6 +131,8 @@ public class UserApiLoginService {
         user.setAccessToken(null);
         userRepository.save(user);
     }
+
+
 }
 
 

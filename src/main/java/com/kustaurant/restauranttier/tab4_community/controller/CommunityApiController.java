@@ -1,11 +1,11 @@
 package com.kustaurant.restauranttier.tab4_community.controller;
 
 import com.kustaurant.restauranttier.common.apiUser.JwtToken;
+import com.kustaurant.restauranttier.common.apiUser.UserApiLoginService;
+import com.kustaurant.restauranttier.common.user.UserSecuriyService;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
-import com.kustaurant.restauranttier.tab4_community.entity.Post;
-import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
-import com.kustaurant.restauranttier.tab4_community.entity.PostPhoto;
-import com.kustaurant.restauranttier.tab4_community.entity.PostScrap;
+import com.kustaurant.restauranttier.tab4_community.dto.UserDTO;
+import com.kustaurant.restauranttier.tab4_community.entity.*;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostPhotoApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
@@ -18,6 +18,7 @@ import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,11 +38,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 @RequestMapping("/api/v1/community")
 @RestController
 @RequiredArgsConstructor
@@ -57,7 +61,7 @@ public class CommunityApiController {
     private final PostApiRepository postApiRepository;
     private final MypageApiService mypageApiService;
     // 커뮤니티 메인 화면
-    @GetMapping
+    @GetMapping("/posts")
     @Operation(summary = "커뮤니티 메인화면의 글 리스트 불러오기", description = "게시판 종류와 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "community request success", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostDTO.class)))}),
@@ -419,12 +423,122 @@ public class CommunityApiController {
 //    }
 
     // 댓글 입력창 포커스시 로그인 상태 확인
-    @GetMapping("/api/v1/login/comment-write")
+    @GetMapping("/login/comment-write")
     @Operation(summary = "댓글 작성 로그인 확인", description = "댓글 입력창 포커스시 로그인 상태를 확인합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 확인 성공", content = @Content)
     })
     public ResponseEntity<String> commentWriteLogin(@JwtToken Integer userId) {
         return ResponseEntity.ok("로그인이 성공적으로 되어있습니다.");
+    }
+
+    @GetMapping("/ranking")
+    @Operation(summary = "커뮤니티-랭킹 탭에서 유저 랭킹 불러오기", description = "평가 수 기반의 유저 랭킹을 반환합니다. 분기순일 경우 sort 파라미터 값으로 quarterly, 누적순일 경우 cumulative를 설정하여 요청을 보냅니다.")
+    @ApiResponse(responseCode = "200", description = "유저 랭킹 반환 성공", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))})
+    public List<UserDTO> ranking(@RequestParam @Parameter(example = "quarterly") String sort) {
+        if ("cumulative".equals(sort)) {
+            // 누적 기준으로 유저 리스트 가져오기
+            List<User> userList = userRepository.findUsersWithEvaluationCountDescending();
+            // 누적 순위 리스트 계산
+            return calculateRank(userList);
+        } else if ("quarterly".equals(sort)) {
+            // 현재 날짜를 기준으로 연도와 분기 계산
+            LocalDate now = LocalDate.now();
+            int currentYear = now.getYear();
+            int currentQuarter = getCurrentQuarter(now);
+
+            // 특정 분기의 평가 데이터를 기준으로 유저 리스트 가져오기
+            List<User> userList = userRepository.findUsersByEvaluationCountForQuarter(currentYear, currentQuarter);
+            // 분기별 순위 리스트 계산
+            return calculateRankForQuarter(userList, currentYear, currentQuarter);
+        } else {
+            throw new IllegalArgumentException("Invalid sort type");
+        }
+    }
+
+    private int getCurrentQuarter(LocalDate date) {
+        int month = date.getMonthValue();
+        if (month >= 1 && month <= 3) {
+            return 1;
+        } else if (month >= 4 && month <= 6) {
+            return 2;
+        } else if (month >= 7 && month <= 9) {
+            return 3;
+        } else {
+            return 4;
+        }
+    }
+
+    private List<UserDTO> calculateRank(List<User> userList) {
+        List<UserDTO> rankList = new ArrayList<>();
+
+        int i = 0;
+        int prevCount = 100000; // 이전 유저의 평가 개수
+        int countSame = 1; // 동일 순위를 세기 위한 변수
+        for (User user : userList) {
+            int evaluationCount = user.getEvaluationList().size();
+            UserDTO userDTO = UserDTO.fromEntity(user); // 필요한 정보를 UserDTO에 담음
+            userDTO.setEvaluationCount(evaluationCount); // 누적된 평가 수를 설정
+
+            if (evaluationCount < prevCount) {
+                i += countSame;
+                userDTO.setRank(i);
+                countSame = 1;
+            } else {
+                userDTO.setRank(i);
+                countSame++;
+            }
+
+            rankList.add(userDTO);
+            prevCount = evaluationCount;
+        }
+        return rankList;
+    }
+
+    private List<UserDTO> calculateRankForQuarter(List<User> userList, int year, int quarter) {
+        List<UserDTO> rankList = new ArrayList<>();
+
+        int i = 0;
+        int prevCount = 100000; // 이전 유저의 평가 개수
+        int countSame = 1; // 동일 순위를 세기 위한 변수
+        for (User user : userList) {
+            // 특정 분기의 평가 수 계산
+            int evaluationCount = (int) user.getEvaluationList().stream()
+                    .filter(e -> getYear(e.getCreatedAt()) == year && getQuarter(e.getCreatedAt()) == quarter)
+                    .count();
+
+            UserDTO userDTO = UserDTO.fromEntity(user); // 필요한 정보를 UserDTO에 담음
+            userDTO.setEvaluationCount(evaluationCount); // 분기 내 평가 수를 설정
+
+            if (evaluationCount < prevCount) {
+                i += countSame;
+                userDTO.setRank(i);
+                countSame = 1;
+            } else {
+                userDTO.setRank(i);
+                countSame++;
+            }
+
+            rankList.add(userDTO);
+            prevCount = evaluationCount;
+        }
+        return rankList;
+    }
+
+    private int getYear(LocalDateTime dateTime) {
+        return dateTime.getYear();
+    }
+
+    private int getQuarter(LocalDateTime dateTime) {
+        int month = dateTime.getMonthValue();
+        if (month <= 3) {
+            return 1;
+        } else if (month <= 6) {
+            return 2;
+        } else if (month <= 9) {
+            return 3;
+        } else {
+            return 4;
+        }
     }
 }

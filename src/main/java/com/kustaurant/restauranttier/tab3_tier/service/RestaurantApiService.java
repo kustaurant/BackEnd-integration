@@ -158,7 +158,6 @@ public class RestaurantApiService {
             // 즐겨찾기한 식당이 없을 경우 랜덤 식당 15개 추천
             List<Restaurant> restaurants = getRestaurantsByCuisinesAndLocations("ALL", "ALL", null, false);
             Collections.shuffle(restaurants, new Random());
-            System.out.println("랜덤추천");
 
             return restaurants.stream().limit(15).collect(Collectors.toList());
 
@@ -170,7 +169,6 @@ public class RestaurantApiService {
 
         // 가장 많이 즐겨찾기된 카테고리 찾기
         String favoriteCuisine = Collections.max(cuisineFrequencyMap.entrySet(), Map.Entry.comparingByValue()).getKey();
-        System.out.println(favoriteCuisine + " : 가장 많이 즐찾된 카테고리");
         // 4. 해당 카테고리와 일치하는 식당을 검색합니다.
         List<Restaurant> recommendedRestaurants = restaurantApiRepository.findByRestaurantCuisineAndStatus(favoriteCuisine, "ACTIVE");
 
@@ -182,14 +180,11 @@ public class RestaurantApiService {
     }
     public List<Restaurant> getRecommendedOrRandomRestaurants(Integer userId) {
         if (userId == null) {
-            System.out.println("미로그인");
             // 미로그인 시: 랜덤으로 15개의 식당 반환
             List<Restaurant> restaurants = getRestaurantsByCuisinesAndLocations("ALL", "ALL", null, false);
             Collections.shuffle(restaurants, new Random());
             return restaurants.stream().limit(15).collect(Collectors.toList());
         } else {
-            System.out.println("로그인");
-
             // 로그인 시: 즐겨찾기 기반 추천 식당 반환
             return getRecommendedRestaurantsForUser(userId);
         }
