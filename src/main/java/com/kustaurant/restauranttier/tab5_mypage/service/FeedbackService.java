@@ -33,4 +33,21 @@ public class FeedbackService {
         feedbackRepository.save(newFeedback);
         return "success";
     }
+
+    public String addApiFeedback(String feedbackBody, Integer UserId) {
+        Optional<User> userOptional = userRepository.findByUserId(UserId);
+        if (userOptional.isEmpty()) {
+            return "fail";
+        }
+
+        Feedback newFeedback = new Feedback();
+        newFeedback.setFeedbackContent(feedbackBody);
+        newFeedback.setUser(userOptional.get());
+        newFeedback.setCreatedAt(LocalDateTime.now());
+        newFeedback.setStatus("ACTIVE");
+
+        feedbackRepository.save(newFeedback);
+        return "success";
+    }
+
 }

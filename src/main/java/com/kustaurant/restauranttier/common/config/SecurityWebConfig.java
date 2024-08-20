@@ -30,6 +30,7 @@ public class SecurityWebConfig {
     @Bean(name = "filterChainWeb")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher(request -> !request.getServletPath().matches("^/api/v\\d+/.*$"))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())) // CSRF 보호 활성화
                 .headers(headers -> headers

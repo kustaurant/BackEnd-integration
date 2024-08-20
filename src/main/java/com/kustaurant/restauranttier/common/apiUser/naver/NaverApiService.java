@@ -42,7 +42,7 @@ public class NaverApiService {
             return objectMapper.readTree(response.getBody()).path("response");
         } catch (Exception e) {
             log.error("Failed to parse user info from Naver API", e);
-            throw new RuntimeException("Failed to retrieve user info from Naver API");
+            throw new RuntimeException("Naver API로부터 유저정보를 불러오는데 실패했습니다.");
         }
     }
 }

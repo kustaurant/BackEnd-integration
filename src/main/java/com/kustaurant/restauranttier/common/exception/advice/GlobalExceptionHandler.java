@@ -45,4 +45,16 @@ public class GlobalExceptionHandler {
         log.error("[IllegalStateException]", e);
         return new ResponseEntity<>(new ErrorResponse("SERVER STATE ERROR", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    //띵운씨 이런거 추가했으면 전체적으로 브리핑좀 해주세요 ^^
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
