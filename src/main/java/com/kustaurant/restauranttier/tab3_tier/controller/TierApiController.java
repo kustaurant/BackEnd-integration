@@ -1,7 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
+import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.common.apiUser.JwtToken;
-import com.kustaurant.restauranttier.common.apiUser.UserApiLoginService;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.argument_resolver.CuisineList;
 import com.kustaurant.restauranttier.tab3_tier.argument_resolver.LocationList;
@@ -10,7 +10,6 @@ import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierMapDTO;
 import com.kustaurant.restauranttier.tab3_tier.constants.MapConstants;
-import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantSituationRelationRepository;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
@@ -49,7 +48,7 @@ import java.util.stream.IntStream;
 public class TierApiController {
 
     private final RestaurantApiService restaurantApiService;
-    private final MypageApiService mypageApiService;
+    private final UserService userService;
     private final RestaurantSituationRelationRepository restaurantSituationRelationRepository;
 
     @Operation(summary = "티어표 리스트 불러오기", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
@@ -87,7 +86,7 @@ public class TierApiController {
             @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit,
             @JwtToken Integer userId
     ) {
-        User user = mypageApiService.findUserById(userId);
+        User user = userService.findUserById(userId);
         // page 0부터 시작하게 수정
         page--;
         // DB 조회

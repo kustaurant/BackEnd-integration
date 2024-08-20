@@ -1,6 +1,6 @@
 package com.kustaurant.restauranttier.tab4_community.controller;
 
-import com.kustaurant.restauranttier.common.MainController;
+import com.kustaurant.restauranttier.tab1_home.controller.MainController;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.entity.PostPhoto;

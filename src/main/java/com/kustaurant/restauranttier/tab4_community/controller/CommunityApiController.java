@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab4_community.controller;
 
+import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
@@ -15,7 +16,6 @@ import com.kustaurant.restauranttier.tab4_community.service.PostApiService;
 import com.kustaurant.restauranttier.tab4_community.service.StorageApiService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
-import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -54,7 +54,7 @@ public class CommunityApiController {
     private final UserRepository userRepository;
     private final PostCommentApiRepository postCommentApiRepository;
     private final PostApiRepository postApiRepository;
-    private final MypageApiService mypageApiService;
+    private final UserService userService;
     //    User userApiService.findUserById(24); = customOAuth2UserService.getUser(principal.getName());
     // 커뮤니티 메인 화면
     @GetMapping
@@ -171,7 +171,7 @@ public class CommunityApiController {
             @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
             Model model, Principal principal) {
         Integer postIdInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(24);;
+        User user = userService.findUserById(24);;
         Post post = postApiService.getPost(postIdInt);
         PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), post, user);
         PostComment savedPostComment = postCommentApiRepository.save(postComment);
@@ -202,7 +202,7 @@ public class CommunityApiController {
     })
     public ResponseEntity<Map<String, Object>> postLikeCreate(@PathVariable String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(24);;
+        User user = userService.findUserById(24);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.likeCreateOrDelete(post, user);
         response.put("likeCount", post.getLikeUserList().size());
@@ -221,7 +221,7 @@ public class CommunityApiController {
     })
     public ResponseEntity<Map<String, Object>> postDislikeCreate(@PathVariable String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(24);;
+        User user = userService.findUserById(24);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.dislikeCreateOrDelete(post, user);
         response.put("dislikeCount", post.getDislikeUserList().size());
@@ -239,7 +239,7 @@ public class CommunityApiController {
     })
     public ResponseEntity<Map<String, Object>> postScrap(@PathVariable String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = mypageApiService.findUserById(24);;
+        User user = userService.findUserById(24);;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postScrapApiService.scrapCreateOrDelete(post, user);
         return ResponseEntity.ok(response);
@@ -275,7 +275,7 @@ public class CommunityApiController {
     public ResponseEntity<Map<String, Object>> likeComment(@PathVariable String commentId, Principal principal) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
-        User user = mypageApiService.findUserById(24);;
+        User user = userService.findUserById(24);;
         Map<String, Object> response = postApiCommentService.likeCreateOrDelete(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
@@ -292,7 +292,7 @@ public class CommunityApiController {
     public ResponseEntity<Map<String, Object>> dislikeComment(@PathVariable String commentId, Principal principal) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
-        User user = mypageApiService.findUserById(24);;
+        User user = userService.findUserById(24);;
         Map<String, Object> response = postApiCommentService.dislikeCreateOrDelete(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
@@ -315,7 +315,7 @@ public class CommunityApiController {
 
         // 게시글 객체 생성
         Post post = new Post(title, content, postCategory, "ACTIVE", LocalDateTime.now());
-        User user = mypageApiService.findUserById(24);;
+        User user = userService.findUserById(24);;
         postApiService.create(post, user);
 
 //        // TinyMCE 컨텐츠에서 <img> 태그를 파싱

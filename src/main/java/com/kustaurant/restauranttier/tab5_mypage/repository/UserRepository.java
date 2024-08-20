@@ -23,4 +23,5 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     List<User> findUsersWithEvaluationCountDescending();
 
     Optional<User> findByUserIdAndStatus(Integer userId, String status);
+
 }

@@ -1,7 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
 import com.google.gson.Gson;
-import com.kustaurant.restauranttier.common.MainController;
+import com.kustaurant.restauranttier.tab1_home.controller.MainController;
 import com.kustaurant.restauranttier.common.etc.JsonData;
 import com.kustaurant.restauranttier.tab3_tier.repository.EvaluationRepository;
 import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
