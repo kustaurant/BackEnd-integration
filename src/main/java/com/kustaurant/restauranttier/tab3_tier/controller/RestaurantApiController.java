@@ -135,7 +135,8 @@ public class RestaurantApiController {
             "   - evaluationSituations: **null이거나 빈 배열일 수 있습니다.**\n\n" +
             "   - evaluationImgUrl: **null일 수 있습니다.**\n\n" +
             "   - evaluationComment: **null일 수 있습니다.**\n\n" +
-            "   - starComment: not null")
+            "   - starComment: not null\n\n" +
+            "   - newImage: **null입니다.**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "success\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EvaluationDTO.class))}),
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
