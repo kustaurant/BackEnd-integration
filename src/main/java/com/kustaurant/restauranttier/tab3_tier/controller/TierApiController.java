@@ -196,7 +196,7 @@ public class TierApiController {
         response.insertZoomAndRestaurants(18, nonTier18);
         response.insertZoomAndRestaurants(19, nonTier19);
         // 3.4 폴리곤 좌표 리스트의 리스트
-        if (!locations.contains(("ALL"))) {
+        if (locations != null && !locations.contains(("ALL"))) {
             try {
                 for (int i = 0; i < MapConstants.LIST_OF_COORD_LIST.size(); i++) {
                     if (locations.contains("L" + (i + 1))) {

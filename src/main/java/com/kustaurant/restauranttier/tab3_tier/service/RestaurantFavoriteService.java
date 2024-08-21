@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -84,7 +85,7 @@ public class RestaurantFavoriteService {
     // 유저의 즐겨찾기 식당 Tier DTO 리스트를 반환
     public List<RestaurantTierDTO> getFavoriteRestaurantDtoList(User user) {
         if (user == null) {
-            return null;
+            return new ArrayList<>();
         }
         return user.getRestaurantFavoriteList().stream()
                 .map(restaurantFavorite -> RestaurantTierDTO.convertRestaurantToTierDTO(
