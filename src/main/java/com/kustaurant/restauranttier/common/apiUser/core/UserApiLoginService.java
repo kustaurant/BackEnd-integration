@@ -1,6 +1,7 @@
-package com.kustaurant.restauranttier.common.apiUser;
+package com.kustaurant.restauranttier.common.apiUser.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.kustaurant.restauranttier.common.apiUser.JwtUtil;
 import com.kustaurant.restauranttier.common.apiUser.apple.AppleApiService;
 import com.kustaurant.restauranttier.common.apiUser.naver.NaverApiService;
 import com.kustaurant.restauranttier.common.user.UserRole;
@@ -9,6 +10,7 @@ import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -23,7 +25,7 @@ public class UserApiLoginService {
     private final AppleApiService appleApiService;
     private final JwtUtil jwtUtil;
 
-
+    //1
     //네이버 로그인 처리
     public User processNaverLogin(String provider, String providerId, String accessToken) {
         // 네이버 API를 통해 사용자 정보 가져오기
@@ -61,9 +63,9 @@ public class UserApiLoginService {
         return user;
     }
 
-
+    //2
     // 애플 로그인 처리
-    public String processAppleLogin(String provider, String identityToken, String authorizationCode) {
+    public User processAppleLogin(String provider, String identityToken, String authorizationCode) {
         // identityToken 검증 및 사용자 정보 가져오기
         Claims claims = appleApiService.verifyAppleIdentityToken(identityToken);
         String userEmail = claims.get("email", String.class);
@@ -89,15 +91,21 @@ public class UserApiLoginService {
             userRepository.save(user);
         }
 
+        String newRefreshToken = jwtUtil.generateRefreshToken(user.getUserEmail());
+        String newAccessToken = jwtUtil.generateAccessToken(user.getUserEmail());
+        user.setAccessToken(newAccessToken);
+        user.setRefreshToken(newRefreshToken);
+        userRepository.save(user);
+
         // 새로운 JWT 액세스 토큰 생성
-        return jwtUtil.generateAccessToken(user.getUserEmail());
+        return user;
     }
 
-
+    //3
     //새로운 액세스 토큰 발급
     public String refreshAccessToken(String accessToken) {
         // 액세스 토큰이 만료되었는지 확인
-        if (jwtUtil.isTokenExpired(accessToken)) {
+        if (jwtUtil.validateToken(accessToken)) {
             // 액세스 토큰에서 이메일 추출
             String userEmail = jwtUtil.getUserEmailFromToken(accessToken);
 
@@ -124,6 +132,7 @@ public class UserApiLoginService {
         }
     }
 
+    //4
     //로그아웃 처리
     public void logoutUser(Integer userId) {
         User user = userRepository.findByUserId(userId)
@@ -134,6 +143,22 @@ public class UserApiLoginService {
         userRepository.save(user);
     }
 
+    //5
+    //회원탈퇴 처리
+    @Transactional
+    public boolean deleteUserById(Integer userId) {
+        try {
+            Optional<User> userOptional = userRepository.findById(userId);
+            if (userOptional.isPresent()) {
+                userRepository.delete(userOptional.get());
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 }
 

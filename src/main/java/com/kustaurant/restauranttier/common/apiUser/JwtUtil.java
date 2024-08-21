@@ -23,7 +23,6 @@ public class JwtUtil {
     // 액세스 토큰 유효 시간
     @Value("${jwt.accessTokenExpiration}")
     private long accessTokenExpiration;
-
     // 리프레시 토큰 유효 시간
     @Value("${jwt.refreshTokenExpiration}")
     private long refreshTokenExpiration;
@@ -88,22 +87,4 @@ public class JwtUtil {
         }
     }
 
-    // JWT 토큰에서 만료 시간 추출
-    public Date getExpirationDateFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getExpiration();
-    }
-
-    // JWT 토큰의 만료 여부를 확인
-    public boolean isTokenExpired(String token) {
-        try {
-            Date expiration = getExpirationDateFromToken(token);
-            return expiration.before(new Date());
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }

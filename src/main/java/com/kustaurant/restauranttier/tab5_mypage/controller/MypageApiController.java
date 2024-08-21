@@ -5,6 +5,7 @@ import com.kustaurant.restauranttier.tab5_mypage.service.FeedbackService;
 import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import com.kustaurant.restauranttier.tab5_mypage.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,9 @@ public class MypageApiController {
             description = "마이페이지 화면에 필요한 정보들이 반환됩니다."
     )
     @GetMapping
-    public ResponseEntity<MypageMainDTO> getMypageView(@JwtToken Integer userId){
+    public ResponseEntity<MypageMainDTO> getMypageView(
+            @Parameter(hidden = true) @JwtToken Integer userId
+    ){
 
         MypageMainDTO mypageMainDTO = mypageApiService.getMypageInfo(userId);
         return new ResponseEntity<>(mypageMainDTO, HttpStatus.OK);
@@ -42,7 +45,9 @@ public class MypageApiController {
             description = ""
     )
     @GetMapping("/profile")
-    public ResponseEntity<ProfileDTO> getMypageProfile(@JwtToken Integer userId){
+    public ResponseEntity<ProfileDTO> getMypageProfile(
+            @Parameter(hidden = true) @JwtToken Integer userId
+    ){
 
         ProfileDTO profileDTO = mypageApiService.getProfileInfo(userId);
         return new ResponseEntity<>(profileDTO, HttpStatus.OK);
@@ -55,7 +60,7 @@ public class MypageApiController {
     )
     @PatchMapping("/profile")
     public ResponseEntity<?> updateMypageProfile(
-            @JwtToken Integer userId,
+            @Parameter(hidden = true) @JwtToken Integer userId,
             @RequestBody ProfileDTO receivedProfileDTO
     ){
         try {
@@ -75,7 +80,7 @@ public class MypageApiController {
     )
     @GetMapping("/evaluate-restuarnt-list")
     public ResponseEntity<List<EvaluateRestaurantInfoDTO>> getEvaluateRestaurantList(
-            @JwtToken Integer userId
+            @Parameter(hidden = true) @JwtToken Integer userId
     ){
 
         List<EvaluateRestaurantInfoDTO> userEvaluateRestaurantList = mypageApiService.getUserEvaluateRestaurantList(userId);
@@ -88,7 +93,9 @@ public class MypageApiController {
             description = "유저가 작성한 커뮤니티 글 리스트 정보들을 불러옵니다."
     )
     @GetMapping("/community-list")
-    public ResponseEntity<List<MypagePostDTO>> getWrittenUserPostsList(@JwtToken Integer userId){
+    public ResponseEntity<List<MypagePostDTO>> getWrittenUserPostsList(
+            @Parameter(hidden = true) @JwtToken Integer userId
+    ){
 
         List<MypagePostDTO> writtenUserPostsDTOList = mypageApiService.getWrittenUserPosts(userId);
         return new ResponseEntity<>(writtenUserPostsDTOList, HttpStatus.OK);
@@ -101,7 +108,7 @@ public class MypageApiController {
     )
     @GetMapping("/favorite-restuarnt-list")
     public ResponseEntity<List<FavoriteRestaurantInfoDTO>> getFavoriteRestaurantList(
-            @JwtToken Integer userId
+            @Parameter(hidden = true) @JwtToken Integer userId
     ){
 
         List<FavoriteRestaurantInfoDTO> userFavoriteRestaurantList = mypageApiService.getUserFavoriteRestaurantList(userId);
@@ -115,7 +122,7 @@ public class MypageApiController {
     )
     @GetMapping("/community-scrap-list")
     public ResponseEntity<List<MypagePostDTO>> getCommunityScrapList(
-            @JwtToken Integer userId
+            @Parameter(hidden = true) @JwtToken Integer userId
     ){
 
         List<MypagePostDTO> postScrapsDTO = mypageApiService.getScrappedUserPosts(userId);
@@ -129,7 +136,7 @@ public class MypageApiController {
     )
     @GetMapping("/community-comment-list")
     public ResponseEntity<List<MypagePostCommentDTO>> getCommunityCommentList(
-            @JwtToken Integer userId
+            @Parameter(hidden = true) @JwtToken Integer userId
     ){
 
         List<MypagePostCommentDTO> commentedUserPosts = mypageApiService.getCommentedUserPosts(userId);
@@ -143,7 +150,7 @@ public class MypageApiController {
     )
     @PostMapping("/feedback")
     public ResponseEntity<String> sendFeedback(
-            @JwtToken Integer userId,
+            @Parameter(hidden = true) @JwtToken Integer userId,
             @RequestBody Map<String, Object> jsonBody
     ){
         String feedbackBody = jsonBody.get("feedbackBody").toString();
