@@ -9,8 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -82,7 +84,14 @@ public class AppleApiService {
                 PublicKey publicKey = generatePublicKey(modulus, exponent);
                 applePublicKeys.put(keyId, publicKey);
             }
+        } catch (IOException e) {
+            log.error("Failed to parse Apple public keys response", e);
+            throw new RuntimeException("Failed to fetch Apple public keys due to parsing error", e);
+        } catch (RestClientException e) {
+            log.error("Failed to fetch Apple public keys from URL: " + publicKeyUrl, e);
+            throw new RuntimeException("Failed to fetch Apple public keys due to network error", e);
         } catch (Exception e) {
+            log.error("Unexpected error while fetching Apple public keys", e);
             throw new RuntimeException("Failed to fetch Apple public keys", e);
         }
     }
