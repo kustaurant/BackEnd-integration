@@ -3,6 +3,8 @@ package com.kustaurant.restauranttier.common.apiUser.apple;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +23,14 @@ import java.util.Map;
 @Slf4j
 @Service
 public class AppleApiService {
-    @Value("${APPLE_PUBLIC_KEYS_URL}")
+    @Value("${apple.APPLE_PUBLIC_KEYS_URL}")
     private String applePublicKeysURL;
-    @Value("${APPLE_CLIENT_ID")
+    @Value("${apple.APPLE_CLIENT_ID}")
     private String appleClientId;
     private final Map<String, PublicKey> applePublicKeys = new HashMap<>();
 
-    public AppleApiService() {
+    @PostConstruct
+    private void init() {
         fetchApplePublicKeys(applePublicKeysURL);
     }
 
