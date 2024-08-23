@@ -82,6 +82,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getUserRole().getValue()));
 
-        return new UsernamePasswordAuthenticationToken(user.getUserEmail(), null, authorities);
+        return new UsernamePasswordAuthenticationToken(user.getUserId(), null, authorities);
     }
 }

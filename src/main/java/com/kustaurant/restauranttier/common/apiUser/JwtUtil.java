@@ -1,17 +1,15 @@
 package com.kustaurant.restauranttier.common.apiUser;
 
-import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.Base64;
 
 @Slf4j
 @Component
@@ -72,6 +70,9 @@ public class JwtUtil {
             //토큰의 서명, 유효기간 등등 검증
             Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token.trim());
             return true;
+        } catch (ExpiredJwtException e) {
+            log.warn("JWT 토큰이 만료되었습니다.", e);
+            return false;
         } catch (Exception e) {
             log.error("JWT 토큰이 유효하지 않습니다.", e);
             return false;
