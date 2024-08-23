@@ -26,13 +26,6 @@ public class JwtUtil {
     @Value("${jwt.refreshTokenExpiration}")
     private long refreshTokenExpiration;
 
-    private final UserRepository userRepository;
-
-    @PostConstruct
-    protected void init() {
-        this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-    }
-
     // JWT 액세스 토큰 생성
     public String generateAccessToken(Integer userId) {
         return generateToken(userId, accessTokenExpiration);
@@ -63,25 +56,27 @@ public class JwtUtil {
                 .compact();
     }
 
-    // JWT 토큰에서 userId 추출
+    //jwt 토큰에서 userId 추출
     public Integer getUserIdFromToken(String token) {
-        return Integer.parseInt(Jwts.parser()
+        return Integer.parseInt(Jwts.parserBuilder()
                 .setSigningKey(secretKey)
-                .parseClaimsJws(token)
+                .build()
+                .parseClaimsJws(token.trim())
                 .getBody()
                 .getSubject());
     }
 
-    // JWT 토큰의 유효성 검증
+    //jwt 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
-            //토큰이 기간이 만료됬는지 확인됨
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            //토큰의 서명, 유효기간 등등 검증
+            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token.trim());
             return true;
         } catch (Exception e) {
             log.error("JWT 토큰이 유효하지 않습니다.", e);
             return false;
         }
     }
+
 
 }
