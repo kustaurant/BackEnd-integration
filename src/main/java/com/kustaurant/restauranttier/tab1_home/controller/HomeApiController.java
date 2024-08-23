@@ -53,18 +53,16 @@ public class HomeApiController {
                 .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
                 .collect(Collectors.toList());
 
-        // 홈화면의 배너 이미지 TODO: 현재 임시이미지고 실제로 이미지를 넣어야함
+        // 홈화면의 배너 이미지
         List<String> homePhotoUrls = new ArrayList<>();
+        for(int i=1;i<=3;i++){
+            String imagePath = "/img/home/배너"+i+".png";
+            // 서버의 도메인 주소와 이미지 경로를 합쳐서 전체 URL을 생성합니다.
+            String imageUrl = "http://3.35.154.191:8080" + imagePath;
+            homePhotoUrls.add(imageUrl);
+        }
 
-        String imagePath = "/img/home/배너1.png";
-        // 서버의 도메인 주소와 이미지 경로를 합쳐서 전체 URL을 생성합니다.
-        String imageUrl = "http://3.35.154.191:8080" + imagePath;
-        homePhotoUrls.add(imageUrl);
-        // 임시 배너 이미지 추가
-        List<String> tempUrls = topRestaurantsByRating.stream().limit(4)
-                .map(Restaurant::getRestaurantImgUrl)
-                .toList();
-        homePhotoUrls.addAll(tempUrls);
+
         RestaurantListsResponse response = new RestaurantListsResponse(topRestaurantsByRatingDTOs, restaurantsForMeDTOs, homePhotoUrls);
         return ResponseEntity.ok(response);
     }

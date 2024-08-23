@@ -77,7 +77,7 @@ public class CommunityApiController {
             @Parameter(example = "0", description = "페이지입니다. 페이지는 0부터 시작하고, 게시글은 페이지 단위로 불러올 수 있습니다")
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(defaultValue = "recent")
-            @Parameter(example = "recent", description = "정렬 종류입니다. (recent:최신순, popular:인기순)")
+            @Parameter(example = "recent", description = "게시글의 댓글에 대한 정렬 종류입니다. (recent:최신순, popular:인기순)")
             String sort
     ) {
 
