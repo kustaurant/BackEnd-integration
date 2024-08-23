@@ -73,7 +73,7 @@ public class UserApiLoginController {
     //4
     @Operation(
             summary = "발급받은 토큰을 검증하는 API입니다.",
-            description = "검증된토큰 : Httpstatus.OK, 아니면  출력"
+            description = "검증된토큰 : Httpstatus.OK, 아니면 HttpStatus.Unauthorized 출력"
     )
     @GetMapping("/auth/verify-token")
     public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String accessToken) {
