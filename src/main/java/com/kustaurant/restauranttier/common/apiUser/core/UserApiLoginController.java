@@ -122,7 +122,7 @@ public class UserApiLoginController {
         }
     }
 
-//6
+    //7
     @Operation(
             summary = "기간이 만료된 액세스토큰을 받는 API입니다. (테스트용)",
             description = "만료기간이 1초짜리인 액세스 토큰을 발급받습니다."

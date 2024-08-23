@@ -4,11 +4,15 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 
 @Slf4j
@@ -23,6 +27,12 @@ public class JwtUtil {
     // 리프레시 토큰 유효 시간
     @Value("${jwt.refreshTokenExpiration}")
     private long refreshTokenExpiration;
+    private Key key;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+    }
 
     // JWT 액세스 토큰 생성
     public String generateAccessToken(Integer userId) {
@@ -50,25 +60,24 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    //jwt 토큰에서 userId 추출
+    // JWT 토큰에서 userId 추출
     public Integer getUserIdFromToken(String token) {
         return Integer.parseInt(Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token.trim())
                 .getBody()
                 .getSubject());
     }
 
-    //jwt 토큰 유효성 검증
+    // JWT 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
-            //토큰의 서명, 유효기간 등등 검증
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token.trim());
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token.trim());
             return true;
         } catch (ExpiredJwtException e) {
             log.warn("JWT 토큰이 만료되었습니다.", e);

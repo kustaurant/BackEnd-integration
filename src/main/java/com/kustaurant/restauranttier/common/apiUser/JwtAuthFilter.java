@@ -42,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (jwtUtil.validateToken(jwt)) {
                 Integer userId = jwtUtil.getUserIdFromToken(jwt);
 
-                // JWT 토큰에서 추출한 이메일로 사용자를 조회
+                // JWT 토큰에서 추출한 아이디로 사용자를 조회
                 User user = userRepository.findByUserId(userId)
                         .orElseThrow(() -> new IllegalStateException("User not found"));
 
