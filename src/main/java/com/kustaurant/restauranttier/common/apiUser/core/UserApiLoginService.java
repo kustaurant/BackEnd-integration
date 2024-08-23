@@ -164,6 +164,23 @@ public class UserApiLoginService {
         }
     }
 
+    //6
+    //유효기간이 1초인 테스트용 액세스토큰을 발급해줌
+    public String yoloAccessToken(String accessToken) {
+            Integer userId = jwtUtil.getUserIdFromToken(accessToken);
+
+            User user = userRepository.findByUserId(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+            // 새로운 액세스 토큰 발급
+            String newAccessToken = jwtUtil.generateYOLOAccessToken(user.getUserId());
+            user.setAccessToken(newAccessToken);
+            userRepository.save(user);
+
+            return newAccessToken;
+    }
+
+
 }
 
 

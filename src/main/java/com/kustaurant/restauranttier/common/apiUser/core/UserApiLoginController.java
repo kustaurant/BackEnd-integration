@@ -122,5 +122,19 @@ public class UserApiLoginController {
         }
     }
 
+//6
+    @Operation(
+            summary = "기간이 만료된 액세스토큰을 받는 API입니다. (테스트용)",
+            description = "만료기간이 1초짜리인 액세스 토큰을 발급받습니다."
+    )
+    @PostMapping("/auth/YOLO")
+    public ResponseEntity<?> testForOneSecToken(
+            @RequestHeader("Authorization") String accessToken
+    ) {
+        String newAccessToken = userApiLoginService.yoloAccessToken(accessToken);
+
+        return ResponseEntity.ok(newAccessToken);
+    }
+
 
 }

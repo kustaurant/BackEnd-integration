@@ -43,6 +43,12 @@ public class JwtUtil {
         return generateToken(userId, refreshTokenExpiration);
     }
 
+    // 테스트용 1초짜리 액세스 토큰 생성
+    public String generateYOLOAccessToken(Integer userId) {
+        return generateToken(userId, 1000); // 1초 = 1000밀리초
+    }
+
+
     // JWT 토큰 생성 로직
     private String generateToken(Integer userId, long expirationTime) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
