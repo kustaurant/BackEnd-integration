@@ -4,6 +4,7 @@ package com.kustaurant.restauranttier.tab4_community.controller;
 import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.common.apiUser.JwtToken;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
 import com.kustaurant.restauranttier.tab4_community.dto.UserDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.*;
@@ -34,6 +35,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -43,10 +45,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/community")
@@ -64,13 +63,16 @@ public class CommunityApiController {
     private final PostApiRepository postApiRepository;
 
     private final UserService userService;
+
     //    User userApiService.findUserById(24); = customOAuth2UserService.getUser(principal.getName());
     // 커뮤니티 메인 화면
     @GetMapping("/posts")
     @Operation(summary = "커뮤니티 메인화면의 글 리스트 불러오기", description = "게시판 종류와 페이지, 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다, 현재 인기순으로 설정했을 때는 좋아요가 3이상인 게시글만 반환됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 리스트 반환 성공", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostDTO.class)))}),
-            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음", content = {@Content(mediaType = "application/json")})
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음", content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", description = "파라미터 값이 유효하지 않음", content = {@Content(mediaType = "application/json")})
+
     })
     public ResponseEntity<List<PostDTO>> community(
             @RequestParam(defaultValue = "all")
@@ -116,12 +118,22 @@ public class CommunityApiController {
                                         String sort) {
         // 잘못된 요청을 처리 (예: 음수 ID)
         if (postId <= 0) {
-            throw new IllegalArgumentException("잘못된 게시글 ID입니다."); // 400 Bad Request 예외 발생
+            throw new ParamException("잘못된 게시글 ID입니다.");
         }
 
         // 게시글 조회
         Post post = postApiService.getPost(postId);
+        List<PostComment> postCommentList = post.getPostCommentList();
 
+        if (sort.equals("recent")) {
+            // createdAt으로 정렬 (최신순)
+            postCommentList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
+        } else if (sort.equals("popular")) {
+            // likeCount로 정렬 (인기순)
+            postCommentList.sort(Comparator.comparing(PostComment::getLikeCount).reversed());
+        } else {
+            throw new ParamException("sort 파라미터 값이 올바르지 않습니다.");
+        }
         // 조회수 증가
         postApiService.increaseVisitCount(post);
 
@@ -133,7 +145,6 @@ public class CommunityApiController {
     }
 
 
-
     @DeleteMapping("/{postId}")
     @Transactional
     @Operation(summary = "게시글 삭제", description = "게시글 ID를 입력받고 해당 게시글을 삭제합니다. 삭제가 완료되면 204 상태 코드를 반환합니다.")
@@ -143,51 +154,44 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "403", description = "삭제 권한 없음", content = @Content),
             @ApiResponse(responseCode = "500", description = "서버 오류로 인해 삭제 실패", content = @Content)
     })
-    public ResponseEntity<Void> postDelete(@PathVariable Integer postId, @JwtToken Integer userId) {
-        try {
-            Post post = postApiService.getPost(postId);
+    public ResponseEntity<Void> postDelete(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
 
-            if (post == null) {
-                return ResponseEntity.status(404).build(); // 게시글이 존재하지 않는 경우
-            }
+        Post post = postApiService.getPost(postId);
 
-            if (!post.getUser().getUserId().equals(userId)) {
-                return ResponseEntity.status(403).build(); // 권한이 없는 경우
-            }
 
-            // 게시글과 관련된 댓글들 상태 변경
-            List<PostComment> comments = post.getPostCommentList();
-            for (PostComment comment : comments) {
-                comment.setStatus("DELETED");
-                // 대댓글 삭제
-                for (PostComment reply : comment.getRepliesList()) {
-                    reply.setStatus("DELETED");
-                }
-            }
-
-            // 게시글과 관련된 스크랩 정보 삭제
-            List<PostScrap> scraps = post.getPostScrapList();
-            postScrapApiRepository.deleteAll(scraps);
-
-            // 게시글과 관련된 사진 삭제
-            List<PostPhoto> existingPhotos = post.getPostPhotoList();
-            if (existingPhotos != null) {
-                postPhotoApiRepository.deleteAll(existingPhotos);
-                post.setPostPhotoList(null); // 기존 리스트 연결 해제
-            }
-
-            // 게시글 상태를 삭제로 변경
-            post.setStatus("DELETED");
-
-            // 204 No Content 반환 (삭제 성공)
-            return ResponseEntity.noContent().build();
-
-        } catch (Exception e) {
-            // 서버 오류 처리
-            return ResponseEntity.status(500).build();
+        if (!post.getUser().getUserId().equals(userId)) {
+            throw new AccessDeniedException("해당 게시글에 대한 권한이 없습니다.");
         }
-    }
 
+        // 게시글과 관련된 댓글들 상태 변경
+        List<PostComment> comments = post.getPostCommentList();
+        for (PostComment comment : comments) {
+            comment.setStatus("DELETED");
+            // 대댓글 삭제
+            for (PostComment reply : comment.getRepliesList()) {
+                reply.setStatus("DELETED");
+            }
+        }
+
+        // 게시글과 관련된 스크랩 정보 삭제
+        List<PostScrap> scraps = post.getPostScrapList();
+        postScrapApiRepository.deleteAll(scraps);
+
+        // 게시글과 관련된 사진 삭제
+        List<PostPhoto> existingPhotos = post.getPostPhotoList();
+        if (existingPhotos != null) {
+            postPhotoApiRepository.deleteAll(existingPhotos);
+            post.setPostPhotoList(null); // 기존 리스트 연결 해제
+        }
+
+        // 게시글 상태를 삭제로 변경
+        post.setStatus("DELETED");
+
+        // 204 No Content 반환 (삭제 성공)
+        return ResponseEntity.noContent().build();
+
+
+    }
 
 
     // 댓글, 대댓글 삭제
@@ -198,7 +202,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "delete success", content = @Content),
             @ApiResponse(responseCode = "404", description = "comment not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> commentDelete(@PathVariable Integer commentId,@JwtToken Integer userId) {
+    public ResponseEntity<Map<String, Object>> commentDelete(@PathVariable Integer commentId, @JwtToken Integer userId) {
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
         postComment.setStatus("DELETED");
         List<PostComment> repliesList = postComment.getRepliesList();
@@ -222,6 +226,7 @@ public class CommunityApiController {
 
         return ResponseEntity.ok(response);
     }
+
     // 댓글 or 대댓글 생성
     @PostMapping("/comments")
     @Operation(summary = "댓글 생성, 대댓글 생성", description = "게시글 ID와 내용을 입력받아 댓글을 생성합니다. 대댓글의 경우 부모 댓글의 id를 파라미터로 받아야 합니다. 생성한 댓글을 반환합니다")
@@ -233,10 +238,11 @@ public class CommunityApiController {
             @RequestParam(name = "content", defaultValue = "") String content,
             @RequestParam(name = "postId") String postId,
             @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
-            @JwtToken @Parameter(hidden = true)Integer userId) {
+            @JwtToken @Parameter(hidden = true) Integer userId) {
         Integer postIdInt = Integer.valueOf(postId);
 
-        User user = userService.findUserById(userId);;
+        User user = userService.findUserById(userId);
+        ;
         Post post = postApiService.getPost(postIdInt);
         PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), post, user);
         PostComment savedPostComment = postCommentApiRepository.save(postComment);
@@ -265,10 +271,11 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "like success", content = @Content),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> postLikeCreate(@PathVariable String postId, @JwtToken @Parameter(hidden = true)Integer userId) {
+    public ResponseEntity<Map<String, Object>> postLikeCreate(@PathVariable String postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
 
-        User user = userService.findUserById(userId);;
+        User user = userService.findUserById(userId);
+        ;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.likeCreateOrDelete(post, user);
         response.put("likeCount", post.getLikeUserList().size());
@@ -285,10 +292,11 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "dislike success", content = @Content),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> postDislikeCreate(@PathVariable String postId, @JwtToken @Parameter(hidden = true)Integer userId) {
+    public ResponseEntity<Map<String, Object>> postDislikeCreate(@PathVariable String postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
 
-        User user = userService.findUserById(userId);;
+        User user = userService.findUserById(userId);
+        ;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.dislikeCreateOrDelete(post, user);
         response.put("dislikeCount", post.getDislikeUserList().size());
@@ -304,10 +312,11 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "scrap success", content = @Content),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> postScrap(@PathVariable String postId, Model model, @JwtToken @Parameter(hidden = true)Integer userId) {
+    public ResponseEntity<Map<String, Object>> postScrap(@PathVariable String postId, Model model, @JwtToken @Parameter(hidden = true) Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
 
-        User user = userService.findUserById(userId);;
+        User user = userService.findUserById(userId);
+        ;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postScrapApiService.scrapCreateOrDelete(post, user);
         return ResponseEntity.ok(response);
@@ -344,7 +353,8 @@ public class CommunityApiController {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
 
-        User user = userService.findUserById(userId);;
+        User user = userService.findUserById(userId);
+        ;
         Map<String, Object> response = postApiCommentService.likeCreateOrDelete(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
@@ -358,11 +368,12 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "dislike success", content = @Content),
             @ApiResponse(responseCode = "404", description = "comment not found", content = @Content)
     })
-    public ResponseEntity<Map<String, Object>> dislikeComment(@PathVariable String commentId, @JwtToken @Parameter(hidden = true)Integer userId) {
+    public ResponseEntity<Map<String, Object>> dislikeComment(@PathVariable String commentId, @JwtToken @Parameter(hidden = true) Integer userId) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
 
-        User user = userService.findUserById(userId);;
+        User user = userService.findUserById(userId);
+        ;
         Map<String, Object> response = postApiCommentService.dislikeCreateOrDelete(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
@@ -380,13 +391,14 @@ public class CommunityApiController {
             @RequestParam("title") String title,
             @RequestParam("postCategory") String postCategory,
             @RequestParam("content") String content,
-            @RequestParam(value= "imgUrl" ,required = false) String imgUrl,
+            @RequestParam(value = "imgUrl", required = false) String imgUrl,
             @JwtToken Integer userId) throws IOException {
 
         // 게시글 객체 생성
         Post post = new Post(title, content, postCategory, "ACTIVE", LocalDateTime.now());
 
-        User user = userService.findUserById(userId);;
+        User user = userService.findUserById(userId);
+        ;
         postApiService.create(post, user);
 
 //        // TinyMCE 컨텐츠에서 <img> 태그를 파싱
@@ -451,7 +463,6 @@ public class CommunityApiController {
         postApiRepository.save(post);
 
 
-
         return ResponseEntity.ok("글이 성공적으로 수정되었습니다.");
     }
 
@@ -501,7 +512,7 @@ public class CommunityApiController {
     @GetMapping("/ranking")
     @Operation(summary = "커뮤니티-랭킹 탭에서 유저 랭킹 불러오기", description = "평가 수 기반의 유저 랭킹을 반환합니다. 분기순일 경우 sort 파라미터 값으로 quarterly, 누적순일 경우 cumulative를 설정하여 요청을 보냅니다.")
     @ApiResponse(responseCode = "200", description = "유저 랭킹 반환 성공", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))})
-    public List<UserDTO> ranking(@RequestParam @Parameter(description = "랭킹 산정 기준입니다. 분기순:quarterly, 최신순:cumulative",example = "quarterly") String sort) {
+    public List<UserDTO> ranking(@RequestParam @Parameter(description = "랭킹 산정 기준입니다. 분기순:quarterly, 최신순:cumulative", example = "quarterly") String sort) {
         if ("cumulative".equals(sort)) {
             // 누적 기준으로 유저 리스트 가져오기
             List<User> userList = userRepository.findUsersWithEvaluationCountDescending();

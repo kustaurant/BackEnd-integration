@@ -6,9 +6,12 @@ import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.nio.file.AccessDeniedException;
 
 /**
  * @author Ding
@@ -54,7 +57,26 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("[IllegalArgumentException]", e);
+        return new ResponseEntity<>(new ErrorResponse("ARGUMENT ERROR", e.getMessage()), HttpStatus.BAD_REQUEST);
+
+    }
+
+
+     // 권한이 없는 사용자가 접근을 시도할 때 발생하는 예외를 처리합니다.
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
+        log.error("[AccessDeniedException]", e);
+        return new ResponseEntity<>(new ErrorResponse("FORBIDDEN", e.getMessage()), HttpStatus.FORBIDDEN);
+    }
+
+
+    //인증되지 않은 사용자가 인증이 필요한 리소스에 접근할 때 발생하는 예외를 처리합니다.
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException e) {
+        log.error("[AuthenticationException]", e);
+        return new ResponseEntity<>(new ErrorResponse("UNAUTHORIZED", e.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 }

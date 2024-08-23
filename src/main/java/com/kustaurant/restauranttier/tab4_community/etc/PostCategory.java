@@ -24,6 +24,6 @@ public enum PostCategory {
                 return pc;
             }
         }
-        throw new IllegalArgumentException("Unknown post category: " + category);
+        throw new IllegalArgumentException("PostCategory 파라미터가 유효하지 않습니다.");
     }
 }

@@ -2,6 +2,7 @@ package com.kustaurant.restauranttier.tab4_community.service;
 
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab4_community.DataNotFoundException;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
@@ -50,7 +51,7 @@ public class PostApiService {
             Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
             return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
         }else{
-            throw new OptionalNotExistException("sort 파라미터 값이 올바르지 않습니다.");
+            throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
         }
     }
 
