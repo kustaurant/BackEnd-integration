@@ -103,7 +103,10 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "request success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostDTO.class))}),
             @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
     })
-    public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id" ,example="69") Integer postId, @RequestParam(defaultValue = "recent") String sort) {
+    public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id" ,example="69") Integer postId,
+                                        @RequestParam(defaultValue = "recent")
+                                        @Parameter(example = "recent", description = "정렬 종류입니다. (recent:최신순, popular:인기순)")
+                                        String sort) {
         Post post = postApiService.getPost(postId);
         postApiService.increaseVisitCount(post);
         PostDTO postDTO = PostDTO.fromEntity(post);

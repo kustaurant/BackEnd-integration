@@ -31,6 +31,8 @@ public class PostDTO {
 
     Integer likeCount;
     UserDTO user;
+    String timeAgo;
+    Integer commentCount;
     List<PostCommentDTO> postCommentList;
     public static PostDTO fromEntity(Post post) {
         PostDTO dto = new PostDTO();
@@ -46,6 +48,8 @@ public class PostDTO {
         dto.setPostCommentList(post.getPostCommentList().stream()
                 .map(PostCommentDTO::fromEntity)
                 .toList());
+        dto.setCommentCount(post.getPostCommentList().size());
+        dto.setTimeAgo(post.calculateTimeAgo());
         return dto;
     }
 }
