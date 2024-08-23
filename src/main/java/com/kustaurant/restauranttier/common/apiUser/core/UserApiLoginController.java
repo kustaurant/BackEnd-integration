@@ -79,9 +79,9 @@ public class UserApiLoginController {
     public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String accessToken) {
         boolean isValid = jwtUtil.validateToken(accessToken);
         if (isValid) {
-            return ResponseEntity.ok("Token is valid");
+            return ResponseEntity.ok("액세스 토큰이 유효합니다");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("액세스 토큰이 유효하지 않습니다");
         }
     }
 
@@ -125,7 +125,7 @@ public class UserApiLoginController {
     //7
     @Operation(
             summary = "기간이 만료된 액세스토큰을 받는 API입니다. (테스트용)",
-            description = "만료기간이 1초짜리인 액세스 토큰을 발급받습니다."
+            description = "만료기간이 10초짜리인 액세스 토큰을 발급받습니다."
     )
     @PostMapping("/auth/YOLO")
     public ResponseEntity<?> testForOneSecToken(

@@ -104,18 +104,12 @@ public class UserApiLoginService {
     //새로운 액세스 토큰 발급
     public String refreshAccessToken(String accessToken) {
         // 액세스 토큰이 만료되었는지 확인
-        if (jwtUtil.validateToken(accessToken)) {
-            // 액세스 토큰에서 유저아이디 추출
+        if (!jwtUtil.validateToken(accessToken)) {
             Integer userId = jwtUtil.getUserIdFromToken(accessToken);
-
-            // 해당 아이디로 사용자를 조회
             User user = userRepository.findByUserId(userId)
                     .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-            // 서버에 저장된 리프레시 토큰을 가져옴
             String storedRefreshToken = user.getRefreshToken();
 
-            // 리프레시 토큰이 유효한지 확인
             if (storedRefreshToken == null || !jwtUtil.validateToken(storedRefreshToken)) {
                 throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
             }

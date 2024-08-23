@@ -44,9 +44,9 @@ public class JwtUtil {
         return generateToken(userId, refreshTokenExpiration);
     }
 
-    // 테스트용 1초짜리 액세스 토큰 생성
+    // 테스트용 10초짜리 액세스 토큰 생성
     public String generateYOLOAccessToken(Integer userId) {
-        return generateToken(userId, 1000); // 1초 = 1000밀리초
+        return generateToken(userId, 10000); // 10초 = 1000밀리초
     }
 
 
@@ -80,10 +80,7 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token.trim());
             return true;
         } catch (ExpiredJwtException e) {
-            log.warn("JWT 토큰이 만료되었습니다.", e);
-            return false;
-        } catch (Exception e) {
-            log.error("JWT 토큰이 유효하지 않습니다.", e);
+            log.error("JWT 토큰이 만료되었습니다.", e);
             return false;
         }
     }
