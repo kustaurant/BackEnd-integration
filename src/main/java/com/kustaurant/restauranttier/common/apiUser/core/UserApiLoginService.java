@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -54,8 +53,8 @@ public class UserApiLoginService {
                     .build();
         }
 
-        String newRefreshToken = jwtUtil.generateRefreshToken(user.getUserEmail());
-        String newAccessToken = jwtUtil.generateAccessToken(user.getUserEmail());
+        String newRefreshToken = jwtUtil.generateRefreshToken(user.getUserId());
+        String newAccessToken = jwtUtil.generateAccessToken(user.getUserId());
         user.setAccessToken(newAccessToken);
         user.setRefreshToken(newRefreshToken);
         userRepository.save(user);
@@ -68,7 +67,6 @@ public class UserApiLoginService {
     public User processAppleLogin(String provider, String identityToken, String authorizationCode) {
         // identityToken 검증 및 사용자 정보 가져오기
         Claims claims = appleApiService.verifyAppleIdentityToken(identityToken);
-        String userEmail = claims.get("email", String.class);
         String userIdentifier = claims.getSubject(); // `sub` claim이 사용자 ID
 
         // 사용자 정보로 기존 회원 조회 또는 새로 가입 처리
@@ -79,11 +77,12 @@ public class UserApiLoginService {
             user = optionalUser.get();
         } else {
             // 새로운 사용자 생성 및 저장
+            int appleUserCount = userRepository.countByUserNicknameStartingWith("애플사용자");
+
             user = User.builder()
                     .providerId(userIdentifier)
                     .loginApi(provider)
-                    .userEmail(userEmail)
-                    .userNickname(StringUtils.substringBefore(userEmail, "@"))
+                    .userNickname("애플사용자" + (appleUserCount + 1))
                     .status("ACTIVE")
                     .createdAt(LocalDateTime.now())
                     .userRole(UserRole.USER)
@@ -91,8 +90,8 @@ public class UserApiLoginService {
             userRepository.save(user);
         }
 
-        String newRefreshToken = jwtUtil.generateRefreshToken(user.getUserEmail());
-        String newAccessToken = jwtUtil.generateAccessToken(user.getUserEmail());
+        String newRefreshToken = jwtUtil.generateRefreshToken(user.getUserId());
+        String newAccessToken = jwtUtil.generateAccessToken(user.getUserId());
         user.setAccessToken(newAccessToken);
         user.setRefreshToken(newRefreshToken);
         userRepository.save(user);
@@ -106,11 +105,11 @@ public class UserApiLoginService {
     public String refreshAccessToken(String accessToken) {
         // 액세스 토큰이 만료되었는지 확인
         if (jwtUtil.validateToken(accessToken)) {
-            // 액세스 토큰에서 이메일 추출
-            String userEmail = jwtUtil.getUserEmailFromToken(accessToken);
+            // 액세스 토큰에서 유저아이디 추출
+            Integer userId = jwtUtil.getUserIdFromToken(accessToken);
 
-            // 해당 이메일로 사용자를 조회
-            User user = userRepository.findByUserEmail(userEmail)
+            // 해당 아이디로 사용자를 조회
+            User user = userRepository.findByUserId(userId)
                     .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
             // 서버에 저장된 리프레시 토큰을 가져옴
@@ -122,7 +121,7 @@ public class UserApiLoginService {
             }
 
             // 새로운 액세스 토큰 발급
-            String newAccessToken = jwtUtil.generateAccessToken(user.getUserEmail());
+            String newAccessToken = jwtUtil.generateAccessToken(user.getUserId());
             user.setAccessToken(newAccessToken);
             userRepository.save(user);
 
@@ -150,7 +149,12 @@ public class UserApiLoginService {
         try {
             Optional<User> userOptional = userRepository.findById(userId);
             if (userOptional.isPresent()) {
-                userRepository.delete(userOptional.get());
+                User user=userOptional.get();
+                user.setStatus("deleted");
+                user.setUserNickname("탈퇴한 회원");
+                user.setPhoneNumber(null);
+                user.setUserEmail(null);
+                userRepository.save(user);
                 return true;
             } else {
                 return false;

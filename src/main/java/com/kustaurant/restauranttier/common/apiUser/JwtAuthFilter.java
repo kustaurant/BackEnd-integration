@@ -40,10 +40,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(jwt)) {
             // JWT 토큰의 유효성을 검증
             if (jwtUtil.validateToken(jwt)) {
-                String email = jwtUtil.getUserEmailFromToken(jwt);
+                Integer userId = jwtUtil.getUserIdFromToken(jwt);
 
                 // JWT 토큰에서 추출한 이메일로 사용자를 조회
-                User user = userRepository.findByUserEmail(email)
+                User user = userRepository.findByUserId(userId)
                         .orElseThrow(() -> new IllegalStateException("User not found"));
 
                 // 스프링 시큐리티 컨텍스트에 설정할 인증 객체 생성

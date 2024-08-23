@@ -105,10 +105,10 @@ public class UserApiLoginController {
 
     //6
     @Operation(
-            summary = "애플전용 회원탈퇴를 위한 API입니다.",
+            summary = "회원탈퇴를 위한 API입니다.",
             description = "사용자가 애플 계정을 통해 회원탈퇴 요청을 하면, 서버에서 해당 사용자 데이터를 삭제합니다."
     )
-    @PostMapping("/auth/bye-apple")
+    @PostMapping("/auth/goodbye-user")
     public ResponseEntity<?> deleteAppleAccount(
             @Parameter(hidden = true)
             @JwtToken Integer userId

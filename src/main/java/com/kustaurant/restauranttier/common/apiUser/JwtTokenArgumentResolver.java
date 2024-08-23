@@ -29,9 +29,6 @@ public class JwtTokenArgumentResolver implements HandlerMethodArgumentResolver {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             String token = bearerToken.substring(7);
             try {
-                // JWT 토큰에서 유저 이메일 추출
-                String userEmail = jwtUtil.getUserEmailFromToken(token);
-
                 // 이메일로 유저 아이디 조회
                 return jwtUtil.getUserIdFromToken(token);
 

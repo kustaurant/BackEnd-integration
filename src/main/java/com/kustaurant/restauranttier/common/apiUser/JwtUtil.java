@@ -1,6 +1,5 @@
 package com.kustaurant.restauranttier.common.apiUser;
 
-import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -35,18 +34,18 @@ public class JwtUtil {
     }
 
     // JWT 액세스 토큰 생성
-    public String generateAccessToken(String userEmail) {
-        return generateToken(userEmail, accessTokenExpiration);
+    public String generateAccessToken(Integer userId) {
+        return generateToken(userId, accessTokenExpiration);
     }
 
     // JWT 리프레시 토큰 생성
-    public String generateRefreshToken(String userEmail) {
-        return generateToken(userEmail, refreshTokenExpiration);
+    public String generateRefreshToken(Integer userId) {
+        return generateToken(userId, refreshTokenExpiration);
     }
 
     // JWT 토큰 생성 로직
-    private String generateToken(String userEmail, long expirationTime) {
-        Claims claims = Jwts.claims().setSubject(userEmail);
+    private String generateToken(Integer userId, long expirationTime) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationTime);
 
@@ -58,21 +57,13 @@ public class JwtUtil {
                 .compact();
     }
 
-    // JWT 토큰에서 userEmail 추출
-    public String getUserEmailFromToken(String token) {
-        return Jwts.parser()
+    // JWT 토큰에서 userId 추출
+    public Integer getUserIdFromToken(String token) {
+        return Integer.parseInt(Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody()
-                .getSubject();
-    }
-
-    // 이메일로 유저 아이디 반환
-    public Integer getUserIdFromToken(String token) {
-        String userEmail = getUserEmailFromToken(token);
-        User user = userRepository.findByUserEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        return user.getUserId();
+                .getSubject());
     }
 
     // JWT 토큰의 유효성 검증
