@@ -81,7 +81,7 @@ public class PostApiService {
         if (post.isPresent()) {
             return post.get();
         } else {
-            throw new DataNotFoundException("post not found");
+            throw new OptionalNotExistException("해당 postId의 게시글을 찾을 수 없습니다.");
         }
     }
 

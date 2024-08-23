@@ -34,7 +34,7 @@ public class HomeApiController {
     private final RestaurantService restaurantService;
     private final UserService userService;
 
-    @Operation(summary = "홈화면 top맛집, 나를 위한 맛집, 배너 이미지 불러오기", description = "top 맛집과 나를 위한 맛집 리스트인 topRestaurantsByRating, restaurantsForMe 을 반환하고 홈의 배너 이미지 url리스트를 반환합니다. 현재 배너 이미지 url은 임시 이미지입니다")
+    @Operation(summary = "홈화면 top맛집, 나를 위한 맛집, 배너 이미지 불러오기", description = "top 맛집과 나를 위한 맛집 리스트인 topRestaurantsByRating, restaurantsForMe 을 반환하고 홈의 배너 이미지 url리스트를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "restaurant found", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantListsResponse.class))}),
             @ApiResponse(responseCode = "404", description = "restaurant not found", content = {@Content(mediaType = "application/json")})
@@ -55,12 +55,17 @@ public class HomeApiController {
 
         // 홈화면의 배너 이미지
         List<String> homePhotoUrls = new ArrayList<>();
-        for(int i=1;i<=3;i++){
-            String imagePath = "/img/home/배너"+i+".png";
-            // 서버의 도메인 주소와 이미지 경로를 합쳐서 전체 URL을 생성합니다.
-            String imageUrl = "http://3.35.154.191:8080" + imagePath;
-            homePhotoUrls.add(imageUrl);
+        for (int i = 1; i <= 3; i++) {
+            StringBuilder imagePathBuilder = new StringBuilder();
+            imagePathBuilder.append("/배너").append(i).append(".png");
+
+            StringBuilder imageUrlBuilder = new StringBuilder();
+            imageUrlBuilder.append("https://kustaurant.s3.ap-northeast-2.amazonaws.com/home").append(imagePathBuilder);
+
+            homePhotoUrls.add(imageUrlBuilder.toString());
         }
+
+
 
 
         RestaurantListsResponse response = new RestaurantListsResponse(topRestaurantsByRatingDTOs, restaurantsForMeDTOs, homePhotoUrls);
