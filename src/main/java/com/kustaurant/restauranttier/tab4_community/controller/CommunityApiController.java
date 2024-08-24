@@ -6,6 +6,7 @@ import com.kustaurant.restauranttier.common.apiUser.JwtToken;
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
+import com.kustaurant.restauranttier.tab4_community.dto.LikeOrDislikeDTO;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
 import com.kustaurant.restauranttier.tab4_community.dto.UserDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.*;
@@ -286,15 +287,16 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "게시글 좋아요 처리가 완료되었습니다", content = @Content),
             @ApiResponse(responseCode = "404", description = "해당 id의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<Map<String, Object>> postLikeCreate(@PathVariable String postId, @JwtToken @Parameter(hidden = true) Integer userId) {
+    public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(@PathVariable String postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
         User user = userService.findUserById(userId);
         Post post = postApiService.getPost(postidInt);
-        Map<String, Object> response = postApiService.likeCreateOrDelete(post, user);
-        response.put("likeCount", post.getLikeUserList().size());
-        response.put("dislikeCount", post.getDislikeUserList().size());
+        String status = postApiService.likeCreateOrDelete(post, user);
+        // 응답 맵 구성
+        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(post.getLikeUserList().size(),post.getDislikeUserList().size(),status);
 
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(likeOrDislikeDTO);
     }
 
     // 게시글 싫어요 생성

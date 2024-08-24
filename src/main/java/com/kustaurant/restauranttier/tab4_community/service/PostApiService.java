@@ -2,8 +2,6 @@ package com.kustaurant.restauranttier.tab4_community.service;
 
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
-import com.kustaurant.restauranttier.common.exception.exception.ParamException;
-import com.kustaurant.restauranttier.tab4_community.DataNotFoundException;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
@@ -130,19 +128,18 @@ public class PostApiService {
     }
 
     // 게시글 좋아요
-    public Map<String, Object> likeCreateOrDelete(Post post, User user) {
+    public String likeCreateOrDelete(Post post, User user) {
         List<User> likeUserList = post.getLikeUserList();
         List<User> dislikeUserList = post.getDislikeUserList();
         List<Post> likePostList = user.getLikePostList();
         List<Post> dislikePostList = user.getDislikePostList();
-        Map<String, Object> status = new HashMap<>();
-
+        String response;
         //해당 post 를 이미 like 한 경우 - 제거
         if (likeUserList.contains(user)) {
             post.setLikeCount(post.getLikeCount() - 1);
             likePostList.remove(post);
             likeUserList.remove(user);
-            status.put("likeDelete", true);
+            response = "likeDeleted";
         }
         //해당 post를 이미 dislike 한 경우 - 제거하고 추가
         else if (dislikeUserList.contains(user)) {
@@ -151,13 +148,12 @@ public class PostApiService {
             dislikePostList.remove(post);
             likeUserList.add(user);
             likePostList.add(post);
-            status.put("likeChanged", true);
+            response = "likeConvertedFromDislike";
 
         }
         // 처음 like 하는 경우-추가
         else {
-            status.put("likeCreated", true);
-
+            response = "likeCreated";
             post.setLikeCount(post.getLikeCount() + 1);
             likeUserList.add(user);
             likePostList.add(post);
@@ -166,7 +162,7 @@ public class PostApiService {
 
         postApiRepository.save(post);
         userRepository.save(user);
-        return status;
+        return response;
     }
 
     // 게시글 싫어요
