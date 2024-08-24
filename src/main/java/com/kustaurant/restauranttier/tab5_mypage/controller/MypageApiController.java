@@ -6,15 +6,14 @@ import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import com.kustaurant.restauranttier.tab5_mypage.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -148,23 +147,24 @@ public class MypageApiController {
             summary = "피드백 보내기 기능입니다",
             description = "피드백을 보냅니다."
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "피드백 감사합니다."),
+            @ApiResponse(responseCode = "400", description = "내용이 없습니다."),
+    })
     @PostMapping("/feedback")
     public ResponseEntity<String> sendFeedback(
             @Parameter(hidden = true) @JwtToken Integer userId,
-            @RequestBody Map<String, Object> jsonBody
+            @RequestBody FeedbackDTO feedbackDTO
     ){
-        String feedbackBody = jsonBody.get("feedbackBody").toString();
+        String comments = feedbackDTO.getComments();
 
-        if (feedbackBody.isEmpty()) {
+        if (comments==null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("내용이 없습니다.");
         }
-        String result = feedbackService.addApiFeedback(feedbackBody, userId);
+        feedbackService.addApiFeedback(comments, userId);
 
-        if (result.equals("fail")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("잘못된 접근입니다.");
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body("피드백 감사합니다.");
-        }
+        return ResponseEntity.status(HttpStatus.OK).body("피드백 감사합니다.");
+
     }
 
 }

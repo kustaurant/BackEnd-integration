@@ -146,6 +146,8 @@ public class UserApiLoginService {
                 User user=userOptional.get();
                 user.setStatus("DELETED");
                 user.setUserNickname("(탈퇴한 회원)");
+                user.setAccessToken(null);
+                user.setRefreshToken(null);
                 user.setPhoneNumber(null);
                 user.setUserEmail(null);
                 userRepository.save(user);

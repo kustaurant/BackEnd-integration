@@ -34,10 +34,10 @@ public class FeedbackService {
         return "success";
     }
 
-    public String addApiFeedback(String feedbackBody, Integer UserId) {
+    public void addApiFeedback(String feedbackBody, Integer UserId) {
         Optional<User> userOptional = userRepository.findByUserId(UserId);
         if (userOptional.isEmpty()) {
-            return "fail";
+            return;
         }
 
         Feedback newFeedback = new Feedback();
@@ -47,7 +47,6 @@ public class FeedbackService {
         newFeedback.setStatus("ACTIVE");
 
         feedbackRepository.save(newFeedback);
-        return "success";
     }
 
 }
