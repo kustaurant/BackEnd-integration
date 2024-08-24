@@ -36,13 +36,12 @@ import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -64,21 +63,20 @@ public class CommunityApiController {
 
     private final UserService userService;
 
-    //    User userApiService.findUserById(24); = customOAuth2UserService.getUser(principal.getName());
     // 커뮤니티 메인 화면
     @GetMapping("/posts")
-    @Operation(summary = "커뮤니티 메인화면의 글 리스트 불러오기", description = "게시판 종류와 페이지, 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다, 현재 인기순으로 설정했을 때는 좋아요가 3이상인 게시글만 반환됩니다.")
+    @Operation(summary = "커뮤니티 메인화면의 게시글 리스트 불러오기", description = "게시판 종류와 페이지, 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다, 현재 인기순으로 설정했을 때는 좋아요가 3이상인 게시글만 반환됩니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 리스트 반환 성공", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostDTO.class)))}),
-            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음", content = {@Content(mediaType = "application/json")}),
-            @ApiResponse(responseCode = "400", description = "파라미터 값이 유효하지 않음", content = {@Content(mediaType = "application/json")})
+            @ApiResponse(responseCode = "200", description = "게시글 리스트를 반환하는데 성공하였습니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostDTO.class)))}),
+            @ApiResponse(responseCode = "404", description = "요청한 조건의 게시글을 찾을 수 없습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "파라미터 값이 유효하지 않습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
 
     })
     public ResponseEntity<List<PostDTO>> community(
             @RequestParam(defaultValue = "all")
             @Parameter(example = "free", description = "게시판 종류입니다. (all:전체, free:자유게시판, column:칼럼게시판, suggestion:건의게시판)")
             String postCategory,
-            @Parameter(example = "0", description = "페이지입니다. 페이지는 0부터 시작하고, 게시글은 페이지 단위로 불러올 수 있습니다")
+            @Parameter(example = "0", description = "페이지입니다. 페이지는 0부터 시작하고, 게시글은 페이지 단위로 불러올 수 있습니다. 1페이지에 10개의 게시글이 담겨있습니다.")
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(defaultValue = "recent")
             @Parameter(example = "recent", description = "게시글의 정렬 방법입니다. (recent:최신순, popular:인기순)")
@@ -108,9 +106,9 @@ public class CommunityApiController {
     @Operation(summary = "게시글 상세 화면", description = "게시글 ID와 해당 게시물의 댓글의 정렬 방법을 입력받고 해당 게시글의 상세 정보를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 반환 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostDTO.class))}),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (유효하지 않은 게시글 ID)", content = @Content),
-            @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content),
-            @ApiResponse(responseCode = "500", description = "서버 오류", content = @Content)
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (유효하지 않은 게시글 ID)", content = @Content(mediaType = "apllication/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "apllication/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버에서 오류가 발생했습니다", content = @Content(mediaType = "apllication/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id", example = "69") Integer postId,
                                         @RequestParam(defaultValue = "recent")
@@ -118,7 +116,7 @@ public class CommunityApiController {
                                         String sort) {
         // 잘못된 요청을 처리 (예: 음수 ID)
         if (postId <= 0) {
-            throw new ParamException("잘못된 게시글 ID입니다.");
+            throw new IllegalArgumentException("잘못된 게시글 ID입니다.");
         }
 
         // 게시글 조회
@@ -132,7 +130,7 @@ public class CommunityApiController {
             // likeCount로 정렬 (인기순)
             postCommentList.sort(Comparator.comparing(PostComment::getLikeCount).reversed());
         } else {
-            throw new ParamException("sort 파라미터 값이 올바르지 않습니다.");
+            throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
         }
         // 조회수 증가
         postApiService.increaseVisitCount(post);
@@ -144,7 +142,30 @@ public class CommunityApiController {
         return ResponseEntity.ok(postDTO);
     }
 
+    @GetMapping("/ranking")
+    @Operation(summary = "커뮤니티 메인의 랭킹 탭에서 유저 랭킹 불러오기", description = "평가 수 기반의 유저 랭킹을 반환합니다. 분기순, 최신순으로 랭킹을 산정할 수 있습니다. 평가를 1개 이상 한 유저들은 모두 랭킹이 매겨집니다.")
+    @ApiResponse(responseCode = "200", description = "유저 랭킹을 반환하는데 성공하였습니다", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))})
+    @ApiResponse(responseCode = "404", description = "sort 파라미터 값이 잘못되었습니다", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    public List<UserDTO> ranking(@RequestParam @Parameter(description = "랭킹 산정 기준입니다. 분기순:quarterly, 최신순:cumulative", example = "cumulative") String sort) {
+        if ("cumulative".equals(sort)) {
+            // 누적 기준으로 유저 리스트 가져오기 (정렬된 상태)
+            List<User> userList = userRepository.findUsersWithEvaluationCountDescending();
+            // 유저의 평가수, 랭킹 첨부하기
+            return calculateRank(userList);
+        } else if ("quarterly".equals(sort)) {
+            // 현재 날짜를 기준으로 연도와 분기 계산
+            LocalDate now = LocalDate.now();
+            int currentYear = now.getYear();
+            int currentQuarter = getCurrentQuarter(now);
 
+            // 특정 분기의 평가 데이터를 기준으로 유저 리스트 가져오기
+            List<User> userList = userRepository.findUsersByEvaluationCountForQuarter(currentYear, currentQuarter);
+            // 분기별 순위 리스트 계산
+            return calculateRankForQuarter(userList, currentYear, currentQuarter);
+        } else {
+            throw new OptionalNotExistException("sort값이 잘못 입력되었습니다.");
+        }
+    }
     @DeleteMapping("/{postId}")
     @Transactional
     @Operation(summary = "게시글 삭제", description = "게시글 ID를 입력받고 해당 게시글을 삭제합니다. 삭제가 완료되면 204 상태 코드를 반환합니다.")
@@ -509,29 +530,7 @@ public class CommunityApiController {
         return ResponseEntity.ok("로그인이 성공적으로 되어있습니다.");
     }
 
-    @GetMapping("/ranking")
-    @Operation(summary = "커뮤니티-랭킹 탭에서 유저 랭킹 불러오기", description = "평가 수 기반의 유저 랭킹을 반환합니다. 분기순일 경우 sort 파라미터 값으로 quarterly, 누적순일 경우 cumulative를 설정하여 요청을 보냅니다.")
-    @ApiResponse(responseCode = "200", description = "유저 랭킹 반환 성공", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))})
-    public List<UserDTO> ranking(@RequestParam @Parameter(description = "랭킹 산정 기준입니다. 분기순:quarterly, 최신순:cumulative", example = "quarterly") String sort) {
-        if ("cumulative".equals(sort)) {
-            // 누적 기준으로 유저 리스트 가져오기
-            List<User> userList = userRepository.findUsersWithEvaluationCountDescending();
-            // 누적 순위 리스트 계산
-            return calculateRank(userList);
-        } else if ("quarterly".equals(sort)) {
-            // 현재 날짜를 기준으로 연도와 분기 계산
-            LocalDate now = LocalDate.now();
-            int currentYear = now.getYear();
-            int currentQuarter = getCurrentQuarter(now);
 
-            // 특정 분기의 평가 데이터를 기준으로 유저 리스트 가져오기
-            List<User> userList = userRepository.findUsersByEvaluationCountForQuarter(currentYear, currentQuarter);
-            // 분기별 순위 리스트 계산
-            return calculateRankForQuarter(userList, currentYear, currentQuarter);
-        } else {
-            throw new OptionalNotExistException("sort값이 잘못 입력되었습니다.");
-        }
-    }
 
     private int getCurrentQuarter(LocalDate date) {
         int month = date.getMonthValue();
