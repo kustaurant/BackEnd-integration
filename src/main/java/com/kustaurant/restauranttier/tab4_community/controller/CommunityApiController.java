@@ -206,10 +206,10 @@ public class CommunityApiController {
     @Transactional
     @Operation(summary = "게시글 삭제", description = "게시글 ID를 입력받고 해당 게시글을 삭제합니다. 삭제가 완료되면 204 상태 코드를 반환합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "삭제 완료", content = @Content),
-            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음 (삭제불가)", content = @Content),
-            @ApiResponse(responseCode = "403", description = "삭제 권한 없음", content = @Content),
-            @ApiResponse(responseCode = "500", description = "서버 오류로 인해 삭제 실패", content = @Content)
+            @ApiResponse(responseCode = "204", description = "해당 게시글 id의 게시글을 삭제 완료하였습니다.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "해당 게시글을 찾을 수 없음 (삭제불가)", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "해당 게시글을 삭제할 권한이 없습니다.", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 오류로 인해 삭제에 실패하였습니다.", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> postDelete(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
 
@@ -256,49 +256,39 @@ public class CommunityApiController {
     @Transactional
     @Operation(summary = "댓글 삭제", description = "댓글 ID를 입력받고 해당 댓글 및 대댓글을 삭제합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "delete success", content = @Content),
-            @ApiResponse(responseCode = "404", description = "comment not found", content = @Content)
+            @ApiResponse(responseCode = "204", description = "댓글 삭제에 성공하였습니다.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "해당 id의 댓글이 존재하지 않습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<Map<String, Object>> commentDelete(@PathVariable Integer commentId, @JwtToken Integer userId) {
+    public ResponseEntity<Map<String, Object>> commentDelete(@PathVariable Integer commentId, @JwtToken @Parameter(hidden = true) Integer userId) {
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
         postComment.setStatus("DELETED");
+
         List<PostComment> repliesList = postComment.getRepliesList();
-        int deletedCount = 1;
         // 해당 댓글에 대한 대댓글이 존재하면 삭제
         if (!repliesList.isEmpty()) {
             for (PostComment reply : repliesList) {
                 if (!reply.getStatus().equals("DELETED")) {
                     reply.setStatus("DELETED");
-                    deletedCount += 1;
                 }
 
             }
 
         }
-        // 응답에 삭제된 개수 포함
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("deletedCount", deletedCount);
-        response.put("message", "comment delete complete");
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.noContent().build();
     }
 
 
 
     // 게시글 좋아요 생성
     @PostMapping("/{postId}/likes")
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "게시글 좋아요", description = "게시글 ID를 입력받아 좋아요를 생성합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "like success", content = @Content),
-            @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
+            @ApiResponse(responseCode = "200", description = "게시글 좋아요 처리가 완료되었습니다", content = @Content),
+            @ApiResponse(responseCode = "404", description = "해당 id의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Map<String, Object>> postLikeCreate(@PathVariable String postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
-
         User user = userService.findUserById(userId);
-        ;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postApiService.likeCreateOrDelete(post, user);
         response.put("likeCount", post.getLikeUserList().size());

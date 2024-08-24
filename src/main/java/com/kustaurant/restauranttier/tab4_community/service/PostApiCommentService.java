@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab4_community.service;
 
 
+import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.tab4_community.DataNotFoundException;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
@@ -47,7 +48,7 @@ public class PostApiCommentService {
         if (postComment.isPresent()) {
             return postComment.get();
         } else {
-            throw new DataNotFoundException("PostComment not found");
+            throw new OptionalNotExistException("해당 id의 댓글이 존재하지 않습니다.");
         }
     }
 
