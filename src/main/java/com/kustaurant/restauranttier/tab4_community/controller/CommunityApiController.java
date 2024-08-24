@@ -5,10 +5,7 @@ import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.common.apiUser.JwtToken;
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
-import com.kustaurant.restauranttier.common.exception.exception.ParamException;
-import com.kustaurant.restauranttier.tab4_community.dto.LikeOrDislikeDTO;
-import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
-import com.kustaurant.restauranttier.tab4_community.dto.UserDTO;
+import com.kustaurant.restauranttier.tab4_community.dto.*;
 import com.kustaurant.restauranttier.tab4_community.entity.*;
 import com.kustaurant.restauranttier.tab4_community.etc.PostCategory;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
@@ -28,7 +25,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
@@ -39,15 +35,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequestMapping("/api/v1/community")
 @RestController
@@ -315,78 +308,74 @@ public class CommunityApiController {
 //        return ResponseEntity.ok(likeOrDislikeDTO);
 //    }
 
-    // 게시글 스크랩 (구현완료)
+    // 게시글 스크랩
     @PostMapping("/{postId}/scraps")
-    @Operation(summary = "게시글 스크랩 ", description = "게시글 ID를 입력받아 스크랩을 생성합니다.")
+    @Operation(summary = "게시글 스크랩 ", description = "게시글 ID를 입력받아 스크랩을 생성하거나 해제합니다. \n\n상태와 현재 게시글의 스크랩 수를 반환합니다. \n\n처음 스크랩을 누르면 스크랩이 처리되고 status 값으로 scrapCreated 가 반환되고, 스크랩이 이미 클릭된 상태였으면 해제되면서 status 값으로 scrapDeleted 가 반환됩니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "scrap success", content = @Content),
-            @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
+            @ApiResponse(responseCode = "200", description = "게시글 스크랩 처리가 완료되었습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ScrapToggleDTO.class))),
+            @ApiResponse(responseCode = "404", description = "해당 id의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<Map<String, Object>> postScrap(@PathVariable String postId, Model model, @JwtToken @Parameter(hidden = true) Integer userId) {
+    public ResponseEntity<ScrapToggleDTO> postScrap(@PathVariable String postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
-
         User user = userService.findUserById(userId);
         Post post = postApiService.getPost(postidInt);
-        Map<String, Object> response = postScrapApiService.scrapCreateOrDelete(post, user);
-        return ResponseEntity.ok(response);
+        String  response = postScrapApiService.scrapCreateOrDelete(post, user);
+        ScrapToggleDTO scrapToggleDTO= new ScrapToggleDTO(post.getPostScrapList().size(), response);
+        return ResponseEntity.ok(scrapToggleDTO);
     }
 
     // 게시글 검색 화면
-    @GetMapping("/search")
-    @Operation(summary = "게시글 검색", description = "검색어를 입력받아 게시글 리스트를 반환합니다.")
+//    @GetMapping("/search")
+//    @Operation(summary = "키워드로 게시글을 검색합니다.", description = "게시판 종류와 페이지, 정렬 방법을 입력받고 해당 검색 조건에 맞는 게시글 리스트가 반환됩니다, 현재 인기순으로 설정했을 때는 좋아요가 3이상인 게시글만 반환됩니다.")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "게시글 리스트를 반환하는데 성공하였습니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostDTO.class)))}),
+//            @ApiResponse(responseCode = "404", description = "요청한 조건의 게시글을 찾을 수 없습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+//            @ApiResponse(responseCode = "400", description = "파라미터 값이 유효하지 않습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+//
+//    })
+//    public ResponseEntity<List<PostDTO>> search(
+//            @RequestParam(value = "page", defaultValue = "0") int page,
+//            @RequestParam(value = "kw", defaultValue = "") String kw,
+//            @RequestParam(defaultValue = "recent") String sort,
+//            @RequestParam(defaultValue = "전체") String postCategory) {
+//
+//        Page<PostDTO> paging = this.postApiService.getList(page, sort, kw, postCategory);
+//
+//
+//        return ResponseEntity.ok(paging.getContent());
+//    }
+// 댓글 좋아요/싫어요 처리
+    @PostMapping("/comments/{commentId}/{action}")
+    @Operation(summary = "댓글 좋아요/싫어요", description = "댓글 ID를 입력받아 댓글에 대한 좋아요 또는 싫어요를 토글합니다. \n\n 댓글에 대한 유저의 현재 상태를 나타내는 commentLikeStatus와 좋아요, 싫어요 개수를 반환합니다. \n\n commentLikeStatus는 1 (좋아요), -1 (싫어요), 0 (아무것도 아님) 값으로 분류됩니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "search success", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostDTO.class)))}),
-            @ApiResponse(responseCode = "404", description = "no posts found", content = @Content)
+            @ApiResponse(responseCode = "200", description = "처리가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentLikeDislikeDTO.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID의 댓글을 찾을 수 없습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<List<PostDTO>> search(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "kw", defaultValue = "") String kw,
-            @RequestParam(defaultValue = "recent") String sort,
-            @RequestParam(defaultValue = "전체") String postCategory) {
-
-        Page<PostDTO> paging = this.postApiService.getList(page, sort, kw, postCategory);
-
-
-        return ResponseEntity.ok(paging.getContent());
-    }
-
-    // 게시글 댓글 좋아요
-    @PostMapping("/comments/{commentId}/likes")
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @Operation(summary = "댓글 좋아요", description = "댓글 ID를 입력받아 좋아요를 생성합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "like success", content = @Content),
-            @ApiResponse(responseCode = "404", description = "comment not found", content = @Content)
-    })
-    public ResponseEntity<Map<String, Object>> likeComment(@PathVariable String commentId, @JwtToken @Parameter(hidden = true) Integer userId) {
-        Integer commentIdInt = Integer.valueOf(commentId);
-        PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
+    public ResponseEntity<CommentLikeDislikeDTO> toggleCommentLikeOrDislike(@PathVariable Integer commentId,
+                                                                            @PathVariable @Parameter(description = "좋아요는 likes, 싫어요는 dislikes로 값을 설정합니다.") String action,
+                                                                            @JwtToken @Parameter(hidden = true) Integer userId) {
+        PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
 
         User user = userService.findUserById(userId);
-        ;
-        Map<String, Object> response = postApiCommentService.likeCreateOrDelete(postComment, user);
-        response.put("totalLikeCount", postComment.getLikeCount());
-        return ResponseEntity.ok(response);
+
+        int commentLikeStatus;
+        if ("likes".equals(action)) {
+            commentLikeStatus = postApiCommentService.likeCreateOrDelete(postComment, user);
+        } else if ("dislikes".equals(action)) {
+            commentLikeStatus = postApiCommentService.dislikeCreateOrDelete(postComment, user);
+        } else {
+            throw new IllegalArgumentException("action 값이 유효하지 않습니다.");
+        }
+
+        CommentLikeDislikeDTO responseDTO = new CommentLikeDislikeDTO(
+                postComment.getLikeCount(),
+                postComment.getDislikeUserList().size(),
+                commentLikeStatus
+        );
+
+        return ResponseEntity.ok(responseDTO);
     }
 
-    // 게시글 댓글 싫어요
-    @PostMapping("/comments/{commentId}/dislikes")
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @Operation(summary = "댓글 싫어요", description = "댓글 ID를 입력받아 싫어요를 생성합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "dislike success", content = @Content),
-            @ApiResponse(responseCode = "404", description = "comment not found", content = @Content)
-    })
-    public ResponseEntity<Map<String, Object>> dislikeComment(@PathVariable String commentId, @JwtToken @Parameter(hidden = true) Integer userId) {
-        Integer commentIdInt = Integer.valueOf(commentId);
-        PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentIdInt);
-
-        User user = userService.findUserById(userId);
-        ;
-        Map<String, Object> response = postApiCommentService.dislikeCreateOrDelete(postComment, user);
-        response.put("totalLikeCount", postComment.getLikeCount());
-        return ResponseEntity.ok(response);
-    }
 
     // 게시글 생성
     @PostMapping("/posts")
@@ -508,15 +497,15 @@ public class CommunityApiController {
 //        }
 //    }
 
-    // 댓글 입력창 포커스시 로그인 상태 확인
-    @GetMapping("/login/comment-write")
-    @Operation(summary = "댓글 작성 로그인 확인 (미구현)", description = "댓글 입력창 포커스시 로그인 상태를 확인합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "로그인 확인 성공", content = @Content)
-    })
-    public ResponseEntity<String> commentWriteLogin(@JwtToken Integer userId) {
-        return ResponseEntity.ok("로그인이 성공적으로 되어있습니다.");
-    }
+//    // 댓글 입력창 포커스시 로그인 상태 확인
+//    @GetMapping("/login/comment-write")
+//    @Operation(summary = "댓글 작성 로그인 확인 (미구현)", description = "댓글 입력창 포커스시 로그인 상태를 확인합니다.")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "로그인 확인 성공", content = @Content)
+//    })
+//    public ResponseEntity<String> commentWriteLogin(@JwtToken Integer userId) {
+//        return ResponseEntity.ok("로그인이 성공적으로 되어있습니다.");
+//    }
 
 
 

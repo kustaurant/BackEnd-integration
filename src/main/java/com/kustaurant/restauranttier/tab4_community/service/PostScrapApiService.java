@@ -22,29 +22,29 @@ public class PostScrapApiService {
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostApiRepository postApiRepository;
     private final UserRepository userRepository;
-    public Map<String, Object> scrapCreateOrDelete(Post post, User user){
+    public String scrapCreateOrDelete(Post post, User user){
         List<PostScrap> postScrapList =post.getPostScrapList();
         List<PostScrap> userScrapList =user.getScrapList();
         Optional<PostScrap> scrapOptional = postScrapApiRepository.findByUserAndPost(user,post);
-        Map<String, Object> status = new HashMap<>();
+        String response;
         if(scrapOptional.isPresent()){
             PostScrap scrap = scrapOptional.get();
             postScrapApiRepository.delete(scrap);
             postScrapList.remove(scrap);
             userScrapList.remove(scrap);
-            status.put("scrapDelete",true);
+            response = "scrapDeleted";
         }
         else{
             PostScrap scrap = new PostScrap(user,post, LocalDateTime.now());
             PostScrap savedScrap= postScrapApiRepository.save(scrap);
             userScrapList.add(savedScrap);
             postScrapList.add(savedScrap);
-            status.put("scrapCreated",true);
+            response = "scrapCreated";
 
         }
         postApiRepository.save(post);
         userRepository.save(user);
-        return status;
+        return response;
     }
 
 }

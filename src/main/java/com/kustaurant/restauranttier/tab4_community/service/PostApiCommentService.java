@@ -2,7 +2,6 @@ package com.kustaurant.restauranttier.tab4_community.service;
 
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
-import com.kustaurant.restauranttier.tab4_community.DataNotFoundException;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
@@ -52,95 +51,82 @@ public class PostApiCommentService {
         }
     }
 
-//    // 작성 시간 반환
-//    public List<String> getCreatedAtList(List<PostComment> postCommentList) {
-//        // Comment의 createdAt을 문자열로 변환하여 저장할 리스트
-//        List<String> commentCreatedAtList = postCommentList.stream()
-//                .map(comment -> formatDateTime(comment.getCreatedAt()))
-//                .collect(Collectors.toList());
-//        return commentCreatedAtList;
-//    }
-//
-//    // datetime 타입의 시간을 특정 형식으로 formatting하는 함수
-//    private String formatDateTime(LocalDateTime dateTime) {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        return dateTime.format(formatter);
-//    }
 
-    // 댓글 좋아요 (세가지 경우)
-    public Map<String, Object> likeCreateOrDelete(PostComment postcomment, User user) {
-        List<User> likeUserList = postcomment.getLikeUserList();
-        List<User> dislikeUserList = postcomment.getDislikeUserList();
+
+    // 댓글 좋아요 (세 가지 경우)
+    public int likeCreateOrDelete(PostComment postComment, User user) {
+        List<User> likeUserList = postComment.getLikeUserList();
+        List<User> dislikeUserList = postComment.getDislikeUserList();
         List<PostComment> likePostCommentList = user.getLikePostCommentList();
         List<PostComment> dislikePostCommentList = user.getDislikePostCommentList();
-        Map<String, Object> status = new HashMap<>();
-        //해당 postcomment를 like 한 경우 - 제거
+        int commentLikeStatus;
+
+        // 해당 postComment를 like 한 경우 - 제거
         if (likeUserList.contains(user)) {
-            postcomment.setLikeCount(postcomment.getLikeCount() - 1);
-            likePostCommentList.remove(postcomment);
+            postComment.setLikeCount(postComment.getLikeCount() - 1);
+            likePostCommentList.remove(postComment);
             likeUserList.remove(user);
-            status.put("likeDelete", true);
+            commentLikeStatus = 0; // 아무것도 누르지 않은 상태로 변경
         }
-        //해당 postcomment를 이미 dislike 한 경우 - 제거하고  like 추가
+        // 해당 postComment를 이미 dislike 한 경우 - 제거하고 like 추가
         else if (dislikeUserList.contains(user)) {
-            postcomment.setLikeCount(postcomment.getLikeCount() + 2);
+            postComment.setLikeCount(postComment.getLikeCount() + 2);
             dislikeUserList.remove(user);
-            dislikePostCommentList.remove(postcomment);
+            dislikePostCommentList.remove(postComment);
             likeUserList.add(user);
-            likePostCommentList.add(postcomment);
-            status.put("changeToLike", true);
-
+            likePostCommentList.add(postComment);
+            commentLikeStatus = 1; // 좋아요 상태로 변경
         }
-        // 처음 dislike 하는 경우-추가
+        // 처음 like 하는 경우 - 추가
         else {
-            postcomment.setLikeCount(postcomment.getLikeCount() + 1);
+            postComment.setLikeCount(postComment.getLikeCount() + 1);
             likeUserList.add(user);
-            likePostCommentList.add(postcomment);
-            status.put("likeCreated", true);
-
+            likePostCommentList.add(postComment);
+            commentLikeStatus = 1; // 좋아요 상태로 변경
         }
-        postCommentApiRepository.save(postcomment);
+
+        postCommentApiRepository.save(postComment);
         userRepository.save(user);
-        return status;
+
+        return commentLikeStatus;
     }
 
-    // 댓글 싫어요 (세가지 경우)
-    public Map<String, Object> dislikeCreateOrDelete(PostComment postcomment, User user) {
-        List<User> likeUserList = postcomment.getLikeUserList();
-        List<User> dislikeUserList = postcomment.getDislikeUserList();
+    // 댓글 싫어요 (세 가지 경우)
+    public int dislikeCreateOrDelete(PostComment postComment, User user) {
+        List<User> likeUserList = postComment.getLikeUserList();
+        List<User> dislikeUserList = postComment.getDislikeUserList();
         List<PostComment> likePostCommentList = user.getLikePostCommentList();
         List<PostComment> dislikePostCommentList = user.getDislikePostCommentList();
-        Map<String, Object> status = new HashMap<>();
+        int commentLikeStatus;
 
-        //해당 post를 이미 dislike 한 경우 - 제거
+        // 해당 postComment를 dislike 한 경우 - 제거
         if (dislikeUserList.contains(user)) {
-            postcomment.setLikeCount(postcomment.getLikeCount() + 1);
-
-            dislikePostCommentList.remove(postcomment);
+            postComment.setLikeCount(postComment.getLikeCount() + 1); // 싫어요를 제거하므로 좋아요 수 증가
+            dislikePostCommentList.remove(postComment);
             dislikeUserList.remove(user);
-            status.put("dislikeDelete", true);
+            commentLikeStatus = 0; // 아무것도 누르지 않은 상태로 변경
         }
-        //해당 post를 이미 like 한 경우 - 제거하고 추가
+        // 해당 postComment를 이미 like 한 경우 - 제거하고 dislike 추가
         else if (likeUserList.contains(user)) {
-            postcomment.setLikeCount(postcomment.getLikeCount() - 2);
-
+            postComment.setLikeCount(postComment.getLikeCount() - 2);
             likeUserList.remove(user);
-            likePostCommentList.remove(postcomment);
+            likePostCommentList.remove(postComment);
             dislikeUserList.add(user);
-            dislikePostCommentList.add(postcomment);
-            status.put("changeToDislike", true);
+            dislikePostCommentList.add(postComment);
+            commentLikeStatus = -1; // 싫어요 상태로 변경
         }
-        // 처음 dislike 하는 경우-추가
+        // 처음 dislike 하는 경우 - 추가
         else {
-            postcomment.setLikeCount(postcomment.getLikeCount() - 1);
-
+            postComment.setLikeCount(postComment.getLikeCount() - 1);
             dislikeUserList.add(user);
-            dislikePostCommentList.add(postcomment);
-            status.put("dislikeCreated", true);
+            dislikePostCommentList.add(postComment);
+            commentLikeStatus = -1; // 싫어요 상태로 변경
         }
-        postCommentApiRepository.save(postcomment);
+
+        postCommentApiRepository.save(postComment);
         userRepository.save(user);
-        return status;
+
+        return commentLikeStatus;
     }
 
 
