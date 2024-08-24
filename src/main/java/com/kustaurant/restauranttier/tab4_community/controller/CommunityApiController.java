@@ -282,41 +282,38 @@ public class CommunityApiController {
 
     // 게시글 좋아요 생성
     @PostMapping("/{postId}/likes")
-    @Operation(summary = "게시글 좋아요", description = "게시글 ID를 입력받아 좋아요를 생성합니다.")
+    @Operation(summary = "게시글 좋아요 토글 버튼", description = "게시글 ID를 입력받아 좋아요를 생성하거나 해제합니다. \n\n상태와 현재 게시글의 좋아요수를 반환합니다. \n\n처음 좋아요를 누르면 좋아요가 처리되고 status 값으로 likeCreated 가 반환되고, 좋아요가 이미 클릭된 상태였으면 해제되면서 status 값으로 likeDeleted 가 반환됩니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 좋아요 처리가 완료되었습니다", content = @Content),
+            @ApiResponse(responseCode = "200", description = "게시글 좋아요 처리가 완료되었습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = LikeOrDislikeDTO.class))),
             @ApiResponse(responseCode = "404", description = "해당 id의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(@PathVariable String postId, @JwtToken @Parameter(hidden = true) Integer userId) {
+    public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         Integer postidInt = Integer.valueOf(postId);
         User user = userService.findUserById(userId);
         Post post = postApiService.getPost(postidInt);
         String status = postApiService.likeCreateOrDelete(post, user);
         // 응답 맵 구성
-        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(post.getLikeUserList().size(),post.getDislikeUserList().size(),status);
-
+        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(post.getLikeUserList().size(),status);
 
         return ResponseEntity.ok(likeOrDislikeDTO);
     }
-
-    // 게시글 싫어요 생성
-    @PostMapping("/{postId}/dislikes")
-    @Operation(summary = "게시글 싫어요", description = "게시글 ID를 입력받아 싫어요를 생성합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "dislike success", content = @Content),
-            @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
-    })
-    public ResponseEntity<Map<String, Object>> postDislikeCreate(@PathVariable String postId, @JwtToken @Parameter(hidden = true) Integer userId) {
-        Integer postidInt = Integer.valueOf(postId);
-
-        User user = userService.findUserById(userId);
-        ;
-        Post post = postApiService.getPost(postidInt);
-        Map<String, Object> response = postApiService.dislikeCreateOrDelete(post, user);
-        response.put("dislikeCount", post.getDislikeUserList().size());
-        response.put("likeCount", post.getLikeUserList().size());
-        return ResponseEntity.ok(response);
-    }
+//
+//    // 게시글 싫어요 생성
+//    @PostMapping("/{postId}/dislikes")
+//    @Operation(summary = "게시글 싫어요", description = "게시글 ID를 입력받아 싫어요를 생성합니다.")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "게시글 싫어요 처리가 완료되었습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = LikeOrDislikeDTO.class))),
+//            @ApiResponse(responseCode = "404", description = "해당 id의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+//    })
+//    public ResponseEntity<LikeOrDislikeDTO> postDislikeCreate(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
+//        Integer postidInt = Integer.valueOf(postId);
+//        User user = userService.findUserById(userId);
+//        Post post = postApiService.getPost(postidInt);
+//        String status = postApiService.dislikeCreateOrDelete(post, user);
+//        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(post.getLikeUserList().size(), post.getDislikeUserList().size(), status);
+//
+//        return ResponseEntity.ok(likeOrDislikeDTO);
+//    }
 
     // 게시글 스크랩 (구현완료)
     @PostMapping("/{postId}/scraps")
@@ -329,7 +326,6 @@ public class CommunityApiController {
         Integer postidInt = Integer.valueOf(postId);
 
         User user = userService.findUserById(userId);
-        ;
         Post post = postApiService.getPost(postidInt);
         Map<String, Object> response = postScrapApiService.scrapCreateOrDelete(post, user);
         return ResponseEntity.ok(response);

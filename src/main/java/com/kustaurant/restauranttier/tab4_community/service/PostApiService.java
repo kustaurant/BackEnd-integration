@@ -166,18 +166,18 @@ public class PostApiService {
     }
 
     // 게시글 싫어요
-    public Map<String, Object> dislikeCreateOrDelete(Post post, User user) {
+    public String dislikeCreateOrDelete(Post post, User user) {
         List<User> likeUserList = post.getLikeUserList();
         List<User> dislikeUserList = post.getDislikeUserList();
         List<Post> likePostList = user.getLikePostList();
         List<Post> dislikePostList = user.getDislikePostList();
-        Map<String, Object> status = new HashMap<>();
+        String response;
         //해당 post를 이미 dislike 한 경우 - 제거
         if (dislikeUserList.contains(user)) {
             post.setLikeCount(post.getLikeCount() + 1);
             dislikePostList.remove(post);
             dislikeUserList.remove(user);
-            status.put("dislikeDelete", true);
+            response= "dislikeDeleted";
         }
         //해당 post를 이미 like 한 경우 - 제거하고 추가
         else if (likeUserList.contains(user)) {
@@ -187,18 +187,18 @@ public class PostApiService {
             likePostList.remove(post);
             dislikeUserList.add(user);
             dislikePostList.add(post);
-            status.put("dislikeChanged", true);
+            response = "dislikeConvertedFromLike";
         }
         // 처음 dislike 하는 경우-추가
         else {
             post.setLikeCount(post.getLikeCount() - 1);
             dislikeUserList.add(user);
             dislikePostList.add(post);
-            status.put("dislikeCreated", true);
+            response = "dislikeCreated";
         }
         postApiRepository.save(post);
         userRepository.save(user);
-        return status;
+        return response;
     }
 
 
