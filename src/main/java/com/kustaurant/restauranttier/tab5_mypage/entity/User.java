@@ -133,11 +133,11 @@ public class User {
 
     public String getRankImg() {
         if (this.evaluationList.size() >= 30) {
-            return "/img/ranking/왕관_평가30개이상.png";
+            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level3icon.png";
         } else if (this.evaluationList.size() >= 10) {
-            return "/img/ranking/소_평가10개이상.png";
+            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level2icon.png";
         } else {
-            return "/img/ranking/소_평가10개미만.png";
+            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level1icon.png";
         }
     }
 }

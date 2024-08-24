@@ -3,6 +3,7 @@ package com.kustaurant.restauranttier.tab4_community.controller;
 
 import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.common.apiUser.JwtToken;
+import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
@@ -34,10 +35,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.ui.Model;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -76,7 +77,7 @@ public class CommunityApiController {
             @RequestParam(defaultValue = "all")
             @Parameter(example = "free", description = "게시판 종류입니다. (all:전체, free:자유게시판, column:칼럼게시판, suggestion:건의게시판)")
             String postCategory,
-            @Parameter(example = "0", description = "페이지입니다. 페이지는 0부터 시작하고, 게시글은 페이지 단위로 불러올 수 있습니다. 1페이지에 10개의 게시글이 담겨있습니다.")
+            @Parameter(example = "0", description = "게시글은 페이지 단위로 불러올 수 있고, 한 페이지에 10개의 게시글이 담겨있습니다. 페이지 인덱스는 0부터 시작합니다.")
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(defaultValue = "recent")
             @Parameter(example = "recent", description = "게시글의 정렬 방법입니다. (recent:최신순, popular:인기순)")
@@ -166,6 +167,41 @@ public class CommunityApiController {
             throw new OptionalNotExistException("sort값이 잘못 입력되었습니다.");
         }
     }
+    // 댓글 or 대댓글 생성
+    @PostMapping("/comments")
+    @Operation(summary = "댓글 생성, 대댓글 생성", description = "게시글 ID와 내용을 입력받아 댓글을 생성합니다. 대댓글의 경우 부모 댓글의 id를 파라미터로 받아야 합니다. 생성한 댓글을 반환합니다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "댓글 혹은 대댓글 생성이 완료되었습니다", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostCommentDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = com.kustaurant.restauranttier.common.exception.ErrorResponse.class)))
+    })
+    public ResponseEntity<PostCommentDTO> postCommentCreate(
+            @RequestParam(name = "content", defaultValue = "") String content,
+            @RequestParam(name = "postId") String postId,
+            @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
+            @JwtToken @Parameter(hidden = true) Integer userId) {
+        Integer postIdInt = Integer.valueOf(postId);
+
+        User user = userService.findUserById(userId);
+        Post post = postApiService.getPost(postIdInt);
+        PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), post, user);
+        PostComment savedPostComment = postCommentApiRepository.save(postComment);
+
+        // 대댓글이면 부모 관계 매핑하기
+        if (!parentCommentId.isEmpty()) {
+            PostComment parentComment = postApiCommentService.getPostCommentByCommentId(Integer.valueOf(parentCommentId));
+            savedPostComment.setParentComment(parentComment);
+            parentComment.getRepliesList().add(savedPostComment);
+            postApiCommentService.replyCreate(user, savedPostComment);
+            postCommentApiRepository.save(parentComment);
+        }
+        // 댓글이면 post와 연결하면서 저장
+        else {
+            postApiCommentService.create(post, user, savedPostComment);
+        }
+        postCommentApiRepository.save(savedPostComment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(PostCommentDTO.fromEntity(savedPostComment));
+    }
+
     @DeleteMapping("/{postId}")
     @Transactional
     @Operation(summary = "게시글 삭제", description = "게시글 ID를 입력받고 해당 게시글을 삭제합니다. 삭제가 완료되면 204 상태 코드를 반환합니다.")
@@ -248,41 +284,7 @@ public class CommunityApiController {
         return ResponseEntity.ok(response);
     }
 
-    // 댓글 or 대댓글 생성
-    @PostMapping("/comments")
-    @Operation(summary = "댓글 생성, 대댓글 생성", description = "게시글 ID와 내용을 입력받아 댓글을 생성합니다. 대댓글의 경우 부모 댓글의 id를 파라미터로 받아야 합니다. 생성한 댓글을 반환합니다")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "댓글 생성 완료", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostCommentDTO.class))}),
-            @ApiResponse(responseCode = "404", description = "오류 발생", content = @Content)
-    })
-    public ResponseEntity<PostCommentDTO> postCommentCreate(
-            @RequestParam(name = "content", defaultValue = "") String content,
-            @RequestParam(name = "postId") String postId,
-            @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
-            @JwtToken @Parameter(hidden = true) Integer userId) {
-        Integer postIdInt = Integer.valueOf(postId);
 
-        User user = userService.findUserById(userId);
-        ;
-        Post post = postApiService.getPost(postIdInt);
-        PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), post, user);
-        PostComment savedPostComment = postCommentApiRepository.save(postComment);
-
-        // 대댓글이면 부모 관계 매핑하기
-        if (!parentCommentId.isEmpty()) {
-            PostComment parentComment = postApiCommentService.getPostCommentByCommentId(Integer.valueOf(parentCommentId));
-            savedPostComment.setParentComment(parentComment);
-            parentComment.getRepliesList().add(savedPostComment);
-            postApiCommentService.replyCreate(user, savedPostComment);
-            postCommentApiRepository.save(parentComment);
-        }
-        // 댓글이면 post와 연결하면서 저장
-        else {
-            postApiCommentService.create(post, user, savedPostComment);
-        }
-        postCommentApiRepository.save(savedPostComment);
-        return ResponseEntity.ok(PostCommentDTO.fromEntity(savedPostComment));
-    }
 
     // 게시글 좋아요 생성
     @PostMapping("/{postId}/likes")
@@ -307,7 +309,6 @@ public class CommunityApiController {
 
     // 게시글 싫어요 생성
     @PostMapping("/{postId}/dislikes")
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "게시글 싫어요", description = "게시글 ID를 입력받아 싫어요를 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "dislike success", content = @Content),
@@ -327,7 +328,6 @@ public class CommunityApiController {
 
     // 게시글 스크랩 (구현완료)
     @PostMapping("/{postId}/scraps")
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @Operation(summary = "게시글 스크랩 ", description = "게시글 ID를 입력받아 스크랩을 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "scrap success", content = @Content),
@@ -554,7 +554,6 @@ public class CommunityApiController {
         for (User user : userList) {
             int evaluationCount = user.getEvaluationList().size();
             UserDTO userDTO = UserDTO.fromEntity(user); // 필요한 정보를 UserDTO에 담음
-            userDTO.setEvaluationCount(evaluationCount); // 누적된 평가 수를 설정
 
             if (evaluationCount < prevCount) {
                 i += countSame;
