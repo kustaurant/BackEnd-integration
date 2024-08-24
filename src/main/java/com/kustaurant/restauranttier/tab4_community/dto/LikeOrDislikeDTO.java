@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class LikeOrDislikeDTO {
 
-    public LikeOrDislikeDTO(Integer likeCount, String status) {
+    public LikeOrDislikeDTO(Integer likeCount, Integer status) {
         this.likeCount = likeCount;
         this.status = status;
     }
@@ -16,6 +16,6 @@ public class LikeOrDislikeDTO {
     @Schema(description = "좋아요 수", example = "10")
     Integer likeCount;
 
-    @Schema(description = "상태", example = "likeCreated")
-    String status;
+    @Schema(description = "상태", example = "1")
+    Integer status;
 }

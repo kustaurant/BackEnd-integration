@@ -22,29 +22,30 @@ public class PostScrapApiService {
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostApiRepository postApiRepository;
     private final UserRepository userRepository;
-    public String scrapCreateOrDelete(Post post, User user){
-        List<PostScrap> postScrapList =post.getPostScrapList();
-        List<PostScrap> userScrapList =user.getScrapList();
-        Optional<PostScrap> scrapOptional = postScrapApiRepository.findByUserAndPost(user,post);
-        String response;
-        if(scrapOptional.isPresent()){
+    public int scrapCreateOrDelete(Post post, User user) {
+        List<PostScrap> postScrapList = post.getPostScrapList();
+        List<PostScrap> userScrapList = user.getScrapList();
+        Optional<PostScrap> scrapOptional = postScrapApiRepository.findByUserAndPost(user, post);
+        int status;
+
+        if (scrapOptional.isPresent()) {
             PostScrap scrap = scrapOptional.get();
             postScrapApiRepository.delete(scrap);
             postScrapList.remove(scrap);
             userScrapList.remove(scrap);
-            response = "scrapDeleted";
-        }
-        else{
-            PostScrap scrap = new PostScrap(user,post, LocalDateTime.now());
-            PostScrap savedScrap= postScrapApiRepository.save(scrap);
+            status = 0; // scrapDeleted
+        } else {
+            PostScrap scrap = new PostScrap(user, post, LocalDateTime.now());
+            PostScrap savedScrap = postScrapApiRepository.save(scrap);
             userScrapList.add(savedScrap);
             postScrapList.add(savedScrap);
-            response = "scrapCreated";
-
+            status = 1; // scrapCreated
         }
+
         postApiRepository.save(post);
         userRepository.save(user);
-        return response;
+        return status;
     }
+
 
 }

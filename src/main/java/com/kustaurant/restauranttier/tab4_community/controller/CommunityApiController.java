@@ -273,23 +273,7 @@ public class CommunityApiController {
 
 
 
-    // 게시글 좋아요 생성
-    @PostMapping("/{postId}/likes")
-    @Operation(summary = "게시글 좋아요 토글 버튼", description = "게시글 ID를 입력받아 좋아요를 생성하거나 해제합니다. \n\n상태와 현재 게시글의 좋아요수를 반환합니다. \n\n처음 좋아요를 누르면 좋아요가 처리되고 status 값으로 likeCreated 가 반환되고, 좋아요가 이미 클릭된 상태였으면 해제되면서 status 값으로 likeDeleted 가 반환됩니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 좋아요 처리가 완료되었습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = LikeOrDislikeDTO.class))),
-            @ApiResponse(responseCode = "404", description = "해당 id의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
-        Integer postidInt = Integer.valueOf(postId);
-        User user = userService.findUserById(userId);
-        Post post = postApiService.getPost(postidInt);
-        String status = postApiService.likeCreateOrDelete(post, user);
-        // 응답 맵 구성
-        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(post.getLikeUserList().size(),status);
 
-        return ResponseEntity.ok(likeOrDislikeDTO);
-    }
 //
 //    // 게시글 싫어요 생성
 //    @PostMapping("/{postId}/dislikes")
@@ -310,18 +294,32 @@ public class CommunityApiController {
 
     // 게시글 스크랩
     @PostMapping("/{postId}/scraps")
-    @Operation(summary = "게시글 스크랩 ", description = "게시글 ID를 입력받아 스크랩을 생성하거나 해제합니다. \n\n상태와 현재 게시글의 스크랩 수를 반환합니다. \n\n처음 스크랩을 누르면 스크랩이 처리되고 status 값으로 scrapCreated 가 반환되고, 스크랩이 이미 클릭된 상태였으면 해제되면서 status 값으로 scrapDeleted 가 반환됩니다.")
+    @Operation(summary = "게시글 스크랩", description = "게시글 ID를 입력받아 스크랩을 생성하거나 해제합니다. \n\nstatus와 현재 게시글의 스크랩 수를 반환합니다. \n\n처음 스크랩을 누르면 스크랩이 처리되고 status 값으로 1이 반환되며, 이미 스크랩된 상태였으면 해제되면서 status 값으로 0이 반환됩니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 스크랩 처리가 완료되었습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ScrapToggleDTO.class))),
-            @ApiResponse(responseCode = "404", description = "해당 id의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "게시글 스크랩 처리가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ScrapToggleDTO.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<ScrapToggleDTO> postScrap(@PathVariable String postId, @JwtToken @Parameter(hidden = true) Integer userId) {
-        Integer postidInt = Integer.valueOf(postId);
+    public ResponseEntity<ScrapToggleDTO> postScrap(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         User user = userService.findUserById(userId);
-        Post post = postApiService.getPost(postidInt);
-        String  response = postScrapApiService.scrapCreateOrDelete(post, user);
-        ScrapToggleDTO scrapToggleDTO= new ScrapToggleDTO(post.getPostScrapList().size(), response);
+        Post post = postApiService.getPost(postId);
+        int status = postScrapApiService.scrapCreateOrDelete(post, user); // 1 또는 0 반환
+        ScrapToggleDTO scrapToggleDTO = new ScrapToggleDTO(post.getPostScrapList().size(), status);
         return ResponseEntity.ok(scrapToggleDTO);
+    }
+
+    // 게시글 좋아요 생성
+    @PostMapping("/{postId}/likes")
+    @Operation(summary = "게시글 좋아요 토글 버튼", description = "게시글 ID를 입력받아 좋아요를 생성하거나 해제합니다. \n\nstatus와 현재 게시글의 좋아요 수를 반환합니다. \n\n처음 좋아요를 누르면 좋아요가 처리되고 status 값으로 1이 반환되며, 이미 좋아요된 상태였으면 해제되면서 status 값으로 0이 반환됩니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 좋아요 처리가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LikeOrDislikeDTO.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
+        User user = userService.findUserById(userId);
+        Post post = postApiService.getPost(postId);
+        int status = postApiService.likeCreateOrDelete(post, user); // 1 또는 0 반환
+        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(post.getLikeUserList().size(), status);
+        return ResponseEntity.ok(likeOrDislikeDTO);
     }
 
     // 게시글 검색 화면
@@ -352,7 +350,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "404", description = "해당 ID의 댓글을 찾을 수 없습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<CommentLikeDislikeDTO> toggleCommentLikeOrDislike(@PathVariable Integer commentId,
-                                                                            @PathVariable @Parameter(description = "좋아요는 likes, 싫어요는 dislikes로 값을 설정합니다.") String action,
+                                                                            @PathVariable @Parameter(description = "좋아요는 likes, 싫어요는 dislikes로 값을 설정합니다.", example = "likes") String action,
                                                                             @JwtToken @Parameter(hidden = true) Integer userId) {
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
 

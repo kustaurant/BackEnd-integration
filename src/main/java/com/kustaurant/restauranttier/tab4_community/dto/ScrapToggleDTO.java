@@ -9,7 +9,7 @@ import lombok.Setter;
 public class ScrapToggleDTO
 
 {
-    public ScrapToggleDTO(Integer scrapCount, String status) {
+    public ScrapToggleDTO(Integer scrapCount, Integer status) {
         this.scrapCount = scrapCount;
         this.status = status;
     }
@@ -17,6 +17,6 @@ public class ScrapToggleDTO
     @Schema(description = "스크랩 수", example = "10")
     Integer scrapCount;
 
-    @Schema(description = "상태", example = "scrapCreated")
-    String status;
+    @Schema(description = "현재 상태", example = "1")
+    Integer status;
 }

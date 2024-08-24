@@ -126,44 +126,31 @@ public class PostApiService {
         post.setPostVisitCount(++visitCount);
         postApiRepository.save(post);
     }
-
-    // 게시글 좋아요
-    public String likeCreateOrDelete(Post post, User user) {
+    public int likeCreateOrDelete(Post post, User user) {
         List<User> likeUserList = post.getLikeUserList();
-        List<User> dislikeUserList = post.getDislikeUserList();
         List<Post> likePostList = user.getLikePostList();
-        List<Post> dislikePostList = user.getDislikePostList();
-        String response;
+        int status;
+
         //해당 post 를 이미 like 한 경우 - 제거
         if (likeUserList.contains(user)) {
             post.setLikeCount(post.getLikeCount() - 1);
             likePostList.remove(post);
             likeUserList.remove(user);
-            response = "likeDeleted";
+            status = 0; // likeDeleted
         }
-        //해당 post를 이미 dislike 한 경우 - 제거하고 추가
-        else if (dislikeUserList.contains(user)) {
-            post.setLikeCount(post.getLikeCount() + 2);
-            dislikeUserList.remove(user);
-            dislikePostList.remove(post);
-            likeUserList.add(user);
-            likePostList.add(post);
-            response = "likeConvertedFromDislike";
-
-        }
-        // 처음 like 하는 경우-추가
+        // 처음 like 하는 경우 - 추가
         else {
-            response = "likeCreated";
             post.setLikeCount(post.getLikeCount() + 1);
             likeUserList.add(user);
             likePostList.add(post);
+            status = 1; // likeCreated
         }
-        // 상태 반환
 
         postApiRepository.save(post);
         userRepository.save(user);
-        return response;
+        return status;
     }
+
 
     // 게시글 싫어요
     public String dislikeCreateOrDelete(Post post, User user) {
