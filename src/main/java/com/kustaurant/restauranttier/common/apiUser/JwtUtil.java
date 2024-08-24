@@ -1,18 +1,19 @@
 package com.kustaurant.restauranttier.common.apiUser;
 
-import com.kustaurant.restauranttier.tab5_mypage.entity.User;
-import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
-import java.util.Base64;
 
 @Slf4j
 @Component
@@ -26,27 +27,32 @@ public class JwtUtil {
     // 리프레시 토큰 유효 시간
     @Value("${jwt.refreshTokenExpiration}")
     private long refreshTokenExpiration;
-
-    private final UserRepository userRepository;
+    private Key key;
 
     @PostConstruct
-    protected void init() {
-        this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
     // JWT 액세스 토큰 생성
-    public String generateAccessToken(String userEmail) {
-        return generateToken(userEmail, accessTokenExpiration);
+    public String generateAccessToken(Integer userId) {
+        return generateToken(userId, accessTokenExpiration);
     }
 
     // JWT 리프레시 토큰 생성
-    public String generateRefreshToken(String userEmail) {
-        return generateToken(userEmail, refreshTokenExpiration);
+    public String generateRefreshToken(Integer userId) {
+        return generateToken(userId, refreshTokenExpiration);
     }
 
+    // 테스트용 10초짜리 액세스 토큰 생성
+    public String generateYOLOAccessToken(Integer userId) {
+        return generateToken(userId, 10000); // 10초 = 1000밀리초
+    }
+
+
     // JWT 토큰 생성 로직
-    private String generateToken(String userEmail, long expirationTime) {
-        Claims claims = Jwts.claims().setSubject(userEmail);
+    private String generateToken(Integer userId, long expirationTime) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationTime);
 
@@ -54,37 +60,30 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // JWT 토큰에서 userEmail 추출
-    public String getUserEmailFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    // 이메일로 유저 아이디 반환
+    // JWT 토큰에서 userId 추출
     public Integer getUserIdFromToken(String token) {
-        String userEmail = getUserEmailFromToken(token);
-        User user = userRepository.findByUserEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        return user.getUserId();
+        return Integer.parseInt(Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token.trim())
+                .getBody()
+                .getSubject());
     }
 
-    // JWT 토큰의 유효성 검증
+    // JWT 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
-            //토큰이 기간이 만료됬는지 확인됨
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token.trim());
             return true;
-        } catch (Exception e) {
-            log.error("JWT 토큰이 유효하지 않습니다.", e);
+        } catch (ExpiredJwtException e) {
+            log.error("JWT 토큰이 만료되었습니다.", e);
             return false;
         }
     }
+
 
 }

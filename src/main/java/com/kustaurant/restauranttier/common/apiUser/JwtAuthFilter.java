@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,7 +33,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    )
             throws ServletException, IOException {
         // 요청 헤더에서 Authorization 값을 가져옴
         String jwt = getJwtFromRequest(request);
@@ -40,11 +45,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(jwt)) {
             // JWT 토큰의 유효성을 검증
             if (jwtUtil.validateToken(jwt)) {
-                String email = jwtUtil.getUserEmailFromToken(jwt);
+                Integer userId = jwtUtil.getUserIdFromToken(jwt);
 
-                // JWT 토큰에서 추출한 이메일로 사용자를 조회
-                User user = userRepository.findByUserEmail(email)
-                        .orElseThrow(() -> new IllegalStateException("User not found"));
+                // JWT 토큰에서 추출한 아이디로 사용자를 조회
+                User user = userRepository.findByUserId(userId)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
                 // 스프링 시큐리티 컨텍스트에 설정할 인증 객체 생성
                 Authentication authentication = getAuthentication(user);
@@ -67,7 +72,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+            return bearerToken.substring(7).trim();
         }
         return null;
     }
@@ -82,6 +87,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getUserRole().getValue()));
 
-        return new UsernamePasswordAuthenticationToken(user.getUserEmail(), null, authorities);
+        return new UsernamePasswordAuthenticationToken(user.getUserId(), null, authorities);
     }
 }

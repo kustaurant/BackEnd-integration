@@ -27,12 +27,9 @@ public class JwtTokenArgumentResolver implements HandlerMethodArgumentResolver {
                                   WebDataBinderFactory binderFactory) throws Exception {
         String bearerToken = webRequest.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            String token = bearerToken.substring(7);
+            String token = bearerToken.substring(7).trim();
             try {
-                // JWT 토큰에서 유저 이메일 추출
-                String userEmail = jwtUtil.getUserEmailFromToken(token);
-
-                // 이메일로 유저 아이디 조회
+                // 토큰으로 유저 아이디 조회
                 return jwtUtil.getUserIdFromToken(token);
 
             } catch (Exception e) {

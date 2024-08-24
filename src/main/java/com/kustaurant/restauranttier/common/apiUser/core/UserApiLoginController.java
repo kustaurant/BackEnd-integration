@@ -73,15 +73,15 @@ public class UserApiLoginController {
     //4
     @Operation(
             summary = "발급받은 토큰을 검증하는 API입니다.",
-            description = "검증된토큰 : Httpstatus.OK, 아니면  출력"
+            description = "검증된토큰 : Httpstatus.OK, 아니면 HttpStatus.Unauthorized 출력"
     )
     @GetMapping("/auth/verify-token")
     public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String accessToken) {
         boolean isValid = jwtUtil.validateToken(accessToken);
         if (isValid) {
-            return ResponseEntity.ok("Token is valid");
+            return ResponseEntity.ok("액세스 토큰이 유효합니다");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("액세스 토큰이 유효하지 않습니다");
         }
     }
 
@@ -105,10 +105,10 @@ public class UserApiLoginController {
 
     //6
     @Operation(
-            summary = "애플전용 회원탈퇴를 위한 API입니다.",
+            summary = "회원탈퇴를 위한 API입니다.",
             description = "사용자가 애플 계정을 통해 회원탈퇴 요청을 하면, 서버에서 해당 사용자 데이터를 삭제합니다."
     )
-    @PostMapping("/auth/bye-apple")
+    @PostMapping("/auth/goodbye-user")
     public ResponseEntity<?> deleteAppleAccount(
             @Parameter(hidden = true)
             @JwtToken Integer userId
@@ -120,6 +120,20 @@ public class UserApiLoginController {
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 문제로 회원탈퇴에 실패했습니다.");
         }
+    }
+
+    //7
+    @Operation(
+            summary = "기간이 만료된 액세스토큰을 받는 API입니다. (테스트용)",
+            description = "만료기간이 10초짜리인 액세스 토큰을 발급받습니다."
+    )
+    @PostMapping("/auth/YOLO")
+    public ResponseEntity<?> testForOneSecToken(
+            @RequestHeader("Authorization") String accessToken
+    ) {
+        String newAccessToken = userApiLoginService.yoloAccessToken(accessToken);
+
+        return ResponseEntity.ok(newAccessToken);
     }
 
 
