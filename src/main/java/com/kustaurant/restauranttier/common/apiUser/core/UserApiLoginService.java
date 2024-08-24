@@ -144,8 +144,8 @@ public class UserApiLoginService {
             Optional<User> userOptional = userRepository.findById(userId);
             if (userOptional.isPresent()) {
                 User user=userOptional.get();
-                user.setStatus("deleted");
-                user.setUserNickname("탈퇴한 회원");
+                user.setStatus("DELETED");
+                user.setUserNickname("(탈퇴한 회원)");
                 user.setPhoneNumber(null);
                 user.setUserEmail(null);
                 userRepository.save(user);
@@ -159,7 +159,7 @@ public class UserApiLoginService {
     }
 
     //6
-    //유효기간이 1초인 테스트용 액세스토큰을 발급해줌
+    //유효기간이 10초인 테스트용 액세스토큰을 발급해줌
     public String yoloAccessToken(String accessToken) {
             Integer userId = jwtUtil.getUserIdFromToken(accessToken);
 
