@@ -11,31 +11,27 @@ import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab3_tier.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class EvaluationService {
     private final EvaluationRepository evaluationRepository;
     private final SituationRepository situationRepository;
     private final EvaluationItemScoreRepository evaluationItemScoreRepository;
-    private final RestaurantService restaurantService;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final SituationService situationService;
     private final RestaurantRepository restaurantRepository;
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
-    private final RestaurantSituationRelationRepository restaurantSituationRelationRepository;
     private final RestaurantCommentService restaurantCommentService;
-    private final RestaurantCommentRepository restaurantCommentRepository;
     private final RestaurantSituationRelationService restaurantSituationRelationService;
     private final EvaluationItemScoresService evaluationItemScoresService;
 
@@ -173,7 +169,8 @@ public class EvaluationService {
         }
     }
 
-    private void evaluationUpdate(User user, Restaurant restaurant, Evaluation evaluation, EvaluationDTO evaluationDTO) {
+    @Transactional
+    public void evaluationUpdate(User user, Restaurant restaurant, Evaluation evaluation, EvaluationDTO evaluationDTO) {
         // 평가 업데이트
         evaluation.setUpdatedAt(LocalDateTime.now());
         evaluation.setEvaluationScore(evaluationDTO.getEvaluationScore());
@@ -204,7 +201,8 @@ public class EvaluationService {
         }
     }
 
-    private void evaluationCreate(User user, Restaurant restaurant, EvaluationDTO evaluationDTO) {
+    @Transactional
+    public void evaluationCreate(User user, Restaurant restaurant, EvaluationDTO evaluationDTO) {
         // 평가 저장
         Evaluation evaluation = new Evaluation(
                 evaluationDTO.getEvaluationScore(), "ACTIVE", LocalDateTime.now(), user, restaurant
@@ -228,6 +226,7 @@ public class EvaluationService {
     }
 
     // 모든 평가 기록에 대해서 티어를 다시 계산함.
+    @Transactional
     public void calculateAllTier() {
         // 가게 메인 티어 계산
         List<Restaurant> restaurantList = restaurantRepository.getAllRestaurantsOrderedByAvgScore(minNumberOfEvaluations, "전체");
@@ -241,6 +240,38 @@ public class EvaluationService {
             }
             restaurantRepository.save(restaurant);
         }
+    }
+
+    // 식당 별 점수, 평가 수, 상황 개수를 다시 카운트합니다.
+    @Transactional
+    public void calculateEvaluationDatas() {
+        List<Restaurant> restaurantList = restaurantRepository.findByStatus("ACTIVE");
+
+        restaurantList.forEach(restaurant -> {
+            Map<Integer, Integer> situationCountMap = new HashMap<>(Map.of(
+                    1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0));
+            int evaluationCount = 0;
+            double scoreSum = 0;
+
+            for (Evaluation evaluation : restaurant.getEvaluationList()) {
+                if (evaluation.getStatus().equals("ACTIVE")) {
+                    evaluationCount++;
+                    scoreSum += evaluation.getEvaluationScore();
+
+                    for (EvaluationItemScore item : evaluation.getEvaluationItemScoreList()) {
+                        Integer situationId = item.getSituation().getSituationId();
+                        situationCountMap.put(situationId, situationCountMap.getOrDefault(situationId, 0) + 1);
+                    }
+                }
+            }
+
+            restaurant.setRestaurantEvaluationCount(evaluationCount);
+            restaurant.setRestaurantScoreSum(scoreSum);
+            restaurantRepository.save(restaurant);
+            log.info("식당:{}, 평가개수: {}, 총합: {}", restaurant.getRestaurantName(), evaluationCount, scoreSum);
+
+            situationCountMap.forEach((key, value) -> restaurantSituationRelationService.createOrDelete(restaurant, key, value));
+        });
     }
 
 

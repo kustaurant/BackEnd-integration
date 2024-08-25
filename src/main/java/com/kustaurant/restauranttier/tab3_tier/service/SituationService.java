@@ -16,11 +16,6 @@ public class SituationService {
 
     public Situation getSituation(Integer id){
         Optional<Situation> situation = situationRepository.findById(id);
-        if(situation.isPresent()){
-            return situation.get();
-        }
-        else{
-            throw  new DataNotFoundException("Situation not found");
-        }
+        return situation.orElse(null);
     }
 }
