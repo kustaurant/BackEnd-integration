@@ -86,7 +86,7 @@ public class UserApiLoginController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "액세스 토큰이 유효합니다"),
-            @ApiResponse(responseCode = "403", description = "액세스 토큰이 유효하지 않습니다"),
+            @ApiResponse(responseCode = "401", description = "액세스 토큰이 유효하지 않습니다"),
     })
     @GetMapping("/verify-token")
     public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String accessToken) {
