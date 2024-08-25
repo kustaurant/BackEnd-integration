@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.*;
@@ -30,6 +31,7 @@ public class RestaurantCommentService {
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
     public RestaurantComment findCommentByEvaluationId(Integer evaluationId) {
         return restaurantCommentRepository.findByParentEvaluationIdAndStatus(evaluationId, "ACTIVE").orElse(null);
@@ -51,6 +53,7 @@ public class RestaurantCommentService {
         String commentImgUrl = null;
         if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
             // TODO: 이미지 url로 변환해야됨.
+            commentImgUrl = s3Service.uploadFile(evaluationDTO.getNewImage());
         }
         RestaurantComment newComment = new RestaurantComment(
                 user, restaurant, evaluationDTO.getEvaluationComment(), commentImgUrl, evaluation.getEvaluationId(),
@@ -64,7 +67,7 @@ public class RestaurantCommentService {
         comment.setCommentBody(evaluationDTO.getEvaluationComment());
         if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
             // TODO: 이미지 url로 변환해야됨.
-            String commentImgUrl = null;
+            String commentImgUrl = s3Service.uploadFile(evaluationDTO.getNewImage());
             comment.setCommentImgUrl(commentImgUrl);
         }
         restaurantCommentRepository.save(comment);
@@ -77,8 +80,13 @@ public class RestaurantCommentService {
         }
     }
 
-    public void deleteComment(Integer commentId) {
+    public void deleteAppComment(Integer commentId, User user) {
         RestaurantComment comment = findCommentByCommentId(commentId);
+
+        if (user != null && !comment.getUser().equals(user)) {
+            throw new ParamException("해당 유저가 단 댓글이 아닙니다.");
+        }
+
         comment.setStatus("DELETE");
         restaurantCommentRepository.save(comment);
     }
