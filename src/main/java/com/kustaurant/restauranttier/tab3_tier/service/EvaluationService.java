@@ -160,6 +160,8 @@ public class EvaluationService {
     }
 
     public void createOrUpdate(User user, Restaurant restaurant, EvaluationDTO evaluationDTO) {
+        log.info("새로운 평가 내용: {}", evaluationDTO);
+
         Evaluation evaluation = evaluationRepository.findByUserAndRestaurantAndStatus(user, restaurant, "ACTIVE").orElse(null);
 
         if (evaluation == null) { // 이전 평가가 없을 경우
@@ -177,9 +179,12 @@ public class EvaluationService {
         evaluationRepository.save(evaluation);
         // 평가 코멘트 업데이트
         RestaurantComment comment = restaurantCommentService.findCommentByEvaluationId(evaluation.getEvaluationId());
-        if (evaluationDTO.getEvaluationComment() == null || evaluationDTO.getEvaluationComment().isEmpty()) { // 코멘트 내용이 없는 경우
-            restaurantCommentService.deleteComment(comment);
-        } else { // 코멘트 내용이 있는 경우
+        if ((evaluationDTO.getEvaluationComment() == null || evaluationDTO.getEvaluationComment().isEmpty())
+                && (evaluationDTO.getNewImage() == null || evaluationDTO.getNewImage().isEmpty())) { // 코멘트 내용과 사진이 없는 경우
+            if (comment != null && comment.getCommentImgUrl() != null && !comment.getCommentImgUrl().isEmpty()) {
+                restaurantCommentService.deleteComment(comment);
+            }
+        } else { // 코멘트 내용이나 사진이 있는 경우
             if (comment == null) { // 기존 코멘트가 없으면 생성
                 restaurantCommentService.createRestaurantComment(user, restaurant, evaluation, evaluationDTO);
             } else { // 기존 코멘트가 있으면 수정
@@ -209,7 +214,8 @@ public class EvaluationService {
         );
         evaluationRepository.save(evaluation);
         // 평가 코멘트
-        if (evaluationDTO.getEvaluationComment() != null && !evaluationDTO.getEvaluationComment().isEmpty()) {
+        if ((evaluationDTO.getEvaluationComment() != null && !evaluationDTO.getEvaluationComment().isEmpty())
+                || (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty())) {
             restaurantCommentService.createRestaurantComment(user, restaurant, evaluation, evaluationDTO);
         }
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
@@ -243,7 +249,6 @@ public class EvaluationService {
     }
 
     // 식당 별 점수, 평가 수, 상황 개수를 다시 카운트합니다.
-    @Transactional
     public void calculateEvaluationDatas() {
         List<Restaurant> restaurantList = restaurantRepository.findByStatus("ACTIVE");
 
