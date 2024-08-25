@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -154,7 +155,7 @@ public class RestaurantApiController {
     }
 
     // 평가하기
-    @PostMapping("/auth/restaurants/{restaurantId}/evaluation")
+    @PostMapping(value = "/auth/restaurants/{restaurantId}/evaluation")
     @Operation(summary = "평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)\n\n" +
             "- 요청 형식 보충 설명\n\n" +
             "   - evaluationScore: 필수\n\n" +
@@ -173,7 +174,7 @@ public class RestaurantApiController {
     })
     public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
             @PathVariable Integer restaurantId,
-            @RequestBody EvaluationDTO evaluationDTO,
+            EvaluationDTO evaluationDTO,
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @JwtToken Integer userId
             ) {
