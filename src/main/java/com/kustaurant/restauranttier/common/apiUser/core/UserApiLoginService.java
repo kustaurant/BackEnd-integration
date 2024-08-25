@@ -8,6 +8,7 @@ import com.kustaurant.restauranttier.common.user.UserRole;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,26 +104,33 @@ public class UserApiLoginService {
     //3
     //새로운 액세스 토큰 발급
     public String refreshAccessToken(String accessToken) {
-        // 액세스 토큰이 만료되었는지 확인
-        if (!jwtUtil.validateToken(accessToken)) {
-            Integer userId = jwtUtil.getUserIdFromToken(accessToken);
-            User user = userRepository.findByUserId(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-            String storedRefreshToken = user.getRefreshToken();
-
-            if (storedRefreshToken == null || !jwtUtil.validateToken(storedRefreshToken)) {
-                throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+        Integer userId;
+        try {
+            // 액세스 토큰이 만료되었는지 확인
+            userId = jwtUtil.getUserIdFromToken(accessToken);
+            if (jwtUtil.validateToken(accessToken)) {
+                throw new IllegalArgumentException("액세스 토큰이 아직 유효합니다.");
             }
-
-            // 새로운 액세스 토큰 발급
-            String newAccessToken = jwtUtil.generateAccessToken(user.getUserId());
-            user.setAccessToken(newAccessToken);
-            userRepository.save(user);
-
-            return newAccessToken;
-        } else {
-            throw new IllegalArgumentException("액세스 토큰이 아직 유효합니다.");
+        } catch (ExpiredJwtException e) {
+            // 토큰이 만료된 경우 새로운 액세스 토큰 발급 로직으로 이동
+            userId = e.getClaims().getSubject() != null ? Integer.parseInt(e.getClaims().getSubject()) : null;
         }
+
+        // 만료된 토큰이므로 새 토큰을 발급
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        String storedRefreshToken = user.getRefreshToken();
+
+        if (storedRefreshToken == null || !jwtUtil.validateToken(storedRefreshToken)) {
+            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+        }
+
+        // 새로운 액세스 토큰 발급
+        String newAccessToken = jwtUtil.generateAccessToken(user.getUserId());
+        user.setAccessToken(newAccessToken);
+        userRepository.save(user);
+
+        return newAccessToken;
     }
 
     //4

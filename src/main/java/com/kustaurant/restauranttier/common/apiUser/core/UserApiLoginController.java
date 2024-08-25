@@ -62,8 +62,14 @@ public class UserApiLoginController {
             summary = "액세스 토큰 재발행 API입니다.",
             description = "서버에 있는 리프레시 토큰을 이용해 새로운 액세스토큰을 발급받아 리턴합니다."
     )
-    @PostMapping("/auth/new-access-token")
-    public ResponseEntity<?> refreshAccessToken(@RequestHeader("Authorization") String accessToken) {
+    @PostMapping("/new-access-token")
+    public ResponseEntity<?> refreshAccessToken(
+            @RequestHeader("Authorization") String accessToken
+    ) {
+        if (accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+
         // 리프레시 토큰을 사용해 새로운 액세스 토큰 발급
         String newAccessToken = userApiLoginService.refreshAccessToken(accessToken);
 
@@ -75,8 +81,13 @@ public class UserApiLoginController {
             summary = "발급받은 토큰을 검증하는 API입니다.",
             description = "검증된토큰 : Httpstatus.OK, 아니면 HttpStatus.Unauthorized 출력"
     )
-    @GetMapping("/auth/verify-token")
+    @GetMapping("/verify-token")
     public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String accessToken) {
+
+        if (accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+
         boolean isValid = jwtUtil.validateToken(accessToken);
         if (isValid) {
             return ResponseEntity.ok("액세스 토큰이 유효합니다");
@@ -131,6 +142,10 @@ public class UserApiLoginController {
     public ResponseEntity<?> testForOneSecToken(
             @RequestHeader("Authorization") String accessToken
     ) {
+        if (accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+
         String newAccessToken = userApiLoginService.yoloAccessToken(accessToken);
 
         return ResponseEntity.ok(newAccessToken);
