@@ -63,7 +63,7 @@ public class UserApiLoginController {
             description = "서버에 있는 리프레시 토큰을 이용해 새로운 액세스토큰을 발급받아 리턴합니다."
     )
     @PostMapping("/new-access-token")
-    public ResponseEntity<?> refreshAccessToken(
+    public ResponseEntity<TokenResponse> refreshAccessToken(
             @RequestHeader("Authorization") String accessToken
     ) {
         if (accessToken.startsWith("Bearer ")) {
@@ -72,8 +72,9 @@ public class UserApiLoginController {
 
         // 리프레시 토큰을 사용해 새로운 액세스 토큰 발급
         String newAccessToken = userApiLoginService.refreshAccessToken(accessToken);
+        TokenResponse tokenResponse = new TokenResponse(newAccessToken);
 
-        return ResponseEntity.ok(newAccessToken);
+        return ResponseEntity.ok(tokenResponse);
     }
 
     //4
@@ -147,8 +148,9 @@ public class UserApiLoginController {
         }
 
         String newAccessToken = userApiLoginService.yoloAccessToken(accessToken);
+        TokenResponse tokenResponse = new TokenResponse(newAccessToken);
 
-        return ResponseEntity.ok(newAccessToken);
+        return ResponseEntity.ok(tokenResponse);
     }
 
 
