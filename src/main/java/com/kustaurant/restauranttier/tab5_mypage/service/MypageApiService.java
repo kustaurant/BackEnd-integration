@@ -7,6 +7,9 @@ import com.kustaurant.restauranttier.tab3_tier.service.RestaurantCommentService;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.entity.PostScrap;
+import com.kustaurant.restauranttier.tab4_community.repository.PostCommentRepository;
+import com.kustaurant.restauranttier.tab4_community.repository.PostRepository;
+import com.kustaurant.restauranttier.tab4_community.repository.PostScrapRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.dto.*;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
@@ -31,6 +34,9 @@ public class MypageApiService {
     private EntityManager entityManager;
 
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final PostScrapRepository postScrapRepository;
+    private final PostCommentRepository postCommentRepository;
     private final RestaurantCommentService restaurantCommentService;
     public User findUserById(Integer userId) {
         if (userId == null) {
@@ -39,7 +45,7 @@ public class MypageApiService {
         return userRepository.findByUserIdAndStatus(userId, "ACTIVE").orElse(null);
     }
 
-
+    //1
     // 마이페이지 화면에서 표시될 "유저닉네임, 좋아요맛집개수, 스크랩맛집개수" 를 반환.
     public MypageMainDTO getMypageInfo(Integer userid){
         User user = findUserById(userid);
@@ -52,7 +58,7 @@ public class MypageApiService {
     }
 
 
-
+    //2
     // 마이페이지 프로필 정보(변경)화면에서 표시될 "닉네임, 메일주소, 핸드폰번호" 를 반환
     public ProfileDTO getProfileInfo(Integer userid){
         User user = findUserById(userid);
@@ -65,7 +71,7 @@ public class MypageApiService {
     }
 
 
-
+    //3
     // 마이페이지 프로필 정보(변경)화면에서 로직을 검증하고 업데이트 하거나 결과를 반환
     public ProfileDTO updateUserProfile(Integer userid, ProfileDTO profileDTO) {
         User user = findUserById(userid);
@@ -101,7 +107,7 @@ public class MypageApiService {
     }
 
 
-
+    //4
     // 닉네임 유효성 검증 메서드
     private void validateNickname(User user, String newNickname) {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
@@ -137,6 +143,7 @@ public class MypageApiService {
         user.setUpdatedAt(LocalDateTime.now());
     }
 
+    //5
     // 전화번호 유효성 검증 메서드
     private void validatePhoneNum(User user, String newPhoneNum) {
         // 핸드폰 값이 변경됨을 확인
@@ -171,7 +178,7 @@ public class MypageApiService {
     }
 
 
-
+    //6
     // 유저가 평가한 레스토랑 리스트들 반환
     public List<EvaluatedRestaurantInfoDTO> getUserEvaluateRestaurantList(Integer userId) {
         User user = findUserById(userId);
@@ -212,67 +219,47 @@ public class MypageApiService {
     }
 
 
-
-
-
-
+    //7
     // 유저가 작성한 커뮤니티 게시글 리스트들 반환
-    public List<MypagePostDTO> getWrittenUserPosts(Integer userId){
-        Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("activePostFilter").setParameter("status", "ACTIVE");
+    public List<MypagePostDTO> getWrittenUserPosts(Integer userId) {
+        List<Post> activePosts = postRepository.findActivePostsByUserId(userId);
 
-        User user = findUserById(userId);
-        List<Post> activePosts = user.getPostList();
-
-        // 데이터를 DTO로 변환
-        List<MypagePostDTO> postDTOList = activePosts.stream()
+        return activePosts.stream()
                 .map(post -> new MypagePostDTO(
                         post.getPostCategory(),
                         post.getPostTitle(),
-                        post.getPostBody().length() > 20 ? post.getPostBody().substring(0, 20) : post.getPostBody(), // 최대 20자,
+                        post.getPostBody().length() > 20 ? post.getPostBody().substring(0, 20) : post.getPostBody(),
                         post.getLikeCount(),
                         post.getPostCommentList().size()
                 ))
                 .collect(Collectors.toList());
-
-        return postDTOList;
     }
 
 
-
+    //8
     // 유저가 스크랩한 커뮤니티 게시글 리스트들 반환
     public List<MypagePostDTO> getScrappedUserPosts(Integer userId) {
-        Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("activePostFilter").setParameter("status", "ACTIVE");
+        List<PostScrap> scrappedPosts = postScrapRepository.findActiveScrappedPostsByUserId(userId);
 
-        User user = findUserById(userId);
-        List<PostScrap> scrappedPosts = user.getScrapList();
-
-        // 데이터를 DTO로 변환
-        List<MypagePostDTO> postScrapsDTOList = scrappedPosts.stream()
+        return scrappedPosts.stream()
                 .map(scrap -> new MypagePostDTO(
                         scrap.getPost().getPostCategory(),
                         scrap.getPost().getPostTitle(),
-                        scrap.getPost().getPostBody().length() > 20 ? scrap.getPost().getPostBody().substring(0, 20) : scrap.getPost().getPostBody(), // 최대 20자
+                        scrap.getPost().getPostBody().length() > 20 ? scrap.getPost().getPostBody().substring(0, 20) : scrap.getPost().getPostBody(),
                         scrap.getPost().getLikeCount(),
                         scrap.getPost().getPostCommentList().size()
                 ))
                 .collect(Collectors.toList());
-
-        return postScrapsDTOList;
     }
 
 
+    //9
     // 유저가 댓글단 커뮤니티 게시글 리스트들 반환
-    public List<MypagePostCommentDTO> getCommentedUserPosts(Integer userId){
-        Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("activePostFilter").setParameter("status", "ACTIVE");
-
-        User user = findUserById(userId);
-        List<PostComment> commentedPosts = user.getPostCommentList();
+    public List<MypagePostCommentDTO> getCommentedUserPosts(Integer userId) {
+        List<PostComment> commentedPosts = postCommentRepository.findActiveCommentedPostsByUserId(userId);
 
         // 데이터를 DTO로 변환
-        List<MypagePostCommentDTO> postCommentDTOList = commentedPosts.stream()
+        return commentedPosts.stream()
                 .map(comment -> new MypagePostCommentDTO(
                         comment.getPost().getPostCategory(),
                         comment.getPost().getPostTitle(),
@@ -280,9 +267,8 @@ public class MypageApiService {
                         comment.getLikeCount()
                 ))
                 .toList();
-
-        return postCommentDTOList;
     }
+
 
 
 }
