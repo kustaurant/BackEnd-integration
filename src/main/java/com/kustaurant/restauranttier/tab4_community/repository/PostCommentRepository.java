@@ -11,6 +11,6 @@ import java.util.List;
 public interface PostCommentRepository extends JpaRepository<PostComment,Integer> {
     List<PostComment> findAll(Specification<PostComment> spec);
 
-    @Query("SELECT pc FROM PostComment pc WHERE pc.user.userId = :userId AND pc.post.status = 'ACTIVE'")
+    @Query("SELECT pc FROM PostComment pc WHERE pc.user.userId = :userId AND pc.status = 'ACTIVE'")
     List<PostComment> findActiveCommentedPostsByUserId(@Param("userId") Integer userId);
 }
