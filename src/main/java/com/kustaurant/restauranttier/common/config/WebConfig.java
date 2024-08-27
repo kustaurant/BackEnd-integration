@@ -1,6 +1,6 @@
 package com.kustaurant.restauranttier.common.config;
 
-import com.kustaurant.restauranttier.common.apiUser.JwtTokenArgumentResolver;
+import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtTokenArgumentResolver;
 import com.kustaurant.restauranttier.tab3_tier.argument_resolver.CuisineListArgumentResolver;
 import com.kustaurant.restauranttier.tab3_tier.argument_resolver.LocationListArgumentResolver;
 import com.kustaurant.restauranttier.tab3_tier.argument_resolver.SituationListArgumentResolver;

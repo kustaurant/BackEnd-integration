@@ -1,7 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
 import com.kustaurant.restauranttier.common.UserService;
-import com.kustaurant.restauranttier.common.apiUser.JwtToken;
+import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.argument_resolver.CuisineList;
 import com.kustaurant.restauranttier.tab3_tier.argument_resolver.LocationList;

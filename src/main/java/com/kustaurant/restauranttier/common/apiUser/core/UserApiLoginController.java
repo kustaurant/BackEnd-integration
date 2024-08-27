@@ -1,6 +1,6 @@
 package com.kustaurant.restauranttier.common.apiUser.core;
 
-import com.kustaurant.restauranttier.common.apiUser.JwtToken;
+import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
 import com.kustaurant.restauranttier.common.apiUser.JwtUtil;
 import com.kustaurant.restauranttier.common.apiUser.TokenResponse;
 import com.kustaurant.restauranttier.common.apiUser.apple.AppleLoginRequest;
