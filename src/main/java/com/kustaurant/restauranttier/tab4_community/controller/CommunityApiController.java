@@ -170,10 +170,21 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = com.kustaurant.restauranttier.common.exception.ErrorResponse.class)))
     })
     public ResponseEntity<PostCommentDTO> postCommentCreate(
-            @RequestParam(name = "content", defaultValue = "") String content,
-            @RequestParam(name = "postId") String postId,
-            @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
-            @JwtToken @Parameter(hidden = true) Integer userId) {
+            @RequestParam(name = "content", defaultValue = "")
+            @Parameter(description = "생성할 댓글의 내용입니다. 최소 1자에서 최대 10,000자까지 입력 가능합니다.", example = "이 게시글에 대해 궁금한 점이 있습니다.")
+            String content,
+
+            @RequestParam(name = "postId")
+            @Parameter(description = "댓글을 추가할 게시글의 ID입니다.", example = "123")
+            String postId,
+
+            @RequestParam(name = "parentCommentId", defaultValue = "")
+            @Parameter(description = "대댓글을 작성할 경우, 부모 댓글의 ID를 입력합니다. 이 값이 비어 있으면 일반 댓글로 처리됩니다.", example = "456")
+            String parentCommentId,
+
+            @JwtToken
+            @Parameter(hidden = true)
+            Integer userId) {
         Integer postIdInt = Integer.valueOf(postId);
 
         User user = userService.findUserById(userId);
@@ -254,7 +265,13 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "204", description = "댓글 삭제에 성공하였습니다.", content = @Content),
             @ApiResponse(responseCode = "404", description = "해당 id의 댓글이 존재하지 않습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<Map<String, Object>> commentDelete(@PathVariable Integer commentId, @JwtToken @Parameter(hidden = true) Integer userId) {
+    public ResponseEntity<Map<String, Object>> commentDelete(
+            @PathVariable
+            @Parameter(description = "삭제할 댓글의 ID입니다.", example = "123")
+            Integer commentId,
+            @JwtToken
+            @Parameter(hidden = true)
+            Integer userId) {
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
         postComment.setStatus("DELETED");
 
@@ -350,7 +367,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "200", description = "처리가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentLikeDislikeDTO.class))),
             @ApiResponse(responseCode = "404", description = "해당 ID의 댓글을 찾을 수 없습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<CommentLikeDislikeDTO> toggleCommentLikeOrDislike(@PathVariable Integer commentId,
+    public ResponseEntity<CommentLikeDislikeDTO> toggleCommentLikeOrDislike(@PathVariable @Parameter(description = "댓글 id입니다", example = "30") Integer commentId ,
                                                                             @PathVariable @Parameter(description = "좋아요는 likes, 싫어요는 dislikes로 값을 설정합니다.", example = "likes") String action,
                                                                             @JwtToken @Parameter(hidden = true) Integer userId) {
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
