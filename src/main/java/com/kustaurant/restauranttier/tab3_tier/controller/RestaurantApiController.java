@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
 import com.kustaurant.restauranttier.common.UserService;
+import com.kustaurant.restauranttier.common.apiUser.JwtToken;
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
@@ -9,12 +10,8 @@ import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantDetailDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
-import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
-import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
-import com.kustaurant.restauranttier.tab3_tier.service.RestaurantCommentService;
-import com.kustaurant.restauranttier.tab3_tier.service.RestaurantFavoriteService;
+import com.kustaurant.restauranttier.tab3_tier.service.*;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
-import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -26,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +48,13 @@ public class RestaurantApiController {
     private final RestaurantCommentService restaurantCommentService;
     private final EvaluationService evaluationService;
 
-    private final int userId = 23;
+    private final S3Service s3Service;
+
+    @PostMapping("/test-for-s3")
+    public ResponseEntity<Void> testForS3(EvaluationDTO evaluationDTO) {
+        s3Service.uploadFile(evaluationDTO.getNewImage());
+        return ResponseEntity.ok(null);
+    }
 
     @Operation(summary = "식당 상세 화면 정보 불러오기", description = "식당 하나에 대한 상세 정보가 반환됩니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
             "- 반환 값 보충 설명\n\n" +
@@ -80,7 +84,8 @@ public class RestaurantApiController {
     @GetMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetail(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId,
-            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+            @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
 
@@ -100,7 +105,7 @@ public class RestaurantApiController {
     }
 
     // 즐겨찾기
-    @PostMapping("/restaurants/{restaurantId}/favorite-toggle")
+    @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle")
     @Operation(summary = "즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태를 반환합니다.\n\n눌러서 즐겨찾기가 해제된 경우 -> false반환\n\n" +
             "- 반환 값 보충 설명\n\n" +
             "   - boolean: not null")
@@ -109,7 +114,8 @@ public class RestaurantApiController {
             @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
     })
     public ResponseEntity<Boolean> restaurantFavoriteToggle(
-            @PathVariable Integer restaurantId
+            @PathVariable Integer restaurantId,
+            @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         // TODO: 로그인 구현 후 수정
         User user = userService.findUserById(userId);
@@ -122,7 +128,7 @@ public class RestaurantApiController {
     }
 
     // 이전 평가 데이터 가져오기
-    @GetMapping("/restaurants/{restaurantId}/evaluation")
+    @GetMapping("/auth/restaurants/{restaurantId}/evaluation")
     @Operation(summary = "평가 하기로 갈 때 이전 평가 데이터가 있을 경우 불러오기", description = "평가하기에서 사용하는 형식과 동일합니다. 유저가 이전에 해당 식당을 평가했을 경우 이전 평가 데이터를 불러와서 이전에 평가했던 사항을 보여줍니다. " +
             "\n\n이전 데이터가 없을 경우 아무것도 반환하지 않습니다.\n\n현재 restaurantId 599, 631에 데이터 있습니다.\n\n" +
             "- 반환 값 보충 설명\n\n" +
@@ -137,7 +143,8 @@ public class RestaurantApiController {
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
     })
     public ResponseEntity<EvaluationDTO> getPreEvaluationInfo(
-            @PathVariable Integer restaurantId
+            @PathVariable Integer restaurantId,
+            @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         User user = userService.findUserById(userId);
@@ -156,7 +163,7 @@ public class RestaurantApiController {
     }
 
     // 평가하기
-    @PostMapping("/restaurants/{restaurantId}/evaluation")
+    @PostMapping(value = "/auth/restaurants/{restaurantId}/evaluation")
     @Operation(summary = "평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)\n\n" +
             "- 요청 형식 보충 설명\n\n" +
             "   - evaluationScore: 필수\n\n" +
@@ -175,12 +182,15 @@ public class RestaurantApiController {
     })
     public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
             @PathVariable Integer restaurantId,
-            @RequestBody EvaluationDTO evaluationDTO,
-            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
+            EvaluationDTO evaluationDTO,
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+            @Parameter(hidden = true) @JwtToken Integer userId
             ) {
         if (evaluationDTO.getEvaluationScore() == null || evaluationDTO.getEvaluationScore().equals(0d)) {
             throw new ParamException("평가 점수가 필요합니다.");
         }
+
+        log.info("이미지: {}", evaluationDTO.getNewImage());
 
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // TODO 나중에 수정
@@ -222,7 +232,8 @@ public class RestaurantApiController {
             @RequestParam(defaultValue = "popularity")
             @Parameter(example = "popularity 또는 latest", description = "인기순: popularity, 최신순: latest")
             String sort,
-            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+            @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         if (!sort.equals("popularity") && !sort.equals("latest")) {
             throw new ParamException("sort 파라미터 입력 값이 올바르지 않습니다.");
@@ -237,7 +248,7 @@ public class RestaurantApiController {
     }
 
     // 리뷰 추천하기
-    @PostMapping("/restaurants/{restaurantId}/comments/{commentId}/like")
+    @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}/like")
     @Operation(summary = "리뷰 추천하기", description = "추천을 누른 후의 추천수와 비추천수를 반환합니다.\n\n반환 형식은 리뷰와 동일합니다." +
             "\n\n추천과 비추천은 동시에 눌릴 수 없고, 비추천을 누른 상태로 추천을 누르면 자동으로 비추천이 해제되고 추천이 누른 상태가 됩니다." +
             "\n\ncommentLikeStatus가 1이면 현재 추천을 누른 상태, -1이면 비추천을 누른 상태, 0이면 아무것도 누르지 않은 상태입니다.\n\n" +
@@ -261,7 +272,8 @@ public class RestaurantApiController {
     })
     public ResponseEntity<RestaurantCommentDTO> likeComment(
             @PathVariable Integer restaurantId,
-            @PathVariable Integer commentId
+            @PathVariable Integer commentId,
+            @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
@@ -282,7 +294,7 @@ public class RestaurantApiController {
     }
 
     // 리뷰 비추천하기
-    @PostMapping("/restaurants/{restaurantId}/comments/{commentId}/dislike")
+    @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}/dislike")
     @Operation(summary = "리뷰 비추천하기", description = "비추천을 누른 후의 추천수와 비추천수를 반환합니다.\n\n" +
             "반환 형식은 댓글과 동일합니다.\n\n추천과 비추천은 동시에 눌릴 수 없고, 추천을 누른 상태로 비추천을 누르면 자동으로 추천이 해제되고 비추천이 누른 상태가 됩니다.\n\n" +
             "commentLikeStatus가 1이면 현재 추천을 누른 상태, -1이면 비추천을 누른 상태, 0이면 아무것도 누르지 않은 상태입니다.\n\n" +
@@ -306,7 +318,8 @@ public class RestaurantApiController {
     })
     public ResponseEntity<RestaurantCommentDTO> dislikeComment(
             @PathVariable Integer restaurantId,
-            @PathVariable Integer commentId
+            @PathVariable Integer commentId,
+            @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
@@ -327,7 +340,7 @@ public class RestaurantApiController {
     }
 
     // 식당 대댓글 달기
-    @PostMapping("/restaurants/{restaurantId}/comments/{commentId}")
+    @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
     @Operation(summary = "식당 대댓글 달기", description = "작성한 대댓글을 반환합니다.\n\n" +
             "- 반환 값 보충 설명\n\n" +
             "   - commentId: not null\n\n" +
@@ -350,7 +363,8 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
             @RequestBody String commentBody,
-            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+            @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         // 댓글 내용 없는 경우 예외 처리
         if (commentBody.trim().isEmpty()) {
@@ -378,7 +392,7 @@ public class RestaurantApiController {
     }
 
     // 식당 댓글 및 대댓글 삭제하기
-    @DeleteMapping("/restaurants/{restaurantId}/comments/{commentId}")
+    @DeleteMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
     @Operation(summary = "식당 댓글 및 대댓글 삭제하기", description = "식당 댓글 및 대댓글 삭제하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "삭제에 성공했습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))}),
@@ -386,13 +400,15 @@ public class RestaurantApiController {
     })
     public ResponseEntity<Void> deleteComment(
             @PathVariable Integer restaurantId,
-            @PathVariable Integer commentId
+            @PathVariable Integer commentId,
+            @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        User user = userService.findUserById(userId);
 
         checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
 
-        restaurantCommentService.deleteComment(commentId);
+        restaurantCommentService.deleteAppComment(commentId, user);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

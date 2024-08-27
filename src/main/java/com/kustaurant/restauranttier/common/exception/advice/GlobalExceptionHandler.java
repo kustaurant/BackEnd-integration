@@ -3,6 +3,7 @@ package com.kustaurant.restauranttier.common.exception.advice;
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
+import com.kustaurant.restauranttier.common.exception.exception.ServerException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e) {
         log.error("[IllegalStateException]", e);
         return new ResponseEntity<>(new ErrorResponse("SERVER STATE ERROR", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ServerException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(ServerException e) {
+        log.error("[ServerException]", e);
+        return new ResponseEntity<>(new ErrorResponse("SERVER ERROR", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     //띵운씨 이런거 추가했으면 전체적으로 브리핑좀 해주세요 ^^

@@ -8,6 +8,8 @@ import com.kustaurant.restauranttier.common.apiUser.naver.NaverLoginRequest;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,12 +64,19 @@ public class UserApiLoginController {
             summary = "액세스 토큰 재발행 API입니다.",
             description = "서버에 있는 리프레시 토큰을 이용해 새로운 액세스토큰을 발급받아 리턴합니다."
     )
-    @PostMapping("/auth/new-access-token")
-    public ResponseEntity<?> refreshAccessToken(@RequestHeader("Authorization") String accessToken) {
+    @PostMapping("/new-access-token")
+    public ResponseEntity<TokenResponse> refreshAccessToken(
+            @RequestHeader("Authorization") String accessToken
+    ) {
+        if (accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+
         // 리프레시 토큰을 사용해 새로운 액세스 토큰 발급
         String newAccessToken = userApiLoginService.refreshAccessToken(accessToken);
+        TokenResponse tokenResponse = new TokenResponse(newAccessToken);
 
-        return ResponseEntity.ok(newAccessToken);
+        return ResponseEntity.ok(tokenResponse);
     }
 
     //4
@@ -75,8 +84,17 @@ public class UserApiLoginController {
             summary = "발급받은 토큰을 검증하는 API입니다.",
             description = "검증된토큰 : Httpstatus.OK, 아니면 HttpStatus.Unauthorized 출력"
     )
-    @GetMapping("/auth/verify-token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "액세스 토큰이 유효합니다"),
+            @ApiResponse(responseCode = "401", description = "액세스 토큰이 유효하지 않습니다"),
+    })
+    @GetMapping("/verify-token")
     public ResponseEntity<?> verifyToken(@RequestHeader("Authorization") String accessToken) {
+
+        if (accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+
         boolean isValid = jwtUtil.validateToken(accessToken);
         if (isValid) {
             return ResponseEntity.ok("액세스 토큰이 유효합니다");
@@ -131,9 +149,14 @@ public class UserApiLoginController {
     public ResponseEntity<?> testForOneSecToken(
             @RequestHeader("Authorization") String accessToken
     ) {
-        String newAccessToken = userApiLoginService.yoloAccessToken(accessToken);
+        if (accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
 
-        return ResponseEntity.ok(newAccessToken);
+        String newAccessToken = userApiLoginService.yoloAccessToken(accessToken);
+        TokenResponse tokenResponse = new TokenResponse(newAccessToken);
+
+        return ResponseEntity.ok(tokenResponse);
     }
 
 
