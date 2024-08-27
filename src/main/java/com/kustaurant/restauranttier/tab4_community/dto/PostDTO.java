@@ -3,6 +3,7 @@ package com.kustaurant.restauranttier.tab4_community.dto;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.entity.PostCommentDTO;
+import com.kustaurant.restauranttier.tab4_community.entity.PostPhoto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,10 +31,17 @@ public class PostDTO {
     @Schema(description = "좋아요 개수", example = "3")
 
     Integer likeCount;
+    @Schema(description = "작성자 정보")
     UserDTO user;
+    @Schema(description = "작성 경과 시간",example = "5시간 전")
     String timeAgo;
+    @Schema(description = "댓글 수",example = "13")
     Integer commentCount;
+    @Schema(description = "댓글 목록")
     List<PostCommentDTO> postCommentList;
+
+    @Schema(description = "게시글 사진", example = "3")
+    String postPhotoImgUrl;
     public static PostDTO fromEntity(Post post) {
         PostDTO dto = new PostDTO();
         dto.setPostId(post.getPostId());
@@ -50,6 +58,11 @@ public class PostDTO {
                 .toList());
         dto.setCommentCount(post.getPostCommentList().size());
         dto.setTimeAgo(post.calculateTimeAgo());
+        if(!post.getPostPhotoList().isEmpty()){
+            dto.setPostPhotoImgUrl(post.getPostPhotoList().get(0).getPhotoImgUrl());
+        }else{
+            dto.setPostPhotoImgUrl(null);
+        }
         return dto;
     }
 }

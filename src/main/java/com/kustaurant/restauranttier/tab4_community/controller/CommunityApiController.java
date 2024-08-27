@@ -35,6 +35,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -378,17 +379,16 @@ public class CommunityApiController {
     // 게시글 생성
     @PostMapping("/posts")
 //    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @Operation(summary = "게시글 생성 ", description = "게시글 제목,카테고리,내용,이미지를 입력받아 게시글을 생성합니다. 이미지 저장은 아직 미구현 상태입니다")
+    @Operation(summary = "게시글 생성 ", description = "게시글 제목,카테고리,내용,이미지를 입력받아 게시글을 생성합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "create success", content = @Content),
-            @ApiResponse(responseCode = "404", description = "user not found", content = @Content)
+            @ApiResponse(responseCode = "204", description = "게시글이 생성되었습니다", content = @Content)
     })
     public ResponseEntity<PostDTO> postCreate(
             @RequestParam("title") String title,
             @RequestParam("postCategory") String postCategory,
             @RequestParam("content") String content,
             @RequestParam(value = "imgUrl", required = false) String imgUrl,
-            @JwtToken Integer userId) throws IOException {
+            @JwtToken Integer userId) {
 
         // 게시글 객체 생성
         Post post = new Post(title, content, postCategory, "ACTIVE", LocalDateTime.now());
@@ -401,11 +401,11 @@ public class CommunityApiController {
 //        Document doc = Jsoup.parse(content);
 //        Elements imgTags = doc.select("img");
 
-//        // 이미지 파일 처리
-//        PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-//        postPhoto.setPost(post); // 게시글과 이미지 연관관계 설정
-//        post.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
-//        postPhotoApiRepository.save(postPhoto); // 이미지 정보 저장
+        // 이미지 파일 처리
+        PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
+        postPhoto.setPost(post); // 게시글과 이미지 연관관계 설정
+        post.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
+        postPhotoApiRepository.save(postPhoto); // 이미지 정보 저장
 
 
         // 게시글 저장
@@ -417,49 +417,32 @@ public class CommunityApiController {
     // 게시글 수정
     @PatchMapping("/posts/{postId}")
 //    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @Operation(summary = "게시글 수정 (미구현)", description = "게시글 ID와 내용을 입력받아 수정합니다.")
+    @Operation(summary = "게시글 수정 (사진 첨부는 미구현)", description = "게시글 ID와 내용을 입력받아 수정합니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "update success", content = @Content),
-            @ApiResponse(responseCode = "404", description = "post not found", content = @Content)
+            @ApiResponse(responseCode = "204", description = "게시글 수정이 완료되었습니다.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<String> postUpdate(
             @PathVariable String postId,
             @RequestParam String title,
             @RequestParam String postCategory,
             @RequestParam String content,
-            @JwtToken Integer userId
+            @RequestParam(value = "imgUrl", required = false) String imgUrl,
+            @JwtToken @Parameter(hidden = true) Integer userId
     ) {
 
-        // TODO: 사진 업로드 구현
         Post post = postApiService.getPost(Integer.valueOf(postId));
-        // 기존 연관된 사진 정보 삭제
-        List<PostPhoto> existingPhotos = post.getPostPhotoList();
-        if (existingPhotos != null) {
-            postPhotoApiRepository.deleteAll(existingPhotos);
-            post.setPostPhotoList(null); // 기존 리스트 연결 해제
-        }
 
-        // 새로운 사진 정보 처리 로직 (기존 로직 유지)
-        List<PostPhoto> newPhotoList = new ArrayList<>();
-        Document doc = Jsoup.parse(content);
-        Elements imgTags = doc.select("img");
-        for (Element img : imgTags) {
-            String imgUrl = img.attr("src");
-            if (!imgUrl.isEmpty()) {
-                PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-                postPhoto.setPost(post);
-                newPhotoList.add(postPhoto);
-                postPhotoApiRepository.save(postPhoto);
-            }
-        }
-        post.setPostPhotoList(newPhotoList);
+        PostPhoto postPhoto = new PostPhoto(imgUrl,"ACTIVE");
+        post.getPostPhotoList().clear();
+        post.getPostPhotoList().add(postPhoto);
         post.setPostTitle(title);
         post.setPostCategory(postCategory);
         post.setPostBody(content);
         postApiRepository.save(post);
 
 
-        return ResponseEntity.ok("글이 성공적으로 수정되었습니다.");
+        return ResponseEntity.noContent().build();
     }
 
 //    // 이미지 업로드 (게시글 작성 중 미리보기)
