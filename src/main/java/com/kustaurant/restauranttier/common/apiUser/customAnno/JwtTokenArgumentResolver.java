@@ -1,5 +1,6 @@
-package com.kustaurant.restauranttier.common.apiUser;
+package com.kustaurant.restauranttier.common.apiUser.customAnno;
 
+import com.kustaurant.restauranttier.common.apiUser.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;

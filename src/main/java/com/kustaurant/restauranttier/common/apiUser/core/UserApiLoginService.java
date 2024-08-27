@@ -40,7 +40,13 @@ public class UserApiLoginService {
         if (optionalUser.isPresent()) {
             // 기존 회원이 있으면 그 정보를 반환
             user = optionalUser.get();
-
+            if(user.getStatus().equals("DELETED")){
+                //탈퇴한 회원이 재가입 하는 경우
+                user.setUserEmail(userEmail);
+                user.setUserNickname(StringUtils.substringBefore(userEmail, "@"));
+                user.setStatus("ACTIVE");
+                user.setCreatedAt(LocalDateTime.now());
+            }
         } else {
             // 없으면 새로운 회원을 생성하고 저장
             user = User.builder()
@@ -72,14 +78,19 @@ public class UserApiLoginService {
 
         // 사용자 정보로 기존 회원 조회 또는 새로 가입 처리
         Optional<User> optionalUser = userRepository.findByProviderId(userIdentifier);
+        int appleUserCount = userRepository.countByUserNicknameStartingWith("애플사용자");
 
         User user;
         if (optionalUser.isPresent()) {
             user = optionalUser.get();
+            if(user.getStatus().equals("DELETED")){
+                //탈퇴한 회원이 재가입 하는 경우
+                user.setUserNickname("애플사용자" + (appleUserCount + 1));
+                user.setStatus("ACTIVE");
+                user.setCreatedAt(LocalDateTime.now());
+            }
         } else {
             // 새로운 사용자 생성 및 저장
-            int appleUserCount = userRepository.countByUserNicknameStartingWith("애플사용자");
-
             user = User.builder()
                     .providerId(userIdentifier)
                     .loginApi(provider)

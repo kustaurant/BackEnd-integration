@@ -1,7 +1,7 @@
 package com.kustaurant.restauranttier.tab1_home.controller;
 
 import com.kustaurant.restauranttier.common.UserService;
-import com.kustaurant.restauranttier.common.apiUser.JwtToken;
+import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
 import com.kustaurant.restauranttier.tab1_home.dto.RestaurantListsResponse;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 @RestController

@@ -2,7 +2,7 @@ package com.kustaurant.restauranttier.tab4_community.controller;
 
 
 import com.kustaurant.restauranttier.common.UserService;
-import com.kustaurant.restauranttier.common.apiUser.JwtToken;
+import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.tab4_community.dto.*;

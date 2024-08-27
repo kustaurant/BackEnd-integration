@@ -1,7 +1,9 @@
 package com.kustaurant.restauranttier.tab5_mypage.service;
 
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
+import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantFavorite;
+import com.kustaurant.restauranttier.tab3_tier.service.RestaurantCommentService;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.entity.PostScrap;
@@ -29,6 +31,7 @@ public class MypageApiService {
     private EntityManager entityManager;
 
     private final UserRepository userRepository;
+    private final RestaurantCommentService restaurantCommentService;
     public User findUserById(Integer userId) {
         if (userId == null) {
             return null;
@@ -74,7 +77,7 @@ public class MypageApiService {
         // 아무런 변경값 없이 프로필 저장하기 버튼을 누름
         if ((receivedPhoneNumber.isEmpty() || user.getPhoneNumber().equals(receivedPhoneNumber))
                 && user.getUserNickname().equals(receivedNickname)) {
-            throw new IllegalArgumentException("수정된 값이 없습니다.");
+            throw new IllegalArgumentException("변경된 값이 없습니다.");
         }
 
         // 전화번호 값이 공백이 아님 (변경이 이루어진 적이 있음)
@@ -170,7 +173,7 @@ public class MypageApiService {
 
 
     // 유저가 평가한 레스토랑 리스트들 반환
-    public List<EvaluateRestaurantInfoDTO> getUserEvaluateRestaurantList(Integer userId) {
+    public List<EvaluatedRestaurantInfoDTO> getUserEvaluateRestaurantList(Integer userId) {
         User user = findUserById(userId);
         List<Evaluation> evaluationList = user.getEvaluationList();
 
@@ -182,18 +185,34 @@ public class MypageApiService {
         });
 
         // 평가 리스트를 DTO로 변환하여 반환
-        List<EvaluateRestaurantInfoDTO> evaluateRestaurantInfoDTOS = evaluationList.stream()
-                .map(evaluation -> new EvaluateRestaurantInfoDTO(
+        List<EvaluatedRestaurantInfoDTO> evaluateRestaurantInfoDTOS = evaluationList.stream()
+                .map(evaluation -> {
+                    // RestaurantCommentService에서 코멘트를 가져옴
+                    RestaurantComment comment = restaurantCommentService.findCommentByEvaluationId(evaluation.getEvaluationId());
+
+                    String userCommentBody = comment != null ? comment.getCommentBody() : null;
+
+                    // EvaluationItemScoreList에서 각 상황 이름을 추출
+                    List<String> situationNames = evaluation.getEvaluationItemScoreList().stream()
+                            .map(item -> item.getSituation().getSituationName())
+                            .collect(Collectors.toList());
+
+                    return new EvaluatedRestaurantInfoDTO(
                             evaluation.getRestaurant().getRestaurantName(),
                             evaluation.getRestaurant().getRestaurantImgUrl(),
                             evaluation.getRestaurant().getRestaurantCuisine(),
-                            evaluation.getEvaluationScore()
-//                            evaluation.getEvaluationItemScoreList()
-                    ))
+                            evaluation.getEvaluationScore(),
+                            userCommentBody,
+                            situationNames
+                    );
+                })
                 .collect(Collectors.toList());
 
         return evaluateRestaurantInfoDTOS;
     }
+
+
+
 
 
 
