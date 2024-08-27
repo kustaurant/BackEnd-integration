@@ -59,14 +59,13 @@ public class MypageApiController {
             description = "유저의 닉네임,전화번호를 변경합니다. (프로필 사진 미구현)"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "변경된 사항이 없습니다"),
-            @ApiResponse(responseCode = "400", description = "닉네임을 변경한 지 30일이 지나지 않아 변경할 수 없습니다."),
-            @ApiResponse(responseCode = "400", description = "해당 닉네임이 이미 존재합니다."),
-            @ApiResponse(responseCode = "400", description = "이전과 동일한 닉네임입니다."),
-            @ApiResponse(responseCode = "400", description = "닉네임은 2자 이상이어야 합니다."),
-            @ApiResponse(responseCode = "400", description = "닉네임은 10자 이하여야 합니다."),
-            @ApiResponse(responseCode = "400", description = "전화번호는 숫자로 11자로만 입력되어야 합니다.")
-
+            @ApiResponse(responseCode = "400", description = "변경된 사항이 없습니다 or" +
+                    " 닉네임을 변경한 지 30일이 지나지 않아 변경할 수 없습니다 or" +
+                    "해당 닉네임이 이미 존재합니다. or" +
+                    "이전과 동일한 닉네임입니다. or" +
+                    "닉네임은 2자 이상이어야 합니다. or" +
+                    "닉네임은 10자 이하여야 합니다. or" +
+                    "전화번호는 숫자로 11자로만 입력되어야 합니다.")
     })
     @PatchMapping("/auth/mypage/profile")
     public ResponseEntity<?> updateMypageProfile(
@@ -88,7 +87,7 @@ public class MypageApiController {
             summary = "\"내가 평가한 맛집 화면\" 로드에 필요한 정보 불러오기",
             description = "유저가 평가해논 맛집 정보들을 불러옵니다."
     )
-    @GetMapping("/auth/mypage/evaluate-restuarnt-list")
+    @GetMapping("/auth/mypage/evaluate-restaurant-list")
     public ResponseEntity<List<EvaluatedRestaurantInfoDTO>> getEvaluateRestaurantList(
             @Parameter(hidden = true) @JwtToken Integer userId
     ){
@@ -116,7 +115,7 @@ public class MypageApiController {
             summary = "\"내가 저장한 맛집 화면\" 로드에 필요한 정보 불러오기",
             description = "유저가 즐겨찾기해논 맛집 정보들을 불러옵니다."
     )
-    @GetMapping("/auth/mypage/favorite-restuarnt-list")
+    @GetMapping("/auth/mypage/favorite-restaurant-list")
     public ResponseEntity<List<FavoriteRestaurantInfoDTO>> getFavoriteRestaurantList(
             @Parameter(hidden = true) @JwtToken Integer userId
     ){

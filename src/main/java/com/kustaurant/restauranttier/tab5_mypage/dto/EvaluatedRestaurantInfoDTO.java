@@ -16,6 +16,6 @@ public class EvaluatedRestaurantInfoDTO {
     private String cuisine;
     private Double evaluationScore;
     private String restaurantComment;
-    @Schema(description = "유저가 선택한 상황카테고리들 입니다.", example = "한식, 혼밥 등등")
+    @Schema(description = "유저가 선택한 상황카테고리들 입니다.", example = "(string으로된 배열입니다. 혼밥, 소개팅 등등")
     private List<String> evaluationItemScores;
 }
