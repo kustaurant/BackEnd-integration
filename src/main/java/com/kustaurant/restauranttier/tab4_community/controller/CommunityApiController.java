@@ -414,7 +414,7 @@ public class CommunityApiController {
     // 게시글 수정
     @PatchMapping("/posts/{postId}")
 //    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @Operation(summary = "게시글 수정 (사진 첨부는 미구현)", description = "게시글 ID와 내용을 입력받아 수정합니다.")
+    @Operation(summary = "게시글 수정)", description = "게시글 ID와 내용을 입력받아 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "게시글 수정이 완료되었습니다.", content = @Content),
             @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class)))
