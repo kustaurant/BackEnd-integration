@@ -52,7 +52,6 @@ public class RestaurantCommentService {
     public void createRestaurantComment(User user, Restaurant restaurant, Evaluation evaluation, EvaluationDTO evaluationDTO) {
         String commentImgUrl = null;
         if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
-            // TODO: 이미지 url로 변환해야됨.
             commentImgUrl = s3Service.uploadFile(evaluationDTO.getNewImage());
         }
         RestaurantComment newComment = new RestaurantComment(
@@ -66,8 +65,8 @@ public class RestaurantCommentService {
         comment.setUpdatedAt(LocalDateTime.now());
         comment.setCommentBody(evaluationDTO.getEvaluationComment());
         if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
-            // TODO: 이미지 url로 변환해야됨.
             String commentImgUrl = s3Service.uploadFile(evaluationDTO.getNewImage());
+            s3Service.deleteFile(comment.getCommentImgUrl());
             comment.setCommentImgUrl(commentImgUrl);
         }
         restaurantCommentRepository.save(comment);

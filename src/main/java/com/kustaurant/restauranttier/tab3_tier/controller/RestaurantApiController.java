@@ -47,6 +47,14 @@ public class RestaurantApiController {
     private final RestaurantCommentService restaurantCommentService;
     private final EvaluationService evaluationService;
 
+    private final S3Service s3Service;
+
+    @PostMapping("/test-for-s3")
+    public ResponseEntity<Void> testForS3(EvaluationDTO evaluationDTO) {
+        s3Service.uploadFile(evaluationDTO.getNewImage());
+        return ResponseEntity.ok(null);
+    }
+
     @Operation(summary = "식당 상세 화면 정보 불러오기", description = "식당 하나에 대한 상세 정보가 반환됩니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
             "- 반환 값 보충 설명\n\n" +
             "   - restaurantId: not null\n\n" +
@@ -180,6 +188,8 @@ public class RestaurantApiController {
         if (evaluationDTO.getEvaluationScore() == null || evaluationDTO.getEvaluationScore().equals(0d)) {
             throw new ParamException("평가 점수가 필요합니다.");
         }
+
+        log.info("이미지: {}", evaluationDTO.getNewImage());
 
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // TODO 나중에 수정
