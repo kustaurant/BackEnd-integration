@@ -378,17 +378,31 @@ public class CommunityApiController {
 
     // 게시글 생성
     @PostMapping("/posts")
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @Operation(summary = "게시글 생성 ", description = "게시글 제목,카테고리,내용,이미지를 입력받아 게시글을 생성합니다.")
+    @Operation(summary = "게시글 생성", description = "게시글 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "게시글이 생성되었습니다", content = @Content)
     })
     public ResponseEntity<PostDTO> postCreate(
-            @RequestParam("title") String title,
-            @RequestParam("postCategory") String postCategory,
-            @RequestParam("content") String content,
-            @RequestParam(value = "imgUrl", required = false) String imgUrl,
-            @JwtToken Integer userId) {
+            @RequestParam("title")
+            @Parameter(description = "게시글 제목입니다. 최소 1자에서 최대 100자까지 입력 가능합니다.", example = "오늘의 맛집 추천")
+            String title,
+
+            @RequestParam("postCategory")
+            @Parameter(description = "게시판 종류를 나타내는 파라미터입니다. (free:자유게시판, column:칼럼게시판, suggestion:건의게시판)", example = "free")
+            String postCategory,
+
+            @RequestParam("content")
+            @Parameter(description = "게시글의 내용입니다. 최소 1자에서 최대 10,000자까지 입력 가능합니다.", example = "이 음식점은 정말 최고였습니다!")
+            String content,
+
+            @RequestParam(value = "imgUrl", required = false)
+            @Parameter(description = "첨부 이미지의 URL입니다. 이미지를 첨부하지 않을 경우 이 필드는 생략할 수 있습니다.", example = "https://example.com/image.jpg")
+            String imgUrl,
+
+            @JwtToken
+            @Parameter(hidden = true)
+            Integer userId
+    ) {
 
         // 게시글 객체 생성
         Post post = new Post(title, content, postCategory, "ACTIVE", LocalDateTime.now());
@@ -413,19 +427,35 @@ public class CommunityApiController {
 
     // 게시글 수정
     @PatchMapping("/posts/{postId}")
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @Operation(summary = "게시글 수정)", description = "게시글 ID와 내용을 입력받아 수정합니다.")
+    @Operation(summary = "게시글 수정", description = "게시글 ID와 수정할 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "게시글 수정이 완료되었습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<String> postUpdate(
-            @PathVariable String postId,
-            @RequestParam String title,
-            @RequestParam String postCategory,
-            @RequestParam String content,
-            @RequestParam(value = "imgUrl", required = false) String imgUrl,
-            @JwtToken @Parameter(hidden = true) Integer userId
+            @PathVariable
+            @Parameter(description = "수정할 게시글의 ID입니다.", example = "123")
+            String postId,
+
+            @RequestParam("title")
+            @Parameter(description = "수정할 게시글 제목입니다. 최소 1자에서 최대 100자까지 입력 가능합니다.", example = "업데이트된 맛집 추천")
+            String title,
+
+            @RequestParam("postCategory")
+            @Parameter(description = "수정할 게시판 종류를 나타내는 파라미터입니다. (free:자유게시판, column:칼럼게시판, suggestion:건의게시판)", example = "free")
+            String postCategory,
+
+            @RequestParam("content")
+            @Parameter(description = "수정할 게시글의 내용입니다. 최소 1자에서 최대 10,000자까지 입력 가능합니다.", example = "건대 맛집을 다녀왔습니다.")
+            String content,
+
+            @RequestParam(value = "imgUrl", required = false)
+            @Parameter(description = "수정할 첨부 이미지의 URL입니다. 이미지를 변경하지 않을 경우 이 필드는 생략할 수 있습니다.", example = "https://example.com/new-image.jpg")
+            String imgUrl,
+
+            @JwtToken
+            @Parameter(hidden = true)
+            Integer userId
     ) {
 
         Post post = postApiService.getPost(Integer.valueOf(postId));
