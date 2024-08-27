@@ -397,9 +397,6 @@ public class CommunityApiController {
         ;
         postApiService.create(post, user);
 
-//        // TinyMCE 컨텐츠에서 <img> 태그를 파싱
-//        Document doc = Jsoup.parse(content);
-//        Elements imgTags = doc.select("img");
 
         // 이미지 파일 처리
         PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");

@@ -29,7 +29,6 @@ public class PostDTO {
     @Schema(description = "게시글이 업데이트된 날짜", example = "2024-05-20T18:09:06")
     LocalDateTime updatedAt;
     @Schema(description = "좋아요 개수", example = "3")
-
     Integer likeCount;
     @Schema(description = "작성자 정보")
     UserDTO user;
