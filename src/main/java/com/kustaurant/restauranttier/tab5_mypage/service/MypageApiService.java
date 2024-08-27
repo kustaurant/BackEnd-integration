@@ -219,7 +219,7 @@ public class MypageApiService {
     // 유저가 작성한 커뮤니티 게시글 리스트들 반환
     public List<MypagePostDTO> getWrittenUserPosts(Integer userId){
         Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("activePostFilter").setParameter("status", "active");
+        session.enableFilter("activePostFilter").setParameter("status", "ACTIVE");
 
         User user = findUserById(userId);
         List<Post> activePosts = user.getPostList();
@@ -243,7 +243,7 @@ public class MypageApiService {
     // 유저가 스크랩한 커뮤니티 게시글 리스트들 반환
     public List<MypagePostDTO> getScrappedUserPosts(Integer userId) {
         Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("activePostFilter").setParameter("status", "active");
+        session.enableFilter("activePostFilter").setParameter("status", "ACTIVE");
 
         User user = findUserById(userId);
         List<PostScrap> scrappedPosts = user.getScrapList();
@@ -266,7 +266,7 @@ public class MypageApiService {
     // 유저가 댓글단 커뮤니티 게시글 리스트들 반환
     public List<MypagePostCommentDTO> getCommentedUserPosts(Integer userId){
         Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("activePostFilter").setParameter("status", "active");
+        session.enableFilter("activePostFilter").setParameter("status", "ACTIVE");
 
         User user = findUserById(userId);
         List<PostComment> commentedPosts = user.getPostCommentList();
