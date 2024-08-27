@@ -5,6 +5,7 @@ import com.kustaurant.restauranttier.common.apiUser.JwtToken;
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
+import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
@@ -95,13 +96,9 @@ public class RestaurantApiController {
         log.info("{}", userAgent);
 
         RestaurantDetailDTO responseData = RestaurantDetailDTO.convertRestaurantToDetailDTO(
-                restaurant, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user), isIOS(userAgent));
+                restaurant, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user), RestaurantConstants.isIOS(userAgent));
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
-    }
-
-    private boolean isIOS(String userAgent) {
-        return userAgent.toLowerCase().contains("iphone") || userAgent.toLowerCase().contains("ipad") || userAgent.toLowerCase().contains("ios");
     }
 
     // 즐겨찾기
@@ -204,7 +201,7 @@ public class RestaurantApiController {
 
         evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
 
-        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, isEvaluated, isFavorite, isIOS(userAgent)), HttpStatus.OK);
+        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, isEvaluated, isFavorite, RestaurantConstants.isIOS(userAgent)), HttpStatus.OK);
     }
 
     // 리뷰 불러오기
@@ -242,7 +239,7 @@ public class RestaurantApiController {
         // TODO 나중에 수정
         User user = userService.findUserById(userId);
 
-        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurant, user, sort.equals("popularity"), isIOS(userAgent));
+        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurant, user, sort.equals("popularity"), userAgent);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -382,7 +379,7 @@ public class RestaurantApiController {
 
         RestaurantComment restaurantComment = restaurantCommentService.addSubComment(restaurant, user, commentBody, commentId);
 
-        return new ResponseEntity<>(RestaurantCommentDTO.convertComment(restaurantComment, null, null, isIOS(userAgent)), HttpStatus.OK);
+        return new ResponseEntity<>(RestaurantCommentDTO.convertComment(restaurantComment, null, user, userAgent), HttpStatus.OK);
     }
 
     private void checkRestaurantIdAndCommentId(Restaurant restaurant, int restaurantId, int commentId) {

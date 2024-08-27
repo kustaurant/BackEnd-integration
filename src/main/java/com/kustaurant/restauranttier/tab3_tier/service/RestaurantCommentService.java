@@ -90,7 +90,7 @@ public class RestaurantCommentService {
         restaurantCommentRepository.save(comment);
     }
 
-    public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular, boolean isIOS) {
+    public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular, String userAgent) {
         // 평가 데이터 및 댓글 가져오기
         List<RestaurantCommentDTO> mainCommentList = new ArrayList<>(restaurant.getEvaluationList().stream()
                 .map(evaluation -> {
@@ -102,7 +102,7 @@ public class RestaurantCommentService {
                         entry.getValue(),          // comment
                         entry.getKey().getEvaluationScore(), // evaluationScore
                         user,
-                        isIOS
+                        userAgent
                 ))
                 .toList());
 
@@ -119,7 +119,7 @@ public class RestaurantCommentService {
                 .peek(mainComment ->
                         mainComment.setCommentReplies(
                                 findCommentsByParentCommentId(mainComment.getCommentId()).stream()
-                                        .map(comment -> RestaurantCommentDTO.convertComment(comment, null, user, isIOS))
+                                        .map(comment -> RestaurantCommentDTO.convertComment(comment, null, user, userAgent))
                                         .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
                                         .collect(Collectors.toList())
                         )
