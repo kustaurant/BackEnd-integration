@@ -247,6 +247,7 @@ public class EvaluationService {
     }
 
     // 식당 별 점수, 평가 수, 상황 개수를 다시 카운트합니다.
+    @Transactional
     public void calculateEvaluationDatas() {
         List<Restaurant> restaurantList = restaurantRepository.findByStatus("ACTIVE");
 
@@ -271,7 +272,7 @@ public class EvaluationService {
             restaurant.setRestaurantEvaluationCount(evaluationCount);
             restaurant.setRestaurantScoreSum(scoreSum);
             restaurantRepository.save(restaurant);
-            log.info("식당:{}, 평가개수: {}, 총합: {}", restaurant.getRestaurantName(), evaluationCount, scoreSum);
+            log.info("식당id:{} 식당:{}, 평가개수:{}, 총합:{}", restaurant.getRestaurantId(), restaurant.getRestaurantName(), evaluationCount, scoreSum);
 
             situationCountMap.forEach((key, value) -> restaurantSituationRelationService.createOrDelete(restaurant, key, value));
         });

@@ -42,10 +42,6 @@ public class Evaluation {
     @OneToMany(mappedBy = "evaluation")
     private List<EvaluationItemScore> evaluationItemScoreList = new ArrayList<>();
 
-    public List<EvaluationItemScore> getEvaluationItemScoreList() {
-        return null;
-    }
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="restaurant_id")
