@@ -4,6 +4,9 @@ import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -14,6 +17,8 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "posts_tbl")
+@FilterDef(name = "activePostFilter", parameters = @ParamDef(name = "status", type = String.class))
+@Filter(name = "activePostFilter", condition = "status = :status")
 public class Post {
 
     @Id
