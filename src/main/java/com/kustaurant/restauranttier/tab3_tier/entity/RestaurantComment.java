@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -34,6 +35,10 @@ public class RestaurantComment {
 
     @OneToMany(mappedBy = "restaurantComment")
     private List<RestaurantCommentdislike> restaurantCommentdislikeList=new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "restaurantComment")
+    private List<RestaurantCommentReport> restaurantCommentReportList = new ArrayList<>();
 
     private String commentBody;
     private String commentImgUrl;

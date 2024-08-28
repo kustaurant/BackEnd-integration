@@ -3,7 +3,6 @@ package com.kustaurant.restauranttier.tab3_tier.service;
 import com.kustaurant.restauranttier.tab3_tier.constants.TierConstants;
 import com.kustaurant.restauranttier.tab3_tier.controller.TierWebController;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
-import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.common.etc.JsonData;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
@@ -160,10 +159,8 @@ public class EvaluationService {
     }
 
     public void createOrUpdate(User user, Restaurant restaurant, EvaluationDTO evaluationDTO) {
-        log.info("새로운 평가 내용: {}", evaluationDTO);
-
+        // 이전 평가 가져오기
         Evaluation evaluation = evaluationRepository.findByUserAndRestaurantAndStatus(user, restaurant, "ACTIVE").orElse(null);
-
         if (evaluation == null) { // 이전 평가가 없을 경우
             evaluationCreate(user, restaurant, evaluationDTO);
         } else { // 이전 평가가 있을 경우
@@ -171,13 +168,14 @@ public class EvaluationService {
         }
     }
 
+    // 평가 업데이트하기
     @Transactional
     public void evaluationUpdate(User user, Restaurant restaurant, Evaluation evaluation, EvaluationDTO evaluationDTO) {
         // 평가 업데이트
         evaluation.setUpdatedAt(LocalDateTime.now());
         evaluation.setEvaluationScore(evaluationDTO.getEvaluationScore());
         evaluationRepository.save(evaluation);
-        // 평가 코멘트 업데이트
+        // 평가 코멘트나 사진 업데이트
         RestaurantComment comment = restaurantCommentService.findCommentByEvaluationId(evaluation.getEvaluationId());
         if ((evaluationDTO.getEvaluationComment() == null || evaluationDTO.getEvaluationComment().isEmpty())
                 && (evaluationDTO.getNewImage() == null || evaluationDTO.getNewImage().isEmpty())) { // 코멘트 내용과 사진이 없는 경우
@@ -213,7 +211,7 @@ public class EvaluationService {
                 evaluationDTO.getEvaluationScore(), "ACTIVE", LocalDateTime.now(), user, restaurant
         );
         evaluationRepository.save(evaluation);
-        // 평가 코멘트
+        // 평가 코멘트 - 평가 코멘트나 사진 추가
         if ((evaluationDTO.getEvaluationComment() != null && !evaluationDTO.getEvaluationComment().isEmpty())
                 || (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty())) {
             restaurantCommentService.createRestaurantComment(user, restaurant, evaluation, evaluationDTO);

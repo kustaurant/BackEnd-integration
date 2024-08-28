@@ -90,6 +90,10 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<PostScrap> scrapList = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private List<RestaurantCommentReport> restaurantCommentReportList = new ArrayList<>();
+
     @Builder
     public User(String providerId, String loginApi, String userPassword, String userEmail, String userPhoneNumber, String userNickname, UserRole userRole, String status, LocalDateTime createdAt) {
         this.providerId = providerId;
