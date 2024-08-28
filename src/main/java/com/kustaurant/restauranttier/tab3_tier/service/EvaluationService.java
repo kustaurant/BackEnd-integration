@@ -168,9 +168,13 @@ public class EvaluationService {
         }
     }
 
-    // 평가 업데이트하기
+    // 이전 평가가 있는 경우 - 평가 업데이트하기
     @Transactional
     public void evaluationUpdate(User user, Restaurant restaurant, Evaluation evaluation, EvaluationDTO evaluationDTO) {
+        // restaurants_tbl 테이블 점수 업데이트
+        restaurant.setRestaurantScoreSum(restaurant.getRestaurantScoreSum() - evaluation.getEvaluationScore() + evaluationDTO.getEvaluationScore());
+        restaurantRepository.save(restaurant);
+        calculateTierOfOneRestaurant(restaurant);
         // 평가 업데이트
         evaluation.setUpdatedAt(LocalDateTime.now());
         evaluation.setEvaluationScore(evaluationDTO.getEvaluationScore());
@@ -191,10 +195,10 @@ public class EvaluationService {
         }
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
         // 이전 상황 데이터 삭제 & 이전에 선택한 상황에 대해 restaurant_situation_relations_tbl 테이블의 count 1씩 감소
-        evaluationItemScoresService.deleteSituationsByEvaluation(evaluation);
         for (EvaluationItemScore evaluationItemScore : evaluation.getEvaluationItemScoreList()) {
             restaurantSituationRelationService.updateOrCreate(restaurant, evaluationItemScore.getSituation(), -1);
         }
+        evaluationItemScoresService.deleteSituationsByEvaluation(evaluation);
         // 새로 추가
         if (evaluationDTO.getEvaluationSituations() != null && !evaluationDTO.getEvaluationSituations().isEmpty()) {
             for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {
@@ -209,6 +213,7 @@ public class EvaluationService {
         }
     }
 
+    // 이전 평가가 업는 경우 - 평가 생성하기
     @Transactional
     public void evaluationCreate(User user, Restaurant restaurant, EvaluationDTO evaluationDTO) {
         // 평가 저장
@@ -216,6 +221,11 @@ public class EvaluationService {
                 evaluationDTO.getEvaluationScore(), "ACTIVE", LocalDateTime.now(), user, restaurant
         );
         evaluationRepository.save(evaluation);
+        // restaurants_tbl 테이블 점수 업데이트
+        restaurant.setRestaurantScoreSum(restaurant.getRestaurantScoreSum() + evaluationDTO.getEvaluationScore());
+        restaurant.setRestaurantEvaluationCount(restaurant.getRestaurantEvaluationCount() + 1);
+        restaurantRepository.save(restaurant);
+        calculateTierOfOneRestaurant(restaurant);
         // 평가 코멘트 - 평가 코멘트나 사진 추가
         if ((evaluationDTO.getEvaluationComment() != null && !evaluationDTO.getEvaluationComment().isEmpty())
                 || (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty())) {
@@ -231,6 +241,17 @@ public class EvaluationService {
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
                         restaurantSituationRelationService.updateOrCreate(restaurant, newSituation, 1));
             }
+        }
+    }
+
+    // 식당의 티어를 다시 계산함
+    @Transactional
+    public void calculateTierOfOneRestaurant(Restaurant restaurant) {
+        if (restaurant != null) {
+            restaurant.setMainTier(
+                    TierConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
+            );
+            restaurantRepository.save(restaurant);
         }
     }
 
