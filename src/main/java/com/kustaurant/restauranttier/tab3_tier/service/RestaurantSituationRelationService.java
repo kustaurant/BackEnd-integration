@@ -21,9 +21,11 @@ public class RestaurantSituationRelationService {
     public void updateOrCreate(Restaurant restaurant, Situation situation, Integer addDateCount) {
         RestaurantSituationRelation restaurantSituationRelation = getByRestaurantAndSituation(restaurant, situation);
         if (restaurantSituationRelation == null) { // 새로 생성
-            restaurantSituationRelationRepository.save(new RestaurantSituationRelation(
-                    addDateCount, situation, restaurant
-            ));
+            if (addDateCount > 0) { // 음수가 들어올수도 있어서
+                restaurantSituationRelationRepository.save(new RestaurantSituationRelation(
+                        addDateCount, situation, restaurant
+                ));
+            }
         } else { // 기존에 있어서 업데이트
             restaurantSituationRelation.setDataCount(restaurantSituationRelation.getDataCount() + addDateCount);
             restaurantSituationRelationRepository.save(restaurantSituationRelation);

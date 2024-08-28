@@ -190,7 +190,12 @@ public class EvaluationService {
             }
         }
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
+        // 이전 상황 데이터 삭제 & 이전에 선택한 상황에 대해 restaurant_situation_relations_tbl 테이블의 count 1씩 감소
         evaluationItemScoresService.deleteSituationsByEvaluation(evaluation);
+        for (EvaluationItemScore evaluationItemScore : evaluation.getEvaluationItemScoreList()) {
+            restaurantSituationRelationService.updateOrCreate(restaurant, evaluationItemScore.getSituation(), -1);
+        }
+        // 새로 추가
         if (evaluationDTO.getEvaluationSituations() != null && !evaluationDTO.getEvaluationSituations().isEmpty()) {
             for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {
                 // Evaluation Situation Item Table
