@@ -55,11 +55,11 @@ public class RestaurantApiController {
 
     private final S3Service s3Service;
 
-    @PostMapping("/test-for-s3")
-    public ResponseEntity<Void> testForS3(EvaluationDTO evaluationDTO) {
-        s3Service.uploadFile(evaluationDTO.getNewImage());
-        return ResponseEntity.ok(null);
-    }
+//    @PostMapping("/test-for-s3")
+//    public ResponseEntity<Void> testForS3(EvaluationDTO evaluationDTO) {
+//        s3Service.uploadFile(evaluationDTO.getNewImage());
+//        return ResponseEntity.ok(null);
+//    }
 
     @Operation(summary = "식당 상세 화면 정보 불러오기", description = "식당 하나에 대한 상세 정보가 반환됩니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
             "- 반환 값 보충 설명\n\n" +
