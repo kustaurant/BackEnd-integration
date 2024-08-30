@@ -146,12 +146,12 @@ public class MypageApiService {
     //5
     // 전화번호 유효성 검증 메서드
     private void validatePhoneNum(User user, String newPhoneNum) {
-        // 핸드폰 값이 변경됨을 확인
-        if(user.getPhoneNumber()!=null && !newPhoneNum.equals(user.getPhoneNumber())){
+        // 핸드폰 값이 없거나, 변경됨을 확인
+        if(user.getPhoneNumber() == null || !newPhoneNum.equals(user.getPhoneNumber())) {
             // 핸드폰 값이 숫자로 11개만 이루어진 형식임을 확인
             if (newPhoneNum.matches("\\d{11}")) {
                 user.setPhoneNumber(newPhoneNum);
-            }else {
+            } else {
                 throw new IllegalArgumentException("전화번호는 숫자로 11자로만 입력되어야 합니다.");
             }
         }
