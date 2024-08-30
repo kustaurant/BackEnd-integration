@@ -80,7 +80,8 @@ public class MypageApiService {
         boolean updated = false;
 
         // 아무런 변경값 없이 프로필 저장하기 버튼을 누름
-        if ((receivedPhoneNumber.isEmpty() || user.getPhoneNumber().equals(receivedPhoneNumber))
+        if ((receivedPhoneNumber == null || receivedPhoneNumber.isEmpty() ||
+                (user.getPhoneNumber() != null && user.getPhoneNumber().equals(receivedPhoneNumber)))
                 && user.getUserNickname().equals(receivedNickname)) {
             throw new IllegalArgumentException("변경된 값이 없습니다.");
         }
