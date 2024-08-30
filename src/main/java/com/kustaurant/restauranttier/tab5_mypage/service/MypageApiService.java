@@ -16,7 +16,6 @@ import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

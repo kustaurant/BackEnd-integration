@@ -46,7 +46,7 @@ public class RestaurantCommentDTO {
         return new RestaurantCommentDTO(
                 comment.getCommentId(),
                 evaluationScore,
-                RestaurantConstants.getIconImgUrl(user, userAgent),
+                RestaurantConstants.getIconImgUrl(comment.getUser(), userAgent),
                 comment.getUser().getUserNickname(),
                 comment.calculateTimeAgo(),
                 comment.getCommentImgUrl(),
