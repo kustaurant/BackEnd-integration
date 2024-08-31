@@ -1,5 +1,7 @@
 package com.kustaurant.restauranttier.tab5_mypage.service;
 
+import com.kustaurant.restauranttier.tab1_home.repository.NoticeRepository;
+import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantFavorite;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,14 +32,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MypageApiService {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PostScrapRepository postScrapRepository;
     private final PostCommentRepository postCommentRepository;
     private final RestaurantCommentService restaurantCommentService;
+    private final NoticeRepository noticeRepo;
+
+
     public User findUserById(Integer userId) {
         if (userId == null) {
             return null;
@@ -46,14 +49,15 @@ public class MypageApiService {
 
     //1
     // 마이페이지 화면에서 표시될 "유저닉네임, 좋아요맛집개수, 스크랩맛집개수" 를 반환.
-    public MypageMainDTO getMypageInfo(Integer userid){
+    public MypageMainDTO getMypageInfo(Integer userid,String userAgent){
         User user = findUserById(userid);
 
+        String iconURL = RestaurantConstants.getIconImgUrl(user, userAgent);
         String userNickname = user.getUserNickname();
         int evalListSize = user.getEvaluationList().size();
         int favorListsize = user.getRestaurantFavoriteList().size();
 
-        return new MypageMainDTO(userNickname, evalListSize, favorListsize);
+        return new MypageMainDTO(iconURL, userNickname, evalListSize, favorListsize);
     }
 
 
@@ -267,6 +271,17 @@ public class MypageApiService {
                         comment.getLikeCount()
                 ))
                 .toList();
+    }
+
+    //10
+    public List<NoticeDTO> getAllNotices() {
+        return noticeRepo.findAll().stream()
+                .map(notice -> new NoticeDTO(
+                        notice.getNoticeTitle(),
+                        notice.getNoticeHref(),
+                        notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                ))
+                .collect(Collectors.toList());
     }
 
 

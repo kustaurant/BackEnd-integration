@@ -1,6 +1,8 @@
 package com.kustaurant.restauranttier.tab5_mypage.controller;
 
 import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
+import com.kustaurant.restauranttier.tab1_home.entity.Notice;
+import com.kustaurant.restauranttier.tab1_home.repository.NoticeRepository;
 import com.kustaurant.restauranttier.tab5_mypage.service.FeedbackService;
 import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import com.kustaurant.restauranttier.tab5_mypage.dto.*;
@@ -9,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,10 +35,11 @@ public class MypageApiController {
     )
     @GetMapping("/mypage")
     public ResponseEntity<MypageMainDTO> getMypageView(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @JwtToken Integer userId
     ){
 
-        MypageMainDTO mypageMainDTO = mypageApiService.getMypageInfo(userId);
+        MypageMainDTO mypageMainDTO = mypageApiService.getMypageInfo(userId, userAgent);
         return new ResponseEntity<>(mypageMainDTO, HttpStatus.OK);
     }
 
@@ -177,4 +181,14 @@ public class MypageApiController {
 
     }
 
+    //10
+    @Operation(
+            summary = "\"공지사항 목록화면\" 로드에 필요한 정보 불러오기",
+            description = "공지사항 리스트와 관련 링크들을 불러옵니다."
+    )
+    @GetMapping("/mypage/noticelist")
+    public ResponseEntity<List<NoticeDTO>> getNotices() {
+        List<NoticeDTO> noticeDTOs = mypageApiService.getAllNotices();
+        return ResponseEntity.ok(noticeDTOs);
+    }
 }
