@@ -21,9 +21,11 @@ public class RestaurantSituationRelationService {
     public void updateOrCreate(Restaurant restaurant, Situation situation, Integer addDateCount) {
         RestaurantSituationRelation restaurantSituationRelation = getByRestaurantAndSituation(restaurant, situation);
         if (restaurantSituationRelation == null) { // 새로 생성
-            restaurantSituationRelationRepository.save(new RestaurantSituationRelation(
-                    addDateCount, situation, restaurant
-            ));
+            if (addDateCount > 0) { // 음수가 들어올수도 있어서
+                restaurantSituationRelationRepository.save(new RestaurantSituationRelation(
+                        addDateCount, situation, restaurant
+                ));
+            }
         } else { // 기존에 있어서 업데이트
             restaurantSituationRelation.setDataCount(restaurantSituationRelation.getDataCount() + addDateCount);
             restaurantSituationRelationRepository.save(restaurantSituationRelation);
@@ -39,7 +41,12 @@ public class RestaurantSituationRelationService {
         RestaurantSituationRelation restaurantSituationRelation = getByRestaurantAndSituation(restaurant, situation);
         if (dataCount == 0 && restaurantSituationRelation != null) { // 0인데 기존에 있는 경우 삭제
             restaurantSituationRelationRepository.delete(restaurantSituationRelation);
-        } else { // 새로 생성
+        } else if (dataCount > 0 && restaurantSituationRelation != null && !restaurantSituationRelation.getDataCount().equals(dataCount)) {
+            // 기존 데이터 있는데 데이터가 다르면 업데이트
+            restaurantSituationRelation.setDataCount(dataCount);
+            restaurantSituationRelationRepository.save(restaurantSituationRelation);
+        } else if (dataCount > 0 && restaurantSituationRelation == null) {
+            // 기존 데이터가 없으면 새로 생성
             restaurantSituationRelationRepository.save(new RestaurantSituationRelation(
                     dataCount, situation, restaurant
             ));

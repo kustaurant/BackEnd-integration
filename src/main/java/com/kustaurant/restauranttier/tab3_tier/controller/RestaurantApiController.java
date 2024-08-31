@@ -1,15 +1,18 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
 import com.kustaurant.restauranttier.common.UserService;
-import com.kustaurant.restauranttier.common.apiUser.JwtToken;
+import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
+import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantDetailDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
+import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantCommentReport;
+import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantCommentReportRepository;
 import com.kustaurant.restauranttier.tab3_tier.service.*;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,10 +26,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +50,8 @@ public class RestaurantApiController {
     private final RestaurantFavoriteService restaurantFavoriteService;
     private final RestaurantCommentService restaurantCommentService;
     private final EvaluationService evaluationService;
+
+    private final RestaurantCommentReportRepository restaurantCommentReportRepository;
 
     private final S3Service s3Service;
 
@@ -87,21 +92,15 @@ public class RestaurantApiController {
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
+        // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
-
-        // TODO: 로그인 구현 후 수정
+        // 유져 가져오기
         User user = userService.findUserById(userId);
-
-        log.info("{}", userAgent);
-
+        // 식당 데이터 DTO로 변환하기
         RestaurantDetailDTO responseData = RestaurantDetailDTO.convertRestaurantToDetailDTO(
-                restaurant, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user), isIOS(userAgent));
+                restaurant, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user), RestaurantConstants.isIOS(userAgent));
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
-    }
-
-    private boolean isIOS(String userAgent) {
-        return userAgent.toLowerCase().contains("iphone") || userAgent.toLowerCase().contains("ipad") || userAgent.toLowerCase().contains("ios");
     }
 
     // 즐겨찾기
@@ -117,13 +116,11 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        // TODO: 로그인 구현 후 수정
+        // 유저 가져오기
         User user = userService.findUserById(userId);
-        if (user == null) {
-            throw new OptionalNotExistException(userId + " 유저가 존재하지 않습니다.");
-        }
-
+        // 즐겨찾기 로직
         boolean result = restaurantFavoriteService.toggleFavorite(user.getProviderId(), restaurantId);
+        // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         return ResponseEntity.ok(result);
     }
 
@@ -146,14 +143,13 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
+        // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        // 유저 가져오기
         User user = userService.findUserById(userId);
-        if (user == null) {
-            throw new OptionalNotExistException(userId + " 유저가 없습니다.");
-        }
-
+        // 해당 식당에 대한 이전 평가가 있을 경우 이전 평가 데이터를 반환해주고, 이전 평가가 없으면 별점 코멘트 데이터만 반환
         return user.getEvaluationList().stream()
-                .filter(evaluation -> evaluation.getRestaurant().equals(restaurant))
+                .filter(evaluation -> evaluation.getRestaurant().equals(restaurant) && evaluation.getStatus().equals("ACTIVE"))
                 .findFirst()
                 .map(evaluation -> {
                     RestaurantComment comment = restaurantCommentService.findCommentByEvaluationId(evaluation.getEvaluationId());
@@ -185,26 +181,20 @@ public class RestaurantApiController {
             EvaluationDTO evaluationDTO,
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @JwtToken Integer userId
-            ) {
+    ) {
+        // 필수 파라미터 체크
         if (evaluationDTO.getEvaluationScore() == null || evaluationDTO.getEvaluationScore().equals(0d)) {
             throw new ParamException("평가 점수가 필요합니다.");
         }
-
-        log.info("이미지: {}", evaluationDTO.getNewImage());
-
+        // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
-        // TODO 나중에 수정
+        // 유저 가져오기
         User user = userService.findUserById(userId);
-        boolean isFavorite = false;
-        boolean isEvaluated = false;
-        if (user != null) {
-            isFavorite = restaurantApiService.isFavorite(restaurant, user);
-            isEvaluated = restaurantApiService.isEvaluated(restaurant, user);
-        }
-
+        // 평가 추가하기 혹은 기존 평가 업데이트하기
         evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
-
-        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(restaurant, isEvaluated, isFavorite, isIOS(userAgent)), HttpStatus.OK);
+        // 평가 완료 후에 업데이트된 식당 데이터를 다시 반환
+        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(
+                restaurant, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user), RestaurantConstants.isIOS(userAgent)), HttpStatus.OK);
     }
 
     // 리뷰 불러오기
@@ -235,14 +225,16 @@ public class RestaurantApiController {
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
+        // sort 파라미터 체크
         if (!sort.equals("popularity") && !sort.equals("latest")) {
             throw new ParamException("sort 파라미터 입력 값이 올바르지 않습니다.");
         }
+        // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
-        // TODO 나중에 수정
+        // 유져 가져오기
         User user = userService.findUserById(userId);
-
-        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurant, user, sort.equals("popularity"), isIOS(userAgent));
+        // 이 식당의 댓글 리스트 가져오기
+        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurant, user, sort.equals("popularity"), userAgent);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -275,18 +267,15 @@ public class RestaurantApiController {
             @PathVariable Integer commentId,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
+        // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
         checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
-
-        // TODO: 로그인 구현 후 수정
+        // 유저 가져오기
         User user = userService.findUserById(userId);
-        if (user == null) {
-            throw new OptionalNotExistException(userId + "해당 유저가 없습니다.");
-        }
-
+        // 코멘트 가져오기
         RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-
+        // 식당 좋아요 로직
         Map<String, String> responseMap = new HashMap<>();
         restaurantCommentService.likeComment(user, restaurantComment, responseMap);
 
@@ -321,18 +310,15 @@ public class RestaurantApiController {
             @PathVariable Integer commentId,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
+        // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
         checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
-
-        // TODO: 로그인 구현 후 수정
+        // 유저 가져오기
         User user = userService.findUserById(userId);
-        if (user == null) {
-            throw new OptionalNotExistException(userId + "해당 유저가 없습니다.");
-        }
-
+        // 코멘트 가져오기
         RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-
+        // 댓글 싫어요 로직
         Map<String, String> responseMap = new HashMap<>();
         restaurantCommentService.dislikeComment(user, restaurantComment, responseMap);
 
@@ -370,19 +356,16 @@ public class RestaurantApiController {
         if (commentBody.trim().isEmpty()) {
             throw new ParamException("대댓글 내용이 없습니다.");
         }
-
+        // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
         checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
-        // TODO: 로그인 구현 후 수정
+        // 유저 가져오기
         User user = userService.findUserById(userId);
-        if (user == null) {
-            throw new OptionalNotExistException(userId + "해당 유저가 없습니다.");
-        }
-
+        // 대댓글 달기
         RestaurantComment restaurantComment = restaurantCommentService.addSubComment(restaurant, user, commentBody, commentId);
 
-        return new ResponseEntity<>(RestaurantCommentDTO.convertComment(restaurantComment, null, null, isIOS(userAgent)), HttpStatus.OK);
+        return new ResponseEntity<>(RestaurantCommentDTO.convertComment(restaurantComment, null, user, userAgent), HttpStatus.OK);
     }
 
     private void checkRestaurantIdAndCommentId(Restaurant restaurant, int restaurantId, int commentId) {
@@ -396,19 +379,49 @@ public class RestaurantApiController {
     @Operation(summary = "식당 댓글 및 대댓글 삭제하기", description = "식당 댓글 및 대댓글 삭제하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "삭제에 성공했습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))}),
-            @ApiResponse(responseCode = "400", description = "restaurantId 식당에 해당 comment Id를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+            @ApiResponse(responseCode = "400", description = "restaurantId 식당에 해당 comment Id를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
     })
     public ResponseEntity<Void> deleteComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
+        // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        // 유저 가져오기
         User user = userService.findUserById(userId);
-
+        // 이 댓글이 해당 식당의 댓글이 맞는지 확인
         checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
-
+        // 댓글 삭제
         restaurantCommentService.deleteAppComment(commentId, user);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 댓글 신고하기
+    @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}/report")
+    @Operation(summary = "댓글 신고하기", description = "신고하기를 누르면 \"정말 신고하시겠습니까?\" 다이얼로그를 띄우고, 이 api를 호출하시면 됩니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "신고에 성공했습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))}),
+            @ApiResponse(responseCode = "400", description = "restaurantId 식당에 해당 comment Id를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
+            @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.\n\n또한 commentId에 해당하는 comment가 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    })
+    public ResponseEntity<Void> reportComment(
+            @PathVariable Integer restaurantId,
+            @PathVariable Integer commentId,
+            @Parameter(hidden = true) @JwtToken Integer userId
+    ) {
+        // 식당 가져오기
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        // 유저 가져오기
+        User user = userService.findUserById(userId);
+        // 이 댓글이 해당 식당의 댓글이 맞는지 확인
+        checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+        // 댓글 가져오기
+        RestaurantComment comment = restaurantCommentService.findCommentByCommentId(commentId);
+        // 신고 테이블에 저장
+        restaurantCommentReportRepository.save(new RestaurantCommentReport(user, comment, LocalDateTime.now(), "ACTIVE"));
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

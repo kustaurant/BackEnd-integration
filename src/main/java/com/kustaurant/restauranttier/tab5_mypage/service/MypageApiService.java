@@ -1,21 +1,28 @@
 package com.kustaurant.restauranttier.tab5_mypage.service;
 
+import com.kustaurant.restauranttier.tab1_home.repository.NoticeRepository;
+import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
+import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantFavorite;
+import com.kustaurant.restauranttier.tab3_tier.service.RestaurantCommentService;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.entity.PostScrap;
+import com.kustaurant.restauranttier.tab4_community.repository.PostCommentRepository;
+import com.kustaurant.restauranttier.tab4_community.repository.PostRepository;
+import com.kustaurant.restauranttier.tab4_community.repository.PostScrapRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.dto.*;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,10 +32,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MypageApiService {
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final PostScrapRepository postScrapRepository;
+    private final PostCommentRepository postCommentRepository;
+    private final RestaurantCommentService restaurantCommentService;
+    private final NoticeRepository noticeRepo;
+
+
     public User findUserById(Integer userId) {
         if (userId == null) {
             return null;
@@ -36,20 +47,21 @@ public class MypageApiService {
         return userRepository.findByUserIdAndStatus(userId, "ACTIVE").orElse(null);
     }
 
-
+    //1
     // 마이페이지 화면에서 표시될 "유저닉네임, 좋아요맛집개수, 스크랩맛집개수" 를 반환.
-    public MypageMainDTO getMypageInfo(Integer userid){
+    public MypageMainDTO getMypageInfo(Integer userid,String userAgent){
         User user = findUserById(userid);
 
+        String iconURL = RestaurantConstants.getIconImgUrl(user, userAgent);
         String userNickname = user.getUserNickname();
         int evalListSize = user.getEvaluationList().size();
         int favorListsize = user.getRestaurantFavoriteList().size();
 
-        return new MypageMainDTO(userNickname, evalListSize, favorListsize);
+        return new MypageMainDTO(iconURL, userNickname, evalListSize, favorListsize);
     }
 
 
-
+    //2
     // 마이페이지 프로필 정보(변경)화면에서 표시될 "닉네임, 메일주소, 핸드폰번호" 를 반환
     public ProfileDTO getProfileInfo(Integer userid){
         User user = findUserById(userid);
@@ -62,7 +74,7 @@ public class MypageApiService {
     }
 
 
-
+    //3
     // 마이페이지 프로필 정보(변경)화면에서 로직을 검증하고 업데이트 하거나 결과를 반환
     public ProfileDTO updateUserProfile(Integer userid, ProfileDTO profileDTO) {
         User user = findUserById(userid);
@@ -72,9 +84,10 @@ public class MypageApiService {
         boolean updated = false;
 
         // 아무런 변경값 없이 프로필 저장하기 버튼을 누름
-        if ((receivedPhoneNumber.isEmpty() || user.getPhoneNumber().equals(receivedPhoneNumber))
+        if ((receivedPhoneNumber == null || receivedPhoneNumber.isEmpty() ||
+                (user.getPhoneNumber() != null && user.getPhoneNumber().equals(receivedPhoneNumber)))
                 && user.getUserNickname().equals(receivedNickname)) {
-            throw new IllegalArgumentException("수정된 값이 없습니다.");
+            throw new IllegalArgumentException("변경된 값이 없습니다.");
         }
 
         // 전화번호 값이 공백이 아님 (변경이 이루어진 적이 있음)
@@ -98,7 +111,7 @@ public class MypageApiService {
     }
 
 
-
+    //4
     // 닉네임 유효성 검증 메서드
     private void validateNickname(User user, String newNickname) {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
@@ -134,14 +147,15 @@ public class MypageApiService {
         user.setUpdatedAt(LocalDateTime.now());
     }
 
+    //5
     // 전화번호 유효성 검증 메서드
     private void validatePhoneNum(User user, String newPhoneNum) {
-        // 핸드폰 값이 변경됨을 확인
-        if(!newPhoneNum.equals(user.getPhoneNumber())){
+        // 핸드폰 값이 없거나, 변경됨을 확인
+        if(user.getPhoneNumber() == null || !newPhoneNum.equals(user.getPhoneNumber())) {
             // 핸드폰 값이 숫자로 11개만 이루어진 형식임을 확인
             if (newPhoneNum.matches("\\d{11}")) {
                 user.setPhoneNumber(newPhoneNum);
-            }else {
+            } else {
                 throw new IllegalArgumentException("전화번호는 숫자로 11자로만 입력되어야 합니다.");
             }
         }
@@ -168,9 +182,9 @@ public class MypageApiService {
     }
 
 
-
+    //6
     // 유저가 평가한 레스토랑 리스트들 반환
-    public List<EvaluateRestaurantInfoDTO> getUserEvaluateRestaurantList(Integer userId) {
+    public List<EvaluatedRestaurantInfoDTO> getUserEvaluateRestaurantList(Integer userId) {
         User user = findUserById(userId);
         List<Evaluation> evaluationList = user.getEvaluationList();
 
@@ -182,72 +196,74 @@ public class MypageApiService {
         });
 
         // 평가 리스트를 DTO로 변환하여 반환
-        List<EvaluateRestaurantInfoDTO> evaluateRestaurantInfoDTOS = evaluationList.stream()
-                .map(evaluation -> new EvaluateRestaurantInfoDTO(
+        List<EvaluatedRestaurantInfoDTO> evaluateRestaurantInfoDTOS = evaluationList.stream()
+                .map(evaluation -> {
+                    // RestaurantCommentService에서 코멘트를 가져옴
+                    RestaurantComment comment = restaurantCommentService.findCommentByEvaluationId(evaluation.getEvaluationId());
+
+                    String userCommentBody = comment != null ? comment.getCommentBody() : null;
+
+                    // EvaluationItemScoreList에서 각 상황 이름을 추출
+                    List<String> situationNames = evaluation.getEvaluationItemScoreList().stream()
+                            .map(item -> item.getSituation().getSituationName())
+                            .collect(Collectors.toList());
+
+                    return new EvaluatedRestaurantInfoDTO(
                             evaluation.getRestaurant().getRestaurantName(),
                             evaluation.getRestaurant().getRestaurantImgUrl(),
                             evaluation.getRestaurant().getRestaurantCuisine(),
-                            evaluation.getEvaluationScore()
-//                            evaluation.getEvaluationItemScoreList()
-                    ))
+                            evaluation.getEvaluationScore(),
+                            userCommentBody,
+                            situationNames
+                    );
+                })
                 .collect(Collectors.toList());
 
         return evaluateRestaurantInfoDTOS;
     }
 
 
-
+    //7
     // 유저가 작성한 커뮤니티 게시글 리스트들 반환
-    public List<MypagePostDTO> getWrittenUserPosts(Integer userId){
-        Session session = entityManager.unwrap(Session.class);
-        session.enableFilter("activePostFilter").setParameter("status", "active");
+    public List<MypagePostDTO> getWrittenUserPosts(Integer userId) {
+        List<Post> activePosts = postRepository.findActivePostsByUserId(userId);
 
-        User user = findUserById(userId);
-        List<Post> activePosts = user.getPostList();
-
-        // 데이터를 DTO로 변환
-        List<MypagePostDTO> postDTOList = activePosts.stream()
+        return activePosts.stream()
                 .map(post -> new MypagePostDTO(
                         post.getPostCategory(),
                         post.getPostTitle(),
-                        post.getPostBody().length() > 20 ? post.getPostBody().substring(0, 20) : post.getPostBody(), // 최대 20자,
+                        post.getPostBody().length() > 20 ? post.getPostBody().substring(0, 20) : post.getPostBody(),
                         post.getLikeCount(),
                         post.getPostCommentList().size()
                 ))
                 .collect(Collectors.toList());
-
-        return postDTOList;
     }
 
 
-
+    //8
     // 유저가 스크랩한 커뮤니티 게시글 리스트들 반환
     public List<MypagePostDTO> getScrappedUserPosts(Integer userId) {
-        User user = findUserById(userId);
-        List<PostScrap> scrappedPosts = user.getScrapList();
+        List<PostScrap> scrappedPosts = postScrapRepository.findActiveScrappedPostsByUserId(userId);
 
-        // 데이터를 DTO로 변환
-        List<MypagePostDTO> postScrapsDTOList = scrappedPosts.stream()
+        return scrappedPosts.stream()
                 .map(scrap -> new MypagePostDTO(
                         scrap.getPost().getPostCategory(),
                         scrap.getPost().getPostTitle(),
-                        scrap.getPost().getPostBody().length() > 20 ? scrap.getPost().getPostBody().substring(0, 20) : scrap.getPost().getPostBody(), // 최대 20자
+                        scrap.getPost().getPostBody().length() > 20 ? scrap.getPost().getPostBody().substring(0, 20) : scrap.getPost().getPostBody(),
                         scrap.getPost().getLikeCount(),
                         scrap.getPost().getPostCommentList().size()
                 ))
                 .collect(Collectors.toList());
-
-        return postScrapsDTOList;
     }
 
 
+    //9
     // 유저가 댓글단 커뮤니티 게시글 리스트들 반환
-    public List<MypagePostCommentDTO> getCommentedUserPosts(Integer userId){
-        User user = findUserById(userId);
-        List<PostComment> commentedPosts = user.getPostCommentList();
+    public List<MypagePostCommentDTO> getCommentedUserPosts(Integer userId) {
+        List<PostComment> commentedPosts = postCommentRepository.findActiveCommentedPostsByUserId(userId);
 
         // 데이터를 DTO로 변환
-        List<MypagePostCommentDTO> postCommentDTOList = commentedPosts.stream()
+        return commentedPosts.stream()
                 .map(comment -> new MypagePostCommentDTO(
                         comment.getPost().getPostCategory(),
                         comment.getPost().getPostTitle(),
@@ -255,9 +271,19 @@ public class MypageApiService {
                         comment.getLikeCount()
                 ))
                 .toList();
-
-        return postCommentDTOList;
     }
+
+    //10
+    public List<NoticeDTO> getAllNotices() {
+        return noticeRepo.findAll().stream()
+                .map(notice -> new NoticeDTO(
+                        notice.getNoticeTitle(),
+                        notice.getNoticeHref(),
+                        notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                ))
+                .collect(Collectors.toList());
+    }
+
 
 
 }

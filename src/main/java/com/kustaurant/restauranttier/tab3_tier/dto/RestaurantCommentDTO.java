@@ -42,11 +42,11 @@ public class RestaurantCommentDTO {
     @JsonIgnore
     private LocalDateTime date;
 
-    public static RestaurantCommentDTO convertComment(RestaurantComment comment, Double evaluationScore, User user, boolean isIOS) {
+    public static RestaurantCommentDTO convertComment(RestaurantComment comment, Double evaluationScore, User user, String userAgent) {
         return new RestaurantCommentDTO(
                 comment.getCommentId(),
                 evaluationScore,
-                RestaurantConstants.getIconImgUrl(comment, isIOS),
+                RestaurantConstants.getIconImgUrl(comment.getUser(), userAgent),
                 comment.getUser().getUserNickname(),
                 comment.calculateTimeAgo(),
                 comment.getCommentImgUrl(),

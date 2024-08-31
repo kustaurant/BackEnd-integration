@@ -23,11 +23,13 @@ public class RestaurantConstants {
             new StarComment(5.0, "인생 최고의 식당입니다.")
     );
 
-    public static String getIconImgUrl(RestaurantComment restaurantComment, boolean isIOS) {
-        if (restaurantComment == null) {
-            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level1icon" + (isIOS ? ".svg" : ".png");
+    public static String getIconImgUrl(User user, String userAgent) {
+        if (user == null) {
+            return null;
         }
-        User user = restaurantComment.getUser();
+
+        boolean isIOS = isIOS(userAgent);
+
         if (user.getEvaluationList().size() > 60) {
             return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level3icon" + (isIOS ? ".svg" : ".png");
         } else if (user.getEvaluationList().size() > 30) {
@@ -35,6 +37,10 @@ public class RestaurantConstants {
         } else {
             return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level1icon" + (isIOS ? ".svg" : ".png");
         }
+    }
+
+    public static boolean isIOS(String userAgent) {
+        return userAgent.toLowerCase().contains("iphone") || userAgent.toLowerCase().contains("ipad") || userAgent.toLowerCase().contains("ios");
     }
 
     @Data

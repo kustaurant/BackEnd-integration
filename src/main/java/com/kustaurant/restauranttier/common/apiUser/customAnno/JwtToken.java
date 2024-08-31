@@ -1,4 +1,4 @@
-package com.kustaurant.restauranttier.common.apiUser;
+package com.kustaurant.restauranttier.common.apiUser.customAnno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

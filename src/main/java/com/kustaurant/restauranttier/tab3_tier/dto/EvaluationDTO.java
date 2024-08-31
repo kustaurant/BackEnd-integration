@@ -32,7 +32,7 @@ public class EvaluationDTO {
         return new EvaluationDTO(
                 // TODO: 여기 수정
                 evaluation.getEvaluationScore(),
-                evaluation.getEvaluationItemScoreList().stream().map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationId()).collect(Collectors.toList()),
+                evaluation.getSituationIdList(),
                 comment == null ? null : comment.getCommentImgUrl(),
                 comment == null ? null : comment.getCommentBody(),
                 RestaurantConstants.STAR_COMMENTS,

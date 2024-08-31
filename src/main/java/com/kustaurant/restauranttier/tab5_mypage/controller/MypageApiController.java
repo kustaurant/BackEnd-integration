@@ -1,6 +1,8 @@
 package com.kustaurant.restauranttier.tab5_mypage.controller;
 
-import com.kustaurant.restauranttier.common.apiUser.JwtToken;
+import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
+import com.kustaurant.restauranttier.tab1_home.entity.Notice;
+import com.kustaurant.restauranttier.tab1_home.repository.NoticeRepository;
 import com.kustaurant.restauranttier.tab5_mypage.service.FeedbackService;
 import com.kustaurant.restauranttier.tab5_mypage.service.MypageApiService;
 import com.kustaurant.restauranttier.tab5_mypage.dto.*;
@@ -9,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auth/mypage/")
+@RequestMapping("/api/v1")
 public class MypageApiController {
 
     private final MypageApiService mypageApiService;
@@ -27,23 +30,25 @@ public class MypageApiController {
     //1
     @Operation(
             summary = "\"마이페이지 화면\" 로드에 필요한 정보 불러오기",
-            description = "마이페이지 화면에 필요한 정보들이 반환됩니다."
+            description = "마이페이지 화면에 필요한 정보들이 반환됩니다." +
+                    "또한 로그인하지 않은 회원도 접속 가능하기 때문에 엔드포인트에 /auth가 포함되지 않습니다."
     )
-    @GetMapping
+    @GetMapping("/mypage")
     public ResponseEntity<MypageMainDTO> getMypageView(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @JwtToken Integer userId
     ){
 
-        MypageMainDTO mypageMainDTO = mypageApiService.getMypageInfo(userId);
+        MypageMainDTO mypageMainDTO = mypageApiService.getMypageInfo(userId, userAgent);
         return new ResponseEntity<>(mypageMainDTO, HttpStatus.OK);
     }
 
     //2
     @Operation(
             summary = "마이페이지 프로필 정보(변경)화면 로드에 정보 불러오기",
-            description = ""
+            description = "마이페이지 프로필 정보(변경)화면 로드에 정보를 불러옵니다"
     )
-    @GetMapping("/profile")
+    @GetMapping("/auth/mypage/profile")
     public ResponseEntity<ProfileDTO> getMypageProfile(
             @Parameter(hidden = true) @JwtToken Integer userId
     ){
@@ -55,9 +60,18 @@ public class MypageApiController {
     //3
     @Operation(
             summary = "마이페이지 프로필 변경하기",
-            description = "유저의 닉네임,전화번호를 변경합니다. (프로필 사진 아직 미구현)"
+            description = "유저의 닉네임,전화번호를 변경합니다. (프로필 사진 미구현)"
     )
-    @PatchMapping("/profile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "변경된 사항이 없습니다 or" +
+                    " 닉네임을 변경한 지 30일이 지나지 않아 변경할 수 없습니다 or" +
+                    "해당 닉네임이 이미 존재합니다. or" +
+                    "이전과 동일한 닉네임입니다. or" +
+                    "닉네임은 2자 이상이어야 합니다. or" +
+                    "닉네임은 10자 이하여야 합니다. or" +
+                    "전화번호는 숫자로 11자로만 입력되어야 합니다.")
+    })
+    @PatchMapping("/auth/mypage/profile")
     public ResponseEntity<?> updateMypageProfile(
             @Parameter(hidden = true) @JwtToken Integer userId,
             @RequestBody ProfileDTO receivedProfileDTO
@@ -77,12 +91,12 @@ public class MypageApiController {
             summary = "\"내가 평가한 맛집 화면\" 로드에 필요한 정보 불러오기",
             description = "유저가 평가해논 맛집 정보들을 불러옵니다."
     )
-    @GetMapping("/evaluate-restuarnt-list")
-    public ResponseEntity<List<EvaluateRestaurantInfoDTO>> getEvaluateRestaurantList(
+    @GetMapping("/auth/mypage/evaluate-restaurant-list")
+    public ResponseEntity<List<EvaluatedRestaurantInfoDTO>> getEvaluateRestaurantList(
             @Parameter(hidden = true) @JwtToken Integer userId
     ){
 
-        List<EvaluateRestaurantInfoDTO> userEvaluateRestaurantList = mypageApiService.getUserEvaluateRestaurantList(userId);
+        List<EvaluatedRestaurantInfoDTO> userEvaluateRestaurantList = mypageApiService.getUserEvaluateRestaurantList(userId);
         return new ResponseEntity<>(userEvaluateRestaurantList, HttpStatus.OK);
     }
 
@@ -91,7 +105,7 @@ public class MypageApiController {
             summary = "\"내가 작성한 커뮤니티글 화면\" 로드에 필요한 정보 불러오기",
             description = "유저가 작성한 커뮤니티 글 리스트 정보들을 불러옵니다."
     )
-    @GetMapping("/community-list")
+    @GetMapping("/auth/mypage/community-list")
     public ResponseEntity<List<MypagePostDTO>> getWrittenUserPostsList(
             @Parameter(hidden = true) @JwtToken Integer userId
     ){
@@ -105,7 +119,7 @@ public class MypageApiController {
             summary = "\"내가 저장한 맛집 화면\" 로드에 필요한 정보 불러오기",
             description = "유저가 즐겨찾기해논 맛집 정보들을 불러옵니다."
     )
-    @GetMapping("/favorite-restuarnt-list")
+    @GetMapping("/auth/mypage/favorite-restaurant-list")
     public ResponseEntity<List<FavoriteRestaurantInfoDTO>> getFavoriteRestaurantList(
             @Parameter(hidden = true) @JwtToken Integer userId
     ){
@@ -119,7 +133,7 @@ public class MypageApiController {
             summary = "\"내가 저장한 커뮤니티 게시글 화면\" 로드에 필요한 정보 불러오기",
             description = "유저가 저장해놓은 커뮤니티 게시글 리스트 정보들을 불러옵니다."
     )
-    @GetMapping("/community-scrap-list")
+    @GetMapping("/auth/mypage/community-scrap-list")
     public ResponseEntity<List<MypagePostDTO>> getCommunityScrapList(
             @Parameter(hidden = true) @JwtToken Integer userId
     ){
@@ -133,7 +147,7 @@ public class MypageApiController {
             summary = "\"내가 작성한 커뮤니티 댓글 화면\" 로드에 필요한 정보 불러오기",
             description = "유저가 작성한 커뮤니티의 댓글 리스트들을 불러옵니다."
     )
-    @GetMapping("/community-comment-list")
+    @GetMapping("/auth/mypage/community-comment-list")
     public ResponseEntity<List<MypagePostCommentDTO>> getCommunityCommentList(
             @Parameter(hidden = true) @JwtToken Integer userId
     ){
@@ -151,7 +165,7 @@ public class MypageApiController {
             @ApiResponse(responseCode = "200", description = "피드백 감사합니다."),
             @ApiResponse(responseCode = "400", description = "내용이 없습니다."),
     })
-    @PostMapping("/feedback")
+    @PostMapping("/auth/mypage/feedback")
     public ResponseEntity<String> sendFeedback(
             @Parameter(hidden = true) @JwtToken Integer userId,
             @RequestBody FeedbackDTO feedbackDTO
@@ -167,4 +181,14 @@ public class MypageApiController {
 
     }
 
+    //10
+    @Operation(
+            summary = "\"공지사항 목록화면\" 로드에 필요한 정보 불러오기",
+            description = "공지사항 리스트와 관련 링크들을 불러옵니다."
+    )
+    @GetMapping("/mypage/noticelist")
+    public ResponseEntity<List<NoticeDTO>> getNotices() {
+        List<NoticeDTO> noticeDTOs = mypageApiService.getAllNotices();
+        return ResponseEntity.ok(noticeDTOs);
+    }
 }

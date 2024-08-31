@@ -40,7 +40,7 @@ public class Evaluation {
     private User user;
 
     @OneToMany(mappedBy = "evaluation")
-    private List<EvaluationItemScore> EvaluationItemScoreList = new ArrayList<>();
+    private List<EvaluationItemScore> evaluationItemScoreList = new ArrayList<>();
 
     @JsonIgnore
     @ManyToOne
@@ -57,6 +57,28 @@ public class Evaluation {
         this.createdAt = createdAt;
         this.user = user;
         this.restaurant = restaurant;
+    }
+
+    // 평가에서 선택한 situation들의 id 리스트를 반환합니다. 이전에 선택한게 없을경우 null을 반환합니다.
+    public List<Integer> getSituationIdList() {
+        if (this.evaluationItemScoreList == null || this.evaluationItemScoreList.isEmpty()) {
+            return null;
+        }
+
+        return this.evaluationItemScoreList.stream()
+                .map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationId())
+                .toList();
+    }
+
+    // 평가에서 선택한 situation들의 이름("혼밥", "데이트" 등)의 리스트를 반환합니다. 이전에 선택한게 없을 경우 null을 반환합니다.
+    public List<String> getSituationNameList() {
+        if (this.evaluationItemScoreList == null || this.evaluationItemScoreList.isEmpty()) {
+            return null;
+        }
+
+        return this.evaluationItemScoreList.stream()
+                .map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationName())
+                .toList();
     }
 
     public String calculateTimeAgo() {
