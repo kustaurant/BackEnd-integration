@@ -46,7 +46,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@RequestMapping("/api/v1/community")
+@RequestMapping("/api/v1")
 @RestController
 @RequiredArgsConstructor
 public class CommunityApiController {
@@ -63,7 +63,7 @@ public class CommunityApiController {
     private final UserService userService;
 
     // 커뮤니티 메인 화면
-    @GetMapping("/posts")
+    @GetMapping("/community/posts")
     @Operation(summary = "커뮤니티 메인화면의 게시글 리스트 불러오기", description = "게시판 종류와 페이지, 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다, 현재 인기순으로 설정했을 때는 좋아요가 3이상인 게시글만 반환됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 리스트를 반환하는데 성공하였습니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostDTO.class)))}),
@@ -101,7 +101,7 @@ public class CommunityApiController {
     }
 
     // 커뮤니티 게시글 상세 화면
-    @GetMapping("/{postId}")
+    @GetMapping("/community/{postId}")
     @Operation(summary = "게시글 상세 화면", description = "게시글 ID와 해당 게시물의 댓글의 정렬 방법을 입력받고 해당 게시글의 상세 정보를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 반환 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostDTO.class))}),
@@ -141,7 +141,7 @@ public class CommunityApiController {
         return ResponseEntity.ok(postDTO);
     }
 
-    @GetMapping("/ranking")
+    @GetMapping("/community/ranking")
     @Operation(summary = "커뮤니티 메인의 랭킹 탭에서 유저 랭킹 불러오기", description = "평가 수 기반의 유저 랭킹을 반환합니다. 분기순, 최신순으로 랭킹을 산정할 수 있습니다. 평가를 1개 이상 한 유저들은 모두 랭킹이 매겨집니다.")
     @ApiResponse(responseCode = "200", description = "유저 랭킹을 반환하는데 성공하였습니다", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))})
     @ApiResponse(responseCode = "404", description = "sort 파라미터 값이 잘못되었습니다", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
@@ -166,7 +166,7 @@ public class CommunityApiController {
         }
     }
     // 댓글 or 대댓글 생성
-    @PostMapping("/comments")
+    @PostMapping("/auth/community/comments")
     @Operation(summary = "댓글 생성, 대댓글 생성", description = "게시글 ID와 내용을 입력받아 댓글을 생성합니다. 대댓글의 경우 부모 댓글의 id를 파라미터로 받아야 합니다. 생성한 댓글을 반환합니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "댓글 혹은 대댓글 생성이 완료되었습니다", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostCommentDTO.class))}),
@@ -211,7 +211,7 @@ public class CommunityApiController {
         return ResponseEntity.status(HttpStatus.CREATED).body(PostCommentDTO.fromEntity(savedPostComment));
     }
 
-    @DeleteMapping("/{postId}")
+    @DeleteMapping("/auth/community/{postId}")
     @Transactional
     @Operation(summary = "게시글 삭제", description = "게시글 ID를 입력받고 해당 게시글을 삭제합니다. 삭제가 완료되면 204 상태 코드를 반환합니다.")
     @ApiResponses(value = {
@@ -261,7 +261,7 @@ public class CommunityApiController {
 
 
     // 댓글, 대댓글 삭제
-    @DeleteMapping("/comment/{commentId}")
+    @DeleteMapping("/auth/community/comment/{commentId}")
     @Transactional
     @Operation(summary = "댓글 삭제", description = "댓글 ID를 입력받고 해당 댓글 및 대댓글을 삭제합니다.")
     @ApiResponses(value = {
@@ -292,29 +292,8 @@ public class CommunityApiController {
         return ResponseEntity.noContent().build();
     }
 
-
-
-
-//
-//    // 게시글 싫어요 생성
-//    @PostMapping("/{postId}/dislikes")
-//    @Operation(summary = "게시글 싫어요", description = "게시글 ID를 입력받아 싫어요를 생성합니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "게시글 싫어요 처리가 완료되었습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = LikeOrDislikeDTO.class))),
-//            @ApiResponse(responseCode = "404", description = "해당 id의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-//    })
-//    public ResponseEntity<LikeOrDislikeDTO> postDislikeCreate(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
-//        Integer postidInt = Integer.valueOf(postId);
-//        User user = userService.findUserById(userId);
-//        Post post = postApiService.getPost(postidInt);
-//        String status = postApiService.dislikeCreateOrDelete(post, user);
-//        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(post.getLikeUserList().size(), post.getDislikeUserList().size(), status);
-//
-//        return ResponseEntity.ok(likeOrDislikeDTO);
-//    }
-
     // 게시글 스크랩
-    @PostMapping("/{postId}/scraps")
+    @PostMapping("/auth/community/{postId}/scraps")
     @Operation(summary = "게시글 스크랩", description = "게시글 ID를 입력받아 스크랩을 생성하거나 해제합니다. \n\nstatus와 현재 게시글의 스크랩 수를 반환합니다. \n\n처음 스크랩을 누르면 스크랩이 처리되고 status 값으로 1이 반환되며, 이미 스크랩된 상태였으면 해제되면서 status 값으로 0이 반환됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 스크랩 처리가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ScrapToggleDTO.class))),
@@ -329,7 +308,7 @@ public class CommunityApiController {
     }
 
     // 게시글 좋아요 생성
-    @PostMapping("/{postId}/likes")
+    @PostMapping("/auth/community/{postId}/likes")
     @Operation(summary = "게시글 좋아요 토글 버튼", description = "게시글 ID를 입력받아 좋아요를 생성하거나 해제합니다. \n\nstatus와 현재 게시글의 좋아요 수를 반환합니다. \n\n처음 좋아요를 누르면 좋아요가 처리되고 status 값으로 1이 반환되며, 이미 좋아요된 상태였으면 해제되면서 status 값으로 0이 반환됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 좋아요 처리가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LikeOrDislikeDTO.class))),
@@ -364,7 +343,7 @@ public class CommunityApiController {
 //        return ResponseEntity.ok(paging.getContent());
 //    }
 // 댓글 좋아요/싫어요 처리
-    @PostMapping("/comments/{commentId}/{action}")
+    @PostMapping("/auth/community/comments/{commentId}/{action}")
     @Operation(summary = "댓글 좋아요/싫어요", description = "댓글 ID를 입력받아 댓글에 대한 좋아요 또는 싫어요를 토글합니다. \n\n 댓글에 대한 유저의 현재 상태를 나타내는 commentLikeStatus와 좋아요, 싫어요 개수를 반환합니다. \n\n commentLikeStatus는 1 (좋아요), -1 (싫어요), 0 (아무것도 아님) 값으로 분류됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "처리가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentLikeDislikeDTO.class))),
@@ -396,7 +375,7 @@ public class CommunityApiController {
     }
 
 
-    @PostMapping("/posts")
+    @PostMapping("/auth/community/posts/create")
     @Operation(summary = "게시글 생성", description = "게시글 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 생성합니다.\n\n" +
             "- 요청 형식 보충 설명\n\n" +
             "   - title: 필수\n\n" +
@@ -447,7 +426,7 @@ public class CommunityApiController {
     }
 
 
-    @PatchMapping("/posts/{postId}")
+    @PatchMapping("/auth/community/posts/{postId}")
     @Operation(summary = "게시글 수정", description = "게시글 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 수정합니다.\n\n" +
             "- 요청 형식 보충 설명\n\n" +
             "   - title: 필수\n\n" +
