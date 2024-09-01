@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class MypageMainDTO {
+    private String iconImgUrl;
     private String nickname;
     private int evaluationCount;
     private int favoriteCount;
