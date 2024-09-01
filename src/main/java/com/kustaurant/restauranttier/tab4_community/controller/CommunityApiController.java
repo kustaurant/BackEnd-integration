@@ -5,6 +5,7 @@ import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.common.exception.exception.ServerException;
 import com.kustaurant.restauranttier.tab4_community.dto.*;
 import com.kustaurant.restauranttier.tab4_community.entity.*;
 import com.kustaurant.restauranttier.tab4_community.etc.PostCategory;
@@ -33,10 +34,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -397,7 +400,9 @@ public class CommunityApiController {
     @PostMapping("/posts")
     @Operation(summary = "게시글 생성", description = "게시글 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 생성합니다.")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글이 생성되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostDTO.class))),
             @ApiResponse(responseCode = "204", description = "게시글이 생성되었습니다", content = @Content)
+
     })
     public ResponseEntity<PostDTO> postCreate(
             @RequestParam("title")
@@ -412,9 +417,9 @@ public class CommunityApiController {
             @Parameter(description = "게시글의 내용입니다. 최소 1자에서 최대 10,000자까지 입력 가능합니다.", example = "이 음식점은 정말 최고였습니다!")
             String content,
 
-            @RequestParam(value = "imgUrl", required = false)
-            @Parameter(description = "첨부 이미지의 URL입니다. 이미지를 첨부하지 않을 경우 이 필드는 생략할 수 있습니다.", example = "https://example.com/image.jpg")
-            String imgUrl,
+            @RequestParam(value = "imageFile", required = false)
+            @Parameter(description = "MultipartFile타입의 이미지 파일입니다. 이미지를 첨부하지 않을 경우 이 필드는 생략할 수 있습니다. ", example = "https://example.com/image.jpg")
+            MultipartFile imageFile,
 
             @JwtToken
             @Parameter(hidden = true)
@@ -427,19 +432,24 @@ public class CommunityApiController {
         User user = userService.findUserById(userId);
         ;
         postApiService.create(post, user);
+        try{
+            String imageUrl = storageApiService.storeImage(imageFile);
+
+            // 이미지 파일 처리
+            PostPhoto postPhoto = new PostPhoto(imageUrl, "ACTIVE");
+            postPhoto.setPost(post); // 게시글과 이미지 연관관계 설정
+            post.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
+            postPhotoApiRepository.save(postPhoto); // 이미지 정보 저장
 
 
-        // 이미지 파일 처리
-        PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-        postPhoto.setPost(post); // 게시글과 이미지 연관관계 설정
-        post.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
-        postPhotoApiRepository.save(postPhoto); // 이미지 정보 저장
+            // 게시글 저장
+            postApiRepository.save(post);
 
+            return ResponseEntity.ok(PostDTO.fromEntity(post));
+        }catch (Exception e){
+            throw new ServerException("이미지 처리 과정에서 서버 에러가 발생했습니다.");
+        }
 
-        // 게시글 저장
-        postApiRepository.save(post);
-
-        return ResponseEntity.ok(PostDTO.fromEntity(post));
     }
 
     // 게시글 수정
@@ -466,27 +476,33 @@ public class CommunityApiController {
             @Parameter(description = "수정할 게시글의 내용입니다. 최소 1자에서 최대 10,000자까지 입력 가능합니다.", example = "건대 맛집을 다녀왔습니다.")
             String content,
 
-            @RequestParam(value = "imgUrl", required = false)
-            @Parameter(description = "수정할 첨부 이미지의 URL입니다. 이미지를 변경하지 않을 경우 이 필드는 생략할 수 있습니다.", example = "https://example.com/new-image.jpg")
-            String imgUrl,
+            @RequestParam(value = "imageFile", required = false)
+            @Parameter(description = "MultipartFile타입의 이미지 파일입니다. 이미지를 변경하지 않을 경우 이 필드는 생략할 수 있습니다.", example = "https://example.com/new-image.jpg")
+            MultipartFile imageFile,
 
             @JwtToken
             @Parameter(hidden = true)
             Integer userId
     ) {
+        try{
+            String imageUrl = storageApiService.storeImage(imageFile);
 
-        Post post = postApiService.getPost(Integer.valueOf(postId));
+            Post post = postApiService.getPost(Integer.valueOf(postId));
 
-        PostPhoto postPhoto = new PostPhoto(imgUrl,"ACTIVE");
-        post.getPostPhotoList().clear();
-        post.getPostPhotoList().add(postPhoto);
-        post.setPostTitle(title);
-        post.setPostCategory(postCategory);
-        post.setPostBody(content);
-        postApiRepository.save(post);
+            PostPhoto postPhoto = new PostPhoto(imageUrl,"ACTIVE");
+            post.getPostPhotoList().clear();
+            post.getPostPhotoList().add(postPhoto);
+            post.setPostTitle(title);
+            post.setPostCategory(postCategory);
+            post.setPostBody(content);
+            postApiRepository.save(post);
 
 
-        return ResponseEntity.noContent().build();
+            return ResponseEntity.noContent().build();
+        }catch(Exception e){
+            throw new ServerException("이미지 처리 중 서버에서 오류가 발생했습니다.");
+        }
+
     }
 
 //    // 이미지 업로드 (게시글 작성 중 미리보기)
