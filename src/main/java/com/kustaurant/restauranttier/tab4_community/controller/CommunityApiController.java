@@ -396,157 +396,93 @@ public class CommunityApiController {
     }
 
 
-    // 게시글 생성
     @PostMapping("/posts")
-    @Operation(summary = "게시글 생성", description = "게시글 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 생성합니다.")
+    @Operation(summary = "게시글 생성", description = "게시글 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 생성합니다.\n\n" +
+            "- 요청 형식 보충 설명\n\n" +
+            "   - title: 필수\n\n" +
+            "   - postCategory: 필수.\n\n" +
+            "   - content: 필수.\n\n" +
+            "   - imageFile: 없어도 됩니다.\n\n")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글이 생성되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostDTO.class))),
-            @ApiResponse(responseCode = "204", description = "게시글이 생성되었습니다", content = @Content)
-
+            @ApiResponse(responseCode = "500", description = "게시글 생성에 오류가 발생했습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<PostDTO> postCreate(
-            @RequestParam("title")
-            @Parameter(description = "게시글 제목입니다. 최소 1자에서 최대 100자까지 입력 가능합니다.", example = "오늘의 맛집 추천")
-            String title,
-
-            @RequestParam("postCategory")
-            @Parameter(description = "게시판 종류를 나타내는 파라미터입니다. (free:자유게시판, column:칼럼게시판, suggestion:건의게시판)", example = "free")
-            String postCategory,
-
-            @RequestParam("content")
-            @Parameter(description = "게시글의 내용입니다. 최소 1자에서 최대 10,000자까지 입력 가능합니다.", example = "이 음식점은 정말 최고였습니다!")
-            String content,
-
-            @RequestParam(value = "imageFile", required = false)
-            @Parameter(description = "MultipartFile타입의 이미지 파일입니다. 이미지를 첨부하지 않을 경우 이 필드는 생략할 수 있습니다. ", example = "https://example.com/image.jpg")
-            MultipartFile imageFile,
-
-            @JwtToken
-            @Parameter(hidden = true)
-            Integer userId
+            @ModelAttribute PostUpdateDTO postUpdateDTO,
+            @JwtToken @Parameter(hidden = true) Integer userId
     ) {
+        try {
+            // 유저 정보 가져오기
+            User user = userService.findUserById(userId);
 
-        // 게시글 객체 생성
-        Post post = new Post(title, content, postCategory, "ACTIVE", LocalDateTime.now());
+            // 게시글 객체 생성
+            Post post = new Post(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), "ACTIVE", LocalDateTime.now());
 
-        User user = userService.findUserById(userId);
-        ;
-        postApiService.create(post, user);
-        try{
-            String imageUrl = storageApiService.storeImage(imageFile);
+            // 유저와 게시글의 연관관계 설정
+            postApiService.create(post, user);
 
             // 이미지 파일 처리
-            PostPhoto postPhoto = new PostPhoto(imageUrl, "ACTIVE");
-            postPhoto.setPost(post); // 게시글과 이미지 연관관계 설정
-            post.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
-            postPhotoApiRepository.save(postPhoto); // 이미지 정보 저장
-
+            handleImageUpload(post, postUpdateDTO.getImageFile());
 
             // 게시글 저장
             postApiRepository.save(post);
 
+            // 성공 응답 반환
             return ResponseEntity.ok(PostDTO.fromEntity(post));
-        }catch (Exception e){
-            throw new ServerException("이미지 처리 과정에서 서버 에러가 발생했습니다.");
+        } catch (IOException e) {
+            throw new ServerException("이미지 처리 과정에서 오류가 발생했습니다.", e);
+        } catch (Exception e) {
+            throw new ServerException("게시글 생성 중 서버 오류가 발생했습니다.", e);
         }
-
+    }
+    private void handleImageUpload(Post post, MultipartFile imageFile) throws IOException {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageUrl = storageApiService.storeImage(imageFile);
+            PostPhoto postPhoto = new PostPhoto(imageUrl, "ACTIVE");
+            postPhoto.setPost(post);
+            post.getPostPhotoList().clear();  // 기존 이미지를 제거하고 새로운 이미지를 추가
+            post.getPostPhotoList().add(postPhoto);
+            postPhotoApiRepository.save(postPhoto);
+        }
     }
 
-    // 게시글 수정
+
     @PatchMapping("/posts/{postId}")
-    @Operation(summary = "게시글 수정", description = "게시글 ID와 수정할 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 수정합니다.")
+    @Operation(summary = "게시글 수정", description = "게시글 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 수정합니다.\n\n" +
+            "- 요청 형식 보충 설명\n\n" +
+            "   - title: 필수\n\n" +
+            "   - postCategory: 필수.\n\n" +
+            "   - content: 필수.\n\n" +
+            "   - imageFile: 없어도 됩니다.\n\n")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "게시글 수정이 완료되었습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "게시글 수정이 완료되었습니다."),
+            @ApiResponse(responseCode = "500", description = "게시글 수정 중 서버에러가 발생했습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<String> postUpdate(
-            @PathVariable
-            @Parameter(description = "수정할 게시글의 ID입니다.", example = "123")
-            String postId,
-
-            @RequestParam("title")
-            @Parameter(description = "수정할 게시글 제목입니다. 최소 1자에서 최대 100자까지 입력 가능합니다.", example = "업데이트된 맛집 추천")
-            String title,
-
-            @RequestParam("postCategory")
-            @Parameter(description = "수정할 게시판 종류를 나타내는 파라미터입니다. (free:자유게시판, column:칼럼게시판, suggestion:건의게시판)", example = "free")
-            String postCategory,
-
-            @RequestParam("content")
-            @Parameter(description = "수정할 게시글의 내용입니다. 최소 1자에서 최대 10,000자까지 입력 가능합니다.", example = "건대 맛집을 다녀왔습니다.")
-            String content,
-
-            @RequestParam(value = "imageFile", required = false)
-            @Parameter(description = "MultipartFile타입의 이미지 파일입니다. 이미지를 변경하지 않을 경우 이 필드는 생략할 수 있습니다.", example = "https://example.com/new-image.jpg")
-            MultipartFile imageFile,
-
-            @JwtToken
-            @Parameter(hidden = true)
-            Integer userId
+            @PathVariable @Parameter(description = "수정할 게시글의 ID입니다.", example = "123") String postId,
+            @ModelAttribute PostUpdateDTO postUpdateDTO,
+            @JwtToken @Parameter(hidden = true) Integer userId
     ) {
-        try{
-            String imageUrl = storageApiService.storeImage(imageFile);
-
+        try {
             Post post = postApiService.getPost(Integer.valueOf(postId));
 
-            PostPhoto postPhoto = new PostPhoto(imageUrl,"ACTIVE");
-            post.getPostPhotoList().clear();
-            post.getPostPhotoList().add(postPhoto);
-            post.setPostTitle(title);
-            post.setPostCategory(postCategory);
-            post.setPostBody(content);
+            // DTO를 통해 받은 데이터로 수정
+            if (postUpdateDTO.getTitle() != null) post.setPostTitle(postUpdateDTO.getTitle());
+            if (postUpdateDTO.getPostCategory() != null) post.setPostCategory(postUpdateDTO.getPostCategory());
+            if (postUpdateDTO.getContent() != null) post.setPostBody(postUpdateDTO.getContent());
+
+            // 이미지 파일 처리
+            handleImageUpload(post, postUpdateDTO.getImageFile());
+
+            // 게시글 저장
             postApiRepository.save(post);
-
-
-            return ResponseEntity.noContent().build();
-        }catch(Exception e){
-            throw new ServerException("이미지 처리 중 서버에서 오류가 발생했습니다.");
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            throw new ServerException("이미지 처리 과정에서 오류가 발생했습니다.", e);
+        } catch (Exception e) {
+            throw new ServerException("게시글 수정 중 서버 오류가 발생했습니다.", e);
         }
-
     }
-
-//    // 이미지 업로드 (게시글 작성 중 미리보기)
-//    @PostMapping("/upload/image")
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-//    @Operation(summary = "이미지 업로드", description = "이미지를 업로드하여 URL을 반환합니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "upload success", content = @Content),
-//            @ApiResponse(responseCode = "400", description = "bad request", content = @Content),
-//            @ApiResponse(responseCode = "500", description = "upload failure", content = @Content)
-//    })
-//    public ResponseEntity<?> imageUpload(Principal principal, @RequestParam("image") MultipartFile imageFile) throws IOException {
-//        if (imageFile.isEmpty()) {
-//            return ResponseEntity.badRequest().body(Map.of("rs_st", -1, "rs_msg", "파일이 없습니다."));
-//        }
-//
-//        try {
-//            String imageUrl = storageService.storeImage(imageFile);
-//            String thumbnailUrl = imageUrl; // 실제로는 썸네일 URL을 생성하거나 처리해야 할 수 있습니다.
-//
-//            Map<String, Object> fileInfo = new HashMap<>();
-//            fileInfo.put("thumbnailPath", thumbnailUrl);
-//            fileInfo.put("fullPath", imageUrl);
-//            fileInfo.put("orgFilename", imageFile.getOriginalFilename());
-//
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("rs_st", 0); // 성공 상태 코드
-//            response.put("rs_data", fileInfo);
-//
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            return ResponseEntity.internalServerError().body(Map.of("rs_st", -1, "rs_msg", "이미지 업로드 실패"));
-//        }
-//    }
-
-//    // 댓글 입력창 포커스시 로그인 상태 확인
-//    @GetMapping("/login/comment-write")
-//    @Operation(summary = "댓글 작성 로그인 확인 (미구현)", description = "댓글 입력창 포커스시 로그인 상태를 확인합니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "로그인 확인 성공", content = @Content)
-//    })
-//    public ResponseEntity<String> commentWriteLogin(@JwtToken Integer userId) {
-//        return ResponseEntity.ok("로그인이 성공적으로 되어있습니다.");
-//    }
 
 
 
