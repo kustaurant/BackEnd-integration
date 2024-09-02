@@ -33,7 +33,10 @@ public class RestaurantSpecification {
             // null인 경우 전체임
             if (cuisines != null) {
                 if (cuisines.contains("JH")) {
-                    predicates.add(criteriaBuilder.isNotNull(root.get("partnershipInfo")));
+                    predicates.add(criteriaBuilder.and(
+                            criteriaBuilder.isNotNull(root.get("partnershipInfo")),
+                            criteriaBuilder.notEqual(root.get("partnershipInfo"), "")
+                    ));
                 } else {
                     predicates.add(root.get("restaurantCuisine").in(cuisines));
                 }

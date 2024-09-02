@@ -30,6 +30,9 @@ $(document).ready(function () {
                         cuisineList = cuisineList.filter(item => item !== newCuisine);
                     }
                 }
+                if (cuisineList.length === 0) {
+                    cuisineList = ['ALL']
+                }
                 var apiUrl = `/tier?cuisines=${cuisineList.join(',')}&situations=${situationParam}&locations=${locationParam}`;
                 window.location.href = apiUrl;
             } else if (btn.dataset.situation) {
@@ -48,6 +51,9 @@ $(document).ready(function () {
                         situationList = situationList.filter(item => item !== newSituation);
                     }
                 }
+                if (situationList.length === 0) {
+                    situationList = ['ALL']
+                }
                 var apiUrl = `/tier?cuisines=${cuisineParam}&situations=${situationList.join(',')}&locations=${locationParam}`;
                 window.location.href = apiUrl;
             } else if (btn.dataset.location) {
@@ -65,6 +71,9 @@ $(document).ready(function () {
                     } else if (btn.classList.contains('selected')) {
                         locationList = locationList.filter(item => item !== newLocation);
                     }
+                }
+                if (locationList.length === 0) {
+                    locationList = ['ALL']
                 }
                 var apiUrl = `/tier?cuisines=${cuisineParam}&situations=${situationParam}&locations=${locationList.join(',')}`;
                 window.location.href = apiUrl;

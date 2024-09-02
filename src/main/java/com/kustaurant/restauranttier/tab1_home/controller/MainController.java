@@ -114,7 +114,7 @@ public class MainController {
         String[] kwList = kw.split(" "); // 검색어 공백 단위로 끊음
         List<Restaurant> restaurantList = restaurantWebService.searchRestaurants(kwList);
 
-        List<RestaurantTierDataClass> restaurantTierDataClassList = evaluationService.convertToTierDataClassList(restaurantList, user, 0, TierWebController.tierPageSize, false);
+        List<RestaurantTierDataClass> restaurantTierDataClassList = evaluationService.convertToTierDataClassList(restaurantList, user, false);
 
         model.addAttribute("restaurantTierData", restaurantTierDataClassList);
 

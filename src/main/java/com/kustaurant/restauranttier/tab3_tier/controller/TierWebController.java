@@ -9,6 +9,7 @@ import com.kustaurant.restauranttier.tab3_tier.argument_resolver.LocationList;
 import com.kustaurant.restauranttier.tab3_tier.argument_resolver.SituationList;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantFavorite;
 import com.kustaurant.restauranttier.tab3_tier.entity.Situation;
+import com.kustaurant.restauranttier.tab3_tier.etc.CuisineEnum;
 import com.kustaurant.restauranttier.tab3_tier.etc.EnumSituation;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
@@ -19,6 +20,7 @@ import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,7 +34,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -81,28 +85,61 @@ public class TierWebController {
     @GetMapping("/tier")
     public String tier(
             Model model,
-            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "page", defaultValue = "1") int page,
             @CuisineList List<String> cuisines,
             @SituationList List<Integer> situations,
             @LocationList List<String> locations,
-            Principal principal
+            Principal principal,
+            HttpServletRequest request
     ) {
+        // page를 0부터 시작하도록 처리
+        if (page < 1) {
+            page = 0;
+        } else {
+            page--;
+        }
         // User 처리
         User user = customOAuth2UserService.getUserByPrincipal(principal);
         // restaurant list 처리
-        Page<Restaurant> tierRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocationsWithPage(cuisines, situations, locations, 1, true, page, tierPageSize);
+        List<Restaurant> tierRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, null, true);
 
-        List<RestaurantTierDataClass> restaurantsData = evaluationService.convertToTierDataClassList(tierRestaurants.toList(), user, page, tierPageSize, true);
+        List<RestaurantTierDataClass> restaurantsData = evaluationService.convertToTierDataClassList(tierRestaurants, user, true);
         Pageable pageable = PageRequest.of(page, tierPageSize);
-
 
         model.addAttribute("cuisines", cuisines);
         model.addAttribute("situations", situations);
         model.addAttribute("locations", locations);
+        model.addAttribute("currentPage","tier");
         model.addAttribute("evaluationsCount", evaluationRepository.countAllByStatus("ACTIVE"));
         model.addAttribute("paging", convertToPage(restaurantsData, pageable));
+        model.addAttribute("queryString", getQueryStringWithoutPage(request));
 
         return "tier";
+    }
+
+    private String getQueryStringWithoutPage(HttpServletRequest request) {
+        return request.getParameterMap().entrySet().stream()
+                .filter(entry -> !entry.getKey().equals("page"))
+                .flatMap(entry -> {
+                    String key = entry.getKey();
+                    return Arrays.stream(entry.getValue()).map(value -> key + "=" + value);
+                })
+                .collect(Collectors.joining("&"));
+    }
+
+    public Page<RestaurantTierDataClass> convertToPage(List<RestaurantTierDataClass> dataList, Pageable pageable) {
+        int totalSize = dataList.size();
+        int totalPages = (int) Math.ceil((double) totalSize / pageable.getPageSize());
+
+        // 현재 페이지가 총 페이지 수보다 큰 경우 마지막 페이지로 이동
+        if (pageable.getPageNumber() >= totalPages && totalPages > 0) {
+            pageable = PageRequest.of(totalPages - 1, pageable.getPageSize());
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), totalSize);
+
+        return new PageImpl<>(dataList.subList(start, end), pageable, totalSize);
     }
 
     // 티어표 화면 이전
@@ -168,11 +205,4 @@ public class TierWebController {
 //        model.addAttribute("evaluationsCount", evaluationRepository.countAllByStatus("ACTIVE"));
 //        return "tier";
 //    }
-
-    public Page<RestaurantTierDataClass> convertToPage(List<RestaurantTierDataClass> dataList, Pageable pageable) {
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), dataList.size());
-
-        return new PageImpl<>(dataList.subList(start, end), pageable, dataList.size());
-    }
 }

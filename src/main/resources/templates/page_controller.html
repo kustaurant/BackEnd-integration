@@ -1,27 +1,3 @@
-<!--페이지 컨트롤러-->
-<div th:fragment="page-controller" class="row" th:if="${!paging.isEmpty()}" style="margin: 0;">
-  <div class="col-12 mt-2 mb-2 d-flex justify-content-center" style="padding: 0;">
-
-    <ul class="pagination pagination-style-01 fs-13 mb-0">
-      <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'"><a class="page-link"
-                                                                                    th:href="@{|?page=${paging.number-1}|}"
-                                                                                    th:data-page="${paging.number-1}"><img
-              src="/img/community/back.png" class="fs-18 d-xs-none page-arrow"></a></li>
-      <li th:each="page: ${#numbers.sequence(1, paging.totalPages)}"
-          th:if="${paging.number <= 2 ? page <= 5 : page >= paging.number - 1 and page <= paging.number + 3}"
-          th:classappend="${page == paging.number+1} ? 'active'"
-          class="page-item">
-        <a th:text="${page}" class="page-link" th:href="@{|?page=${page-1}|}" th:data-page="${page}"></a>
-      </li>
-      <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'"><a class="page-link"
-                                                                                th:href="@{|?page=${paging.number+1}|}"
-                                                                                th:data-page="${paging.number+1}"><img
-              src="/img/community/next.png" class="fs-18 d-xs-none page-arrow"></a></li>
-    </ul>
-
-  </div>
-</div>
-
 <!--티어표 페이지 컨트롤러-->
 <div id="pageController" th:fragment="tier-page-controller" class="row" th:if="${!paging.isEmpty()}" style="margin: 0;">
   <div class="col-12 mt-2 mb-2 d-flex justify-content-center" style="padding: 0;">
@@ -30,8 +6,8 @@
       <li class="page-item"
           th:classappend="${!paging.hasPrevious} ? 'disabled'">
         <a class="page-link page-number-button"
-           th:href="@{|?cuisine=${cuisine}&situation=${situationQueryParameter}&position=${positionQueryParameter}&page=${paging.number-1}|}"
-           th:data-page="${paging.number-1}">
+           th:href="@{|?${queryString}&page=${paging.number}|}"
+           th:data-page="${paging.number}">
           <img src="/img/community/back.png" class="fs-18 d-xs-none page-arrow">
         </a>
       </li>
@@ -39,10 +15,10 @@
           th:if="${paging.number <= 2 ? page <= 5 : page >= paging.number - 1 and page <= paging.number + 3}"
           th:classappend="${page == paging.number+1} ? 'active'"
           class="page-item">
-        <a th:text="${page}" class="page-link page-number-button"  th:href="@{|?cuisine=${cuisine}&situation=${situationQueryParameter}&position=${positionQueryParameter}&page=${page-1}|}" th:data-page="${page}"></a>
+        <a th:text="${page}" class="page-link page-number-button"  th:href="@{|?${queryString}&page=${page}|}" th:data-page="${page}"></a>
       </li>
       <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
-        <a class="page-link page-number-button" th:href="@{|?cuisine=${cuisine}&situation=${situationQueryParameter}&position=${positionQueryParameter}&page=${paging.number+1}|}" th:data-page="${paging.number+1}"><img src="/img/community/next.png" class="fs-18 d-xs-none page-arrow">
+        <a class="page-link page-number-button" th:href="@{|?${queryString}&page=${paging.number+2}|}" th:data-page="${paging.number+2}"><img src="/img/community/next.png" class="fs-18 d-xs-none page-arrow">
         </a>
       </li>
     </ul>

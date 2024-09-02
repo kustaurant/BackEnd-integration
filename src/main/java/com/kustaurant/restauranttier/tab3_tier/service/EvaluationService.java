@@ -308,7 +308,7 @@ public class EvaluationService {
 
 
     // 그냥 Restaurant 리스트를 RestaurantTierDataClass 리스트로 변경 ver1
-    public List<RestaurantTierDataClass> convertToTierDataClassList(List<Restaurant> restaurantList, User user, int page, int pageSize, boolean isRanking) {
+    public List<RestaurantTierDataClass> convertToTierDataClassList(List<Restaurant> restaurantList, User user, boolean isRanking) {
         List<RestaurantTierDataClass> resultList = new ArrayList<>();
 
         for (int i = 0; i < restaurantList.size(); i++) {
@@ -319,7 +319,7 @@ public class EvaluationService {
             // 순위, 상황 추가
             if (restaurant.getMainTier() > 0) { // 티어가 있는 경우
                 if (isRanking) {
-                    int ranking = page * pageSize + i + 1;
+                    int ranking = i + 1;
                     newDataClass.setRanking(ranking + "");
                 } else {
                     newDataClass.setRanking("-");
