@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -62,5 +63,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         } else {
             throw new DataNotFoundException("user not found");
         }
+    }
+
+    public User getUserByPrincipal(Principal principal) {
+        if (principal == null) {
+            return null;
+        }
+        Optional<User> user = userRepository.findByProviderId(principal.getName());
+        return user.orElse(null);
     }
 }

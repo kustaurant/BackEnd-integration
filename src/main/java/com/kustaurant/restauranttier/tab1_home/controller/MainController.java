@@ -1,12 +1,15 @@
 package com.kustaurant.restauranttier.tab1_home.controller;
 
+import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab1_home.entity.HomeModal;
 import com.kustaurant.restauranttier.tab1_home.repository.HomeModalRepository;
+import com.kustaurant.restauranttier.tab3_tier.controller.TierWebController;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantRepository;
+import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.service.FeedbackService;
-import com.kustaurant.restauranttier.tab3_tier.service.RestaurantService;
+import com.kustaurant.restauranttier.tab3_tier.service.RestaurantWebService;
 import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -26,9 +29,10 @@ import java.util.*;
 public class MainController {
     private final RestaurantRepository restaurantRepository;
     private final FeedbackService feedbackService;
-    private final RestaurantService restaurantService;
+    private final RestaurantWebService restaurantWebService;
     private final EvaluationService evaluationService;
     private final HomeModalRepository HomeModalRepository;
+    private final CustomOAuth2UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     //@Value("#{'${restaurant.cuisines}'.split(',\\s*')}")
@@ -60,7 +64,7 @@ public class MainController {
             Model model,
             Principal principal
     ) {
-        List<Restaurant> restaurants = restaurantService.getTopRestaurants();
+        List<Restaurant> restaurants = restaurantWebService.getTopRestaurants();
         List<String> cuisines = new ArrayList<>(Arrays.asList("한식","일식","중식","양식","아시안","고기","치킨","햄버거","분식","해산물","술집","샐러드","카페","베이커리","기타","전체"));
 
         HomeModal homeModal = HomeModalRepository.getHomeModalByModalId(1);
@@ -98,6 +102,8 @@ public class MainController {
             @RequestParam(value = "kw", defaultValue = "") String kw,
             Principal principal
     ) {
+        User user = userService.getUserByPrincipal(principal);
+
         if (kw.isEmpty()) {
             model.addAttribute("kw", "입력된 검색어가 없습니다.");
             return "searchResult";
@@ -106,9 +112,9 @@ public class MainController {
         }
 
         String[] kwList = kw.split(" "); // 검색어 공백 단위로 끊음
-        List<Restaurant> restaurantList = restaurantService.searchRestaurants(kwList);
+        List<Restaurant> restaurantList = restaurantWebService.searchRestaurants(kwList);
 
-        List<RestaurantTierDataClass> restaurantTierDataClassList = evaluationService.convertToTierDataClassList(restaurantList, principal, 0, true);
+        List<RestaurantTierDataClass> restaurantTierDataClassList = evaluationService.convertToTierDataClassList(restaurantList, user, 0, TierWebController.tierPageSize, false);
 
         model.addAttribute("restaurantTierData", restaurantTierDataClassList);
 

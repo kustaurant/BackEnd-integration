@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class RestaurantService {
+public class RestaurantWebService {
     // 슬라이더에 나오는 식당들의 평가 수 기준 (현재 2이상)
     public static final Integer evaluationCount = 2;
     private final RestaurantRepository restaurantRepository;

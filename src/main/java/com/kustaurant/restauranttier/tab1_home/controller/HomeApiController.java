@@ -6,7 +6,7 @@ import com.kustaurant.restauranttier.tab1_home.dto.RestaurantListsResponse;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
-import com.kustaurant.restauranttier.tab3_tier.service.RestaurantService;
+import com.kustaurant.restauranttier.tab3_tier.service.RestaurantWebService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class HomeApiController {
     private final RestaurantApiService restaurantApiService;
-    private final RestaurantService restaurantService;
+    private final RestaurantWebService restaurantWebService;
     private final UserService userService;
 
     @Operation(summary = "홈화면 top맛집, 나를 위한 맛집, 배너 이미지 불러오기", description = "top 맛집과 나를 위한 맛집 리스트인 topRestaurantsByRating, restaurantsForMe 을 반환하고 홈의 배너 이미지 url리스트를 반환합니다.")
@@ -100,7 +100,7 @@ public class HomeApiController {
         User user = userService.findUserById(userId);
 
         String[] kwList = kw.split(" ");
-        List<Restaurant> restaurantList = restaurantService.searchRestaurants(kwList);
+        List<Restaurant> restaurantList = restaurantWebService.searchRestaurants(kwList);
 
         return ResponseEntity.ok(restaurantList.stream().map(restaurant ->
                 RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)))

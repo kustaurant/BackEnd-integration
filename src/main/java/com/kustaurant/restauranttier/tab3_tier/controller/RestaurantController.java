@@ -7,7 +7,7 @@ import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantMenu;
 import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantCommentService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantFavoriteService;
-import com.kustaurant.restauranttier.tab3_tier.service.RestaurantService;
+import com.kustaurant.restauranttier.tab3_tier.service.RestaurantWebService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab3_tier.etc.EnumSortComment;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
@@ -36,7 +36,7 @@ public class RestaurantController {
     private final RestaurantCommentService restaurantCommentService;
     private final EvaluationService evaluatioanService;
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final RestaurantService restaurantService;
+    private final RestaurantWebService restaurantWebService;
     private final RestaurantFavoriteService restaurantFavoriteService;
     private final EvaluationRepository evaluationRepository;
 
@@ -52,8 +52,8 @@ public class RestaurantController {
             Principal principal
     ) {
         // 식당 정보
-        Restaurant restaurant = restaurantService.getRestaurant(restaurantId);
-        restaurantService.plusVisitCount(restaurant);
+        Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
+        restaurantWebService.plusVisitCount(restaurant);
         model.addAttribute("restaurant", restaurant);
         String visitCountData = restaurant.getVisitCount() +
                 "회";
@@ -66,7 +66,7 @@ public class RestaurantController {
         evaluatioanService.insertSituation(restaurantTierDataClass, restaurant);
         model.addAttribute("situationTierList", restaurantTierDataClass.getRestaurantSituationRelationList());
         // 메뉴
-        List<RestaurantMenu> restaurantMenus = restaurantService.getRestaurantMenuList(restaurantId);
+        List<RestaurantMenu> restaurantMenus = restaurantWebService.getRestaurantMenuList(restaurantId);
         model.addAttribute("menus", restaurantMenus);
         // 메뉴 펼치기 이전에 몇개의 메뉴를 보여줄 것인가
         model.addAttribute("initialDisplayMenuCount", initialDisplayMenuCount);
@@ -104,7 +104,7 @@ public class RestaurantController {
     public ResponseEntity<List<Restaurant>> getRestaurantsByCuisine(
             @RequestParam(value = "cuisine", defaultValue = "전체") String cuisine
     ) {
-        List<Restaurant> restaurants = restaurantService.getRestaurantList(cuisine);
+        List<Restaurant> restaurants = restaurantWebService.getRestaurantList(cuisine);
 
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
@@ -116,7 +116,7 @@ public class RestaurantController {
             @PathVariable Integer restaurantId
     ) {
         //TODO: 반환값이 null일 경우(해당 식당의 status가 ACTIVE가 아닐 경우) 처리 해줘야함.
-        List<RestaurantMenu> restaurantMenus = restaurantService.getRestaurantMenuList(restaurantId);
+        List<RestaurantMenu> restaurantMenus = restaurantWebService.getRestaurantMenuList(restaurantId);
 
         return new ResponseEntity<>(restaurantMenus, HttpStatus.OK);
     }

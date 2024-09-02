@@ -89,18 +89,10 @@ public class Restaurant {
     private List<RestaurantMenu> restaurantMenuList = new ArrayList<>();
 
     public String getTierImgUrl(Integer tier) {
-        String url = "/img/tier/" + tier.toString() + "tier.png";
-        return url;
+        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + tier.toString() + "tier.png";
     }
     public String getCuisineImgUrl(String cuisine) {
-        return "/img/tier/cuisine/" + getSubstringBefore(cuisine, '/') + ".png";
-    }
-    public String getSubstringBefore(String input, char delimiter) {
-        int index = input.indexOf(delimiter);
-        if (index != -1) {
-            return input.substring(0, index);
-        }
-        return input; // delimiter가 없는 경우에는 원본 문자열 그대로 반환
+        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + cuisine.replaceAll("/", "") + ".png";
     }
 
     // 평균 평가 점수 계산

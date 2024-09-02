@@ -14,8 +14,7 @@ import java.util.List;
 public class RestaurantTierDataClass {
     private String ranking;
     private Restaurant restaurant;
-    @JsonIgnore
-    private Integer situationTier;
+
     private Boolean isFavorite = false;
     private Boolean isEvaluation = false;
     @JsonIgnore
@@ -23,11 +22,6 @@ public class RestaurantTierDataClass {
 
     public RestaurantTierDataClass(Restaurant restaurant) {
         this.restaurant = restaurant;
-    }
-
-    public RestaurantTierDataClass (Restaurant restaurant, Integer situationTier) {
-        this.restaurant = restaurant;
-        this.situationTier = situationTier;
     }
 
     public void addSituation(RestaurantSituationRelation restaurantSituationRelation) {

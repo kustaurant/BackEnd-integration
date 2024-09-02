@@ -2,11 +2,13 @@ package com.kustaurant.restauranttier.tab3_tier.argument_resolver;
 
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.etc.CuisineEnum;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +26,7 @@ public class CuisineListArgumentResolver implements HandlerMethodArgumentResolve
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) throws Exception {
+        boolean isApiRequest = isApiRequest(webRequest);
 
         String cuisines = webRequest.getParameter("cuisines");
         if (cuisines == null || cuisines.isEmpty()) {
@@ -31,7 +34,17 @@ public class CuisineListArgumentResolver implements HandlerMethodArgumentResolve
         }
 
         if (cuisines.contains("ALL") && cuisines.contains(("JH"))) {
-            throw new ParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
+            if (isApiRequest) {
+                // API 요청의 경우 예외를 던집니다.
+                throw new ParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
+            } else {
+                // 웹 요청의 경우 클라이언트에 리다이렉트를 지시합니다.
+                HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+                if (response != null) {
+                    response.sendRedirect("/tier"); // 리다이렉트할 URL
+                }
+                return null;
+            }
         }
 
         try {
@@ -52,7 +65,26 @@ public class CuisineListArgumentResolver implements HandlerMethodArgumentResolve
             return cuisineList;
 
         } catch (IllegalArgumentException e) {
-            throw new ParamException("cuisines 파라미터 입력이 올바르지 않습니다.");
+            if (isApiRequest) {
+                // API 요청의 경우 예외를 던집니다.
+                throw new ParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
+            } else {
+                // 웹 요청의 경우 클라이언트에 리다이렉트를 지시합니다.
+                HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);
+                if (response != null) {
+                    response.sendRedirect("/tier"); // 리다이렉트할 URL
+                }
+                return null;
+            }
         }
+    }
+
+    private boolean isApiRequest(NativeWebRequest webRequest) {
+        String acceptHeader = webRequest.getHeader("Accept");
+        String contentTypeHeader = webRequest.getHeader("Content-Type");
+
+        // JSON 요청일 경우 API 요청으로 간주합니다.
+        return (acceptHeader != null && acceptHeader.contains("application/json")) ||
+                (contentTypeHeader != null && contentTypeHeader.contains("application/json"));
     }
 }

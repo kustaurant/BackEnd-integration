@@ -5,7 +5,7 @@ import com.kustaurant.restauranttier.tab1_home.controller.MainController;
 import com.kustaurant.restauranttier.common.etc.JsonData;
 import com.kustaurant.restauranttier.tab3_tier.repository.EvaluationRepository;
 import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
-import com.kustaurant.restauranttier.tab3_tier.service.RestaurantService;
+import com.kustaurant.restauranttier.tab3_tier.service.RestaurantWebService;
 import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @Controller
 public class EvaluationController {
-    private final RestaurantService restaurantService;
+    private final RestaurantWebService restaurantWebService;
     private final EvaluationService evaluationService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final EvaluationRepository evaluationRepository;
