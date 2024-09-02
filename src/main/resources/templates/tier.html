@@ -96,67 +96,67 @@
                     <span class="text">종류</span>
                     <div class="buttons scrollable">
                         <a th:class="${cuisines eq null ? 'selected button category' : 'unselected button category'}" data-cuisine="ALL">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/전체.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/전체.svg">
                             <span class="cuisine-link">전체</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '한식') ? 'selected button category' : 'unselected button category'}" data-cuisine="KO">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/한식.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/한식.svg">
                             <span class="cuisine-link">한식</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '일식') ? 'selected button category' : 'unselected button category'}" data-cuisine="JA">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/일식.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/일식.svg">
                             <span class="cuisine-link">일식</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '중식') ? 'selected button category' : 'unselected button category'}" data-cuisine="CH">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/중식.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/중식.svg">
                             <span class="cuisine-link">중식</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '양식') ? 'selected button category' : 'unselected button category'}" data-cuisine="WE">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/양식.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/양식.svg">
                             <span class="cuisine-link">양식</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '아시안') ? 'selected button category' : 'unselected button category'}" data-cuisine="AS">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/아시안.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/아시안.svg">
                             <span class="cuisine-link">아시안</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '고기') ? 'selected button category' : 'unselected button category'}" data-cuisine="ME">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/고기.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/고기.svg">
                             <span class="cuisine-link">고기</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '치킨') ? 'selected button category' : 'unselected button category'}" data-cuisine="CK">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/치킨.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/치킨.svg">
                             <span class="cuisine-link">치킨</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '해산물') ? 'selected button category' : 'unselected button category'}" data-cuisine="SE">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/해산물.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/해산물.svg">
                             <span class="cuisine-link">해산물</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '햄버거/피자') ? 'selected button category' : 'unselected button category'}" data-cuisine="HP">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/햄버거피자.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/햄버거피자.svg">
                             <span class="cuisine-link">햄버거/피자</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '분식') ? 'selected button category' : 'unselected button category'}" data-cuisine="BS">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/분식.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/분식.svg">
                             <span class="cuisine-link">분식</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '술집') ? 'selected button category' : 'unselected button category'}" data-cuisine="PU">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/술집.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/술집.svg">
                             <span class="cuisine-link">술집</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '카페/디저트') ? 'selected button category' : 'unselected button category'}" data-cuisine="CA">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/카페디저트.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/카페디저트.svg">
                             <span class="cuisine-link">카페/디저트</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '베이커리') ? 'selected button category' : 'unselected button category'}" data-cuisine="BA">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/베이커리.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/베이커리.svg">
                             <span class="cuisine-link">베이커리</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, '샐러드') ? 'selected button category' : 'unselected button category'}" data-cuisine="SA">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/샐러드.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/샐러드.svg">
                             <span class="cuisine-link">샐러드</span>
                         </a>
                         <a th:class="${cuisines ne null and #lists.contains(cuisines, 'JH') ? 'selected button category' : 'unselected button category'}" data-cuisine="JH">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/제휴업체.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/제휴업체.svg">
                             <span class="cuisine-link">제휴 업체</span>
                         </a>
                     </div>
@@ -166,7 +166,7 @@
                     <span class="text">상황</span>
                     <div class="buttons scrollable">
                         <a th:class="${situations eq null ? 'selected button category' : 'unselected button category'}" data-situation="ALL">
-                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/전체.png">
+                            <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/전체.svg">
                             <span>전체</span>
                         </a>
                         <a th:class="${situations ne null and #lists.contains(situations, 1) ? 'selected button category' : 'unselected button category'}" data-situation="1">
@@ -269,11 +269,11 @@
             <td class="td-rank" th:text="${restaurantTierData.getRanking()}" style="min-width: 32px"></td>
             <td id="restaurantTierDateNameOuter" class="td-center" th:attr="data-favorite=${restaurantTierData.getIsFavorite()}" style="min-width: 58px; position: relative;">
                 <div style="width: fit-content; height: fit-content; padding: 0; margin: auto; position: relative;">
-                    <img class="favorite-icon restaurant-img-bottom-icon" th:if="${restaurantTierData.getIsEvaluation() and restaurantTierData.getIsFavorite()}" src="/img/tier/check.png">
-                    <img class="favorite-icon restaurant-img-top-icon" th:if="${restaurantTierData.getIsEvaluation() and !restaurantTierData.getIsFavorite()}" src="/img/tier/check.png">
-                    <img class="favorite-icon restaurant-img-top-icon" th:if="${restaurantTierData.getIsFavorite()}" src="/img/tier/star.png">
+                    <img class="favorite-icon restaurant-img-bottom-icon" th:if="${restaurantTierData.getIsEvaluation() and restaurantTierData.getIsFavorite()}" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/check.png">
+                    <img class="favorite-icon restaurant-img-top-icon" th:if="${restaurantTierData.getIsEvaluation() and !restaurantTierData.getIsFavorite()}" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/check.png">
+                    <img class="favorite-icon restaurant-img-top-icon" th:if="${restaurantTierData.getIsFavorite()}" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/star.png">
                     <img th:if="${restaurantTierData.getRestaurant().getRestaurantImgUrl() != 'no_img'}" class="td-main-img" th:src="${restaurantTierData.getRestaurant().getRestaurantImgUrl()}">
-                    <img th:if="${restaurantTierData.getRestaurant().getRestaurantImgUrl() == 'no_img'}" data-cuisine="전체" class="td-main-img" src="/img/restaurant/no_img.png">
+                    <img th:if="${restaurantTierData.getRestaurant().getRestaurantImgUrl() == 'no_img'}" data-cuisine="전체" class="td-main-img" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/no_img.png">
                 </div>
             </td>
             <td class="td-name">
