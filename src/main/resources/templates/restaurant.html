@@ -86,10 +86,9 @@
                 </span>
             </div>
             <div class="situation-tier-info left-justified">
-                <span th:each="situationTier : ${situationTierList}" th:class="'situation-tier tier' + ${situationTier.getSituationTier()}">
-                    <img class="tier-situation-img" th:src="'/img/tier/'+${situationTier.getSituation().getSituationName()}+'.png'">
+                <span th:each="situationTier : ${situationTierList}" class="situation-tier tier-1">
+                    <img class="tier-situation-img" th:src="'https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/'+${situationTier.getSituation().getSituationName()}+'.png'">
                     <span th:text="${situationTier.getSituation().getSituationName()} + ' '"></span>
-                    <span th:text="${situationTier.getSituationTier()} + '티어'"></span>
                 </span>
             </div>
         </div>

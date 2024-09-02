@@ -32,7 +32,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
-public class RestaurantController {
+public class RestaurantWebController {
     private final RestaurantCommentService restaurantCommentService;
     private final EvaluationService evaluatioanService;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -40,7 +40,7 @@ public class RestaurantController {
     private final RestaurantFavoriteService restaurantFavoriteService;
     private final EvaluationRepository evaluationRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(RestaurantController.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestaurantWebController.class);
     
     @Value("${restaurant.initialDisplayMenuCount}")
     private int initialDisplayMenuCount;
