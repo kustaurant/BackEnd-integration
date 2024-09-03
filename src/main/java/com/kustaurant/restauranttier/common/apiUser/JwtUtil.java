@@ -72,14 +72,6 @@ public class JwtUtil {
                 .getSubject());
     }
 
-    // JWT 토큰 유효성 검증 for Filter
-    public boolean validateTokenForFilter(String token) throws ExpiredJwtException, JwtException {
-        Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-        log.debug("토큰이 유효합니다: {}", token);
-        return true;
-    }
-
-
     // JWT 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
@@ -97,4 +89,11 @@ public class JwtUtil {
             return false;
         }
     }
+
+    // JWT 토큰 유효성 검증 for Filter
+    public boolean validateTokenForFilter(String token) throws ExpiredJwtException, JwtException {
+        Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        return true;
+    }
+
 }

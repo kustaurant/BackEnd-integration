@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,7 +34,7 @@ public class SecurityApiConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v*/auth/**").authenticated() // /api/vX/auth/** 경로는 인증 요구
                         .anyRequest().permitAll()) // 그 외의 모든 요청은 인증 없이 허용
-                .addFilterBefore(jwtAuthFilter, SecurityContextHolderFilter.class); // JWT 인증 필터 추가
+                .addFilterBefore(jwtAuthFilter, SecurityContextPersistenceFilter.class); // JWT 인증 필터 추가
 
         return http.build();
     }
