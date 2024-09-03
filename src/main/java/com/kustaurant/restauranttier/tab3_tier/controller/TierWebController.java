@@ -106,9 +106,7 @@ public class TierWebController {
         List<RestaurantTierDataClass> restaurantsData = evaluationService.convertToTierDataClassList(tierRestaurants, user, true);
         Pageable pageable = PageRequest.of(page, tierPageSize);
 
-        if (cuisines != null) {
-            model.addAttribute("isJH", cuisines.contains("JH"));
-        }
+        model.addAttribute("isJH", cuisines != null && cuisines.contains("JH"));
 
         model.addAttribute("cuisines", cuisines);
         model.addAttribute("situations", situations);
