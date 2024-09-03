@@ -275,11 +275,29 @@ td {
     vertical-align: middle;
 }
 
-tbody > tr {
+tbody > .tr-data {
     display: table-row;
     border-bottom: 1.5px solid #EBEEF1;
     cursor: pointer;
     vertical-align: middle;
+}
+
+tbody > .tr-data-when-partnership {
+    display: table-row;
+    border-bottom: 1px dashed #EBEEF1;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+tbody > .tr-partnership {
+    border-bottom: 1.5px solid #EBEEF1;
+}
+
+.tr-partnership p {
+    height: fit-content;
+    font-size: 12px;
+    margin: 4px 10px;
+    text-align: left;
 }
 
 tbody > tr > td.middle-align {

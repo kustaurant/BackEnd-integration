@@ -113,7 +113,7 @@ $(document).ready(function () {
     setMouseHover();
     function setMouseHover() {
         // 표 위에 마우스 올렸을 때 색상 변경
-        document.querySelectorAll("#tierTableBody tr").forEach(function (tr) {
+        document.querySelectorAll("#tierTableBody tr.tr-main").forEach(function (tr) {
             // 마우스를 올렸을 때
             tr.addEventListener("mouseenter", function () {
                 this.style.backgroundColor = "#eee";
