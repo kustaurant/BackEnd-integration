@@ -267,7 +267,7 @@
         <tbody id="tierTableBody">
         <th:block th:each="restaurantTierData : ${paging}">
             <!-- 메인 데이터 행 -->
-            <tr th:class="${isJH ? 'tr-data-when-partnership tr-main' : 'tr-data tr-main'}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantTierData.restaurant.restaurantId})} + '\''">
+            <tr th:class="${isJH != null and isJH ? 'tr-data-when-partnership tr-main' : 'tr-data tr-main'}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantTierData.restaurant.restaurantId})} + '\''">
                 <td class="td-rank" th:text="${restaurantTierData.ranking}" style="min-width: 32px"></td>
                 <td class="td-center" style="min-width: 58px; position: relative;">
                     <div style="width: fit-content; height: fit-content; padding: 0; margin: auto; position: relative;">
