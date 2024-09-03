@@ -5,6 +5,7 @@ import com.kustaurant.restauranttier.common.apiUser.JwtUtil;
 import com.kustaurant.restauranttier.common.apiUser.TokenResponse;
 import com.kustaurant.restauranttier.common.apiUser.apple.AppleLoginRequest;
 import com.kustaurant.restauranttier.common.apiUser.naver.NaverLoginRequest;
+import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -97,9 +98,10 @@ public class UserApiLoginController {
 
         boolean isValid = jwtUtil.validateToken(accessToken);
         if (isValid) {
-            return ResponseEntity.ok("액세스 토큰이 유효합니다");
+            return ResponseEntity.ok(new ErrorResponse("OK", "액세스 토큰이 유효합니다"));
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("액세스 토큰이 유효하지 않습니다");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("UNAUTHORIZED", "액세스 토큰이 유효하지 않습니다"));
         }
     }
 
@@ -115,9 +117,10 @@ public class UserApiLoginController {
     ) {
         try {
             userApiLoginService.logoutUser(userId);
-            return ResponseEntity.ok("로그아웃이 완료되었습니다.");
+            return ResponseEntity.ok(new ErrorResponse("OK", "로그아웃이 완료되었습니다."));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그아웃에 실패했습니다: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("UNAUTHORIZED", "로그아웃에 실패했습니다: " + e.getMessage()));
         }
     }
 
@@ -134,9 +137,10 @@ public class UserApiLoginController {
         boolean isDeleted = userApiLoginService.deleteUserById(userId);
 
         if (isDeleted) {
-            return ResponseEntity.ok("회원탈퇴가 성공적으로 이루어졌습니다.");
+            return ResponseEntity.ok(new ErrorResponse("OK", "회원탈퇴가 성공적으로 이루어졌습니다."));
         } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부 문제로 회원탈퇴에 실패했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("INTERNAL_SERVER_ERROR", "서버 내부 문제로 회원탈퇴에 실패했습니다."));
         }
     }
 

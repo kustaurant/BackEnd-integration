@@ -166,19 +166,20 @@ public class MypageApiController {
             @ApiResponse(responseCode = "400", description = "내용이 없습니다."),
     })
     @PostMapping("/auth/mypage/feedback")
-    public ResponseEntity<String> sendFeedback(
+    public ResponseEntity<MypageErrorDTO> sendFeedback(
             @Parameter(hidden = true) @JwtToken Integer userId,
             @RequestBody FeedbackDTO feedbackDTO
     ){
         String comments = feedbackDTO.getComments();
+        MypageErrorDTO response = new MypageErrorDTO();
 
-        if (comments==null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("내용이 없습니다.");
+        if (comments == null) {
+            response.setError("내용이 없습니다.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
         feedbackService.addApiFeedback(comments, userId);
-
-        return ResponseEntity.status(HttpStatus.OK).body("피드백 감사합니다.");
-
+        response.setError("피드백 감사합니다.");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     //10

@@ -255,8 +255,6 @@ public class CommunityApiController {
 
         // 204 No Content 반환 (삭제 성공)
         return ResponseEntity.noContent().build();
-
-
     }
 
 

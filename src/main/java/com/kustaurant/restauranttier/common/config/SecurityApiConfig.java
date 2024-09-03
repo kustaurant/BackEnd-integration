@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,12 +29,11 @@ public class SecurityApiConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 기능 비활성화
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션관리 정책을 STATELESS로 설정
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션관리 정책을 STATELESS 로 설정
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v*/auth/**").authenticated() // /api/vX/auth/** 경로는 인증 요구
                         .anyRequest().permitAll()) // 그 외의 모든 요청은 인증 없이 허용
-                .addFilterBefore(jwtAuthFilter, SecurityContextPersistenceFilter.class); // JWT 인증 필터 추가
-
+                .addFilterBefore(jwtAuthFilter, SecurityContextHolderFilter.class); // JWT 인증 필터 추가
 
         return http.build();
     }

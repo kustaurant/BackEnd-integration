@@ -2,6 +2,7 @@ package com.kustaurant.restauranttier.common.apiUser;
 
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -37,31 +39,34 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain
-    )
-            throws ServletException, IOException {
-        // 요청 헤더에서 Authorization 값을 가져옴
+    ) throws ServletException, IOException {
         String jwt = getJwtFromRequest(request);
 
         if (StringUtils.hasText(jwt)) {
-            // JWT 토큰의 유효성을 검증
+            try {
+                if (jwtUtil.validateTokenForFilter(jwt)) {
+                    Integer userId = jwtUtil.getUserIdFromToken(jwt);
+                    User user = userRepository.findByUserId(userId)
+                            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-
-            if (jwtUtil.validateToken(jwt)) {
-                Integer userId = jwtUtil.getUserIdFromToken(jwt);
-
-                // JWT 토큰에서 추출한 아이디로 사용자를 조회
-                User user = userRepository.findByUserId(userId)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-                // 스프링 시큐리티 컨텍스트에 설정할 인증 객체 생성
-                Authentication authentication = getAuthentication(user);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
+                    Authentication authentication = getAuthentication(user);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    log.warn("Invalid JWT token: {}", jwt);
+                }
+            } catch (ExpiredJwtException e) {
+                log.warn("Expired JWT token: {}", jwt);
+                SecurityContextHolder.clearContext();
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT토큰이 만료되었습니다.");
+                return;
+            } catch (JwtException e) {
                 log.warn("Invalid JWT token: {}", jwt);
+                SecurityContextHolder.clearContext();
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "valid하지 않은 JWT토큰입니다");
+                return;
             }
         }
 
-        // 다음 필터로 요청 전달
         filterChain.doFilter(request, response);
     }
 
