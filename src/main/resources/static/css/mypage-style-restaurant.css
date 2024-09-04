@@ -72,7 +72,7 @@
     width: 40px;
     height: 40px;
     border-radius: 5px;
-    margin-right: 7px;
+    margin-right: 20px;
 }
 /* 평가 모음 */
 #area3Contents {
@@ -117,7 +117,6 @@
     cursor: pointer;
     width: 100%;
     display: flex;
-    flex-direction: column;
     align-items: center;
     padding: 5px 9px;
     margin-bottom: 10px;
@@ -132,7 +131,6 @@
 /* 평가 점수 부분 */
 .evaluation-outer {
     display: flex;
-
 }
 .category-main-name {
     width: 70px;
@@ -149,53 +147,5 @@
 .category-name {
     width: 70px;
     font-size: 14px;
-    color: #444;
-}
-.category-score {
-    text-align: center;
-    width: 70px;
-    font-size: 15px;
-    color: #000;
-}
-/* 댓글 내용 */
-#area4Contents {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-.restaurant-comment-container {
-    cursor: pointer;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 5px 9px;
-    margin-bottom: 10px;
-    border: #888 solid 1px;
-    border-radius: 6px;
-}
-.restaurant-comment-section {
-    width: 100%;
-    display: flex;
-    justify-content: left;
-}
-.restaurant-comment-like {
-    width: 50px;
-    margin-right: 7px;
-    text-align: center;
-    color: #222;
-    font-size: 15px;
-}
-.restaurant-comment-body {
-    flex: 1;
-    font-size: 15px;
-    margin-right: 10px;
-    line-height: 24px;
-    color: #222;
-}
-.restaurant-comment-date {
-    width: 80px;
-    text-align: right;
-    font-size: 13px;
     color: #444;
 }

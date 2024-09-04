@@ -155,6 +155,7 @@
             <button id="button2" onclick="toggleButton(2)">최신순</button>
         </div>
     </div>
+
     <div class="comment-list-container">
         <ul id="commentList">
             <li th:each="restaurantComment, iterStat : ${restaurantComments}" th:style="${iterStat.last ? 'border-radius: 0 0 7px 7px;' : ''}">
@@ -186,6 +187,7 @@
             </li>
         </ul>
     </div>
+
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
