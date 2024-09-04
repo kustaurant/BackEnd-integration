@@ -58,6 +58,7 @@
 <header th:replace="~{navbar-new :: navbarFragment}"></header>
 
 <div class="outer-container" id="outerContainer">
+
     <div class="inner-container">
         <div class="basic-info left-justified">
             <img th:if="${restaurant.restaurantImgUrl != 'no_img'}" th:id="mainImg" th:src="${restaurant.restaurantImgUrl}">
@@ -107,6 +108,13 @@
             </div>
         </div>
     </div>
+
+
+    <div class="inner-container" th:if="${restaurant.getPartnershipInfo()}">
+        <div class="stat-name" th:text="'제휴 정보 - ' + ${restaurant.getPartnershipInfo()}"></div>
+    </div>
+
+
     <div id="menuContainer" class="inner-container" th:if="${#lists.size(menus) > 0 && menus[0].menuName != 'no_menu'}">
         <div id="menuTopDiv" style="height:110px; width:100%; position: absolute; top: -110px; left: 0; visibility: hidden;"></div>
         <div class="section-title">메뉴</div>
