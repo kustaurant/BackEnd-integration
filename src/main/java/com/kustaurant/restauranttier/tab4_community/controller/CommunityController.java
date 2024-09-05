@@ -168,6 +168,7 @@ public class CommunityController {
             @RequestParam(name = "postId") String postId,
             @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
             Model model, Principal principal) {
+        System.out.println("디버깅");
         Integer postIdInt = Integer.valueOf(postId);
         User user = customOAuth2UserService.getUser(principal.getName());
         Post post = postService.getPost(postIdInt);
@@ -425,13 +426,13 @@ public class CommunityController {
     }
 
 
-//    // 댓글 입력창 포커스시 로그인 상태 확인
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-//    @GetMapping("/api/login/comment-write")
-//    public ResponseEntity<String> commentWriteLogin() {
-//        return ResponseEntity.ok("로그인이 성공적으로 되어있습니다.");
-//
-//    }
+    // 댓글 입력창 포커스시 로그인 상태 확인
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+    @GetMapping("/api/login/comment-write")
+    public ResponseEntity<String> commentWriteLogin() {
+        return ResponseEntity.ok("로그인이 성공적으로 되어있습니다.");
+
+    }
 
 
 }
