@@ -13,4 +13,5 @@ public class MypagePostDTO {
     private String postBody;
     private Integer likeCount;
     private Integer commentCount;
+    private String timeAgo;
 }

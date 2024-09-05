@@ -67,7 +67,7 @@ public class CuisineListArgumentResolver implements HandlerMethodArgumentResolve
         } catch (IllegalArgumentException e) {
             if (isApiRequest) {
                 // API 요청의 경우 예외를 던집니다.
-                throw new ParamException("cuisines 파라미터 값에 ALL와 JH가 둘 다 있습니다.");
+                throw new ParamException("cuisines 파라미터 값이 올바르지 않습니다.");
             } else {
                 // 웹 요청의 경우 클라이언트에 리다이렉트를 지시합니다.
                 HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);

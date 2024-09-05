@@ -30,16 +30,25 @@ public class MypageApiController {
     //1
     @Operation(
             summary = "\"마이페이지 화면\" 로드에 필요한 정보 불러오기",
-            description = "마이페이지 화면에 필요한 정보들이 반환됩니다." +
-                    "또한 로그인하지 않은 회원도 접속 가능하기 때문에 엔드포인트에 /auth가 포함되지 않습니다."
+            description = "마이페이지 화면에 필요한 정보들이 반환됩니다. " +
+                    "로그인하지 않은 회원도 접속 가능하기 때문에 엔드포인트에 /auth가 포함되지 않습니다. " +
+                    "로그인하지 않은 회원인 경우 기본적인 빈 객체가 반환됩니다."
     )
     @GetMapping("/mypage")
     public ResponseEntity<MypageMainDTO> getMypageView(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @JwtToken Integer userId
     ){
+        MypageMainDTO mypageMainDTO;
 
-        MypageMainDTO mypageMainDTO = mypageApiService.getMypageInfo(userId, userAgent);
+        if (userId == null) {
+            // 로그인하지 않은 사용자일 경우, 빈 객체 반환
+            mypageMainDTO = new MypageMainDTO(); // 기본 생성자를 통해 빈 객체 생성
+        } else {
+            // 로그인한 사용자의 마이페이지 정보 로드
+            mypageMainDTO = mypageApiService.getMypageInfo(userId, userAgent);
+        }
+
         return new ResponseEntity<>(mypageMainDTO, HttpStatus.OK);
     }
 

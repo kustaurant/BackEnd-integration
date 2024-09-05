@@ -198,12 +198,12 @@ public class MypageApiService {
         // 평가 리스트를 DTO로 변환하여 반환
         List<EvaluatedRestaurantInfoDTO> evaluateRestaurantInfoDTOS = evaluationList.stream()
                 .map(evaluation -> {
-                    // RestaurantCommentService에서 코멘트를 가져옴
+                    // RestaurantCommentService 에서 코멘트를 가져옴
                     RestaurantComment comment = restaurantCommentService.findCommentByEvaluationId(evaluation.getEvaluationId());
 
                     String userCommentBody = comment != null ? comment.getCommentBody() : null;
 
-                    // EvaluationItemScoreList에서 각 상황 이름을 추출
+                    // EvaluationItemScoreList 에서 각 상황 이름을 추출
                     List<String> situationNames = evaluation.getEvaluationItemScoreList().stream()
                             .map(item -> item.getSituation().getSituationName())
                             .collect(Collectors.toList());
@@ -234,7 +234,8 @@ public class MypageApiService {
                         post.getPostTitle(),
                         post.getPostBody().length() > 20 ? post.getPostBody().substring(0, 20) : post.getPostBody(),
                         post.getLikeCount(),
-                        post.getPostCommentList().size()
+                        post.getPostCommentList().size(),
+                        post.calculateTimeAgo()
                 ))
                 .collect(Collectors.toList());
     }
@@ -251,7 +252,8 @@ public class MypageApiService {
                         scrap.getPost().getPostTitle(),
                         scrap.getPost().getPostBody().length() > 20 ? scrap.getPost().getPostBody().substring(0, 20) : scrap.getPost().getPostBody(),
                         scrap.getPost().getLikeCount(),
-                        scrap.getPost().getPostCommentList().size()
+                        scrap.getPost().getPostCommentList().size(),
+                        scrap.getPost().calculateTimeAgo()
                 ))
                 .collect(Collectors.toList());
     }
@@ -262,7 +264,7 @@ public class MypageApiService {
     public List<MypagePostCommentDTO> getCommentedUserPosts(Integer userId) {
         List<PostComment> commentedPosts = postCommentRepository.findActiveCommentedPostsByUserId(userId);
 
-        // 데이터를 DTO로 변환
+        // 데이터를 DTO 로 변환
         return commentedPosts.stream()
                 .map(comment -> new MypagePostCommentDTO(
                         comment.getPost().getPostCategory(),
@@ -283,7 +285,6 @@ public class MypageApiService {
                 ))
                 .collect(Collectors.toList());
     }
-
 
 
 }
