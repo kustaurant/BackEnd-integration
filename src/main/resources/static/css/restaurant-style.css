@@ -466,13 +466,15 @@ div.basic-info > div.texts > span {
 }
 
 /* 댓글 리스트 */
-ul.comment-list > li {
-    display: flex;
+#commentList > li {
     background-color: #F9F9F9;
     margin-top: 2px;
     padding: 6px 12px;
 }
-ul.comment-list > li > .body-div {
+#commentList > li > div {
+    display: flex;
+}
+.body-div {
     flex: 1;
 }
 .like-div {
@@ -544,11 +546,32 @@ ul.comment-list > li > .body-div {
     width: 100%;
 }
 /* 대댓글 좌측 화살표 이미지 */
-ul.comment-list .reply-img-container {
-    padding-top: 5px;
+#subCommentList > li {
+    display: flex;
+    background-color: #F9F9F9;
+    padding: 3px 12px;
+}
+#subCommentList .reply-img-container {
+    padding: 10px 2px 0 5px;
     display: flex;
     justify-content: center; /* 가로 방향 가운데 정렬 */
     align-items: flex-start; /* 세로 방향 상단 정렬 */
+}
+#subCommentList .real-comment-container {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+    padding-right: 10px;
+    padding-bottom: 5px;
+    white-space: pre;
+    width: 100%;
+}
+#subCommentList .real-comment-container span {
+    font-size: 12px;
+    line-height: 18px;
+    text-align: left;
+    white-space: pre-wrap;
+    width: 100%;
 }
 /* 텍스트 커서 깜빡임 없애기 */
 body{

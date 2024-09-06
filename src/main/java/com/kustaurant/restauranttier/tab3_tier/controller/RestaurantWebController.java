@@ -87,7 +87,9 @@ public class RestaurantWebController {
             User user = customOAuth2UserService.getUser(principal.getName());
             model.addAttribute("user", user);
             // 식당 댓글
-            List<Object[]> restaurantComments = restaurantCommentService.getCommentList(restaurantId, EnumSortComment.POPULAR, user);
+//            List<Object[]> restaurantComments = restaurantCommentService.getCommentList(restaurantId, EnumSortComment.POPULAR, user);
+//            model.addAttribute("restaurantComments", restaurantComments);
+            List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurant, user, true, "ios");
             model.addAttribute("restaurantComments", restaurantComments);
             // 즐겨찾기 여부
             model.addAttribute("isFavoriteExist", restaurantFavoriteService.isFavoriteExist(principal.getName(), restaurantId));
