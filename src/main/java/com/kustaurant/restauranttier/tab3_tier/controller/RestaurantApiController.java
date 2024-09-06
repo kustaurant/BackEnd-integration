@@ -363,6 +363,7 @@ public class RestaurantApiController {
         // 유저 가져오기
         User user = userService.findUserById(userId);
         // 대댓글 달기
+        log.info("대댓글 내용: {}", commentBody);
         RestaurantComment restaurantComment = restaurantCommentService.addSubComment(restaurant, user, commentBody, commentId);
 
         return new ResponseEntity<>(RestaurantCommentDTO.convertComment(restaurantComment, null, user, userAgent), HttpStatus.OK);

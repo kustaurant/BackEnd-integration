@@ -41,6 +41,8 @@ public class RestaurantCommentDTO {
     private List<RestaurantCommentDTO> commentReplies;
     @JsonIgnore
     private LocalDateTime date;
+    @JsonIgnore
+    private User user;
 
     public static RestaurantCommentDTO convertComment(RestaurantComment comment, Double evaluationScore, User user, String userAgent) {
         return new RestaurantCommentDTO(
@@ -56,7 +58,8 @@ public class RestaurantCommentDTO {
                 comment.getRestaurantCommentdislikeList().size(),
                 isCommentMine(user, comment),
                 null,
-                comment.getUpdatedAt() == null ? comment.getCreatedAt() : comment.getUpdatedAt()
+                comment.getUpdatedAt() == null ? comment.getCreatedAt() : comment.getUpdatedAt(),
+                comment.getUser()
         );
     }
 
@@ -66,7 +69,7 @@ public class RestaurantCommentDTO {
                 null, null, null, null, null, null, null,
                 isUserLikeDisLikeStatus(comment, user),
                 comment.getRestaurantCommentlikeList().size(),
-                comment.getRestaurantCommentdislikeList().size(), null, null, null
+                comment.getRestaurantCommentdislikeList().size(), null, null, null, null
         );
     }
 
