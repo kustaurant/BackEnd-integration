@@ -2,6 +2,7 @@
 package com.kustaurant.restauranttier.tab5_mypage.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
 import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
@@ -136,13 +137,7 @@ public class User {
     private List<PostComment> likePostCommentList = new ArrayList<>();
 
     public String getRankImg() {
-        if (this.evaluationList.size() >= 30) {
-            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level3icon.png";
-        } else if (this.evaluationList.size() >= 10) {
-            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level2icon.png";
-        } else {
-            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level1icon.png";
-        }
+        return RestaurantConstants.getIconImgUrl(this, "");
     }
 }
 

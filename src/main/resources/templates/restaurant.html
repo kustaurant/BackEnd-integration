@@ -156,35 +156,71 @@
         </div>
     </div>
 
+    <!-- 댓글 부분 -->
     <div class="comment-list-container">
-        <ul id="commentList">
+        <ul id="commentList" class="comment-list">
             <li th:each="restaurantComment, iterStat : ${restaurantComments}" th:style="${iterStat.last ? 'border-radius: 0 0 7px 7px;' : ''}">
+                <!-- 댓글 좋아요/싫어요 영역 -->
                 <div class="like-div">
-                    <button class="comment-up" type="button" onclick="commentLike(this)" th:data-id="${restaurantComment[0].commentId}">
-                        <img th:if="${restaurantComment[2]}" src="/img/community/up-green.png">
-                        <img th:unless="${restaurantComment[2]}" src="/img/community/up.png">
+                    <button class="comment-up" type="button" onclick="commentLike(this)" th:data-id="${restaurantComment.commentId}">
+                        <img th:if="${restaurantComment.commentLikeStatus eq 1}" src="/img/community/up-green.png">
+                        <img th:unless="${restaurantComment.commentLikeStatus eq 1}" src="/img/community/up.png">
                     </button>
-                    <span th:text="${restaurantComment[1]}"></span>
-                    <button class="comment-down" type="button" onclick="commentDislike(this)" th:data-id="${restaurantComment[0].commentId}">
-                        <img th:if="${restaurantComment[3]}" src="/img/community/down-red.png">
-                        <img th:unless="${restaurantComment[3]}" src="/img/community/down.png">
+                    <span th:text="${restaurantComment.commentLikeCount - restaurantComment.commentDislikeCount}"></span>
+                    <button class="comment-down" type="button" onclick="commentDislike(this)" th:data-id="${restaurantComment.commentId}">
+                        <img th:if="${restaurantComment.commentLikeStatus eq -1}" src="/img/community/down-red.png">
+                        <img th:unless="${restaurantComment.commentLikeStatus eq -1}" src="/img/community/down.png">
                     </button>
                 </div>
+                <!-- 댓글 본문 영역 -->
                 <div class="body-div">
                     <div class="nick-date-div">
-                        <img th:src="${restaurantComment[0].getUser().getRankImg()}">
-                        <span class="nick-span" th:text="${restaurantComment[0].getUser().getUserNickname()}"></span>
-                        <span class="date-span" th:text="${restaurantComment[0].calculateTimeAgo()}"></span>
+                        <img th:src="${restaurantComment.user.getRankImg()}">
+                        <span class="nick-span" th:text="${restaurantComment.commentNickname}"></span>
+                        <span class="date-span" th:text="${restaurantComment.commentTime}"></span>
                         <!-- Button trigger modal -->
-                        <button type="button" th:if="${restaurantComment[0].getUser() == user}" th:data-id="${restaurantComment[0].commentId}" class="delete-button btn btn-primary" onclick="deleteComment(this)" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <button type="button" th:if="${restaurantComment.isCommentMine}" th:data-id="${restaurantComment.commentId}" class="delete-button btn btn-primary" onclick="deleteComment(this)" data-bs-toggle="modal" data-bs-target="#exampleModal">
                             삭제
                         </button>
                     </div>
                     <div class="real-comment-container">
-                        <span th:text="${restaurantComment[0].getCommentBody()}"></span>
+                        <span th:text="${restaurantComment.commentBody}"></span>
                     </div>
                 </div>
             </li>
+            <!-- 대댓글 부분 -->
+            <ul class="comment-list">
+                <li th:each="reply, iterStat : ${restaurantComment.commentReplies}" th:if="${restaurantComment != null && restaurantComment.commentReplies != null}" th:style="${iterStat.last ? 'border-radius: 0 0 7px 7px;' : ''}">
+                    <div class="reply-img-container">
+                        <img src="/img/restaurant/reply.svg"/>
+                    </div>
+                    <div class="like-div">
+                        <button class="comment-up" type="button" onclick="commentLike(this)" th:data-id="${reply.commentId}">
+                            <img th:if="${reply.commentLikeStatus eq 1}" src="/img/community/up-green.png">
+                            <img th:unless="${reply.commentLikeStatus eq 1}" src="/img/community/up.png">
+                        </button>
+                        <span th:text="${reply.commentLikeCount - reply.commentDislikeCount}"></span>
+                        <button class="comment-down" type="button" onclick="commentDislike(this)" th:data-id="${reply.commentId}">
+                            <img th:if="${reply.commentLikeStatus eq -1}" src="/img/community/down-red.png">
+                            <img th:unless="${reply.commentLikeStatus eq -1}" src="/img/community/down.png">
+                        </button>
+                    </div>
+                    <div class="body-div">
+                        <div class="nick-date-div">
+                            <img th:src="${reply.user.getRankImg()}">
+                            <span class="nick-span" th:text="${reply.commentNickname}"></span>
+                            <span class="date-span" th:text="${reply.commentTime}"></span>
+                            <!-- Button trigger modal -->
+                            <button type="button" th:if="${reply.isCommentMine}" th:data-id="${reply.commentId}" class="delete-button btn btn-primary" onclick="deleteComment(this)" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                삭제
+                            </button>
+                        </div>
+                        <div class="real-comment-container">
+                            <span th:text="${reply.commentBody}"></span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </ul>
     </div>
 

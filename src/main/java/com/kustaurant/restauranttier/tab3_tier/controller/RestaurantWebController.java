@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
+import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
@@ -75,7 +76,9 @@ public class RestaurantWebController {
         // 로그인 안되어있을 경우
         if (principal == null) {
             // 식당 댓글
-            List<Object[]> restaurantComments = restaurantCommentService.getCommentList(restaurantId, EnumSortComment.POPULAR);
+//            List<Object[]> restaurantComments = restaurantCommentService.getCommentList(restaurantId, EnumSortComment.POPULAR);
+//            model.addAttribute("restaurantComments", restaurantComments);
+            List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurant, null, true, "ios");
             model.addAttribute("restaurantComments", restaurantComments);
             //
             model.addAttribute("evaluationButton", " 평가하기");
