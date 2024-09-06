@@ -190,7 +190,7 @@
             </li>
             <!-- 대댓글 부분 -->
             <ul class="comment-list">
-                <li th:each="reply, iterStat : ${restaurantComment.commentReplies}" th:if="${restaurantComment.commentReplies != null}" th:style="${iterStat.last ? 'border-radius: 0 0 7px 7px;' : ''}">
+                <li th:each="reply, iterStat : ${restaurantComment.commentReplies}" th:if="${restaurantComment != null && restaurantComment.commentReplies != null}" th:style="${iterStat.last ? 'border-radius: 0 0 7px 7px;' : ''}">
                     <div class="reply-img-container">
                         <img src="/img/restaurant/reply.svg"/>
                     </div>

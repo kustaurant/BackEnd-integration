@@ -356,6 +356,9 @@ public class RestaurantApiController {
         if (commentBody.trim().isEmpty()) {
             throw new ParamException("대댓글 내용이 없습니다.");
         }
+        // 댓글 내용 전처리
+        commentBody = commentBody.replaceAll("^\"|\"$", ""); // 양쪽 큰 따옴표 제거
+        commentBody = commentBody.replace("\\\"", "\"");     // 이스케이프된 따옴표 복구
         // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
