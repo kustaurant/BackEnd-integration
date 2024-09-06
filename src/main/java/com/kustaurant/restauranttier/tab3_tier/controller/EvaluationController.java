@@ -3,11 +3,15 @@ package com.kustaurant.restauranttier.tab3_tier.controller;
 import com.google.gson.Gson;
 import com.kustaurant.restauranttier.tab1_home.controller.MainController;
 import com.kustaurant.restauranttier.common.etc.JsonData;
+import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
+import com.kustaurant.restauranttier.tab3_tier.entity.EvaluationItemScore;
+import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.repository.EvaluationRepository;
 import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantWebService;
 import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 
+import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Controller
@@ -42,27 +50,19 @@ public class EvaluationController {
             @PathVariable Integer restaurantId
     ) {
         // TODO: 현재 평가를 막아놨습니다.
-        return null;
-//        Restaurant restaurant = restaurantService.getRestaurant(restaurantId);
-//        User user = customOAuth2UserService.getUser(principal.getName());
-//        Optional<Evaluation> evaluation = evaluationRepository.findByUserAndRestaurant(user, restaurant);
-//
-//        Map<Integer, Double> situationEvaluationData = new HashMap<>();
-//        Double mainScore = 0.0;
-//
-//        if (evaluation.isPresent()) {
-//            List<EvaluationItemScore> evaluationItemScoreList = evaluation.get().getEvaluationItemScoreList();
-//            //상황 데이터 Map에 추가
-//            for (EvaluationItemScore evaluationItemScore: evaluationItemScoreList) {
-//                situationEvaluationData.put(evaluationItemScore.getSituation().getSituationId(), evaluationItemScore.getScore());
-//            }
-//            mainScore = evaluation.get().getEvaluationScore();
-//        }
-//        model.addAttribute("situationJson", gson.toJson(situationEvaluationData));
-//        model.addAttribute("mainScore", mainScore);
-//        model.addAttribute("restaurant", restaurant);
-//
-//        return "evaluation";
+        Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
+        User user = customOAuth2UserService.getUser(principal.getName());
+        Optional<Evaluation> evaluation = evaluationRepository.findByUserAndRestaurant(user, restaurant);
+        Double mainScore = 0.0;
+
+        if (evaluation.isPresent()) {
+
+            mainScore = evaluation.get().getEvaluationScore();
+        }
+        model.addAttribute("mainScore", mainScore);
+        model.addAttribute("restaurant", restaurant);
+
+        return "evaluation";
     }
 
     // 평가 데이터 db 저장 (기존 평가 존재 시 업데이트 진행)
