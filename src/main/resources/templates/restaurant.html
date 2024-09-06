@@ -141,20 +141,22 @@
     </div>
 
     <a class="inner-container evaluation-button button" id="evaluationButton" th:href="@{/evaluation/{restuarantId}(restuarantId=${restaurant.restaurantId})}" th:text="${evaluationButton}"></a>
-    <div class="comment-container">
-        <div class="section-title">댓글</div>
-        <div class="input-container">
-            <div>
-                <textarea id="commentInput" placeholder="식당에 대한 댓글을 남겨주세요." spellcheck="false"></textarea>
-                <span id="commentAlert"></span>
-            </div>
-            <button class="button evaluation-button" onclick="sendComment()">등록</button>
-        </div>
-        <div class="sort-toggle-buttons">
-            <button id="button1" class="active" onclick="toggleButton(1)">인기순</button>
-            <button id="button2" onclick="toggleButton(2)">최신순</button>
-        </div>
-    </div>
+
+    <!-- 댓글 쓰는 부분 : 기능 변경으로 삭제 -->
+<!--    <div class="comment-container">-->
+<!--        <div class="section-title">댓글</div>-->
+<!--        <div class="input-container">-->
+<!--            <div>-->
+<!--                <textarea id="commentInput" placeholder="식당에 대한 댓글을 남겨주세요." spellcheck="false"></textarea>-->
+<!--                <span id="commentAlert"></span>-->
+<!--            </div>-->
+<!--            <button class="button evaluation-button" onclick="sendComment()">등록</button>-->
+<!--        </div>-->
+<!--        <div class="sort-toggle-buttons">-->
+<!--            <button id="button1" class="active" onclick="toggleButton(1)">인기순</button>-->
+<!--            <button id="button2" onclick="toggleButton(2)">최신순</button>-->
+<!--        </div>-->
+<!--    </div>-->
 
     <!-- 댓글 부분 -->
     <div class="comment-list-container">

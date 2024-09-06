@@ -1,24 +1,24 @@
 // 창이 로드될 때와 창 크기가 바뀔 때 적용할 함수 넣어주기
 var map;
 var marker;
-// window.onload = function() {
-//     mainImgResize();
-//     // html 에서 식당 정보 가져오기
-//     var restaurantInfo = document.getElementById('restaurantInfo');
-//     var name = restaurantInfo.getAttribute('data-name');
-//     var latitude = parseFloat(restaurantInfo.getAttribute('data-latitude'));
-//     var longitude = parseFloat(restaurantInfo.getAttribute('data-longitude'));
-//     // 네이버 지도
-//     map = new naver.maps.Map('map', {
-//         center: new naver.maps.LatLng(latitude, longitude),//위도, 경도
-//         zoom: 16,
-//         minZoom: 10,
-//     });
-//     marker = new naver.maps.Marker({
-//         position: new naver.maps.LatLng(latitude, longitude),//위도, 경도
-//         map: map
-//     });
-// };
+window.onload = function() {
+    mainImgResize();
+    // html 에서 식당 정보 가져오기
+    var restaurantInfo = document.getElementById('restaurantInfo');
+    var name = restaurantInfo.getAttribute('data-name');
+    var latitude = parseFloat(restaurantInfo.getAttribute('data-latitude'));
+    var longitude = parseFloat(restaurantInfo.getAttribute('data-longitude'));
+    // 네이버 지도
+    map = new naver.maps.Map('map', {
+        center: new naver.maps.LatLng(latitude, longitude),//위도, 경도
+        zoom: 16,
+        minZoom: 10,
+    });
+    marker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(latitude, longitude),//위도, 경도
+        map: map
+    });
+};
 window.onresize = function() {
     mainImgResize();
 }
