@@ -37,6 +37,7 @@ public class EvaluationController {
     private final EvaluationService evaluationService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final EvaluationRepository evaluationRepository;
+
     Gson gson = new Gson();
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
@@ -56,9 +57,9 @@ public class EvaluationController {
         Double mainScore = 0.0;
 
         if (evaluation.isPresent()) {
-
             mainScore = evaluation.get().getEvaluationScore();
         }
+        model.addAttribute("eval",evaluation);
         model.addAttribute("mainScore", mainScore);
         model.addAttribute("restaurant", restaurant);
 
