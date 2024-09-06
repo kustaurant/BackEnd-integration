@@ -397,8 +397,10 @@ public class RestaurantApiController {
         User user = userService.findUserById(userId);
         // 이 댓글이 해당 식당의 댓글이 맞는지 확인
         checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+        // 댓글 가져오기
+        RestaurantComment comment = restaurantCommentService.findCommentByCommentId(commentId);
         // 댓글 삭제
-        restaurantCommentService.deleteAppComment(commentId, user);
+        restaurantCommentService.deleteComment(comment, user);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

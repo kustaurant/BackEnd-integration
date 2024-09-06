@@ -160,6 +160,14 @@ public class EvaluationService {
         }*/
     }
 
+    public Double getEvaluationScoreByRestaurantComment(RestaurantComment restaurantComment) {
+        if (restaurantComment == null) {
+            return null;
+        }
+        Optional<Evaluation> evaluationOptional = evaluationRepository.findById(restaurantComment.getParentEvaluationId());
+        return evaluationOptional.map(Evaluation::getEvaluationScore).orElse(null);
+    }
+
     public void createOrUpdate(User user, Restaurant restaurant, EvaluationDTO evaluationDTO) {
         // 이전 평가 가져오기
         Evaluation evaluation = evaluationRepository.findByUserAndRestaurantAndStatus(user, restaurant, "ACTIVE").orElse(null);
@@ -186,7 +194,7 @@ public class EvaluationService {
         if ((evaluationDTO.getEvaluationComment() == null || evaluationDTO.getEvaluationComment().isEmpty())
                 && (evaluationDTO.getNewImage() == null || evaluationDTO.getNewImage().isEmpty())) { // 코멘트 내용과 사진이 없는 경우
             if (comment != null && comment.getCommentImgUrl() != null && !comment.getCommentImgUrl().isEmpty()) {
-                restaurantCommentService.deleteComment(comment);
+                restaurantCommentService.deleteComment(comment, user);
             }
         } else { // 코멘트 내용이나 사진이 있는 경우
             if (comment == null) { // 기존 코멘트가 없으면 생성

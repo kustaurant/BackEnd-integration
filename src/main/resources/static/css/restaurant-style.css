@@ -531,12 +531,19 @@ div.basic-info > div.texts > span {
 }
 .real-comment-container {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
     margin-top: 5px;
     padding-right: 10px;
     padding-bottom: 12px;
     white-space: pre;
     width: 100%;
+}
+.real-comment-container img {
+    max-height: 250px;
+    border-radius: 10px;
+    margin-bottom: 5px;
 }
 .real-comment-container span {
     font-size: 13px;
@@ -549,10 +556,10 @@ div.basic-info > div.texts > span {
 #subCommentList > li {
     display: flex;
     background-color: #F9F9F9;
-    padding: 3px 12px;
+    padding: 3px 6px;
 }
 #subCommentList .reply-img-container {
-    padding: 10px 2px 0 5px;
+    padding: 10px 2px 0 2px;
     display: flex;
     justify-content: center; /* 가로 방향 가운데 정렬 */
     align-items: flex-start; /* 세로 방향 상단 정렬 */
