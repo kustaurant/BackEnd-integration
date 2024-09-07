@@ -12,6 +12,7 @@ import java.util.List;
 
 public class EvaluatedRestaurantInfoDTO {
     private String restaurantName;
+    private Integer restaurantId;
     private String restaurantImgURL;
     private String cuisine;
     private Double evaluationScore;
