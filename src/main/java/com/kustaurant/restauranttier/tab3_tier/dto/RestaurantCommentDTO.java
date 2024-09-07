@@ -1,7 +1,9 @@
 package com.kustaurant.restauranttier.tab3_tier.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kustaurant.restauranttier.tab3_tier.constants.EvaluationConstants;
 import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
+import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,23 +45,46 @@ public class RestaurantCommentDTO {
     private LocalDateTime date;
     @JsonIgnore
     private User user;
+    @JsonIgnore
+    private Evaluation evaluation;
 
-    public static RestaurantCommentDTO convertComment(RestaurantComment comment, Double evaluationScore, User user, String userAgent) {
+    public static RestaurantCommentDTO convertCommentWhenEvaluation(Evaluation evaluation, User user, String userAgent) {
+        return new RestaurantCommentDTO(
+                evaluation.getEvaluationId() + EvaluationConstants.EVALUATION_ID_OFFSET,
+                evaluation.getEvaluationScore(),
+                RestaurantConstants.getIconImgUrl(evaluation.getUser(), userAgent),
+                evaluation.getUser().getUserNickname(),
+                evaluation.calculateTimeAgo(),
+                evaluation.getCommentImgUrl(),
+                evaluation.getCommentBody(),
+                isUserLikeDisLikeStatus(evaluation, user),
+                evaluation.getRestaurantCommentLikeList().size(),
+                evaluation.getRestaurantCommentDislikeList().size(),
+                isCommentMine(user, evaluation),
+                null,
+                evaluation.getUpdatedAt() == null ? evaluation.getCreatedAt() : evaluation.getUpdatedAt(),
+                evaluation.getUser(),
+                evaluation
+        );
+    }
+
+    public static RestaurantCommentDTO convertCommentWhenSubComment(RestaurantComment comment, Double evaluationScore, User user, String userAgent) {
         return new RestaurantCommentDTO(
                 comment.getCommentId(),
                 evaluationScore,
                 RestaurantConstants.getIconImgUrl(comment.getUser(), userAgent),
                 comment.getUser().getUserNickname(),
                 comment.calculateTimeAgo(),
-                comment.getCommentImgUrl(),
+                null,
                 comment.getCommentBody(),
                 isUserLikeDisLikeStatus(comment, user),
-                comment.getRestaurantCommentlikeList().size(),
-                comment.getRestaurantCommentdislikeList().size(),
+                comment.getRestaurantCommentLikeList().size(),
+                comment.getRestaurantCommentDislikeList().size(),
                 isCommentMine(user, comment),
                 null,
                 comment.getUpdatedAt() == null ? comment.getCreatedAt() : comment.getUpdatedAt(),
-                comment.getUser()
+                comment.getUser(),
+                null
         );
     }
 
@@ -68,9 +93,16 @@ public class RestaurantCommentDTO {
         return new RestaurantCommentDTO(
                 null, null, null, null, null, null, null,
                 isUserLikeDisLikeStatus(comment, user),
-                comment.getRestaurantCommentlikeList().size(),
-                comment.getRestaurantCommentdislikeList().size(), null, null, null, null
+                comment.getRestaurantCommentLikeList().size(),
+                comment.getRestaurantCommentDislikeList().size(), null, null, null, null, null
         );
+    }
+
+    public static boolean isCommentMine(User user, Evaluation evaluation) {
+        if (user == null) {
+            return false;
+        }
+        return evaluation.getUser().equals(user);
     }
 
     public static boolean isCommentMine(User user, RestaurantComment comment) {
@@ -80,12 +112,12 @@ public class RestaurantCommentDTO {
         return comment.getUser().equals(user);
     }
 
-    private static int isUserLikeDisLikeStatus(RestaurantComment comment, User user) {
+    private static int isUserLikeDisLikeStatus(Evaluation evaluation, User user) {
         if (user == null) {
             return 0;
         }
         // 유저가 좋아요를 눌렀는지 확인
-        boolean liked = comment.getRestaurantCommentlikeList().stream()
+        boolean liked = evaluation.getRestaurantCommentLikeList().stream()
                 .anyMatch(like -> like.getUser().equals(user));
 
         if (liked) {
@@ -93,7 +125,26 @@ public class RestaurantCommentDTO {
         }
 
         // 유저가 싫어요를 눌렀는지 확인
-        boolean disliked = comment.getRestaurantCommentdislikeList().stream()
+        boolean disliked = evaluation.getRestaurantCommentDislikeList().stream()
+                .anyMatch(dislike -> dislike.getUser().equals(user));
+
+        return disliked ? -1 : 0;
+    }
+
+    private static int isUserLikeDisLikeStatus(RestaurantComment comment, User user) {
+        if (user == null) {
+            return 0;
+        }
+        // 유저가 좋아요를 눌렀는지 확인
+        boolean liked = comment.getRestaurantCommentLikeList().stream()
+                .anyMatch(like -> like.getUser().equals(user));
+
+        if (liked) {
+            return 1;
+        }
+
+        // 유저가 싫어요를 눌렀는지 확인
+        boolean disliked = comment.getRestaurantCommentDislikeList().stream()
                 .anyMatch(dislike -> dislike.getUser().equals(user));
 
         return disliked ? -1 : 0;

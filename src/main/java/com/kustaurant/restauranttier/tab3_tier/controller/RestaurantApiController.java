@@ -3,9 +3,10 @@ package com.kustaurant.restauranttier.tab3_tier.controller;
 import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
-import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
+import com.kustaurant.restauranttier.tab3_tier.constants.EvaluationConstants;
 import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
+import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
@@ -152,8 +153,7 @@ public class RestaurantApiController {
                 .filter(evaluation -> evaluation.getRestaurant().equals(restaurant) && evaluation.getStatus().equals("ACTIVE"))
                 .findFirst()
                 .map(evaluation -> {
-                    RestaurantComment comment = restaurantCommentService.findCommentByEvaluationId(evaluation.getEvaluationId());
-                    return ResponseEntity.ok(EvaluationDTO.convertEvaluation(evaluation, comment));
+                    return ResponseEntity.ok(EvaluationDTO.convertEvaluation(evaluation));
                 })
                 .orElse(ResponseEntity.ok(EvaluationDTO.convertEvaluationWhenNoEvaluation()));
     }
@@ -207,7 +207,7 @@ public class RestaurantApiController {
             "   - commentNickname: not null\n\n" +
             "   - commentTime: not null\n\n" +
             "   - commentImgUrl: **null일 수 있습니다.**\n\n" +
-            "   - commentBody: not null\n\n" +
+            "   - commentBody: **null일 수 있습니다.**\n\n" +
             "   - commentLikeStatus: not null\n\n" +
             "   - commentLikeCount: not null\n\n" +
             "   - commentDislikeCount: not null\n\n" +
@@ -352,6 +352,7 @@ public class RestaurantApiController {
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
+        int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
         // 댓글 내용 없는 경우 예외 처리
         if (commentBody.trim().isEmpty()) {
             throw new ParamException("대댓글 내용이 없습니다.");
@@ -362,14 +363,21 @@ public class RestaurantApiController {
         // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
-        checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+        checkRestaurantIdAndEvaluationId(restaurant, restaurantId, evaluationId);
         // 유저 가져오기
         User user = userService.findUserById(userId);
+        // Evaluation 가져오기
+        Evaluation evaluation = evaluationService.getByEvaluationId(evaluationId);
         // 대댓글 달기
-        log.info("대댓글 내용: {}", commentBody);
-        RestaurantComment restaurantComment = restaurantCommentService.addSubComment(restaurant, user, commentBody, commentId);
+        RestaurantComment restaurantComment = restaurantCommentService.addSubComment(restaurant, user, commentBody, evaluation);
 
-        return new ResponseEntity<>(RestaurantCommentDTO.convertComment(restaurantComment, null, user, userAgent), HttpStatus.OK);
+        return new ResponseEntity<>(RestaurantCommentDTO.convertCommentWhenSubComment(restaurantComment, null, user, userAgent), HttpStatus.OK);
+    }
+
+    private void checkRestaurantIdAndEvaluationId(Restaurant restaurant, int restaurantId, int evaluationId) {
+        if (restaurant.getEvaluationList().stream().noneMatch(evaluation -> evaluation.getEvaluationId().equals(evaluationId))) {
+            throw new ParamException(restaurantId + " 식당에는 " + evaluationId + " id를 가진 evaluation이 없습니다.");
+        }
     }
 
     private void checkRestaurantIdAndCommentId(Restaurant restaurant, int restaurantId, int commentId) {

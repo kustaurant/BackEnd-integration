@@ -8,16 +8,16 @@ window.onload = function() {
     var name = restaurantInfo.getAttribute('data-name');
     var latitude = parseFloat(restaurantInfo.getAttribute('data-latitude'));
     var longitude = parseFloat(restaurantInfo.getAttribute('data-longitude'));
-    // 네이버 지도
-    map = new naver.maps.Map('map', {
-        center: new naver.maps.LatLng(latitude, longitude),//위도, 경도
-        zoom: 16,
-        minZoom: 10,
-    });
-    marker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(latitude, longitude),//위도, 경도
-        map: map
-    });
+    // // 네이버 지도
+    // map = new naver.maps.Map('map', {
+    //     center: new naver.maps.LatLng(latitude, longitude),//위도, 경도
+    //     zoom: 16,
+    //     minZoom: 10,
+    // });
+    // marker = new naver.maps.Marker({
+    //     position: new naver.maps.LatLng(latitude, longitude),//위도, 경도
+    //     map: map
+    // });
 };
 window.onresize = function() {
     mainImgResize();
@@ -193,17 +193,17 @@ function resize(width, height){
 }
 
 // 댓글 입력 창 글자 제한
-const commentTextArea = document.getElementById('commentInput');
-const maxLength = 1000;
-commentTextArea.addEventListener("input", function() {
-    var remainingCharacters = maxLength - commentTextArea.value.length;
-    //document.getElementById("remainingCharacters").textContent = remainingCharacters;
-
-    // 최대 길이 초과 시 잘라냄
-    if (commentTextArea.value.length > maxLength) {
-        commentTextArea.value = commentTextArea.value.substring(0, maxLength);
-    }
-});
+// const commentTextArea = document.getElementById('commentInput');
+// const maxLength = 1000;
+// commentTextArea.addEventListener("input", function() {
+//     var remainingCharacters = maxLength - commentTextArea.value.length;
+//     //document.getElementById("remainingCharacters").textContent = remainingCharacters;
+//
+//     // 최대 길이 초과 시 잘라냄
+//     if (commentTextArea.value.length > maxLength) {
+//         commentTextArea.value = commentTextArea.value.substring(0, maxLength);
+//     }
+// });
 
 // 댓글 인기순, 최신순 토글 초기화
 let activeButton = document.getElementById('button1');

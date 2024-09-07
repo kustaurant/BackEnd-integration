@@ -23,6 +23,9 @@ public class RestaurantCommentReport {
     @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
+    @JoinColumn(name = "evaluation_id")
+    private Evaluation evaluation;
+    @ManyToOne
     @JoinColumn(name = "comment_id")
     private RestaurantComment restaurantComment;
 
@@ -31,7 +34,15 @@ public class RestaurantCommentReport {
 
     public RestaurantCommentReport(User user, RestaurantComment restaurantComment, LocalDateTime createdAt, String status) {
         this.user = user;
+        this.evaluation = null;
         this.restaurantComment = restaurantComment;
+        this.createdAt = createdAt;
+        this.status = status;
+    }
+    public RestaurantCommentReport(User user, Evaluation evaluation, LocalDateTime createdAt, String status) {
+        this.user = user;
+        this.evaluation = evaluation;
+        this.restaurantComment = null;
         this.createdAt = createdAt;
         this.status = status;
     }
