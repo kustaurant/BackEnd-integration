@@ -1,6 +1,5 @@
 package com.kustaurant.restauranttier.tab3_tier.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,9 +12,8 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "restaurant_comment_likes_tbl")
-public class RestaurantCommentlike {
-
+@Table(name = "restaurant_comment_dislikes_tbl")
+public class RestaurantCommentDislike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer likeId;
@@ -28,9 +26,21 @@ public class RestaurantCommentlike {
     @JoinColumn(name="comment_id")
     private RestaurantComment restaurantComment;
 
-    public RestaurantCommentlike(User user, RestaurantComment restaurantComment) {
+    @ManyToOne
+    @JoinColumn(name="evaluation_id")
+    private Evaluation evaluation;
+
+    public RestaurantCommentDislike(User user, RestaurantComment restaurantComment) {
         this.restaurantComment = restaurantComment;
         this.user = user;
+        this.evaluation = null;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public RestaurantCommentDislike(User user, Evaluation evaluation) {
+        this.restaurantComment = null;
+        this.user = user;
+        this.evaluation = evaluation;
         this.createdAt = LocalDateTime.now();
     }
 

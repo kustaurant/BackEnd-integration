@@ -73,10 +73,10 @@ public class User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<RestaurantCommentlike> restaurantCommentlikeList = new ArrayList<>();
+    private List<RestaurantCommentLike> restaurantCommentLikeList = new ArrayList<>();
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<RestaurantCommentdislike> restaurantCommentdislikeList = new ArrayList<>();
+    private List<RestaurantCommentDislike> restaurantCommentDislikeList = new ArrayList<>();
 
 
     @JsonIgnore
@@ -107,7 +107,7 @@ public class User {
         this.status = status;
         this.createdAt = createdAt;
 
-        
+
     }
 
 

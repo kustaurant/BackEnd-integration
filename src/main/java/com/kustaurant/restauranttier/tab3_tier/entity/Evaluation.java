@@ -35,12 +35,25 @@ public class Evaluation {
 
     private LocalDateTime updatedAt;
 
+    // 평가 내용 관련
+    private String commentBody;
+    private String commentImgUrl;
+    private Integer commentLikeCount;
+    @OneToMany(mappedBy = "evaluation")
+    private List<RestaurantCommentLike> restaurantCommentLikeList = new ArrayList<>();
+    @OneToMany(mappedBy = "evaluation")
+    private List<RestaurantCommentDislike> restaurantCommentDislikeList = new ArrayList<>();
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "evaluation")
     private List<EvaluationItemScore> evaluationItemScoreList = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "evaluation")
+    private List<RestaurantCommentReport> restaurantCommentReportList = new ArrayList<>();
 
     @JsonIgnore
     @ManyToOne
@@ -79,6 +92,19 @@ public class Evaluation {
         return this.evaluationItemScoreList.stream()
                 .map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationName())
                 .toList();
+    }
+
+    public String getStarImgUrl() {
+        try {
+            String[] scoreSplit = evaluationScore.toString().split(".");
+            if (scoreSplit.length > 1) {
+                return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/star/star" + scoreSplit[0] + scoreSplit[1] + ".svg";
+            } else {
+                return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/star/star" + scoreSplit[0] + "0.svg";
+            }
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public String calculateTimeAgo() {

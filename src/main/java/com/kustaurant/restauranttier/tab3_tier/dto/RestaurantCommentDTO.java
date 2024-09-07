@@ -54,8 +54,8 @@ public class RestaurantCommentDTO {
                 comment.getCommentImgUrl(),
                 comment.getCommentBody(),
                 isUserLikeDisLikeStatus(comment, user),
-                comment.getRestaurantCommentlikeList().size(),
-                comment.getRestaurantCommentdislikeList().size(),
+                comment.getRestaurantCommentLikeList().size(),
+                comment.getRestaurantCommentDislikeList().size(),
                 isCommentMine(user, comment),
                 null,
                 comment.getUpdatedAt() == null ? comment.getCreatedAt() : comment.getUpdatedAt(),
@@ -68,8 +68,8 @@ public class RestaurantCommentDTO {
         return new RestaurantCommentDTO(
                 null, null, null, null, null, null, null,
                 isUserLikeDisLikeStatus(comment, user),
-                comment.getRestaurantCommentlikeList().size(),
-                comment.getRestaurantCommentdislikeList().size(), null, null, null, null
+                comment.getRestaurantCommentLikeList().size(),
+                comment.getRestaurantCommentDislikeList().size(), null, null, null, null
         );
     }
 
@@ -85,7 +85,7 @@ public class RestaurantCommentDTO {
             return 0;
         }
         // 유저가 좋아요를 눌렀는지 확인
-        boolean liked = comment.getRestaurantCommentlikeList().stream()
+        boolean liked = comment.getRestaurantCommentLikeList().stream()
                 .anyMatch(like -> like.getUser().equals(user));
 
         if (liked) {
@@ -93,7 +93,7 @@ public class RestaurantCommentDTO {
         }
 
         // 유저가 싫어요를 눌렀는지 확인
-        boolean disliked = comment.getRestaurantCommentdislikeList().stream()
+        boolean disliked = comment.getRestaurantCommentDislikeList().stream()
                 .anyMatch(dislike -> dislike.getUser().equals(user));
 
         return disliked ? -1 : 0;

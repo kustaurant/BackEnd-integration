@@ -31,10 +31,10 @@ public class RestaurantComment {
     private Restaurant restaurant;
 
     @OneToMany(mappedBy = "restaurantComment")
-    private List<RestaurantCommentlike> restaurantCommentlikeList=new ArrayList<>();
+    private List<RestaurantCommentLike> restaurantCommentLikeList =new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurantComment")
-    private List<RestaurantCommentdislike> restaurantCommentdislikeList=new ArrayList<>();
+    private List<RestaurantCommentDislike> restaurantCommentDislikeList =new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "restaurantComment")
