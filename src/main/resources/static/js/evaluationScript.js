@@ -4,16 +4,20 @@ document.addEventListener("DOMContentLoaded", function () {
     var isDragging = false; // 드래그 여부를 확인하는 변수
     var maxRating = 10; // 별점 최대값 (0.5 단위로 10까지 가능)
     var starImageWidth = starImage.clientWidth; // 별점 이미지의 전체 너비
+
+    // 초기 별점 설정
+    var initialRating = parseFloat(document.getElementById("situationJson").getAttribute("data-mainScore")) || 0;
+    var initialRatingIndex = initialRating * 2 - 1; // 기존 평가가 있다면 별점 인덱스 설정
     var evaluationData = {
-        starRating: 0, // 선택된 별점 초기값
+        starRating: initialRating, // 초기값 설정
         selectedSituations: [], // 선택된 상황
         restaurantId: 0, // 식당 ID
         evaluationComment: "", // 평가 코멘트
         newImage: null // 새로운 이미지
     };
 
-
-
+    // 기존 평가 별점이 있는 경우 문구 업데이트
+    setMainRating(initialRatingIndex);
 
     // 별점 이미지 클릭 이벤트
     starImage.addEventListener("click", function (event) {
@@ -113,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ---------- (second) 상황 버튼 선택 효과 로직 ---------- //
+    // 상황 버튼 선택 효과 로직
     var situationButtons = document.querySelectorAll(".keywordBtn");
 
     situationButtons.forEach(function (button) {
@@ -137,11 +141,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ---------- (third) 이미지 및 코멘트 첨부 로직 ---------- //
+    // 이미지 및 코멘트 첨부 로직
     var imageInput = document.getElementById('newImage');
     var commentInput = document.getElementById('evaluationComment');
 
-    // 커서가 들어오면 placeholder를 지우고 나가면 다시 설정하는 이벤트 리스너
     commentInput.addEventListener('focus', function () {
         this.setAttribute('data-placeholder', this.placeholder);
         this.placeholder = '';
@@ -150,7 +153,6 @@ document.addEventListener("DOMContentLoaded", function () {
     commentInput.addEventListener('blur', function () {
         this.placeholder = this.getAttribute('data-placeholder');
     });
-
 
     if (imageInput) {
         imageInput.addEventListener('change', function () {
@@ -164,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ---------- 제출 버튼 눌림 효과 로직 ---------- //
+    // 제출 버튼 눌림 효과 로직
     var submitBtn = document.getElementById('submitBtn');
 
     submitBtn.addEventListener('click', function () {
@@ -184,7 +186,7 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.append("newImage", evaluationData.newImage);
         }
 
-        fetch(`/api/evaluation?restaurantId=${restaurantId}`, { // restaurantId를 쿼리 파라미터로 추가
+        fetch(`/api/evaluation/${restaurantId}`, {
             method: "POST",
             body: formData
         })
@@ -223,8 +225,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (evaluationData.starRating === 0) {
             return false;
         }
-
-
         return true;
     }
 });
