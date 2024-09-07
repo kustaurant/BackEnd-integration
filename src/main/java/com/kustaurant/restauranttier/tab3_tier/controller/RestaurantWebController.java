@@ -35,7 +35,7 @@ import java.util.Map;
 @Controller
 public class RestaurantWebController {
     private final RestaurantCommentService restaurantCommentService;
-    private final EvaluationService evaluatioanService;
+    private final EvaluationService evaluationService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final RestaurantWebService restaurantWebService;
     private final RestaurantFavoriteService restaurantFavoriteService;
@@ -64,7 +64,7 @@ public class RestaurantWebController {
         model.addAttribute("favoriteCount", restaurantFavoriteService.getFavoriteCountByRestaurant(restaurant));
         // 티어 정보
         RestaurantTierDataClass restaurantTierDataClass = new RestaurantTierDataClass(restaurant);
-        evaluatioanService.insertSituation(restaurantTierDataClass, restaurant);
+        evaluationService.insertSituation(restaurantTierDataClass, restaurant);
         model.addAttribute("situationTierList", restaurantTierDataClass.getRestaurantSituationRelationList());
         // 메뉴
         List<RestaurantMenu> restaurantMenus = restaurantWebService.getRestaurantMenuList(restaurantId);
@@ -87,12 +87,14 @@ public class RestaurantWebController {
             User user = customOAuth2UserService.getUser(principal.getName());
             model.addAttribute("user", user);
             // 식당 댓글
-            List<Object[]> restaurantComments = restaurantCommentService.getCommentList(restaurantId, EnumSortComment.POPULAR, user);
+//            List<Object[]> restaurantComments = restaurantCommentService.getCommentList(restaurantId, EnumSortComment.POPULAR, user);
+//            model.addAttribute("restaurantComments", restaurantComments);
+            List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurant, user, true, "ios");
             model.addAttribute("restaurantComments", restaurantComments);
             // 즐겨찾기 여부
             model.addAttribute("isFavoriteExist", restaurantFavoriteService.isFavoriteExist(principal.getName(), restaurantId));
             //
-            Evaluation evaluation = evaluatioanService.getByUserAndRestaurant(user, restaurant);
+            Evaluation evaluation = evaluationService.getByUserAndRestaurant(user, restaurant);
             if (evaluation!=null) {
                 model.addAttribute("evaluationButton", "다시 평가하기");
             } else {
@@ -158,17 +160,17 @@ public class RestaurantWebController {
             Model model
     ) {
         EnumSortComment sortComment = EnumSortComment.valueOf(sort);
+        Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
 
         if (principal == null) {
-            List<Object[]> restaurantComments = restaurantCommentService.getCommentList(restaurantId, sortComment);
+            List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurant, null, sortComment.equals(EnumSortComment.POPULAR), "ios");
             model.addAttribute("restaurantComments", restaurantComments);
         } else {
             User user = customOAuth2UserService.getUser(principal.getName());
 
             model.addAttribute("user", user);
 
-            List<Object[]> restaurantComments = restaurantCommentService.getCommentList(restaurantId, sortComment, user);
-
+            List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurant, user, sortComment.equals(EnumSortComment.POPULAR), "ios");
             model.addAttribute("restaurantComments", restaurantComments);
         }
 
@@ -182,16 +184,16 @@ public class RestaurantWebController {
             @PathVariable Integer commentId,
             Principal principal
     ) {
-        RestaurantComment restaurantComment = restaurantCommentService.getComment(commentId);
+        RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
         model.addAttribute("comment", restaurantComment);
-
-        Integer restaurantCommentLikeScore = restaurantCommentService.getCommentLikeScore(commentId);
-        model.addAttribute("commentLikeScore", restaurantCommentLikeScore);
 
         if (principal != null) {
             User user = customOAuth2UserService.getUser(principal.getName());
 
             model.addAttribute("user", user);
+
+            RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(commentId, evaluationService.getEvaluationScoreByRestaurantComment(restaurantComment), user, "ios");
+            model.addAttribute("restaurantComment", restaurantCommentDTO);
 
             boolean isUserLikedComment = restaurantCommentService.isUserLikedComment(user, restaurantComment);
             model.addAttribute("isLiked", isUserLikedComment);
@@ -199,6 +201,9 @@ public class RestaurantWebController {
             boolean isUserDislikedComment = restaurantCommentService.isUserHatedComment(user, restaurantComment);
             model.addAttribute("isHated", isUserDislikedComment);
         } else {
+            RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(commentId, evaluationService.getEvaluationScoreByRestaurantComment(restaurantComment), null, "ios");
+            model.addAttribute("restaurantComment", restaurantCommentDTO);
+
             model.addAttribute("isLiked", false);
             model.addAttribute("isHated", false);
         }
@@ -216,7 +221,7 @@ public class RestaurantWebController {
         Map<String, String> responseMap = new HashMap<>();
         try {
             User user = customOAuth2UserService.getUser(principal.getName());
-            RestaurantComment restaurantComment = restaurantCommentService.getComment(commentId);
+            RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
 
             restaurantCommentService.likeComment(user, restaurantComment, responseMap);
         } catch (DataNotFoundException e) {
@@ -243,7 +248,7 @@ public class RestaurantWebController {
         Map<String, String> responseMap = new HashMap<>();
         try {
             User user = customOAuth2UserService.getUser(principal.getName());
-            RestaurantComment restaurantComment = restaurantCommentService.getComment(commentId);
+            RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
 
             restaurantCommentService.dislikeComment(user, restaurantComment, responseMap);
         } catch (DataNotFoundException e) {
@@ -268,17 +273,15 @@ public class RestaurantWebController {
             Principal principal
             ) {
         User user = customOAuth2UserService.getUser(principal.getName());
-        RestaurantComment restaurantComment = restaurantCommentService.getComment(commentId);
+        RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
         // 삭제 요청한 user가 댓글을 단 user가 아닌 경우
         if (restaurantComment.getUser() != user) {
             return ResponseEntity.badRequest().build();
         }
-        boolean result = restaurantCommentService.deleteComment(commentId, user);
-        if (result) {
-            return ResponseEntity.ok("success");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        // 댓글 지우기
+        restaurantCommentService.deleteComment(restaurantComment, user);
+
+        return ResponseEntity.ok("success");
     }
 
     // 식당 즐겨찾기

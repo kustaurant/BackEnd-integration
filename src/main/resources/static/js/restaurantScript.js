@@ -287,6 +287,7 @@ function sendComment() {
 // 댓글 좋아요 요청
 function commentLike(button) {
     const commentId = button.getAttribute("data-id");
+    const parentCommentId = button.getAttribute("data-parent-id");
     const apiUrl = window.location.origin + `/api/restaurants/comments/${commentId}/like`;
     fetch(apiUrl, {
         method: "GET",
@@ -301,7 +302,7 @@ function commentLike(button) {
             } else if (!response.ok) {
                 throw new Error(`${data.status}: ${data.message}`);
             } else {
-                changeCommentHtml(commentId, button.closest('li'));
+                changeCommentHtml(parentCommentId, button.closest('#commentList > li'));
             }
         })
         .catch(error => {
@@ -311,6 +312,7 @@ function commentLike(button) {
 // 댓글 싫어요 요청
 function commentDislike(button) {
     const commentId = button.getAttribute("data-id");
+    const parentCommentId = button.getAttribute("data-parent-id");
     const apiUrl = window.location.origin + `/api/restaurants/comments/${commentId}/dislike`;
     fetch(apiUrl, {
         method: "GET",
@@ -325,7 +327,7 @@ function commentDislike(button) {
             } else if (!response.ok) {
                 throw new Error(`${data.status}: ${data.message}`);
             } else {
-                changeCommentHtml(commentId, button.closest('li'));
+                changeCommentHtml(parentCommentId, button.closest('#commentList > li'));
             }
         })
         .catch(error => {
