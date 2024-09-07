@@ -171,6 +171,7 @@ public class MypageApiService {
         List<FavoriteRestaurantInfoDTO> favoriteRestaurantInfoDTOs = favoriteList.stream()
                 .map(restaurantFavorite -> new FavoriteRestaurantInfoDTO(
                         restaurantFavorite.getRestaurant().getRestaurantName(),
+                        restaurantFavorite.getRestaurant().getRestaurantId(),
                         restaurantFavorite.getRestaurant().getRestaurantImgUrl(),
                         restaurantFavorite.getRestaurant().getMainTier(),
                         restaurantFavorite.getRestaurant().getRestaurantCuisine(),
@@ -210,6 +211,7 @@ public class MypageApiService {
 
                     return new EvaluatedRestaurantInfoDTO(
                             evaluation.getRestaurant().getRestaurantName(),
+                            evaluation.getRestaurant().getRestaurantId(),
                             evaluation.getRestaurant().getRestaurantImgUrl(),
                             evaluation.getRestaurant().getRestaurantCuisine(),
                             evaluation.getEvaluationScore(),

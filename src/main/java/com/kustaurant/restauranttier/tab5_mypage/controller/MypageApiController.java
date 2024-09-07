@@ -27,9 +27,9 @@ public class MypageApiController {
     private final FeedbackService feedbackService;
 
 
-    //1
+    //1-1
     @Operation(
-            summary = "\"마이페이지 화면\" 로드에 필요한 정보 불러오기",
+            summary = "\"마이페이지 화면\" 로드에 필요한 정보 불러오기(/auth 없음)",
             description = "마이페이지 화면에 필요한 정보들이 반환됩니다. " +
                     "로그인하지 않은 회원도 접속 가능하기 때문에 엔드포인트에 /auth가 포함되지 않습니다. " +
                     "로그인하지 않은 회원인 경우 기본적인 빈 객체가 반환됩니다."
@@ -52,6 +52,33 @@ public class MypageApiController {
         return new ResponseEntity<>(mypageMainDTO, HttpStatus.OK);
     }
 
+
+    //1-2
+    @Operation(
+            summary = "\"마이페이지 화면\" 로드에 필요한 정보 불러오기(/auth 있음)",
+            description = "마이페이지 화면에 필요한 정보들이 반환됩니다. " +
+                    "로그인하지 않은 회원도 접속 가능하기 때문에 엔드포인트에 /auth가 포함됩니다. " +
+                    "로그인하지 않은 회원인 경우 기본적인 빈 객체가 반환됩니다."
+    )
+    @GetMapping("/auth/mypage")
+    public ResponseEntity<MypageMainDTO> getMypageView2(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+            @Parameter(hidden = true) @JwtToken Integer userId
+    ){
+        MypageMainDTO mypageMainDTO;
+
+        if (userId == null) {
+            // 로그인하지 않은 사용자일 경우, 빈 객체 반환
+            mypageMainDTO = new MypageMainDTO(); // 기본 생성자를 통해 빈 객체 생성
+        } else {
+            // 로그인한 사용자의 마이페이지 정보 로드
+            mypageMainDTO = mypageApiService.getMypageInfo(userId, userAgent);
+        }
+
+        return new ResponseEntity<>(mypageMainDTO, HttpStatus.OK);
+    }
+
+
     //2
     @Operation(
             summary = "마이페이지 프로필 정보(변경)화면 로드에 정보 불러오기",
@@ -65,6 +92,7 @@ public class MypageApiController {
         ProfileDTO profileDTO = mypageApiService.getProfileInfo(userId);
         return new ResponseEntity<>(profileDTO, HttpStatus.OK);
     }
+
 
     //3
     @Operation(
@@ -95,6 +123,7 @@ public class MypageApiController {
         }
     }
 
+
     //4
     @Operation(
             summary = "\"내가 평가한 맛집 화면\" 로드에 필요한 정보 불러오기",
@@ -108,6 +137,7 @@ public class MypageApiController {
         List<EvaluatedRestaurantInfoDTO> userEvaluateRestaurantList = mypageApiService.getUserEvaluateRestaurantList(userId);
         return new ResponseEntity<>(userEvaluateRestaurantList, HttpStatus.OK);
     }
+
 
     //5
     @Operation(
@@ -123,6 +153,7 @@ public class MypageApiController {
         return new ResponseEntity<>(writtenUserPostsDTOList, HttpStatus.OK);
     }
 
+
     //6
     @Operation(
             summary = "\"내가 저장한 맛집 화면\" 로드에 필요한 정보 불러오기",
@@ -136,6 +167,7 @@ public class MypageApiController {
         List<FavoriteRestaurantInfoDTO> userFavoriteRestaurantList = mypageApiService.getUserFavoriteRestaurantList(userId);
         return new ResponseEntity<>(userFavoriteRestaurantList, HttpStatus.OK);
     }
+
 
     //7
     @Operation( //---------------------------------------------------------------//
@@ -151,6 +183,7 @@ public class MypageApiController {
         return new ResponseEntity<>(postScrapsDTO, HttpStatus.OK);
     }
 
+
     //8
     @Operation(
             summary = "\"내가 작성한 커뮤니티 댓글 화면\" 로드에 필요한 정보 불러오기",
@@ -164,6 +197,7 @@ public class MypageApiController {
         List<MypagePostCommentDTO> commentedUserPosts = mypageApiService.getCommentedUserPosts(userId);
         return new ResponseEntity<>(commentedUserPosts, HttpStatus.OK);
     }
+
 
     //9
     @Operation(
@@ -190,6 +224,7 @@ public class MypageApiController {
         response.setError("피드백 감사합니다.");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
 
     //10
     @Operation(

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FavoriteRestaurantInfoDTO {
     private String restaurantName;
+    private Integer restaurantId;
     private String restaurantImgURL;
     private Integer mainTier;
     private String restaurantType;
