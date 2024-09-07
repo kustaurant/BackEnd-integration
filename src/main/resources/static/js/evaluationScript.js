@@ -172,7 +172,6 @@ document.addEventListener("DOMContentLoaded", function () {
             alert('모든 항목을 평가해주세요.');
             return;
         }
-
         var restaurantId = extractRestaurantIdFromUrl();
         evaluationData.restaurantId = restaurantId;
 
@@ -180,13 +179,12 @@ document.addEventListener("DOMContentLoaded", function () {
         formData.append("starRating", evaluationData.starRating);
         formData.append("selectedSituations", JSON.stringify(evaluationData.selectedSituations));
         formData.append("evaluationComment", evaluationData.evaluationComment);
-        formData.append("restaurantId", restaurantId);
 
         if (evaluationData.newImage) {
             formData.append("newImage", evaluationData.newImage);
         }
 
-        fetch("/api/evaluation", {
+        fetch(`/api/evaluation?restaurantId=${restaurantId}`, { // restaurantId를 쿼리 파라미터로 추가
             method: "POST",
             body: formData
         })
@@ -194,9 +192,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!response.ok) {
                     throw new Error("로그인이 되지 않았습니다");
                 }
-                return response;
+                return response.text(); // 응답 텍스트를 확인
             })
             .then(data => {
+                console.log(data); // 응답 확인용
                 if (window.history.length > 1) {
                     window.history.back();
                 } else {
@@ -204,6 +203,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             })
             .catch(error => {
+                console.error(error); // 에러 메시지 로그
                 if (window.history.length > 1) {
                     window.history.back();
                 } else {

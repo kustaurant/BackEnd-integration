@@ -20,10 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -65,17 +62,23 @@ public class EvaluationController {
 
         return "evaluation";
     }
-
     // 평가 데이터 db 저장 (기존 평가 존재 시 업데이트 진행)
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/evaluation")
-    public ResponseEntity<?> evaluationDBcreate(EvaluationDTO evaluationDTO, Principal principal, Integer restaurantId) {
+    public ResponseEntity<?> evaluationDBcreate(
+            @RequestBody EvaluationDTO evaluationDTO, // DTO를 통해 나머지 평가 데이터 수신
+            @RequestParam Integer restaurantId, // 레스토랑 ID를 별도로 수신
+            Principal principal) {
         User user = customOAuth2UserService.getUser(principal.getName());
         Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
-        
+
+        // 평가 데이터 저장 또는 업데이트
         evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
+        System.out.println("평가가 저장되었습니다");
 
         return ResponseEntity.ok("평가가 성공적으로 저장되었습니다.");
     }
+
+
 
 }
