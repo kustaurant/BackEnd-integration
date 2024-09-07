@@ -3,6 +3,7 @@ package com.kustaurant.restauranttier.tab3_tier.controller;
 import com.google.gson.Gson;
 import com.kustaurant.restauranttier.tab1_home.controller.MainController;
 import com.kustaurant.restauranttier.common.etc.JsonData;
+import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
 import com.kustaurant.restauranttier.tab3_tier.entity.EvaluationItemScore;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
@@ -69,8 +70,11 @@ public class EvaluationController {
     // 평가 데이터 db 저장 (기존 평가 존재 시 업데이트 진행)
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/evaluation")
-    public ResponseEntity<?> evaluationDBcreate(@RequestBody JsonData jsonData, Principal principal) {
-        evaluationService.createOrUpdate(jsonData, principal);
+    public ResponseEntity<?> evaluationDBcreate(EvaluationDTO evaluationDTO, Principal principal, Integer restaurantId) {
+        User user = customOAuth2UserService.getUser(principal.getName());
+        Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
+        
+        evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
 
         return ResponseEntity.ok("평가가 성공적으로 저장되었습니다.");
     }
