@@ -85,14 +85,17 @@ body{
     width: fit-content;
     padding-bottom: 10px;
 }
+#evaluationComment{
+    margin: 1rem auto; width: 100%; max-width: 800px;
+}
 @media only screen and (min-width: 371px) {
     .stars{
-        width: 40px;
+        width: 300px;
     }
 }
 @media only screen and (max-width: 370px) {
     .stars{
-        width: 33px;
+        width: 100px;
     }
 }
 #ratingComment{

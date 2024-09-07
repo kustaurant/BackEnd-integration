@@ -51,14 +51,13 @@ public class EvaluationController {
             Principal principal,
             @PathVariable Integer restaurantId
     ) {
-        // TODO: 현재 평가를 막아놨습니다.
         Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
         User user = customOAuth2UserService.getUser(principal.getName());
-        Optional<Evaluation> evaluation = evaluationRepository.findByUserAndRestaurant(user, restaurant);
+        Evaluation evaluation = evaluationRepository.findByUserAndRestaurant(user, restaurant).orElse(null);
         Double mainScore = 0.0;
 
-        if (evaluation.isPresent()) {
-            mainScore = evaluation.get().getEvaluationScore();
+        if (evaluation!=null) {
+            mainScore = evaluation.getEvaluationScore();
         }
         model.addAttribute("eval",evaluation);
         model.addAttribute("mainScore", mainScore);
