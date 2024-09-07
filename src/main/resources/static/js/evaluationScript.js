@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 초기 별점 설정
     var initialRating = parseFloat(document.getElementById("situationJson").getAttribute("data-mainScore")) || 0;
-    var initialRatingIndex = initialRating * 2 - 1; // 기존 평가가 있다면 별점 인덱스 설정
+    var initialRatingIndex = initialRating > 0 ? initialRating * 2 - 1 : 0; // 기존 평가가 있다면 별점 인덱스 설정, 아니면 0으로 설정
     var evaluationData = {
         starRating: initialRating, // 초기값 설정
         selectedSituations: [], // 선택된 상황
@@ -21,21 +21,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 별점 이미지 클릭 이벤트
     starImage.addEventListener("click", function (event) {
-        var selectedIndex = calculateStarRating(event); // 클릭 위치로부터 별점 계산
+        var selectedIndex = Math.max(calculateStarRating(event), 1); // 최소 별점 0.5(인덱스 1)로 설정
         setMainRating(selectedIndex); // 별점 설정
     });
 
     // 드래그 시작 이벤트
     starImage.addEventListener('mousedown', function (event) {
         isDragging = true; // 드래그 시작
-        var selectedIndex = calculateStarRating(event); // 드래그 시작 위치로부터 별점 계산
+        var selectedIndex = Math.max(calculateStarRating(event), 1); // 최소 별점 0.5로 설정
         setMainRating(selectedIndex); // 별점 설정
     });
 
     // 드래그 중 이벤트
     starImage.addEventListener('mousemove', function (event) {
         if (isDragging) { // 드래그 중일 때만 처리
-            var selectedIndex = calculateStarRating(event); // 드래그 위치로부터 별점 계산
+            var selectedIndex = Math.max(calculateStarRating(event), 1); // 최소 별점 0.5로 설정
             setMainRating(selectedIndex); // 별점 설정
         }
     });
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 터치 시작 이벤트 (모바일 환경)
     starImage.addEventListener('touchstart', function (event) {
         isDragging = true; // 터치 시작
-        var selectedIndex = calculateStarRating(event.touches[0]); // 터치 시작 위치로부터 별점 계산
+        var selectedIndex = Math.max(calculateStarRating(event.touches[0]), 1); // 최소 별점 0.5로 설정
         setMainRating(selectedIndex); // 별점 설정
     });
 
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
     starImage.addEventListener('touchmove', function (event) {
         event.preventDefault();
         if (isDragging) {
-            var selectedIndex = calculateStarRating(event.touches[0]); // 터치 이동 위치로부터 별점 계산
+            var selectedIndex = Math.max(calculateStarRating(event.touches[0]), 1); // 최소 별점 0.5로 설정
             setMainRating(selectedIndex); // 별점 설정
         }
     });
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // 별점에 따른 평가 코멘트 설정
         switch (selectedIndex) {
             case 0:
-                comment.textContent = "다시 올 일은 없을 것 같습니다";
+                comment.textContent = "";
                 break;
             case 1:
                 comment.textContent = "이 곳에 다시 올 일은 거의 없을 것 같아요";
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     submitBtn.addEventListener('click', function () {
         if (!checkData()) {
-            alert('모든 항목을 평가해주세요.');
+            alert('별점을 매겨주세요.');
             return;
         }
         var restaurantId = extractRestaurantIdFromUrl();

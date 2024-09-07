@@ -75,7 +75,6 @@ public class EvaluationController {
             @RequestParam(value = "evaluationComment", required = false) String evaluationComment,
             @RequestPart(value = "newImage", required = false) MultipartFile newImage
     ) {
-        System.out.println(principal.getName());
         User user = customOAuth2UserService.getUser(principal.getName());
         Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
 
@@ -91,7 +90,6 @@ public class EvaluationController {
 
         // 평가 데이터 저장 또는 업데이트
         evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
-        System.out.println("평가가 저장되었습니다");
 
         return ResponseEntity.ok("평가가 성공적으로 저장되었습니다.");
     }
