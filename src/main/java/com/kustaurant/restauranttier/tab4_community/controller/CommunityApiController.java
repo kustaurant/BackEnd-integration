@@ -92,10 +92,6 @@ public class CommunityApiController {
             paging = postApiService.getListByPostCategory(koreanCategory, page, sort);
         }
 
-        // 요청한 조건에 해당하는 게시글이 없는 경우 예외 발생
-        if (paging.isEmpty()) {
-            throw new OptionalNotExistException("요청한 조건에 해당하는 게시글이 없습니다.");
-        }
 
         return ResponseEntity.ok(paging.getContent());
     }

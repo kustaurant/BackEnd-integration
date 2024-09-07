@@ -1,359 +1,230 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // ----------(first) 메인 평가 선택 로직---------- //
-
-    var stars = document.querySelectorAll(".stars");
-    let isDragging = false;
+    var starImage = document.querySelector(".stars");
     var comment = document.querySelector("#ratingComment");
+    var isDragging = false; // 드래그 여부를 확인하는 변수
+    var maxRating = 10; // 별점 최대값 (0.5 단위로 10까지 가능)
+    var starImageWidth = starImage.clientWidth; // 별점 이미지의 전체 너비
 
-    stars.forEach(function (star, index) {
-        // 클릭했을 경우
-        star.addEventListener("click", function () {
-            setMainRating(index);
-        });
-        // 마우스를 클릭했을 경우 - 드래그 시작
-        star.addEventListener('mousedown', function() {
-            isDragging = true;
-            setMainRating(index);
-        });
-        // 마우스가 드래그 중일 때 별위로 마우스가 올라갔을 경우
-        star.addEventListener('mouseenter', function() {
-            if (isDragging) {
-                setMainRating(index);
-            }
-        });
-        // 모바일 환경 - 터치 시작
-        star.addEventListener('touchstart', (event) => {
-            isDragging = true;
-            setMainRating(index);
-        });
-        // 모바일 환경 - 터치 이동
-        star.addEventListener('touchmove', (event) => {
-            event.preventDefault();
-            const touch = event.touches[0];
-            const target = document.elementFromPoint(touch.clientX, touch.clientY);
-            const index = Array.from(stars).indexOf(target);
-            if (index !== -1) {
-                setMainRating(index);
-            }
-        });
-        // 모바일 환경 - 터치 종료
-        star.addEventListener('touchend', () => {
-            isDragging = false;
-        });
+    // 초기 별점 설정
+    var initialRating = parseFloat(document.getElementById("situationJson").getAttribute("data-mainScore")) || 0;
+    var initialRatingIndex = initialRating > 0 ? initialRating * 2 - 1 : 0; // 기존 평가가 있다면 별점 인덱스 설정, 아니면 0으로 설정
+    var evaluationData = {
+        starRating: initialRating, // 초기값 설정
+        selectedSituations: [], // 선택된 상황
+        restaurantId: 0, // 식당 ID
+        evaluationComment: "", // 평가 코멘트
+        newImage: null // 새로운 이미지
+    };
+
+    // 기존 평가 별점이 있는 경우 문구 업데이트
+    setMainRating(initialRatingIndex);
+
+    // 별점 이미지 클릭 이벤트
+    starImage.addEventListener("click", function (event) {
+        var selectedIndex = Math.max(calculateStarRating(event), 1); // 최소 별점 0.5(인덱스 1)로 설정
+        setMainRating(selectedIndex); // 별점 설정
     });
 
-    document.addEventListener('mouseup', function() {
-        isDragging = false;
-    })
+    // 드래그 시작 이벤트
+    starImage.addEventListener('mousedown', function (event) {
+        isDragging = true; // 드래그 시작
+        var selectedIndex = Math.max(calculateStarRating(event), 1); // 최소 별점 0.5로 설정
+        setMainRating(selectedIndex); // 별점 설정
+    });
 
+    // 드래그 중 이벤트
+    starImage.addEventListener('mousemove', function (event) {
+        if (isDragging) { // 드래그 중일 때만 처리
+            var selectedIndex = Math.max(calculateStarRating(event), 1); // 최소 별점 0.5로 설정
+            setMainRating(selectedIndex); // 별점 설정
+        }
+    });
+
+    // 드래그 종료 이벤트
+    document.addEventListener('mouseup', function () {
+        isDragging = false; // 드래그 종료
+    });
+
+    // 터치 시작 이벤트 (모바일 환경)
+    starImage.addEventListener('touchstart', function (event) {
+        isDragging = true; // 터치 시작
+        var selectedIndex = Math.max(calculateStarRating(event.touches[0]), 1); // 최소 별점 0.5로 설정
+        setMainRating(selectedIndex); // 별점 설정
+    });
+
+    // 터치 이동 이벤트 (모바일 환경)
+    starImage.addEventListener('touchmove', function (event) {
+        event.preventDefault();
+        if (isDragging) {
+            var selectedIndex = Math.max(calculateStarRating(event.touches[0]), 1); // 최소 별점 0.5로 설정
+            setMainRating(selectedIndex); // 별점 설정
+        }
+    });
+
+    // 터치 종료 이벤트 (모바일 환경)
+    starImage.addEventListener('touchend', function () {
+        isDragging = false; // 터치 종료
+    });
+
+    // 별점 계산 함수
+    function calculateStarRating(event) {
+        var rect = starImage.getBoundingClientRect(); // 별점 이미지의 경계 정보
+        var offsetX = event.clientX - rect.left; // 클릭 또는 터치 위치의 X 좌표 계산
+        var selectedIndex = Math.round((offsetX / starImageWidth) * maxRating); // 반점 단위로 별점 계산
+        return Math.max(0, Math.min(selectedIndex, maxRating)); // 최소값과 최대값 사이의 값으로 제한
+    }
+
+    // 별점 설정 함수
     function setMainRating(selectedIndex) {
-        stars.forEach(function (star, index) {
-            if (index <= selectedIndex) {
-                star.src = "/img/evaluation/star-filled.png";
-            } else {
-                star.src = "/img/evaluation/star-empty.png";
-            }
-            evaluationData.starRating = selectedIndex + 1
-        });
+        starImage.src = `/img/evaluation/star-${selectedIndex}.png`; // 별점 이미지 업데이트
+        evaluationData.starRating = (selectedIndex + 1) / 2; // 평가 데이터에 별점 저장 (0.5 단위로 변환)
 
-        if (selectedIndex > 5) {
-            comment.style.color = '#0F6341';
-            comment.style.fontWeight = 'bold';
-        } else if (selectedIndex > 4) {
-            comment.style.color = '#0F6341';
-            comment.style.fontWeight = '500';
-        } else if (selectedIndex > 3) {
-            comment.style.color = '#000';
-            comment.style.fontWeight = 'normal';
-        } else {
-            comment.style.color = '#555';
-            comment.style.fontWeight = 'normal';
+        // 별점에 따른 평가 코멘트 설정
+        switch (selectedIndex) {
+            case 0:
+                comment.textContent = "";
+                break;
+            case 1:
+                comment.textContent = "이 곳에 다시 올 일은 거의 없을 것 같아요";
+                break;
+            case 2:
+                comment.textContent = "조금 실망스러운 가게에요";
+                break;
+            case 3:
+                comment.textContent = "별로였어요, 다시 오지는 않을 것 같아요";
+                break;
+            case 4:
+                comment.textContent = "보통이에요, 크게 기대하지 마세요";
+                break;
+            case 5:
+                comment.textContent = "그럭저럭 괜찮았어요";
+                break;
+            case 6:
+                comment.textContent = "괜찮아요, 다시 올 수도 있을 것 같아요";
+                break;
+            case 7:
+                comment.textContent = "꽤 마음에 들었어요, 다시 와도 좋을 것 같아요";
+                break;
+            case 8:
+                comment.textContent = "좋아요! 다시 방문할 것 같아요";
+                break;
+            case 9:
+                comment.textContent = "매우 만족스러웠어요, 꼭 다시 올 거에요!";
+                break;
+            case 10:
+                comment.textContent = "내 마음속 최고의 가게!";
+                break;
         }
-
-        if (selectedIndex == 0) {
-            comment.textContent = "다시 올 일은 없을 것 같습니다";
-        } else if (selectedIndex == 1) {
-            comment.textContent = "음.. 다시 오고싶다는 생각은 딱히.. ";
-        } else if (selectedIndex == 2) {
-            comment.textContent = "조금 아쉬운 가게에요";
-        } else if (selectedIndex == 3) {
-            comment.textContent = "평범한 음식점이에요";
-        } else if (selectedIndex == 4) {
-            comment.textContent = "괜찮아요. 다시 방문은 할겁니다";
-        } else if (selectedIndex == 5) {
-            comment.textContent = "제법 괜찮아요. 무조건 재방문 합니다";
-        } else {
-            comment.textContent = "내 마음속 최고의 가게!";
-        }
-
     }
 
-// ---------- (second) 버튼 선택 효과 로직---------- //
+    // 상황 버튼 선택 효과 로직
+    var situationButtons = document.querySelectorAll(".keywordBtn");
 
-    var categoryBtns = document.querySelectorAll(".categoryBtn");
-
-    categoryBtns.forEach(function (button) {
+    situationButtons.forEach(function (button) {
         button.addEventListener("click", function () {
-            toggleCategoryBtnsClass(button);
+            toggleSituationButton(button);
         });
     });
 
-    function toggleCategoryBtnsClass(button) {
+    // 상황 버튼의 선택 상태 토글 함수
+    function toggleSituationButton(button) {
         button.classList.toggle("unselected");
         button.classList.toggle("selected");
-    }
 
-
-    // ---------- (third) 버튼 선택 효과 로직---------- //
-
-    document.querySelectorAll(".keywordBtn").forEach(function (button, index) {
-        button.addEventListener("click", function () {
-            toggleKeywordsBtnClass(button);
-            togglekeywordsRatingArea(index)
-        });
-    });
-
-    function toggleKeywordsBtnClass(button) {
-        button.classList.toggle("unselected");
-        button.classList.toggle("selected");
-    }
-
-    function togglekeywordsRatingArea(index) {
-        var targetDiv = document.querySelector('#keywordEvaluateSection .keywordEvaluateArea:nth-child(' + (index + 1) + ')');
-
-        targetDiv.classList.toggle('hidden');
-        if (targetDiv.classList.contains('hidden')) {
-            resetRatingInArea(targetDiv);
+        var situationId = button.id.replace('situation', '');
+        if (evaluationData.selectedSituations.includes(situationId)) {
+            evaluationData.selectedSituations = evaluationData.selectedSituations.filter(function (id) {
+                return id !== situationId;
+            });
+        } else {
+            evaluationData.selectedSituations.push(situationId);
         }
     }
 
-    // 키워드 평가 태그 두번 눌러서 숨겨질 때 데이터 초기화하기
-    function resetRatingInArea(area) {
-        // 모든 선택 포인트에서 'picked' 클래스 제거
-        var selectPoints = area.querySelectorAll('.select-point .circle');
-        selectPoints.forEach(function (point) {
-            point.classList.remove('picked');
+    // 이미지 및 코멘트 첨부 로직
+    var imageInput = document.getElementById('newImage');
+    var commentInput = document.getElementById('evaluationComment');
+
+    commentInput.addEventListener('focus', function () {
+        this.setAttribute('data-placeholder', this.placeholder);
+        this.placeholder = '';
+    });
+
+    commentInput.addEventListener('blur', function () {
+        this.placeholder = this.getAttribute('data-placeholder');
+    });
+
+    if (imageInput) {
+        imageInput.addEventListener('change', function () {
+            evaluationData.newImage = imageInput.files[0]; // 선택된 이미지 파일 저장
         });
-
-        // 모든 평가 텍스트에서 'bold' 클래스 제거
-        var ratingParagraphs = area.querySelectorAll('.bar-comment-area p');
-        ratingParagraphs.forEach(function (p) {
-            p.classList.remove('bold');
-        });
-
-        // 평가 데이터에서 해당 키워드 평가 점수를 리셋
-        var keywordIndex = Array.from(document.querySelectorAll('.keywordEvaluateArea')).indexOf(area);
-        evaluationData.barRatings[keywordIndex] = undefined;
-
-        // 바 색깔 원상태로
-        var evaluationBars = area.querySelectorAll('.picked-bar');
-        evaluationBars.forEach(function (bar) {
-            bar.classList.remove('picked-bar');
-        })
-        var evaluationCircles = area.querySelectorAll('.color-circle');
-        evaluationCircles.forEach(function (bar) {
-            bar.classList.remove('color-circle');
-        })
     }
 
-    // ---- 바형 ui에서 선택 효과 로직 ---- //
+    if (commentInput) {
+        commentInput.addEventListener('input', function () {
+            evaluationData.evaluationComment = commentInput.value; // 입력된 코멘트 저장
+        });
+    }
 
-    var keywordEvaluateAreas = document.querySelectorAll('.keywordEvaluateArea');
+    // 제출 버튼 눌림 효과 로직
+    var submitBtn = document.getElementById('submitBtn');
 
-    keywordEvaluateAreas.forEach(function (keyword) {
-        var selectPoints = keyword.querySelectorAll('.select-point');
+    submitBtn.addEventListener('click', function () {
+        if (!checkData()) {
+            alert('별점을 매겨주세요.');
+            return;
+        }
+        var restaurantId = extractRestaurantIdFromUrl();
+        evaluationData.restaurantId = restaurantId;
 
-        selectPoints.forEach(function (point, index) {
-            // 클릭했을 경우
-            point.addEventListener("click", function () {
-                toggleSelectPoint(index + 1, keyword);
-            });
-            // 마우스를 클릭했을 경우 - 드래그 시작
-            point.addEventListener('mousedown', function() {
-                isDragging = true;
-                toggleSelectPoint(index + 1, keyword);
-            });
-            // 마우스가 드래그 중일 때 별위로 마우스가 올라갔을 경우
-            point.addEventListener('mouseenter', function() {
-                if (isDragging) {
-                    toggleSelectPoint(index + 1, keyword);
+        var formData = new FormData();
+        formData.append("starRating", evaluationData.starRating);
+        formData.append("selectedSituations", JSON.stringify(evaluationData.selectedSituations));
+        formData.append("evaluationComment", evaluationData.evaluationComment);
+
+        if (evaluationData.newImage) {
+            formData.append("newImage", evaluationData.newImage);
+        }
+
+        fetch(`/api/evaluation/${restaurantId}`, {
+            method: "POST",
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("로그인이 되지 않았습니다");
+                }
+                return response.text(); // 응답 텍스트를 확인
+            })
+            .then(data => {
+                console.log(data); // 응답 확인용
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = "/restaurants/" + restaurantId;
+                }
+            })
+            .catch(error => {
+                console.error(error); // 에러 메시지 로그
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = "/restaurants/" + restaurantId;
                 }
             });
-            // 모바일 환경 - 터치 시작
-            point.addEventListener('touchstart', (event) => {
-                isDragging = true;
-                toggleSelectPoint(index + 1, keyword);
-            });
-            // 모바일 환경 - 터치 이동
-            point.addEventListener('touchmove', (event) => {
-                event.preventDefault();
-                const touch = event.touches[0];
-                selectPoints.forEach(function(element, elementIndex) {
-                    const rect = element.getBoundingClientRect();
-                    if (touch.clientX >= rect.left && touch.clientX <= rect.right - 1 &&
-                        touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-                        toggleSelectPoint(elementIndex + 1, keyword);
-                        return;
-                    }
-                })
-            });
-            // 모바일 환경 - 터치 종료
-            point.addEventListener('touchend', () => {
-                isDragging = false;
-            });
-        });
     });
-    document.addEventListener('mouseup', function() {
-        isDragging = false;
-    })
 
-    function toggleSelectPoint(rating, keyword) {
-        var selectPoints = keyword.querySelectorAll('.select-point .circle');
-        var leftBars = keyword.querySelectorAll('.left-bar');
-        var rightBars = keyword.querySelectorAll('.right-bar');
-        var ratingParagraphs = keyword.querySelectorAll('.bar-comment-area p');
-
-        // 해당 keyword 내에서 모든 select-point에서 picked 클래스 제거
-        selectPoints.forEach(function (point) {
-            point.classList.remove('picked');
-            point.classList.remove('color-circle');
-        });
-        leftBars.forEach(function (point) {
-            point.classList.remove('picked-bar');
-        });
-        rightBars.forEach(function (point) {
-            point.classList.remove('picked-bar');
-        });
-
-        // 클릭된 select-point에 picked 클래스 추가
-        selectPoints.forEach(function(circle, index) {
-            if (index < rating - 1) {
-                circle.classList.add("color-circle");
-            } else if (index === rating - 1) {
-                circle.classList.add('picked');
-            }
-        })
-        // 클릭된 부분 앞의 bar에 picked-bar 클래스 추가
-        leftBars.forEach(function(bar, index) {
-            if (index < rating - 1) {
-                bar.classList.add('picked-bar');
-            }
-        })
-        rightBars.forEach(function(bar, index) {
-            if (index < rating - 1) {
-                bar.classList.add('picked-bar');
-            }
-        })
-
-        // 각 p 태그에 bold 클래스를 toggle
-        ratingParagraphs.forEach(function (p, index) {
-            p.classList.toggle('bold', index + 1 === rating);
-        });
-        var keywordIndex = Array.from(keywordEvaluateAreas).indexOf(keyword);
-        evaluationData.barRatings[keywordIndex] = rating;
+    // URL에서 식당 ID 추출 함수
+    function extractRestaurantIdFromUrl() {
+        var urlSegments = window.location.pathname.split('/');
+        return urlSegments[urlSegments.length - 1]; // 마지막 세그먼트를 ID로 가정
     }
-    // 전송 데이터 초기화
-    var evaluationData = {
-        starRating: 0,
-        barRatings: [],
-        restaurantId: 0
-    }
-    // 데이터가 제대로 입력 됐는지 체크
+
+    // 데이터가 올바르게 입력되었는지 체크하는 함수
     function checkData() {
         if (evaluationData.starRating === 0) {
             return false;
         }
-        let areas = document.querySelectorAll('.keywordEvaluateArea');
-        let dataIndex = [];
-        areas.forEach(function(area, index) {
-            if (!area.classList.contains('hidden')) {
-                dataIndex.push(index);
-            }
-        });
-        if (dataIndex.length === 0 && evaluationData.barRatings.length === 0)
-            return true;
-        for (let i = 0; i < evaluationData.barRatings.length; i++) {
-            if (dataIndex.length === 0 && evaluationData.barRatings[i]) {
-                return false;
-            }
-
-            if (dataIndex[0] === i && !evaluationData.barRatings[i]) {
-                return false;
-            } else if (dataIndex[0] !== i && evaluationData.barRatings[i]) {
-                return false;
-            } else if (dataIndex[0] === i) {
-                dataIndex.shift();
-            }
-        }
-        return dataIndex.length <= 0;
-    }
-    // ----------제출 버튼 눌림효과 로직---------- //
-    
-    var submitBtn = document.getElementById('submitBtn');
-    
-    // 평가하기 버튼 눌렀을 때
-    submitBtn.addEventListener('click', function () {
-        if (!checkData()) {
-            alert('모든 항목을 평가해주세요.');
-            return;
-        }
-
-        var restaurantId = extractRestaurantIdFromUrl();
-        evaluationData.restaurantId = restaurantId;
-
-        fetch("/api/evaluation", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(evaluationData)
-        })
-            .then(response =>{
-                if(!response.ok){
-                    throw new Error("로그인이 되지 않았습니다");
-                }
-                return response;
-            })
-            .then(data => {
-                if (window.history.length > 1) {
-                    window.history.back();
-                } else {
-                    window.location.href = "/restaurants/"+restaurantId;
-                }
-            }
-        )
-            .catch(error =>{
-                if (window.history.length > 1) {
-                    window.history.back();
-                } else {
-                    window.location.href = "/restaurants/"+restaurantId;
-                }
-            })
-
-    })
-
-    function extractRestaurantIdFromUrl() {
-        // URL에서 레스토랑 ID 추출하는 로직
-        // 예시: http://example.com/restaurant/123 -> 123 반환
-        var urlSegments = window.location.pathname.split('/');
-        return urlSegments[urlSegments.length - 1]; // 마지막 세그먼트가 ID라고 가정
-    }
-
-
-
-    /* 이전에 평가한 데이터가 있을 경우 버튼을 누르게 함. */
-    var situationJsonElement = document.getElementById('situationJson');
-    var situationJson = situationJsonElement.getAttribute('data-situationJson');
-    const situationData = JSON.parse(situationJson);
-    const mainScore = situationJsonElement.getAttribute('data-mainScore');
-    var mainStars = document.querySelectorAll('.stars');
-    mainStars[mainScore - 1].click();
-    var situationButtons = document.querySelectorAll('#keywordList button');
-    var lvContainers = document.querySelectorAll('.lv-container');
-    for (var key in situationData) {
-        if (situationData.hasOwnProperty(key)) {
-            situationButtons[key - 1].click();
-            lvContainers[key - 1].querySelector('.lv' + situationData[key]).click();
-        }
+        return true;
     }
 });
