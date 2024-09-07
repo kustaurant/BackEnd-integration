@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.controller;
 
+import com.kustaurant.restauranttier.tab3_tier.constants.EvaluationConstants;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
@@ -178,30 +179,23 @@ public class RestaurantWebController {
     }
 
     // 식당 댓글 하나 html 로드
-    @GetMapping("/api/restaurants/comments/{commentId}")
+    @GetMapping("/api/restaurants/comments/{evaluationId}")
     public String getARenderedRestaurantCommentHtml(
             Model model,
-            @PathVariable Integer commentId,
+            @PathVariable Integer evaluationId,
             Principal principal
     ) {
-        RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-        model.addAttribute("comment", restaurantComment);
+        evaluationId -= EvaluationConstants.EVALUATION_ID_OFFSET;
 
         if (principal != null) {
             User user = customOAuth2UserService.getUser(principal.getName());
 
             model.addAttribute("user", user);
 
-            RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(commentId, evaluationService.getEvaluationScoreByRestaurantComment(restaurantComment), user, "ios");
+            RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(evaluationId, user, "ios");
             model.addAttribute("restaurantComment", restaurantCommentDTO);
-
-            boolean isUserLikedComment = restaurantCommentService.isUserLikedComment(user, restaurantComment);
-            model.addAttribute("isLiked", isUserLikedComment);
-
-            boolean isUserDislikedComment = restaurantCommentService.isUserHatedComment(user, restaurantComment);
-            model.addAttribute("isHated", isUserDislikedComment);
         } else {
-            RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(commentId, evaluationService.getEvaluationScoreByRestaurantComment(restaurantComment), null, "ios");
+            RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(evaluationId, null, "ios");
             model.addAttribute("restaurantComment", restaurantCommentDTO);
 
             model.addAttribute("isLiked", false);
@@ -221,9 +215,14 @@ public class RestaurantWebController {
         Map<String, String> responseMap = new HashMap<>();
         try {
             User user = customOAuth2UserService.getUser(principal.getName());
-            RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-
-            restaurantCommentService.likeComment(user, restaurantComment, responseMap);
+            if (isSubComment(commentId)) { // 대댓글인 경우
+                RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
+                restaurantCommentService.likeComment(user, restaurantComment, responseMap);
+            } else { // 부모 댓글인 경우
+                int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
+                Evaluation evaluation = evaluationService.getByEvaluationId(evaluationId);
+                evaluationService.likeEvaluation(user, evaluation);
+            }
         } catch (DataNotFoundException e) {
             logger.error("RestaurantCommentLikeError", e);
             responseMap.put("status", "error");
@@ -248,9 +247,14 @@ public class RestaurantWebController {
         Map<String, String> responseMap = new HashMap<>();
         try {
             User user = customOAuth2UserService.getUser(principal.getName());
-            RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-
-            restaurantCommentService.dislikeComment(user, restaurantComment, responseMap);
+            if (isSubComment(commentId)) { // 대댓글인 경우
+                RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
+                restaurantCommentService.dislikeComment(user, restaurantComment, responseMap);
+            } else { // 부모 댓글인 경우
+                int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
+                Evaluation evaluation = evaluationService.getByEvaluationId(evaluationId);
+                evaluationService.dislikeEvaluation(user, evaluation);
+            }
         } catch (DataNotFoundException e) {
             logger.error("RestaurantCommentDislikeError", e);
             responseMap.put("status", "error");
@@ -273,13 +277,23 @@ public class RestaurantWebController {
             Principal principal
             ) {
         User user = customOAuth2UserService.getUser(principal.getName());
-        RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-        // 삭제 요청한 user가 댓글을 단 user가 아닌 경우
-        if (restaurantComment.getUser() != user) {
-            return ResponseEntity.badRequest().build();
+        if (isSubComment(commentId)) {
+            RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
+            // 삭제 요청한 user가 댓글을 단 user가 아닌 경우
+            if (!restaurantComment.getUser().equals(user)) {
+                return ResponseEntity.badRequest().build();
+            }
+            // 대댓글 지우기
+            restaurantCommentService.deleteComment(restaurantComment, user);
+        } else {
+            int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
+            Evaluation evaluation = evaluationService.getByEvaluationId(evaluationId);
+            if (!evaluation.getUser().equals(user)) {
+                return ResponseEntity.badRequest().build();
+            }
+            // 댓글 내용 지우기
+            evaluationService.deleteComment(evaluation, user);
         }
-        // 댓글 지우기
-        restaurantCommentService.deleteComment(restaurantComment, user);
 
         return ResponseEntity.ok("success");
     }
@@ -292,5 +306,9 @@ public class RestaurantWebController {
             Principal principal
     ) {
         return ResponseEntity.ok(restaurantFavoriteService.toggleFavorite(principal.getName(), restaurantId));
+    }
+
+    private boolean isSubComment(Integer id) {
+        return id <= EvaluationConstants.EVALUATION_ID_OFFSET;
     }
 }

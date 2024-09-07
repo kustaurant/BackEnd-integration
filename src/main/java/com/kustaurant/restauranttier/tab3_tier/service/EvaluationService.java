@@ -1,10 +1,12 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
+import com.kustaurant.restauranttier.common.exception.exception.DataNotFoundException;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.constants.TierConstants;
 import com.kustaurant.restauranttier.tab3_tier.controller.TierWebController;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
+import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.specification.RestaurantSpecification;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.common.etc.JsonData;
@@ -31,10 +33,7 @@ public class EvaluationService {
     private final EvaluationRepository evaluationRepository;
     private final SituationRepository situationRepository;
     private final EvaluationItemScoreRepository evaluationItemScoreRepository;
-    private final CustomOAuth2UserService customOAuth2UserService;
     private final RestaurantRepository restaurantRepository;
-    private final RestaurantFavoriteRepository restaurantFavoriteRepository;
-    private final RestaurantCommentService restaurantCommentService;
     private final RestaurantSituationRelationService restaurantSituationRelationService;
     private final EvaluationItemScoresService evaluationItemScoresService;
     private final RestaurantApiService restaurantApiService;
@@ -375,6 +374,7 @@ public class EvaluationService {
     }
 
     // Evaluation 좋아요
+    @Transactional
     public void likeEvaluation(User user, Evaluation evaluation) {
         Optional<RestaurantCommentLike> likeOptional = restaurantCommentLikeRepository.findByUserAndEvaluation(user, evaluation);
         Optional<RestaurantCommentDislike> dislikeOptional = restaurantCommentDislikeRepository.findByUserAndEvaluation(user, evaluation);
@@ -398,6 +398,7 @@ public class EvaluationService {
     }
 
     // Evaluation 싫어요
+    @Transactional
     public void dislikeEvaluation(User user, Evaluation evaluation) {
         Optional<RestaurantCommentLike> likeOptional = restaurantCommentLikeRepository.findByUserAndEvaluation(user, evaluation);
         Optional<RestaurantCommentDislike> dislikeOptional = restaurantCommentDislikeRepository.findByUserAndEvaluation(user, evaluation);

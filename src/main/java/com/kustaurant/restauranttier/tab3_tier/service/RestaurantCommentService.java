@@ -30,6 +30,7 @@ public class RestaurantCommentService {
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+    private final EvaluationService evaluationService;
 
     public RestaurantComment findCommentByCommentId(Integer commentId) {
         Optional<RestaurantComment> commentOptional = restaurantCommentRepository.findByCommentIdAndStatus(commentId, "ACTIVE");
@@ -95,22 +96,21 @@ public class RestaurantCommentService {
                 .toList();
     }
 
-    public RestaurantCommentDTO getRestaurantCommentDTO(int commentId, Double score, User user, String userAgent) {
-//        Optional<RestaurantComment> restaurantCommentOptional = restaurantCommentRepository.findByCommentId(commentId);
-//        if (restaurantCommentOptional.isPresent()) {
-//            RestaurantComment restaurantComment = restaurantCommentOptional.get();
-//            RestaurantCommentDTO restaurantCommentDTO = RestaurantCommentDTO.convertCommentWhenSubComment(restaurantComment, score, user, userAgent);
-//            restaurantCommentDTO.setCommentReplies(
-//                    findCommentsByParentCommentId(restaurantCommentDTO.getCommentId()).stream()
-//                            .map(comment -> RestaurantCommentDTO.convertCommentWhenSubComment(comment, null, user, userAgent))
-//                            .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
-//                            .collect(Collectors.toList())
-//            );
-//            return restaurantCommentDTO;
-//        } else {
-//            throw new DataNotFoundException("comment not found");
-//        }
-        return null;
+    public RestaurantCommentDTO getRestaurantCommentDTO(int evaluationId, User user, String userAgent) {
+        Evaluation evaluation = evaluationService.getByEvaluationId(evaluationId);
+        if (evaluation != null) {
+            RestaurantCommentDTO restaurantCommentDTO = RestaurantCommentDTO.convertCommentWhenEvaluation(evaluation, user, userAgent);
+            restaurantCommentDTO.setCommentReplies(
+                    restaurantCommentDTO.getEvaluation().getRestaurantCommentList().stream()
+                            .filter(comment -> comment.getStatus().equals("ACTIVE"))
+                            .map(comment -> RestaurantCommentDTO.convertCommentWhenSubComment(comment, restaurantCommentDTO.getCommentScore(), user, userAgent))
+                            .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
+                            .collect(Collectors.toList())
+            );
+            return restaurantCommentDTO;
+        } else {
+            throw new DataNotFoundException("comment not found");
+        }
     }
 
     public String addComment(Integer restaurantId, String userTokenId, String commentBody) {
@@ -162,6 +162,7 @@ public class RestaurantCommentService {
         return restaurantCommentdislikeOptional.isPresent();
     }
 
+    @Transactional
     public void likeComment(User user, RestaurantComment restaurantComment, Map<String, String> responseMap) {
         Optional<RestaurantCommentLike> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserAndRestaurantComment(user, restaurantComment);
         Optional<RestaurantCommentDislike> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserAndRestaurantComment(user, restaurantComment);
@@ -191,6 +192,7 @@ public class RestaurantCommentService {
         restaurantCommentRepository.save(restaurantComment);
     }
 
+    @Transactional
     public void dislikeComment(User user, RestaurantComment restaurantComment, Map<String, String> responseMap) {
         Optional<RestaurantCommentLike> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserAndRestaurantComment(user, restaurantComment);
         Optional<RestaurantCommentDislike> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserAndRestaurantComment(user, restaurantComment);

@@ -8,16 +8,16 @@ window.onload = function() {
     var name = restaurantInfo.getAttribute('data-name');
     var latitude = parseFloat(restaurantInfo.getAttribute('data-latitude'));
     var longitude = parseFloat(restaurantInfo.getAttribute('data-longitude'));
-    // // 네이버 지도
-    // map = new naver.maps.Map('map', {
-    //     center: new naver.maps.LatLng(latitude, longitude),//위도, 경도
-    //     zoom: 16,
-    //     minZoom: 10,
-    // });
-    // marker = new naver.maps.Marker({
-    //     position: new naver.maps.LatLng(latitude, longitude),//위도, 경도
-    //     map: map
-    // });
+    // 네이버 지도
+    map = new naver.maps.Map('map', {
+        center: new naver.maps.LatLng(latitude, longitude),//위도, 경도
+        zoom: 16,
+        minZoom: 10,
+    });
+    marker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(latitude, longitude),//위도, 경도
+        map: map
+    });
 };
 window.onresize = function() {
     mainImgResize();
