@@ -38,7 +38,7 @@ public class Evaluation {
     // 평가 내용 관련
     private String commentBody;
     private String commentImgUrl;
-    private Integer commentLikeCount;
+    private Integer commentLikeCount = 0;
     @OneToMany(mappedBy = "evaluation")
     private List<RestaurantCommentLike> restaurantCommentLikeList = new ArrayList<>();
     @OneToMany(mappedBy = "evaluation")
@@ -56,6 +56,10 @@ public class Evaluation {
     private List<RestaurantCommentReport> restaurantCommentReportList = new ArrayList<>();
 
     @JsonIgnore
+    @OneToMany(mappedBy = "evaluation")
+    private List<RestaurantComment> restaurantCommentList = new ArrayList<>();
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="restaurant_id")
     private Restaurant restaurant;
@@ -64,10 +68,12 @@ public class Evaluation {
 
     }
 
-    public Evaluation(Double evaluationScore, String status, LocalDateTime createdAt, User user, Restaurant restaurant) {
+    public Evaluation(Double evaluationScore, String status, LocalDateTime createdAt, String commentBody, String commentImgUrl, User user, Restaurant restaurant) {
         this.evaluationScore = evaluationScore;
         this.status = status;
         this.createdAt = createdAt;
+        this.commentBody = commentBody;
+        this.commentImgUrl = commentImgUrl;
         this.user = user;
         this.restaurant = restaurant;
     }

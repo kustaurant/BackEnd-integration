@@ -2,7 +2,6 @@ package com.kustaurant.restauranttier.tab3_tier.service;
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
-import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantCommentDislikeRepository;
@@ -31,15 +30,6 @@ public class RestaurantCommentService {
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
-    private final S3Service s3Service;
-
-    public RestaurantComment findCommentByEvaluationId(Integer evaluationId) {
-        return restaurantCommentRepository.findByParentEvaluationIdAndStatus(evaluationId, "ACTIVE").orElse(null);
-    }
-
-    public List<RestaurantComment> findCommentsByParentCommentId(Integer parentCommentId) {
-        return restaurantCommentRepository.findByParentCommentIdAndStatus(parentCommentId, "ACTIVE");
-    }
 
     public RestaurantComment findCommentByCommentId(Integer commentId) {
         Optional<RestaurantComment> commentOptional = restaurantCommentRepository.findByCommentIdAndStatus(commentId, "ACTIVE");
@@ -47,29 +37,6 @@ public class RestaurantCommentService {
             throw new OptionalNotExistException(commentId + " 코멘트가 없습니다.");
         }
         return commentOptional.get();
-    }
-
-    public void createRestaurantComment(User user, Restaurant restaurant, Evaluation evaluation, EvaluationDTO evaluationDTO) {
-        String commentImgUrl = null;
-        if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
-            commentImgUrl = s3Service.uploadFile(evaluationDTO.getNewImage());
-        }
-        RestaurantComment newComment = new RestaurantComment(
-                user, restaurant, evaluationDTO.getEvaluationComment(), commentImgUrl, evaluation.getEvaluationId(),
-                0, "ACTIVE", LocalDateTime.now()
-        );
-        restaurantCommentRepository.save(newComment);
-    }
-
-    public void updateRestaurantComment(EvaluationDTO evaluationDTO, RestaurantComment comment) {
-        comment.setUpdatedAt(LocalDateTime.now());
-        comment.setCommentBody(evaluationDTO.getEvaluationComment());
-        if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
-            String commentImgUrl = s3Service.uploadFile(evaluationDTO.getNewImage());
-            s3Service.deleteFile(comment.getCommentImgUrl());
-            comment.setCommentImgUrl(commentImgUrl);
-        }
-        restaurantCommentRepository.save(comment);
     }
 
     // 식당 코멘트 삭제
@@ -83,13 +50,13 @@ public class RestaurantCommentService {
             throw new ParamException("해당 유저가 단 댓글이 아닙니다.");
         }
 
-        List<RestaurantComment> childrenComments = findCommentsByParentCommentId(comment.getCommentId());
-        if (childrenComments != null && !childrenComments.isEmpty()) {
-            childrenComments.forEach(child -> {
-                child.setStatus("DELETED");
-                restaurantCommentRepository.save(child);
-            });
-        }
+//        List<RestaurantComment> childrenComments = findCommentsByParentCommentId(comment.getCommentId());
+//        if (childrenComments != null && !childrenComments.isEmpty()) {
+//            childrenComments.forEach(child -> {
+//                child.setStatus("DELETED");
+//                restaurantCommentRepository.save(child);
+//            });
+//        }
 
         comment.setStatus("DELETED");
         restaurantCommentRepository.save(comment);
@@ -98,14 +65,13 @@ public class RestaurantCommentService {
     public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular, String userAgent) {
         // 평가 데이터 및 댓글 가져오기
         List<RestaurantCommentDTO> mainCommentList = new ArrayList<>(restaurant.getEvaluationList().stream()
-                .map(evaluation -> {
-                    RestaurantComment comment = findCommentByEvaluationId(evaluation.getEvaluationId());
-                    return comment != null ? new AbstractMap.SimpleEntry<>(evaluation, comment) : null;
+                .filter(evaluation -> {
+                    String body = evaluation.getCommentBody();
+                    String imgUrl = evaluation.getCommentImgUrl();
+                    return (body != null && !body.isEmpty()) || (imgUrl != null && !imgUrl.isEmpty());
                 })
-                .filter(Objects::nonNull)
-                .map(entry -> RestaurantCommentDTO.convertComment(
-                        entry.getValue(),          // comment
-                        entry.getKey().getEvaluationScore(), // evaluationScore
+                .map(evaluation -> RestaurantCommentDTO.convertCommentWhenEvaluation(
+                        evaluation,
                         user,
                         userAgent
                 ))
@@ -123,30 +89,30 @@ public class RestaurantCommentService {
         return mainCommentList.stream()
                 .peek(mainComment ->
                         mainComment.setCommentReplies(
-                                findCommentsByParentCommentId(mainComment.getCommentId()).stream()
-                                        .map(comment -> RestaurantCommentDTO.convertComment(comment, null, user, userAgent))
+                                mainComment.getEvaluation().getRestaurantCommentList().stream()
+                                        .map(comment -> RestaurantCommentDTO.convertCommentWhenSubComment(comment, mainComment.getCommentScore(), user, userAgent))
                                         .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
                                         .collect(Collectors.toList())
-                        )
-                )
+                        ))
                 .toList();
     }
 
     public RestaurantCommentDTO getRestaurantCommentDTO(int commentId, Double score, User user, String userAgent) {
-        Optional<RestaurantComment> restaurantCommentOptional = restaurantCommentRepository.findByCommentId(commentId);
-        if (restaurantCommentOptional.isPresent()) {
-            RestaurantComment restaurantComment = restaurantCommentOptional.get();
-            RestaurantCommentDTO restaurantCommentDTO = RestaurantCommentDTO.convertComment(restaurantComment, score, user, userAgent);
-            restaurantCommentDTO.setCommentReplies(
-                    findCommentsByParentCommentId(restaurantCommentDTO.getCommentId()).stream()
-                            .map(comment -> RestaurantCommentDTO.convertComment(comment, null, user, userAgent))
-                            .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
-                            .collect(Collectors.toList())
-            );
-            return restaurantCommentDTO;
-        } else {
-            throw new DataNotFoundException("comment not found");
-        }
+//        Optional<RestaurantComment> restaurantCommentOptional = restaurantCommentRepository.findByCommentId(commentId);
+//        if (restaurantCommentOptional.isPresent()) {
+//            RestaurantComment restaurantComment = restaurantCommentOptional.get();
+//            RestaurantCommentDTO restaurantCommentDTO = RestaurantCommentDTO.convertCommentWhenSubComment(restaurantComment, score, user, userAgent);
+//            restaurantCommentDTO.setCommentReplies(
+//                    findCommentsByParentCommentId(restaurantCommentDTO.getCommentId()).stream()
+//                            .map(comment -> RestaurantCommentDTO.convertCommentWhenSubComment(comment, null, user, userAgent))
+//                            .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
+//                            .collect(Collectors.toList())
+//            );
+//            return restaurantCommentDTO;
+//        } else {
+//            throw new DataNotFoundException("comment not found");
+//        }
+        return null;
     }
 
     public String addComment(Integer restaurantId, String userTokenId, String commentBody) {
@@ -172,15 +138,15 @@ public class RestaurantCommentService {
         }
     }
 
-    public RestaurantComment addSubComment(Restaurant restaurant, User user, String commentBody, Integer parentCommentId) {
+    public RestaurantComment addSubComment(Restaurant restaurant, User user, String commentBody, Evaluation evaluation) {
         RestaurantComment restaurantComment = new RestaurantComment();
 
         restaurantComment.setUser(user);
         restaurantComment.setRestaurant(restaurant);
+        restaurantComment.setEvaluation(evaluation);
         restaurantComment.setCommentBody(commentBody);
         restaurantComment.setStatus("ACTIVE");
         restaurantComment.setCreatedAt(LocalDateTime.now());
-        restaurantComment.setParentCommentId(parentCommentId);
         restaurantComment.setCommentLikeCount(0);
 
         restaurantCommentRepository.save(restaurantComment);

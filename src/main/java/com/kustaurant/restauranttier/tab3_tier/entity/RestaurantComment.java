@@ -30,6 +30,10 @@ public class RestaurantComment {
     @JoinColumn(name="restaurant_id")
     private Restaurant restaurant;
 
+    @ManyToOne
+    @JoinColumn(name="evaluation_id")
+    private Evaluation evaluation;
+
     @OneToMany(mappedBy = "restaurantComment")
     private List<RestaurantCommentLike> restaurantCommentLikeList =new ArrayList<>();
 
@@ -41,21 +45,16 @@ public class RestaurantComment {
     private List<RestaurantCommentReport> restaurantCommentReportList = new ArrayList<>();
 
     private String commentBody;
-    private String commentImgUrl;
-    private Integer parentEvaluationId;
-    private Integer parentCommentId;
     private Integer commentLikeCount;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public RestaurantComment(User user, Restaurant restaurant, String commentBody, String commentImgUrl, Integer parentEvaluationId, Integer commentLikeCount, String status, LocalDateTime createdAt) {
+    public RestaurantComment(User user, Restaurant restaurant, Evaluation evaluation, String commentBody, String status, LocalDateTime createdAt) {
         this.user = user;
         this.restaurant = restaurant;
+        this.evaluation = evaluation;
         this.commentBody = commentBody;
-        this.commentImgUrl = commentImgUrl;
-        this.parentEvaluationId = parentEvaluationId;
-        this.commentLikeCount = commentLikeCount;
         this.status = status;
         this.createdAt = createdAt;
     }

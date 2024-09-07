@@ -1,5 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
+import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.constants.TierConstants;
 import com.kustaurant.restauranttier.tab3_tier.controller.TierWebController;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
@@ -10,6 +12,7 @@ import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab3_tier.repository.*;
+import groovy.util.Eval;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,9 +38,18 @@ public class EvaluationService {
     private final RestaurantSituationRelationService restaurantSituationRelationService;
     private final EvaluationItemScoresService evaluationItemScoresService;
     private final RestaurantApiService restaurantApiService;
+    private final S3Service s3Service;
 
     @Value("${tier.min.evaluation}")
     private int minNumberOfEvaluations;
+
+    public Evaluation getByEvaluationId(Integer evaluationId) {
+        Optional<Evaluation> evaluationOptional = evaluationRepository.findByEvaluationIdAndStatus(evaluationId, "ACTIVE");
+        if (evaluationOptional.isEmpty()) {
+            throw new OptionalNotExistException(evaluationId + " 평가가 없습니다.");
+        }
+        return evaluationOptional.get();
+    }
 
     public Evaluation getByUserAndRestaurant(User user, Restaurant restaurant) {
         Optional<Evaluation> evaluation = evaluationRepository.findByUserAndRestaurant(user, restaurant);
@@ -164,8 +176,8 @@ public class EvaluationService {
         if (restaurantComment == null) {
             return null;
         }
-        Optional<Evaluation> evaluationOptional = evaluationRepository.findById(restaurantComment.getParentEvaluationId());
-        return evaluationOptional.map(Evaluation::getEvaluationScore).orElse(null);
+        Evaluation evaluation = restaurantComment.getEvaluation();
+        return evaluation.getEvaluationScore();
     }
 
     public void createOrUpdate(User user, Restaurant restaurant, EvaluationDTO evaluationDTO) {
@@ -188,21 +200,15 @@ public class EvaluationService {
         // 평가 업데이트
         evaluation.setUpdatedAt(LocalDateTime.now());
         evaluation.setEvaluationScore(evaluationDTO.getEvaluationScore());
-        evaluationRepository.save(evaluation);
-        // 평가 코멘트나 사진 업데이트
-        RestaurantComment comment = restaurantCommentService.findCommentByEvaluationId(evaluation.getEvaluationId());
-        if ((evaluationDTO.getEvaluationComment() == null || evaluationDTO.getEvaluationComment().isEmpty())
-                && (evaluationDTO.getNewImage() == null || evaluationDTO.getNewImage().isEmpty())) { // 코멘트 내용과 사진이 없는 경우
-            if (comment != null && comment.getCommentImgUrl() != null && !comment.getCommentImgUrl().isEmpty()) {
-                restaurantCommentService.deleteComment(comment, user);
-            }
-        } else { // 코멘트 내용이나 사진이 있는 경우
-            if (comment == null) { // 기존 코멘트가 없으면 생성
-                restaurantCommentService.createRestaurantComment(user, restaurant, evaluation, evaluationDTO);
-            } else { // 기존 코멘트가 있으면 수정
-                restaurantCommentService.updateRestaurantComment(evaluationDTO, comment);
-            }
+        String commentBody = evaluationDTO.getEvaluationComment();
+        if (commentBody == null || commentBody.isEmpty()) {
+            commentBody = null;
         }
+        evaluation.setCommentBody(commentBody);
+        if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
+            evaluation.setCommentImgUrl(s3Service.uploadFile(evaluationDTO.getNewImage()));
+        }
+        evaluationRepository.save(evaluation);
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
         // 이전 상황 데이터 삭제 & 이전에 선택한 상황에 대해 restaurant_situation_relations_tbl 테이블의 count 1씩 감소
         for (EvaluationItemScore evaluationItemScore : evaluation.getEvaluationItemScoreList()) {
@@ -223,12 +229,26 @@ public class EvaluationService {
         }
     }
 
-    // 이전 평가가 업는 경우 - 평가 생성하기
+    // 이전 평가가 없는 경우 - 평가 생성하기
     @Transactional
     public void evaluationCreate(User user, Restaurant restaurant, EvaluationDTO evaluationDTO) {
         // 평가 저장
+        String commentImgUrl = null;
+        if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
+            commentImgUrl = s3Service.uploadFile(evaluationDTO.getNewImage());
+        }
+        String commentBody = evaluationDTO.getEvaluationComment();
+        if (commentBody == null || commentBody.isEmpty()) {
+            commentBody = null;
+        }
         Evaluation evaluation = new Evaluation(
-                evaluationDTO.getEvaluationScore(), "ACTIVE", LocalDateTime.now(), user, restaurant
+                evaluationDTO.getEvaluationScore(),
+                "ACTIVE",
+                LocalDateTime.now(),
+                commentBody,
+                commentImgUrl,
+                user,
+                restaurant
         );
         evaluationRepository.save(evaluation);
         // restaurants_tbl 테이블 점수 업데이트
@@ -236,11 +256,6 @@ public class EvaluationService {
         restaurant.setRestaurantEvaluationCount(restaurant.getRestaurantEvaluationCount() + 1);
         restaurantRepository.save(restaurant);
         calculateTierOfOneRestaurant(restaurant);
-        // 평가 코멘트 - 평가 코멘트나 사진 추가
-        if ((evaluationDTO.getEvaluationComment() != null && !evaluationDTO.getEvaluationComment().isEmpty())
-                || (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty())) {
-            restaurantCommentService.createRestaurantComment(user, restaurant, evaluation, evaluationDTO);
-        }
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
         if (evaluationDTO.getEvaluationSituations() != null && !evaluationDTO.getEvaluationSituations().isEmpty()) {
             for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {

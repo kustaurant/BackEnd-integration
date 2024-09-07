@@ -28,13 +28,12 @@ public class EvaluationDTO {
     @Schema(description = "새로운 이미지", example = "평가하기나 다시평가하기를 할 때 새로 등록한 이미지가 있을 경우에만 사용하는 필드입니다.")
     private MultipartFile newImage;
 
-    public static EvaluationDTO convertEvaluation(Evaluation evaluation, RestaurantComment comment) {
+    public static EvaluationDTO convertEvaluation(Evaluation evaluation) {
         return new EvaluationDTO(
-                // TODO: 여기 수정
                 evaluation.getEvaluationScore(),
                 evaluation.getSituationIdList(),
-                comment == null ? null : comment.getCommentImgUrl(),
-                comment == null ? null : comment.getCommentBody(),
+                evaluation.getCommentImgUrl(),
+                evaluation.getCommentBody(),
                 RestaurantConstants.STAR_COMMENTS,
                 null
         );

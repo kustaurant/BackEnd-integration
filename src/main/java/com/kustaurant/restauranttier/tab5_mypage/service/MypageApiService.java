@@ -199,10 +199,7 @@ public class MypageApiService {
         // 평가 리스트를 DTO로 변환하여 반환
         List<EvaluatedRestaurantInfoDTO> evaluateRestaurantInfoDTOS = evaluationList.stream()
                 .map(evaluation -> {
-                    // RestaurantCommentService 에서 코멘트를 가져옴
-                    RestaurantComment comment = restaurantCommentService.findCommentByEvaluationId(evaluation.getEvaluationId());
-
-                    String userCommentBody = comment != null ? comment.getCommentBody() : null;
+                    String userCommentBody = evaluation.getCommentBody();
 
                     // EvaluationItemScoreList 에서 각 상황 이름을 추출
                     List<String> situationNames = evaluation.getEvaluationItemScoreList().stream()
