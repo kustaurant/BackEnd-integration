@@ -62,7 +62,7 @@
     <p>별점을 선택해 주세요</p>
     <div id="starsArea">
         <img class="stars"
-             th:src="${eval != null ? '/img/evaluation/star-' + (eval.getEvaluationScore() * 2).intValue() + '.png' : '/img/evaluation/star-0.png'}"
+             th:src="${eval != null ? 'https://kustaurant.s3.ap-northeast-2.amazonaws.com/evaluation/star-' + (eval.getEvaluationScore() * 2).intValue() + '.png' : 'https://kustaurant.s3.ap-northeast-2.amazonaws.com/evaluation/star-0.png'}"
              alt="stars">
     </div>
 

@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 별점 설정 함수
     function setMainRating(selectedIndex) {
-        starImage.src = `/img/evaluation/star-${selectedIndex}.png`; // 별점 이미지 업데이트
+        starImage.src = `https://kustaurant.s3.ap-northeast-2.amazonaws.com/evaluation/star-${selectedIndex}.png`; // 별점 이미지 업데이트
         evaluationData.starRating = (selectedIndex + 1) / 2; // 평가 데이터에 별점 저장 (0.5 단위로 변환)
 
         // 별점에 따른 평가 코멘트 설정
