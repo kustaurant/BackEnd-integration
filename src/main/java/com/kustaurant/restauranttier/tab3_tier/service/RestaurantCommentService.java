@@ -39,27 +39,24 @@ public class RestaurantCommentService {
         return commentOptional.get();
     }
 
-    // 식당 코멘트 삭제
+    // 식당 대댓글 삭제
     @Transactional
     public void deleteComment(RestaurantComment comment, User user) {
         if (comment == null || user == null) {
             return;
         }
 
-        if (user != null && !comment.getUser().equals(user)) {
-            throw new ParamException("해당 유저가 단 댓글이 아닙니다.");
+        if (!comment.getUser().equals(user)) {
+            throw new ParamException("해당 유저가 단 대댓글이 아닙니다.");
         }
 
-//        List<RestaurantComment> childrenComments = findCommentsByParentCommentId(comment.getCommentId());
-//        if (childrenComments != null && !childrenComments.isEmpty()) {
-//            childrenComments.forEach(child -> {
-//                child.setStatus("DELETED");
-//                restaurantCommentRepository.save(child);
-//            });
-//        }
-
         comment.setStatus("DELETED");
+        comment.setCommentLikeCount(0);
         restaurantCommentRepository.save(comment);
+
+        // 좋아요, 싫어요 삭제
+        restaurantCommentLikeRepository.deleteAll(comment.getRestaurantCommentLikeList());
+        restaurantCommentDislikeRepository.deleteAll(comment.getRestaurantCommentDislikeList());
     }
 
     public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular, String userAgent) {
@@ -79,7 +76,7 @@ public class RestaurantCommentService {
 
         // 정렬
         if (sortPopular) {
-            mainCommentList.sort(Comparator.comparing(RestaurantCommentDTO::getCommentLikeCount).reversed());
+            mainCommentList.sort(Comparator.comparing(RestaurantCommentDTO::commentLikeDiffDislike).reversed());
         } else {
             // TODO: 평가 정렬을 UpdateAt을 반영해야됨
             mainCommentList.sort(Comparator.comparing(RestaurantCommentDTO::getDate).reversed());
@@ -90,6 +87,7 @@ public class RestaurantCommentService {
                 .peek(mainComment ->
                         mainComment.setCommentReplies(
                                 mainComment.getEvaluation().getRestaurantCommentList().stream()
+                                        .filter(comment -> comment.getStatus().equals("ACTIVE"))
                                         .map(comment -> RestaurantCommentDTO.convertCommentWhenSubComment(comment, mainComment.getCommentScore(), user, userAgent))
                                         .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
                                         .collect(Collectors.toList())

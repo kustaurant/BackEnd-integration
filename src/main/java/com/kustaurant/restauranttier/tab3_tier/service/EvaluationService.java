@@ -39,6 +39,9 @@ public class EvaluationService {
     private final EvaluationItemScoresService evaluationItemScoresService;
     private final RestaurantApiService restaurantApiService;
     private final S3Service s3Service;
+    private final RestaurantCommentLikeRepository restaurantCommentLikeRepository;
+    private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
+    private final RestaurantCommentRepository restaurantCommentRepository;
 
     @Value("${tier.min.evaluation}")
     private int minNumberOfEvaluations;
@@ -368,6 +371,89 @@ public class EvaluationService {
             if (RestaurantSpecification.hasSituation(restaurantSituationRelation)) {
                 data.addSituation(restaurantSituationRelation);
             }
+        }
+    }
+
+    // Evaluation 좋아요
+    public void likeEvaluation(User user, Evaluation evaluation) {
+        Optional<RestaurantCommentLike> likeOptional = restaurantCommentLikeRepository.findByUserAndEvaluation(user, evaluation);
+        Optional<RestaurantCommentDislike> dislikeOptional = restaurantCommentDislikeRepository.findByUserAndEvaluation(user, evaluation);
+
+        if (likeOptional.isPresent() && dislikeOptional.isPresent()) {
+            throw new IllegalStateException(evaluation.getEvaluationId() + "id 평가 좋아요 상태 문제. 서버측에 알려주세요.. 감사합니다!");
+        } else if (likeOptional.isPresent()) {
+            restaurantCommentLikeRepository.delete(likeOptional.get());
+            evaluationLikeCountAdd(evaluation, -1);
+        } else if (dislikeOptional.isPresent()) {
+            restaurantCommentDislikeRepository.delete(dislikeOptional.get());
+            RestaurantCommentLike restaurantCommentLike = new RestaurantCommentLike(user, evaluation);
+            restaurantCommentLikeRepository.save(restaurantCommentLike);
+            evaluationLikeCountAdd(evaluation, 2);
+        } else {
+            RestaurantCommentLike restaurantCommentLike = new RestaurantCommentLike(user, evaluation);
+            restaurantCommentLikeRepository.save(restaurantCommentLike);
+            evaluationLikeCountAdd(evaluation, 1);
+        }
+
+    }
+
+    // Evaluation 싫어요
+    public void dislikeEvaluation(User user, Evaluation evaluation) {
+        Optional<RestaurantCommentLike> likeOptional = restaurantCommentLikeRepository.findByUserAndEvaluation(user, evaluation);
+        Optional<RestaurantCommentDislike> dislikeOptional = restaurantCommentDislikeRepository.findByUserAndEvaluation(user, evaluation);
+
+        if (likeOptional.isPresent() && dislikeOptional.isPresent()) {
+            throw new IllegalStateException(evaluation.getEvaluationId() + "id 평가 좋아요 상태 문제. 서버측에 알려주세요.. 감사합니다!");
+        } else if (dislikeOptional.isPresent()) {
+            restaurantCommentDislikeRepository.delete(dislikeOptional.get());
+            evaluationLikeCountAdd(evaluation, 1);
+        } else if (likeOptional.isPresent()) {
+            restaurantCommentLikeRepository.delete(likeOptional.get());
+            RestaurantCommentDislike restaurantCommentDislike = new RestaurantCommentDislike(user, evaluation);
+            restaurantCommentDislikeRepository.save(restaurantCommentDislike);
+            evaluationLikeCountAdd(evaluation, -2);
+        } else {
+            RestaurantCommentDislike restaurantCommentDislike = new RestaurantCommentDislike(user, evaluation);
+            restaurantCommentDislikeRepository.save(restaurantCommentDislike);
+            evaluationLikeCountAdd(evaluation, -1);
+        }
+
+    }
+
+    private void evaluationLikeCountAdd(Evaluation evaluation, int addNum) {
+        evaluation.setCommentLikeCount(evaluation.getCommentLikeCount() + addNum);
+        evaluationRepository.save(evaluation);
+    }
+
+    // 평가의 댓글 내용 삭제
+    @Transactional
+    public void deleteComment(Evaluation evaluation, User user) {
+        if (evaluation == null || user == null) {
+            return;
+        }
+
+        if (!evaluation.getUser().equals(user)) {
+            throw new ParamException("해당 유저가 단 댓글이 아닙니다.");
+        }
+
+        // 평가 코멘트 및 사진 삭제
+        evaluation.setCommentBody(null);
+        evaluation.setCommentImgUrl(null);
+        evaluation.setCommentLikeCount(0);
+        evaluationRepository.save(evaluation);
+
+        // 좋아요, 싫어요 삭제
+        restaurantCommentLikeRepository.deleteAll(evaluation.getRestaurantCommentLikeList());
+        restaurantCommentDislikeRepository.deleteAll(evaluation.getRestaurantCommentDislikeList());
+
+        // 대댓글 삭제
+        for (RestaurantComment restaurantComment : evaluation.getRestaurantCommentList()) {
+            restaurantComment.setStatus("DELETED");
+            restaurantComment.setCommentLikeCount(0);
+            restaurantCommentRepository.save(restaurantComment);
+
+            restaurantCommentLikeRepository.deleteAll(restaurantComment.getRestaurantCommentLikeList());
+            restaurantCommentDislikeRepository.deleteAll(restaurantComment.getRestaurantCommentDislikeList());
         }
     }
 }

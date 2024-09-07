@@ -97,6 +97,19 @@ public class RestaurantCommentDTO {
                 comment.getRestaurantCommentDislikeList().size(), null, null, null, null, null
         );
     }
+    public static RestaurantCommentDTO convertCommentWhenLikeDislike(Evaluation evaluation, User user) {
+        return new RestaurantCommentDTO(
+                null, null, null, null, null, null, null,
+                isUserLikeDisLikeStatus(evaluation, user),
+                evaluation.getRestaurantCommentLikeList().size(),
+                evaluation.getRestaurantCommentDislikeList().size(), null, null, null, null, null
+        );
+    }
+
+    public int commentLikeDiffDislike() {
+        return commentLikeCount - commentDislikeCount;
+    }
+
 
     public static boolean isCommentMine(User user, Evaluation evaluation) {
         if (user == null) {

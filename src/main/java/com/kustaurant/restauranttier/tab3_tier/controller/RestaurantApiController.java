@@ -269,17 +269,29 @@ public class RestaurantApiController {
     ) {
         // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
-        // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
-        checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
         // 유저 가져오기
         User user = userService.findUserById(userId);
-        // 코멘트 가져오기
-        RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-        // 식당 좋아요 로직
-        Map<String, String> responseMap = new HashMap<>();
-        restaurantCommentService.likeComment(user, restaurantComment, responseMap);
+        // 평가 댓글인 경우 / 대댓글인 경우 판단
+        if (!isSubComment(commentId)) { // 평가 댓글인 경우
+            commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
+            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
 
-        return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, user));
+            // 평가 가져오기
+            Evaluation evaluation = evaluationService.getByEvaluationId(commentId);
+            // 댓글 좋아요 로직
+            evaluationService.likeEvaluation(user, evaluation);
+
+            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(evaluation, user));
+        } else { // 대댓글인 경우
+            checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+            // 코멘트 가져오기
+            RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
+            // 대댓글 좋아요 로직
+            Map<String, String> responseMap = new HashMap<>();
+            restaurantCommentService.likeComment(user, restaurantComment, responseMap);
+
+            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, user));
+        }
     }
 
     // 리뷰 비추천하기
@@ -312,17 +324,29 @@ public class RestaurantApiController {
     ) {
         // 식당 가져오기
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
-        // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
-        checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
         // 유저 가져오기
         User user = userService.findUserById(userId);
-        // 코멘트 가져오기
-        RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-        // 댓글 싫어요 로직
-        Map<String, String> responseMap = new HashMap<>();
-        restaurantCommentService.dislikeComment(user, restaurantComment, responseMap);
+        // 평가 댓글인 경우 / 대댓글인 경우 판단
+        if (!isSubComment(commentId)) { // 평가 댓글인 경우
+            commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
+            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
 
-        return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, user));
+            // 평가 가져오기
+            Evaluation evaluation = evaluationService.getByEvaluationId(commentId);
+            // 댓글 좋아요 로직
+            evaluationService.dislikeEvaluation(user, evaluation);
+
+            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(evaluation, user));
+        } else { // 대댓글인 경우
+            checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+            // 코멘트 가져오기
+            RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
+            // 대댓글 좋아요 로직
+            Map<String, String> responseMap = new HashMap<>();
+            restaurantCommentService.dislikeComment(user, restaurantComment, responseMap);
+
+            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, user));
+        }
     }
 
     // 식당 대댓글 달기
@@ -403,12 +427,22 @@ public class RestaurantApiController {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 유저 가져오기
         User user = userService.findUserById(userId);
-        // 이 댓글이 해당 식당의 댓글이 맞는지 확인
-        checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
-        // 댓글 가져오기
-        RestaurantComment comment = restaurantCommentService.findCommentByCommentId(commentId);
-        // 댓글 삭제
-        restaurantCommentService.deleteComment(comment, user);
+        // 대댓글인지 평가 코멘트 댓글인지 판단
+        if (isSubComment(commentId)) { // 대댓글인 경우
+            // 이 댓글이 해당 식당의 댓글이 맞는지 확인
+            checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+            // 댓글 가져오기
+            RestaurantComment comment = restaurantCommentService.findCommentByCommentId(commentId);
+            // 댓글 삭제
+            restaurantCommentService.deleteComment(comment, user);
+        } else { // 평가 코멘트 댓글인 경우
+            commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
+            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
+            // 평가 가져오기
+            Evaluation evaluation = evaluationService.getByEvaluationId(commentId);
+            // 평가 및 평가의 대댓글 삭제
+            evaluationService.deleteComment(evaluation, user);
+        }
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -430,14 +464,29 @@ public class RestaurantApiController {
         Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 유저 가져오기
         User user = userService.findUserById(userId);
-        // 이 댓글이 해당 식당의 댓글이 맞는지 확인
-        checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
-        // 댓글 가져오기
-        RestaurantComment comment = restaurantCommentService.findCommentByCommentId(commentId);
-        // 신고 테이블에 저장
-        restaurantCommentReportRepository.save(new RestaurantCommentReport(user, comment, LocalDateTime.now(), "ACTIVE"));
+        // 대댓글인지 평가 코멘트 댓글인지 판단
+        if (isSubComment(commentId)) { // 대댓글인 경우
+            // 이 댓글이 해당 식당의 댓글이 맞는지 확인
+            checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
+            // 댓글 가져오기
+            RestaurantComment comment = restaurantCommentService.findCommentByCommentId(commentId);
+            // 신고 테이블에 저장
+            restaurantCommentReportRepository.save(new RestaurantCommentReport(user, comment, LocalDateTime.now(), "ACTIVE"));
+        } else { // 평가 코멘트 댓글인 경우
+            commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
+            // 이 평가가 해당 식당의 평가가 맞는지 확인
+            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
+            // 평가 가져오기
+            Evaluation evaluation = evaluationService.getByEvaluationId(commentId);
+            // 신고 테이블에 저장
+            restaurantCommentReportRepository.save(new RestaurantCommentReport(user, evaluation, LocalDateTime.now(), "ACTIVE"));
+        }
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private boolean isSubComment(Integer id) {
+        return id <= EvaluationConstants.EVALUATION_ID_OFFSET;
     }
 
 }
