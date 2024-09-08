@@ -8,11 +8,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // 초기 별점 설정
     var initialRating = parseFloat(document.getElementById("situationJson").getAttribute("data-mainScore")) || 0;
     var initialRatingIndex = initialRating > 0 ? initialRating * 2 - 1 : 0; // 기존 평가가 있다면 별점 인덱스 설정, 아니면 0으로 설정
+    var initialComment = document.getElementById("situationJson").getAttribute("data-comment") || "";
+
     var evaluationData = {
         starRating: initialRating, // 초기값 설정
         selectedSituations: [], // 선택된 상황
         restaurantId: 0, // 식당 ID
-        evaluationComment: "", // 평가 코멘트
+        evaluationComment: initialComment, // 평가 코멘트
         newImage: null // 새로운 이미지
     };
 
@@ -117,29 +119,27 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 상황 버튼 선택 효과 로직
-    var situationButtons = document.querySelectorAll(".keywordBtn");
-
-    situationButtons.forEach(function (button) {
-        button.addEventListener("click", function () {
-            toggleSituationButton(button);
+    var selectedSituations=[]
+    //상황 버튼 로직
+    document.querySelectorAll('.keywordBtn').forEach(function (button) {
+        // 상황 버튼 초기 세팅
+        if (button.classList.contains('selected')) {
+            let situationId = parseInt(button.id.replace('situation', ''));
+            selectedSituations.push(situationId);
+        }
+        // 상황 버튼 토글 처리
+        button.addEventListener('click', function () {
+            button.classList.toggle('selected');
+            let situationId = parseInt(button.id.replace('situation', ''));
+            if (button.classList.contains('selected')) {
+                if (!selectedSituations.includes(situationId)) {
+                    selectedSituations.push(situationId);
+                }
+            } else {
+                selectedSituations = selectedSituations.filter(id => id !== situationId);
+            }
         });
     });
-
-    // 상황 버튼의 선택 상태 토글 함수
-    function toggleSituationButton(button) {
-        button.classList.toggle("unselected");
-        button.classList.toggle("selected");
-
-        var situationId = button.id.replace('situation', '');
-        if (evaluationData.selectedSituations.includes(situationId)) {
-            evaluationData.selectedSituations = evaluationData.selectedSituations.filter(function (id) {
-                return id !== situationId;
-            });
-        } else {
-            evaluationData.selectedSituations.push(situationId);
-        }
-    }
 
     // 이미지 및 코멘트 첨부 로직
     var imageInput = document.getElementById('newImage');
@@ -174,8 +174,14 @@ document.addEventListener("DOMContentLoaded", function () {
             alert('별점을 매겨주세요.');
             return;
         }
+
         var restaurantId = extractRestaurantIdFromUrl();
         evaluationData.restaurantId = restaurantId;
+        evaluationData.selectedSituations = selectedSituations;
+
+        // 코멘트 값을 제출 시점에 설정
+        var commentInput = document.getElementById('evaluationComment');
+        evaluationData.evaluationComment = commentInput.value.trim() !== "" ? commentInput.value : initialComment;
 
         var formData = new FormData();
         formData.append("starRating", evaluationData.starRating);
@@ -194,10 +200,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (!response.ok) {
                     throw new Error("로그인이 되지 않았습니다");
                 }
-                return response.text(); // 응답 텍스트를 확인
+                return response.text();
             })
             .then(data => {
-                console.log(data); // 응답 확인용
+                console.log(data);
                 if (window.history.length > 1) {
                     window.history.back();
                 } else {
@@ -205,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             })
             .catch(error => {
-                console.error(error); // 에러 메시지 로그
+                console.error(error);
                 if (window.history.length > 1) {
                     window.history.back();
                 } else {
