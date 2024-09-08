@@ -556,7 +556,7 @@ div.basic-info > div.texts > span {
 #subCommentList > li {
     display: flex;
     background-color: #F9F9F9;
-    padding: 3px 6px;
+    padding: 3px 0 3px 6px;
 }
 #subCommentList .reply-img-container {
     width: 14px;

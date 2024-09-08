@@ -30,6 +30,7 @@ public class RestaurantCommentService {
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+    private final EvaluationService evaluationService;
 
     public RestaurantComment findCommentByCommentId(Integer commentId) {
         Optional<RestaurantComment> commentOptional = restaurantCommentRepository.findByCommentIdAndStatus(commentId, "ACTIVE");
@@ -39,27 +40,24 @@ public class RestaurantCommentService {
         return commentOptional.get();
     }
 
-    // 식당 코멘트 삭제
+    // 식당 대댓글 삭제
     @Transactional
     public void deleteComment(RestaurantComment comment, User user) {
         if (comment == null || user == null) {
             return;
         }
 
-        if (user != null && !comment.getUser().equals(user)) {
-            throw new ParamException("해당 유저가 단 댓글이 아닙니다.");
+        if (!comment.getUser().equals(user)) {
+            throw new ParamException("해당 유저가 단 대댓글이 아닙니다.");
         }
 
-//        List<RestaurantComment> childrenComments = findCommentsByParentCommentId(comment.getCommentId());
-//        if (childrenComments != null && !childrenComments.isEmpty()) {
-//            childrenComments.forEach(child -> {
-//                child.setStatus("DELETED");
-//                restaurantCommentRepository.save(child);
-//            });
-//        }
-
         comment.setStatus("DELETED");
+        comment.setCommentLikeCount(0);
         restaurantCommentRepository.save(comment);
+
+        // 좋아요, 싫어요 삭제
+        restaurantCommentLikeRepository.deleteAll(comment.getRestaurantCommentLikeList());
+        restaurantCommentDislikeRepository.deleteAll(comment.getRestaurantCommentDislikeList());
     }
 
     public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular, String userAgent) {
@@ -79,7 +77,7 @@ public class RestaurantCommentService {
 
         // 정렬
         if (sortPopular) {
-            mainCommentList.sort(Comparator.comparing(RestaurantCommentDTO::getCommentLikeCount).reversed());
+            mainCommentList.sort(Comparator.comparing(RestaurantCommentDTO::commentLikeDiffDislike).reversed());
         } else {
             // TODO: 평가 정렬을 UpdateAt을 반영해야됨
             mainCommentList.sort(Comparator.comparing(RestaurantCommentDTO::getDate).reversed());
@@ -90,6 +88,7 @@ public class RestaurantCommentService {
                 .peek(mainComment ->
                         mainComment.setCommentReplies(
                                 mainComment.getEvaluation().getRestaurantCommentList().stream()
+                                        .filter(comment -> comment.getStatus().equals("ACTIVE"))
                                         .map(comment -> RestaurantCommentDTO.convertCommentWhenSubComment(comment, mainComment.getCommentScore(), user, userAgent))
                                         .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
                                         .collect(Collectors.toList())
@@ -97,22 +96,21 @@ public class RestaurantCommentService {
                 .toList();
     }
 
-    public RestaurantCommentDTO getRestaurantCommentDTO(int commentId, Double score, User user, String userAgent) {
-//        Optional<RestaurantComment> restaurantCommentOptional = restaurantCommentRepository.findByCommentId(commentId);
-//        if (restaurantCommentOptional.isPresent()) {
-//            RestaurantComment restaurantComment = restaurantCommentOptional.get();
-//            RestaurantCommentDTO restaurantCommentDTO = RestaurantCommentDTO.convertCommentWhenSubComment(restaurantComment, score, user, userAgent);
-//            restaurantCommentDTO.setCommentReplies(
-//                    findCommentsByParentCommentId(restaurantCommentDTO.getCommentId()).stream()
-//                            .map(comment -> RestaurantCommentDTO.convertCommentWhenSubComment(comment, null, user, userAgent))
-//                            .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
-//                            .collect(Collectors.toList())
-//            );
-//            return restaurantCommentDTO;
-//        } else {
-//            throw new DataNotFoundException("comment not found");
-//        }
-        return null;
+    public RestaurantCommentDTO getRestaurantCommentDTO(int evaluationId, User user, String userAgent) {
+        Evaluation evaluation = evaluationService.getByEvaluationId(evaluationId);
+        if (evaluation != null) {
+            RestaurantCommentDTO restaurantCommentDTO = RestaurantCommentDTO.convertCommentWhenEvaluation(evaluation, user, userAgent);
+            restaurantCommentDTO.setCommentReplies(
+                    restaurantCommentDTO.getEvaluation().getRestaurantCommentList().stream()
+                            .filter(comment -> comment.getStatus().equals("ACTIVE"))
+                            .map(comment -> RestaurantCommentDTO.convertCommentWhenSubComment(comment, restaurantCommentDTO.getCommentScore(), user, userAgent))
+                            .sorted(Comparator.comparing(RestaurantCommentDTO::getDate))
+                            .collect(Collectors.toList())
+            );
+            return restaurantCommentDTO;
+        } else {
+            throw new DataNotFoundException("comment not found");
+        }
     }
 
     public String addComment(Integer restaurantId, String userTokenId, String commentBody) {
@@ -164,6 +162,7 @@ public class RestaurantCommentService {
         return restaurantCommentdislikeOptional.isPresent();
     }
 
+    @Transactional
     public void likeComment(User user, RestaurantComment restaurantComment, Map<String, String> responseMap) {
         Optional<RestaurantCommentLike> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserAndRestaurantComment(user, restaurantComment);
         Optional<RestaurantCommentDislike> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserAndRestaurantComment(user, restaurantComment);
@@ -193,6 +192,7 @@ public class RestaurantCommentService {
         restaurantCommentRepository.save(restaurantComment);
     }
 
+    @Transactional
     public void dislikeComment(User user, RestaurantComment restaurantComment, Map<String, String> responseMap) {
         Optional<RestaurantCommentLike> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserAndRestaurantComment(user, restaurantComment);
         Optional<RestaurantCommentDislike> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserAndRestaurantComment(user, restaurantComment);
