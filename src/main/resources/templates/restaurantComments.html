@@ -14,6 +14,10 @@
         </div>
         <!-- 댓글 본문 영역 -->
         <div class="body-div">
+            <div class="evaluation-star-div">
+                <img th:src="${restaurantComment.evaluation.getStarImgUrl()}"/>
+                <span th:text="${restaurantComment.commentScore}"></span>
+            </div>
             <div class="nick-date-div">
                 <img th:src="${restaurantComment.user.getRankImg()}">
                 <span class="nick-span" th:text="${restaurantComment.commentNickname}"></span>
