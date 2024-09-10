@@ -102,7 +102,7 @@ public class Evaluation {
 
     public String getStarImgUrl() {
         try {
-            String[] scoreSplit = evaluationScore.toString().split(".");
+            String[] scoreSplit = evaluationScore.toString().split("\\.");
             if (scoreSplit.length > 1) {
                 return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/star/star" + scoreSplit[0] + scoreSplit[1] + ".svg";
             } else {

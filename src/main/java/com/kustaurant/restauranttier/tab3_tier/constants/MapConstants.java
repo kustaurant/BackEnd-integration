@@ -6,6 +6,7 @@ import java.util.List;
 
 public class MapConstants {
     public static final Integer MIN_ZOOM = 13;
+
     public static final List<List<Coordinate>> LIST_OF_COORD_LIST = List.of(
             // 건입~정문
             List.of(

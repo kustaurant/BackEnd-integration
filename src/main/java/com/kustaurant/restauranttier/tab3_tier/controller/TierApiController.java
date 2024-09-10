@@ -10,6 +10,7 @@ import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierMapDTO;
 import com.kustaurant.restauranttier.tab3_tier.constants.MapConstants;
+import com.kustaurant.restauranttier.tab3_tier.etc.LocationEnum;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantFavoriteService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
@@ -262,7 +263,8 @@ public class TierApiController {
         if (locations != null && !locations.contains(("ALL"))) {
             try {
                 for (int i = 0; i < MapConstants.LIST_OF_COORD_LIST.size(); i++) {
-                    if (locations.contains("L" + (i + 1))) {
+                    LocationEnum locationEnum = LocationEnum.valueOf("L" + (i + 1));
+                    if (locations.contains(locationEnum.getValue())) {
                         response.getSolidPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
                     } else {
                         response.getDashedPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
@@ -280,7 +282,7 @@ public class TierApiController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Operation(summary = "지도 식당 정보 불러오기 (Auth 버전)g", description = "[설명]" +
+    @Operation(summary = "지도 식당 정보 불러오기 (Auth 버전)", description = "[설명]" +
             "\n\n현재 선택한 카테고리에 맞는 전체 식당 정보를 불러옵니다. (현재는 카테고리와 상관없이 고정된 정보를 반환합니다.) " +
             "\n\n티어가 있는 식당(tieredRestaurants)은 zoom에 상관없이 항상 보입니다. " +
             "\n\n티어가 없는 식당은 zoom에 따라 보이는게 달라집니다. " +
@@ -370,7 +372,8 @@ public class TierApiController {
         if (locations != null && !locations.contains(("ALL"))) {
             try {
                 for (int i = 0; i < MapConstants.LIST_OF_COORD_LIST.size(); i++) {
-                    if (locations.contains("L" + (i + 1))) {
+                    LocationEnum locationEnum = LocationEnum.valueOf("L" + (i + 1));
+                    if (locations.contains(locationEnum.getValue())) {
                         response.getSolidPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
                     } else {
                         response.getDashedPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));

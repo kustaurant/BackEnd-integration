@@ -123,7 +123,12 @@
                         </li>
                         <li class="nav-item d-lg-none">
                             <a sec:authorize="isAnonymous()" href="/user/login" class="nav-link">로그인</a>
-                            <a sec:authorize="isAuthenticated()" href="/user/logout" class="nav-link">로그아웃</a>
+                            <form sec:authorize="isAuthenticated()" action="/user/logout" method="post" style="display: inline;">
+                                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                <button type="submit" class="nav-link" style="background: none; border: none; color: inherit; padding: 0;">
+                                    로그아웃
+                                </button>
+                            </form>
                         </li>
                     </ul>
                 </div>

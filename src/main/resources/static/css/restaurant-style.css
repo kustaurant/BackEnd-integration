@@ -500,7 +500,7 @@ div.basic-info > div.texts > span {
 .nick-date-div {
     display: flex;
     font-size: 13px;
-    line-height: 29.5px;
+    line-height: 27px;
     justify-content: space-between;
     align-items: center;
 }
@@ -508,6 +508,24 @@ div.basic-info > div.texts > span {
     height: 22px;
     width: 22px;
     margin-right: 5px;
+}
+.evaluation-star-div {
+    display: flex;
+    align-content: flex-start;
+    align-items: center;
+    margin-bottom: 2px;
+    margin-top: 3px;
+}
+.evaluation-star-div > img {
+    height: 15px;
+    align-self: self-start;
+    margin-right: 3px;
+}
+.evaluation-star-div > span {
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 600;
+    margin-right: 3px;
 }
 .nick-span {
     font-weight: 550;
