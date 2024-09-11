@@ -86,7 +86,7 @@ public class CommunityApiController {
         String koreanCategory = categoryEnum.getKoreanName();
 
         Page<PostDTO> paging;
-        if (categoryEnum == PostCategory.FREE) {
+        if (categoryEnum == PostCategory.ALL) {
             paging = postApiService.getList(page, sort);
         } else {
             paging = postApiService.getListByPostCategory(koreanCategory, page, sort);

@@ -4,7 +4,7 @@ import com.kustaurant.restauranttier.tab3_tier.dto.Coordinate;
 
 import java.util.List;
 
-public class MapConstants {
+public abstract class MapConstants {
     public static final Integer MIN_ZOOM = 13;
 
     public static final List<List<Coordinate>> LIST_OF_COORD_LIST = List.of(
