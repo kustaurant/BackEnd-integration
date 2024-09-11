@@ -73,7 +73,11 @@ public class RestaurantCrawlingTask {
         // 식당 네이버 지도 링크
         newRestaurant.setRestaurantUrl(crawling.getCurrentUrl());
         // 식당 메인 이미지 url
-        newRestaurant.setRestaurantImgUrl(crawling.getAttribute(restaurantImgUrl, "src"));
+        try {
+            newRestaurant.setRestaurantImgUrl(crawling.getAttribute(restaurantImgUrl, "src"));
+        } catch (Exception e) {
+            newRestaurant.setRestaurantImgUrl("no_img");
+        }
         // 식당 음식 카테고리 (ex 한식, 일식, 중식, ...)
         newRestaurant.setRestaurantCuisine(urlAndInfo.getCuisine());
         // 식당 경도, 위도
