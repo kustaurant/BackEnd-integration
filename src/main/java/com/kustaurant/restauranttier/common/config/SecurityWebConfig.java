@@ -1,8 +1,8 @@
 package com.kustaurant.restauranttier.common.config;
 
-import com.kustaurant.restauranttier.common.user.CustomLoginSuccessHandler;
-import com.kustaurant.restauranttier.common.user.CustomLogoutSuccessHandler;
-import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.webUser.CustomLoginSuccessHandler;
+import com.kustaurant.restauranttier.common.webUser.CustomLogoutSuccessHandler;
+import com.kustaurant.restauranttier.common.webUser.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +33,7 @@ public class SecurityWebConfig {
                 .securityMatcher(request -> !request.getServletPath().matches("^/api/v\\d+/.*$"))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // 기본적으로 CSRF 보호 활성화
-                        .ignoringRequestMatchers("/api/evaluation/**") // 평가페이지 한정 CSRF 보호 비활성화
+//                        .ignoringRequestMatchers("/api/evaluation/**") // 평가페이지 한정 CSRF 보호 비활성화
                 )
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Frame Options 비활성화
