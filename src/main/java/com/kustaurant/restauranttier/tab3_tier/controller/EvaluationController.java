@@ -3,13 +3,11 @@
     import com.google.gson.Gson;
     import com.google.gson.reflect.TypeToken;
     import com.kustaurant.restauranttier.tab1_home.controller.MainController;
-    import com.kustaurant.restauranttier.common.etc.JsonData;
     import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
     import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
-    import com.kustaurant.restauranttier.tab3_tier.entity.EvaluationItemScore;
     import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
     import com.kustaurant.restauranttier.tab3_tier.repository.EvaluationRepository;
-    import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
+    import com.kustaurant.restauranttier.common.webUser.CustomOAuth2UserService;
     import com.kustaurant.restauranttier.tab3_tier.service.RestaurantWebService;
     import com.kustaurant.restauranttier.tab3_tier.service.EvaluationService;
 
@@ -25,10 +23,7 @@
     import org.springframework.web.multipart.MultipartFile;
 
     import java.security.Principal;
-    import java.util.HashMap;
     import java.util.List;
-    import java.util.Map;
-    import java.util.Optional;
 
     @RequiredArgsConstructor
     @Controller

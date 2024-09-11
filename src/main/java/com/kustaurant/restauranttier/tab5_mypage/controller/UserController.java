@@ -1,7 +1,7 @@
 package com.kustaurant.restauranttier.tab5_mypage.controller;
 
-import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
-import com.kustaurant.restauranttier.common.user.UserCreateForm;
+import com.kustaurant.restauranttier.common.webUser.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.webUser.UserCreateForm;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;

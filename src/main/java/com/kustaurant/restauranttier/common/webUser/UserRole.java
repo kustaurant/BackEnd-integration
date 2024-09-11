@@ -1,4 +1,4 @@
-package com.kustaurant.restauranttier.common.user;
+package com.kustaurant.restauranttier.common.webUser;
 
 import lombok.Getter;
 

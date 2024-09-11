@@ -7,7 +7,7 @@ import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.entity.PostScrap;
-import com.kustaurant.restauranttier.common.user.UserRole;
+import com.kustaurant.restauranttier.common.webUser.UserRole;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

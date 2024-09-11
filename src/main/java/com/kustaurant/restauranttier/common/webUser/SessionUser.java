@@ -1,4 +1,4 @@
-package com.kustaurant.restauranttier.common.user;
+package com.kustaurant.restauranttier.common.webUser;
 
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import lombok.Getter;

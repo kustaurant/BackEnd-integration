@@ -1,6 +1,5 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
-import com.kustaurant.restauranttier.common.exception.exception.DataNotFoundException;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.constants.EvaluationConstants;
@@ -11,17 +10,14 @@ import com.kustaurant.restauranttier.common.etc.JsonData;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab3_tier.repository.*;
-import groovy.util.Eval;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.kustaurant.restauranttier.common.apiUser.JwtUtil;
 import com.kustaurant.restauranttier.common.apiUser.apple.AppleApiService;
 import com.kustaurant.restauranttier.common.apiUser.naver.NaverApiService;
-import com.kustaurant.restauranttier.common.user.UserRole;
+import com.kustaurant.restauranttier.common.webUser.UserRole;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import io.jsonwebtoken.Claims;

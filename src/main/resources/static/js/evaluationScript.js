@@ -84,34 +84,34 @@ document.addEventListener("DOMContentLoaded", function () {
         // 별점에 따른 평가 코멘트 설정
         switch (selectedIndex) {
             case 0:
-                comment.textContent = "";
+                comment.textContent = "장사를 왜 하는지 모르겠어요";
                 break;
             case 1:
-                comment.textContent = "이 곳에 다시 올 일은 거의 없을 것 같아요";
+                comment.textContent = "별로였어요, 두번 다시 오지는 않을 것 같아요";
                 break;
             case 2:
-                comment.textContent = "조금 실망스러운 가게에요";
+                comment.textContent = "많이 부족한 가게에요";
                 break;
             case 3:
-                comment.textContent = "별로였어요, 다시 오지는 않을 것 같아요";
+                comment.textContent = "뭔가 부족한 가게에요";
                 break;
             case 4:
-                comment.textContent = "보통이에요, 크게 기대하지 마세요";
+                comment.textContent = "조금만 더 분발해주면 좋을것 같아요";
                 break;
             case 5:
-                comment.textContent = "그럭저럭 괜찮았어요";
+                comment.textContent = "평범 무난한 음식점 이에요";
                 break;
             case 6:
-                comment.textContent = "괜찮아요, 다시 올 수도 있을 것 같아요";
+                comment.textContent = "평범한데 살짝 더 나은 정도에요";
                 break;
             case 7:
-                comment.textContent = "꽤 마음에 들었어요, 다시 와도 좋을 것 같아요";
+                comment.textContent = "꽤 괜찮았어요, 다시 올 의향 있어요";
                 break;
             case 8:
-                comment.textContent = "좋아요! 다시 방문할 것 같아요";
+                comment.textContent = "맛있어요! 꼭 다시 오고 싶어요";
                 break;
             case 9:
-                comment.textContent = "매우 만족스러웠어요, 꼭 다시 올 거에요!";
+                comment.textContent = "별5개에 살짝 못미치지만 훌륭했어요!";
                 break;
             case 10:
                 comment.textContent = "내 마음속 최고의 가게!";
@@ -192,8 +192,15 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.append("newImage", evaluationData.newImage);
         }
 
+        // CSRF 토큰 가져오기
+        var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
         fetch(`/api/evaluation/${restaurantId}`, {
             method: "POST",
+            headers: {
+                [csrfHeader]: csrfToken  // CSRF 토큰을 헤더에 포함
+            },
             body: formData
         })
             .then(response => {
