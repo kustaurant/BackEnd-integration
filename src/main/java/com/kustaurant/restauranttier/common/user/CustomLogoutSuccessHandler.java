@@ -23,8 +23,6 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        System.out.println("logout 진입!!!!!!!!!!!!!!!");
-
         clearSession(request);
 
         String fullURL = request.getHeader("Referer");
