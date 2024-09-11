@@ -92,7 +92,7 @@ public class Restaurant {
         return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + tier.toString() + "tier.png";
     }
     public String getCuisineImgUrl(String cuisine) {
-        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + cuisine.replaceAll("/", "") + ".svg";
+        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/cuisine-icon/" + cuisine.replaceAll("/", "") + ".svg";
     }
 
     // 평균 평가 점수 계산
