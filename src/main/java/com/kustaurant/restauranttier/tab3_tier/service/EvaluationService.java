@@ -3,15 +3,12 @@ package com.kustaurant.restauranttier.tab3_tier.service;
 import com.kustaurant.restauranttier.common.exception.exception.DataNotFoundException;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
-import com.kustaurant.restauranttier.tab3_tier.constants.TierConstants;
-import com.kustaurant.restauranttier.tab3_tier.controller.TierWebController;
+import com.kustaurant.restauranttier.tab3_tier.constants.EvaluationConstants;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
-import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantCommentDTO;
 import com.kustaurant.restauranttier.tab3_tier.specification.RestaurantSpecification;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.common.etc.JsonData;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
-import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab3_tier.entity.*;
 import com.kustaurant.restauranttier.tab3_tier.repository.*;
 import groovy.util.Eval;
@@ -41,9 +38,7 @@ public class EvaluationService {
     private final RestaurantCommentLikeRepository restaurantCommentLikeRepository;
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final RestaurantCommentRepository restaurantCommentRepository;
-
-    @Value("${tier.min.evaluation}")
-    private int minNumberOfEvaluations;
+    private final EvaluationConstants evaluationConstants;
 
     public Evaluation getByEvaluationId(Integer evaluationId) {
         Optional<Evaluation> evaluationOptional = evaluationRepository.findByEvaluationIdAndStatus(evaluationId, "ACTIVE");
@@ -274,9 +269,9 @@ public class EvaluationService {
     // 식당의 티어를 다시 계산함
     @Transactional
     public void calculateTierOfOneRestaurant(Restaurant restaurant) {
-        if (restaurant != null) {
+        if (restaurant != null && restaurant.getEvaluationList().size() > evaluationConstants.getMinimumEvaluationCountForTier()) {
             restaurant.setMainTier(
-                    TierConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
+                    EvaluationConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
             );
             restaurantRepository.save(restaurant);
         }
@@ -286,11 +281,11 @@ public class EvaluationService {
     @Transactional
     public void calculateAllTier() {
         // 가게 메인 티어 계산
-        List<Restaurant> restaurantList = restaurantRepository.getAllRestaurantsOrderedByAvgScore(minNumberOfEvaluations, "전체");
+        List<Restaurant> restaurantList = restaurantRepository.findAll();
         for (Restaurant restaurant: restaurantList) {
-            if (restaurant.getRestaurantEvaluationCount() >= minNumberOfEvaluations) {
+            if (restaurant.getRestaurantEvaluationCount() >= evaluationConstants.getMinimumEvaluationCountForTier()) {
                 restaurant.setMainTier(
-                        TierConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
+                        EvaluationConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
                 );
             } else {
                 restaurant.setMainTier(-1);

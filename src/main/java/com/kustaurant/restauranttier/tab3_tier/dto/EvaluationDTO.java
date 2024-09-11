@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab3_tier.dto;
 
+import com.kustaurant.restauranttier.tab3_tier.constants.EvaluationConstants;
 import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantComment;
@@ -38,14 +39,14 @@ public class EvaluationDTO {
                 evaluation.getSituationIdList(),
                 evaluation.getCommentImgUrl(),
                 evaluation.getCommentBody(),
-                RestaurantConstants.STAR_COMMENTS,
+                EvaluationConstants.STAR_COMMENTS,
                 null
         );
     }
 
     public static EvaluationDTO convertEvaluationWhenNoEvaluation() {
         return new EvaluationDTO(
-                null, null, null, null, RestaurantConstants.STAR_COMMENTS, null
+                null, null, null, null, EvaluationConstants.STAR_COMMENTS, null
         );
     }
 }
