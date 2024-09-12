@@ -81,10 +81,13 @@ document.addEventListener("DOMContentLoaded", function () {
         starImage.src = `https://kustaurant.s3.ap-northeast-2.amazonaws.com/evaluation/star-${selectedIndex}.png`; // 별점 이미지 업데이트
         evaluationData.starRating = (selectedIndex + 1) / 2; // 평가 데이터에 별점 저장 (0.5 단위로 변환)
 
+        // 숨겨진 필드에 별점 값 설정
+        document.getElementById('starRatingInput').value = evaluationData.starRating;
+
         // 별점에 따른 평가 코멘트 설정
         switch (selectedIndex) {
             case 0:
-                comment.textContent = "장사를 왜 하는지 모르겠어요";
+                comment.textContent = "아직 선택하지 않으셨습니다.";
                 break;
             case 1:
                 comment.textContent = "별로였어요, 두번 다시 오지는 않을 것 같아요";
@@ -169,7 +172,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // 제출 버튼 눌림 효과 로직
     var submitBtn = document.getElementById('submitBtn');
 
-    submitBtn.addEventListener('click', function () {
+    submitBtn.addEventListener('click', function (event) {
+        event.preventDefault();
+
         if (!checkData()) {
             alert('별점을 매겨주세요.');
             return;

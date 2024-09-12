@@ -139,6 +139,9 @@
             <!-- CSRF 토큰 포함 -->
             <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
 
+            <!-- 숨겨진 별점 input 필드 -->
+            <input type="hidden" name="starRating" id="starRatingInput">
+
             <!-- 평가 제출 버튼 -->
             <button type="submit" id="submitBtn">평가 제출</button>
         </form>
