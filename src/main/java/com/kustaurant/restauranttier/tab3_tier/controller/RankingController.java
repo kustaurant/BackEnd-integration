@@ -2,7 +2,7 @@ package com.kustaurant.restauranttier.tab3_tier.controller;
 
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
-import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.webUser.CustomOAuth2UserService;
 import lombok.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

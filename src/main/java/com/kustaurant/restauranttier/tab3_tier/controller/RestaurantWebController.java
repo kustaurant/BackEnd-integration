@@ -14,7 +14,7 @@ import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab3_tier.etc.EnumSortComment;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.restauranttier.tab3_tier.repository.EvaluationRepository;
-import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.webUser.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.common.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

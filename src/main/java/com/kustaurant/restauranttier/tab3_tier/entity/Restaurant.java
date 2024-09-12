@@ -29,11 +29,11 @@ public class Restaurant {
     @Column(unique = true)
     private String restaurantUrl;
     private String restaurantImgUrl;
-    private Integer restaurantVisitCount;
-    private Integer visitCount;
-    private Integer restaurantEvaluationCount;
-    private Double restaurantScoreSum;
-    private Integer mainTier;
+    private Integer restaurantVisitCount = 0;
+    private Integer visitCount = 0;
+    private Integer restaurantEvaluationCount = 0;
+    private Double restaurantScoreSum = 0d;
+    private Integer mainTier = -1;
 
     private String restaurantCuisine;
     private String restaurantLatitude;
@@ -92,7 +92,7 @@ public class Restaurant {
         return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + tier.toString() + "tier.png";
     }
     public String getCuisineImgUrl(String cuisine) {
-        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + cuisine.replaceAll("/", "") + ".svg";
+        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/cuisine-icon/" + cuisine.replaceAll("/", "") + ".svg";
     }
 
     // 평균 평가 점수 계산

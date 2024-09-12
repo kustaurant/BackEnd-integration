@@ -1,9 +1,8 @@
 package com.kustaurant.restauranttier.tab1_home.controller;
 
-import com.kustaurant.restauranttier.common.user.CustomOAuth2UserService;
+import com.kustaurant.restauranttier.common.webUser.CustomOAuth2UserService;
 import com.kustaurant.restauranttier.tab1_home.entity.HomeModal;
 import com.kustaurant.restauranttier.tab1_home.repository.HomeModalRepository;
-import com.kustaurant.restauranttier.tab3_tier.controller.TierWebController;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantRepository;

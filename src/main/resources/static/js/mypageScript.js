@@ -92,7 +92,31 @@ document.getElementById('saveBtn').addEventListener('click',function (){
 })
 
 //logout
-function logout() {
-    window.location.href = '/user/logout';
-}
+document.getElementById('logoutBtn').addEventListener('click', function (event) {
+    event.preventDefault(); // 기본 폼 제출 막기
+
+    // CSRF 토큰 가져오기
+    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+    // 로그아웃 요청 보내기
+    fetch('/user/logout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken  // CSRF 토큰을 헤더에 포함
+        }
+    })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = "/";  // 로그아웃 후 리디렉션할 페이지
+            } else {
+                throw new Error('로그아웃 실패');
+            }
+        })
+        .catch(error => {
+            console.error('로그아웃 중 오류 발생:', error);
+        });
+});
+
 

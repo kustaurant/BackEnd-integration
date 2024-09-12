@@ -21,6 +21,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+
     <title>쿠스토랑 - 마이페이지</title>
 
     <!-- 탭 관련 라이브러리 / 순서 지켜야함 -->
