@@ -64,7 +64,7 @@ public class RestaurantDetailDTO {
                 restaurant.getRestaurantImgUrl() == null || restaurant.getRestaurantImgUrl().equals("no_img") ? RestaurantConstants.REPLACE_IMG_URL : restaurant.getRestaurantImgUrl(),
                 restaurant.getMainTier(),
                 restaurant.getRestaurantCuisine(),
-                "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + restaurant.getRestaurantCuisine().replaceAll("/", "") + (isIOS ? ".svg" : ".png"),
+                "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/cuisine-icon/" + restaurant.getRestaurantCuisine().replaceAll("/", "") + (isIOS ? ".svg" : ".png"),
                 restaurant.getRestaurantPosition() == null ? "건대 주변" : restaurant.getRestaurantPosition(),
                 restaurant.getRestaurantName(),
                 restaurant.getRestaurantAddress() == null || restaurant.getRestaurantAddress().equals("no_address") ? "주소가 없습니다." : restaurant.getRestaurantAddress(),
