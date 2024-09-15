@@ -6,6 +6,7 @@ import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.constants.EvaluationConstants;
 import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
+import com.kustaurant.restauranttier.tab3_tier.dto.FavoriteResponseDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
@@ -166,6 +167,37 @@ public class RestaurantApiController {
         boolean result = restaurantFavoriteService.toggleFavorite(user.getProviderId(), restaurantId);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         return ResponseEntity.ok(result);
+    }
+
+    // 즐겨찾기2
+    @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle2")
+    @Operation(summary = "즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태와 수를 반환합니다.\n\n" +
+            "[즐겨찾기 상태]\n\n" +
+            "눌러서 즐겨찾기가 해제된 경우 -> false반환\n\n" +
+            "눌러서 즐겨찾기가 추가된 경우 -> true반환\n\n" +
+            "[즐겨찾기 수]\n\n" +
+            "누른 후의 해당 식당 현재 즐겨찾기 수 반환\n\n" +
+            "[반환 값 보충 설명]\n\n" +
+            "   - boolean: not null\n\n" +
+            "   - int: not null")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FavoriteResponseDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    })
+    public ResponseEntity<FavoriteResponseDTO> restaurantFavoriteToggle2(
+            @PathVariable Integer restaurantId,
+            @Parameter(hidden = true) @JwtToken Integer userId
+    ) {
+        // 유저 가져오기
+        User user = userService.findUserById(userId);
+        // 식당 가져오기
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        // 즐겨찾기 로직
+        boolean result = restaurantFavoriteService.toggleFavorite(user.getProviderId(), restaurantId);
+        // 즐겨찾기 수
+        int count = restaurant.getRestaurantFavorite().size();
+        // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
+        return ResponseEntity.ok(new FavoriteResponseDTO(result, count));
     }
 
     // 이전 평가 데이터 가져오기
