@@ -171,11 +171,17 @@ public class RestaurantApiController {
 
     // 즐겨찾기2
     @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle2")
-    @Operation(summary = "즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태를 반환합니다.\n\n눌러서 즐겨찾기가 해제된 경우 -> false반환\n\n" +
-            "- 반환 값 보충 설명\n\n" +
-            "   - boolean: not null")
+    @Operation(summary = "즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태와 수를 반환합니다.\n\n" +
+            "[즐겨찾기 상태]\n\n" +
+            "눌러서 즐겨찾기가 해제된 경우 -> false반환\n\n" +
+            "눌러서 즐겨찾기가 추가된 경우 -> true반환\n\n" +
+            "[즐겨찾기 수]\n\n" +
+            "누른 후의 해당 식당 현재 즐겨찾기 수 반환\n\n" +
+            "[반환 값 보충 설명]\n\n" +
+            "   - boolean: not null\n\n" +
+            "   - int: not null")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
+            @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FavoriteResponseDTO.class))}),
             @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
     })
     public ResponseEntity<FavoriteResponseDTO> restaurantFavoriteToggle2(
