@@ -282,9 +282,15 @@ document.addEventListener('DOMContentLoaded', function () {
         formData.set('content', content); // trim 처리된 내용으로 업데이트
         formData.append('postId', postId);
 
+        // CSRF 토큰 가져오기
+        var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
         fetch(this.action, {
             method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken // CSRF 토큰을 헤더에 포함
+            },
             body: formData
         })
             .then(response => {
@@ -294,10 +300,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         window.location.href = "/user/login";
                     } else {
                         window.location.reload();
-
                     }
-
-
                 }
             })
             .catch(error => {
@@ -305,10 +308,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error:', error);
             });
     });
-    // 대댓글 작성 완료 버튼 리스너
+
+// 대댓글 작성 완료 버튼 리스너
     document.querySelector('.comment-ul').addEventListener('submit', function (event) {
         event.preventDefault(); // 폼의 기본 제출 동작을 방지
-        if (!event.target.matches(" .comment-form")) {
+        if (!event.target.matches(".comment-form")) {
             return
         }
         // 현재 주소에서 postId 추출
@@ -323,9 +327,15 @@ document.addEventListener('DOMContentLoaded', function () {
             formData.append('parentCommentId', parentCommentId); // 대댓글이 속한 댓글의 ID를 formData에 추가
         }
 
+        // CSRF 토큰 가져오기
+        var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
         fetch(form.action, {
             method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken // CSRF 토큰을 헤더에 포함
+            },
             body: formData
         })
             .then(response => {
@@ -343,6 +353,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error:', error);
             });
     });
+
     // 글 삭제
     // if (document.querySelector(".post-delete")) {
     //     document.querySelector(".post-delete").addEventListener("click", function (event) {

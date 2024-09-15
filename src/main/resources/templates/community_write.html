@@ -5,33 +5,30 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-C47HQ74QCF"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-C47HQ74QCF');
     </script>
     <!-- Google Tag Manager -->
     <script>(function (w, d, s, l, i) {
         w[l] = w[l] || [];
         w[l].push({
-            'gtm.start':
-                new Date().getTime(), event: 'gtm.js'
+            'gtm.start': new Date().getTime(), event: 'gtm.js'
         });
-        var f = d.getElementsByTagName(s)[0],
-            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+        var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
         j.async = true;
-        j.src =
-            'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
         f.parentNode.insertBefore(j, f);
     })(window, document, 'script', 'dataLayer', 'GTM-T2CX8XG3');</script>
     <!-- End Google Tag Manager -->
+
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
     <title>쿠스토랑 - 게시글 작성</title>
+
     <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/community_write_style.css">
     <!-- 파비콘 -->
@@ -45,7 +42,6 @@
     <script src="/js/communityWriteScript.js"></script>
     <script src="https://cdn.tiny.cloud/1/digg1r45hnwpvnziectokoy8wzl63w48rw4t7rxio2tgwkue/tinymce/6/tinymce.min.js"
             referrerpolicy="origin"></script>
-
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -54,43 +50,42 @@
             height="0" width="0" style="display:none;visibility:hidden"></iframe>
 </noscript>
 <!-- End Google Tag Manager (noscript) -->
-<main>
 
+<main>
     <div>
-        <form method="post" action="/api/community/post/create" enctype="multipart/form-data">
+        <form id="post-form" method="post" action="/api/community/post/create" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+
             <div class="top-banner">
                 <button id="back-button" type="button"><img src="/img/community/back-button.png"></button>
-
                 <h1 class="writeText">게시글 작성</h1>
                 <button id="complete-button" type="submit"><img src="/img/community/check.png"></button>
             </div>
-            <select name="postCategory">
+
+            <select name="postCategory" required>
                 <option value="" disabled selected hidden>채널 선택</option>
                 <option value="자유게시판">자유게시판</option>
                 <option value="칼럼게시판">칼럼게시판</option>
                 <option value="건의게시판">건의게시판</option>
             </select>
-            <input class="title" name="title" placeholder="제목">
+
+            <input class="title" name="title" placeholder="제목" required>
+
             <div class="post-body">
                 <div class="post-body-inner">
                     <textarea class="post-content" id="tiny-editor" maxlength="2000"></textarea>
                 </div>
             </div>
-
         </form>
-
     </div>
-
-
 </main>
 
 <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
 <script type="text/javascript">
     if (!wcs_add) var wcs_add = {};
     wcs_add["wa"] = "14b5af05d120a20";
-    if (window.wcs) {
-        wcs_do();
-    }
+    if (window.wcs) { wcs_do(); }
 </script>
+
 </body>
 </html>
