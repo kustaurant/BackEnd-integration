@@ -137,6 +137,7 @@
                     </ul>
                 </div>
             </div>
+
             <div class="col-auto col-lg-2 text-end d-none d-sm-flex">
                 <!-- 우측 상단 아이콘 모음 !-->
                 <div class="header-icon">
@@ -150,9 +151,18 @@
                         <button id="myPageToggleButton" class="my-page-button d-none d-lg-block" sec:authorize="isAuthenticated()">
                             <img id="myPage" src="/img/home/account.png" alt="쿠스토랑 마이페이지">
                         </button>
+
                         <div id="myPageToggleDiv" class="my-menu-div" style="display: none;">
+
                             <a href="/user/myPage">마이 페이지</a>
-                            <a href="/user/logout">로그아웃</a>
+
+                            <form id="logoutForm" action="/user/logout" method="post" style="display: inline;">
+                                <!-- CSRF 토큰 필드 -->
+                                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                <button type="submit" style="background: none; border: none; color: inherit; padding: 0; cursor: pointer;">
+                                    로그아웃
+                                </button>
+                            </form>
                         </div>
                         <div id="myPageToggleBackdrop"></div>
                         <!--<a class="d-none d-lg-block" href="/user/myPage" sec:authorize="isAuthenticated()">
@@ -170,4 +180,5 @@
             </div>
         </div>
     </nav>
+
 </header>

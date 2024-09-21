@@ -86,9 +86,14 @@ document.addEventListener('DOMContentLoaded', function () {
         var formData = new FormData(form);
         formData.append('content', content); // 폼 데이터에 에디터 내용 추가
 
+        var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
         fetch('/api/community/post/create', {
             method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken
+            },
             body: formData
         }).then(response => {
             if (response.redirected)

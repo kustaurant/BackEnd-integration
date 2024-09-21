@@ -168,7 +168,6 @@ public class CommunityController {
             @RequestParam(name = "postId") String postId,
             @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
             Model model, Principal principal) {
-        System.out.println("디버깅");
         Integer postIdInt = Integer.valueOf(postId);
         User user = customOAuth2UserService.getUser(principal.getName());
         Post post = postService.getPost(postIdInt);
