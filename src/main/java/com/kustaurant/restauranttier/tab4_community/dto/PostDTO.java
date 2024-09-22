@@ -1,15 +1,15 @@
 package com.kustaurant.restauranttier.tab4_community.dto;
 
-import com.kustaurant.restauranttier.tab4_community.entity.Post;
-import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
-import com.kustaurant.restauranttier.tab4_community.entity.PostCommentDTO;
-import com.kustaurant.restauranttier.tab4_community.entity.PostPhoto;
+import com.kustaurant.restauranttier.tab4_community.entity.*;
+import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -41,6 +41,11 @@ public class PostDTO {
 
     @Schema(description = "게시글 사진", example = "3")
     String postPhotoImgUrl;
+    @Schema(description = "조회수", example = "3")
+    Integer postVisitCount;
+    @Schema(description = "스크랩한 유저 리스트", example = "")
+    List<User> postScrapList = new ArrayList<>();
+
     public static PostDTO fromEntity(Post post) {
         PostDTO dto = new PostDTO();
         dto.setPostId(post.getPostId());
@@ -62,6 +67,8 @@ public class PostDTO {
         }else{
             dto.setPostPhotoImgUrl(null);
         }
+        dto.setPostVisitCount(post.getPostVisitCount());
+        dto.setPostScrapList(post.getPostScrapList().stream().map(PostScrap::getUser).collect(Collectors.toList()));
         return dto;
     }
 }
