@@ -228,7 +228,7 @@ footer{
 @media only screen and (max-width: 767px) {
     h2.main-page-title {
         font-size: 28px;
-        line-height:60px;
+        line-height: 40px;
         color: #2a2a2a;
     }
     .googledown, .appledown{
@@ -238,12 +238,12 @@ footer{
 }
 @media only screen and (max-width: 420px) {
     h2.main-page-title {
-        font-size: 20px;
-        line-height:55px;
+        font-size: 23px;
+        line-height: 40px;
         color: #2a2a2a;
     }
     h2.firstSectionComment {
-        font-size: 11px;
+        font-size: 13px;
     }
     .googledown, .appledown{
         width: 90px;
