@@ -244,14 +244,24 @@ public class RestaurantApiController {
             "   - starComments: 사용 안함. 없어도 됩니다.\n\n" +
             "   - newImage: 사용자가 이미지를 추가했을 경우만. 없어도 됩니다.\n\n" +
             "- 반환 값 보충 설명\n\n" +
-            "   - 식당 상세 화면 정보 불러오기 api와 동일합니다.")
+            "   - commentId: not null\n\n" +
+            "   - commentScore: not null\n\n" +
+            "   - commentIconImgUrl: not null\n\n" +
+            "   - commentNickname: not null\n\n" +
+            "   - commentTime: not null\n\n" +
+            "   - commentImgUrl: **null일 수 있습니다.**\n\n" +
+            "   - commentBody: **null일 수 있습니다.**\n\n" +
+            "   - commentLikeStatus: not null\n\n" +
+            "   - commentLikeCount: not null\n\n" +
+            "   - commentDislikeCount: not null\n\n" +
+            "   - commentReplies: **null이거나 빈 배열일 수 있습니다.**")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))}),
+            @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCommentDTO.class)))}),
             @ApiResponse(responseCode = "400", description = "평가 점수가 없거나 0점인 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "500", description = "데이터베이스 상에 문제가 있을 경우 500을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
     })
-    public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
+    public ResponseEntity<List<RestaurantCommentDTO>> evaluateRestaurant(
             @PathVariable Integer restaurantId,
             EvaluationDTO evaluationDTO,
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
@@ -268,8 +278,7 @@ public class RestaurantApiController {
         // 평가 추가하기 혹은 기존 평가 업데이트하기
         evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
         // 평가 완료 후에 업데이트된 식당 데이터를 다시 반환
-        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(
-                restaurant, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user), RestaurantConstants.isIOS(userAgent)), HttpStatus.OK);
+        return new ResponseEntity<>(restaurantCommentService.getRestaurantCommentList(restaurant, user, true, userAgent), HttpStatus.OK);
     }
 
     // 리뷰 불러오기
