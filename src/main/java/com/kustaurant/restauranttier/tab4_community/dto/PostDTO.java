@@ -45,6 +45,9 @@ public class PostDTO {
     Integer postVisitCount;
     @Schema(description = "스크랩한 유저 리스트", example = "")
     List<User> postScrapList = new ArrayList<>();
+    @Schema(description = "스크랩 수", example = "")
+    Integer scrapCount;
+    private List<User> likeUserList = new ArrayList<>();
 
     public static PostDTO fromEntity(Post post) {
         PostDTO dto = new PostDTO();
@@ -69,6 +72,8 @@ public class PostDTO {
         }
         dto.setPostVisitCount(post.getPostVisitCount());
         dto.setPostScrapList(post.getPostScrapList().stream().map(PostScrap::getUser).collect(Collectors.toList()));
+        dto.setScrapCount(post.getPostScrapList().size());
+        dto.setLikeUserList(post.getLikeUserList());
         return dto;
     }
 }
