@@ -70,13 +70,16 @@
     <!--홈화면 배너-->
     <section
             class="mt-0 top-banner mb-1 age-title-big-typography cover-background p-0 md-background-position-left-center"
-            style="background-image: url('/img/home/background.jpg');">
+            style="background-image: url('/img/home/web-banner.png'); ">
         <div class="container">
             <div class="row align-items-center justify-content-center small-screen">
                 <div class="col-lg-6 col-md-8 position-relative text-center page-title-extra-large appear anime-child anime-complete alt-font"
                      data-anime="{ &quot;el&quot;: &quot;childs&quot;, &quot;translateY&quot;: [30, 0], &quot;opacity&quot;: [0,1], &quot;duration&quot;: 600, &quot;delay&quot;: 0, &quot;staggervalue&quot;: 200, &quot;easing&quot;: &quot;easeOutQuad&quot; }">
-                    <h2 class="main-page-title alt-font text-dark-gray text-uppercase ls-minus-1px mb-0">메뉴를 선택해주세요</h2>
-                    <h2 class="m-auto fw-600 text-uppercase mb-0 firstSectionComment">건대 주변의 관련 맛집을 볼 수 있습니다</h2>
+                    <h2 class="main-page-title alt-font text-dark-gray text-uppercase ls-minus-1px mb-0">쿠스토랑 모바일 앱 론칭!</h2>
+                    <h2 class="m-auto fw-600 text-uppercase mb-0 firstSectionComment">이젠 모바일 앱에서 간편하게 확인해보세요!</h2>
+                    <img class="googledown" src="/img/home/download_google.png" alt="Google download">
+                    <img class="appledown" src="/img/home/download_apple.png" alt="Apple download">
+                    <h2> </h2>
                 </div>
             </div>
         </div>
@@ -256,119 +259,6 @@
             </div>
         </div>
     </section>
-
-    <!--    &lt;!&ndash;뽑기 배너&ndash;&gt;-->
-    <!--    <section-->
-    <!--            class="mt-0 top-banner mb-1 age-title-big-typography cover-background p-0 md-background-position-left-center"-->
-    <!--            style="background-image: url('/img/home/background.jpg');">-->
-    <!--        <div class="container">-->
-    <!--            <div class="row align-items-center justify-content-center small-screen">-->
-    <!--                <div class="col-lg-6 col-md-8 position-relative text-center page-title-extra-large appear anime-child anime-complete alt-font">-->
-    <!--                    <h2 class="main-page-title alt-font text-dark-gray text-uppercase ls-minus-1px mb-0">랜덤 맛집 뽑기</h2>-->
-    <!--                    <h2 class="m-auto fw-600 text-uppercase mb-0 firstSectionComment">랜덤으로 한 맛집을 추천받을 수 있습니다</h2>-->
-
-    <!--                </div>-->
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--    </section>-->
-
-    <!--    <div id="mainContents" class="alt-font ">-->
-    <!--        <div class="dropdown">-->
-    <!--            <button class="btn btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"-->
-    <!--                    data-bs-toggle="dropdown"-->
-    <!--                    aria-expanded="false">-->
-    <!--                <span>지역 : 전체</span>-->
-    <!--            </button>-->
-    <!--            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">-->
-    <!--                <li class="dropdown-item">-->
-    <!--                    전체-->
-    <!--                </li>-->
-    <!--                <li class="dropdown-item">-->
-    <!--                    건입~중문-->
-    <!--                </li>-->
-    <!--                <li class="dropdown-item">-->
-    <!--                    중문~어대-->
-    <!--                </li>-->
-    <!--                <li class="dropdown-item">-->
-    <!--                    후문-->
-    <!--                </li>-->
-    <!--                <li class="dropdown-item">-->
-    <!--                    정문-->
-    <!--                </li>-->
-    <!--                <li class="dropdown-item">-->
-    <!--                    구의역-->
-    <!--                </li>-->
-    <!--            </ul>-->
-    <!--        </div>-->
-    <!--        <div id="recommendPage">-->
-    <!--            <div class="option-area">-->
-    <!--                <div class="row option">-->
-    <!--                    &lt;!&ndash; 음식 이미지 버튼 모아둔 그리드   &ndash;&gt;-->
-    <!--                    <div class="container fluid icon-grid">-->
-    <!--                        <div class="row mt-2 p-2 home-grid">-->
-    <!--                            <div class="cell col-3 col-lg-custom" th:each="cuisine : ${cuisines}">-->
-    <!--                                <button class="cell-button col-12" th:attr="data-cuisine=${cuisine}">-->
-    <!--                                    <img class="img col-12" th:src="@{/img/home/{cuisine}.png(cuisine=${cuisine})}"-->
-    <!--                                         th:alt="'쿠스토랑 건대 맛집 ' + ${cuisine}">-->
-    <!--                                </button>-->
-    <!--                                <div class="mobile-cuisine-name">-->
-    <!--                                    <span th:text="${cuisine}"></span>-->
-    <!--                                </div>-->
-    <!--                            </div>-->
-    <!--                        </div>-->
-
-
-    <!--                    </div>-->
-    <!--                </div>-->
-
-    <!--            </div>-->
-
-    <!--        </div>-->
-
-
-    <!--        <div class="btn-area">-->
-    <!--            <button id="recommendBtn" class="btn-style">뽑기</button>-->
-    <!--        </div>-->
-
-
-    <!--        <div id="resultPage" class="hidden">-->
-    <!--            <hr>-->
-    <!--            <p id="processingTitle" class="title">-->
-    <!--                맛집을 고르는 중...-->
-    <!--                <img class="title-icon" src="/img/recommend/wondering.png" alt="wondering_img">-->
-    <!--            </p>-->
-    <!--            <hr>-->
-    <!--            <div class="result-img-slideBar">-->
-
-    <!--                <div class="result-animation-list result-animation">-->
-    <!--                    <div class="result-img-list"></div>-->
-    <!--                    <div class="result-img-list"></div>-->
-    <!--                </div>-->
-    <!--                <div id="SelectedBox"></div>-->
-    <!--                <hr>-->
-    <!--            </div>-->
-
-    <!--        </div>-->
-
-    <!--        <div id="resultInfoPage" class="hidden">-->
-    <!--            <div class="resultImgContainer">-->
-    <!--                <div class="image-container">-->
-    <!--                    <a id="storeHref" href="">-->
-    <!--                        <img id="resultImg" src="/" alt="이미지가 들어올 예정입니다">-->
-    <!--                    </a>-->
-    <!--                </div>-->
-    <!--                <div id="storeInfo">-->
-    <!--                </div>-->
-    <!--            </div>-->
-
-    <!--        </div>-->
-
-    <!--        <div class="btn-area">-->
-    <!--            <button id="restartBtn" class="btn-style2 hidden alt-font">재설정</button>-->
-    <!--            <button id="restartDirectBtn" class="btn-style2 hidden alt-font">다시 뽑기</button>-->
-    <!--        </div>-->
-
-
 
     <!--    </div>-->
     <!--  인기 식당 탭  -->

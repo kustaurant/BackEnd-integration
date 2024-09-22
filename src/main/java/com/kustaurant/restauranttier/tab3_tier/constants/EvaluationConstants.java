@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.constants;
 
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
+import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.repository.EvaluationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,10 @@ public class EvaluationConstants {
     private final EvaluationRepository evaluationRepository;
 
     public static final int EVALUATION_ID_OFFSET = 10000000;
+
+    public boolean isHasTier(Restaurant restaurant) {
+        return restaurant.getRestaurantEvaluationCount() >= getMinimumEvaluationCountForTier();
+    }
 
     public int getMinimumEvaluationCountForTier() {
         return (int) (evaluationRepository.findByStatus("ACTIVE").size() * 0.004);

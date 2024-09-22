@@ -34,7 +34,6 @@ public class SecurityWebConfig {
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // 기본적으로 CSRF 보호 활성화
 
-//                        .ignoringRequestMatchers("/api/evaluation/**") // 평가페이지 한정 CSRF 보호 비활성화
                 )
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Frame Options 비활성화

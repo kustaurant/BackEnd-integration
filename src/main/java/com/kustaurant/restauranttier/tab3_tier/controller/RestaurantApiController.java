@@ -6,6 +6,7 @@ import com.kustaurant.restauranttier.common.exception.ErrorResponse;
 import com.kustaurant.restauranttier.common.exception.exception.ParamException;
 import com.kustaurant.restauranttier.tab3_tier.constants.EvaluationConstants;
 import com.kustaurant.restauranttier.tab3_tier.constants.RestaurantConstants;
+import com.kustaurant.restauranttier.tab3_tier.dto.FavoriteResponseDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Evaluation;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.dto.EvaluationDTO;
@@ -168,6 +169,37 @@ public class RestaurantApiController {
         return ResponseEntity.ok(result);
     }
 
+    // 즐겨찾기2
+    @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle2")
+    @Operation(summary = "즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태와 수를 반환합니다.\n\n" +
+            "[즐겨찾기 상태]\n\n" +
+            "눌러서 즐겨찾기가 해제된 경우 -> false반환\n\n" +
+            "눌러서 즐겨찾기가 추가된 경우 -> true반환\n\n" +
+            "[즐겨찾기 수]\n\n" +
+            "누른 후의 해당 식당 현재 즐겨찾기 수 반환\n\n" +
+            "[반환 값 보충 설명]\n\n" +
+            "   - boolean: not null\n\n" +
+            "   - int: not null")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FavoriteResponseDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+    })
+    public ResponseEntity<FavoriteResponseDTO> restaurantFavoriteToggle2(
+            @PathVariable Integer restaurantId,
+            @Parameter(hidden = true) @JwtToken Integer userId
+    ) {
+        // 유저 가져오기
+        User user = userService.findUserById(userId);
+        // 식당 가져오기
+        Restaurant restaurant = restaurantApiService.findRestaurantById(restaurantId);
+        // 즐겨찾기 로직
+        boolean result = restaurantFavoriteService.toggleFavorite(user.getProviderId(), restaurantId);
+        // 즐겨찾기 수
+        int count = restaurant.getRestaurantFavorite().size();
+        // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
+        return ResponseEntity.ok(new FavoriteResponseDTO(result, count));
+    }
+
     // 이전 평가 데이터 가져오기
     @GetMapping("/auth/restaurants/{restaurantId}/evaluation")
     @Operation(summary = "평가 하기로 갈 때 이전 평가 데이터가 있을 경우 불러오기", description = "평가하기에서 사용하는 형식과 동일합니다. 유저가 이전에 해당 식당을 평가했을 경우 이전 평가 데이터를 불러와서 이전에 평가했던 사항을 보여줍니다. " +
@@ -212,14 +244,24 @@ public class RestaurantApiController {
             "   - starComments: 사용 안함. 없어도 됩니다.\n\n" +
             "   - newImage: 사용자가 이미지를 추가했을 경우만. 없어도 됩니다.\n\n" +
             "- 반환 값 보충 설명\n\n" +
-            "   - 식당 상세 화면 정보 불러오기 api와 동일합니다.")
+            "   - commentId: not null\n\n" +
+            "   - commentScore: not null\n\n" +
+            "   - commentIconImgUrl: not null\n\n" +
+            "   - commentNickname: not null\n\n" +
+            "   - commentTime: not null\n\n" +
+            "   - commentImgUrl: **null일 수 있습니다.**\n\n" +
+            "   - commentBody: **null일 수 있습니다.**\n\n" +
+            "   - commentLikeStatus: not null\n\n" +
+            "   - commentLikeCount: not null\n\n" +
+            "   - commentDislikeCount: not null\n\n" +
+            "   - commentReplies: **null이거나 빈 배열일 수 있습니다.**")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))}),
+            @ApiResponse(responseCode = "200", description = "평가하기 후에 식당 정보를 다시 반환해줍니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCommentDTO.class)))}),
             @ApiResponse(responseCode = "400", description = "평가 점수가 없거나 0점인 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
             @ApiResponse(responseCode = "500", description = "데이터베이스 상에 문제가 있을 경우 500을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
     })
-    public ResponseEntity<RestaurantDetailDTO> evaluateRestaurant(
+    public ResponseEntity<List<RestaurantCommentDTO>> evaluateRestaurant(
             @PathVariable Integer restaurantId,
             EvaluationDTO evaluationDTO,
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
@@ -236,8 +278,7 @@ public class RestaurantApiController {
         // 평가 추가하기 혹은 기존 평가 업데이트하기
         evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
         // 평가 완료 후에 업데이트된 식당 데이터를 다시 반환
-        return new ResponseEntity<>(RestaurantDetailDTO.convertRestaurantToDetailDTO(
-                restaurant, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user), RestaurantConstants.isIOS(userAgent)), HttpStatus.OK);
+        return new ResponseEntity<>(restaurantCommentService.getRestaurantCommentList(restaurant, user, true, userAgent), HttpStatus.OK);
     }
 
     // 리뷰 불러오기

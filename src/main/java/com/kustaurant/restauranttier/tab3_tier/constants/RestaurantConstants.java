@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.List;
 
 public abstract class RestaurantConstants {
-    public static final String REPLACE_IMG_URL ="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/%EC%BF%A0%EC%8A%A4%ED%86%A0%EB%9E%91%EB%A1%9C%EA%B3%A0.png";
+    public static final String REPLACE_IMG_URL ="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/NoImgRestaurant.png";
 
     public static String getIconImgUrl(User user, String userAgent) {
         if (user == null) {
