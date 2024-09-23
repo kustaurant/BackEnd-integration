@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+
     var modal = document.getElementById("modal");
     var closeButton = document.querySelector('#modal button[data-bs-dismiss="modal"]');
     var hideCheckbox = document.getElementById("flexCheckChecked");
@@ -60,4 +61,9 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         effect: 'slide',
     });
+});
+
+//--곧 출시--
+document.getElementById('commingSoon').addEventListener('click', function() {
+    alert('곧 출시될 예정입니다!');
 });
