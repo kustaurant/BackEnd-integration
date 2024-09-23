@@ -1,5 +1,6 @@
 var navbarTitles = document.querySelectorAll('.navbar-title');
 
+
 // -------------navBar 선택 및 보이기 로직 -------------------
 navbarTitles.forEach(function(navbarTitle, index) {
     navbarTitle.addEventListener('click', function() {
@@ -72,11 +73,16 @@ document.getElementById('saveBtn').addEventListener('click',function (){
         return;
     }
 
+    // CSRF 토큰 가져오기
+    var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
     // 서버로 전송
     fetch("/user/api/myPage/setNickname", {
         method: "PATCH",
         headers: {
             'Content-Type': 'application/json',
+            [csrfHeader]: csrfToken
         },
         body: JSON.stringify(dataToSend), // JSON 형태로 데이터 전송
     })
