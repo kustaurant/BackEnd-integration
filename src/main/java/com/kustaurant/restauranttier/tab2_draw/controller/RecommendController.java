@@ -51,19 +51,6 @@ public class RecommendController {
             combinedRestaurantList.addAll(retaurantList);
         }
 
-        // 뽑기 후보 기준 로직 제거
-//        if (evaluation.equals("평점 높은 순")) {
-//            combinedRestaurantList = combinedRestaurantList.stream()
-//                    .sorted(Comparator.comparingDouble((Restaurant r) -> r.getRestaurantScoreSum() / (double) r.getRestaurantEvaluationCount()).reversed())
-//                    .collect(Collectors.toList());
-//        } else if (evaluation.equals("후기 많은 순")) {
-//            combinedRestaurantList = combinedRestaurantList.stream()
-//                    .sorted(Comparator.comparingInt((Restaurant r) -> r.getEvaluationList().size()).reversed())
-//                    .collect(Collectors.toList());
-//        }
-//        // 조건에 맞게 상위 100개 선택
-//        List<Restaurant> top100List = combinedRestaurantList.stream().limit(100).collect(Collectors.toList());
-
         // 랜덤으로 30개 선택
         return new ResponseEntity<>(getRandomSubList(combinedRestaurantList, 30), HttpStatus.OK);
 
@@ -90,6 +77,8 @@ public class RecommendController {
         // 결과 리스트에서 targetSize만큼 잘라서 반환
         return new ArrayList<>(resultList.subList(0, targetSize));
     }
+
+
     // id에 해당 하는 식당 정보 반환
     @GetMapping("/api/recommend/restaurant")
     public ResponseEntity<Restaurant> recommendRestaurant(@RequestParam(name = "restaurantId") String restaurantId) {
