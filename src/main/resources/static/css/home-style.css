@@ -1,5 +1,18 @@
 @import "variables.css";
 
+.googledown,
+.appledown {
+    width: 100px;
+    height: 40px;
+    box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    transition: box-shadow 0.3s; /* 부드러운 전환 효과 */
+    border-radius: 10px;
+}
+
+.googledown:hover,
+.appledown:hover {
+    box-shadow: -3px 3px 20px rgba(0, 0, 0, 0.3); /* 호버 시 그림자 강화 */
+}
 
 /* 전체 페이지에 대한 기본 스타일 */
 body {
@@ -87,9 +100,7 @@ body {
 .home-grid{
     padding: 0 6% 6%;
 }
-/*img:hover {
-    filter: brightness(50%); !* 마우스 오버 시 이미지 어둡게 *!
-}*/
+
 .mobile-cuisine-name {
     display: flex;
     justify-content: center;
