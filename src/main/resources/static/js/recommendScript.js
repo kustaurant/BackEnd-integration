@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var restaurantLocation = "전체";
     const selectedCuisines = [];
     // 초기에 선택되어야 하는 음식 카테고리 리스트
-    const initialSelectedCuisines = ["한식", "일식", "중식", "양식", "아시안", "고기", "치킨", "햄버거", "분식", "해산물"];
+    const initialSelectedCuisines = ["전체"];
 
     // 모든 cell-button을 순회하며, 이미지 경로 초기화 및 선택 상태 설정
     document.querySelectorAll('.cell-button').forEach(button => {
