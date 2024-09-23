@@ -33,6 +33,7 @@ public class SecurityWebConfig {
                 .securityMatcher(request -> !request.getServletPath().matches("^/api/v\\d+/.*$"))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // 기본적으로 CSRF 보호 활성화
+
                 )
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Frame Options 비활성화
