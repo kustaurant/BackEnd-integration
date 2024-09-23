@@ -23,7 +23,8 @@ public class EvaluationConstants {
     }
 
     public int getMinimumEvaluationCountForTier() {
-        return (int) (evaluationRepository.findByStatus("ACTIVE").size() * 0.004);
+//        return (int) (evaluationRepository.findByStatus("ACTIVE").size() * 0.004);
+        return 1;
     }
 
     public static int calculateRestaurantTier(double averageScore) {
