@@ -28,13 +28,13 @@ public class EvaluationConstants {
     }
 
     public static int calculateRestaurantTier(double averageScore) {
-        if (averageScore >= 4.3) {
+        if (averageScore >= 4.8) {
             return 1;
-        } else if (averageScore > 3.9) {
+        } else if (averageScore > 4.2) {
             return 2;
-        } else if (averageScore > 3.3) {
+        } else if (averageScore > 3.7) {
             return 3;
-        } else if (averageScore > 2.5) {
+        } else if (averageScore > 2.8) {
             return 4;
         } else if (averageScore >= 1.0) {
             return 5;
