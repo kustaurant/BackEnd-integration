@@ -66,7 +66,6 @@
         // 평가 데이터 db 저장 (기존 평가 존재 시 업데이트 진행)
         @PreAuthorize("isAuthenticated() and hasRole('USER')")
         @PostMapping("/api/evaluation/{restaurantId}")
-        @ResponseBody
         public ResponseEntity<?> evaluationDBcreate(
                 @PathVariable Integer restaurantId,
                 Principal principal,
