@@ -7,7 +7,7 @@ public abstract class SelectorConst {
     public static String restaurantName = ".GHAhO";
     public static String restaurantType = ".lnJFt";
     public static String restaurantAddress = ".LDgIH";
-    public static String restaurantTel = ".LDgIH";
+    public static String restaurantTel = ".xlx7Q";
     public static String restaurantImgUrl = "#ibu_1";
 
     // 메뉴 관련
