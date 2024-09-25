@@ -23,18 +23,17 @@ public class EvaluationConstants {
     }
 
     public int getMinimumEvaluationCountForTier() {
-//        return (int) (evaluationRepository.findByStatus("ACTIVE").size() * 0.004);
-        return 1;
+        return (int) (evaluationRepository.findByStatus("ACTIVE").size() * 0.004);
     }
 
     public static int calculateRestaurantTier(double averageScore) {
-        if (averageScore >= 4.8) {
+        if (averageScore >= 4.3) {
             return 1;
-        } else if (averageScore > 4.2) {
+        } else if (averageScore > 3.9) {
             return 2;
-        } else if (averageScore > 3.7) {
+        } else if (averageScore > 3.3) {
             return 3;
-        } else if (averageScore > 2.8) {
+        } else if (averageScore > 2.5) {
             return 4;
         } else if (averageScore >= 1.0) {
             return 5;
