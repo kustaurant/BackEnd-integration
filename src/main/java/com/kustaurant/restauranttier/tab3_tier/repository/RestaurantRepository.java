@@ -49,4 +49,12 @@ public interface RestaurantRepository extends JpaRepository<Restaurant,Integer>,
     );
 
     List<Restaurant> findByStatusAndRestaurantPosition(String status, String restaurantPosition);
+
+    List<Restaurant> findByStatusAndMainTierNot(String status, Integer mainTier);
+
+    List<Restaurant> findByStatusAndRestaurantPositionAndMainTierNot(String status, String location, Integer mainTier);
+
+    List<Restaurant> findByRestaurantCuisineAndStatusAndMainTierNot(String cuisine, String status, Integer mainTier);
+
+    List<Restaurant> findByRestaurantCuisineAndStatusAndRestaurantPositionAndMainTierNot(String cuisine, String status, String location, Integer mainTier);
 }

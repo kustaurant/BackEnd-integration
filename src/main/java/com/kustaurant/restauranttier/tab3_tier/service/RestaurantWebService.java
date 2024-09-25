@@ -108,23 +108,20 @@ public class RestaurantWebService {
     }
     // 뽑기 리스트 반환
     public List<Restaurant> getRestaurantListByRandomPick(String cuisine, String location) {
-        // cuisine 이 전체일 떄
-        if(cuisine.equals("전체")){
-            if(location.equals("전체")) {
-                return restaurantRepository.findByStatus("ACTIVE");
+        // cuisine이 전체일 때
+        if (cuisine.equals("전체")) {
+            if (location.equals("전체")) {
+                return restaurantRepository.findByStatusAndMainTierNot("ACTIVE", -1);
             }
-            return restaurantRepository.findByStatusAndRestaurantPosition("ACTIVE", location);
-        }
-        // cuisine이 전체가 아닐때
-
-        else{
-            if(location.equals("전체")) {
-                return restaurantRepository.findByRestaurantCuisineAndStatus(cuisine, "ACTIVE");
+            return restaurantRepository.findByStatusAndRestaurantPositionAndMainTierNot("ACTIVE", location, -1);
+        } else {
+            if (location.equals("전체")) {
+                return restaurantRepository.findByRestaurantCuisineAndStatusAndMainTierNot(cuisine, "ACTIVE", -1);
             }
-            return restaurantRepository.findByRestaurantCuisineAndStatusAndRestaurantPosition(cuisine, "ACTIVE", location);
+            return restaurantRepository.findByRestaurantCuisineAndStatusAndRestaurantPositionAndMainTierNot(cuisine, "ACTIVE", location, -1);
         }
-
     }
+
     // 해당 식당이 방문 상위 몇 퍼센트인지 반환
     public Float getPercentOrderByVisitCount(Restaurant restaurant) {
         return restaurantRepository.getPercentOrderByVisitCount(restaurant);
