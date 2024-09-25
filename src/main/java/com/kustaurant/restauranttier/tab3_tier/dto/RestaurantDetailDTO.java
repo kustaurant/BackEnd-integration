@@ -69,7 +69,7 @@ public class RestaurantDetailDTO {
                 restaurant.getRestaurantName(),
                 restaurant.getRestaurantAddress() == null || restaurant.getRestaurantAddress().equals("no_address") ? "주소가 없습니다." : restaurant.getRestaurantAddress(),
                 true,
-                "영업중 오늘 10:00~20:00",
+                "-",
                 restaurant.getRestaurantUrl(),
                 restaurant.getRestaurantSituationRelationList().stream().filter(RestaurantSpecification::hasSituation).map(el -> el.getSituation().getSituationName()).collect(Collectors.toList()),
                 restaurant.getPartnershipInfo(),
