@@ -30,13 +30,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: 'GET'
             })
                 .then(response => {
-                    if (response.ok) {
                         if (response.redirected) {
                             window.location.href = "/user/login";
                             return;
                         }
+                        else{
+                            console.log("리다이렉트 안됨")
+                            console.log(response)
+
+                        }
                         return response.json()
-                    }
+
                 })
                 .then(data => {
                     if (data.dislikeCount === 0) {

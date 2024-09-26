@@ -38,7 +38,7 @@ public class SecurityWebConfig {
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Frame Options 비활성화
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/restaurant/**", "/evaluation/**", "/user/myPage", "/community/write").authenticated()
+                        .requestMatchers("/restaurant/**", "/evaluation/**", "/user/myPage", "/community/write","/api/post/**").authenticated()
                         .anyRequest().permitAll()) // 모든 요청 허용
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/user/login")
