@@ -163,7 +163,7 @@ public class CommunityController {
 
     // 댓글 or 대댓글 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @PostMapping("/api/community/comment/create")
+    @PostMapping("/api/comment/create")
     public ResponseEntity<String> postCommentCreate(
             @RequestParam(name = "content", defaultValue = "") String content,
             @RequestParam(name = "postId") String postId,
