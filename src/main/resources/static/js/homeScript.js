@@ -62,8 +62,3 @@ document.addEventListener('DOMContentLoaded', function () {
         effect: 'slide',
     });
 });
-
-//--곧 출시--
-document.getElementById('commingSoon').addEventListener('click', function() {
-    alert('곧 출시될 예정입니다!');
-});
