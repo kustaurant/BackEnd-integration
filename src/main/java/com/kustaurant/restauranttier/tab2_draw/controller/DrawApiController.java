@@ -55,10 +55,6 @@ public class DrawApiController {
         // DTO로 변환
         List<RestaurantTierDTO> drawRestaurantListDTOs = randomRestaurantList.stream()
                 .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
-                .map(dto -> {
-                    dto.setPartnershipInfo("건대생 공짜!!!");
-                    return dto; // dto 객체 자체를 반환
-                })
                 .toList();
 
 
