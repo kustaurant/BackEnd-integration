@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,9 +61,13 @@ public class PostDTO {
         dto.setUpdatedAt(post.getUpdatedAt());
         dto.setLikeCount(post.getLikeCount());
         dto.setUser(UserDTO.fromEntity(post.getUser()));
-        dto.setPostCommentList(post.getPostCommentList().stream()
-                .map(PostCommentDTO::fromEntity)
-                .toList());
+        dto.setPostCommentList(
+                post.getPostCommentList().stream()
+                        .filter(comment -> comment.getParentComment() == null) // 부모 댓글만 필터링
+                        .sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()) // createdAt 기준으로 정렬 (최신순)
+                        .map(PostCommentDTO::fromEntity) // DTO로 변환
+                        .toList()
+        );
         dto.setCommentCount(post.getPostCommentList().size());
         dto.setTimeAgo(post.calculateTimeAgo());
         if(!post.getPostPhotoList().isEmpty()){

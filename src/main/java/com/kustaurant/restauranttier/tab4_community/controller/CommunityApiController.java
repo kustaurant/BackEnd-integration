@@ -48,6 +48,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static java.util.stream.Collectors.toList;
+
 @RequestMapping("/api/v1")
 @RestController
 @RequiredArgsConstructor
@@ -100,7 +102,7 @@ public class CommunityApiController {
 
     // 커뮤니티 게시글 상세 화면
     @GetMapping("/community/{postId}")
-    @Operation(summary = "게시글 상세 화면", description = "게시글 ID와 해당 게시물의 댓글의 정렬 방법을 입력받고 해당 게시글의 상세 정보를 반환합니다.")
+    @Operation(summary = "게시글 상세 화면", description = "게시글 ID를 받고 해당 게시글의 상세 정보를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 반환 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostDTO.class))}),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (유효하지 않은 게시글 ID)", content = @Content(mediaType = "apllication/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -112,17 +114,12 @@ public class CommunityApiController {
         if (postId <= 0) {
             throw new IllegalArgumentException("잘못된 게시글 ID입니다.");
         }
-
         // 게시글 조회
         Post post = postApiService.getPost(postId);
-        List<PostComment> postCommentList = post.getPostCommentList();
-        postCommentList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
         // 조회수 증가
         postApiService.increaseVisitCount(post);
-
         // DTO로 변환
         PostDTO postDTO = PostDTO.fromEntity(post);
-
         // 성공적으로 게시글 반환
         return ResponseEntity.ok(postDTO);
     }
