@@ -16,6 +16,8 @@ public class PostCommentDTO {
     Integer commentId;
     @Schema(description = "댓글 내용", example = "안녕하세요~")
     private String commentBody;
+    @Schema(description = "댓글 상태 (활성화 or 삭제)", example = "ACTIVE")
+    private String status;
     @Schema(description = "댓글 작성자", example = "임재")
     private UserDTO user;
     @Schema(description = "좋아요 수", example = "3")
@@ -29,10 +31,11 @@ public class PostCommentDTO {
     @Schema(description = "댓글에 달린 대댓글 리스트")
     private List<PostCommentDTO> repliesList;
 
-    public PostCommentDTO(Integer commentId,String commentBody, UserDTO user, Integer likeCount, Integer dislikeCount, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
+    public PostCommentDTO(Integer commentId,String commentBody, UserDTO user, String status,Integer likeCount, Integer dislikeCount, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
         this.commentId= commentId;
         this.commentBody = commentBody;
         this.user = user;
+        this.status =status;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
         this.createdAt = createdAt;
@@ -42,5 +45,5 @@ public class PostCommentDTO {
 
     public static PostCommentDTO fromEntity(PostComment comment) {
         UserDTO userDTO = UserDTO.fromEntity(comment.user);
-        return new PostCommentDTO(comment.commentId,comment.getCommentBody(), userDTO, comment.getLikeCount(), comment.getDislikeUserList().size(),comment.createdAt, comment.updatedAt, comment.getRepliesList().stream().map(PostCommentDTO::fromEntity).toList());
+        return new PostCommentDTO(comment.commentId,comment.getCommentBody(), userDTO, comment.status, comment.getLikeCount(), comment.getDislikeUserList().size(),comment.createdAt, comment.updatedAt, comment.getRepliesList().stream().map(PostCommentDTO::fromEntity).toList());
     }}
