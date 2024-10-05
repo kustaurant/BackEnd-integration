@@ -107,10 +107,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "apllication/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "서버에서 오류가 발생했습니다", content = @Content(mediaType = "apllication/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id", example = "69") Integer postId,
-                                        @RequestParam(defaultValue = "recent")
-                                        @Parameter(example = "recent", description = "정렬 종류입니다. (recent:최신순, popular:인기순)")
-                                        String sort) {
+    public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id", example = "69") Integer postId) {
         // 잘못된 요청을 처리 (예: 음수 ID)
         if (postId <= 0) {
             throw new IllegalArgumentException("잘못된 게시글 ID입니다.");
@@ -119,16 +116,7 @@ public class CommunityApiController {
         // 게시글 조회
         Post post = postApiService.getPost(postId);
         List<PostComment> postCommentList = post.getPostCommentList();
-
-        if (sort.equals("recent")) {
-            // createdAt으로 정렬 (최신순)
-            postCommentList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
-        } else if (sort.equals("popular")) {
-            // likeCount로 정렬 (인기순)
-            postCommentList.sort(Comparator.comparing(PostComment::getLikeCount).reversed());
-        } else {
-            throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
-        }
+        postCommentList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
         // 조회수 증가
         postApiService.increaseVisitCount(post);
 
@@ -163,12 +151,13 @@ public class CommunityApiController {
             throw new OptionalNotExistException("sort값이 잘못 입력되었습니다.");
         }
     }
+
     // 댓글 or 대댓글 생성
     @PostMapping("/auth/community/comments")
     @Operation(summary = "댓글 생성, 대댓글 생성", description = "게시글 ID와 내용을 입력받아 댓글을 생성합니다. 대댓글의 경우 부모 댓글의 id를 파라미터로 받아야 합니다. 생성한 댓글을 반환합니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "댓글 혹은 대댓글 생성이 완료되었습니다", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostCommentDTO.class))}),
-            @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = com.kustaurant.restauranttier.common.exception.ErrorResponse.class)))
+            @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.kustaurant.restauranttier.common.exception.ErrorResponse.class)))
     })
     public ResponseEntity<PostCommentDTO> postCommentCreate(
             @RequestParam(name = "content", defaultValue = "")
@@ -214,9 +203,9 @@ public class CommunityApiController {
     @Operation(summary = "게시글 삭제", description = "게시글 ID를 입력받고 해당 게시글을 삭제합니다. 삭제가 완료되면 204 상태 코드를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "해당 게시글 id의 게시글을 삭제 완료하였습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "해당 게시글을 찾을 수 없음 (삭제불가)", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "해당 게시글을 삭제할 권한이 없습니다.", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "서버 오류로 인해 삭제에 실패하였습니다.", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "404", description = "해당 게시글을 찾을 수 없음 (삭제불가)", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "해당 게시글을 삭제할 권한이 없습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "서버 오류로 인해 삭제에 실패하였습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> postDelete(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
 
@@ -262,7 +251,7 @@ public class CommunityApiController {
     @Operation(summary = "댓글 삭제", description = "댓글 ID를 입력받고 해당 댓글 및 대댓글을 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "댓글 삭제에 성공하였습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "해당 id의 댓글이 존재하지 않습니다", content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "404", description = "해당 id의 댓글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Map<String, Object>> commentDelete(
             @PathVariable
@@ -318,34 +307,15 @@ public class CommunityApiController {
         return ResponseEntity.ok(likeOrDislikeDTO);
     }
 
-    // 게시글 검색 화면
-//    @GetMapping("/search")
-//    @Operation(summary = "키워드로 게시글을 검색합니다.", description = "게시판 종류와 페이지, 정렬 방법을 입력받고 해당 검색 조건에 맞는 게시글 리스트가 반환됩니다, 현재 인기순으로 설정했을 때는 좋아요가 3이상인 게시글만 반환됩니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "게시글 리스트를 반환하는데 성공하였습니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = PostDTO.class)))}),
-//            @ApiResponse(responseCode = "404", description = "요청한 조건의 게시글을 찾을 수 없습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))}),
-//            @ApiResponse(responseCode = "400", description = "파라미터 값이 유효하지 않습니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
-//
-//    })
-//    public ResponseEntity<List<PostDTO>> search(
-//            @RequestParam(value = "page", defaultValue = "0") int page,
-//            @RequestParam(value = "kw", defaultValue = "") String kw,
-//            @RequestParam(defaultValue = "recent") String sort,
-//            @RequestParam(defaultValue = "전체") String postCategory) {
-//
-//        Page<PostDTO> paging = this.postApiService.getList(page, sort, kw, postCategory);
-//
-//
-//        return ResponseEntity.ok(paging.getContent());
-//    }
-// 댓글 좋아요/싫어요 처리
+
+    // 댓글 좋아요/싫어요 처리
     @PostMapping("/auth/community/comments/{commentId}/{action}")
     @Operation(summary = "댓글 좋아요/싫어요", description = "댓글 ID를 입력받아 댓글에 대한 좋아요 또는 싫어요를 토글합니다. \n\n 댓글에 대한 유저의 현재 상태를 나타내는 commentLikeStatus와 좋아요, 싫어요 개수를 반환합니다. \n\n commentLikeStatus는 1 (좋아요), -1 (싫어요), 0 (아무것도 아님) 값으로 분류됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "처리가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CommentLikeDislikeDTO.class))),
             @ApiResponse(responseCode = "404", description = "해당 ID의 댓글을 찾을 수 없습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<CommentLikeDislikeDTO> toggleCommentLikeOrDislike(@PathVariable @Parameter(description = "댓글 id입니다", example = "30") Integer commentId ,
+    public ResponseEntity<CommentLikeDislikeDTO> toggleCommentLikeOrDislike(@PathVariable @Parameter(description = "댓글 id입니다", example = "30") Integer commentId,
                                                                             @PathVariable @Parameter(description = "좋아요는 likes, 싫어요는 dislikes로 값을 설정합니다.", example = "likes") String action,
                                                                             @JwtToken @Parameter(hidden = true) Integer userId) {
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
@@ -410,6 +380,7 @@ public class CommunityApiController {
             throw new ServerException("게시글 생성 중 서버 오류가 발생했습니다.", e);
         }
     }
+
     // 이미지 업로드
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/auth/community/posts/image")
@@ -423,7 +394,6 @@ public class CommunityApiController {
         try {
             // StorageService를 통해 이미지를 S3에 저장하고, URL을 받아옵니다.
             String imageUrl = storageApiService.storeImage(imageFile);
-
 
 
             return ResponseEntity.ok(new ImageUplodeDTO(imageUrl));
@@ -469,7 +439,6 @@ public class CommunityApiController {
             throw new ServerException("게시글 수정 중 서버 오류가 발생했습니다.", e);
         }
     }
-
 
 
     private int getCurrentQuarter(LocalDate date) {
