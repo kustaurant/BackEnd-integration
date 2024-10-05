@@ -408,16 +408,7 @@ public class CommunityApiController {
             throw new ServerException("게시글 생성 중 서버 오류가 발생했습니다.", e);
         }
     }
-    private void handleImageUpload(Post post, MultipartFile imageFile) throws IOException {
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String imageUrl = storageApiService.storeImage(imageFile);
-            PostPhoto postPhoto = new PostPhoto(imageUrl, "ACTIVE");
-            postPhoto.setPost(post);
-            post.getPostPhotoList().clear();  // 기존 이미지를 제거하고 새로운 이미지를 추가
-            post.getPostPhotoList().add(postPhoto);
-            postPhotoApiRepository.save(postPhoto);
-        }
-    }
+
 
 
     @PatchMapping("/auth/community/posts/{postId}")
@@ -541,6 +532,17 @@ public class CommunityApiController {
             return 3;
         } else {
             return 4;
+        }
+    }
+
+    private void handleImageUpload(Post post, MultipartFile imageFile) throws IOException {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageUrl = storageApiService.storeImage(imageFile);
+            PostPhoto postPhoto = new PostPhoto(imageUrl, "ACTIVE");
+            postPhoto.setPost(post);
+            post.getPostPhotoList().clear();  // 기존 이미지를 제거하고 새로운 이미지를 추가
+            post.getPostPhotoList().add(postPhoto);
+            postPhotoApiRepository.save(postPhoto);
         }
     }
 }

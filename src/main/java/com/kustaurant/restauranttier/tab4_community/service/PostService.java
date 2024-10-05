@@ -28,7 +28,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final PostScrapRepository postScrapRepository;
     // 인기순 제한 기준 숫자
-    public static  final int POPULARCOUNT = 5;
+    public static  final int POPULARCOUNT = 3;
     // 페이지 숫자
     public static  final int PAGESIZE=10;
 
