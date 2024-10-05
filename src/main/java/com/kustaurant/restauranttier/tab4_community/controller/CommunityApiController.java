@@ -412,7 +412,7 @@ public class CommunityApiController {
     }
     // 이미지 업로드
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @PostMapping("/api/post/image")
+    @PostMapping("/auth/community/posts/image")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이미지 업로드가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ImageUplodeDTO.class))),
             @ApiResponse(responseCode = "400", description = "파일 이미지가 없거나 유효하지 않습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
