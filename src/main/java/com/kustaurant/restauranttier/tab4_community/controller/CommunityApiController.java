@@ -37,11 +37,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -408,7 +410,27 @@ public class CommunityApiController {
             throw new ServerException("게시글 생성 중 서버 오류가 발생했습니다.", e);
         }
     }
+    // 이미지 업로드
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+    @PostMapping("/api/post/image")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이미지 업로드가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ImageUplodeDTO.class))),
+            @ApiResponse(responseCode = "400", description = "파일 이미지가 없거나 유효하지 않습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @Operation(summary = "게시글 작성 중 이미지 업로드", description = "게시글 작성화면에서 이미지를 업로드합니다")
+    public ResponseEntity<?> imageUpload(@RequestParam("image") MultipartFile imageFile) throws IOException {
 
+        try {
+            // StorageService를 통해 이미지를 S3에 저장하고, URL을 받아옵니다.
+            String imageUrl = storageApiService.storeImage(imageFile);
+
+
+
+            return ResponseEntity.ok(new ImageUplodeDTO(imageUrl));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("파일 이미지가 유효하지 않습니다");
+        }
+    }
 
 
     @PatchMapping("/auth/community/posts/{postId}")
@@ -535,9 +557,8 @@ public class CommunityApiController {
         }
     }
 
-    private void handleImageUpload(Post post, MultipartFile imageFile) throws IOException {
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String imageUrl = storageApiService.storeImage(imageFile);
+    private void handleImageUpload(Post post, String imageUrl) throws IOException {
+        if (imageUrl != null) {
             PostPhoto postPhoto = new PostPhoto(imageUrl, "ACTIVE");
             postPhoto.setPost(post);
             post.getPostPhotoList().clear();  // 기존 이미지를 제거하고 새로운 이미지를 추가

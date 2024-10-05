@@ -33,7 +33,7 @@ public class Post {
     LocalDateTime updatedAt;
     Integer postVisitCount=0;
     Integer likeCount=0;
-    public Post(String postTitle, String postBody, String postCategory, String status, LocalDateTime createdAt) {
+    public Post(String postTitle, String postBody, String postCategory, String status,LocalDateTime createdAt) {
         this.postTitle = postTitle;
         this.postBody = postBody;
         this.postCategory = postCategory;
