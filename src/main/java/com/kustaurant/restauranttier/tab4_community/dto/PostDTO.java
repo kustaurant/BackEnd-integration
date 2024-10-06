@@ -44,11 +44,14 @@ public class PostDTO {
     String postPhotoImgUrl;
     @Schema(description = "조회수", example = "3")
     Integer postVisitCount;
-    @Schema(description = "스크랩한 유저 리스트", example = "")
-    List<User> postScrapList = new ArrayList<>();
     @Schema(description = "스크랩 수", example = "")
     Integer scrapCount;
-    private List<User> likeUserList = new ArrayList<>();
+    @Schema(description = "스크랩 여부", example = "false")
+    Boolean isScraped =false;
+    @Schema(description = "좋아요 여부", example = "true")
+    Boolean isliked =false;
+    @Schema(description = "작성자 여부",example = "true")
+    Boolean isPostMine =false;
 
     public static PostDTO fromEntity(Post post) {
         PostDTO dto = new PostDTO();
@@ -61,14 +64,6 @@ public class PostDTO {
         dto.setUpdatedAt(post.getUpdatedAt());
         dto.setLikeCount(post.getLikeCount());
         dto.setUser(UserDTO.fromEntity(post.getUser()));
-        dto.setPostCommentList(
-                post.getPostCommentList().stream()
-                        .filter(comment -> comment.getParentComment() == null)
-                        .filter(comment -> comment.getStatus().equals("ACTIVE"))// 부모 댓글만 필터링
-                        .sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()) // createdAt 기준으로 정렬 (최신순)
-                        .map(PostCommentDTO::fromEntity) // DTO로 변환
-                        .toList()
-        );
         dto.setCommentCount(post.getPostCommentList().size());
         dto.setTimeAgo(post.calculateTimeAgo());
         if(!post.getPostPhotoList().isEmpty()){
@@ -77,9 +72,7 @@ public class PostDTO {
             dto.setPostPhotoImgUrl(null);
         }
         dto.setPostVisitCount(post.getPostVisitCount());
-        dto.setPostScrapList(post.getPostScrapList().stream().map(PostScrap::getUser).collect(Collectors.toList()));
         dto.setScrapCount(post.getPostScrapList().size());
-        dto.setLikeUserList(post.getLikeUserList());
         return dto;
     }
 }

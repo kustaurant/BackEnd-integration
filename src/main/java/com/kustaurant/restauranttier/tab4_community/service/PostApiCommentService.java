@@ -2,8 +2,11 @@ package com.kustaurant.restauranttier.tab4_community.service;
 
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
+import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
+import com.kustaurant.restauranttier.tab4_community.entity.PostCommentDTO;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
@@ -17,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -50,7 +54,6 @@ public class PostApiCommentService {
             throw new OptionalNotExistException("해당 id의 댓글이 존재하지 않습니다.");
         }
     }
-
 
 
     // 댓글 좋아요 (세 가지 경우)
@@ -162,4 +165,109 @@ public class PostApiCommentService {
 
         };
     }
+
+
+    // 해당 댓글을 해당 유저가 좋아요를 눌렀는지 여부
+    public boolean isLiked(PostComment postComment, User user) {
+        if (user == null || postComment == null) {
+            return false;
+        }
+        return postComment.getLikeUserList().stream()
+                .anyMatch(likeUser -> likeUser.equals(user));
+    }
+
+    // 해당 댓글을 해당 유저가 싫어요를 눌렀는지 여부
+    public boolean isDisliked(PostComment postComment, User user) {
+        if (user == null || postComment == null) {
+            return false;
+        }
+        return postComment.getDislikeUserList().stream()
+                .anyMatch(dislikeUser -> dislikeUser.equals(user));
+    }
+
+    // 해당 댓글의 작성자인지 여부
+    public boolean isCommentMine(PostComment postComment, User user) {
+        if (user == null || postComment == null) {
+            return false;
+        }
+        return postComment.getUser().equals(user);
+    }
+
+    // 해당 글을 유저가 좋아요를 눌렀는지의 여부
+    public boolean isLiked(Post post, User user) {
+        if (user == null || post == null) {
+            return false;
+        }
+        return post.getLikeUserList().stream()
+                .anyMatch(likeUser -> likeUser.equals(user));
+    }
+
+    // 해당 글을 해당 유저가 싫어요를 눌렀는지의 여부
+    public boolean isScraped(Post post, User user) {
+        if (user == null || post == null) {
+            return false;
+        }
+        return post.getDislikeUserList().stream()
+                .anyMatch(dislikeUser -> dislikeUser.equals(user));
+    }
+
+    // 해당 글의 작성자인지 여부
+    public boolean isPostMine(Post post, User user) {
+        if (user == null || post == null) {
+            return false;
+        }
+        return post.getUser().equals(user);
+    }
+
+    // flags들 추가하여  PostComment DTO 생성
+    public PostCommentDTO createPostCommentDTOWithFlags(PostComment postComment, User user) {
+        PostCommentDTO postCommentDTO = PostCommentDTO.fromEntity(postComment);
+        if (user != null) {
+            // 각 댓글에 대해 좋아요, 싫어요, 나의 댓글인지 여부 계산
+            boolean isLiked = isLiked(postComment, user);
+            boolean isDisliked = isDisliked(postComment, user);
+            boolean isCommentMine = isCommentMine(postComment, user);
+            postCommentDTO.setIsLiked(isLiked);
+            postCommentDTO.setIsDisliked(isDisliked);
+            postCommentDTO.setIsCommentMine(isCommentMine);
+
+            // 대댓글 리스트에 대해 재귀적으로 flag 계산
+            List<PostCommentDTO> replyDTOs = postComment.getRepliesList().stream()
+                    .filter(reply -> reply.getStatus().equals("ACTIVE"))  // 활성화된 대댓글만 필터링
+                    .sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()) // 최신순 정렬
+                    .map(reply -> createPostCommentDTOWithFlags(reply, user))  // 재귀적으로 flag 계산
+                    .collect(Collectors.toList());
+
+            postCommentDTO.setRepliesList(replyDTOs);
+
+        }
+
+        return postCommentDTO;
+    }
+
+
+
+    public PostDTO createPostDTOWithFlags(Post post, User user) {
+        // PostDTO 생성 및 post의 flag 설정
+        PostDTO postDTO = PostDTO.fromEntity(post);
+        if (user != null) {
+            postDTO.setIsPostMine(isPostMine(post, user));
+            postDTO.setIsliked(isLiked(post, user));
+            postDTO.setIsScraped(isScraped(post, user));
+        }
+        // 각 댓글에 대한 flag 설정
+        List<PostCommentDTO> commentDTOList = post.getPostCommentList().stream()
+                .filter(comment -> comment.getParentComment() == null) // 부모 댓글만 처리
+                .filter(comment -> comment.getStatus().equals("ACTIVE")) // 활성화된 댓글만 필터링
+                .sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()) // 최신순 정렬
+                .map(comment -> createPostCommentDTOWithFlags(comment, user))
+                .collect(Collectors.toList());
+
+        postDTO.setPostCommentList(commentDTOList);
+
+
+        return postDTO;
+    }
+
+
 }

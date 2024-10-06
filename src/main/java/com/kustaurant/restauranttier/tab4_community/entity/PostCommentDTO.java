@@ -20,8 +20,6 @@ public class PostCommentDTO {
     private String commentBody;
     @Schema(description = "댓글 상태 (활성화 or 삭제)", example = "ACTIVE")
     private String status;
-    @Schema(description = "댓글 작성자", example = "임재")
-    private UserDTO user;
     @Schema(description = "좋아요 수", example = "3")
     private Integer likeCount;
     @Schema(description = "싫어요 수", example = "2")
@@ -34,11 +32,15 @@ public class PostCommentDTO {
     private List<PostCommentDTO> repliesList;
     @Schema(description = "시간 경과", example = "8일 전")
     private String timeAgo;
-
-    public PostCommentDTO(Integer commentId, String commentBody, UserDTO user, String status, Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
+    @Schema(description = "싫어요 여부", example = "true")
+    private Boolean isDisliked = false;
+    @Schema(description = "좋아요 여부", example = "false")
+    private Boolean isLiked = false;
+    @Schema(description = "나의 댓글인지의 여부", example = "false")
+    private Boolean isCommentMine = false;
+    public PostCommentDTO(Integer commentId, String commentBody, String status, Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
         this.commentId = commentId;
         this.commentBody = commentBody;
-        this.user = user;
         this.status = status;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
@@ -49,8 +51,7 @@ public class PostCommentDTO {
     }
 
     public static PostCommentDTO fromEntity(PostComment comment) {
-        UserDTO userDTO = UserDTO.fromEntity(comment.user);
-        return new PostCommentDTO(comment.commentId, comment.getCommentBody(), userDTO, comment.status, comment.getLikeCount(), comment.getDislikeUserList().size(), comment.calculateTimeAgo(), comment.createdAt, comment.updatedAt, comment.getRepliesList().stream().filter(reply -> reply.getStatus().equals("ACTIVE")).sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()).map(PostCommentDTO::fromEntity).toList());
+        return new PostCommentDTO(comment.commentId, comment.getCommentBody(),comment.status, comment.getLikeCount(), comment.getDislikeUserList().size(), comment.calculateTimeAgo(), comment.createdAt, comment.updatedAt, comment.getRepliesList().stream().filter(reply -> reply.getStatus().equals("ACTIVE")).sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()).map(PostCommentDTO::fromEntity).toList());
     }
 
 }

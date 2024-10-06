@@ -84,6 +84,7 @@ public class CommunityApiController {
             @RequestParam(defaultValue = "recent")
             @Parameter(example = "recent", description = "게시글의 정렬 방법입니다. (recent:최신순, popular:인기순)")
             String sort
+            ,@JwtToken @Parameter(hidden = true) Integer userId
     ) {
         // Enum으로 변환하고 한글 이름 추출
         PostCategory categoryEnum = PostCategory.fromStringToEnum(postCategory);
@@ -109,19 +110,18 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "apllication/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "서버에서 오류가 발생했습니다", content = @Content(mediaType = "apllication/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id", example = "69") Integer postId) {
+    public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id", example = "69") Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         // 잘못된 요청을 처리 (예: 음수 ID)
         if (postId <= 0) {
             throw new IllegalArgumentException("잘못된 게시글 ID입니다.");
         }
+        User user = userService.findUserById(userId);
         // 게시글 조회
         Post post = postApiService.getPost(postId);
         // 조회수 증가
         postApiService.increaseVisitCount(post);
-        // DTO로 변환
-        PostDTO postDTO = PostDTO.fromEntity(post);
         // 성공적으로 게시글 반환
-        return ResponseEntity.ok(postDTO);
+        return ResponseEntity.ok(postApiCommentService.createPostDTOWithFlags(post,user));
     }
 
     @GetMapping("/community/ranking")
@@ -192,7 +192,8 @@ public class CommunityApiController {
             postApiCommentService.create(post, user, savedPostComment);
         }
         postCommentApiRepository.save(savedPostComment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(PostCommentDTO.fromEntity(savedPostComment));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(postApiCommentService.createPostCommentDTOWithFlags(postComment,user));
     }
 
     @DeleteMapping("/auth/community/{postId}")

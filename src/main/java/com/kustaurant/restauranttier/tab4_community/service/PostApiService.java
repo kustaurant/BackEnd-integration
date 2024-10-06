@@ -2,9 +2,11 @@ package com.kustaurant.restauranttier.tab4_community.service;
 
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
+import com.kustaurant.restauranttier.tab4_community.entity.PostCommentDTO;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostScrapApiRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
@@ -278,6 +280,49 @@ public class PostApiService {
 
 
         };
+    }
+
+    // flags들 추가하여  PostDTO 생성
+    public PostDTO createPostDTOWithFlags(Post post, User user) {
+        PostDTO postDTO = PostDTO.fromEntity(post);
+        if(user!=null){
+            // 각 글에 대해 좋아요, 스크랩, 나의 글인지 여부 계산
+            boolean isLiked = isLiked(post, user);
+            boolean isScraped = isScraped(post, user);
+            boolean isPostMine = isPostMine(post, user);
+            postDTO.setIsliked(isLiked);
+            postDTO.setIsScraped(isScraped);
+            postDTO.setIsPostMine(isPostMine);
+        }
+
+
+        return postDTO;
+    };
+
+    // 해당 글을 유저가 좋아요를 눌렀는지의 여부
+    public boolean isLiked(Post post, User user) {
+        if (user == null || post == null) {
+            return false;
+        }
+        return post.getLikeUserList().stream()
+                .anyMatch(likeUser -> likeUser.equals(user));
+    }
+
+    // 해당 글을 해당 유저가 싫어요를 눌렀는지의 여부
+    public boolean isScraped(Post post, User user) {
+        if (user == null || post== null) {
+            return false;
+        }
+        return post.getDislikeUserList().stream()
+                .anyMatch(dislikeUser -> dislikeUser.equals(user));
+    }
+
+    // 해당 글의 작성자인지 여부
+    public boolean isPostMine(Post post, User user) {
+        if (user == null || post == null) {
+            return false;
+        }
+        return post.getUser().equals(user);
     }
 
 
