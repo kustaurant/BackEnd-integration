@@ -125,10 +125,15 @@ document.addEventListener('DOMContentLoaded', function () {
         input.onchange = function () {
             var files = this.files;
             var formData = new FormData();
+            var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
             formData.append('image', files[0]); // 첫 번째 선택된 파일만 처리
             fetch('/api/upload/image', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
             })
                 .then(response => response.json())
                 .then(data => {
