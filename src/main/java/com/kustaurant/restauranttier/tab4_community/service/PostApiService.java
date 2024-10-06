@@ -76,7 +76,7 @@ public class PostApiService {
         return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
     }
     public Post getPost(Integer id) {
-        Optional<Post> post = this.postApiRepository.findById(id);
+        Optional<Post> post = this.postApiRepository.findByStatusAndPostId("ACTIVE",id);
         if (post.isPresent()) {
             return post.get();
         } else {

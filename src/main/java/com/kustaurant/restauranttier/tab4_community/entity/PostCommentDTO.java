@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -33,11 +34,12 @@ public class PostCommentDTO {
     private List<PostCommentDTO> repliesList;
     @Schema(description = "시간 경과", example = "8일 전")
     private String timeAgo;
-    public PostCommentDTO(Integer commentId,String commentBody, UserDTO user, String status,Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
-        this.commentId= commentId;
+
+    public PostCommentDTO(Integer commentId, String commentBody, UserDTO user, String status, Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
+        this.commentId = commentId;
         this.commentBody = commentBody;
         this.user = user;
-        this.status =status;
+        this.status = status;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
         this.timeAgo = timeAgo;
@@ -48,7 +50,7 @@ public class PostCommentDTO {
 
     public static PostCommentDTO fromEntity(PostComment comment) {
         UserDTO userDTO = UserDTO.fromEntity(comment.user);
-        return new PostCommentDTO(comment.commentId,comment.getCommentBody(), userDTO, comment.status, comment.getLikeCount(), comment.getDislikeUserList().size(),comment.calculateTimeAgo(),comment.createdAt, comment.updatedAt, comment.getRepliesList().stream().map(PostCommentDTO::fromEntity).toList());
+        return new PostCommentDTO(comment.commentId, comment.getCommentBody(), userDTO, comment.status, comment.getLikeCount(), comment.getDislikeUserList().size(), comment.calculateTimeAgo(), comment.createdAt, comment.updatedAt, comment.getRepliesList().stream().filter(reply -> reply.getStatus().equals("ACTIVE")).sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()).map(PostCommentDTO::fromEntity).toList());
     }
 
 }

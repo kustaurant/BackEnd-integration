@@ -63,7 +63,8 @@ public class PostDTO {
         dto.setUser(UserDTO.fromEntity(post.getUser()));
         dto.setPostCommentList(
                 post.getPostCommentList().stream()
-                        .filter(comment -> comment.getParentComment() == null) // 부모 댓글만 필터링
+                        .filter(comment -> comment.getParentComment() == null)
+                        .filter(comment -> comment.getStatus().equals("ACTIVE"))// 부모 댓글만 필터링
                         .sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()) // createdAt 기준으로 정렬 (최신순)
                         .map(PostCommentDTO::fromEntity) // DTO로 변환
                         .toList()
