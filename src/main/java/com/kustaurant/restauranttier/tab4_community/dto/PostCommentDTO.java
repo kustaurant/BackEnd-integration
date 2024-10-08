@@ -43,6 +43,7 @@ public class PostCommentDTO {
         this.commentId = commentId;
         this.commentBody = commentBody;
         this.status = status;
+        this.user = user;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
         this.timeAgo = timeAgo;
