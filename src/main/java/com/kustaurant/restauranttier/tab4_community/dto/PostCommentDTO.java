@@ -1,13 +1,12 @@
-package com.kustaurant.restauranttier.tab4_community.entity;
+package com.kustaurant.restauranttier.tab4_community.dto;
 
-import com.kustaurant.restauranttier.tab4_community.dto.UserDTO;
+import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
+import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -38,7 +37,9 @@ public class PostCommentDTO {
     private Boolean isLiked = false;
     @Schema(description = "나의 댓글인지의 여부", example = "false")
     private Boolean isCommentMine = false;
-    public PostCommentDTO(Integer commentId, String commentBody, String status, Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
+    @Schema(description = "작성 유저", example = "false")
+    User user;
+    public PostCommentDTO(Integer commentId, String commentBody, String status, User user,Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
         this.commentId = commentId;
         this.commentBody = commentBody;
         this.status = status;
@@ -51,7 +52,7 @@ public class PostCommentDTO {
     }
 
     public static PostCommentDTO fromEntity(PostComment comment) {
-        return new PostCommentDTO(comment.commentId, comment.getCommentBody(),comment.status, comment.getLikeCount(), comment.getDislikeUserList().size(), comment.calculateTimeAgo(), comment.createdAt, comment.updatedAt, comment.getRepliesList().stream().filter(reply -> reply.getStatus().equals("ACTIVE")).sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()).map(PostCommentDTO::fromEntity).toList());
+        return new PostCommentDTO(comment.getCommentId(), comment.getCommentBody(),comment.getStatus(),comment.getUser(), comment.getLikeCount(), comment.getDislikeUserList().size(), comment.calculateTimeAgo(), comment.getCreatedAt(), comment.getUpdatedAt(), comment.getRepliesList().stream().filter(reply -> reply.getStatus().equals("ACTIVE")).sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()).map(PostCommentDTO::fromEntity).toList());
     }
 
 }

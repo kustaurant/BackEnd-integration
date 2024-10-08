@@ -2,11 +2,9 @@ package com.kustaurant.restauranttier.tab4_community.service;
 
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
-import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
-import com.kustaurant.restauranttier.tab4_community.entity.PostCommentDTO;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostScrapApiRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
