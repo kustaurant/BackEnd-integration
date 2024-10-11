@@ -1,6 +1,7 @@
 package com.kustaurant.restauranttier.tab3_tier.service;
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.entity.RestaurantFavorite;
 import com.kustaurant.restauranttier.tab3_tier.repository.RestaurantApiRepository;
@@ -39,16 +40,18 @@ public class RestaurantApiService {
         return restaurantOptional.get();
     }
 
-    public List<Restaurant> getTopRestaurants() {
+    public List<RestaurantTierDTO> getTopRestaurants() {
         // 모든 'ACTIVE' 상태의 식당을 불러온다.
         List<Restaurant> restaurants = restaurantApiRepository.findByStatus("ACTIVE");
-
-        // 점수가 높은 식당 16개를 선택
-        return restaurants.stream()
+        restaurants = restaurants.stream()
                 .filter(r -> r.getRestaurantEvaluationCount() >= evaluationCount)
                 .sorted(Comparator.comparingDouble(Restaurant::calculateAverageScore).reversed())
                 .limit(16)
                 .collect(Collectors.toList());
+        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = restaurants.stream()
+                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
+                .collect(Collectors.toList());
+        return topRestaurantsByRatingDTOs;
     }
 
     // 뽑기 리스트 반환
@@ -142,15 +145,22 @@ public class RestaurantApiService {
         // 6. 원하는 개수만큼 자릅니다 (예: 15개).
         return recommendedRestaurants.stream().limit(15).collect(Collectors.toList());
     }
-    public List<Restaurant> getRecommendedOrRandomRestaurants(Integer userId) {
+    public List<RestaurantTierDTO> getRecommendedOrRandomRestaurants(Integer userId) {
+        List<Restaurant> restaurants;
         if (userId == null) {
             // 미로그인 시: 랜덤으로 15개의 식당 반환
-            List<Restaurant> restaurants = getRestaurantsByCuisinesAndSituationsAndLocations(null, null, null, null, false);
+            restaurants = getRestaurantsByCuisinesAndSituationsAndLocations(null, null, null, null, false);
             Collections.shuffle(restaurants, new Random());
-            return restaurants.stream().limit(15).collect(Collectors.toList());
+            restaurants=  restaurants.stream().limit(15).collect(Collectors.toList());
         } else {
             // 로그인 시: 즐겨찾기 기반 추천 식당 반환
-            return getRecommendedRestaurantsForUser(userId);
+            restaurants= getRecommendedRestaurantsForUser(userId);
         }
+
+        List<RestaurantTierDTO> restaurantsForMeDTOs = restaurants.stream()
+                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
+                .collect(Collectors.toList());
+
+        return restaurantsForMeDTOs;
     }
 }

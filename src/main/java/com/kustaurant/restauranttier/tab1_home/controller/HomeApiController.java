@@ -3,6 +3,7 @@ package com.kustaurant.restauranttier.tab1_home.controller;
 import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
 import com.kustaurant.restauranttier.tab1_home.dto.RestaurantListsResponse;
+import com.kustaurant.restauranttier.tab1_home.service.HomeApiService;
 import com.kustaurant.restauranttier.tab3_tier.dto.RestaurantTierDTO;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
@@ -31,7 +32,7 @@ public class HomeApiController {
     private final RestaurantApiService restaurantApiService;
     private final RestaurantWebService restaurantWebService;
     private final UserService userService;
-
+    private final HomeApiService homeApiService;
     @Operation(summary = "홈화면 top맛집, 나를 위한 맛집, 배너 이미지 불러오기", description = "top 맛집과 나를 위한 맛집 리스트인 topRestaurantsByRating, restaurantsForMe 을 반환하고 홈의 배너 이미지 url리스트를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "restaurant found", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantListsResponse.class))}),
@@ -39,33 +40,11 @@ public class HomeApiController {
     })
     @GetMapping("/api/v1/home")
     public ResponseEntity<RestaurantListsResponse> home(@JwtToken @Parameter(hidden = true)Integer userId) {
-        List<Restaurant> topRestaurantsByRating = restaurantApiService.getTopRestaurants(); // 점수 높은 순으로 총 16개
-
+        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = restaurantApiService.getTopRestaurants(); // 점수 높은 순으로 총 16개
         // 로그인 여부에 따라 랜덤 식당 또는 추천 식당을 반환하는 서비스 메서드를 호출합니다.
-        List<Restaurant> restaurantsForMe = restaurantApiService.getRecommendedOrRandomRestaurants(userId);
-
-        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = topRestaurantsByRating.stream()
-                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
-                .collect(Collectors.toList());
-        List<RestaurantTierDTO> restaurantsForMeDTOs = restaurantsForMe.stream()
-                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
-                .collect(Collectors.toList());
-
+        List<RestaurantTierDTO> restaurantsForMeDTOs = restaurantApiService.getRecommendedOrRandomRestaurants(userId);
         // 홈화면의 배너 이미지
-        List<String> homePhotoUrls = new ArrayList<>();
-        for (int i = 1; i <= 3; i++) {
-            StringBuilder imagePathBuilder = new StringBuilder();
-            imagePathBuilder.append("/배너").append(i).append(".png");
-
-            StringBuilder imageUrlBuilder = new StringBuilder();
-            imageUrlBuilder.append("https://kustaurant.s3.ap-northeast-2.amazonaws.com/home").append(imagePathBuilder);
-
-            homePhotoUrls.add(imageUrlBuilder.toString());
-        }
-
-
-
-
+        List<String> homePhotoUrls = homeApiService.getHomeBannerImage();
         RestaurantListsResponse response = new RestaurantListsResponse(topRestaurantsByRatingDTOs, restaurantsForMeDTOs, homePhotoUrls);
         return ResponseEntity.ok(response);
     }
