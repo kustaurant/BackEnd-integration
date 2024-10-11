@@ -1,11 +1,13 @@
 package com.kustaurant.restauranttier.tab4_community.service;
 
 
+import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.dto.PostCommentDTO;
+import com.kustaurant.restauranttier.tab4_community.etc.PostStatus;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,7 +32,7 @@ public class PostApiCommentService {
     private final UserRepository userRepository;
     private final PostApiRepository postApiRepository;
     private final PostApiService postApiService;
-
+    private final UserService userService;
     // 댓글 생성
     public void create(Post post, User user, PostComment postComment) {
         user.getPostCommentList().add(postComment);
@@ -267,6 +270,40 @@ public class PostApiCommentService {
 
         return postDTO;
     }
+    // 댓글 삭제
+    public void deleteComment(Integer commentId, Integer userId) {
+        PostComment postComment = getPostCommentByCommentId(commentId);
+        postComment.setStatus("DELETED");
 
+        // 대댓글 상태 변경
+        postComment.getRepliesList().forEach(reply -> reply.setStatus("DELETED"));
+        postCommentApiRepository.save(postComment);
+    }
 
+    // 댓글 생성
+    public PostComment createComment(String content, String postId, Integer userId) {
+        User user = userService.findUserById(userId);
+        Post post = postApiService.getPost(Integer.valueOf(postId));
+        PostComment postComment = new PostComment(content, PostStatus.ACTIVE.name(), LocalDateTime.now(), post, user);
+        return postCommentApiRepository.save(postComment);
+    }
+    // 대댓글 생성
+    public void processParentComment(PostComment postComment, String parentCommentId) {
+        PostComment parentComment = getPostCommentByCommentId(Integer.valueOf(parentCommentId));
+        postComment.setParentComment(parentComment);
+        parentComment.getRepliesList().add(postComment);
+        postCommentApiRepository.save(parentComment);
+    }
+
+    public int toggleCommentLikeOrDislike(String action, PostComment postComment, User user) {
+        int commentLikeStatus;
+        if ("likes".equals(action)) {
+            commentLikeStatus = likeCreateOrDelete(postComment, user);
+        } else if ("dislikes".equals(action)) {
+            commentLikeStatus = dislikeCreateOrDelete(postComment, user);
+        } else {
+            throw new IllegalArgumentException("action 값이 유효하지 않습니다.");
+        }
+        return commentLikeStatus;
+    }
 }

@@ -9,6 +9,7 @@ import com.kustaurant.restauranttier.common.exception.exception.ServerException;
 import com.kustaurant.restauranttier.tab4_community.dto.*;
 import com.kustaurant.restauranttier.tab4_community.entity.*;
 import com.kustaurant.restauranttier.tab4_community.etc.PostCategory;
+import com.kustaurant.restauranttier.tab4_community.etc.PostStatus;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostPhotoApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
@@ -80,15 +81,7 @@ public class CommunityApiController {
         // Enum으로 변환하고 한글 이름 추출
         PostCategory categoryEnum = PostCategory.fromStringToEnum(postCategory);
         String koreanCategory = categoryEnum.getKoreanName();
-
-        Page<PostDTO> paging;
-        if (categoryEnum == PostCategory.ALL) {
-            paging = postApiService.getList(page, sort);
-        } else {
-            paging = postApiService.getListByPostCategory(koreanCategory, page, sort);
-        }
-
-
+        Page<PostDTO> paging = postApiService.getList(page,sort,koreanCategory);
         return ResponseEntity.ok(paging.getContent());
     }
 
@@ -104,11 +97,8 @@ public class CommunityApiController {
     public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id", example = "69") Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         postApiService.validatePostId(postId);
         User user = userService.findUserById(userId);
-        // 게시글 조회
         Post post = postApiService.getPost(postId);
-        // 조회수 증가
         postApiService.increaseVisitCount(post);
-        // 성공적으로 게시글 반환
         return ResponseEntity.ok(postApiCommentService.createPostDTOWithFlags(post,user));
     }
 
@@ -117,24 +107,9 @@ public class CommunityApiController {
     @ApiResponse(responseCode = "200", description = "유저 랭킹을 반환하는데 성공하였습니다", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))})
     @ApiResponse(responseCode = "404", description = "sort 파라미터 값이 잘못되었습니다", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
     public List<UserDTO> ranking(@RequestParam @Parameter(description = "랭킹 산정 기준입니다. 분기순:quarterly, 최신순:cumulative", example = "cumulative") String sort) {
-        if ("cumulative".equals(sort)) {
-            // 누적 기준으로 유저 리스트 가져오기 (정렬된 상태)
-            List<User> userList = userRepository.findUsersWithEvaluationCountDescending();
-            // 유저의 평가수, 랭킹 첨부하기
-            return calculateRank(userList);
-        } else if ("quarterly".equals(sort)) {
-            // 현재 날짜를 기준으로 연도와 분기 계산
-            LocalDate now = LocalDate.now();
-            int currentYear = now.getYear();
-            int currentQuarter = getCurrentQuarter(now);
 
-            // 특정 분기의 평가 데이터를 기준으로 유저 리스트 가져오기
-            List<User> userList = userRepository.findUsersByEvaluationCountForQuarter(currentYear, currentQuarter);
-            // 분기별 순위 리스트 계산
-            return calculateRankForQuarter(userList, currentYear, currentQuarter);
-        } else {
-            throw new OptionalNotExistException("sort값이 잘못 입력되었습니다.");
-        }
+        List<UserDTO> userList =  postApiService.getUserListforRanking(sort);
+        return userList;
     }
 
     // 댓글 or 대댓글 생성
@@ -160,29 +135,16 @@ public class CommunityApiController {
             @JwtToken
             @Parameter(hidden = true)
             Integer userId) {
-        Integer postIdInt = Integer.valueOf(postId);
-
         User user = userService.findUserById(userId);
-        Post post = postApiService.getPost(postIdInt);
-        PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), post, user);
-        PostComment savedPostComment = postCommentApiRepository.save(postComment);
-
-        // 대댓글이면 부모 관계 매핑하기
+        PostComment postComment = postApiCommentService.createComment(content, postId, userId);
+        // 대댓글 일 경우 부모 댓글과 관계 매핑
         if (!parentCommentId.isEmpty()) {
-            PostComment parentComment = postApiCommentService.getPostCommentByCommentId(Integer.valueOf(parentCommentId));
-            savedPostComment.setParentComment(parentComment);
-            parentComment.getRepliesList().add(savedPostComment);
-            postApiCommentService.replyCreate(user, savedPostComment);
-            postCommentApiRepository.save(parentComment);
+            postApiCommentService.processParentComment(postComment, parentCommentId);
         }
-        // 댓글이면 post와 연결하면서 저장
-        else {
-            postApiCommentService.create(post, user, savedPostComment);
-        }
-        postCommentApiRepository.save(savedPostComment);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(postApiCommentService.createPostCommentDTOWithFlags(postComment,user));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(postApiCommentService.createPostCommentDTOWithFlags(postComment, user));
     }
+
 
     @DeleteMapping("/auth/community/{postId}")
     @Transactional
@@ -214,20 +176,7 @@ public class CommunityApiController {
             @JwtToken
             @Parameter(hidden = true)
             Integer userId) {
-        PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
-        postComment.setStatus("DELETED");
-
-        List<PostComment> repliesList = postComment.getRepliesList();
-        // 해당 댓글에 대한 대댓글이 존재하면 삭제
-        if (!repliesList.isEmpty()) {
-            for (PostComment reply : repliesList) {
-                if (!reply.getStatus().equals("DELETED")) {
-                    reply.setStatus("DELETED");
-                }
-
-            }
-
-        }
+        postApiCommentService.deleteComment(commentId, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -273,24 +222,9 @@ public class CommunityApiController {
                                                                             @PathVariable @Parameter(description = "좋아요는 likes, 싫어요는 dislikes로 값을 설정합니다.", example = "likes") String action,
                                                                             @JwtToken @Parameter(hidden = true) Integer userId) {
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
-
         User user = userService.findUserById(userId);
-
-        int commentLikeStatus;
-        if ("likes".equals(action)) {
-            commentLikeStatus = postApiCommentService.likeCreateOrDelete(postComment, user);
-        } else if ("dislikes".equals(action)) {
-            commentLikeStatus = postApiCommentService.dislikeCreateOrDelete(postComment, user);
-        } else {
-            throw new IllegalArgumentException("action 값이 유효하지 않습니다.");
-        }
-
-        CommentLikeDislikeDTO responseDTO = new CommentLikeDislikeDTO(
-                postComment.getLikeCount(),
-                postComment.getDislikeUserList().size(),
-                commentLikeStatus
-        );
-
+        int commentLikeStatus = postApiCommentService.toggleCommentLikeOrDislike(action, postComment,user);
+        CommentLikeDislikeDTO responseDTO = CommentLikeDislikeDTO.toCommentLikeDislikeDTO(postComment,commentLikeStatus);
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -311,22 +245,11 @@ public class CommunityApiController {
             @JwtToken @Parameter(hidden = true) Integer userId
     ) {
         try {
-            // 유저 정보 가져오기
             User user = userService.findUserById(userId);
-
-            // 게시글 객체 생성
             Post post = new Post(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), "ACTIVE", LocalDateTime.now());
-
-            // 유저와 게시글의 연관관계 설정
             postApiService.create(post, user);
-
-            // 이미지 파일 처리
             storageApiService.handleImageUpload(post, postUpdateDTO.getImageFile());
-
-            // 게시글 저장
             postApiRepository.save(post);
-
-            // 성공 응답 반환
             return ResponseEntity.ok(PostDTO.fromEntity(post));
         } catch (IOException e) {
             throw new ServerException("이미지 처리 과정에서 오류가 발생했습니다.", e);
@@ -346,10 +269,7 @@ public class CommunityApiController {
     public ResponseEntity<?> imageUpload(@RequestParam("image") MultipartFile imageFile) throws IOException {
 
         try {
-            // StorageService를 통해 이미지를 S3에 저장하고, URL을 받아옵니다.
             String imageUrl = storageApiService.storeImage(imageFile);
-
-
             return ResponseEntity.ok(new ImageUplodeDTO(imageUrl));
         } catch (Exception e) {
             throw new IllegalArgumentException("파일 이미지가 유효하지 않습니다");
@@ -375,16 +295,8 @@ public class CommunityApiController {
     ) {
         try {
             Post post = postApiService.getPost(Integer.valueOf(postId));
-
-            // DTO를 통해 받은 데이터로 수정
-            if (postUpdateDTO.getTitle() != null) post.setPostTitle(postUpdateDTO.getTitle());
-            if (postUpdateDTO.getPostCategory() != null) post.setPostCategory(postUpdateDTO.getPostCategory());
-            if (postUpdateDTO.getContent() != null) post.setPostBody(postUpdateDTO.getContent());
-
-            // 이미지 파일 처리
+            postApiService.updatePost(postUpdateDTO, post);
             storageApiService.handleImageUpload(post, postUpdateDTO.getImageFile());
-
-            // 게시글 저장
             postApiRepository.save(post);
             return ResponseEntity.ok().build();
         } catch (IOException e) {
@@ -393,92 +305,4 @@ public class CommunityApiController {
             throw new ServerException("게시글 수정 중 서버 오류가 발생했습니다.", e);
         }
     }
-
-
-    private int getCurrentQuarter(LocalDate date) {
-        int month = date.getMonthValue();
-        if (month >= 1 && month <= 3) {
-            return 1;
-        } else if (month >= 4 && month <= 6) {
-            return 2;
-        } else if (month >= 7 && month <= 9) {
-            return 3;
-        } else {
-            return 4;
-        }
-    }
-
-    private List<UserDTO> calculateRank(List<User> userList) {
-        List<UserDTO> rankList = new ArrayList<>();
-
-        int i = 0;
-        int prevCount = 100000; // 이전 유저의 평가 개수
-        int countSame = 1; // 동일 순위를 세기 위한 변수
-        for (User user : userList) {
-            int evaluationCount = user.getEvaluationList().size();
-            UserDTO userDTO = UserDTO.fromEntity(user); // 필요한 정보를 UserDTO에 담음
-
-            if (evaluationCount < prevCount) {
-                i += countSame;
-                userDTO.setRank(i);
-                countSame = 1;
-            } else {
-                userDTO.setRank(i);
-                countSame++;
-            }
-
-            rankList.add(userDTO);
-            prevCount = evaluationCount;
-        }
-        return rankList;
-    }
-
-    private List<UserDTO> calculateRankForQuarter(List<User> userList, int year, int quarter) {
-        List<UserDTO> rankList = new ArrayList<>();
-
-        int i = 0;
-        int prevCount = 100000; // 이전 유저의 평가 개수
-        int countSame = 1; // 동일 순위를 세기 위한 변수
-        for (User user : userList) {
-            // 특정 분기의 평가 수 계산
-            int evaluationCount = (int) user.getEvaluationList().stream()
-                    .filter(e -> getYear(e.getCreatedAt()) == year && getQuarter(e.getCreatedAt()) == quarter)
-                    .count();
-
-            UserDTO userDTO = UserDTO.fromEntity(user); // 필요한 정보를 UserDTO에 담음
-            userDTO.setEvaluationCount(evaluationCount); // 분기 내 평가 수를 설정
-
-            if (evaluationCount < prevCount) {
-                i += countSame;
-                userDTO.setRank(i);
-                countSame = 1;
-            } else {
-                userDTO.setRank(i);
-                countSame++;
-            }
-
-            rankList.add(userDTO);
-            prevCount = evaluationCount;
-        }
-        return rankList;
-    }
-
-    private int getYear(LocalDateTime dateTime) {
-        return dateTime.getYear();
-    }
-
-    private int getQuarter(LocalDateTime dateTime) {
-        int month = dateTime.getMonthValue();
-        if (month <= 3) {
-            return 1;
-        } else if (month <= 6) {
-            return 2;
-        } else if (month <= 9) {
-            return 3;
-        } else {
-            return 4;
-        }
-    }
-
-
 }

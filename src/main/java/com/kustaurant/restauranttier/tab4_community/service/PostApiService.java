@@ -2,11 +2,14 @@ package com.kustaurant.restauranttier.tab4_community.service;
 
 
 import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.tab4_community.dto.PostUpdateDTO;
+import com.kustaurant.restauranttier.tab4_community.dto.UserDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.PostPhoto;
 import com.kustaurant.restauranttier.tab4_community.entity.PostScrap;
+import com.kustaurant.restauranttier.tab4_community.etc.PostStatus;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostPhotoApiRepository;
@@ -24,6 +27,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,22 +46,33 @@ public class PostApiService {
     public static  final int PAGESIZE=10;
 
     // 메인 화면 로딩하기
-    public Page<PostDTO> getList(int page, String sort) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        if (sort.isEmpty() || sort.equals("recent")) {
+    public Page<PostDTO> getList(int page, String sort, String koreanCategory) {
+        if(koreanCategory.equals("전체")){
+            List<Sort.Order> sorts = new ArrayList<>();
+            if (sort.isEmpty() || sort.equals("recent")) {
+                sorts.add(Sort.Order.desc("createdAt"));
+                Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
+                Page<Post> posts = this.postApiRepository.findByStatus("ACTIVE", pageable);
+                return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
+            } else if(sort.equals("popular")){
+                sorts.add(Sort.Order.desc("createdAt"));
+                Specification<Post> spec = getSpecByPopularOver5();
+                Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
+                Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
+                return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
+            }else{
+                throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
+            }
+        }else{
+            List<Sort.Order> sorts = new ArrayList<>();
             sorts.add(Sort.Order.desc("createdAt"));
             Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-            Page<Post> posts = this.postApiRepository.findByStatus("ACTIVE", pageable);
-            return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
-        } else if(sort.equals("popular")){
-            sorts.add(Sort.Order.desc("createdAt"));
-            Specification<Post> spec = getSpecByPopularOver5();
-            Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
+            Specification<Post> spec = getSpecByCategoryAndPopularOver5(koreanCategory, sort);
+            //spec의 인기순으로 먼저 정렬, 그다음 pageable의 최신순으로 두번째 정렬 기준 설정
             Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
             return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
-        }else{
-            throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
         }
+
     }
 
     // 검색 결과 반환하기
@@ -70,18 +85,6 @@ public class PostApiService {
         return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
     }
 
-
-
-    // 드롭다운에서 카테고리가 설정된 상태에서 게시물 반환하기
-    public Page<PostDTO> getListByPostCategory(String postCategory, int page, String sort) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("createdAt"));
-        Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        Specification<Post> spec = getSpecByCategoryAndPopularOver5(postCategory, sort);
-        //spec의 인기순으로 먼저 정렬, 그다음 pageable의 최신순으로 두번째 정렬 기준 설정
-        Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
-        return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
-    }
     public Post getPost(Integer id) {
         Optional<Post> post = this.postApiRepository.findByStatusAndPostId("ACTIVE",id);
         if (post.isPresent()) {
@@ -344,7 +347,7 @@ public class PostApiService {
         deleteComments(post);
         deleteScraps(post);
         deletePhotos(post);
-        post.setStatus("DELETED");
+        post.setStatus(PostStatus.DELETED.name());
         postApiRepository.save(post);
     }
 
@@ -371,7 +374,116 @@ public class PostApiService {
             post.setPostPhotoList(null); // 기존 사진과의 연결 해제
         }
     }
+    // 랭킹 화면에서 유저 가져오기
+    public List<UserDTO> getUserListforRanking(String sort){
+        if ("cumulative".equals(sort)) {
+            // 누적 기준으로 유저 리스트 가져오기 (정렬된 상태)
+            List<User> userList = userRepository.findUsersWithEvaluationCountDescending();
+            // 유저의 평가수, 랭킹 첨부하기
+            return calculateRank(userList);
+        } else if ("quarterly".equals(sort)) {
+            // 현재 날짜를 기준으로 연도와 분기 계산
+            LocalDate now = LocalDate.now();
+            int currentYear = now.getYear();
+            int currentQuarter = getCurrentQuarter(now);
 
+            // 특정 분기의 평가 데이터를 기준으로 유저 리스트 가져오기
+            List<User> userList = userRepository.findUsersByEvaluationCountForQuarter(currentYear, currentQuarter);
+            // 분기별 순위 리스트 계산
+            return calculateRankForQuarter(userList, currentYear, currentQuarter);
+        } else {
+            throw new OptionalNotExistException("sort값이 잘못 입력되었습니다.");
+        }
+    }
 
+    private int getCurrentQuarter(LocalDate date) {
+        int month = date.getMonthValue();
+        if (month >= 1 && month <= 3) {
+            return 1;
+        } else if (month >= 4 && month <= 6) {
+            return 2;
+        } else if (month >= 7 && month <= 9) {
+            return 3;
+        } else {
+            return 4;
+        }
+    }
 
+    private List<UserDTO> calculateRank(List<User> userList) {
+        List<UserDTO> rankList = new ArrayList<>();
+
+        int i = 0;
+        int prevCount = 100000; // 이전 유저의 평가 개수
+        int countSame = 1; // 동일 순위를 세기 위한 변수
+        for (User user : userList) {
+            int evaluationCount = user.getEvaluationList().size();
+            UserDTO userDTO = UserDTO.fromEntity(user); // 필요한 정보를 UserDTO에 담음
+
+            if (evaluationCount < prevCount) {
+                i += countSame;
+                userDTO.setRank(i);
+                countSame = 1;
+            } else {
+                userDTO.setRank(i);
+                countSame++;
+            }
+
+            rankList.add(userDTO);
+            prevCount = evaluationCount;
+        }
+        return rankList;
+    }
+
+    private List<UserDTO> calculateRankForQuarter(List<User> userList, int year, int quarter) {
+        List<UserDTO> rankList = new ArrayList<>();
+
+        int i = 0;
+        int prevCount = 100000; // 이전 유저의 평가 개수
+        int countSame = 1; // 동일 순위를 세기 위한 변수
+        for (User user : userList) {
+            // 특정 분기의 평가 수 계산
+            int evaluationCount = (int) user.getEvaluationList().stream()
+                    .filter(e -> getYear(e.getCreatedAt()) == year && getQuarter(e.getCreatedAt()) == quarter)
+                    .count();
+
+            UserDTO userDTO = UserDTO.fromEntity(user); // 필요한 정보를 UserDTO에 담음
+            userDTO.setEvaluationCount(evaluationCount); // 분기 내 평가 수를 설정
+
+            if (evaluationCount < prevCount) {
+                i += countSame;
+                userDTO.setRank(i);
+                countSame = 1;
+            } else {
+                userDTO.setRank(i);
+                countSame++;
+            }
+
+            rankList.add(userDTO);
+            prevCount = evaluationCount;
+        }
+        return rankList;
+    }
+
+    private int getYear(LocalDateTime dateTime) {
+        return dateTime.getYear();
+    }
+
+    private int getQuarter(LocalDateTime dateTime) {
+        int month = dateTime.getMonthValue();
+        if (month <= 3) {
+            return 1;
+        } else if (month <= 6) {
+            return 2;
+        } else if (month <= 9) {
+            return 3;
+        } else {
+            return 4;
+        }
+    }
+
+    public void updatePost(PostUpdateDTO postUpdateDTO, Post post) {
+        if (postUpdateDTO.getTitle() != null) post.setPostTitle(postUpdateDTO.getTitle());
+        if (postUpdateDTO.getPostCategory() != null) post.setPostCategory(postUpdateDTO.getPostCategory());
+        if (postUpdateDTO.getContent() != null) post.setPostBody(postUpdateDTO.getContent());
+    }
 }

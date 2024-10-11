@@ -1,6 +1,8 @@
 package com.kustaurant.restauranttier.tab4_community.service;
 
 import com.kustaurant.restauranttier.common.exception.exception.DataNotFoundException;
+import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
+import com.kustaurant.restauranttier.tab4_community.dto.UserDTO;
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
@@ -17,6 +19,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -300,6 +303,7 @@ public class PostService {
 
         };
     }
+
 
 
 }

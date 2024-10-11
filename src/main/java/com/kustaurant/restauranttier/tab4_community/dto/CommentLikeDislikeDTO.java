@@ -1,5 +1,6 @@
 package com.kustaurant.restauranttier.tab4_community.dto;
 
+import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,9 @@ public class CommentLikeDislikeDTO {
         this.dislikeCount = totalDislikeCount;
         this.commentLikeStatus = commentLikeStatus;
     }
-
+    public static CommentLikeDislikeDTO toCommentLikeDislikeDTO(PostComment postComment, int commentLikeStatus){
+        return new CommentLikeDislikeDTO(postComment.getLikeCount(),
+                postComment.getDislikeUserList().size(),commentLikeStatus);
+    }
 
 }
