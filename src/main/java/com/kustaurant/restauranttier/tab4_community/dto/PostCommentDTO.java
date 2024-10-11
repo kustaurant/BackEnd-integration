@@ -37,13 +37,13 @@ public class PostCommentDTO {
     private Boolean isLiked = false;
     @Schema(description = "나의 댓글인지의 여부", example = "false")
     private Boolean isCommentMine = false;
-    @Schema(description = "작성 유저", example = "false")
-    User user;
+    @Schema(description = "작성 유저")
+    UserDTO user;
     public PostCommentDTO(Integer commentId, String commentBody, String status, User user,Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
         this.commentId = commentId;
         this.commentBody = commentBody;
         this.status = status;
-        this.user = user;
+        this.user = UserDTO.fromEntity(user);
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
         this.timeAgo = timeAgo;

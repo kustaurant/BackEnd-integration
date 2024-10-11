@@ -5,7 +5,11 @@ import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExist
 import com.kustaurant.restauranttier.tab4_community.entity.Post;
 import com.kustaurant.restauranttier.tab4_community.entity.PostComment;
 import com.kustaurant.restauranttier.tab4_community.dto.PostDTO;
+import com.kustaurant.restauranttier.tab4_community.entity.PostPhoto;
+import com.kustaurant.restauranttier.tab4_community.entity.PostScrap;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
+import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
+import com.kustaurant.restauranttier.tab4_community.repository.PostPhotoApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostScrapApiRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
@@ -16,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -29,6 +34,8 @@ public class PostApiService {
     private final PostApiRepository postApiRepository;
     private final UserRepository userRepository;
     private final PostScrapApiRepository postScrapApiRepository;
+    private final PostCommentApiRepository postCommentApiRepository;
+    private final PostPhotoApiRepository postPhotoApiRepository;
     // 인기순 제한 기준 숫자
     public static  final int POPULARCOUNT = 3;
     // 페이지 숫자
@@ -322,6 +329,49 @@ public class PostApiService {
         }
         return post.getUser().equals(user);
     }
+    // post Id 유효성 검사
+    public void validatePostId(Integer postId) {
+        if (postId <= 0) {
+            throw new IllegalArgumentException("잘못된 게시글 ID입니다.");
+        }
+    }
+    // 게시글 삭제
+    public void deletePost(Integer postId, Integer userId) {
+        Post post = getPost(postId);
+        if (!post.getUser().getUserId().equals(userId)) {
+            throw new AccessDeniedException("해당 게시글에 대한 권한이 없습니다.");
+        }
+        deleteComments(post);
+        deleteScraps(post);
+        deletePhotos(post);
+        post.setStatus("DELETED");
+        postApiRepository.save(post);
+    }
+
+    private void deleteComments(Post post) {
+        List<PostComment> comments = post.getPostCommentList();
+        for (PostComment comment : comments) {
+            comment.setStatus("DELETED");
+            for (PostComment reply : comment.getRepliesList()) {
+                reply.setStatus("DELETED");
+            }
+            postCommentApiRepository.save(comment);
+        }
+    }
+
+    private void deleteScraps(Post post) {
+        List<PostScrap> scraps = post.getPostScrapList();
+        postScrapApiRepository.deleteAll(scraps);
+    }
+
+    private void deletePhotos(Post post) {
+        List<PostPhoto> photos = post.getPostPhotoList();
+        if (photos != null) {
+            postPhotoApiRepository.deleteAll(photos);
+            post.setPostPhotoList(null); // 기존 사진과의 연결 해제
+        }
+    }
+
 
 
 }

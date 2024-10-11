@@ -102,10 +102,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "500", description = "서버에서 오류가 발생했습니다", content = @Content(mediaType = "apllication/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id", example = "69") Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
-        // 잘못된 요청을 처리 (예: 음수 ID)
-        if (postId <= 0) {
-            throw new IllegalArgumentException("잘못된 게시글 ID입니다.");
-        }
+        postApiService.validatePostId(postId);
         User user = userService.findUserById(userId);
         // 게시글 조회
         Post post = postApiService.getPost(postId);
@@ -197,39 +194,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "500", description = "서버 오류로 인해 삭제에 실패하였습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> postDelete(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
-
-        Post post = postApiService.getPost(postId);
-
-
-        if (!post.getUser().getUserId().equals(userId)) {
-            throw new AccessDeniedException("해당 게시글에 대한 권한이 없습니다.");
-        }
-
-        // 게시글과 관련된 댓글들 상태 변경
-        List<PostComment> comments = post.getPostCommentList();
-        for (PostComment comment : comments) {
-            comment.setStatus("DELETED");
-            // 대댓글 삭제
-            for (PostComment reply : comment.getRepliesList()) {
-                reply.setStatus("DELETED");
-            }
-        }
-
-        // 게시글과 관련된 스크랩 정보 삭제
-        List<PostScrap> scraps = post.getPostScrapList();
-        postScrapApiRepository.deleteAll(scraps);
-
-        // 게시글과 관련된 사진 삭제
-        List<PostPhoto> existingPhotos = post.getPostPhotoList();
-        if (existingPhotos != null) {
-            postPhotoApiRepository.deleteAll(existingPhotos);
-            post.setPostPhotoList(null); // 기존 리스트 연결 해제
-        }
-
-        // 게시글 상태를 삭제로 변경
-        post.setStatus("DELETED");
-
-        // 204 No Content 반환 (삭제 성공)
+        postApiService.deletePost(postId, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -356,7 +321,7 @@ public class CommunityApiController {
             postApiService.create(post, user);
 
             // 이미지 파일 처리
-            handleImageUpload(post, postUpdateDTO.getImageFile());
+            storageApiService.handleImageUpload(post, postUpdateDTO.getImageFile());
 
             // 게시글 저장
             postApiRepository.save(post);
@@ -417,7 +382,7 @@ public class CommunityApiController {
             if (postUpdateDTO.getContent() != null) post.setPostBody(postUpdateDTO.getContent());
 
             // 이미지 파일 처리
-            handleImageUpload(post, postUpdateDTO.getImageFile());
+            storageApiService.handleImageUpload(post, postUpdateDTO.getImageFile());
 
             // 게시글 저장
             postApiRepository.save(post);
@@ -515,13 +480,5 @@ public class CommunityApiController {
         }
     }
 
-    private void handleImageUpload(Post post, String imageUrl) throws IOException {
-        if (imageUrl != null) {
-            PostPhoto postPhoto = new PostPhoto(imageUrl, "ACTIVE");
-            postPhoto.setPost(post);
-            post.getPostPhotoList().clear();  // 기존 이미지를 제거하고 새로운 이미지를 추가
-            post.getPostPhotoList().add(postPhoto);
-            postPhotoApiRepository.save(postPhoto);
-        }
-    }
+
 }
