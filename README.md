@@ -4,6 +4,7 @@
 </p>
 <p align="middle" >건국대학교 대표 맛집 확인서비스</p>
 <p align="middle" ><strong>'티어'</strong> 로 맛집확인, <strong>'뽑기'</strong> 로 맛집추천, <strong>'제휴서비스'</strong> 로 혜택맛집을 한눈에 알아보자!</p>
+<a href="https://kustaurant.com/"><p align="middle" >쿠스토랑 웹사이트 바로가기</p></a>
 <div align="center">
     <a href="https://play.google.com/store/apps/details?id=com.kust.kustaurant">
         <img src="https://github.com/user-attachments/assets/9c5549f2-4a3b-4b32-8577-3399a3016c9c" width="100">
