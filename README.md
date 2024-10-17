@@ -26,6 +26,8 @@
 
 소개 페이지 확인해보기 -> https://leeward-foam-2c2.notion.site/11e5483fde8a80a9889af04812a85f49?pvs=74
 
+투데이건국 인터뷰 -> https://blog.naver.com/PostView.naver?blogId=dreamkonkuk&logNo=223479201690&categoryNo=8&parentCategoryNo=8&from=thumbnailList
+
 <br>
 
 ## 📁 레포지토리
