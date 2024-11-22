@@ -24,9 +24,9 @@
 그래서 만들었습니다.
 그 어떤 서비스보다도 건국대 한정해서는 편리하고 직관적이게 맛집 관련 정보를 유저들에게 제공해보자.
 
-소개 페이지 확인해보기 -> https://leeward-foam-2c2.notion.site/11e5483fde8a80a9889af04812a85f49?pvs=74
+소개 페이지 확인해보기 -> <a href="https://leeward-foam-2c2.notion.site/11e5483fde8a80a9889af04812a85f49?pvs=74"> 노션 페이지로 이동 </a>
 
-투데이건국 인터뷰 -> https://blog.naver.com/PostView.naver?blogId=dreamkonkuk&logNo=223479201690&categoryNo=8&parentCategoryNo=8&from=thumbnailList
+투데이건국 인터뷰 -> <a href="https://blog.naver.com/PostView.naver?blogId=dreamkonkuk&logNo=223479201690&categoryNo=8&parentCategoryNo=8&from=thumbnailList"> 투데이건국 블로그 이동 </a>
 
 <br>
 
