@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.kustaurant'
 // 배포 버젼 (여기서 번경해야 버젼 바뀜)
-version = '0.0.3-SNAPSHOT'
+version = '0.0.4-SNAPSHOT'
 // 배포 자바 버젼 ( 서버컴퓨터의 자바버전)
 java {
 	sourceCompatibility = '17'
