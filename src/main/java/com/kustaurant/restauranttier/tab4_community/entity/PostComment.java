@@ -28,6 +28,7 @@ public class PostComment {
     List<PostComment> repliesList = new ArrayList<>();
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    // 웹 버전을 위한 totallikeCount 를 말함. 모바일에선 사용하지 않음
     Integer likeCount=0;
 
     public PostComment(String commentBody, String status, LocalDateTime createdAt, Post post, User user) {

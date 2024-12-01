@@ -19,9 +19,9 @@ public class CommentLikeDislikeDTO {
         this.dislikeCount = totalDislikeCount;
         this.commentLikeStatus = commentLikeStatus;
     }
-    public static CommentLikeDislikeDTO toCommentLikeDislikeDTO(PostComment postComment, int commentLikeStatus){
-        return new CommentLikeDislikeDTO(postComment.getLikeCount(),
-                postComment.getDislikeUserList().size(),commentLikeStatus);
+
+    public static CommentLikeDislikeDTO toCommentLikeDislikeDTO(PostComment postComment, int commentLikeStatus) {
+        return new CommentLikeDislikeDTO(postComment.getLikeUserList().size(), postComment.getDislikeUserList().size(), commentLikeStatus);
     }
 
 }

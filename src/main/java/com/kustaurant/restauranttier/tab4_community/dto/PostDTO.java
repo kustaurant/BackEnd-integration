@@ -60,7 +60,8 @@ public class PostDTO {
         dto.setUpdatedAt(post.getUpdatedAt());
         dto.setLikeCount(post.getLikeCount());
         dto.setUser(UserDTO.fromEntity(post.getUser()));
-        dto.setCommentCount(post.getPostCommentList().size());
+        int commentCount = post.getPostCommentList().stream().filter(c -> c.getStatus().equals("ACTIVE")).toList().size();
+        dto.setCommentCount(commentCount);
         dto.setTimeAgo(post.calculateTimeAgo());
         if(!post.getPostPhotoList().isEmpty()){
             dto.setPostPhotoImgUrl(post.getPostPhotoList().get(0).getPhotoImgUrl());
