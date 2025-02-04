@@ -42,8 +42,8 @@ public class JwtUtil {
         return generateToken(userId, refreshTokenExpiration);
     }
 
-    // 테스트용 10초짜리 액세스 토큰 생성
-    public String generateYOLOAccessToken(Integer userId) {
+    // 테스트용 10초짜리 토큰 생성
+    public String generateYOLOToken(Integer userId) {
         return generateToken(userId, 10000); // 10초 = 1000밀리초
     }
 

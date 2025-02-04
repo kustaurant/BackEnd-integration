@@ -146,11 +146,11 @@ public class UserApiLoginController {
 
     //7
     @Operation(
-            summary = "기간이 만료된 액세스토큰을 받는 API입니다. (테스트용)",
+            summary = "[테스트용] 기간이 만료된 액세스토큰을 받는 API입니다. (expired Access Token)",
             description = "만료기간이 10초짜리인 액세스 토큰을 발급받습니다."
     )
-    @PostMapping("/auth/YOLO")
-    public ResponseEntity<?> testForOneSecToken(
+    @PostMapping("/auth/test/expACT") // test with expired access token
+    public ResponseEntity<?> testWithExpiredACT(
             @RequestHeader("Authorization") String accessToken
     ) {
         if (accessToken.startsWith("Bearer ")) {
@@ -159,6 +159,25 @@ public class UserApiLoginController {
 
         String newAccessToken = userApiLoginService.yoloAccessToken(accessToken);
         TokenResponse tokenResponse = new TokenResponse(newAccessToken);
+
+        return ResponseEntity.ok(tokenResponse);
+    }
+
+    //8
+    @Operation(
+            summary = "[테스트용]기간이 만료된 리프레시토큰을 받는 API입니다. (expired Refresh Token)",
+            description = "만료기간이 10초짜리인 리프레시 토큰을 발급받습니다."
+    )
+    @PostMapping("/auth/test/expRFT") // test with expired refresh token
+    public ResponseEntity<?> testWithExpiredRFT(
+            @RequestHeader("Authorization") String accessToken
+    ) {
+        if (accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+
+        String newRefreshToken = userApiLoginService.yoloRefreshToken(accessToken);
+        TokenResponse tokenResponse = new TokenResponse(newRefreshToken);
 
         return ResponseEntity.ok(tokenResponse);
     }
