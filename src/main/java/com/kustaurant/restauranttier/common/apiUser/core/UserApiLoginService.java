@@ -60,6 +60,9 @@ public class UserApiLoginService {
                     .createdAt(LocalDateTime.now())
                     .userRole(UserRole.USER)
                     .build();
+
+            // 회원가입 시에 DB에 저장해서 userId를 초기화함.
+            userRepository.save(user);
         }
 
         String newRefreshToken = jwtUtil.generateRefreshToken(user.getUserId());
