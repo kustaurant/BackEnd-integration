@@ -248,6 +248,7 @@ public class MypageApiService {
 
         return scrappedPosts.stream()
                 .map(scrap -> new MypagePostDTO(
+                        scrap.getPost().getPostId(),
                         scrap.getPost().getPostCategory(),
                         scrap.getPost().getPostTitle(),
                         scrap.getPost().getPostBody().length() > 20 ? scrap.getPost().getPostBody().substring(0, 20) : scrap.getPost().getPostBody(),
