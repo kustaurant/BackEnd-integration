@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MypagePostDTO {
+    private Integer postId;
     private String postCategory;
     private String postTitle;
     private String postBody;

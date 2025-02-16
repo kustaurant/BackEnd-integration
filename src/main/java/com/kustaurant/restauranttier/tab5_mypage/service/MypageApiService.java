@@ -229,6 +229,7 @@ public class MypageApiService {
 
         return activePosts.stream()
                 .map(post -> new MypagePostDTO(
+                        post.getPostId(),
                         post.getPostCategory(),
                         post.getPostTitle(),
                         post.getPostBody().length() > 20 ? post.getPostBody().substring(0, 20) : post.getPostBody(),
@@ -266,6 +267,7 @@ public class MypageApiService {
         // 데이터를 DTO 로 변환
         return commentedPosts.stream()
                 .map(comment -> new MypagePostCommentDTO(
+                        comment.getPost().getPostId(),
                         comment.getPost().getPostCategory(),
                         comment.getPost().getPostTitle(),
                         comment.getCommentBody().length() > 20 ? comment.getCommentBody().substring(0, 20) : comment.getCommentBody(),

@@ -139,7 +139,7 @@ public class MypageApiController {
     }
 
 
-    //5
+    //5 커뮤니티
     @Operation(
             summary = "\"내가 작성한 커뮤니티글 화면\" 로드에 필요한 정보 불러오기",
             description = "유저가 작성한 커뮤니티 글 리스트 정보들을 불러옵니다."
@@ -169,8 +169,8 @@ public class MypageApiController {
     }
 
 
-    //7
-    @Operation( //---------------------------------------------------------------//
+    //7 커뮤니티
+    @Operation(
             summary = "\"내가 저장한 커뮤니티 게시글 화면\" 로드에 필요한 정보 불러오기",
             description = "유저가 저장해놓은 커뮤니티 게시글 리스트 정보들을 불러옵니다."
     )
@@ -184,7 +184,7 @@ public class MypageApiController {
     }
 
 
-    //8
+    //8 커뮤니티
     @Operation(
             summary = "\"내가 작성한 커뮤니티 댓글 화면\" 로드에 필요한 정보 불러오기",
             description = "유저가 작성한 커뮤니티의 댓글 리스트들을 불러옵니다."
