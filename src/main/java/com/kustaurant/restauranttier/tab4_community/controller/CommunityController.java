@@ -267,9 +267,6 @@ public class CommunityController {
         return ResponseEntity.ok(response);
     }
 
-
-    // 게시글 작성 화면 관련
-
     // 커뮤니티 게시글 작성 화면
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/community/write")
@@ -319,11 +316,8 @@ public class CommunityController {
     //게시글 수정화면
     @GetMapping("/community/post/update")
     public String postUpdatePage(@RequestParam String postId, Model model) {
-        logger.info(postId);
         Post post = postService.getPost(Integer.valueOf(postId));
         model.addAttribute("post", post);
-        logger.info(post.toString());
-
         return "community_update";
     }
 
@@ -336,8 +330,6 @@ public class CommunityController {
             @RequestParam String postCategory,
             @RequestParam String content
     ) {
-
-
         Post post = postService.getPost(Integer.valueOf(postId));
         // 기존 연관된 사진 정보 삭제
         List<PostPhoto> existingPhotos = post.getPostPhotoList();
