@@ -11,6 +11,7 @@ public class MypagePostDTO {
     private Integer postId;
     private String postCategory;
     private String postTitle;
+    private String postImgUrl;
     private String postBody;
     private Integer likeCount;
     private Integer commentCount;

@@ -11,5 +11,5 @@ public class MypageMainDTO {
     private String iconImgUrl;
     private String nickname;
     private int evaluationCount;
-    private int favoriteCount;
+    private int PostCount;
 }
