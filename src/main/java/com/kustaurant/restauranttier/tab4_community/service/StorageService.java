@@ -19,7 +19,7 @@ public class StorageService {
     @Autowired
     private AmazonS3Client amazonS3Client;
     // 아마존 s3에 이미지 저장하는 함수
-    public String storeImage(MultipartFile file) throws IOException {
+    public String storeImage(MultipartFile file) {
         try {
             String folderPath = "community/"; // 새 폴더 경로
             String fileName = folderPath + file.getOriginalFilename();

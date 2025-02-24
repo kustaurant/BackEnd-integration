@@ -53,9 +53,6 @@ public class CommunityController {
     private final PostPhotoRepository postPhotoRepository;
     private final StorageService storageService;
 
-    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
-
-
     // 커뮤니티 메인 화면
     @GetMapping("/community")
     public String community(

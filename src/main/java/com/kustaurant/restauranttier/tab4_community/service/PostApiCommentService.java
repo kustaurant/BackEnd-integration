@@ -33,18 +33,13 @@ public class PostApiCommentService {
     private final PostApiRepository postApiRepository;
     private final PostApiService postApiService;
     private final UserService userService;
+
     // 댓글 생성
     public void create(Post post, User user, PostComment postComment) {
         user.getPostCommentList().add(postComment);
         post.getPostCommentList().add(postComment);
         userRepository.save(user);
         postApiRepository.save(post);
-    }
-
-    // 대댓글 생성
-    public void replyCreate(User user, PostComment postComment) {
-        user.getPostCommentList().add(postComment);
-        userRepository.save(user);
     }
 
     // 댓글 조회
@@ -135,40 +130,6 @@ public class PostApiCommentService {
     }
 
 
-    public List<PostComment> getList(Integer postId, String sort) {
-        Post post = postApiService.getPost(postId);
-        Specification<PostComment> spec = getSpecByPostId(post);
-        List<PostComment> postCommentList = postCommentApiRepository.findAll(spec);
-        if (sort.equals("popular")) {
-            postCommentList.sort(Comparator.comparingInt(PostComment::getLikeCount).reversed());
-        } else {
-            postCommentList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
-
-        }
-        return postCommentList;
-    }
-
-    private Specification<PostComment> getSpecByPostId(Post post) {
-        return new Specification<>() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public Predicate toPredicate(Root<PostComment> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                query.distinct(true);  // 중복을 제거
-                Predicate postIdPredicate = cb.equal(p.get("post"), post);
-                Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
-
-
-                return cb.and(statusPredicate, postIdPredicate);
-
-
-            }
-
-
-        };
-    }
-
-
     // 해당 댓글을 해당 유저가 좋아요를 눌렀는지 여부
     public boolean isLiked(PostComment postComment, User user) {
         if (user == null || postComment == null) {
@@ -248,7 +209,6 @@ public class PostApiCommentService {
     }
 
 
-
     public PostDTO createPostDTOWithFlags(Post post, User user) {
         // PostDTO 생성 및 post의 flag 설정
         PostDTO postDTO = PostDTO.fromEntity(post);
@@ -270,6 +230,7 @@ public class PostApiCommentService {
 
         return postDTO;
     }
+
     // 댓글 삭제
     public void deleteComment(Integer commentId, Integer userId) {
         PostComment postComment = getPostCommentByCommentId(commentId);
@@ -287,6 +248,7 @@ public class PostApiCommentService {
         PostComment postComment = new PostComment(content, PostStatus.ACTIVE.name(), LocalDateTime.now(), post, user);
         return postCommentApiRepository.save(postComment);
     }
+
     // 대댓글 생성
     public void processParentComment(PostComment postComment, String parentCommentId) {
         PostComment parentComment = getPostCommentByCommentId(Integer.valueOf(parentCommentId));

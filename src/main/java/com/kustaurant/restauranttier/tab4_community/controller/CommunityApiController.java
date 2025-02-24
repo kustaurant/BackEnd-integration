@@ -50,12 +50,7 @@ public class CommunityApiController {
     private final PostApiCommentService postApiCommentService;
     private final PostScrapApiService postScrapApiService;
     private final StorageApiService storageApiService;
-    private final PostScrapApiRepository postScrapApiRepository;
-    private final PostPhotoApiRepository postPhotoApiRepository;
-    private final UserRepository userRepository;
-    private final PostCommentApiRepository postCommentApiRepository;
     private final PostApiRepository postApiRepository;
-
     private final UserService userService;
 
     // 커뮤니티 메인 화면

@@ -101,36 +101,6 @@ public class PostApiService {
         userRepository.save(user);
     }
 
-    // 게시물 리스트에 대한 시간 경과 리스트로 반환하는 함수.
-    public List<String> getTimeAgoList(Page<PostDTO> postList) {
-        LocalDateTime now = LocalDateTime.now();
-
-        // postList의 createdAt 필드를 문자열 형식으로 만들어 timeAgoList에 할당
-        List<String> timeAgoList = postList.stream()
-                .map(post -> {
-                    LocalDateTime createdAt = post.getCreatedAt();
-                    // datetime 타입의 createdAt을 string 타입으로 변환해주는 함수
-                    return timeAgo(now, createdAt);
-                })
-                .collect(Collectors.toList());
-        return timeAgoList;
-
-    }
-
-    // 작성글이나 댓글이 만들어진지 얼마나 됐는지 계산하는 함수
-    public String timeAgo(LocalDateTime now, LocalDateTime past) {
-        long minutes = Duration.between(past, now).toMinutes();
-        if (minutes < 60) {
-            return minutes + "분 전";
-        }
-        long hours = minutes / 60;
-        if (hours < 24) {
-            return hours + "시간 전";
-        }
-        long days = hours / 24;
-        return days + "일 전";
-    }
-
     // 조회수 증가
     public void increaseVisitCount(Post post) {
         int visitCount = post.getPostVisitCount();
@@ -254,51 +224,6 @@ public class PostApiService {
         };
     }
 
-    // flags들 추가하여  PostDTO 생성
-    public PostDTO createPostDTOWithFlags(Post post, User user) {
-        PostDTO postDTO = PostDTO.fromEntity(post);
-        if (user != null) {
-            // 각 글에 대해 좋아요, 스크랩, 나의 글인지 여부 계산
-            boolean isLiked = isLiked(post, user);
-            boolean isScraped = isScraped(post, user);
-            boolean isPostMine = isPostMine(post, user);
-            postDTO.setIsliked(isLiked);
-            postDTO.setIsScraped(isScraped);
-            postDTO.setIsPostMine(isPostMine);
-        }
-
-
-        return postDTO;
-    }
-
-    ;
-
-    // 해당 글을 유저가 좋아요를 눌렀는지의 여부
-    public boolean isLiked(Post post, User user) {
-        if (user == null || post == null) {
-            return false;
-        }
-        return post.getLikeUserList().stream()
-                .anyMatch(likeUser -> likeUser.equals(user));
-    }
-
-    // 해당 글을 해당 유저가 싫어요를 눌렀는지의 여부
-    public boolean isScraped(Post post, User user) {
-        if (user == null || post == null) {
-            return false;
-        }
-        return post.getDislikeUserList().stream()
-                .anyMatch(dislikeUser -> dislikeUser.equals(user));
-    }
-
-    // 해당 글의 작성자인지 여부
-    public boolean isPostMine(Post post, User user) {
-        if (user == null || post == null) {
-            return false;
-        }
-        return post.getUser().equals(user);
-    }
-
     // post Id 유효성 검사
     public void validatePostId(Integer postId) {
         if (postId <= 0) {
@@ -380,7 +305,6 @@ public class PostApiService {
 
     private List<UserDTO> calculateRank(List<User> userList) {
         List<UserDTO> rankList = new ArrayList<>();
-
         int i = 0;
         int prevCount = 100000; // 이전 유저의 평가 개수
         int countSame = 1; // 동일 순위를 세기 위한 변수
@@ -411,9 +335,7 @@ public class PostApiService {
         int countSame = 1; // 동일 순위를 세기 위한 변수
         for (User user : userList) {
             // 특정 분기의 평가 수 계산
-            int evaluationCount = (int) user.getEvaluationList().stream()
-                    .filter(e -> getYear(e.getCreatedAt()) == year && getQuarter(e.getCreatedAt()) == quarter)
-                    .count();
+            int evaluationCount = (int) user.getEvaluationList().stream().filter(e -> getYear(e.getCreatedAt()) == year && getQuarter(e.getCreatedAt()) == quarter).count();
 
             UserDTO userDTO = UserDTO.fromEntity(user); // 필요한 정보를 UserDTO에 담음
             userDTO.setEvaluationCount(evaluationCount); // 분기 내 평가 수를 설정

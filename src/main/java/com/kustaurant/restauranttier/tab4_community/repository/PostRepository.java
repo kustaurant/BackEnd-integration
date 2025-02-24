@@ -10,13 +10,11 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface PostRepository extends JpaRepository<Post, Integer>{
-    Post findByPostTitle(String title);
-
-    Page<Post> findByPostCategory( String postCategory,Pageable pageable);
-
+public interface PostRepository extends JpaRepository<Post, Integer> {
     Page<Post> findAll(Specification<Post> spec, Pageable pageable);
+
     Page<Post> findAll(Pageable pageable);
+
     Page<Post> findByStatus(String status, Pageable pageable);
 
     @Query("SELECT p FROM Post p WHERE p.user.userId = :userId AND p.status = 'ACTIVE'")
