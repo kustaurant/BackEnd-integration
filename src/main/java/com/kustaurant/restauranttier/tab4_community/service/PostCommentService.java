@@ -50,21 +50,6 @@ public class PostCommentService {
         }
     }
 
-//    // 작성 시간 반환
-//    public List<String> getCreatedAtList(List<PostComment> postCommentList) {
-//        // Comment의 createdAt을 문자열로 변환하여 저장할 리스트
-//        List<String> commentCreatedAtList = postCommentList.stream()
-//                .map(comment -> formatDateTime(comment.getCreatedAt()))
-//                .collect(Collectors.toList());
-//        return commentCreatedAtList;
-//    }
-//
-//    // datetime 타입의 시간을 특정 형식으로 formatting하는 함수
-//    private String formatDateTime(LocalDateTime dateTime) {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        return dateTime.format(formatter);
-//    }
-
     // 댓글 좋아요 (세가지 경우)
     public Map<String, Object> likeCreateOrDelete(PostComment postcomment, User user) {
         List<User> likeUserList = postcomment.getLikeUserList();

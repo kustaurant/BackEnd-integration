@@ -17,7 +17,7 @@ public class UserDTO {
     @Schema(description="유저의 랭킹",example = "2")
 
     Integer Rank;
-    public static UserDTO fromEntity(User user) {
+    public static UserDTO convertUserToUserDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setUserNickname(user.getUserNickname());
         dto.setRankImg(user.getRankImg());
