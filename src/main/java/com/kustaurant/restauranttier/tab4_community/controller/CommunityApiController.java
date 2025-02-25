@@ -4,22 +4,16 @@ package com.kustaurant.restauranttier.tab4_community.controller;
 import com.kustaurant.restauranttier.common.UserService;
 import com.kustaurant.restauranttier.common.apiUser.customAnno.JwtToken;
 import com.kustaurant.restauranttier.common.exception.ErrorResponse;
-import com.kustaurant.restauranttier.common.exception.exception.OptionalNotExistException;
 import com.kustaurant.restauranttier.common.exception.exception.ServerException;
 import com.kustaurant.restauranttier.tab4_community.dto.*;
 import com.kustaurant.restauranttier.tab4_community.entity.*;
 import com.kustaurant.restauranttier.tab4_community.etc.PostCategory;
-import com.kustaurant.restauranttier.tab4_community.etc.PostStatus;
-import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRepository;
-import com.kustaurant.restauranttier.tab4_community.repository.PostPhotoApiRepository;
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
-import com.kustaurant.restauranttier.tab4_community.repository.PostScrapApiRepository;
 import com.kustaurant.restauranttier.tab4_community.service.PostApiCommentService;
 import com.kustaurant.restauranttier.tab4_community.service.PostScrapApiService;
 import com.kustaurant.restauranttier.tab4_community.service.PostApiService;
 import com.kustaurant.restauranttier.tab4_community.service.StorageApiService;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
-import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -32,13 +26,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -245,7 +237,7 @@ public class CommunityApiController {
             postApiService.create(post, user);
             storageApiService.handleImageUpload(post, postUpdateDTO.getImageFile());
             postApiRepository.save(post);
-            return ResponseEntity.ok(PostDTO.fromEntity(post));
+            return ResponseEntity.ok(PostDTO.convertPostToPostDTO(post));
         } catch (IOException e) {
             throw new ServerException("이미지 처리 과정에서 오류가 발생했습니다.", e);
         } catch (Exception e) {

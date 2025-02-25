@@ -12,12 +12,7 @@ import com.kustaurant.restauranttier.tab4_community.repository.PostCommentApiRep
 import com.kustaurant.restauranttier.tab4_community.repository.PostApiRepository;
 import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -184,7 +179,7 @@ public class PostApiCommentService {
 
     // flags들 추가하여  PostComment DTO 생성
     public PostCommentDTO createPostCommentDTOWithFlags(PostComment postComment, User user) {
-        PostCommentDTO postCommentDTO = PostCommentDTO.fromEntity(postComment);
+        PostCommentDTO postCommentDTO = PostCommentDTO.convertPostCommentToPostCommentDTO(postComment);
         if (user != null) {
             // 각 댓글에 대해 좋아요, 싫어요, 나의 댓글인지 여부 계산
             boolean isLiked = isLiked(postComment, user);
@@ -211,7 +206,7 @@ public class PostApiCommentService {
 
     public PostDTO createPostDTOWithFlags(Post post, User user) {
         // PostDTO 생성 및 post의 flag 설정
-        PostDTO postDTO = PostDTO.fromEntity(post);
+        PostDTO postDTO = PostDTO.convertPostToPostDTO(post);
         if (user != null) {
             postDTO.setIsPostMine(isPostMine(post, user));
             postDTO.setIsliked(isLiked(post, user));

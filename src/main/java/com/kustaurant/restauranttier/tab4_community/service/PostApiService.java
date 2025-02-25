@@ -26,11 +26,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,13 +51,13 @@ public class PostApiService {
                 sorts.add(Sort.Order.desc("createdAt"));
                 Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
                 Page<Post> posts = this.postApiRepository.findByStatus("ACTIVE", pageable);
-                return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
+                return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
             } else if (sort.equals("popular")) {
                 sorts.add(Sort.Order.desc("createdAt"));
                 Specification<Post> spec = getSpecByPopularOver5();
                 Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
                 Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
-                return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
+                return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
             } else {
                 throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
             }
@@ -70,7 +68,7 @@ public class PostApiService {
             Specification<Post> spec = getSpecByCategoryAndPopularOver5(koreanCategory, sort);
             //spec의 인기순으로 먼저 정렬, 그다음 pageable의 최신순으로 두번째 정렬 기준 설정
             Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
-            return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
+            return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
         }
 
     }
@@ -82,7 +80,7 @@ public class PostApiService {
         Specification<Post> spec = search(kw, postCategory, sort);
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
         Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
-        return posts.map(PostDTO::fromEntity);  // Post 엔티티를 PostDTO로 변환
+        return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
     }
 
     public Post getPost(Integer id) {
@@ -310,7 +308,7 @@ public class PostApiService {
         int countSame = 1; // 동일 순위를 세기 위한 변수
         for (User user : userList) {
             int evaluationCount = user.getEvaluationList().size();
-            UserDTO userDTO = UserDTO.fromEntity(user); // 필요한 정보를 UserDTO에 담음
+            UserDTO userDTO = UserDTO.convertUserToUserDTO(user); // 필요한 정보를 UserDTO에 담음
 
             if (evaluationCount < prevCount) {
                 i += countSame;
@@ -337,7 +335,7 @@ public class PostApiService {
             // 특정 분기의 평가 수 계산
             int evaluationCount = (int) user.getEvaluationList().stream().filter(e -> getYear(e.getCreatedAt()) == year && getQuarter(e.getCreatedAt()) == quarter).count();
 
-            UserDTO userDTO = UserDTO.fromEntity(user); // 필요한 정보를 UserDTO에 담음
+            UserDTO userDTO = UserDTO.convertUserToUserDTO(user); // 필요한 정보를 UserDTO에 담음
             userDTO.setEvaluationCount(evaluationCount); // 분기 내 평가 수를 설정
 
             if (evaluationCount < prevCount) {
