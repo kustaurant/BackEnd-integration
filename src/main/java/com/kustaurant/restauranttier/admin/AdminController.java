@@ -33,7 +33,7 @@ public class AdminController {
     }
 
     // 관리자 화면 - 식당 수정 화면 로드
-    @GetMapping("/restaurant/{id}/revise")
+    @GetMapping("/restaurants/{id}/revise")
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String reviseRestaurant(
             @PathVariable int id,
@@ -63,7 +63,7 @@ public class AdminController {
     }
 
     // 식당 정보 수정 요청
-    @PostMapping("/restaurant/{id}/revise")
+    @PostMapping("/restaurants/{id}/revise")
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String reviseRestaurant(
             @PathVariable int id,
@@ -82,7 +82,7 @@ public class AdminController {
     }
 
     // 관리자 화면 - 식당 추가 화면 로드
-    @GetMapping("/restaurant/add")
+    @GetMapping("/restaurants/add")
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String addRestaurant(Model model) {
         // model에 데이터 채우기
@@ -102,7 +102,7 @@ public class AdminController {
     }
 
     // 식당 정보 추가 요청
-    @PostMapping("/restaurant/add")
+    @PostMapping("/restaurants/add")
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String addRestaurant(
             @RequestParam MultiValueMap<String, String> dataMap,

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 @Slf4j
@@ -42,6 +44,15 @@ public class AdminService {
             restaurant.setPartnershipInfo(null);
         } else {
             restaurant.setPartnershipInfo(info.getPartnershipInfo());
+        }
+
+        if (restaurant.getCreatedAt() == null) {
+            restaurant.setCreatedAt(LocalDateTime.now());
+        } else {
+            restaurant.setUpdatedAt(LocalDateTime.now());
+        }
+        if (restaurant.getStatus() == null) {
+            restaurant.setStatus("ACTIVE");
         }
     }
 
