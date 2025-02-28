@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // 수정 완료 버튼 리스너 추가
     var form = document.querySelector('form');
     form.addEventListener('submit', function (event) {
+        console.log("submit 진입")
 
         event.preventDefault(); // 폼의 기본 제출 동작을 방지
         var category = form.querySelector('select[name="postCategory"]').value;
@@ -84,9 +85,13 @@ document.addEventListener('DOMContentLoaded', function () {
         formData.append('content', content); // 폼 데이터에 에디터 내용 추가
         formData.append("postId",postId);
 
-
+        var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
         fetch('/api/community/post/update', {
             method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken
+            },
             body: formData
         }).then(response => {
             if (response.redirected)
