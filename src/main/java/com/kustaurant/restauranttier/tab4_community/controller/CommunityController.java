@@ -53,9 +53,6 @@ public class CommunityController {
     private final PostPhotoRepository postPhotoRepository;
     private final StorageService storageService;
 
-    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
-
-
     // 커뮤니티 메인 화면
     @GetMapping("/community")
     public String community(
@@ -96,7 +93,6 @@ public class CommunityController {
             isPostScrappedByUser = post.getPostScrapList().stream()
                     .anyMatch(scrap -> scrap.getUser().equals(user));
         }
-        ;
         model.addAttribute("sort", sort);
         model.addAttribute("isPostScrappedByUser", isPostScrappedByUser);
         return "community_post";

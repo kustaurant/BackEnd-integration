@@ -43,7 +43,7 @@ public class PostCommentDTO {
         this.commentId = commentId;
         this.commentBody = commentBody;
         this.status = status;
-        this.user = UserDTO.fromEntity(user);
+        this.user = UserDTO.convertUserToUserDTO(user);
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
         this.timeAgo = timeAgo;
@@ -52,8 +52,8 @@ public class PostCommentDTO {
         this.repliesList = repliesList;
     }
 
-    public static PostCommentDTO fromEntity(PostComment comment) {
-        return new PostCommentDTO(comment.getCommentId(), comment.getCommentBody(),comment.getStatus(),comment.getUser(), comment.getLikeUserList().size(), comment.getDislikeUserList().size(), comment.calculateTimeAgo(), comment.getCreatedAt(), comment.getUpdatedAt(), comment.getRepliesList().stream().filter(reply -> reply.getStatus().equals("ACTIVE")).sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()).map(PostCommentDTO::fromEntity).toList());
+    public static PostCommentDTO convertPostCommentToPostCommentDTO(PostComment comment) {
+        return new PostCommentDTO(comment.getCommentId(), comment.getCommentBody(),comment.getStatus(),comment.getUser(), comment.getLikeUserList().size(), comment.getDislikeUserList().size(), comment.calculateTimeAgo(), comment.getCreatedAt(), comment.getUpdatedAt(), comment.getRepliesList().stream().filter(reply -> reply.getStatus().equals("ACTIVE")).sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()).map(PostCommentDTO::convertPostCommentToPostCommentDTO).toList());
     }
 
 }
