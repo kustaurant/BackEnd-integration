@@ -37,18 +37,15 @@ public class AdminController {
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String reviseRestaurant(
             @PathVariable int id,
-            Model model
+            Model model,
+            RedirectAttributes redirectAttributes
     ) {
         // 식당 데이터 가져오기
         Optional<RestaurantInfoDto> restaurantInfoDtoOptional = adminService.getRestaurantInfo(id);
         // 식당 데이터가 없을 경우
         if (restaurantInfoDtoOptional.isEmpty()) {
-            model.addAllAttributes(Map.of(
-                    "title", "ERROR",
-                    "content", "error",
-                    "errorMessage", "식당 데이터 조회 또는 변환 과정에서 오류가 발생했습니다."
-            ));
-            return "admin/admin";
+            redirectAttributes.addFlashAttribute("errorMessage", "식당 데이터 조회 또는 변환 과정에서 오류가 발생했습니다.");
+            return "redirect:/admin";
         }
         // 식당 데이터가 있을 경우 model 데이터 채우기
         model.addAllAttributes(Map.of(
@@ -73,7 +70,6 @@ public class AdminController {
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String reviseRestaurant(
             @PathVariable int id,
-            Model model,
             RedirectAttributes redirectAttributes,
             @ModelAttribute RestaurantInfoDto restaurantInfoDto
     ) {
@@ -82,16 +78,11 @@ public class AdminController {
             adminService.updateRestaurantInfo(id, restaurantInfoDto);
         } catch (Exception e) { // 트랜잭션 과정에서 예외 발생 시 오류 페이지
             log.error("[AdminController][reviseRestaurantRequest] {}", e.getMessage(), e);
-            model.addAllAttributes(Map.of(
-                    "title", "ERROR",
-                    "content", "error",
-                    "errorMessage", "식당 정보 갱신 과정에서 오류가 발생했습니다."
-            ));
-            return "admin/admin";
+            redirectAttributes.addFlashAttribute("errorMessage", "식당 정보 갱신 과정에서 오류가 발생했습니다.");
+            return "redirect:/admin";
         }
 
         // 트랜잭션 정상 처리 시, 데이터 채우고 관리자 메인 화면으로
-        // redirect로 데이터를 넘기기 위해 redirectAttributes.addFlashAttribute를 사용함.
         redirectAttributes.addFlashAttribute("successMessage", "식당 데이터 수정이 성공적으로 완료되었습니다.");
         return "redirect:/admin";
     }
@@ -120,7 +111,6 @@ public class AdminController {
     @PostMapping("/restaurant/add")
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String addRestaurant(
-            Model model,
             @RequestParam MultiValueMap<String, String> dataMap,
             RedirectAttributes redirectAttributes
     ) {
@@ -128,15 +118,10 @@ public class AdminController {
             adminService.addRestaurantInfos(dataMap);
         } catch (Exception e) { // 트랜잭션 과정에서 예외 발생 시 오류 페이지
             log.error("[AdminController][addRestaurant] {}", e.getMessage(), e);
-            model.addAllAttributes(Map.of(
-                    "title", "ERROR",
-                    "content", "error",
-                    "errorMessage", "식당 데이터 데이터 과정에서 오류가 발생했습니다."
-            ));
-            return "admin/admin";
+            redirectAttributes.addFlashAttribute("errorMessage", "식당 데이터 저장 과정에서 오류가 발생했습니다.");
+            return "redirect:/admin";
         }
         // 트랜잭션 정상 처리 시, 데이터 채우고 관리자 메인 화면으로
-        // redirect로 데이터를 넘기기 위해 redirectAttributes.addFlashAttribute를 사용함.
         redirectAttributes.addFlashAttribute("successMessage", "식당 데이터 추가가 성공적으로 완료되었습니다.");
         return "redirect:/admin";
     }
