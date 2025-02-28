@@ -58,24 +58,19 @@ public class AdminService {
 
     // 식당 id로 RestaurantInfo 객체 가져오기
     public Optional<RestaurantInfoDto> getRestaurantInfo(int id) {
-        try {
-            Restaurant restaurant = restaurantService.findRestaurantById(id);
-            return Optional.of(new RestaurantInfoDto(
-                    restaurant.getRestaurantName(),
-                    restaurant.getRestaurantType(),
-                    restaurant.getRestaurantCuisine(),
-                    restaurant.getRestaurantAddress(),
-                    restaurant.getRestaurantTel(),
-                    restaurant.getRestaurantUrl(),
-                    restaurant.getRestaurantImgUrl(),
-                    restaurant.getRestaurantPosition(),
-                    restaurant.getPartnershipInfo(),
-                    parseDoubleOrNull(restaurant.getRestaurantLatitude()),
-                    parseDoubleOrNull(restaurant.getRestaurantLongitude())));
-        } catch (Exception e) {
-            log.error("[AdminService][getRestaurantInfo] {}", e.getMessage(), e);
-            return Optional.empty();
-        }
+        Restaurant restaurant = restaurantService.findRestaurantById(id);
+        return Optional.of(new RestaurantInfoDto(
+                restaurant.getRestaurantName(),
+                restaurant.getRestaurantType(),
+                restaurant.getRestaurantCuisine(),
+                restaurant.getRestaurantAddress(),
+                restaurant.getRestaurantTel(),
+                restaurant.getRestaurantUrl(),
+                restaurant.getRestaurantImgUrl(),
+                restaurant.getRestaurantPosition(),
+                restaurant.getPartnershipInfo(),
+                parseDoubleOrNull(restaurant.getRestaurantLatitude()),
+                parseDoubleOrNull(restaurant.getRestaurantLongitude())));
     }
 
     // String을 Double 형으로 바꿀 수 있으면 바꾸고, 못 바꾸면 null 반환

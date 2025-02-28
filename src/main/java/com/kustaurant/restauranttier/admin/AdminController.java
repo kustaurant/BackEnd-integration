@@ -58,6 +58,7 @@ public class AdminController {
         } catch (Exception e) {
             log.error("[AdminController][reviseRestaurant] {}", e.getMessage(), e);
             redirectAttributes.addFlashAttribute("errorMessage", "식당 데이터 조회 또는 변환 과정에서 오류가 발생했습니다.");
+            return "redirect:/admin";
         }
         return "admin/admin";
     }
