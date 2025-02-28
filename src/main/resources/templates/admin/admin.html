@@ -42,6 +42,12 @@
     </section>
 </main>
 
+<!-- ✅ 성공 메시지가 있을 때만 표시 -->
+<div id="success-alert" class="alert alert-success alert-dismissible fade show" th:if="${successMessage}" role="alert">
+    <span th:text="${successMessage}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
 <section th:if="content != null" th:replace="~{admin/admin-fragment :: ${content}}"></section>
 
 <footer th:replace="~{footer::footerFragment}"></footer>

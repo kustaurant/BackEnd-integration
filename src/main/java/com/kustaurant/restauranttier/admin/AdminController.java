@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -73,6 +74,7 @@ public class AdminController {
     public String reviseRestaurant(
             @PathVariable int id,
             Model model,
+            RedirectAttributes redirectAttributes,
             @ModelAttribute RestaurantInfoDto restaurantInfoDto
     ) {
         // 데이터 갱신
@@ -88,11 +90,9 @@ public class AdminController {
             return "admin/admin";
         }
 
-        // 트랜잭션 정상 처리 시, model에 데이터 채우고 관리자 메인 화면으로
-        model.addAllAttributes(Map.of(
-                "title", "메인",
-                "content", "main"
-        ));
+        // 트랜잭션 정상 처리 시, 데이터 채우고 관리자 메인 화면으로
+        // redirect로 데이터를 넘기기 위해 redirectAttributes.addFlashAttribute를 사용함.
+        redirectAttributes.addFlashAttribute("successMessage", "식당 데이터 수정이 성공적으로 완료되었습니다.");
         return "redirect:/admin";
     }
 
@@ -121,7 +121,8 @@ public class AdminController {
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String addRestaurant(
             Model model,
-            @RequestParam MultiValueMap<String, String> dataMap
+            @RequestParam MultiValueMap<String, String> dataMap,
+            RedirectAttributes redirectAttributes
     ) {
         try {
             adminService.addRestaurantInfos(dataMap);
@@ -130,14 +131,13 @@ public class AdminController {
             model.addAllAttributes(Map.of(
                     "title", "ERROR",
                     "content", "error",
-                    "errorMessage", "식당 정보 저장 과정에서 오류가 발생했습니다."
+                    "errorMessage", "식당 데이터 데이터 과정에서 오류가 발생했습니다."
             ));
             return "admin/admin";
         }
-        model.addAllAttributes(Map.of(
-                "title", "메인",
-                "content", "main"
-        ));
+        // 트랜잭션 정상 처리 시, 데이터 채우고 관리자 메인 화면으로
+        // redirect로 데이터를 넘기기 위해 redirectAttributes.addFlashAttribute를 사용함.
+        redirectAttributes.addFlashAttribute("successMessage", "식당 데이터 추가가 성공적으로 완료되었습니다.");
         return "redirect:/admin";
     }
 }

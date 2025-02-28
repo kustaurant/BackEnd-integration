@@ -107,6 +107,6 @@ public class AdminService {
 
         log.info("식당 정보 저장 완료\n{}", info);
 
-//        restaurantService.saveRestaurant(restaurant);
+        restaurantService.saveRestaurant(restaurant);
     }
 }
