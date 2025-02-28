@@ -2,7 +2,7 @@
 <article id="adminMain" th:fragment="main">
     <div class="admin-container">
         <div class="section">
-            <button onclick="location.href='/admin/restaurant/add'" class="button">식당 추가</button>
+            <button onclick="location.href='/admin/restaurants/add'" class="button">식당 추가</button>
         </div>
 
         <div class="section">
@@ -17,7 +17,7 @@
         document.getElementById('editRestaurantBtn').addEventListener('click', function() {
             const restaurantId = document.getElementById('restaurantId').value;
             if (restaurantId) {
-                window.location.href = `/admin/restaurant/${restaurantId}/revise`;
+                window.location.href = `/admin/restaurants/${restaurantId}/revise`;
             } else {
                 alert('식당 ID를 입력해주세요.');
             }
@@ -28,7 +28,7 @@
 <!--관리자 식당 정보 수정 html fragment-->
 <article id="adminRevise" th:fragment="revise-restaurant">
     <div class="admin-container">
-        <form id="restaurantForm" th:action="'/admin/restaurant/' + ${id} + '/revise'" method="post">
+        <form id="restaurantForm" th:action="'/admin/restaurants/' + ${id} + '/revise'" method="post">
             <div class="section">
                 <div class="input-group">
                     <label for="name">식당 이름 _필수</label>
@@ -80,7 +80,7 @@
 <!--관리자 식당 추가 html fragment-->
 <article id="adminAdd" th:fragment="add-restaurant">
     <div class="admin-container">
-        <form id="restaurantAddForm" th:action="'/admin/restaurant/add'" method="post">
+        <form id="restaurantAddForm" th:action="'/admin/restaurants/add'" method="post">
             <div id="restaurant-list">
                 <!-- 기본적으로 하나의 입력 폼은 존재 -->
                 <div class="restaurant-item">
