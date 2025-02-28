@@ -1,6 +1,5 @@
 package com.kustaurant.restauranttier.admin;
 
-import com.kustaurant.restauranttier.admin.dto.RestaurantInfoDto;
 import com.kustaurant.restauranttier.tab3_tier.entity.Restaurant;
 import com.kustaurant.restauranttier.tab3_tier.service.RestaurantApiService;
 import lombok.RequiredArgsConstructor;

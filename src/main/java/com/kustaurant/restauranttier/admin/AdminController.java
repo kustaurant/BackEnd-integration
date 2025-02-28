@@ -1,7 +1,5 @@
 package com.kustaurant.restauranttier.admin;
 
-import com.kustaurant.restauranttier.admin.dto.RestaurantInfoDto;
-import com.kustaurant.restauranttier.admin.dto.RestaurantInfoListDto;
 import com.kustaurant.restauranttier.tab3_tier.etc.CuisineEnum;
 import com.kustaurant.restauranttier.tab3_tier.etc.LocationEnum;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +11,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,6 +33,7 @@ public class AdminController {
 
     // 관리자 화면 - 식당 수정 화면
     @GetMapping("/restaurant/{id}/revise")
+    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String reviseRestaurant(
             @PathVariable int id,
             Model model
@@ -71,6 +69,7 @@ public class AdminController {
 
     // 식당 수정 요청
     @PostMapping("/restaurant/{id}/revise")
+    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String reviseRestaurant(
             @PathVariable int id,
             Model model,
@@ -94,11 +93,12 @@ public class AdminController {
                 "title", "메인",
                 "content", "main"
         ));
-        return "redirect: /admin";
+        return "redirect:/admin";
     }
 
     // 관리자 화면 - 식당 추가 화면
     @GetMapping("/restaurant/add")
+    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String addRestaurant(Model model) {
         // model에 데이터 채우기
         model.addAllAttributes(Map.of(
@@ -118,6 +118,7 @@ public class AdminController {
 
     // 식당 추가 요청
     @PostMapping("/restaurant/add")
+    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
     public String addRestaurant(
             Model model,
             @RequestParam MultiValueMap<String, String> dataMap
@@ -137,6 +138,6 @@ public class AdminController {
                 "title", "메인",
                 "content", "main"
         ));
-        return "redirect: /admin";
+        return "redirect:/admin";
     }
 }

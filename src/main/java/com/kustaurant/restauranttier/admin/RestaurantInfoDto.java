@@ -1,4 +1,4 @@
-package com.kustaurant.restauranttier.admin.dto;
+package com.kustaurant.restauranttier.admin;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
