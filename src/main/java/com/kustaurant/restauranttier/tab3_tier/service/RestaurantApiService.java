@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -38,6 +39,11 @@ public class RestaurantApiService {
             throw new OptionalNotExistException(restaurantId + " 식당이 없습니다.");
         }
         return restaurantOptional.get();
+    }
+
+    @Transactional
+    public void saveRestaurant(Restaurant restaurant) {
+        restaurantApiRepository.save(restaurant);
     }
 
     public List<RestaurantTierDTO> getTopRestaurants() {

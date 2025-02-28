@@ -26,7 +26,8 @@ public class MyInterceptor implements HandlerInterceptor {
                 || relativeUrl.startsWith("/user/myPage")
                 || relativeUrl.startsWith("/ranking")
                 || relativeUrl.startsWith("/restaurant")
-                || relativeUrl.startsWith("/search")){
+                || relativeUrl.startsWith("/search")
+                || relativeUrl.startsWith("/admin")){
             request.getSession().setAttribute("currentUrl", requestURL);
         }
 

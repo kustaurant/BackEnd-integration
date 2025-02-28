@@ -1,0 +1,228 @@
+<!--관리자 메인 html fragment-->
+<article id="adminMain" th:fragment="main">
+    <div class="admin-container">
+        <div class="section">
+            <button onclick="location.href='/admin/restaurant/add'" class="button">식당 추가</button>
+        </div>
+
+        <div class="section">
+            <div class="input-group">
+                <input type="number" id="restaurantId" placeholder="식당 ID 입력">
+                <button id="editRestaurantBtn" class="button">식당 정보 수정</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('editRestaurantBtn').addEventListener('click', function() {
+            const restaurantId = document.getElementById('restaurantId').value;
+            if (restaurantId) {
+                window.location.href = `/admin/restaurant/${restaurantId}/revise`;
+            } else {
+                alert('식당 ID를 입력해주세요.');
+            }
+        });
+    </script>
+</article>
+
+<!--관리자 식당 정보 수정 html fragment-->
+<article id="adminRevise" th:fragment="revise-restaurant">
+    <div class="admin-container">
+        <form id="restaurantForm" th:action="'/admin/restaurant/' + ${id} + '/revise'" method="post">
+            <div class="section">
+                <div class="input-group">
+                    <label for="name">식당 이름 _필수</label>
+                    <input type="text" id="name" name="name" required th:value="${restaurantInfo.name} ?: ''">
+
+                    <label for="type">카테고리 (네이버) _필수</label>
+                    <input type="text" id="type" name="type" required th:value="${restaurantInfo.type} ?: ''">
+
+                    <label for="cuisine">카테고리 (쿠스토랑) _필수</label>
+                    <select id="cuisine" name="cuisine" required>
+                        <option th:each="cui : ${cuisines}" th:value="${cui}" th:text="${cui}" th:selected="${cui == restaurantInfo.cuisine}"></option>
+                    </select>
+
+                    <label for="address">주소</label>
+                    <input type="text" id="address" name="address" th:value="${restaurantInfo.address} ?: ''">
+
+                    <label for="tel">전화번호</label>
+                    <input type="text" id="tel" name="tel" th:value="${restaurantInfo.tel} ?: ''">
+
+                    <label for="url">웹사이트 URL _필수</label>
+                    <input type="text" id="url" required name="url" th:value="${restaurantInfo.url} ?: ''">
+
+                    <label for="imgUrl">이미지 URL</label>
+                    <input type="text" id="imgUrl" name="imgUrl" th:value="${restaurantInfo.imgUrl} ?: ''">
+
+                    <label for="position">위치 _필수</label>
+                    <select id="position" name="position" required>
+                        <option th:each="loc : ${locations}" th:value="${loc}" th:text="${loc}" th:selected="${loc == restaurantInfo.position}"></option>
+                    </select>
+
+                    <label for="lat">위도 (Latitude) _필수</label>
+                    <input type="number" id="lat" name="latitude" step="any" required th:value="${restaurantInfo.latitude} ?: ''">
+
+                    <label for="lng">경도 (Longitude) _필수</label>
+                    <input type="number" id="lng" name="longitude" step="any" required th:value="${restaurantInfo.longitude} ?: ''">
+
+                    <label for="partnershipInfo">파트너십 정보</label>
+                    <input type="text" id="partnershipInfo" name="partnershipInfo" th:value="${restaurantInfo.partnershipInfo} ?: ''">
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="button">저장</button>
+            </div>
+        </form>
+    </div>
+</article>
+
+<!--관리자 식당 추가 html fragment-->
+<article id="adminAdd" th:fragment="add-restaurant">
+    <div class="admin-container">
+        <form id="restaurantAddForm" th:action="'/admin/restaurant/add'" method="post">
+            <div id="restaurant-list">
+                <!-- 기본적으로 하나의 입력 폼은 존재 -->
+                <div class="restaurant-item">
+                    <div class="section">
+                        <div class="input-group">
+                            <label for="name">식당 이름 _필수</label>
+                            <input type="text" name="restaurants[0].name" required>
+
+                            <label for="type">카테고리 (네이버) _필수</label>
+                            <input type="text" name="restaurants[0].type" required>
+
+                            <label for="cuisine">카테고리 (쿠스토랑) _필수</label>
+                            <select name="restaurants[0].cuisine" required>
+                                <option th:each="cui : ${cuisines}" th:value="${cui}" th:text="${cui}"></option>
+                            </select>
+
+                            <label for="address">주소</label>
+                            <input type="text" name="restaurants[0].address">
+
+                            <label for="tel">전화번호</label>
+                            <input type="text" name="restaurants[0].tel">
+
+                            <label for="url">웹사이트 URL _필수</label>
+                            <input type="text" name="restaurants[0].url" required>
+
+                            <label for="imgUrl">이미지 URL</label>
+                            <input type="text" name="restaurants[0].imgUrl">
+
+                            <label for="position">위치 _필수</label>
+                            <select name="restaurants[0].position" required>
+                                <option th:each="loc : ${locations}" th:value="${loc}" th:text="${loc}"></option>
+                            </select>
+
+                            <label for="lat">위도 (Latitude _필수)</label>
+                            <input type="number" name="restaurants[0].latitude" step="any" required>
+
+                            <label for="lng">경도 (Longitude) _필수</label>
+                            <input type="number" name="restaurants[0].longitude" step="any" required>
+
+                            <label for="partnershipInfo">파트너십 정보</label>
+                            <input type="text" name="restaurants[0].partnershipInfo">
+                        </div>
+                    </div>
+                    <button type="button" class="remove-btn" onclick="removeRestaurant(this)">삭제</button>
+                </div>
+            </div>
+
+            <!-- 추가 버튼 -->
+            <div class="button-group">
+                <button type="button" class="button" onclick="addRestaurant()">+ 식당 추가</button>
+                <button type="submit" class="button">저장</button>
+            </div>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        let cuisines = /*[[${cuisines}]]*/ [];
+        let locations = /*[[${locations}]]*/ [];
+
+        let restaurantIndex = 1;
+
+        function addRestaurant() {
+            const restaurantList = document.getElementById('restaurant-list');
+            // select 옵션 동적으로 생성
+            let cuisineOptions = cuisines.map(cui =>
+                `<option value="${cui}">${cui}</option>`
+            ).join("");
+            let positionOptions = locations.map(loc =>
+                `<option value="${loc}">${loc}</option>`
+            ).join("");
+
+            // 새로운 입력 폼을 추가
+            const newRestaurant = document.createElement('div');
+            newRestaurant.classList.add('restaurant-item');
+            newRestaurant.innerHTML = `
+            <div class="section">
+                <div class="input-group">
+                    <label for="name">식당 이름 _필수</label>
+                    <input type="text" name="restaurants[${restaurantIndex}].name" required>
+
+                    <label for="type">카테고리 (네이버) _필수</label>
+                    <input type="text" name="restaurants[${restaurantIndex}].type" required>
+
+                    <label for="cuisine">카테고리 (쿠스토랑) _필수</label>
+                    <select name="restaurants[${restaurantIndex}].cuisine" required>
+                        ${cuisineOptions}
+                    </select>
+
+                    <label for="address">주소</label>
+                    <input type="text" name="restaurants[${restaurantIndex}].address">
+
+                    <label for="tel">전화번호</label>
+                    <input type="text" name="restaurants[${restaurantIndex}].tel">
+
+                    <label for="url">웹사이트 URL _필수</label>
+                    <input type="text" name="restaurants[${restaurantIndex}].url" required>
+
+                    <label for="imgUrl">이미지 URL</label>
+                    <input type="text" name="restaurants[${restaurantIndex}].imgUrl">
+
+                    <label for="position">위치 _필수</label>
+                    <select name="restaurants[${restaurantIndex}].position" required>
+                        ${positionOptions}
+                    </select>
+
+                    <label for="lat">위도 (Latitude) _필수</label>
+                    <input type="number" name="restaurants[${restaurantIndex}].latitude" step="any" required>
+
+                    <label for="lng">경도 (Longitude) _필수</label>
+                    <input type="number" name="restaurants[${restaurantIndex}].longitude" step="any" required>
+
+                    <label for="partnershipInfo">파트너십 정보</label>
+                    <input type="text" name="restaurants[${restaurantIndex}].partnershipInfo">
+                </div>
+            </div>
+            <button type="button" class="remove-btn" onclick="removeRestaurant(this)">삭제</button>
+        `;
+
+            restaurantList.appendChild(newRestaurant);
+            restaurantIndex++;
+        }
+
+        function removeRestaurant(button) {
+            button.parentElement.remove();
+            restaurantIndex--;
+
+            let container = document.getElementById("restaurant-list");
+            // 남아있는 요소들의 name 속성을 다시 정렬
+            Array.from(container.children).forEach((form, newIndex) => {
+                form.querySelectorAll("input, select").forEach(input => {
+                    let nameAttr = input.getAttribute("name");
+                    let updatedName = nameAttr.replace(/\[\d+\]/, `[${newIndex}]`);
+                    input.setAttribute("name", updatedName);
+                });
+            });
+        }
+    </script>
+</article>
+
+<!--관리자 잘못된 요청 html fragment-->
+<article id="adminError" th:fragment="error">
+    <div class="error-container" th:text="${errorMessage}">
+        잘못된 요청입니다.
+    </div>
+</article>

@@ -2,6 +2,8 @@ package com.kustaurant.restauranttier.tab3_tier.etc;
 
 import lombok.Getter;
 
+import java.util.Arrays;
+
 @Getter
 public enum CuisineEnum {
     ALL("전체"), KO("한식"), JA("일식"), CH("중식"), WE("양식"),
@@ -13,5 +15,12 @@ public enum CuisineEnum {
 
     CuisineEnum(String value) {
         this.value = value;
+    }
+
+    public static CuisineEnum fromValue(String value) {
+        return Arrays.stream(CuisineEnum.values())
+                .filter(v -> v.value.equals(value))
+                .findFirst()
+                .orElse(null);
     }
 }
