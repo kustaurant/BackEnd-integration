@@ -212,6 +212,15 @@ public class PostApiCommentService {
             postDTO.setIsliked(isLiked(post, user));
             postDTO.setIsScraped(isScraped(post, user));
         }
+        List<PostCommentDTO> commentDTOList = getPostCommentDTOs(post, user);
+
+        postDTO.setPostCommentList(commentDTOList);
+
+
+        return postDTO;
+    }
+
+    public List<PostCommentDTO> getPostCommentDTOs(Post post, User user) {
         // 각 댓글에 대한 flag 설정
         List<PostCommentDTO> commentDTOList = post.getPostCommentList().stream()
                 .filter(comment -> comment.getParentComment() == null) // 부모 댓글만 처리
@@ -219,11 +228,7 @@ public class PostApiCommentService {
                 .sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()) // 최신순 정렬
                 .map(comment -> createPostCommentDTOWithFlags(comment, user))
                 .collect(Collectors.toList());
-
-        postDTO.setPostCommentList(commentDTOList);
-
-
-        return postDTO;
+        return commentDTOList;
     }
 
     // 댓글 삭제

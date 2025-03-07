@@ -18,10 +18,8 @@ import com.kustaurant.restauranttier.tab5_mypage.entity.User;
 import com.kustaurant.restauranttier.tab5_mypage.repository.UserRepository;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.jsoup.Jsoup;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -44,20 +42,19 @@ public class PostApiService {
     public static final int PAGESIZE = 10;
 
     // 메인 화면 로딩하기
-    public Page<PostDTO> getList(int page, String sort, String koreanCategory) {
+    public Page<PostDTO> getPosts(int page, String sort, String koreanCategory,String postBodyType) {
+        Page<Post> posts;
         if (koreanCategory.equals("전체")) {
             List<Sort.Order> sorts = new ArrayList<>();
             if (sort.isEmpty() || sort.equals("recent")) {
                 sorts.add(Sort.Order.desc("createdAt"));
                 Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-                Page<Post> posts = this.postApiRepository.findByStatus("ACTIVE", pageable);
-                return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
+                posts = this.postApiRepository.findByStatus("ACTIVE", pageable);
             } else if (sort.equals("popular")) {
                 sorts.add(Sort.Order.desc("createdAt"));
                 Specification<Post> spec = getSpecByPopularOver5();
                 Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-                Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
-                return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
+                posts = this.postApiRepository.findAll(spec, pageable);
             } else {
                 throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
             }
@@ -65,16 +62,23 @@ public class PostApiService {
             List<Sort.Order> sorts = new ArrayList<>();
             sorts.add(Sort.Order.desc("createdAt"));
             Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-            Specification<Post> spec = getSpecByCategoryAndPopularOver5(koreanCategory, sort);
+            Specification<Post> spec = getSpecByCategoryAndPopularCount(koreanCategory, sort);
             //spec의 인기순으로 먼저 정렬, 그다음 pageable의 최신순으로 두번째 정렬 기준 설정
-            Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
-            return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
+            posts = this.postApiRepository.findAll(spec, pageable);
         }
 
+        Page<PostDTO> result = posts.map(post -> {
+            PostDTO dto = PostDTO.convertPostToPostDTO(post);
+            if (postBodyType.equals("text")) {
+                dto.setPostBody(Jsoup.parse(dto.getPostBody()).text()); // HTML 제거 후 일반 텍스트 변환
+            }
+            return dto;
+        });
+        return result;  // Post 엔티티를 PostDTO로 변환
     }
 
     // 검색 결과 반환하기
-    public Page<PostDTO> getList(int page, String sort, String kw, String postCategory) {
+    public Page<PostDTO> getSearchResults(int page, String sort, String kw, String postCategory) {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("createdAt"));
         Specification<Post> spec = search(kw, postCategory, sort);
@@ -176,7 +180,7 @@ public class PostApiService {
         };
     }
 
-    private Specification<Post> getSpecByCategoryAndPopularOver5(String postCategory, String sort) {
+    private Specification<Post> getSpecByCategoryAndPopularCount(String postCategory, String sort) {
         return new Specification<>() {
             private static final long serialVersionUID = 1L;
 
