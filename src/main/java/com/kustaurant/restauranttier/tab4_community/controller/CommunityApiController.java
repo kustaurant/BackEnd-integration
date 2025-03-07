@@ -228,8 +228,7 @@ public class CommunityApiController {
             "- 요청 형식 보충 설명\n\n" +
             "   - title: 필수\n\n" +
             "   - postCategory: 필수.\n\n" +
-            "   - content: 필수.\n\n" +
-            "   - imageFile: 없어도 됩니다.\n\n")
+            "   - content: 필수.\n\n")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글이 생성되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostDTO.class))),
             @ApiResponse(responseCode = "500", description = "게시글 생성에 오류가 발생했습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
@@ -242,11 +241,8 @@ public class CommunityApiController {
             User user = userService.findUserById(userId);
             Post post = new Post(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), "ACTIVE", LocalDateTime.now());
             postApiService.create(post, user);
-            storageApiService.handleImageUpload(post, postUpdateDTO.getImageFile());
             postApiRepository.save(post);
             return ResponseEntity.ok(PostDTO.convertPostToPostDTO(post));
-        } catch (IOException e) {
-            throw new ServerException("이미지 처리 과정에서 오류가 발생했습니다.", e);
         } catch (Exception e) {
             throw new ServerException("게시글 생성 중 서버 오류가 발생했습니다.", e);
         }
@@ -276,8 +272,7 @@ public class CommunityApiController {
             "- 요청 형식 보충 설명\n\n" +
             "   - title: 필수\n\n" +
             "   - postCategory: 필수.\n\n" +
-            "   - content: 필수.\n\n" +
-            "   - imageFile: 없어도 됩니다.\n\n")
+            "   - content: 필수.\n\n")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 수정이 완료되었습니다."),
             @ApiResponse(responseCode = "500", description = "게시글 수정 중 서버에러가 발생했습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
@@ -290,11 +285,8 @@ public class CommunityApiController {
         try {
             Post post = postApiService.getPost(Integer.valueOf(postId));
             postApiService.updatePost(postUpdateDTO, post);
-            storageApiService.handleImageUpload(post, postUpdateDTO.getImageFile());
             postApiRepository.save(post);
             return ResponseEntity.ok().build();
-        } catch (IOException e) {
-            throw new ServerException("이미지 처리 과정에서 오류가 발생했습니다.", e);
         } catch (Exception e) {
             throw new ServerException("게시글 수정 중 서버 오류가 발생했습니다.", e);
         }

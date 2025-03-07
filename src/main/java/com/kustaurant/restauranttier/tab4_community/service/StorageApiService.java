@@ -40,14 +40,6 @@ public class StorageApiService {
             return "이미지 저장 오류 발생";
         }
     }
-    public void handleImageUpload(Post post, String imageUrl) throws IOException {
-        if (imageUrl != null) {
-            PostPhoto postPhoto = new PostPhoto(imageUrl, "ACTIVE");
-            postPhoto.setPost(post);
-            post.getPostPhotoList().clear();  // 기존 이미지를 제거하고 새로운 이미지를 추가
-            post.getPostPhotoList().add(postPhoto);
-            postPhotoApiRepository.save(postPhoto);
-        }
-    }
+
 }
 
