@@ -70,7 +70,7 @@ public class PostApiService {
         Page<PostDTO> result = posts.map(post -> {
             PostDTO dto = PostDTO.convertPostToPostDTO(post);
             if (postBodyType.equals("text")) {
-                dto.setPostBody(Jsoup.parse(dto.getPostBody()).text()); // ✅ HTML 제거 후 일반 텍스트 변환
+                dto.setPostBody(Jsoup.parse(dto.getPostBody()).text()); // HTML 제거 후 일반 텍스트 변환
             }
             return dto;
         });

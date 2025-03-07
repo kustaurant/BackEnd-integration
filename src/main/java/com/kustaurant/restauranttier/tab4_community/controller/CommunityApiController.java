@@ -106,12 +106,12 @@ public class CommunityApiController {
 
     // 댓글 or 대댓글 생성
     @PostMapping("/auth/community/comments")
-    @Operation(summary = "댓글 생성, 대댓글 생성", description = "게시글 ID와 내용을 입력받아 댓글을 생성합니다. 대댓글의 경우 부모 댓글의 id를 파라미터로 받아야 합니다. 생성한 댓글을 반환합니다")
+    @Operation(summary = "댓글 생성, 대댓글 생성", description = "게시글 ID와 내용을 입력받아 댓글을 생성합니다. 대댓글의 경우 부모 댓글의 id를 파라미터로 받아야 합니다. 전체 댓글 목록을 반환합니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "댓글 혹은 대댓글 생성이 완료되었습니다", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = PostCommentDTO.class))}),
             @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.kustaurant.restauranttier.common.exception.ErrorResponse.class)))
     })
-    public ResponseEntity<PostCommentDTO> postCommentCreate(
+    public ResponseEntity<List<PostCommentDTO>> postCommentCreate(
             @RequestParam(name = "content", defaultValue = "")
             @Parameter(description = "생성할 댓글의 내용입니다. 최소 1자에서 최대 10,000자까지 입력 가능합니다.", example = "이 게시글에 대해 궁금한 점이 있습니다.")
             String content,
@@ -128,13 +128,15 @@ public class CommunityApiController {
             @Parameter(hidden = true)
             Integer userId) {
         User user = userService.findUserById(userId);
+        Post post = postApiService.getPost(Integer.valueOf(postId));
         PostComment postComment = postApiCommentService.createComment(content, postId, userId);
         // 대댓글 일 경우 부모 댓글과 관계 매핑
         if (!parentCommentId.isEmpty()) {
             postApiCommentService.processParentComment(postComment, parentCommentId);
         }
+        List<PostCommentDTO> postCommentDTOs = postApiCommentService.getPostCommentDTOs(post, user);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(postApiCommentService.createPostCommentDTOWithFlags(postComment, user));
+                .body(postCommentDTOs);
     }
 
 
