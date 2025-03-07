@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Jsoup;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,13 +63,17 @@ public class CommunityApiController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(defaultValue = "recent")
             @Parameter(example = "recent", description = "게시글의 정렬 방법입니다. (recent:최신순, popular:인기순)")
-            String sort
+            String sort,
+            @RequestParam(defaultValue = "html")
+            @Parameter(example = "html", description = "반환되는 게시글 내용의 타입입니다. (html,text")
+            String postBodyType
             ,@JwtToken @Parameter(hidden = true) Integer userId
     ) {
         // Enum으로 변환하고 한글 이름 추출
         PostCategory categoryEnum = PostCategory.fromStringToEnum(postCategory);
         String koreanCategory = categoryEnum.getKoreanName();
-        Page<PostDTO> paging = postApiService.getList(page,sort,koreanCategory);
+        Page<PostDTO> paging = postApiService.getPosts(page,sort,koreanCategory,postBodyType);
+
         return ResponseEntity.ok(paging.getContent());
     }
 
