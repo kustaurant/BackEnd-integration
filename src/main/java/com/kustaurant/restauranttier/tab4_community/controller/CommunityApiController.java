@@ -64,7 +64,7 @@ public class CommunityApiController {
             @Parameter(example = "recent", description = "게시글의 정렬 방법입니다. (recent:최신순, popular:인기순)")
             String sort,
             @RequestParam(defaultValue = "html")
-            @Parameter(example = "html", description = "반환되는 게시글 내용의 타입입니다. (html,text")
+            @Parameter(example = "text", description = "반환되는 게시글 내용의 타입입니다. (html,text)")
             String postBodyType
             ,@JwtToken @Parameter(hidden = true) Integer userId
     ) {
