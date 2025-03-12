@@ -28,9 +28,6 @@ public class RestaurantWebService {
     private final RestaurantRepository restaurantRepository;
     private final RestaurantMenuRepository restaurantmenuRepository;
 
-    @Value("${tier.min.evaluation}")
-    private int minNumberOfEvaluations;
-
     public List<Restaurant> searchRestaurants(String[] keyword) {
         Specification<Restaurant> spec = createSearchSpecification(keyword);
         return restaurantRepository.findAll(spec);
