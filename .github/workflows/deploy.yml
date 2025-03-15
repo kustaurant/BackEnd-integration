@@ -3,7 +3,7 @@ name: Github-actions 테스트
 on:
   push:
     branches:
-      - release
+      - refactor/github-actions
 
 jobs:
   My-Deploy-Job:
