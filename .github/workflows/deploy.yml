@@ -1,0 +1,14 @@
+name: Github-actions 테스트
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  My-Deploy-Job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Hi
+        run: echo "Hi"

@@ -40,4 +40,4 @@ out/
 *.log
 
 ### yml ###
-*.yml
+src/main/resources/*.yml
