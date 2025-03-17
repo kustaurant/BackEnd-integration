@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.api.restaurant.controller;
 
+import com.kustaurant.kustaurant.common.restaurant.domain.enums.LocationEnum;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
@@ -10,7 +11,6 @@ import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaur
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.common.restaurant.constants.MapConstants;
-import com.kustaurant.kustaurant.tab3_tier.etc.LocationEnum;
 import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;

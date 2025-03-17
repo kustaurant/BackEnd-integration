@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.argument_resolver;
 
+import com.kustaurant.kustaurant.common.restaurant.domain.enums.LocationEnum;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
-import com.kustaurant.kustaurant.tab3_tier.etc.LocationEnum;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;

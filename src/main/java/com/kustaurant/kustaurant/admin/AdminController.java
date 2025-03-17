@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.admin;
 
-import com.kustaurant.kustaurant.tab3_tier.etc.CuisineEnum;
-import com.kustaurant.kustaurant.tab3_tier.etc.LocationEnum;
+import com.kustaurant.kustaurant.common.restaurant.domain.enums.CuisineEnum;
+import com.kustaurant.kustaurant.common.restaurant.domain.enums.LocationEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -3,11 +3,11 @@ package com.kustaurant.kustaurant.web.restaurant.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;
-import com.kustaurant.kustaurant.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.EvaluationRepository;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.SituationRepository;
