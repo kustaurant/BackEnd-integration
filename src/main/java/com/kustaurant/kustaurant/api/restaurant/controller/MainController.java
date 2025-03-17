@@ -1,10 +1,10 @@
 package com.kustaurant.kustaurant.api.restaurant.controller;
 
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.modal.HomeModal;
 import com.kustaurant.kustaurant.common.modal.HomeModalRepository;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.tab3_tier.etc.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.notice.FeedbackService;

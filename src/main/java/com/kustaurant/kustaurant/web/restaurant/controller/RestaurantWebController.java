@@ -2,6 +2,8 @@ package com.kustaurant.kustaurant.web.restaurant.controller;
 
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantCommentDTO;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDataClass;
+import com.kustaurant.kustaurant.common.restaurant.domain.enums.EnumSortComment;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Evaluation;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantComment;
@@ -11,8 +13,7 @@ import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentServ
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.web.restaurant.service.RestaurantWebService;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.tab3_tier.etc.EnumSortComment;
-import com.kustaurant.kustaurant.tab3_tier.etc.RestaurantTierDataClass;
+
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.EvaluationRepository;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;

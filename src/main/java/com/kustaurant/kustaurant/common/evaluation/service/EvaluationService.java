@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.evaluation.service;
 
 import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.*;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.*;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantSituationRelationService;
@@ -12,7 +13,6 @@ import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.global.etc.JsonData;
-import com.kustaurant.kustaurant.tab3_tier.etc.RestaurantTierDataClass;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
