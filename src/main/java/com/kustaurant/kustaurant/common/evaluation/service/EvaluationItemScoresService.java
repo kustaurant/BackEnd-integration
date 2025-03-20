@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.evaluation.service;
 
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Evaluation;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.EvaluationItemScoreRepository;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationItemScoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

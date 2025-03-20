@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.web.restaurant.controller;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.web.restaurant.service.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -33,12 +34,12 @@ public class DrawController {
 
     // 메뉴 리스트 받아오기
     @GetMapping("/api/recommend")
-    public ResponseEntity<List<Restaurant>> getRestaurantListForCuisine(
+    public ResponseEntity<List<RestaurantEntity>> getRestaurantListForCuisine(
             @RequestParam(value = "cuisine", defaultValue = "전체") String cuisine, @RequestParam(value = "location",defaultValue = "전체") String location, @RequestParam(value = "evaluation",defaultValue = "전체") String evaluation
     ) {
         String[] cuisinesArray = cuisine.split("-");
         List<String> cuisinesList = Arrays.asList(cuisinesArray);
-        List<Restaurant> combinedRestaurantList = new ArrayList<>();
+        List<RestaurantEntity> combinedRestaurantList = new ArrayList<>();
         // 음식 종류마다 location 과 일치하는 식당 리스트 반환해서 combinedRestaurantList에 추가
         for (String item : cuisinesList) {
             if(item.equals("햄버거")){
@@ -47,7 +48,7 @@ public class DrawController {
             if (item.equals("카페")) {
                 item="카페/디저트";
             }
-            List<Restaurant> retaurantList = restaurantWebService.getRestaurantListByRandomPick(item,location);
+            List<RestaurantEntity> retaurantList = restaurantWebService.getRestaurantListByRandomPick(item,location);
             combinedRestaurantList.addAll(retaurantList);
         }
 
@@ -57,8 +58,8 @@ public class DrawController {
     }
 
     // 랜덤으로 섞은 후 정확히 target 변수 만큼 의 식당을 반환하는 메소드
-    private List<Restaurant> getRandomSubList(List<Restaurant> originalList, int targetSize) {
-        List<Restaurant> resultList = new ArrayList<>(originalList.size());
+    private List<RestaurantEntity> getRandomSubList(List<RestaurantEntity> originalList, int targetSize) {
+        List<RestaurantEntity> resultList = new ArrayList<>(originalList.size());
         Random rand = new Random();
 
         // 원본 리스트가 targetSize보다 작으면, 원본 리스트의 항목을 반복하여 추가
@@ -81,8 +82,8 @@ public class DrawController {
 
     // id에 해당 하는 식당 정보 반환
     @GetMapping("/api/recommend/restaurant")
-    public ResponseEntity<Restaurant> recommendRestaurant(@RequestParam(name = "restaurantId") String restaurantId) {
-        Restaurant restaurant = restaurantWebService.getRestaurant(Integer.valueOf(restaurantId));
+    public ResponseEntity<RestaurantEntity> recommendRestaurant(@RequestParam(name = "restaurantId") String restaurantId) {
+        RestaurantEntity restaurant = restaurantWebService.getRestaurant(Integer.valueOf(restaurantId));
         return ResponseEntity.ok(restaurant);
     }
 

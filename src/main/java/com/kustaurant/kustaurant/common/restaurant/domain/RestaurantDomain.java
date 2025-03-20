@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -31,4 +33,7 @@ public class RestaurantDomain {
     private Integer restaurantEvaluationCount = 0;
     private Double restaurantScoreSum = 0d;
     private Integer mainTier = -1;
+
+    private List<String> situations = new ArrayList<>();
+    private Integer favoriteCount = 0;
 }

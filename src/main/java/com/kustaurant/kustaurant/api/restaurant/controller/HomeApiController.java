@@ -1,10 +1,11 @@
 package com.kustaurant.kustaurant.api.restaurant.controller;
 
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.api.restaurant.domain.RestaurantListsResponse;
 import com.kustaurant.kustaurant.api.notice.HomeBannerApiService;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDTO;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.web.restaurant.service.RestaurantWebService;
@@ -78,7 +79,7 @@ public class HomeApiController {
         User user = userService.findUserById(userId);
 
         String[] kwList = kw.split(" ");
-        List<Restaurant> restaurantList = restaurantWebService.searchRestaurants(kwList);
+        List<RestaurantEntity> restaurantList = restaurantWebService.searchRestaurants(kwList);
 
         return ResponseEntity.ok(restaurantList.stream().map(restaurant ->
                 RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)))

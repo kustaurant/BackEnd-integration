@@ -3,6 +3,11 @@ package com.kustaurant.kustaurant.common.restaurant.infrastructure.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtag;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenu;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

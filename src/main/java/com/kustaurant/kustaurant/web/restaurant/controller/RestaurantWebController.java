@@ -1,20 +1,21 @@
 package com.kustaurant.kustaurant.web.restaurant.controller;
 
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantCommentDTO;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDataClass;
+import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantCommentDTO;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.domain.enums.EnumSortComment;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Evaluation;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantComment;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantMenu;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenu;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.web.restaurant.service.RestaurantWebService;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.EvaluationRepository;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +56,7 @@ public class RestaurantWebController {
             Principal principal
     ) {
         // 식당 정보
-        Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
+        RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
         restaurantWebService.plusVisitCount(restaurant);
         model.addAttribute("restaurant", restaurant);
         String visitCountData = restaurant.getVisitCount() +
@@ -162,7 +163,7 @@ public class RestaurantWebController {
             Model model
     ) {
         EnumSortComment sortComment = EnumSortComment.valueOf(sort);
-        Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
+        RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
 
         if (principal == null) {
             List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurant, null, sortComment.equals(EnumSortComment.POPULAR), "ios");

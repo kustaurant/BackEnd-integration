@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.admin;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,14 +22,14 @@ public class AdminService {
     // 식당 정보 갱신
     @Transactional
     public void updateRestaurantInfo(int id, RestaurantInfoDto info) {
-        Restaurant restaurant = restaurantService.findRestaurantById(id);
+        RestaurantEntity restaurant = restaurantService.findRestaurantById(id);
 
         setRestaurant(restaurant, info);
 
         restaurantService.saveRestaurant(restaurant);
     }
 
-    private void setRestaurant(Restaurant restaurant, RestaurantInfoDto info) {
+    private void setRestaurant(RestaurantEntity restaurant, RestaurantInfoDto info) {
         restaurant.setRestaurantName(info.getName());
         restaurant.setRestaurantType(info.getType());
         restaurant.setRestaurantCuisine(info.getCuisine());
@@ -57,7 +58,7 @@ public class AdminService {
 
     // 식당 id로 RestaurantInfo 객체 가져오기
     public Optional<RestaurantInfoDto> getRestaurantInfo(int id) {
-        Restaurant restaurant = restaurantService.findRestaurantById(id);
+        RestaurantEntity restaurant = restaurantService.findRestaurantById(id);
         return Optional.of(new RestaurantInfoDto(
                 restaurant.getRestaurantName(),
                 restaurant.getRestaurantType(),
@@ -106,7 +107,7 @@ public class AdminService {
     // 식당 정보 하나 추가
     @Transactional
     public void addRestaurantInfo(RestaurantInfoDto info) {
-        Restaurant restaurant = new Restaurant();
+        RestaurantEntity restaurant = new RestaurantEntity();
 
         setRestaurant(restaurant, info);
 

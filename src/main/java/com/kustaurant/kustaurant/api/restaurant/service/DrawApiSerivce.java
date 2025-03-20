@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.api.restaurant.service;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +13,8 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class DrawApiSerivce {
 
-    public List<Restaurant> getRandomSubList(List<Restaurant> originalList, int targetSize) {
-        List<Restaurant> resultList = new ArrayList<>();
+    public List<RestaurantEntity> getRandomSubList(List<RestaurantEntity> originalList, int targetSize) {
+        List<RestaurantEntity> resultList = new ArrayList<>();
         Random rand = new Random();
 
         // 원본 리스트가 targetSize보다 작으면, 반복해서 추가

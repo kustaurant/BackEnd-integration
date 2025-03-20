@@ -1,13 +1,16 @@
 package com.kustaurant.kustaurant.common.restaurant.service;
 
 import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDTO;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,14 +29,23 @@ public class RestaurantFavoriteService {
     private final UserRepository userRepository;
     private final RestaurantApiService restaurantApiService;
 
+    public Boolean isUserFavorite(User user, RestaurantDomain restaurant) {
+        try {
+            restaurantFavoriteRepository.getByUserAndRestaurant(user, restaurant);
+        } catch (DataNotFoundException ignored) {
+            return false;
+        }
+        return true;
+    }
+
     public boolean toggleFavorite(String userTokenId, Integer restaurantId) {
         Optional<User> userOptional = userRepository.findByProviderId(userTokenId);
-        Optional<Restaurant> restaurantOptional = restaurantRepository.findByRestaurantIdAndStatus(restaurantId, "ACTIVE");
+        Optional<RestaurantEntity> restaurantOptional = restaurantRepository.findByRestaurantIdAndStatus(restaurantId, "ACTIVE");
 
         if (restaurantOptional.isEmpty()) {
             throw new OptionalNotExistException(restaurantId + " 식당을 찾지 못했습니다.");
         }
-        Restaurant restaurant = restaurantOptional.get();
+        RestaurantEntity restaurant = restaurantOptional.get();
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -50,7 +62,9 @@ public class RestaurantFavoriteService {
         }
     }
 
-    public void addFavorite(User user, Restaurant restaurant) {
+    // TODO: need to delete everything below this
+
+    public void addFavorite(User user, RestaurantEntity restaurant) {
         RestaurantFavorite restaurantFavorite = new RestaurantFavorite();
         restaurantFavorite.setUser(user);
         restaurantFavorite.setRestaurant(restaurant);
@@ -64,7 +78,7 @@ public class RestaurantFavoriteService {
 
     public boolean isFavoriteExist(String userTokenId, Integer restaurantId) {
         Optional<User> userOptional = userRepository.findByProviderId(userTokenId);
-        Restaurant restaurant = restaurantRepository.findByRestaurantId(restaurantId);
+        RestaurantEntity restaurant = restaurantRepository.findByRestaurantId(restaurantId);
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -79,7 +93,7 @@ public class RestaurantFavoriteService {
         }
     }
 
-    public Integer getFavoriteCountByRestaurant(Restaurant restaurant) {
+    public Integer getFavoriteCountByRestaurant(RestaurantEntity restaurant) {
         return restaurantFavoriteRepository.countByRestaurantAndStatus(restaurant, "ACTIVE");
     }
 

@@ -1,11 +1,11 @@
 package com.kustaurant.kustaurant.web.restaurant.service;
 
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantMenuRepository;
+import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantHashtag;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantMenu;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantMenuRepository;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantRepository;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtag;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenu;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -17,7 +17,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -25,19 +24,19 @@ public class RestaurantWebService {
     // 슬라이더에 나오는 식당들의 평가 수 기준 (현재 2이상)
     public static final Integer evaluationCount = 2;
     private final RestaurantRepository restaurantRepository;
-    private final RestaurantMenuRepository restaurantmenuRepository;
+    private final RestaurantMenuRepository restaurantMenuRepository;
 
-    public List<Restaurant> searchRestaurants(String[] keyword) {
-        Specification<Restaurant> spec = createSearchSpecification(keyword);
+    public List<RestaurantEntity> searchRestaurants(String[] keyword) {
+        Specification<RestaurantEntity> spec = createSearchSpecification(keyword);
         return restaurantRepository.findAll(spec);
     }
 
-    private Specification<Restaurant> createSearchSpecification(String[] kws) {
-        return new Specification<Restaurant>() {
+    private Specification<RestaurantEntity> createSearchSpecification(String[] kws) {
+        return new Specification<RestaurantEntity>() {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public Predicate toPredicate(Root<Restaurant> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+            public Predicate toPredicate(Root<RestaurantEntity> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 query.distinct(true);  // 중복을 제거
 
                 // 조인
@@ -75,35 +74,38 @@ public class RestaurantWebService {
         return restaurantRepository.findAll(spec, pageable);
     }*/
 
-    public Restaurant getRestaurant(Integer id) {
-        Optional<Restaurant> restaurant = restaurantRepository.findById(id);
-        if (restaurant.isPresent()) {
-            return restaurant.get();
-        } else {
-            throw new DataNotFoundException("restaurant not found");
-        }
-
+    public RestaurantEntity getRestaurant(Integer id) {
+        // TODO: must revise this
+//        Optional<Restaurant> restaurant = restaurantRepository.findById(id);
+//        if (restaurant.isPresent()) {
+//            return restaurant.get();
+//        } else {
+//            throw new DataNotFoundException("restaurant not found");
+//        }
+        return null;
     }
 
     // 식당의 메뉴 리스트 반환
     public List<RestaurantMenu> getRestaurantMenuList(int restaurantId) {
-        Restaurant restaurant = restaurantRepository.findByRestaurantId(restaurantId);
+        RestaurantEntity restaurant = restaurantRepository.findByRestaurantId(restaurantId);
         if (restaurant.getStatus().equals("ACTIVE")) {
-            return restaurantmenuRepository.findByRestaurantOrderByMenuId(restaurant);
+            return restaurantMenuRepository.findByRestaurantOrderByMenuId(restaurant);
         } else {
             return null;
         }
     }
     // status가 ACTIVE인 cuisine에 속한 식당 리스트 반환
     public List<Restaurant> getRestaurantList(String cuisine) {
-        if (cuisine.equals("전체")) {
-            return restaurantRepository.findByStatus("ACTIVE");
-        } else {
-            return restaurantRepository.findByRestaurantCuisineAndStatus(cuisine, "ACTIVE");
-        }
+        // TODO: must revise this
+//        if (cuisine.equals("전체")) {
+//            return restaurantRepository.findByStatus("ACTIVE");
+//        } else {
+//            return restaurantRepository.findByRestaurantCuisineAndStatus(cuisine, "ACTIVE");
+//        }
+        return List.of();
     }
     // 뽑기 리스트 반환
-    public List<Restaurant> getRestaurantListByRandomPick(String cuisine, String location) {
+    public List<RestaurantEntity> getRestaurantListByRandomPick(String cuisine, String location) {
         // cuisine이 전체일 때
         if (cuisine.equals("전체")) {
             if (location.equals("전체")) {
@@ -118,14 +120,10 @@ public class RestaurantWebService {
         }
     }
 
-    // 해당 식당이 방문 상위 몇 퍼센트인지 반환
-    public Float getPercentOrderByVisitCount(Restaurant restaurant) {
-        return restaurantRepository.getPercentOrderByVisitCount(restaurant);
-    }
     // 식당 방문 카운트 1 증가
     // 식당 방문 카운트 1 증가(5분에 최대한번)
 //    private Map<Integer, LocalDateTime> lastUpdateMap = new HashMap<>(); // 식당별로 마지막 업데이트 시간을 저장하기 위한 맵
-    public void plusVisitCount(Restaurant restaurant) {
+    public void plusVisitCount(RestaurantEntity restaurant) {
         restaurant.setVisitCount(restaurant.getVisitCount() + 1);
         restaurantRepository.save(restaurant);
 
@@ -144,16 +142,19 @@ public class RestaurantWebService {
     // 인기 식당 반환
 
     public List<Restaurant> getTopRestaurants() {
-        // 모든 'ACTIVE' 상태의 식당을 불러온다.
-        List<Restaurant> restaurants = restaurantRepository.findByStatus("ACTIVE");
+        // TODO: must revise this
+//        // 모든 'ACTIVE' 상태의 식당을 불러온다.
+//        List<Restaurant> restaurants = restaurantRepository.findByStatus("ACTIVE");
+//
+//        // 평가 데이터가 evaluationCount개 이상 있는 식당을 필터링하고,
+//        // calculateAverageScore 메소드를 사용하여 평균 평가 점수를 기준으로 내림차순 정렬하여 상위 15개를 추출
+//        return restaurants.stream()
+//                .filter(r -> r.getEvaluationList().size() >= evaluationCount)
+//                .sorted(Comparator.comparingDouble(Restaurant::calculateAverageScore).reversed()) // 평균 점수에 따라 내림차순 정렬
+//                .limit(15) // 상위 15개만 추출
+//                .collect(Collectors.toList()); // 리스트로 수집
 
-        // 평가 데이터가 evaluationCount개 이상 있는 식당을 필터링하고,
-        // calculateAverageScore 메소드를 사용하여 평균 평가 점수를 기준으로 내림차순 정렬하여 상위 15개를 추출
-        return restaurants.stream()
-                .filter(r -> r.getEvaluationList().size() >= evaluationCount)
-                .sorted(Comparator.comparingDouble(Restaurant::calculateAverageScore).reversed()) // 평균 점수에 따라 내림차순 정렬
-                .limit(15) // 상위 15개만 추출
-                .collect(Collectors.toList()); // 리스트로 수집
+        return List.of();
     }
 
 }

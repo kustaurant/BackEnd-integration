@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.api.restaurant.domain;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDTO;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

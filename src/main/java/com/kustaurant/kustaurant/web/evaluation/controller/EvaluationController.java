@@ -4,9 +4,10 @@
     import com.google.gson.reflect.TypeToken;
     import com.kustaurant.kustaurant.api.restaurant.controller.MainController;
     import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
-    import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Evaluation;
+    import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
+    import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
     import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-    import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.EvaluationRepository;
+    import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
     import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
     import com.kustaurant.kustaurant.web.restaurant.service.RestaurantWebService;
     import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
@@ -45,7 +46,7 @@
                 Principal principal,
                 @PathVariable Integer restaurantId
         ) {
-            Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
+            RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
             User user = customOAuth2UserService.getUser(principal.getName());
             Evaluation evaluation = evaluationRepository.findByUserAndRestaurant(user, restaurant).orElse(null);
             Double mainScore = 0.0;
@@ -75,7 +76,7 @@
                 @RequestPart(value = "newImage", required = false) MultipartFile newImage
         ) {
             User user = customOAuth2UserService.getUser(principal.getName());
-            Restaurant restaurant = restaurantWebService.getRestaurant(restaurantId);
+            RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
             // JSON 문자열을 Java List로 변환
             List<Integer> evaluationSituations = new Gson().fromJson(selectedSituationsJson, new TypeToken<List<Integer>>(){}.getType());
 

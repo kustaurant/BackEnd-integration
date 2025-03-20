@@ -1,9 +1,10 @@
 package com.kustaurant.kustaurant.common.restaurant.service;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantSituationRelation;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Situation;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantSituationRelationRepository;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelation;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.Situation;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,12 +14,12 @@ public class RestaurantSituationRelationService {
     private final RestaurantSituationRelationRepository restaurantSituationRelationRepository;
     private final SituationService situationService;
 
-    public RestaurantSituationRelation getByRestaurantAndSituation(Restaurant restaurant, Situation situation) {
+    public RestaurantSituationRelation getByRestaurantAndSituation(RestaurantEntity restaurant, Situation situation) {
         return restaurantSituationRelationRepository.findByRestaurantAndSituation(restaurant, situation).orElse(null);
     }
 
     // 기존에 데이터가 있으면 업데이트하고, 없으면 새로 생성합니다.
-    public void updateOrCreate(Restaurant restaurant, Situation situation, Integer addDateCount) {
+    public void updateOrCreate(RestaurantEntity restaurant, Situation situation, Integer addDateCount) {
         RestaurantSituationRelation restaurantSituationRelation = getByRestaurantAndSituation(restaurant, situation);
         if (restaurantSituationRelation == null) { // 새로 생성
             if (addDateCount > 0) { // 음수가 들어올수도 있어서
@@ -32,7 +33,7 @@ public class RestaurantSituationRelationService {
         }
     }
 
-    public void createOrDelete(Restaurant restaurant, Integer situationId, Integer dataCount) {
+    public void createOrDelete(RestaurantEntity restaurant, Integer situationId, Integer dataCount) {
         Situation situation = situationService.getSituation(situationId);
         if (situation == null) {
             return;

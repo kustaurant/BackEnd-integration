@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.api.restaurant.controller;
 
 import com.kustaurant.kustaurant.common.restaurant.domain.enums.LocationEnum;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
@@ -8,8 +9,8 @@ import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierMapDTO;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.common.restaurant.constants.MapConstants;
 import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
@@ -84,7 +85,7 @@ public class TierApiController {
         // page 0부터 시작하게 수정
         page--;
         // DB 조회
-        List<Restaurant> restaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocationsWithPage(cuisines, situations, locations, null, true, page, limit).toList();
+        List<RestaurantEntity> restaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocationsWithPage(cuisines, situations, locations, null, true, page, limit).toList();
 
         if (restaurants.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
@@ -96,7 +97,7 @@ public class TierApiController {
             try {
                 // 순위
                 Integer ranking = null;
-                Restaurant restaurant = restaurants.get(i);
+                RestaurantEntity restaurant = restaurants.get(i);
                 if (restaurant.getMainTier() > 0) {
                     ranking = page * limit + i + 1;
                 }
@@ -145,7 +146,7 @@ public class TierApiController {
         // page 0부터 시작하게 수정
         page--;
         // DB 조회
-        List<Restaurant> restaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocationsWithPage(cuisines, situations, locations, null, true, page, limit).toList();
+        List<RestaurantEntity> restaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocationsWithPage(cuisines, situations, locations, null, true, page, limit).toList();
 
         if (restaurants.isEmpty()) {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
@@ -157,7 +158,7 @@ public class TierApiController {
             try {
                 // 순위
                 Integer ranking = null;
-                Restaurant restaurant = restaurants.get(i);
+                RestaurantEntity restaurant = restaurants.get(i);
                 if (restaurant.getMainTier() > 0) {
                     ranking = page * limit + i + 1;
                 }
@@ -219,8 +220,8 @@ public class TierApiController {
         User user = userService.findUserById(userId);
 
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
-        List<Restaurant> tieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, 1, false);
-        List<Restaurant> nonTieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, -1, false);
+        List<RestaurantEntity> tieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, 1, false);
+        List<RestaurantEntity> nonTieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, -1, false);
 
         // 2. 상황으로 필터링하기
         List<RestaurantTierDTO> tieredRestaurantTierDTOs = tieredRestaurants.stream().map(restaurant ->
@@ -328,8 +329,8 @@ public class TierApiController {
         User user = userService.findUserById(userId);
 
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
-        List<Restaurant> tieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, 1, false);
-        List<Restaurant> nonTieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, -1, false);
+        List<RestaurantEntity> tieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, 1, false);
+        List<RestaurantEntity> nonTieredRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, -1, false);
 
         // 2. 상황으로 필터링하기
         List<RestaurantTierDTO> tieredRestaurantTierDTOs = tieredRestaurants.stream().map(restaurant ->

@@ -1,11 +1,18 @@
 package com.kustaurant.kustaurant.common.evaluation.service;
 
 import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDataClass;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
+import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.*;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.*;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelation;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.SituationRepository;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantSituationRelationService;
 import com.kustaurant.kustaurant.common.restaurant.service.S3Service;
+import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
@@ -39,6 +46,17 @@ public class EvaluationService {
     private final RestaurantCommentRepository restaurantCommentRepository;
     private final EvaluationConstants evaluationConstants;
 
+    // new code start
+    public Boolean isUserEvaluated(User user, RestaurantDomain restaurant) {
+        try {
+            evaluationRepository.getByUserAndRestaurant(user, restaurant);
+        } catch (DataNotFoundException ignored) {
+            return false;
+        }
+        return true;
+    }
+    // new code end
+
     public Evaluation getByEvaluationId(Integer evaluationId) {
         Optional<Evaluation> evaluationOptional = evaluationRepository.findByEvaluationIdAndStatus(evaluationId, "ACTIVE");
         if (evaluationOptional.isEmpty()) {
@@ -47,7 +65,7 @@ public class EvaluationService {
         return evaluationOptional.get();
     }
 
-    public Evaluation getByUserAndRestaurant(User user, Restaurant restaurant) {
+    public Evaluation getByUserAndRestaurant(User user, RestaurantEntity restaurant) {
         Optional<Evaluation> evaluation = evaluationRepository.findByUserAndRestaurant(user, restaurant);
         return evaluation.orElse(null);
     }
@@ -176,7 +194,7 @@ public class EvaluationService {
         return evaluation.getEvaluationScore();
     }
 
-    public void createOrUpdate(User user, Restaurant restaurant, EvaluationDTO evaluationDTO) {
+    public void createOrUpdate(User user, RestaurantEntity restaurant, EvaluationDTO evaluationDTO) {
         // 이전 평가 가져오기
         Evaluation evaluation = evaluationRepository.findByUserAndRestaurantAndStatus(user, restaurant, "ACTIVE").orElse(null);
         if (evaluation == null) { // 이전 평가가 없을 경우
@@ -188,7 +206,7 @@ public class EvaluationService {
 
     // 이전 평가가 있는 경우 - 평가 업데이트하기
     @Transactional
-    public void evaluationUpdate(User user, Restaurant restaurant, Evaluation evaluation, EvaluationDTO evaluationDTO) {
+    public void evaluationUpdate(User user, RestaurantEntity restaurant, Evaluation evaluation, EvaluationDTO evaluationDTO) {
         // restaurants_tbl 테이블 점수 업데이트
         restaurant.setRestaurantScoreSum(restaurant.getRestaurantScoreSum() - evaluation.getEvaluationScore() + evaluationDTO.getEvaluationScore());
         restaurantRepository.save(restaurant);
@@ -227,7 +245,7 @@ public class EvaluationService {
 
     // 이전 평가가 없는 경우 - 평가 생성하기
     @Transactional
-    public void evaluationCreate(User user, Restaurant restaurant, EvaluationDTO evaluationDTO) {
+    public void evaluationCreate(User user, RestaurantEntity restaurant, EvaluationDTO evaluationDTO) {
         // 평가 저장
         String commentImgUrl = null;
         if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
@@ -267,7 +285,7 @@ public class EvaluationService {
 
     // 식당의 티어를 다시 계산함
     @Transactional
-    public void calculateTierOfOneRestaurant(Restaurant restaurant) {
+    public void calculateTierOfOneRestaurant(RestaurantEntity restaurant) {
         if (evaluationConstants.isHasTier(restaurant)) {
             restaurant.setMainTier(
                     EvaluationConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
@@ -281,8 +299,8 @@ public class EvaluationService {
     public void calculateAllTier() {
         log.info("전체 식당에 대해 메인 티어 계산 시작");
         // 가게 메인 티어 계산
-        List<Restaurant> restaurantList = restaurantRepository.findAll();
-        for (Restaurant restaurant: restaurantList) {
+        List<RestaurantEntity> restaurantList = restaurantRepository.findAll();
+        for (RestaurantEntity restaurant: restaurantList) {
             if (evaluationConstants.isHasTier(restaurant)) {
                 restaurant.setMainTier(
                         EvaluationConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
@@ -298,7 +316,7 @@ public class EvaluationService {
     // 식당 별 점수, 평가 수, 상황 개수를 다시 카운트합니다.
     @Transactional
     public void calculateEvaluationDatas() {
-        List<Restaurant> restaurantList = restaurantRepository.findByStatus("ACTIVE");
+        List<RestaurantEntity> restaurantList = restaurantRepository.findByStatus("ACTIVE");
 
         restaurantList.forEach(restaurant -> {
             Map<Integer, Integer> situationCountMap = new HashMap<>(Map.of(
@@ -329,11 +347,11 @@ public class EvaluationService {
 
 
     // 그냥 Restaurant 리스트를 RestaurantTierDataClass 리스트로 변경 ver1
-    public List<RestaurantTierDataClass> convertToTierDataClassList(List<Restaurant> restaurantList, User user, boolean isRanking) {
+    public List<RestaurantTierDataClass> convertToTierDataClassList(List<RestaurantEntity> restaurantList, User user, boolean isRanking) {
         List<RestaurantTierDataClass> resultList = new ArrayList<>();
 
         for (int i = 0; i < restaurantList.size(); i++) {
-            Restaurant restaurant = restaurantList.get(i);
+            RestaurantEntity restaurant = restaurantList.get(i);
             RestaurantTierDataClass newDataClass = new RestaurantTierDataClass(restaurant);
             // 즐겨찾기, 평가 여부 추가
             injectIsFavoriteIsEvaluation(newDataClass, restaurant, user);
@@ -356,12 +374,12 @@ public class EvaluationService {
         return resultList;
     }
 
-    public void injectIsFavoriteIsEvaluation(RestaurantTierDataClass data, Restaurant restaurant, User user) {
+    public void injectIsFavoriteIsEvaluation(RestaurantTierDataClass data, RestaurantEntity restaurant, User user) {
         data.setIsEvaluation(restaurantApiService.isEvaluated(restaurant, user));
         data.setIsFavorite(restaurantApiService.isFavorite(restaurant, user));
     }
 
-    public void insertSituation(RestaurantTierDataClass data, Restaurant restaurant) {
+    public void insertSituation(RestaurantTierDataClass data, RestaurantEntity restaurant) {
         for (RestaurantSituationRelation restaurantSituationRelation : restaurant.getRestaurantSituationRelationList()) {
             if (RestaurantSpecification.hasSituation(restaurantSituationRelation)) {
                 data.addSituation(restaurantSituationRelation);

@@ -1,11 +1,12 @@
 package com.kustaurant.kustaurant.api.restaurant.controller;
 
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.api.restaurant.service.DrawApiSerivce;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDTO;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,13 +43,13 @@ public class DrawApiController {
             @LocationList List<String> locations
     ) {
 
-        List<Restaurant> restaurantList = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, null, locations,null,true);
+        List<RestaurantEntity> restaurantList = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, null, locations,null,true);
         // 조건에 맞는 식당이 없을 경우 404 에러 반환
         if (restaurantList.isEmpty()) {
             throw new OptionalNotExistException("해당 조건에 맞는 맛집이 존재하지 않습니다.");
         }
         // 랜덤으로 30개의 식당 선택
-        List<Restaurant> randomRestaurantList = drawApiSerivce.getRandomSubList(restaurantList, 30);
+        List<RestaurantEntity> randomRestaurantList = drawApiSerivce.getRandomSubList(restaurantList, 30);
         // DTO로 변환
         List<RestaurantTierDTO> drawRestaurantListDTOs = randomRestaurantList.stream()
                 .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))

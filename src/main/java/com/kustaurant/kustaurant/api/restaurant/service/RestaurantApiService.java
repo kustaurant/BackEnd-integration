@@ -1,11 +1,12 @@
 package com.kustaurant.kustaurant.api.restaurant.service;
 
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantTierDTO;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantApiRepository;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
@@ -26,15 +27,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class RestaurantApiService {
-    private final RestaurantApiRepository restaurantApiRepository;
+    private final RestaurantRepository restaurantRepository;
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
     private final UserRepository userRepository;
 
 
     public static final Integer evaluationCount = 2;
 
-    public Restaurant findRestaurantById(Integer restaurantId) {
-        Optional<Restaurant> restaurantOptional = restaurantApiRepository.findByRestaurantIdAndStatus(restaurantId, "ACTIVE");
+    public RestaurantEntity findRestaurantById(Integer restaurantId) {
+        Optional<RestaurantEntity> restaurantOptional = restaurantRepository.findByRestaurantIdAndStatus(restaurantId, "ACTIVE");
         if (restaurantOptional.isEmpty()) {
             throw new OptionalNotExistException(restaurantId + " 식당이 없습니다.");
         }
@@ -42,58 +43,62 @@ public class RestaurantApiService {
     }
 
     @Transactional
-    public void saveRestaurant(Restaurant restaurant) {
-        restaurantApiRepository.save(restaurant);
+    public void saveRestaurant(RestaurantEntity restaurant) {
+        restaurantRepository.save(restaurant);
     }
 
     public List<RestaurantTierDTO> getTopRestaurants() {
+        // TODO: must revise this
         // 모든 'ACTIVE' 상태의 식당을 불러온다.
-        List<Restaurant> restaurants = restaurantApiRepository.findByStatus("ACTIVE");
-        restaurants = restaurants.stream()
-                .filter(r -> r.getRestaurantEvaluationCount() >= evaluationCount)
-                .sorted(Comparator.comparingDouble(Restaurant::calculateAverageScore).reversed())
-                .limit(16)
-                .collect(Collectors.toList());
-        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = restaurants.stream()
-                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
-                .collect(Collectors.toList());
-        return topRestaurantsByRatingDTOs;
+//        List<Restaurant> restaurants = restaurantRepository.findByStatus("ACTIVE");
+//        restaurants = restaurants.stream()
+//                .filter(r -> r.getRestaurantEvaluationCount() >= evaluationCount)
+//                .sorted(Comparator.comparingDouble(Restaurant::calculateAverageScore).reversed())
+//                .limit(16)
+//                .collect(Collectors.toList());
+//        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = restaurants.stream()
+//                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
+//                .collect(Collectors.toList());
+//        return topRestaurantsByRatingDTOs;
+        return List.of();
     }
 
     // 뽑기 리스트 반환
     public List<Restaurant> getRestaurantListByRandomPick(String cuisine, String location) {
-        // cuisine 이 전체일 떄
-        if(cuisine.equals("전체")){
-            if(location.equals("전체")) {
-                return restaurantApiRepository.findByStatus("ACTIVE");
-            }
-            return restaurantApiRepository.findByStatusAndRestaurantPosition("ACTIVE", location);
-        }
-        // cuisine이 전체가 아닐때
-
-        else{
-            if(location.equals("전체")) {
-                return restaurantApiRepository.findByRestaurantCuisineAndStatus(cuisine, "ACTIVE");
-            }
-            return restaurantApiRepository.findByRestaurantCuisineAndStatusAndRestaurantPosition(cuisine, "ACTIVE", location);
-        }
+        // TODO: must revise this
+//        // cuisine 이 전체일 떄
+//        if(cuisine.equals("전체")){
+//            if(location.equals("전체")) {
+//                return restaurantRepository.findByStatus("ACTIVE");
+//            }
+//            return restaurantRepository.findByStatusAndRestaurantPosition("ACTIVE", location);
+//        }
+//        // cuisine이 전체가 아닐때
+//
+//        else{
+//            if(location.equals("전체")) {
+//                return restaurantRepository.findByRestaurantCuisineAndStatus(cuisine, "ACTIVE");
+//            }
+//            return restaurantRepository.findByRestaurantCuisineAndStatusAndRestaurantPosition(cuisine, "ACTIVE", location);
+//        }
+        return List.of();
 
     }
 
-    public List<Restaurant> getRestaurantsByCuisinesAndSituationsAndLocations(
+    public List<RestaurantEntity> getRestaurantsByCuisinesAndSituationsAndLocations(
             List<String> cuisineList, List<Integer> situationList, List<String> locationList,
             Integer tierInfo, boolean isOrderByScore
     ) {
-        return restaurantApiRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore));
+        return restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore));
     }
 
-    public Page<Restaurant> getRestaurantsByCuisinesAndSituationsAndLocationsWithPage(
+    public Page<RestaurantEntity> getRestaurantsByCuisinesAndSituationsAndLocationsWithPage(
             List<String> cuisineList, List<Integer> situationList, List<String> locationList,
             Integer tierInfo, boolean isOrderByScore, int page, int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
 
-        return restaurantApiRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore), pageable);
+        return restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore), pageable);
     }
 
     public boolean isSituationContainRestaurant(List<Integer> situationList, Restaurant restaurant) {
@@ -103,7 +108,7 @@ public class RestaurantApiService {
     }
 
     // 해당 식당을 해당 유저가 평가 했는가?
-    public boolean isEvaluated(Restaurant restaurant, User user) {
+    public boolean isEvaluated(RestaurantEntity restaurant, User user) {
         if (user == null || restaurant == null) {
             return false;
         }
@@ -112,7 +117,7 @@ public class RestaurantApiService {
     }
 
     // 해당 식당을 해당 유저가 즐겨찾기 했는가?
-    public boolean isFavorite(Restaurant restaurant, User user) {
+    public boolean isFavorite(RestaurantEntity restaurant, User user) {
         if (user == null || restaurant == null) {
             return false;
         }
@@ -120,7 +125,7 @@ public class RestaurantApiService {
                 .anyMatch(restaurantFavorite -> restaurantFavorite.getRestaurant().equals(restaurant));
     }
 
-    public List<Restaurant> getRecommendedRestaurantsForUser(Integer userId) {
+    public List<RestaurantEntity> getRecommendedRestaurantsForUser(Integer userId) {
         // 1. 사용자의 정보를 가져옵니다.
         User user = userRepository.findByUserId(userId).orElse(null);
 
@@ -129,7 +134,7 @@ public class RestaurantApiService {
 
         if (favorites.isEmpty()) {
             // 즐겨찾기한 식당이 없을 경우 랜덤 식당 15개 추천
-            List<Restaurant> restaurants = getRestaurantsByCuisinesAndSituationsAndLocations(null, null, null, null, false);
+            List<RestaurantEntity> restaurants = getRestaurantsByCuisinesAndSituationsAndLocations(null, null, null, null, false);
             Collections.shuffle(restaurants, new Random());
 
             return restaurants.stream().limit(15).collect(Collectors.toList());
@@ -143,16 +148,16 @@ public class RestaurantApiService {
         // 가장 많이 즐겨찾기된 카테고리 찾기
         String favoriteCuisine = Collections.max(cuisineFrequencyMap.entrySet(), Map.Entry.comparingByValue()).getKey();
         // 4. 해당 카테고리와 일치하는 식당을 검색합니다.
-        List<Restaurant> recommendedRestaurants = restaurantApiRepository.findByRestaurantCuisineAndStatus(favoriteCuisine, "ACTIVE");
+        List<RestaurantEntity> recommendedRestaurants = restaurantRepository.findByRestaurantCuisineAndStatus(favoriteCuisine, "ACTIVE");
 
         // 5. 평점이 높은 순으로 정렬합니다.
-        recommendedRestaurants.sort(Comparator.comparingDouble(Restaurant::calculateAverageScore).reversed());
+        recommendedRestaurants.sort(Comparator.comparingDouble(RestaurantEntity::calculateAverageScore).reversed());
 
         // 6. 원하는 개수만큼 자릅니다 (예: 15개).
         return recommendedRestaurants.stream().limit(15).collect(Collectors.toList());
     }
     public List<RestaurantTierDTO> getRecommendedOrRandomRestaurants(Integer userId) {
-        List<Restaurant> restaurants;
+        List<RestaurantEntity> restaurants;
         if (userId == null) {
             // 미로그인 시: 랜덤으로 15개의 식당 반환
             restaurants = getRestaurantsByCuisinesAndSituationsAndLocations(null, null, null, null, false);
