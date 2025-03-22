@@ -128,8 +128,10 @@ public class RestaurantApiController {
     ) {
         // 유저 가져오기
         User user = userService.findUserById(userId);
+        // 식당 가져오기
+        RestaurantDomain restaurant = restaurantService.getDomain(restaurantId);
         // 즐겨찾기 로직
-        boolean result = restaurantFavoriteService.toggleFavorite(user.getProviderId(), restaurantId);
+        boolean result = restaurantFavoriteService.toggleFavorite(user, restaurant);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         return ResponseEntity.ok(result);
     }
@@ -155,10 +157,10 @@ public class RestaurantApiController {
     ) {
         // 유저 가져오기
         User user = userService.findUserById(userId);
-        // 즐겨찾기 로직
-        boolean result = restaurantFavoriteService.toggleFavorite(user.getProviderId(), restaurantId);
         // 식당 가져오기
         RestaurantDomain restaurant = restaurantService.getDomain(restaurantId);
+        // 즐겨찾기 로직
+        boolean result = restaurantFavoriteService.toggleFavorite(user, restaurant);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         return ResponseEntity.ok(new FavoriteResponseDTO(result, restaurant.getFavoriteCount()));
     }

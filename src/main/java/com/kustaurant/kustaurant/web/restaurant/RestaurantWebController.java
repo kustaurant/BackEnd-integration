@@ -1,17 +1,7 @@
 package com.kustaurant.kustaurant.web.restaurant;
 
-import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenuDomain;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantCommentDTO;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantDetailDTO;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenu;
-import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentService;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantMenuService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 
@@ -33,6 +23,7 @@ import java.util.List;
 public class RestaurantWebController {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final RestaurantService restaurantService;
     private final RestaurantWebService restaurantWebService;
     private final RestaurantFavoriteService restaurantFavoriteService;
 
@@ -69,7 +60,9 @@ public class RestaurantWebController {
             @PathVariable Integer restaurantId,
             Principal principal
     ) {
-        return ResponseEntity.ok(restaurantFavoriteService.toggleFavorite(principal.getName(), restaurantId));
+        User user = customOAuth2UserService.getUser(principal.getName());
+        RestaurantDomain restaurant = restaurantService.getDomain(restaurantId);
+        return ResponseEntity.ok(restaurantFavoriteService.toggleFavorite(user, restaurant));
     }
 
 }

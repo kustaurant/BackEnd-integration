@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite;
+package com.kustaurant.kustaurant.common.mock;
 
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDomain;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
@@ -6,55 +6,54 @@ import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.Res
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-@RequiredArgsConstructor
-public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepository {
+public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepository {
+    private final List<RestaurantFavoriteDomain> store = new ArrayList<>();
 
-    private final RestaurantFavoriteJpaRepository jpaRepository;
 
     @Override
     public RestaurantFavoriteDomain findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
-        return jpaRepository.findByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId)
-                .map(RestaurantFavoriteEntity::toModel)
-                .orElseThrow(() -> new DataNotFoundException("요청한 restaurantFavorite이 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
+        return store.stream()
+                .filter(fav -> fav.getUser().getUserId().equals(userId) &&
+                        fav.getRestaurant().getRestaurantId().equals(restaurantId))
+                .findFirst()
+                .orElseThrow(() -> new DataNotFoundException("Favorite not found"));
+
     }
 
     @Override
     public boolean existsByUserAndRestaurant(Integer userId, Integer restaurantId) {
-        if (userId == null || restaurantId == null) {
-            return false;
-        }
-        return jpaRepository.existsByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId);
+        return store.stream()
+                .anyMatch(fav -> fav.getUser().getUserId().equals(userId) &&
+                        fav.getRestaurant().getRestaurantId().equals(restaurantId));
     }
 
     @Override
     public List<RestaurantFavoriteDomain> findByUser(Integer userId) {
-        if (userId == null) {
-            return List.of();
+        List<RestaurantFavoriteDomain> favorites = new ArrayList<>();
+        for (RestaurantFavoriteDomain fav : store) {
+            if (fav.getUser().getUserId().equals(userId)) {
+                favorites.add(fav);
+            }
         }
-        return jpaRepository.findByUser_UserId(userId).stream()
-                .map(RestaurantFavoriteEntity::toModel)
-                .toList();
+        return favorites;
     }
 
     @Override
-    @Transactional
     public RestaurantFavoriteDomain save(RestaurantFavoriteDomain restaurantFavorite) {
-        return jpaRepository.save(RestaurantFavoriteEntity.from(restaurantFavorite)).toModel();
+        store.add(restaurantFavorite);
+        return restaurantFavorite;
     }
 
     @Override
-    @Transactional
     public void delete(RestaurantFavoriteDomain restaurantFavorite) {
-        jpaRepository.delete(RestaurantFavoriteEntity.from(restaurantFavorite));
+        store.remove(restaurantFavorite);
     }
+
 
     // TODO: need to delete everything below this
     @Override

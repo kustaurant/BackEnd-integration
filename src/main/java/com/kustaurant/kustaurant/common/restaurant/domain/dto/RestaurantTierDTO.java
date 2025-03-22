@@ -1,10 +1,12 @@
 package com.kustaurant.kustaurant.common.restaurant.domain.dto;
 
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.RoundingMode;
@@ -13,6 +15,7 @@ import java.text.DecimalFormat;
 @Data
 @AllArgsConstructor
 @Schema(description = "restaurant tier entity")
+@Builder
 public class RestaurantTierDTO {
     @Schema(description = "식당 id", example = "1")
     private Integer restaurantId;
@@ -42,6 +45,28 @@ public class RestaurantTierDTO {
     private Double restaurantScore;
 
     public static RestaurantTierDTO convertRestaurantToTierDTO(RestaurantEntity restaurant, Integer ranking, Boolean isEvaluated, Boolean isFavorite) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        Double score = restaurant.getRestaurantEvaluationCount() != 0 ? Double.parseDouble(df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())) : null;
+
+        return new RestaurantTierDTO(
+                restaurant.getRestaurantId(),
+                ranking,
+                restaurant.getRestaurantName(),
+                restaurant.getRestaurantCuisine(),
+                restaurant.getRestaurantPosition() == null ? "건대 주변" : restaurant.getRestaurantPosition(),
+                restaurant.getRestaurantImgUrl() == null || restaurant.getRestaurantImgUrl().equals("no_img") ? RestaurantConstants.REPLACE_IMG_URL : restaurant.getRestaurantImgUrl(),
+                restaurant.getMainTier(),
+                isEvaluated,
+                isFavorite,
+                restaurant.getRestaurantLongitude(),
+                restaurant.getRestaurantLatitude(),
+                restaurant.getPartnershipInfo(),
+                score
+        );
+    }
+
+    public static RestaurantTierDTO convertRestaurantToTierDTO(RestaurantDomain restaurant, Integer ranking, Boolean isEvaluated, Boolean isFavorite) {
         DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.HALF_UP);
         Double score = restaurant.getRestaurantEvaluationCount() != 0 ? Double.parseDouble(df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())) : null;

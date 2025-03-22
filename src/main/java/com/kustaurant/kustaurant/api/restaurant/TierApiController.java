@@ -234,7 +234,7 @@ public class TierApiController {
         // 3. 응답 생성하기
         RestaurantTierMapDTO response = new RestaurantTierMapDTO();
         // 3.1 즐겨찾기 리스트
-        response.setFavoriteRestaurants(restaurantFavoriteService.getFavoriteRestaurantDtoList(user));
+        response.setFavoriteRestaurants(restaurantFavoriteService.getFavoriteRestaurantDtoList(userId));
         // 3.2 티어가 있는 식당 리스트
         response.setTieredRestaurants(tieredRestaurantTierDTOs);
         // 3.3 티어가 없는 식당 리스트
@@ -343,7 +343,7 @@ public class TierApiController {
         // 3. 응답 생성하기
         RestaurantTierMapDTO response = new RestaurantTierMapDTO();
         // 3.1 즐겨찾기 리스트
-        response.setFavoriteRestaurants(restaurantFavoriteService.getFavoriteRestaurantDtoList(user));
+        response.setFavoriteRestaurants(restaurantFavoriteService.getFavoriteRestaurantDtoList(userId));
         // 3.2 티어가 있는 식당 리스트
         response.setTieredRestaurants(tieredRestaurantTierDTOs);
         // 3.3 티어가 없는 식당 리스트

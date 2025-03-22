@@ -71,4 +71,20 @@ public class RestaurantFavoriteEntity {
                 .updatedAt(updatedAt)
                 .build();
     }
+
+    public static RestaurantFavoriteEntity from(RestaurantFavoriteDomain domain) {
+        if (domain == null) {
+            return null;
+        }
+
+        RestaurantFavoriteEntity entity = new RestaurantFavoriteEntity();
+        entity.favoriteId = domain.getFavoriteId();
+        entity.user = domain.getUser();
+        entity.restaurant = RestaurantEntity.from(domain.getRestaurant());
+        entity.status = domain.getStatus();
+        entity.createdAt = domain.getCreatedAt();
+        entity.updatedAt = domain.getUpdatedAt();
+
+        return entity;
+    }
 }
