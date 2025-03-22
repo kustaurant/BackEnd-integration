@@ -47,16 +47,8 @@ public class EvaluationService {
     private final EvaluationConstants evaluationConstants;
 
     // new code start
-    public Boolean isUserEvaluated(User user, RestaurantDomain restaurant) {
-        if (user == null || restaurant == null) {
-            return false;
-        }
-        try {
-            evaluationRepository.getByUserAndRestaurant(user, restaurant);
-        } catch (DataNotFoundException ignored) {
-            return false;
-        }
-        return true;
+    public Boolean isUserEvaluated(Integer userId, Integer restaurantId) {
+        return evaluationRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 
     public List<EvaluationEntity> findByRestaurantId(Integer restaurantId) {

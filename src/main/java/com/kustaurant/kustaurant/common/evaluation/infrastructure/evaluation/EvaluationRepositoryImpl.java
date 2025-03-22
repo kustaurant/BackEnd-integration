@@ -22,13 +22,11 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     private final EvaluationJpaRepository evaluationJpaRepository;
 
     @Override
-    public EvaluationDomain getByUserAndRestaurant(User user, RestaurantDomain restaurant) {
-        Integer userId = user.getUserId();
-        Integer restaurantId = restaurant.getRestaurantId();
-
-        return jpaRepository.findByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId)
-                .map(EvaluationEntity::toModel)
-                .orElseThrow(() -> new DataNotFoundException("요청한 evaluation가 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
+    public boolean existsByUserAndRestaurant(Integer userId, Integer restaurantId) {
+        if (userId == null || restaurantId == null) {
+            return false;
+        }
+        return jpaRepository.existsByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId);
     }
 
     @Override

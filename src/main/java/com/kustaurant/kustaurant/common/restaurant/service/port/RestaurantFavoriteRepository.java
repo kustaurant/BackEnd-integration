@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface RestaurantFavoriteRepository {
 
-    RestaurantFavoriteDomain getByUserAndRestaurant(User user, RestaurantDomain restaurant);
+    boolean existsByUserAndRestaurant(Integer userId, Integer restaurantId);
 
     // TODO: need to delete everything below this
     Optional<RestaurantFavorite> findByUserAndRestaurant(User user, RestaurantEntity restaurant);

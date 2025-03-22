@@ -28,16 +28,8 @@ public class RestaurantFavoriteService {
     private final UserRepository userRepository;
     private final RestaurantApiService restaurantApiService;
 
-    public Boolean isUserFavorite(User user, RestaurantDomain restaurant) {
-        if (user == null || restaurant == null) {
-            return false;
-        }
-        try {
-            restaurantFavoriteRepository.getByUserAndRestaurant(user, restaurant);
-        } catch (DataNotFoundException ignored) {
-            return false;
-        }
-        return true;
+    public Boolean isUserFavorite(Integer userId, Integer restaurantId) {
+        return restaurantFavoriteRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 
     public boolean toggleFavorite(String userTokenId, Integer restaurantId) {

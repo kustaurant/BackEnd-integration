@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.common.restaurant.service;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenuDomain;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantMenuRepository;
 import lombok.RequiredArgsConstructor;

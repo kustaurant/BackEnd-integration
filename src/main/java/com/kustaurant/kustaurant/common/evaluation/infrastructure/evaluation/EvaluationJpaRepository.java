@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EvaluationJpaRepository extends JpaRepository<EvaluationEntity, Integer>{
-    Optional<EvaluationEntity> findByUser_UserIdAndRestaurant_RestaurantId(Integer userId, Integer restaurantId);
+    boolean existsByUser_UserIdAndRestaurant_RestaurantId(Integer userId, Integer restaurantId);
     List<EvaluationEntity> findByRestaurant_RestaurantIdAndStatus(Integer restaurantId, String status);
 
     Optional<EvaluationEntity> findByUserAndRestaurant(User user, RestaurantEntity restaurant);

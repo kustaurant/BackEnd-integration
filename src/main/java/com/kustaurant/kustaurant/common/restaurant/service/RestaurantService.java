@@ -6,12 +6,10 @@ import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenuDomain;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantDetailDTO;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,20 +21,18 @@ public class RestaurantService {
     private final RestaurantMenuService restaurantMenuService;
     private final EvaluationService evaluationService;
 
-    public RestaurantDomain getDomain(Integer id) {
-        return restaurantRepository.getById(id);
+    public RestaurantDomain getDomain(Integer restaurantId) {
+        return restaurantRepository.getById(restaurantId);
     }
 
-    public RestaurantDetailDTO getRestaurantDetailDto(Integer restaurantId, User user, String userAgent) {
+    public RestaurantDetailDTO getRestaurantDetailDto(Integer restaurantId, Integer userId, String userAgent) {
         RestaurantDomain restaurant = restaurantRepository.getById(restaurantId);
         List<RestaurantMenuDomain> menus = restaurantMenuService.findMenusByRestaurantId(restaurantId);
 
-        return RestaurantDetailDTO.from(
-                restaurant,
-                menus,
-                evaluationService.isUserEvaluated(user, restaurant),
-                restaurantFavoriteService.isUserFavorite(user, restaurant),
-                RestaurantConstants.isIOS(userAgent)
-        );
+        boolean isEvaluated = evaluationService.isUserEvaluated(userId, restaurantId);
+        boolean isFavorite = restaurantFavoriteService.isUserFavorite(userId, restaurantId);
+        boolean isIOS = RestaurantConstants.isIOS(userAgent);
+
+        return RestaurantDetailDTO.from(restaurant, menus, isEvaluated, isFavorite, isIOS);
     }
 }

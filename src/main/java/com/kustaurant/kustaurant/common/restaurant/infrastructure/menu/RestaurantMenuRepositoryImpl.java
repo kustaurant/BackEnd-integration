@@ -22,11 +22,4 @@ public class RestaurantMenuRepositoryImpl implements RestaurantMenuRepository {
                 .map(RestaurantMenuEntity::toModel)
                 .toList();
     }
-
-    // TODO: must delete everything below this.
-
-    @Override
-    public List<RestaurantMenu> findByRestaurantOrderByMenuId(RestaurantEntity restaurant) {
-        return List.of();
-    }
 }

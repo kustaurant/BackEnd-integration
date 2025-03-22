@@ -69,10 +69,8 @@ public class RestaurantApiController {
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        User user = userService.findUserById(userId);
-
         return new ResponseEntity<>(
-                restaurantService.getRestaurantDetailDto(restaurantId, user, userAgent),
+                restaurantService.getRestaurantDetailDto(restaurantId, userId, userAgent),
                 HttpStatus.OK
         );
     }
@@ -108,10 +106,8 @@ public class RestaurantApiController {
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        User user = userService.findUserById(userId);
-
         return new ResponseEntity<>(
-                restaurantService.getRestaurantDetailDto(restaurantId, user, userAgent),
+                restaurantService.getRestaurantDetailDto(restaurantId, userId, userAgent),
                 HttpStatus.OK
         );
     }

@@ -20,13 +20,11 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     private final RestaurantFavoriteJpaRepository jpaRepository;
 
     @Override
-    public RestaurantFavoriteDomain getByUserAndRestaurant(User user, RestaurantDomain restaurant) {
-        Integer userId = user.getUserId();
-        Integer restaurantId = restaurant.getRestaurantId();
-
-        return jpaRepository.findByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId)
-                .map(RestaurantFavoriteEntity::toModel)
-                .orElseThrow(() -> new DataNotFoundException("요청한 RestaurantFavorite이 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
+    public boolean existsByUserAndRestaurant(Integer userId, Integer restaurantId) {
+        if (userId == null || restaurantId == null) {
+            return false;
+        }
+        return jpaRepository.existsByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId);
     }
 
     // TODO: need to delete everything below this

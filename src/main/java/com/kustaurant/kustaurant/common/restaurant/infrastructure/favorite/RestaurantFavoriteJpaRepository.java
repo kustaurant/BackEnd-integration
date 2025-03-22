@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RestaurantFavoriteJpaRepository extends JpaRepository<RestaurantFavoriteEntity, Integer> {
-    Optional<RestaurantFavoriteEntity> findByUser_UserIdAndRestaurant_RestaurantId(Integer userId, Integer restaurantId);
+    boolean existsByUser_UserIdAndRestaurant_RestaurantId(Integer userId, Integer restaurantId);
 
     // TODO: need to delete everything below this
 

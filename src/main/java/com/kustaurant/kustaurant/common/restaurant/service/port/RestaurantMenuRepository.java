@@ -9,7 +9,4 @@ import java.util.List;
 public interface RestaurantMenuRepository {
 
     List<RestaurantMenuDomain> findByRestaurantOrderById(Integer restaurantId);
-
-    // TODO: must delete everying below this
-    List<RestaurantMenu> findByRestaurantOrderByMenuId(RestaurantEntity restaurant);
 }

@@ -34,9 +34,11 @@ public class RestaurantWebService {
     private final RestaurantCommentService restaurantCommentService;
 
     public RestaurantDetailWebDto getRestaurantWebDetails(User user, Integer restaurantId) {
-        RestaurantDetailDTO restaurantDetailDto = restaurantService.getRestaurantDetailDto(restaurantId, user, "ios");
+        Integer userId = user == null ? null : user.getUserId();
+        RestaurantDetailDTO restaurantDetailDto = restaurantService.getRestaurantDetailDto(restaurantId, userId, "web");
         RestaurantDomain restaurant = restaurantService.getDomain(restaurantId);
-        List<RestaurantCommentDTO> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, user, true, "ios");
+        // TODO: 이거도 userId 사용하게 바꿔야됨.
+        List<RestaurantCommentDTO> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, user, true, "web");
 
         return new RestaurantDetailWebDto(
                 restaurantDetailDto,
@@ -109,15 +111,6 @@ public class RestaurantWebService {
         }
     }
 
-    // 식당의 메뉴 리스트 반환
-    public List<RestaurantMenu> getRestaurantMenuList(int restaurantId) {
-        RestaurantEntity restaurant = restaurantRepository.findByRestaurantId(restaurantId);
-        if (restaurant.getStatus().equals("ACTIVE")) {
-            return restaurantMenuRepository.findByRestaurantOrderByMenuId(restaurant);
-        } else {
-            return null;
-        }
-    }
     // status가 ACTIVE인 cuisine에 속한 식당 리스트 반환
     public List<RestaurantEntity> getRestaurantList(String cuisine) {
         if (cuisine.equals("전체")) {
