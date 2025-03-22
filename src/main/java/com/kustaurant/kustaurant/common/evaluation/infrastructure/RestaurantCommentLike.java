@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.common.evaluation.infrastructure;
 
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -29,7 +30,7 @@ public class RestaurantCommentLike {
 
     @ManyToOne
     @JoinColumn(name="evaluation_id")
-    private Evaluation evaluation;
+    private EvaluationEntity evaluation;
 
     public RestaurantCommentLike(User user, RestaurantComment restaurantComment) {
         this.restaurantComment = restaurantComment;
@@ -38,7 +39,7 @@ public class RestaurantCommentLike {
         this.createdAt = LocalDateTime.now();
     }
 
-    public RestaurantCommentLike(User user, Evaluation evaluation) {
+    public RestaurantCommentLike(User user, EvaluationEntity evaluation) {
         this.restaurantComment = null;
         this.user = user;
         this.evaluation = evaluation;

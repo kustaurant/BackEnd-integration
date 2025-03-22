@@ -1,5 +1,5 @@
 
-package com.kustaurant.kustaurant.web.restaurant.controller;
+package com.kustaurant.kustaurant.web.restaurant;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,9 +10,8 @@ import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.SituationRepository;
-import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
+import com.kustaurant.kustaurant.api.restaurant.RestaurantApiService;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import jakarta.servlet.http.HttpServletRequest;

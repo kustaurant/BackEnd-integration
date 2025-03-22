@@ -44,4 +44,6 @@ public interface RestaurantRepository {
     List<RestaurantEntity> findAll(Specification<RestaurantEntity> spec);
 
     void save(RestaurantEntity restaurant);
+
+    Optional<RestaurantEntity> findById(Integer id);
 }

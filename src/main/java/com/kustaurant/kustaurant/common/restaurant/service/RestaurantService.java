@@ -5,7 +5,6 @@ import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenuDomain;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantDetailDTO;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +29,11 @@ public class RestaurantService {
 
     public RestaurantDetailDTO getRestaurantDetailDto(Integer restaurantId, User user, String userAgent) {
         RestaurantDomain restaurant = restaurantRepository.getById(restaurantId);
+        List<RestaurantMenuDomain> menus = restaurantMenuService.findMenusByRestaurantId(restaurantId);
 
         return RestaurantDetailDTO.from(
                 restaurant,
-                restaurantMenuService.findMenusByRestaurantId(restaurantId),
+                menus,
                 evaluationService.isUserEvaluated(user, restaurant),
                 restaurantFavoriteService.isUserFavorite(user, restaurant),
                 RestaurantConstants.isIOS(userAgent)

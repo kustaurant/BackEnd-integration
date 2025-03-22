@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.web.restaurant.controller;
+package com.kustaurant.kustaurant.web.ranking;
 
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;

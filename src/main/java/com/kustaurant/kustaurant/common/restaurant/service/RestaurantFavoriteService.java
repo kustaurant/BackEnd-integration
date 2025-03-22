@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.service;
 
-import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
+import com.kustaurant.kustaurant.api.restaurant.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
@@ -8,7 +8,6 @@ import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantReposi
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
@@ -30,6 +29,9 @@ public class RestaurantFavoriteService {
     private final RestaurantApiService restaurantApiService;
 
     public Boolean isUserFavorite(User user, RestaurantDomain restaurant) {
+        if (user == null || restaurant == null) {
+            return false;
+        }
         try {
             restaurantFavoriteRepository.getByUserAndRestaurant(user, restaurant);
         } catch (DataNotFoundException ignored) {

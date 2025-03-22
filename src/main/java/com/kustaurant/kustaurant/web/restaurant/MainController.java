@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.api.restaurant.controller;
+package com.kustaurant.kustaurant.web.restaurant;
 
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
@@ -6,10 +6,8 @@ import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantReposi
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.modal.HomeModal;
 import com.kustaurant.kustaurant.common.modal.HomeModalRepository;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.notice.FeedbackService;
-import com.kustaurant.kustaurant.web.restaurant.service.RestaurantWebService;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -64,7 +62,7 @@ public class MainController {
             Model model,
             Principal principal
     ) {
-        List<Restaurant> restaurants = restaurantWebService.getTopRestaurants();
+        List<RestaurantEntity> restaurants = restaurantWebService.getTopRestaurants();
         List<String> cuisines = new ArrayList<>(Arrays.asList("한식","일식","중식","양식","아시안","고기","치킨","햄버거","분식","해산물","술집","샐러드","카페","베이커리","기타","전체"));
 
         HomeModal homeModal = HomeModalRepository.getHomeModalByModalId(1);

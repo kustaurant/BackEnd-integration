@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.evaluation.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
@@ -34,7 +35,7 @@ public class RestaurantComment {
 
     @ManyToOne
     @JoinColumn(name="evaluation_id")
-    private Evaluation evaluation;
+    private EvaluationEntity evaluation;
 
     @OneToMany(mappedBy = "restaurantComment")
     private List<RestaurantCommentLike> restaurantCommentLikeList =new ArrayList<>();
@@ -52,7 +53,7 @@ public class RestaurantComment {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public RestaurantComment(User user, RestaurantEntity restaurant, Evaluation evaluation, String commentBody, String status, LocalDateTime createdAt) {
+    public RestaurantComment(User user, RestaurantEntity restaurant, EvaluationEntity evaluation, String commentBody, String status, LocalDateTime createdAt) {
         this.user = user;
         this.restaurant = restaurant;
         this.evaluation = evaluation;

@@ -1,11 +1,18 @@
-package com.kustaurant.kustaurant.web.restaurant.service;
+package com.kustaurant.kustaurant.web.restaurant;
 
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantCommentDTO;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantDetailDTO;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentService;
+import com.kustaurant.kustaurant.common.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantMenuRepository;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtag;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenu;
+import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -17,10 +24,29 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class RestaurantWebService {
+    
+    private final RestaurantService restaurantService;
+    private final RestaurantCommentService restaurantCommentService;
+
+    public RestaurantDetailWebDto getRestaurantWebDetails(User user, Integer restaurantId) {
+        RestaurantDetailDTO restaurantDetailDto = restaurantService.getRestaurantDetailDto(restaurantId, user, "ios");
+        RestaurantDomain restaurant = restaurantService.getDomain(restaurantId);
+        List<RestaurantCommentDTO> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, user, true, "ios");
+
+        return new RestaurantDetailWebDto(
+                restaurantDetailDto,
+                restaurant,
+                comments
+        );
+    }
+
+    // TODO: need to delete everything below this
+    
     // 슬라이더에 나오는 식당들의 평가 수 기준 (현재 2이상)
     public static final Integer evaluationCount = 2;
     private final RestaurantRepository restaurantRepository;
@@ -75,14 +101,12 @@ public class RestaurantWebService {
     }*/
 
     public RestaurantEntity getRestaurant(Integer id) {
-        // TODO: must revise this
-//        Optional<Restaurant> restaurant = restaurantRepository.findById(id);
-//        if (restaurant.isPresent()) {
-//            return restaurant.get();
-//        } else {
-//            throw new DataNotFoundException("restaurant not found");
-//        }
-        return null;
+        Optional<RestaurantEntity> restaurant = restaurantRepository.findById(id);
+        if (restaurant.isPresent()) {
+            return restaurant.get();
+        } else {
+            throw new DataNotFoundException("restaurant not found");
+        }
     }
 
     // 식당의 메뉴 리스트 반환
@@ -95,14 +119,12 @@ public class RestaurantWebService {
         }
     }
     // status가 ACTIVE인 cuisine에 속한 식당 리스트 반환
-    public List<Restaurant> getRestaurantList(String cuisine) {
-        // TODO: must revise this
-//        if (cuisine.equals("전체")) {
-//            return restaurantRepository.findByStatus("ACTIVE");
-//        } else {
-//            return restaurantRepository.findByRestaurantCuisineAndStatus(cuisine, "ACTIVE");
-//        }
-        return List.of();
+    public List<RestaurantEntity> getRestaurantList(String cuisine) {
+        if (cuisine.equals("전체")) {
+            return restaurantRepository.findByStatus("ACTIVE");
+        } else {
+            return restaurantRepository.findByRestaurantCuisineAndStatus(cuisine, "ACTIVE");
+        }
     }
     // 뽑기 리스트 반환
     public List<RestaurantEntity> getRestaurantListByRandomPick(String cuisine, String location) {
@@ -141,20 +163,17 @@ public class RestaurantWebService {
 
     // 인기 식당 반환
 
-    public List<Restaurant> getTopRestaurants() {
-        // TODO: must revise this
-//        // 모든 'ACTIVE' 상태의 식당을 불러온다.
-//        List<Restaurant> restaurants = restaurantRepository.findByStatus("ACTIVE");
-//
-//        // 평가 데이터가 evaluationCount개 이상 있는 식당을 필터링하고,
-//        // calculateAverageScore 메소드를 사용하여 평균 평가 점수를 기준으로 내림차순 정렬하여 상위 15개를 추출
-//        return restaurants.stream()
-//                .filter(r -> r.getEvaluationList().size() >= evaluationCount)
-//                .sorted(Comparator.comparingDouble(Restaurant::calculateAverageScore).reversed()) // 평균 점수에 따라 내림차순 정렬
-//                .limit(15) // 상위 15개만 추출
-//                .collect(Collectors.toList()); // 리스트로 수집
+    public List<RestaurantEntity> getTopRestaurants() {
+        // 모든 'ACTIVE' 상태의 식당을 불러온다.
+        List<RestaurantEntity> restaurants = restaurantRepository.findByStatus("ACTIVE");
 
-        return List.of();
+        // 평가 데이터가 evaluationCount개 이상 있는 식당을 필터링하고,
+        // calculateAverageScore 메소드를 사용하여 평균 평가 점수를 기준으로 내림차순 정렬하여 상위 15개를 추출
+        return restaurants.stream()
+                .filter(r -> r.getEvaluationList().size() >= evaluationCount)
+                .sorted(Comparator.comparingDouble(RestaurantEntity::calculateAverageScore).reversed()) // 평균 점수에 따라 내림차순 정렬
+                .limit(15) // 상위 15개만 추출
+                .collect(Collectors.toList()); // 리스트로 수집
     }
 
 }

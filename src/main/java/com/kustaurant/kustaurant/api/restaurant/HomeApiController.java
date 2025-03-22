@@ -1,14 +1,11 @@
-package com.kustaurant.kustaurant.api.restaurant.controller;
+package com.kustaurant.kustaurant.api.restaurant;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
-import com.kustaurant.kustaurant.api.restaurant.domain.RestaurantListsResponse;
 import com.kustaurant.kustaurant.api.notice.HomeBannerApiService;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
-import com.kustaurant.kustaurant.web.restaurant.service.RestaurantWebService;
+import com.kustaurant.kustaurant.web.restaurant.RestaurantWebService;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

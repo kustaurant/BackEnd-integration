@@ -24,7 +24,7 @@ public abstract class RestaurantConstants {
     }
 
     public static boolean isIOS(String userAgent) {
-        return userAgent.toLowerCase().contains("iphone") || userAgent.toLowerCase().contains("ipad") || userAgent.toLowerCase().contains("ios");
+        return userAgent != null && (userAgent.toLowerCase().contains("iphone") || userAgent.toLowerCase().contains("ipad") || userAgent.toLowerCase().contains("ios"));
     }
 
     @Data

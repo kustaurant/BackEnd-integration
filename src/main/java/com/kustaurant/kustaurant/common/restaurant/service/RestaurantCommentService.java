@@ -1,6 +1,8 @@
 package com.kustaurant.kustaurant.common.restaurant.service;
 
+import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.*;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
@@ -60,9 +62,10 @@ public class RestaurantCommentService {
         restaurantCommentDislikeRepository.deleteAll(comment.getRestaurantCommentDislikeList());
     }
 
-    public List<RestaurantCommentDTO> getRestaurantCommentList(RestaurantEntity restaurant, User user, boolean sortPopular, String userAgent) {
+    public List<RestaurantCommentDTO> getRestaurantCommentList(Integer restaurantId, User user, boolean sortPopular, String userAgent) {
         // 평가 데이터 및 댓글 가져오기
-        List<RestaurantCommentDTO> mainCommentList = new ArrayList<>(restaurant.getEvaluationList().stream()
+        List<EvaluationEntity> evaluations = evaluationService.findByRestaurantId(restaurantId);
+        List<RestaurantCommentDTO> mainCommentList = new ArrayList<>(evaluations.stream()
                 .filter(evaluation -> {
                     String body = evaluation.getCommentBody();
                     String imgUrl = evaluation.getCommentImgUrl();
@@ -97,7 +100,7 @@ public class RestaurantCommentService {
     }
 
     public RestaurantCommentDTO getRestaurantCommentDTO(int evaluationId, User user, String userAgent) {
-        Evaluation evaluation = evaluationService.getByEvaluationId(evaluationId);
+        EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
         if (evaluation != null) {
             RestaurantCommentDTO restaurantCommentDTO = RestaurantCommentDTO.convertCommentWhenEvaluation(evaluation, user, userAgent);
             restaurantCommentDTO.setCommentReplies(
@@ -136,7 +139,7 @@ public class RestaurantCommentService {
         }
     }
 
-    public RestaurantComment addSubComment(RestaurantEntity restaurant, User user, String commentBody, Evaluation evaluation) {
+    public RestaurantComment addSubComment(RestaurantEntity restaurant, User user, String commentBody, EvaluationEntity evaluation) {
         RestaurantComment restaurantComment = new RestaurantComment();
 
         restaurantComment.setUser(user);

@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.common.restaurant.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
@@ -46,9 +47,9 @@ public class RestaurantCommentDTO {
     @JsonIgnore
     private User user;
     @JsonIgnore
-    private Evaluation evaluation;
+    private EvaluationEntity evaluation;
 
-    public static RestaurantCommentDTO convertCommentWhenEvaluation(Evaluation evaluation, User user, String userAgent) {
+    public static RestaurantCommentDTO convertCommentWhenEvaluation(EvaluationEntity evaluation, User user, String userAgent) {
         return new RestaurantCommentDTO(
                 evaluation.getEvaluationId() + EvaluationConstants.EVALUATION_ID_OFFSET,
                 evaluation.getEvaluationScore(),
@@ -97,7 +98,7 @@ public class RestaurantCommentDTO {
                 comment.getRestaurantCommentDislikeList().size(), null, null, null, null, null
         );
     }
-    public static RestaurantCommentDTO convertCommentWhenLikeDislike(Evaluation evaluation, User user) {
+    public static RestaurantCommentDTO convertCommentWhenLikeDislike(EvaluationEntity evaluation, User user) {
         return new RestaurantCommentDTO(
                 null, null, null, null, null, null, null,
                 isUserLikeDisLikeStatus(evaluation, user),
@@ -111,7 +112,7 @@ public class RestaurantCommentDTO {
     }
 
 
-    public static boolean isCommentMine(User user, Evaluation evaluation) {
+    public static boolean isCommentMine(User user, EvaluationEntity evaluation) {
         if (user == null) {
             return false;
         }
@@ -125,7 +126,7 @@ public class RestaurantCommentDTO {
         return comment.getUser().equals(user);
     }
 
-    private static int isUserLikeDisLikeStatus(Evaluation evaluation, User user) {
+    private static int isUserLikeDisLikeStatus(EvaluationEntity evaluation, User user) {
         if (user == null) {
             return 0;
         }

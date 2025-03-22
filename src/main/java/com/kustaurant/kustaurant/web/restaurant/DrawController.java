@@ -1,8 +1,6 @@
-package com.kustaurant.kustaurant.web.restaurant.controller;
+package com.kustaurant.kustaurant.web.restaurant;
 
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.web.restaurant.service.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

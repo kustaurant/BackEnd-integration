@@ -19,6 +19,7 @@ import java.util.Optional;
 public class EvaluationRepositoryImpl implements EvaluationRepository {
 
     private final EvaluationJpaRepository jpaRepository;
+    private final EvaluationJpaRepository evaluationJpaRepository;
 
     @Override
     public EvaluationDomain getByUserAndRestaurant(User user, RestaurantDomain restaurant) {
@@ -30,10 +31,15 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
                 .orElseThrow(() -> new DataNotFoundException("요청한 evaluation가 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
     }
 
+    @Override
+    public List<EvaluationEntity> findByRestaurantIdAndStatus(Integer restaurantId, String status) {
+        return evaluationJpaRepository.findByRestaurant_RestaurantIdAndStatus(restaurantId, status);
+    }
+
     // TODO: need to delete everything below this.
 
     @Override
-    public Evaluation save(Evaluation evaluation) {
+    public EvaluationEntity save(EvaluationEntity evaluation) {
         return null;
     }
 
@@ -43,7 +49,7 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     }
 
     @Override
-    public Optional<Evaluation> findByUserAndRestaurantAndStatus(User user, RestaurantEntity restaurant, String status) {
+    public Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(User user, RestaurantEntity restaurant, String status) {
         return Optional.empty();
     }
 
@@ -58,7 +64,7 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     }
 
     @Override
-    public Optional<Evaluation> findByEvaluationIdAndStatus(Integer evaluationId, String status) {
+    public Optional<EvaluationEntity> findByEvaluationIdAndStatus(Integer evaluationId, String status) {
         return Optional.empty();
     }
 

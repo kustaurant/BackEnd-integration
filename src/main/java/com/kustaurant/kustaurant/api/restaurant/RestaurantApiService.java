@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.api.restaurant.service;
+package com.kustaurant.kustaurant.api.restaurant;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
@@ -48,40 +48,36 @@ public class RestaurantApiService {
     }
 
     public List<RestaurantTierDTO> getTopRestaurants() {
-        // TODO: must revise this
         // 모든 'ACTIVE' 상태의 식당을 불러온다.
-//        List<Restaurant> restaurants = restaurantRepository.findByStatus("ACTIVE");
-//        restaurants = restaurants.stream()
-//                .filter(r -> r.getRestaurantEvaluationCount() >= evaluationCount)
-//                .sorted(Comparator.comparingDouble(Restaurant::calculateAverageScore).reversed())
-//                .limit(16)
-//                .collect(Collectors.toList());
-//        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = restaurants.stream()
-//                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
-//                .collect(Collectors.toList());
-//        return topRestaurantsByRatingDTOs;
-        return List.of();
+        List<RestaurantEntity> restaurants = restaurantRepository.findByStatus("ACTIVE");
+        restaurants = restaurants.stream()
+                .filter(r -> r.getRestaurantEvaluationCount() >= evaluationCount)
+                .sorted(Comparator.comparingDouble(RestaurantEntity::calculateAverageScore).reversed())
+                .limit(16)
+                .toList();
+        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = restaurants.stream()
+                .map(restaurant -> RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, null, null))
+                .collect(Collectors.toList());
+        return topRestaurantsByRatingDTOs;
     }
 
     // 뽑기 리스트 반환
-    public List<Restaurant> getRestaurantListByRandomPick(String cuisine, String location) {
-        // TODO: must revise this
-//        // cuisine 이 전체일 떄
-//        if(cuisine.equals("전체")){
-//            if(location.equals("전체")) {
-//                return restaurantRepository.findByStatus("ACTIVE");
-//            }
-//            return restaurantRepository.findByStatusAndRestaurantPosition("ACTIVE", location);
-//        }
-//        // cuisine이 전체가 아닐때
-//
-//        else{
-//            if(location.equals("전체")) {
-//                return restaurantRepository.findByRestaurantCuisineAndStatus(cuisine, "ACTIVE");
-//            }
-//            return restaurantRepository.findByRestaurantCuisineAndStatusAndRestaurantPosition(cuisine, "ACTIVE", location);
-//        }
-        return List.of();
+    public List<RestaurantEntity> getRestaurantListByRandomPick(String cuisine, String location) {
+        // cuisine 이 전체일 떄
+        if(cuisine.equals("전체")){
+            if(location.equals("전체")) {
+                return restaurantRepository.findByStatus("ACTIVE");
+            }
+            return restaurantRepository.findByStatusAndRestaurantPosition("ACTIVE", location);
+        }
+        // cuisine이 전체가 아닐때
+
+        else{
+            if(location.equals("전체")) {
+                return restaurantRepository.findByRestaurantCuisineAndStatus(cuisine, "ACTIVE");
+            }
+            return restaurantRepository.findByRestaurantCuisineAndStatusAndRestaurantPosition(cuisine, "ACTIVE", location);
+        }
 
     }
 

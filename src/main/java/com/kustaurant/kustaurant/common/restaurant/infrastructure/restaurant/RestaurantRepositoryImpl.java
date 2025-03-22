@@ -124,4 +124,9 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     public void save(RestaurantEntity restaurant) {
 
     }
+
+    @Override
+    public Optional<RestaurantEntity> findById(Integer id) {
+        return jpaRepository.findById(id);
+    }
 }

@@ -93,17 +93,6 @@ public class EvaluationEntity {
                 .toList();
     }
 
-    // 평가에서 선택한 situation들의 이름("혼밥", "데이트" 등)의 리스트를 반환합니다. 이전에 선택한게 없을 경우 null을 반환합니다.
-    public List<String> getSituationNameList() {
-        if (this.evaluationItemScoreList == null || this.evaluationItemScoreList.isEmpty()) {
-            return null;
-        }
-
-        return this.evaluationItemScoreList.stream()
-                .map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationName())
-                .toList();
-    }
-
     public String getStarImgUrl() {
         try {
             String[] scoreSplit = evaluationScore.toString().split("\\.");

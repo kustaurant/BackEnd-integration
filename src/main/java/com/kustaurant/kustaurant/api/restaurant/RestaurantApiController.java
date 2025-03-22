@@ -1,30 +1,16 @@
-package com.kustaurant.kustaurant.api.restaurant.controller;
+package com.kustaurant.kustaurant.api.restaurant;
 
-import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
-import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
-import com.kustaurant.kustaurant.global.exception.exception.ParamException;
-import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.FavoriteResponseDTO;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantCommentDTO;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantDetailDTO;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantCommentReport;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantCommentReportRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,11 +21,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.api.restaurant.controller;
+package com.kustaurant.kustaurant.api.restaurant;
 
 import com.kustaurant.kustaurant.common.restaurant.domain.enums.LocationEnum;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
@@ -8,11 +8,9 @@ import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.common.restaurant.constants.MapConstants;
-import com.kustaurant.kustaurant.api.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import io.swagger.v3.oas.annotations.Operation;
