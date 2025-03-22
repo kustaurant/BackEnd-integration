@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.common.evaluation.domain;
 
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Evaluation;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

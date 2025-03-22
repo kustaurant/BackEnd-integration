@@ -1,8 +1,9 @@
 package com.kustaurant.kustaurant.common.evaluation.constants;
 
+import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.EvaluationRepository;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class EvaluationConstants {
 
     public static final int EVALUATION_ID_OFFSET = 10000000;
 
-    public boolean isHasTier(Restaurant restaurant) {
+    public boolean isHasTier(RestaurantEntity restaurant) {
         return restaurant.getRestaurantEvaluationCount() >= getMinimumEvaluationCountForTier();
     }
 

@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class RestaurantFavorite {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="restaurant_id")
-    Restaurant restaurant;
+    RestaurantEntity restaurant;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

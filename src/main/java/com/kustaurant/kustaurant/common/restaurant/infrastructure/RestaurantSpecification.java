@@ -1,7 +1,8 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantSituationRelation;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelation;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
@@ -17,7 +18,7 @@ public class RestaurantSpecification {
         return restaurantSituationRelation.getDataCount() > 3;
     }
     // TODO: 상황 기준 작성 해야됨.
-    public static Specification<Restaurant> withCuisinesAndLocationsAndSituations(
+    public static Specification<RestaurantEntity> withCuisinesAndLocationsAndSituations(
             List<String> cuisines,
             List<String> locations,
             List<Integer> situationList,
