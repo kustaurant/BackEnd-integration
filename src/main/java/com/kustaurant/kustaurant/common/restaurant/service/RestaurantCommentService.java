@@ -1,14 +1,15 @@
 package com.kustaurant.kustaurant.common.restaurant.service;
 
+import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDomain;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.*;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantCommentDTO;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantCommentDislikeRepository;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantCommentLikeRepository;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantCommentRepository;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.repository.RestaurantRepository;
+import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantCommentDTO;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
@@ -61,9 +62,10 @@ public class RestaurantCommentService {
         restaurantCommentDislikeRepository.deleteAll(comment.getRestaurantCommentDislikeList());
     }
 
-    public List<RestaurantCommentDTO> getRestaurantCommentList(Restaurant restaurant, User user, boolean sortPopular, String userAgent) {
+    public List<RestaurantCommentDTO> getRestaurantCommentList(Integer restaurantId, User user, boolean sortPopular, String userAgent) {
         // 평가 데이터 및 댓글 가져오기
-        List<RestaurantCommentDTO> mainCommentList = new ArrayList<>(restaurant.getEvaluationList().stream()
+        List<EvaluationEntity> evaluations = evaluationService.findByRestaurantId(restaurantId);
+        List<RestaurantCommentDTO> mainCommentList = new ArrayList<>(evaluations.stream()
                 .filter(evaluation -> {
                     String body = evaluation.getCommentBody();
                     String imgUrl = evaluation.getCommentImgUrl();
@@ -98,7 +100,7 @@ public class RestaurantCommentService {
     }
 
     public RestaurantCommentDTO getRestaurantCommentDTO(int evaluationId, User user, String userAgent) {
-        Evaluation evaluation = evaluationService.getByEvaluationId(evaluationId);
+        EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
         if (evaluation != null) {
             RestaurantCommentDTO restaurantCommentDTO = RestaurantCommentDTO.convertCommentWhenEvaluation(evaluation, user, userAgent);
             restaurantCommentDTO.setCommentReplies(
@@ -117,7 +119,7 @@ public class RestaurantCommentService {
     public String addComment(Integer restaurantId, String userTokenId, String commentBody) {
         RestaurantComment restaurantComment = new RestaurantComment();
 
-        Restaurant restaurant = restaurantRepository.findByRestaurantId(restaurantId);
+        RestaurantEntity restaurant = restaurantRepository.findByRestaurantId(restaurantId);
 
         Optional<User> userOptional = userRepository.findByProviderId(userTokenId);
         if (userOptional.isPresent()) {
@@ -137,7 +139,7 @@ public class RestaurantCommentService {
         }
     }
 
-    public RestaurantComment addSubComment(Restaurant restaurant, User user, String commentBody, Evaluation evaluation) {
+    public RestaurantComment addSubComment(RestaurantEntity restaurant, User user, String commentBody, EvaluationEntity evaluation) {
         RestaurantComment restaurantComment = new RestaurantComment();
 
         restaurantComment.setUser(user);
