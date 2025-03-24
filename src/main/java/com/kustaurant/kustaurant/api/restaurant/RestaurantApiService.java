@@ -1,12 +1,11 @@
 package com.kustaurant.kustaurant.api.restaurant;
 
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
@@ -97,7 +96,7 @@ public class RestaurantApiService {
         return restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore), pageable);
     }
 
-    public boolean isSituationContainRestaurant(List<Integer> situationList, Restaurant restaurant) {
+    public boolean isSituationContainRestaurant(List<Integer> situationList, RestaurantEntity restaurant) {
         // TODO: 여기서 상황 기준 설정
         return restaurant.getRestaurantSituationRelationList().stream()
                 .anyMatch(el -> situationList.contains(el.getSituation().getSituationId()) && el.getDataCount() >= 3);
@@ -117,7 +116,7 @@ public class RestaurantApiService {
         if (user == null || restaurant == null) {
             return false;
         }
-        return user.getRestaurantFavoriteList().stream()
+        return user.getRestaurantFavoriteEntityList().stream()
                 .anyMatch(restaurantFavorite -> restaurantFavorite.getRestaurant().equals(restaurant));
     }
 
@@ -126,7 +125,7 @@ public class RestaurantApiService {
         User user = userRepository.findByUserId(userId).orElse(null);
 
         // 2. 사용자의 즐겨찾기 목록을 가져옵니다.
-        List<RestaurantFavorite> favorites = restaurantFavoriteRepository.findByUser(user);
+        List<RestaurantFavoriteEntity> favorites = restaurantFavoriteRepository.findByUser(user);
 
         if (favorites.isEmpty()) {
             // 즐겨찾기한 식당이 없을 경우 랜덤 식당 15개 추천

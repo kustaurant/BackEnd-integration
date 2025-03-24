@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.common.evaluation.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import jakarta.persistence.*;
@@ -87,7 +86,7 @@ public class Evaluation {
         }
 
         return this.evaluationItemScoreList.stream()
-                .map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationId())
+                .map(evaluationItemScore -> evaluationItemScore.getSituationEntity().getSituationId())
                 .toList();
     }
 

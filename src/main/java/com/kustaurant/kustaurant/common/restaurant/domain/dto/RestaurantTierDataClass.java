@@ -3,9 +3,8 @@ package com.kustaurant.kustaurant.common.restaurant.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelation;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,13 +20,13 @@ public class RestaurantTierDataClass {
     private Boolean isFavorite = false;
     private Boolean isEvaluation = false;
     @JsonIgnore
-    private List<RestaurantSituationRelation> restaurantSituationRelationList = new ArrayList<>();
+    private List<RestaurantSituationRelationEntity> restaurantSituationRelationEntityList = new ArrayList<>();
 
     public RestaurantTierDataClass(RestaurantEntity restaurant) {
         this.restaurant = restaurant;
     }
 
-    public void addSituation(RestaurantSituationRelation restaurantSituationRelation) {
-        this.restaurantSituationRelationList.add(restaurantSituationRelation);
+    public void addSituation(RestaurantSituationRelationEntity restaurantSituationRelationEntity) {
+        this.restaurantSituationRelationEntityList.add(restaurantSituationRelationEntity);
     }
 }

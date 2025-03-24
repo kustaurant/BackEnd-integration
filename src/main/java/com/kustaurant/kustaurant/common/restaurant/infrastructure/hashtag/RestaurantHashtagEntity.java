@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag;
 
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name="restaurant_hashtags_tbl")
-public class RestaurantHashtag {
+public class RestaurantHashtagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer hashtagId;
@@ -17,6 +17,6 @@ public class RestaurantHashtag {
     private String hashtagName;
 
     @ManyToMany(mappedBy = "restaurantHashtagList")
-    private List<Restaurant> restaurantList = new ArrayList<>();
+    private List<RestaurantEntity> restaurantList = new ArrayList<>();
 
 }

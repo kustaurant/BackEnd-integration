@@ -5,10 +5,10 @@ import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.*;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtag;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenu;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelation;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtagEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenuEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -61,11 +61,11 @@ public class RestaurantEntity {
     @JsonIgnore
     @JoinTable(name = "restaurant_hashtag_relations_tbl", joinColumns = @JoinColumn(name = "restaurant_id"),
             inverseJoinColumns = @JoinColumn(name="hashtag_id"))
-    List<RestaurantHashtag> restaurantHashtagList = new ArrayList<>();
+    List<RestaurantHashtagEntity> restaurantHashtagEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
-    List<RestaurantSituationRelation> restaurantSituationRelationList = new ArrayList<>();
+    List<RestaurantSituationRelationEntity> restaurantSituationRelationEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
@@ -77,11 +77,11 @@ public class RestaurantEntity {
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
-    private List<RestaurantFavorite> restaurantFavorite = new ArrayList<>();
+    private List<RestaurantFavoriteEntity> restaurantFavorite = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
-    private List<RestaurantMenu> restaurantMenuList = new ArrayList<>();
+    private List<RestaurantMenuEntity> restaurantMenuEntityList = new ArrayList<>();
 
     public double calculateAverageScore() {
         if (evaluationList.isEmpty()) {
@@ -143,7 +143,7 @@ public class RestaurantEntity {
                 .restaurantScoreSum(restaurantScoreSum)
                 .mainTier(mainTier)
                 // TODO: 개선 필요해 보임
-                .situations(restaurantSituationRelationList.stream().filter(RestaurantSpecification::hasSituation).map(el -> el.getSituation().getSituationName()).collect(Collectors.toList()))
+                .situations(restaurantSituationRelationEntityList.stream().filter(RestaurantSpecification::hasSituation).map(el -> el.getSituationEntity().getSituationName()).collect(Collectors.toList()))
                 .favoriteCount(this.restaurantFavorite.size())
                 .build();
     }

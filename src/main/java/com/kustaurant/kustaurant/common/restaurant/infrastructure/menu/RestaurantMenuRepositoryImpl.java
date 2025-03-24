@@ -1,8 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.menu;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenuDomain;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantMenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

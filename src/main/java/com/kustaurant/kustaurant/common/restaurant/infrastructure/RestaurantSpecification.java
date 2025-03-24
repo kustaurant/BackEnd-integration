@@ -1,8 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure;
 
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelation;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationEntity;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
@@ -14,8 +13,8 @@ import java.util.List;
 public class RestaurantSpecification {
     // TODO:
     // TODO: 상황 기준 작성 해야됨.
-    public static boolean hasSituation(RestaurantSituationRelation restaurantSituationRelation) {
-        return restaurantSituationRelation.getDataCount() > 3;
+    public static boolean hasSituation(RestaurantSituationRelationEntity restaurantSituationRelationEntity) {
+        return restaurantSituationRelationEntity.getDataCount() > 3;
     }
     // TODO: 상황 기준 작성 해야됨.
     public static Specification<RestaurantEntity> withCuisinesAndLocationsAndSituations(
@@ -52,7 +51,7 @@ public class RestaurantSpecification {
             if (situationList != null && !situationList.isEmpty()) {
                 // 서브쿼리 생성
                 Subquery<Long> subquery = query.subquery(Long.class);
-                Root<RestaurantSituationRelation> subRoot = subquery.from(RestaurantSituationRelation.class);
+                Root<RestaurantSituationRelationEntity> subRoot = subquery.from(RestaurantSituationRelationEntity.class);
 
                 // 서브쿼리 조건: situationId가 situationList에 속하고, dataCount가 3보다 큰 항목
                 Predicate situationPredicate = subRoot.get("situation").get("situationId").in(situationList);

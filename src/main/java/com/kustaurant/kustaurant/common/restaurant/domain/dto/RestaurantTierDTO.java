@@ -2,7 +2,6 @@ package com.kustaurant.kustaurant.common.restaurant.domain.dto;
 
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

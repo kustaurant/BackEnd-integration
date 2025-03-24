@@ -4,13 +4,13 @@ import com.kustaurant.kustaurant.common.notice.NoticeDTO;
 import com.kustaurant.kustaurant.common.notice.NoticeRepository;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.post.infrastructure.Post;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostCommentRepository;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostRepository;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrapRepository;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.user.domain.*;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
@@ -161,7 +161,7 @@ public class MypageApiService {
     // 유저가 즐겨찾기한 레스토랑 리스트들 반환
     public List<FavoriteRestaurantInfoDTO> getUserFavoriteRestaurantList(Integer userId) {
         User user = findUserById(userId);
-        List<RestaurantFavorite> favoriteList = user.getRestaurantFavoriteList();
+        List<RestaurantFavoriteEntity> favoriteList = user.getRestaurantFavoriteEntityList();
 
         List<FavoriteRestaurantInfoDTO> favoriteRestaurantInfoDTOs = favoriteList.stream()
                 .map(restaurantFavorite -> new FavoriteRestaurantInfoDTO(
@@ -198,7 +198,7 @@ public class MypageApiService {
 
                     // EvaluationItemScoreList 에서 각 상황 이름을 추출
                     List<String> situationNames = evaluation.getEvaluationItemScoreList().stream()
-                            .map(item -> item.getSituation().getSituationName())
+                            .map(item -> item.getSituationEntity().getSituationName())
                             .collect(Collectors.toList());
 
                     return new EvaluatedRestaurantInfoDTO(

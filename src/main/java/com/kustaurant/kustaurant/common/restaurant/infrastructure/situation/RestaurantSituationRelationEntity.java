@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.situation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "restaurant_situation_relations_tbl")
-public class RestaurantSituationRelation {
+public class RestaurantSituationRelationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer relationId;
@@ -25,15 +24,15 @@ public class RestaurantSituationRelation {
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name="situation_id")
-    private Situation situation;
+    private SituationEntity situationEntity;
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name="restaurant_id")
     private RestaurantEntity restaurant;
 
-    public RestaurantSituationRelation(Integer dataCount, Situation situation, RestaurantEntity restaurant) {
+    public RestaurantSituationRelationEntity(Integer dataCount, SituationEntity situationEntity, RestaurantEntity restaurant) {
         this.dataCount = dataCount;
-        this.situation = situation;
+        this.situationEntity = situationEntity;
         this.restaurant = restaurant;
     }
 }

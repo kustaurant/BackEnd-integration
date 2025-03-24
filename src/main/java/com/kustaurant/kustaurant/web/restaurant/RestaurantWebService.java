@@ -3,14 +3,13 @@ package com.kustaurant.kustaurant.web.restaurant;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantCommentDTO;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantDetailDTO;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenuEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantMenuRepository;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtag;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenu;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtagEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -68,8 +67,8 @@ public class RestaurantWebService {
                 query.distinct(true);  // 중복을 제거
 
                 // 조인
-                Join<Restaurant, RestaurantHashtag> joinHashtag = root.join("restaurantHashtagList", JoinType.LEFT);
-                Join<Restaurant, RestaurantMenu> joinMenu = root.join("restaurantMenuList", JoinType.LEFT);
+                Join<RestaurantEntity, RestaurantHashtagEntity> joinHashtag = root.join("restaurantHashtagList", JoinType.LEFT);
+                Join<RestaurantEntity, RestaurantMenuEntity> joinMenu = root.join("restaurantMenuList", JoinType.LEFT);
                 //Join<Restaurant, Situation> joinSituation = root.join("situationList", JoinType.LEFT);
 
                 List<Predicate> predicates = new ArrayList<>();

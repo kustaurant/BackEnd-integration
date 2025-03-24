@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.mock;
 
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDomain;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
@@ -57,12 +57,12 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
 
     // TODO: need to delete everything below this
     @Override
-    public Optional<RestaurantFavorite> findByUserAndRestaurant(User user, RestaurantEntity restaurant) {
+    public Optional<RestaurantFavoriteEntity> findByUserAndRestaurant(User user, RestaurantEntity restaurant) {
         return Optional.empty();
     }
 
     @Override
-    public List<RestaurantFavorite> findByUser(User user) {
+    public List<RestaurantFavoriteEntity> findByUser(User user) {
         return List.of();
     }
 

@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.service.port;
 
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
