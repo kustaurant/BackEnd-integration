@@ -15,18 +15,20 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TierService {
+public class RestaurantTierService {
 
     private final RestaurantRepository restaurantRepository;
 
-    public List<RestaurantEntity> getRestaurantsByCuisinesAndSituationsAndLocations(
+    // Cuisine, Situation, Location 조건에 맞는 식당 리스트를 반환
+    public List<RestaurantEntity> findByConditions(
             List<String> cuisineList, List<Integer> situationList, List<String> locationList,
             Integer tierInfo, boolean isOrderByScore
     ) {
         return restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore));
     }
 
-    public Page<RestaurantEntity> getRestaurantsByCuisinesAndSituationsAndLocationsWithPage(
+    // 위 함수의 페이징 버전
+    public Page<RestaurantEntity> findByConditionsWithPage(
             List<String> cuisineList, List<Integer> situationList, List<String> locationList,
             Integer tierInfo, boolean isOrderByScore, int page, int size
     ) {

@@ -88,12 +88,6 @@ public class RestaurantApiService {
         return restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore));
     }
 
-    public boolean isSituationContainRestaurant(List<Integer> situationList, RestaurantEntity restaurant) {
-        // TODO: 여기서 상황 기준 설정
-        return restaurant.getRestaurantSituationRelationEntityList().stream()
-                .anyMatch(el -> situationList.contains(el.getSituation().getSituationId()) && el.getDataCount() >= 3);
-    }
-
     // 해당 식당을 해당 유저가 평가 했는가?
     public boolean isEvaluated(RestaurantEntity restaurant, User user) {
         if (user == null || restaurant == null) {
