@@ -30,7 +30,7 @@ public class SituationEntity {
     };
     @OneToMany(mappedBy = "situation")
     @JsonIgnore
-    private List<RestaurantSituationRelationEntity> restaurantSituationRelationEntityList = new ArrayList<>();
+    private List<RestaurantSituationRelationEntity> restaurantSituationRelationList = new ArrayList<>();
 
     @OneToMany(mappedBy = "situation")
     @JsonIgnore

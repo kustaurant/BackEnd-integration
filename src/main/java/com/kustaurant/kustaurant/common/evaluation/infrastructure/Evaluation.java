@@ -86,7 +86,7 @@ public class Evaluation {
         }
 
         return this.evaluationItemScoreList.stream()
-                .map(evaluationItemScore -> evaluationItemScore.getSituationEntity().getSituationId())
+                .map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationId())
                 .toList();
     }
 

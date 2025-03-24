@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.web.restaurant;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantCommentDTO;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantDetailDTO;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenuEntity;
@@ -35,7 +35,7 @@ public class RestaurantWebService {
     public RestaurantDetailWebDto getRestaurantWebDetails(User user, Integer restaurantId) {
         Integer userId = user == null ? null : user.getUserId();
         RestaurantDetailDTO restaurantDetailDto = restaurantService.getRestaurantDetailDto(restaurantId, userId, "web");
-        RestaurantDomain restaurant = restaurantService.getDomain(restaurantId);
+        Restaurant restaurant = restaurantService.getDomain(restaurantId);
         // TODO: 이거도 userId 사용하게 바꿔야됨.
         List<RestaurantCommentDTO> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, user, true, "web");
 

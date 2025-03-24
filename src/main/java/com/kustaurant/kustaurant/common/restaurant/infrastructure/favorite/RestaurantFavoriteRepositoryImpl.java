@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
@@ -19,7 +19,7 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     private final RestaurantFavoriteJpaRepository jpaRepository;
 
     @Override
-    public RestaurantFavoriteDomain findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
+    public RestaurantFavorite findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
         return jpaRepository.findByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId)
                 .map(RestaurantFavoriteEntity::toModel)
                 .orElseThrow(() -> new DataNotFoundException("요청한 restaurantFavorite이 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
@@ -34,7 +34,7 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     }
 
     @Override
-    public List<RestaurantFavoriteDomain> findByUser(Integer userId) {
+    public List<RestaurantFavorite> findByUser(Integer userId) {
         if (userId == null) {
             return List.of();
         }
@@ -45,13 +45,13 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
 
     @Override
     @Transactional
-    public RestaurantFavoriteDomain save(RestaurantFavoriteDomain restaurantFavorite) {
+    public RestaurantFavorite save(RestaurantFavorite restaurantFavorite) {
         return jpaRepository.save(RestaurantFavoriteEntity.from(restaurantFavorite)).toModel();
     }
 
     @Override
     @Transactional
-    public void delete(RestaurantFavoriteDomain restaurantFavorite) {
+    public void delete(RestaurantFavorite restaurantFavorite) {
         jpaRepository.delete(RestaurantFavoriteEntity.from(restaurantFavorite));
     }
 

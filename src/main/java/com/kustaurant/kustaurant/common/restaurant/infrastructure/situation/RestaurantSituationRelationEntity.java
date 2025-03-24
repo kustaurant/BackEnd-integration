@@ -24,15 +24,15 @@ public class RestaurantSituationRelationEntity {
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name="situation_id")
-    private SituationEntity situationEntity;
+    private SituationEntity situation;
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name="restaurant_id")
     private RestaurantEntity restaurant;
 
-    public RestaurantSituationRelationEntity(Integer dataCount, SituationEntity situationEntity, RestaurantEntity restaurant) {
+    public RestaurantSituationRelationEntity(Integer dataCount, SituationEntity situation, RestaurantEntity restaurant) {
         this.dataCount = dataCount;
-        this.situationEntity = situationEntity;
+        this.situation = situation;
         this.restaurant = restaurant;
     }
 }

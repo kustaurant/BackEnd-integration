@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.domain.dto;
 
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -65,7 +65,7 @@ public class RestaurantTierDTO {
         );
     }
 
-    public static RestaurantTierDTO convertRestaurantToTierDTO(RestaurantDomain restaurant, Integer ranking, Boolean isEvaluated, Boolean isFavorite) {
+    public static RestaurantTierDTO convertRestaurantToTierDTO(Restaurant restaurant, Integer ranking, Boolean isEvaluated, Boolean isFavorite) {
         DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.HALF_UP);
         Double score = restaurant.getRestaurantEvaluationCount() != 0 ? Double.parseDouble(df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())) : null;

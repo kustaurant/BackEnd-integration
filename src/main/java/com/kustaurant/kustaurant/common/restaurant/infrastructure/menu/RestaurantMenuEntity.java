@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.menu;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenuDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenu;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -26,8 +26,8 @@ public class RestaurantMenuEntity {
     private String naverType;
     private String menuImgUrl;
 
-    public RestaurantMenuDomain toModel() {
-        return RestaurantMenuDomain.builder()
+    public RestaurantMenu toModel() {
+        return RestaurantMenu.builder()
                 .menuId(this.menuId)
                 .menuImgUrl(this.menuImgUrl)
                 .menuName(this.menuName)

@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.service.port;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RestaurantRepository {
-    RestaurantDomain getById(Integer id);
-    RestaurantDomain getByIdAndStatus(Integer id, String status);
-    List<RestaurantDomain> findByCuisineAndStatus(String cuisine, String status);
-    List<RestaurantDomain> findByPositionAndStatus(String position, String status);
-    List<RestaurantDomain> findByCuisineAndPositionAndStatus(String cuisine, String position, String status);
+    Restaurant getById(Integer id);
+    Restaurant getByIdAndStatus(Integer id, String status);
+    List<Restaurant> findByCuisineAndStatus(String cuisine, String status);
+    List<Restaurant> findByPositionAndStatus(String position, String status);
+    List<Restaurant> findByCuisineAndPositionAndStatus(String cuisine, String position, String status);
 
-    RestaurantDomain save(RestaurantDomain restaurantDomain);
+    Restaurant save(Restaurant restaurant);
 
     // TODO: need to delete everything below this
     List<RestaurantEntity> findAll();

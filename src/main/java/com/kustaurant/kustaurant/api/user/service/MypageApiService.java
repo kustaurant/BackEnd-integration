@@ -198,7 +198,7 @@ public class MypageApiService {
 
                     // EvaluationItemScoreList 에서 각 상황 이름을 추출
                     List<String> situationNames = evaluation.getEvaluationItemScoreList().stream()
-                            .map(item -> item.getSituationEntity().getSituationName())
+                            .map(item -> item.getSituation().getSituationName())
                             .collect(Collectors.toList());
 
                     return new EvaluatedRestaurantInfoDTO(

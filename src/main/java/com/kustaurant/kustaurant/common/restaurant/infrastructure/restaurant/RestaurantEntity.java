@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtagEntity;
@@ -61,7 +61,7 @@ public class RestaurantEntity {
     @JsonIgnore
     @JoinTable(name = "restaurant_hashtag_relations_tbl", joinColumns = @JoinColumn(name = "restaurant_id"),
             inverseJoinColumns = @JoinColumn(name="hashtag_id"))
-    List<RestaurantHashtagEntity> restaurantHashtagEntityList = new ArrayList<>();
+    List<RestaurantHashtagEntity> restaurantHashtagList = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
@@ -81,7 +81,7 @@ public class RestaurantEntity {
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
-    private List<RestaurantMenuEntity> restaurantMenuEntityList = new ArrayList<>();
+    private List<RestaurantMenuEntity> restaurantMenuList = new ArrayList<>();
 
     public double calculateAverageScore() {
         if (evaluationList.isEmpty()) {
@@ -94,34 +94,34 @@ public class RestaurantEntity {
                 .orElse(0.0); // 평가가 없는 경우 0 반환
     }
 
-    public static RestaurantEntity from(RestaurantDomain restaurantDomain) {
+    public static RestaurantEntity from(Restaurant restaurant) {
         RestaurantEntity entity = new RestaurantEntity();
-        entity.setRestaurantId(restaurantDomain.getRestaurantId());
-        entity.setRestaurantName(restaurantDomain.getRestaurantName());
-        entity.setRestaurantType(restaurantDomain.getRestaurantType());
-        entity.setRestaurantPosition(restaurantDomain.getRestaurantPosition());
-        entity.setRestaurantAddress(restaurantDomain.getRestaurantAddress());
-        entity.setRestaurantTel(restaurantDomain.getRestaurantTel());
-        entity.setRestaurantUrl(restaurantDomain.getRestaurantUrl());
-        entity.setRestaurantImgUrl(restaurantDomain.getRestaurantImgUrl());
-        entity.setRestaurantCuisine(restaurantDomain.getRestaurantCuisine());
-        entity.setRestaurantLatitude(restaurantDomain.getRestaurantLatitude());
-        entity.setRestaurantLongitude(restaurantDomain.getRestaurantLongitude());
-        entity.setPartnershipInfo(restaurantDomain.getPartnershipInfo());
-        entity.setStatus(restaurantDomain.getStatus());
-        entity.setCreatedAt(restaurantDomain.getCreatedAt());
-        entity.setUpdatedAt(restaurantDomain.getUpdatedAt());
-        entity.setRestaurantVisitCount(restaurantDomain.getRestaurantVisitCount());
-        entity.setVisitCount(restaurantDomain.getVisitCount());
-        entity.setRestaurantEvaluationCount(restaurantDomain.getRestaurantEvaluationCount());
-        entity.setRestaurantScoreSum(restaurantDomain.getRestaurantScoreSum());
-        entity.setMainTier(restaurantDomain.getMainTier());
+        entity.setRestaurantId(restaurant.getRestaurantId());
+        entity.setRestaurantName(restaurant.getRestaurantName());
+        entity.setRestaurantType(restaurant.getRestaurantType());
+        entity.setRestaurantPosition(restaurant.getRestaurantPosition());
+        entity.setRestaurantAddress(restaurant.getRestaurantAddress());
+        entity.setRestaurantTel(restaurant.getRestaurantTel());
+        entity.setRestaurantUrl(restaurant.getRestaurantUrl());
+        entity.setRestaurantImgUrl(restaurant.getRestaurantImgUrl());
+        entity.setRestaurantCuisine(restaurant.getRestaurantCuisine());
+        entity.setRestaurantLatitude(restaurant.getRestaurantLatitude());
+        entity.setRestaurantLongitude(restaurant.getRestaurantLongitude());
+        entity.setPartnershipInfo(restaurant.getPartnershipInfo());
+        entity.setStatus(restaurant.getStatus());
+        entity.setCreatedAt(restaurant.getCreatedAt());
+        entity.setUpdatedAt(restaurant.getUpdatedAt());
+        entity.setRestaurantVisitCount(restaurant.getRestaurantVisitCount());
+        entity.setVisitCount(restaurant.getVisitCount());
+        entity.setRestaurantEvaluationCount(restaurant.getRestaurantEvaluationCount());
+        entity.setRestaurantScoreSum(restaurant.getRestaurantScoreSum());
+        entity.setMainTier(restaurant.getMainTier());
 
         return entity;
     }
 
-    public RestaurantDomain toModel() {
-        return RestaurantDomain.builder()
+    public Restaurant toModel() {
+        return Restaurant.builder()
                 .restaurantId(restaurantId)
                 .restaurantName(restaurantName)
                 .restaurantType(restaurantType)
@@ -143,7 +143,7 @@ public class RestaurantEntity {
                 .restaurantScoreSum(restaurantScoreSum)
                 .mainTier(mainTier)
                 // TODO: 개선 필요해 보임
-                .situations(restaurantSituationRelationEntityList.stream().filter(RestaurantSpecification::hasSituation).map(el -> el.getSituationEntity().getSituationName()).collect(Collectors.toList()))
+                .situations(restaurantSituationRelationEntityList.stream().filter(RestaurantSpecification::hasSituation).map(el -> el.getSituation().getSituationName()).collect(Collectors.toList()))
                 .favoriteCount(this.restaurantFavorite.size())
                 .build();
     }

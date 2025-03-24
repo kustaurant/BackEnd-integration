@@ -17,14 +17,15 @@ public class EvaluationItemScore {
     @ManyToOne
     @JoinColumn(name="evaluation_id")
     private EvaluationEntity evaluation;
+
     @Id
     @ManyToOne
     @JoinColumn(name="situation_id")
-    private SituationEntity situationEntity;
+    private SituationEntity situation;
 
-    public EvaluationItemScore(EvaluationEntity evaluation, SituationEntity situationEntity) {
+    public EvaluationItemScore(EvaluationEntity evaluation, SituationEntity situation) {
         this.evaluation = evaluation;
-        this.situationEntity = situationEntity;
+        this.situation = situation;
     }
 
 

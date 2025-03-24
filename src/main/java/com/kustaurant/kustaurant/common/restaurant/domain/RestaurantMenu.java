@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class RestaurantMenuDomain {
+public class RestaurantMenu {
     private Integer menuId;
 
-    RestaurantDomain restaurant;
+    Restaurant restaurant;
     private String menuName;
     private String menuPrice;
     private String naverType;

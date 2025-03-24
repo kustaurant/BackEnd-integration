@@ -4,7 +4,6 @@ import com.kustaurant.kustaurant.api.restaurant.RestaurantApiService;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationEntity;
@@ -12,7 +11,6 @@ import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.Situ
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantSituationRelationService;
 import com.kustaurant.kustaurant.common.restaurant.service.S3Service;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
@@ -225,7 +223,7 @@ public class EvaluationService {
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
         // 이전 상황 데이터 삭제 & 이전에 선택한 상황에 대해 restaurant_situation_relations_tbl 테이블의 count 1씩 감소
         for (EvaluationItemScore evaluationItemScore : evaluation.getEvaluationItemScoreList()) {
-            restaurantSituationRelationService.updateOrCreate(restaurant, evaluationItemScore.getSituationEntity(), -1);
+            restaurantSituationRelationService.updateOrCreate(restaurant, evaluationItemScore.getSituation(), -1);
         }
         evaluationItemScoresService.deleteSituationsByEvaluation(evaluation);
         // 새로 추가
@@ -329,7 +327,7 @@ public class EvaluationService {
                     scoreSum += evaluation.getEvaluationScore();
 
                     for (EvaluationItemScore item : evaluation.getEvaluationItemScoreList()) {
-                        Integer situationId = item.getSituationEntity().getSituationId();
+                        Integer situationId = item.getSituation().getSituationId();
                         situationCountMap.put(situationId, situationCountMap.getOrDefault(situationId, 0) + 1);
                     }
                 }
@@ -379,7 +377,7 @@ public class EvaluationService {
     }
 
     public void insertSituation(RestaurantTierDataClass data, RestaurantEntity restaurant) {
-        for (RestaurantSituationRelationEntity restaurantSituationRelationEntity : restaurant.getRestaurantSituationRelationList()) {
+        for (RestaurantSituationRelationEntity restaurantSituationRelationEntity : restaurant.getRestaurantSituationRelationEntityList()) {
             if (RestaurantSpecification.hasSituation(restaurantSituationRelationEntity)) {
                 data.addSituation(restaurantSituationRelationEntity);
             }
