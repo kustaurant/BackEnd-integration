@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.api.restaurant;
+package com.kustaurant.kustaurant.common.restaurant.service;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.*;
 import java.util.stream.Collectors;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -87,15 +88,6 @@ public class RestaurantApiService {
         return restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore));
     }
 
-    public Page<RestaurantEntity> getRestaurantsByCuisinesAndSituationsAndLocationsWithPage(
-            List<String> cuisineList, List<Integer> situationList, List<String> locationList,
-            Integer tierInfo, boolean isOrderByScore, int page, int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-
-        return restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore), pageable);
-    }
-
     public boolean isSituationContainRestaurant(List<Integer> situationList, RestaurantEntity restaurant) {
         // TODO: 여기서 상황 기준 설정
         return restaurant.getRestaurantSituationRelationEntityList().stream()
@@ -129,7 +121,7 @@ public class RestaurantApiService {
 
         if (favorites.isEmpty()) {
             // 즐겨찾기한 식당이 없을 경우 랜덤 식당 15개 추천
-            List<RestaurantEntity> restaurants = getRestaurantsByCuisinesAndSituationsAndLocations(null, null, null, null, false);
+            List<RestaurantEntity> restaurants = restaurantRepository.findByStatus("ACTIVE");
             Collections.shuffle(restaurants, new Random());
 
             return restaurants.stream().limit(15).collect(Collectors.toList());
@@ -155,7 +147,7 @@ public class RestaurantApiService {
         List<RestaurantEntity> restaurants;
         if (userId == null) {
             // 미로그인 시: 랜덤으로 15개의 식당 반환
-            restaurants = getRestaurantsByCuisinesAndSituationsAndLocations(null, null, null, null, false);
+            restaurants = restaurantRepository.findByStatus("ACTIVE");
             Collections.shuffle(restaurants, new Random());
             restaurants=  restaurants.stream().limit(15).collect(Collectors.toList());
         } else {

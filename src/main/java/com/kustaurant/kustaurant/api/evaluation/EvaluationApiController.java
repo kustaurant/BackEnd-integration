@@ -1,9 +1,8 @@
 package com.kustaurant.kustaurant.api.evaluation;
 
-import com.kustaurant.kustaurant.api.restaurant.RestaurantApiService;
+import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantCommentReport;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantCommentReportRepository;
