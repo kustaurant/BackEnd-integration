@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +9,9 @@ import lombok.Getter;
 public class RestaurantMenu {
     private Integer menuId;
 
+    @JsonIgnore
     Restaurant restaurant;
+
     private String menuName;
     private String menuPrice;
     private String naverType;
