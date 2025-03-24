@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
-import com.kustaurant.kustaurant.common.post.infrastructure.Post;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,27 +49,27 @@ public class PostDTO {
     @Schema(description = "작성자 여부",example = "true")
     Boolean isPostMine =false;
 
-    public static PostDTO convertPostToPostDTO(Post post) {
+    public static PostDTO convertPostToPostDTO(PostEntity postEntity) {
         PostDTO dto = new PostDTO();
-        dto.setPostId(post.getPostId());
-        dto.setPostTitle(post.getPostTitle());
-        dto.setPostBody(post.getPostBody());
-        dto.setStatus(post.getStatus());
-        dto.setPostCategory(post.getPostCategory());
-        dto.setCreatedAt(post.getCreatedAt());
-        dto.setUpdatedAt(post.getUpdatedAt());
-        dto.setLikeCount(post.getLikeCount());
-        dto.setUser(UserDTO.convertUserToUserDTO(post.getUser()));
-        int commentCount = post.getPostCommentList().stream().filter(c -> c.getStatus().equals("ACTIVE")).toList().size();
+        dto.setPostId(postEntity.getPostId());
+        dto.setPostTitle(postEntity.getPostTitle());
+        dto.setPostBody(postEntity.getPostBody());
+        dto.setStatus(postEntity.getStatus());
+        dto.setPostCategory(postEntity.getPostCategory());
+        dto.setCreatedAt(postEntity.getCreatedAt());
+        dto.setUpdatedAt(postEntity.getUpdatedAt());
+        dto.setLikeCount(postEntity.getLikeCount());
+        dto.setUser(UserDTO.convertUserToUserDTO(postEntity.getUser()));
+        int commentCount = postEntity.getPostCommentList().stream().filter(c -> c.getStatus().equals("ACTIVE")).toList().size();
         dto.setCommentCount(commentCount);
-        dto.setTimeAgo(post.calculateTimeAgo());
-        if(!post.getPostPhotoList().isEmpty()){
-            dto.setPostPhotoImgUrl(post.getPostPhotoList().get(0).getPhotoImgUrl());
+        dto.setTimeAgo(postEntity.toDomain().calculateTimeAgo());
+        if(!postEntity.getPostPhotoList().isEmpty()){
+            dto.setPostPhotoImgUrl(postEntity.getPostPhotoList().get(0).getPhotoImgUrl());
         }else{
             dto.setPostPhotoImgUrl(null);
         }
-        dto.setPostVisitCount(post.getPostVisitCount());
-        dto.setScrapCount(post.getPostScrapList().size());
+        dto.setPostVisitCount(postEntity.getPostVisitCount());
+        dto.setScrapCount(postEntity.getPostScrapList().size());
         return dto;
     }
 }

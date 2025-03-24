@@ -1,19 +1,14 @@
 package com.kustaurant.kustaurant.web.post.controller;
 
-import com.kustaurant.kustaurant.common.post.infrastructure.Post;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostPhoto;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.web.post.service.PostCommentService;
 import com.kustaurant.kustaurant.web.post.service.PostScrapService;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import com.kustaurant.kustaurant.common.post.service.StorageService;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostCommentRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrapRepository;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostPhotoRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostRepository;
+import groovy.util.logging.Slf4j;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
@@ -36,14 +31,15 @@ import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
-
+@lombok.extern.slf4j.Slf4j
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class CommunityController {
     private final PostService postService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final PostCommentService postCommentService;
-    private final PostRepository postRepository;
+    private final JpaPostRepository jpaPostRepository;
     private final PostCommentRepository postCommentRepository;
     private final PostScrapRepository postScrapRepository;
     private final PostScrapService postScrapService;
@@ -57,7 +53,7 @@ public class CommunityController {
             @RequestParam(defaultValue = "전체") String postCategory,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(defaultValue = "recent") String sort) {
-        Page<Post> paging;
+        Page<PostEntity> paging;
         // 따로 전송된 카테고리 값이 없을떄
         if (postCategory.equals("전체")) {
             paging = postService.getList(page, sort);
@@ -77,17 +73,18 @@ public class CommunityController {
     // 커뮤니티 게시글 상세 화면
     @GetMapping("/community/{postId}")
     public String post(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
-        Post post = postService.getPost(postId);
+        PostEntity postEntity = postService.getPost(postId);
         // 조회수 증가
-        postService.increaseVisitCount(post);
+        postService.increaseVisitCount(postEntity);
         List<PostComment> postCommentList = postCommentService.getList(postId, sort);
         model.addAttribute("postCommentList", postCommentList);
-        model.addAttribute("post", post);
+        model.addAttribute("post", postEntity);
+
         boolean isPostScrappedByUser = false;
         if (principal != null) {
             User user = customOAuth2UserService.getUser(principal.getName());
             model.addAttribute("user", user);
-            isPostScrappedByUser = post.getPostScrapList().stream()
+            isPostScrappedByUser = postEntity.getPostScrapList().stream()
                     .anyMatch(scrap -> scrap.getUser().equals(user));
         }
         model.addAttribute("sort", sort);
@@ -99,10 +96,10 @@ public class CommunityController {
     @GetMapping("/api/post/delete")
     @Transactional
     public ResponseEntity<String> postDelete(@RequestParam String postId) {
-        Post post = postService.getPost(Integer.valueOf(postId));
+        PostEntity postEntity = postService.getPost(Integer.valueOf(postId));
 
         //게시글 지워지면 그 게시글의 댓글들도 DELETED 상태로 변경
-        List<PostComment> comments = post.getPostCommentList();
+        List<PostComment> comments = postEntity.getPostCommentList();
         for (PostComment comment : comments) {
             comment.setStatus("DELETED");
             //대댓글 삭제
@@ -111,16 +108,16 @@ public class CommunityController {
             }
         }
         //게시글 지워지면 그 게시글의 scrab정보들도 다 지워야함
-        List<PostScrap> scraps = post.getPostScrapList();
+        List<PostScrap> scraps = postEntity.getPostScrapList();
         postScrapRepository.deleteAll(scraps);
         // 사진 삭제
-        List<PostPhoto> existingPhotos = post.getPostPhotoList();
+        List<PostPhoto> existingPhotos = postEntity.getPostPhotoList();
         if (existingPhotos != null) {
             postPhotoRepository.deleteAll(existingPhotos);
-            post.setPostPhotoList(null); // 기존 리스트 연결 해제
+            postEntity.setPostPhotoList(null); // 기존 리스트 연결 해제
         }
         // 글 삭제
-        post.setStatus("DELETED");
+        postEntity.setStatus("DELETED");
         return ResponseEntity.ok("post delete complete");
     }
 
@@ -164,8 +161,8 @@ public class CommunityController {
             Model model, Principal principal) {
         Integer postIdInt = Integer.valueOf(postId);
         User user = customOAuth2UserService.getUser(principal.getName());
-        Post post = postService.getPost(postIdInt);
-        PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), post, user);
+        PostEntity postEntity = postService.getPost(postIdInt);
+        PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), postEntity, user);
         PostComment savedPostComment = postCommentRepository.save(postComment);
 
         // 대댓글이면 부모 관계 매핑하기
@@ -178,7 +175,7 @@ public class CommunityController {
         }
         // 댓글이면 post와 연결하면서 저장
         else {
-            postCommentService.create(post, user, savedPostComment);
+            postCommentService.create(postEntity, user, savedPostComment);
         }
         postCommentRepository.save(savedPostComment);
         return ResponseEntity.ok("댓글이 성공적으로 저장되었습니다.");
@@ -190,10 +187,10 @@ public class CommunityController {
     public ResponseEntity<Map<String, Object>> postLikeCreate(@RequestParam("postId") String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
         User user = customOAuth2UserService.getUser(principal.getName());
-        Post post = postService.getPost(postidInt);
-        Map<String, Object> response = postService.likeCreateOrDelete(post, user);
-        response.put("likeCount", post.getLikeUserList().size());
-        response.put("dislikeCount", post.getDislikeUserList().size());
+        PostEntity postEntity = postService.getPost(postidInt);
+        Map<String, Object> response = postService.likeCreateOrDelete(postEntity, user);
+        response.put("likeCount", postEntity.getLikeUserList().size());
+        response.put("dislikeCount", postEntity.getDislikeUserList().size());
 
         return ResponseEntity.ok(response);
     }
@@ -204,10 +201,10 @@ public class CommunityController {
     public ResponseEntity<Map<String, Object>> postDislikeCreate(@RequestParam("postId") String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
         User user = customOAuth2UserService.getUser(principal.getName());
-        Post post = postService.getPost(postidInt);
-        Map<String, Object> response = postService.dislikeCreateOrDelete(post, user);
-        response.put("dislikeCount", post.getDislikeUserList().size());
-        response.put("likeCount", post.getLikeUserList().size());
+        PostEntity postEntity = postService.getPost(postidInt);
+        Map<String, Object> response = postService.dislikeCreateOrDelete(postEntity, user);
+        response.put("dislikeCount", postEntity.getDislikeUserList().size());
+        response.put("likeCount", postEntity.getLikeUserList().size());
         return ResponseEntity.ok(response);
     }
 
@@ -217,8 +214,8 @@ public class CommunityController {
     public ResponseEntity<Map<String, Object>> postScrap(@RequestParam("postId") String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
         User user = customOAuth2UserService.getUser(principal.getName());
-        Post post = postService.getPost(postidInt);
-        Map<String, Object> response = postScrapService.scrapCreateOfDelete(post, user);
+        PostEntity postEntity = postService.getPost(postidInt);
+        Map<String, Object> response = postScrapService.scrapCreateOfDelete(postEntity, user);
         return ResponseEntity.ok(response);
     }
 
@@ -226,7 +223,7 @@ public class CommunityController {
     @GetMapping("/community/search")
     public String search(Model model, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "kw", defaultValue = "") String kw, @RequestParam(defaultValue = "recent") String sort, @RequestParam(defaultValue = "전체") String postCategory) {
 
-        Page<Post> paging = this.postService.getList(page, sort, kw, postCategory);
+        Page<PostEntity> paging = this.postService.getList(page, sort, kw, postCategory);
         List<String> timeAgoList = postService.getTimeAgoList(paging);
         model.addAttribute("timeAgoList", timeAgoList);
         model.addAttribute("paging", paging);
@@ -278,9 +275,10 @@ public class CommunityController {
             Principal principal) throws IOException {
 
         // 게시글 객체 생성
-        Post post = new Post(title, content, postCategory, "ACTIVE", LocalDateTime.now());
         User user = customOAuth2UserService.getUser(principal.getName());
-        postService.create(post, user);
+
+        PostEntity postEntity = new PostEntity(title, content, postCategory, "ACTIVE", LocalDateTime.now(),user);
+        postService.create(postEntity, user);
 
         // TinyMCE 컨텐츠에서 <img> 태그를 파싱
         Document doc = Jsoup.parse(content);
@@ -294,14 +292,14 @@ public class CommunityController {
             // 이미지 파일 처리
             if (imgUrl != null && !imgUrl.isEmpty()) {
                 PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-                postPhoto.setPost(post); // 게시글과 이미지 연관관계 설정
-                post.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
+                postPhoto.setPostEntity(postEntity); // 게시글과 이미지 연관관계 설정
+                postEntity.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
                 postPhotoRepository.save(postPhoto); // 이미지 정보 저장
             }
         }
 
         // 게시글 정보 저장
-        postRepository.save(post);
+        jpaPostRepository.save(postEntity);
 
         return ResponseEntity.ok("글이 성공적으로 저장되었습니다.");
     }
@@ -309,8 +307,8 @@ public class CommunityController {
     //게시글 수정화면
     @GetMapping("/community/post/update")
     public String postUpdatePage(@RequestParam String postId, Model model) {
-        Post post = postService.getPost(Integer.valueOf(postId));
-        model.addAttribute("post", post);
+        PostEntity postEntity = postService.getPost(Integer.valueOf(postId));
+        model.addAttribute("post", postEntity);
         return "community_update";
     }
 
@@ -323,12 +321,12 @@ public class CommunityController {
             @RequestParam String postCategory,
             @RequestParam String content
     ) {
-        Post post = postService.getPost(Integer.valueOf(postId));
+        PostEntity postEntity = postService.getPost(Integer.valueOf(postId));
         // 기존 연관된 사진 정보 삭제
-        List<PostPhoto> existingPhotos = post.getPostPhotoList();
+        List<PostPhoto> existingPhotos = postEntity.getPostPhotoList();
         if (existingPhotos != null) {
             postPhotoRepository.deleteAll(existingPhotos);
-            post.setPostPhotoList(null); // 기존 리스트 연결 해제
+            postEntity.setPostPhotoList(null); // 기존 리스트 연결 해제
         }
 
         // 새로운 사진 정보 처리 로직 (기존 로직 유지)
@@ -339,16 +337,16 @@ public class CommunityController {
             String imgUrl = img.attr("src");
             if (!imgUrl.isEmpty()) {
                 PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-                postPhoto.setPost(post);
+                postPhoto.setPostEntity(postEntity);
                 newPhotoList.add(postPhoto);
                 postPhotoRepository.save(postPhoto);
             }
         }
-        post.setPostPhotoList(newPhotoList);
-        post.setPostTitle(title);
-        post.setPostCategory(postCategory);
-        post.setPostBody(content);
-        postRepository.save(post);
+        postEntity.setPostPhotoList(newPhotoList);
+        postEntity.setPostTitle(title);
+        postEntity.setPostCategory(postCategory);
+        postEntity.setPostBody(content);
+        jpaPostRepository.save(postEntity);
 
 
         return ResponseEntity.ok("글이 성공적으로 수정되었습니다.");

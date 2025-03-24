@@ -117,7 +117,7 @@
                     <span id="category" th:text="${post.postCategory}"></span>
 
                     <!--     현재 postList의 인덱스에 해당하는 포스트의 생성시간으로부터의 경과 표시 (ex.1시간 전)               -->
-                    <span id="createdAt" th:text="${post.calculateTimeAgo()}"> </span>
+                    <span id="createdAt" th:text="${post.toDomain().calculateTimeAgo()}"> </span>
                     <span id="author" th:text="${post.user.userNickname}"></span>
                 </div>
             </div>

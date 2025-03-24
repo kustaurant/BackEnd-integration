@@ -2,9 +2,10 @@
 package com.kustaurant.kustaurant.common.user.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.*;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.common.post.infrastructure.Post;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
 import com.kustaurant.kustaurant.global.webUser.UserRole;
@@ -81,7 +82,7 @@ public class User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<Post> postList = new ArrayList<>();
+    private List<PostEntity> postList = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
@@ -124,10 +125,10 @@ public class User {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "dislikeUserList")
-    private List<Post> dislikePostList = new ArrayList<>();
+    private List<PostEntity> dislikePostList = new ArrayList<>();
     @JsonIgnore
     @ManyToMany(mappedBy = "likeUserList")
-    private List<Post> likePostList = new ArrayList<>();
+    private List<PostEntity> likePostList = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany(mappedBy = "dislikeUserList")

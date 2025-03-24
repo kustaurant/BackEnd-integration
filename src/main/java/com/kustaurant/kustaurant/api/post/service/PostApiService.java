@@ -1,19 +1,13 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.post.domain.PostUpdateDTO;
 import com.kustaurant.kustaurant.common.post.domain.UserDTO;
-import com.kustaurant.kustaurant.common.post.infrastructure.Post;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.domain.PostDTO;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostPhoto;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
 import com.kustaurant.kustaurant.common.post.enums.PostStatus;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostApiRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostCommentApiRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostPhotoApiRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrapApiRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import jakarta.persistence.criteria.*;
@@ -43,7 +37,7 @@ public class PostApiService {
 
     // 메인 화면 로딩하기
     public Page<PostDTO> getPosts(int page, String sort, String koreanCategory,String postBodyType) {
-        Page<Post> posts;
+        Page<PostEntity> posts;
         if (koreanCategory.equals("전체")) {
             List<Sort.Order> sorts = new ArrayList<>();
             if (sort.isEmpty() || sort.equals("recent")) {
@@ -52,7 +46,7 @@ public class PostApiService {
                 posts = this.postApiRepository.findByStatus("ACTIVE", pageable);
             } else if (sort.equals("popular")) {
                 sorts.add(Sort.Order.desc("createdAt"));
-                Specification<Post> spec = getSpecByPopularOver5();
+                Specification<PostEntity> spec = getSpecByPopularOver5();
                 Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
                 posts = this.postApiRepository.findAll(spec, pageable);
             } else {
@@ -62,7 +56,7 @@ public class PostApiService {
             List<Sort.Order> sorts = new ArrayList<>();
             sorts.add(Sort.Order.desc("createdAt"));
             Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-            Specification<Post> spec = getSpecByCategoryAndPopularCount(koreanCategory, sort);
+            Specification<PostEntity> spec = getSpecByCategoryAndPopularCount(koreanCategory, sort);
             //spec의 인기순으로 먼저 정렬, 그다음 pageable의 최신순으로 두번째 정렬 기준 설정
             posts = this.postApiRepository.findAll(spec, pageable);
         }
@@ -81,14 +75,14 @@ public class PostApiService {
     public Page<PostDTO> getSearchResults(int page, String sort, String kw, String postCategory) {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("createdAt"));
-        Specification<Post> spec = search(kw, postCategory, sort);
+        Specification<PostEntity> spec = search(kw, postCategory, sort);
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        Page<Post> posts = this.postApiRepository.findAll(spec, pageable);
+        Page<PostEntity> posts = this.postApiRepository.findAll(spec, pageable);
         return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
     }
 
-    public Post getPost(Integer id) {
-        Optional<Post> post = this.postApiRepository.findByStatusAndPostId("ACTIVE", id);
+    public PostEntity getPost(Integer id) {
+        Optional<PostEntity> post = this.postApiRepository.findByStatusAndPostId("ACTIVE", id);
         if (post.isPresent()) {
             return post.get();
         } else {
@@ -96,57 +90,57 @@ public class PostApiService {
         }
     }
 
-    public void create(Post post, User user) {
-        post.setUser(user);
-        Post savedpost = postApiRepository.save(post);
+    public void create(PostEntity postEntity, User user) {
+        postEntity.setUser(user);
+        PostEntity savedpost = postApiRepository.save(postEntity);
         user.getPostList().add(savedpost);
         userRepository.save(user);
     }
 
     // 조회수 증가
-    public void increaseVisitCount(Post post) {
-        int visitCount = post.getPostVisitCount();
-        post.setPostVisitCount(++visitCount);
-        postApiRepository.save(post);
+    public void increaseVisitCount(PostEntity postEntity) {
+        int visitCount = postEntity.getPostVisitCount();
+        postEntity.setPostVisitCount(++visitCount);
+        postApiRepository.save(postEntity);
     }
 
-    public int likeCreateOrDelete(Post post, User user) {
-        List<User> likeUserList = post.getLikeUserList();
-        List<Post> likePostList = user.getLikePostList();
+    public int likeCreateOrDelete(PostEntity postEntity, User user) {
+        List<User> likeUserList = postEntity.getLikeUserList();
+        List<PostEntity> likePostList = user.getLikePostList();
         int status;
 
         //해당 post 를 이미 like 한 경우 - 제거
         if (likeUserList.contains(user)) {
-            post.setLikeCount(post.getLikeCount() - 1);
-            likePostList.remove(post);
+            postEntity.setLikeCount(postEntity.getLikeCount() - 1);
+            likePostList.remove(postEntity);
             likeUserList.remove(user);
             status = 0; // likeDeleted
         }
         // 처음 like 하는 경우 - 추가
         else {
-            post.setLikeCount(post.getLikeCount() + 1);
+            postEntity.setLikeCount(postEntity.getLikeCount() + 1);
             likeUserList.add(user);
-            likePostList.add(post);
+            likePostList.add(postEntity);
             status = 1; // likeCreated
         }
 
-        postApiRepository.save(post);
+        postApiRepository.save(postEntity);
         userRepository.save(user);
         return status;
     }
 
 
-    private Specification<Post> search(String kw, String postCategory, String sort) {
+    private Specification<PostEntity> search(String kw, String postCategory, String sort) {
         return new Specification<>() {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public Predicate toPredicate(Root<Post> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
+            public Predicate toPredicate(Root<PostEntity> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 query.distinct(true);  // 중복을 제거
 
                 //조인
-                Join<Post, User> u1 = p.join("user", JoinType.LEFT);
-                Join<Post, PostComment> c = p.join("postCommentList", JoinType.LEFT);
+                Join<PostEntity, User> u1 = p.join("user", JoinType.LEFT);
+                Join<PostEntity, PostComment> c = p.join("postCommentList", JoinType.LEFT);
                 Join<PostComment, User> u2 = c.join("user", JoinType.LEFT);
                 // 액티브 조건 추가
                 Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
@@ -180,12 +174,12 @@ public class PostApiService {
         };
     }
 
-    private Specification<Post> getSpecByCategoryAndPopularCount(String postCategory, String sort) {
+    private Specification<PostEntity> getSpecByCategoryAndPopularCount(String postCategory, String sort) {
         return new Specification<>() {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public Predicate toPredicate(Root<Post> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
+            public Predicate toPredicate(Root<PostEntity> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 query.distinct(true);  // 중복을 제거
                 Predicate likeCountPredicate;
 
@@ -207,12 +201,12 @@ public class PostApiService {
         };
     }
 
-    private Specification<Post> getSpecByPopularOver5() {
+    private Specification<PostEntity> getSpecByPopularOver5() {
         return new Specification<>() {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public Predicate toPredicate(Root<Post> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
+            public Predicate toPredicate(Root<PostEntity> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 query.distinct(true);  // 중복을 제거
                 Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
                 Predicate likeCountPredicate = cb.greaterThanOrEqualTo(p.get("likeCount"), POPULARCOUNT);
@@ -235,19 +229,19 @@ public class PostApiService {
 
     // 게시글 삭제
     public void deletePost(Integer postId, Integer userId) {
-        Post post = getPost(postId);
-        if (!post.getUser().getUserId().equals(userId)) {
+        PostEntity postEntity = getPost(postId);
+        if (!postEntity.getUser().getUserId().equals(userId)) {
             throw new AccessDeniedException("해당 게시글에 대한 권한이 없습니다.");
         }
-        deleteComments(post);
-        deleteScraps(post);
-        deletePhotos(post);
-        post.setStatus(PostStatus.DELETED.name());
-        postApiRepository.save(post);
+        deleteComments(postEntity);
+        deleteScraps(postEntity);
+        deletePhotos(postEntity);
+        postEntity.setStatus(PostStatus.DELETED.name());
+        postApiRepository.save(postEntity);
     }
 
-    private void deleteComments(Post post) {
-        List<PostComment> comments = post.getPostCommentList();
+    private void deleteComments(PostEntity postEntity) {
+        List<PostComment> comments = postEntity.getPostCommentList();
         for (PostComment comment : comments) {
             comment.setStatus("DELETED");
             for (PostComment reply : comment.getRepliesList()) {
@@ -257,16 +251,16 @@ public class PostApiService {
         }
     }
 
-    private void deleteScraps(Post post) {
-        List<PostScrap> scraps = post.getPostScrapList();
+    private void deleteScraps(PostEntity postEntity) {
+        List<PostScrap> scraps = postEntity.getPostScrapList();
         postScrapApiRepository.deleteAll(scraps);
     }
 
-    private void deletePhotos(Post post) {
-        List<PostPhoto> photos = post.getPostPhotoList();
+    private void deletePhotos(PostEntity postEntity) {
+        List<PostPhoto> photos = postEntity.getPostPhotoList();
         if (photos != null) {
             postPhotoApiRepository.deleteAll(photos);
-            post.setPostPhotoList(null); // 기존 사진과의 연결 해제
+            postEntity.setPostPhotoList(null); // 기존 사진과의 연결 해제
         }
     }
 
@@ -374,9 +368,9 @@ public class PostApiService {
         }
     }
 
-    public void updatePost(PostUpdateDTO postUpdateDTO, Post post) {
-        if (postUpdateDTO.getTitle() != null) post.setPostTitle(postUpdateDTO.getTitle());
-        if (postUpdateDTO.getPostCategory() != null) post.setPostCategory(postUpdateDTO.getPostCategory());
-        if (postUpdateDTO.getContent() != null) post.setPostBody(postUpdateDTO.getContent());
+    public void updatePost(PostUpdateDTO postUpdateDTO, PostEntity postEntity) {
+        if (postUpdateDTO.getTitle() != null) postEntity.setPostTitle(postUpdateDTO.getTitle());
+        if (postUpdateDTO.getPostCategory() != null) postEntity.setPostCategory(postUpdateDTO.getPostCategory());
+        if (postUpdateDTO.getContent() != null) postEntity.setPostBody(postUpdateDTO.getContent());
     }
 }
