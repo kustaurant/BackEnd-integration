@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationEntity;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;

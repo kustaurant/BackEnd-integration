@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.restaurant.infrastructure.situation;
+package com.kustaurant.kustaurant.common.evaluation.infrastructure.situation;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

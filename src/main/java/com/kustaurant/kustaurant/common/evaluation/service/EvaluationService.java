@@ -6,9 +6,8 @@ import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.Eva
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.SituationRepository;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantSituationRelationService;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.SituationRepository;
 import com.kustaurant.kustaurant.common.restaurant.service.S3Service;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;

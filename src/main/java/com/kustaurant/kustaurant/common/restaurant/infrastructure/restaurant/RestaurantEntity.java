@@ -8,7 +8,7 @@ import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpec
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtagEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenuEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationEntity;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

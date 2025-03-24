@@ -1,9 +1,9 @@
-package com.kustaurant.kustaurant.common.restaurant.service;
+package com.kustaurant.kustaurant.common.evaluation.service;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.SituationEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationRepository;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.SituationEntity;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.RestaurantSituationRelationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

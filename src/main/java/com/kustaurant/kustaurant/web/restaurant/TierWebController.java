@@ -10,7 +10,7 @@ import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.SituationRepository;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.SituationRepository;
 import com.kustaurant.kustaurant.api.restaurant.RestaurantApiService;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;

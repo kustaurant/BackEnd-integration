@@ -4,7 +4,7 @@ package com.kustaurant.kustaurant.common.restaurant.domain.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelationEntity;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.restaurant.infrastructure.situation;
+package com.kustaurant.kustaurant.common.evaluation.infrastructure.situation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
