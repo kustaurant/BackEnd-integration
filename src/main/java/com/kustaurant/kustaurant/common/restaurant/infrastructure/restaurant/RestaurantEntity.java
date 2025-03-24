@@ -94,7 +94,7 @@ public class RestaurantEntity {
                 .orElse(0.0); // 평가가 없는 경우 0 반환
     }
 
-    public static RestaurantEntity from(Restaurant restaurant) {
+    public static RestaurantEntity fromDomain(Restaurant restaurant) {
         RestaurantEntity entity = new RestaurantEntity();
         entity.setRestaurantId(restaurant.getRestaurantId());
         entity.setRestaurantName(restaurant.getRestaurantName());
@@ -120,7 +120,7 @@ public class RestaurantEntity {
         return entity;
     }
 
-    public Restaurant toModel() {
+    public Restaurant toDomain() {
         return Restaurant.builder()
                 .restaurantId(restaurantId)
                 .restaurantName(restaurantName)

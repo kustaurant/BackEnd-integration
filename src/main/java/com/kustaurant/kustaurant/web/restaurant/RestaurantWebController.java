@@ -59,7 +59,7 @@ public class RestaurantWebController {
             Principal principal
     ) {
         User user = customOAuth2UserService.getUser(principal.getName());
-        Restaurant restaurant = restaurantService.getDomain(restaurantId);
+        Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         return ResponseEntity.ok(restaurantFavoriteService.toggleFavorite(user, restaurant));
     }
 

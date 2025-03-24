@@ -26,14 +26,14 @@ public class RestaurantMenuEntity {
     private String naverType;
     private String menuImgUrl;
 
-    public RestaurantMenu toModel() {
+    public RestaurantMenu toDomain() {
         return RestaurantMenu.builder()
                 .menuId(this.menuId)
                 .menuImgUrl(this.menuImgUrl)
                 .menuName(this.menuName)
                 .menuPrice(this.menuPrice)
                 .naverType(this.naverType)
-                .restaurant(this.restaurant.toModel())
+                .restaurant(this.restaurant.toDomain())
                 .build();
     }
 }

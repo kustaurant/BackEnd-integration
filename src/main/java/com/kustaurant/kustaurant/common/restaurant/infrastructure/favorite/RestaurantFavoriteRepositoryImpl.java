@@ -21,7 +21,7 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     @Override
     public RestaurantFavorite findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
         return jpaRepository.findByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId)
-                .map(RestaurantFavoriteEntity::toModel)
+                .map(RestaurantFavoriteEntity::toDomain)
                 .orElseThrow(() -> new DataNotFoundException("요청한 restaurantFavorite이 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
     }
 
@@ -39,20 +39,20 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
             return List.of();
         }
         return jpaRepository.findByUser_UserId(userId).stream()
-                .map(RestaurantFavoriteEntity::toModel)
+                .map(RestaurantFavoriteEntity::toDomain)
                 .toList();
     }
 
     @Override
     @Transactional
     public RestaurantFavorite save(RestaurantFavorite restaurantFavorite) {
-        return jpaRepository.save(RestaurantFavoriteEntity.from(restaurantFavorite)).toModel();
+        return jpaRepository.save(RestaurantFavoriteEntity.fromDomain(restaurantFavorite)).toDomain();
     }
 
     @Override
     @Transactional
     public void delete(RestaurantFavorite restaurantFavorite) {
-        jpaRepository.delete(RestaurantFavoriteEntity.from(restaurantFavorite));
+        jpaRepository.delete(RestaurantFavoriteEntity.fromDomain(restaurantFavorite));
     }
 
     // TODO: need to delete everything below this

@@ -17,7 +17,7 @@ public class RestaurantMenuRepositoryImpl implements RestaurantMenuRepository {
     public List<RestaurantMenu> findByRestaurantOrderById(Integer restaurantId) {
         return jpaRepository.findByRestaurant_RestaurantIdOrderByMenuId(restaurantId)
                 .stream()
-                .map(RestaurantMenuEntity::toModel)
+                .map(RestaurantMenuEntity::toDomain)
                 .toList();
     }
 }

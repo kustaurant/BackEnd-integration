@@ -36,7 +36,7 @@ class RestaurantEntityTest {
         entity.setMainTier(3);
 
         // when
-        Restaurant domain = entity.toModel();
+        Restaurant domain = entity.toDomain();
 
         // then
         assertEquals(entity.getRestaurantId(), domain.getRestaurantId());
@@ -88,7 +88,7 @@ class RestaurantEntityTest {
                 .build();
 
         // when
-        RestaurantEntity entity = RestaurantEntity.from(domain);
+        RestaurantEntity entity = RestaurantEntity.fromDomain(domain);
 
         // then
         assertEquals(domain.getRestaurantId(), entity.getRestaurantId());

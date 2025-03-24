@@ -21,12 +21,12 @@ public class RestaurantService {
     private final RestaurantMenuService restaurantMenuService;
     private final EvaluationService evaluationService;
 
-    public Restaurant getDomain(Integer restaurantId) {
-        return restaurantRepository.getById(restaurantId);
+    public Restaurant getActiveDomain(Integer restaurantId) {
+        return restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
     }
 
-    public RestaurantDetailDTO getRestaurantDetailDto(Integer restaurantId, Integer userId, String userAgent) {
-        Restaurant restaurant = restaurantRepository.getById(restaurantId);
+    public RestaurantDetailDTO getActiveRestaurantDetailDto(Integer restaurantId, Integer userId, String userAgent) {
+        Restaurant restaurant = restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
         List<RestaurantMenu> menus = restaurantMenuService.findMenusByRestaurantId(restaurantId);
 
         boolean isEvaluated = evaluationService.isUserEvaluated(userId, restaurantId);
