@@ -2,15 +2,13 @@ package com.kustaurant.kustaurant.api.post.controller;
 
 
 import com.kustaurant.kustaurant.common.post.domain.*;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.ServerException;
 import com.kustaurant.kustaurant.common.post.enums.PostCategory;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostApiRepository;
 import com.kustaurant.kustaurant.api.post.service.PostApiCommentService;
 import com.kustaurant.kustaurant.api.post.service.PostScrapApiService;
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
@@ -43,7 +41,7 @@ public class CommunityApiController {
     private final PostApiCommentService postApiCommentService;
     private final PostScrapApiService postScrapApiService;
     private final StorageApiService storageApiService;
-    private final PostApiRepository postApiRepository;
+    private final PostRepository postRepository;
     private final UserService userService;
 
     // 커뮤니티 메인 화면
@@ -270,7 +268,7 @@ public class CommunityApiController {
             User user = userService.findUserById(userId);
             PostEntity postEntity = new PostEntity(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), "ACTIVE", LocalDateTime.now(),user);
             postApiService.create(postEntity, user);
-            postApiRepository.save(postEntity);
+            postRepository.save(postEntity);
             return ResponseEntity.ok(PostDTO.convertPostToPostDTO(postEntity));
         } catch (Exception e) {
             throw new ServerException("게시글 생성 중 서버 오류가 발생했습니다.", e);
@@ -314,7 +312,7 @@ public class CommunityApiController {
         try {
             PostEntity postEntity = postApiService.getPost(Integer.valueOf(postId));
             postApiService.updatePost(postUpdateDTO, postEntity);
-            postApiRepository.save(postEntity);
+            postRepository.save(postEntity);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             throw new ServerException("게시글 수정 중 서버 오류가 발생했습니다.", e);

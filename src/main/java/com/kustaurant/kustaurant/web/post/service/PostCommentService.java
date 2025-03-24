@@ -1,12 +1,9 @@
 package com.kustaurant.kustaurant.web.post.service;
 
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostCommentRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.JpaPostRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -24,7 +21,7 @@ import java.util.*;
 public class PostCommentService {
     private final PostCommentRepository postCommentRepository;
     private final UserRepository userRepository;
-    private final JpaPostRepository jpaPostRepository;
+    private final PostRepository postRepository;
     private final PostService postService;
 
     // 댓글 생성
@@ -32,7 +29,7 @@ public class PostCommentService {
         user.getPostCommentList().add(postComment);
         postEntity.getPostCommentList().add(postComment);
         userRepository.save(user);
-        jpaPostRepository.save(postEntity);
+        postRepository.save(postEntity);
     }
 
     // 대댓글 생성

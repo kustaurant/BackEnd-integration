@@ -1,16 +1,13 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.post.domain.PostDTO;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.post.domain.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.enums.PostStatus;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostCommentApiRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostApiRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +23,7 @@ import java.util.stream.Collectors;
 public class PostApiCommentService {
     private final PostCommentApiRepository postCommentApiRepository;
     private final UserRepository userRepository;
-    private final PostApiRepository postApiRepository;
+    private final PostRepository postRepository;
     private final PostApiService postApiService;
     private final UserService userService;
 
@@ -35,7 +32,7 @@ public class PostApiCommentService {
         user.getPostCommentList().add(postComment);
         postEntity.getPostCommentList().add(postComment);
         userRepository.save(user);
-        postApiRepository.save(postEntity);
+        postRepository.save(postEntity);
     }
 
     // 댓글 조회

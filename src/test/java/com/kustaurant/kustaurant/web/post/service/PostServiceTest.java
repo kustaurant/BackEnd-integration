@@ -7,6 +7,5 @@ class PostServiceTest {
     @Test
     void 게시글불러오기(){
         int i =0;
-        PostService postService = new PostService();
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface JpaPostRepository extends JpaRepository<PostEntity, Integer> {
     Page<PostEntity> findAll(Specification<PostEntity> spec, Pageable pageable);
@@ -18,4 +19,6 @@ public interface JpaPostRepository extends JpaRepository<PostEntity, Integer> {
 
     @Query("SELECT p FROM PostEntity p WHERE p.user.userId = :userId AND p.status = 'ACTIVE'")
     List<PostEntity> findActivePostsByUserId(@Param("userId") Integer userId);
+
+    Optional<PostEntity> findByStatusAndPostId(String status, Integer postId);
 }

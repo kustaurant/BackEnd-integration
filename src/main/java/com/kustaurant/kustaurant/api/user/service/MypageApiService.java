@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class MypageApiService {
 
     private final UserRepository userRepository;
-    private final JpaPostRepository jpaPostRepository;
+    private final PostRepository postRepository;
     private final PostScrapRepository postScrapRepository;
     private final PostCommentRepository postCommentRepository;
     private final NoticeRepository noticeRepo;
@@ -216,7 +216,7 @@ public class MypageApiService {
     //7
     // 유저가 작성한 커뮤니티 게시글 리스트들 반환
     public List<MypagePostDTO> getWrittenUserPosts(Integer userId) {
-        List<PostEntity> activePosts = jpaPostRepository.findActivePostsByUserId(userId);
+        List<PostEntity> activePosts = postRepository.findActivePostsByUserId(userId);
 
         return activePosts.stream()
                 .map(post -> new MypagePostDTO(

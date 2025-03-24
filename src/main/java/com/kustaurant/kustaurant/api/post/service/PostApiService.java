@@ -25,7 +25,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class PostApiService {
-    private final PostApiRepository postApiRepository;
+    private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostCommentApiRepository postCommentApiRepository;
@@ -43,12 +43,12 @@ public class PostApiService {
             if (sort.isEmpty() || sort.equals("recent")) {
                 sorts.add(Sort.Order.desc("createdAt"));
                 Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-                posts = this.postApiRepository.findByStatus("ACTIVE", pageable);
+                posts = this.postRepository.findByStatus("ACTIVE", pageable);
             } else if (sort.equals("popular")) {
                 sorts.add(Sort.Order.desc("createdAt"));
                 Specification<PostEntity> spec = getSpecByPopularOver5();
                 Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-                posts = this.postApiRepository.findAll(spec, pageable);
+                posts = this.postRepository.findAll(spec, pageable);
             } else {
                 throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
             }
@@ -58,7 +58,7 @@ public class PostApiService {
             Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
             Specification<PostEntity> spec = getSpecByCategoryAndPopularCount(koreanCategory, sort);
             //spec의 인기순으로 먼저 정렬, 그다음 pageable의 최신순으로 두번째 정렬 기준 설정
-            posts = this.postApiRepository.findAll(spec, pageable);
+            posts = this.postRepository.findAll(spec, pageable);
         }
 
         Page<PostDTO> result = posts.map(post -> {
@@ -77,12 +77,12 @@ public class PostApiService {
         sorts.add(Sort.Order.desc("createdAt"));
         Specification<PostEntity> spec = search(kw, postCategory, sort);
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        Page<PostEntity> posts = this.postApiRepository.findAll(spec, pageable);
+        Page<PostEntity> posts = this.postRepository.findAll(spec, pageable);
         return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
     }
 
     public PostEntity getPost(Integer id) {
-        Optional<PostEntity> post = this.postApiRepository.findByStatusAndPostId("ACTIVE", id);
+        Optional<PostEntity> post = this.postRepository.findByStatusAndPostId("ACTIVE", id);
         if (post.isPresent()) {
             return post.get();
         } else {
@@ -92,7 +92,7 @@ public class PostApiService {
 
     public void create(PostEntity postEntity, User user) {
         postEntity.setUser(user);
-        PostEntity savedpost = postApiRepository.save(postEntity);
+        PostEntity savedpost = postRepository.save(postEntity);
         user.getPostList().add(savedpost);
         userRepository.save(user);
     }
@@ -101,7 +101,7 @@ public class PostApiService {
     public void increaseVisitCount(PostEntity postEntity) {
         int visitCount = postEntity.getPostVisitCount();
         postEntity.setPostVisitCount(++visitCount);
-        postApiRepository.save(postEntity);
+        postRepository.save(postEntity);
     }
 
     public int likeCreateOrDelete(PostEntity postEntity, User user) {
@@ -124,7 +124,7 @@ public class PostApiService {
             status = 1; // likeCreated
         }
 
-        postApiRepository.save(postEntity);
+        postRepository.save(postEntity);
         userRepository.save(user);
         return status;
     }
@@ -237,7 +237,7 @@ public class PostApiService {
         deleteScraps(postEntity);
         deletePhotos(postEntity);
         postEntity.setStatus(PostStatus.DELETED.name());
-        postApiRepository.save(postEntity);
+        postRepository.save(postEntity);
     }
 
     private void deleteComments(PostEntity postEntity) {

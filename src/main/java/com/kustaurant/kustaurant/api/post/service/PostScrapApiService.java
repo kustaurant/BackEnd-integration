@@ -1,11 +1,8 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostApiRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrapApiRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostScrapApiService {
     private final PostScrapApiRepository postScrapApiRepository;
-    private final PostApiRepository postApiRepository;
+    private final PostRepository postRepository;
     private final UserRepository userRepository;
     public int scrapCreateOrDelete(PostEntity postEntity, User user) {
         List<PostScrap> postScrapList = postEntity.getPostScrapList();
@@ -41,7 +38,7 @@ public class PostScrapApiService {
             status = 1; // scrapCreated
         }
 
-        postApiRepository.save(postEntity);
+        postRepository.save(postEntity);
         userRepository.save(user);
         return status;
     }

@@ -1,11 +1,10 @@
 package com.kustaurant.kustaurant.web.post.service;
 
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.post.infrastructure.JpaPostRepository;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrapRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import jakarta.persistence.criteria.*;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PostService {
-    private final JpaPostRepository jpaPostRepository;
+    private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostScrapRepository postScrapRepository;
     // 인기순 제한 기준 숫자
@@ -40,7 +39,7 @@ public class PostService {
         if (sort.isEmpty() || sort.equals("recent")) {
             sorts.add(Sort.Order.desc("createdAt"));
             Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-            return this.jpaPostRepository.findByStatus("ACTIVE", pageable);
+            return this.postRepository.findByStatus("ACTIVE", pageable);
 
         }
 
@@ -49,7 +48,7 @@ public class PostService {
             sorts.add(Sort.Order.desc("createdAt"));
             Specification<PostEntity> spec = getSpecByPopularOver5();
             Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-            return this.jpaPostRepository.findAll(spec, pageable);
+            return this.postRepository.findAll(spec, pageable);
         }
 
 
@@ -65,7 +64,7 @@ public class PostService {
         Specification<PostEntity> spec = search(kw, postCategory, sort);
 
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        return this.jpaPostRepository.findAll(spec, pageable);
+        return this.postRepository.findAll(spec, pageable);
     }
 
 
@@ -78,12 +77,12 @@ public class PostService {
 
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
         Specification<PostEntity> spec = getSpecByCategoryAndPopularOver5(postCategory,sort);
-        return this.jpaPostRepository.findAll(spec, pageable);
+        return this.postRepository.findAll(spec, pageable);
 
     }
 
     public PostEntity getPost(Integer id) {
-        Optional<PostEntity> post = this.jpaPostRepository.findById(id);
+        Optional<PostEntity> post = this.postRepository.findById(id);
         if (post.isPresent()) {
             return post.get();
         } else {
@@ -93,7 +92,7 @@ public class PostService {
 
     public void create(PostEntity postEntity, User user) {
         postEntity.setUser(user);
-        PostEntity savedpost = jpaPostRepository.save(postEntity);
+        PostEntity savedpost = postRepository.save(postEntity);
         user.getPostList().add(savedpost);
         userRepository.save(user);
     }
@@ -131,7 +130,7 @@ public class PostService {
     public void increaseVisitCount(PostEntity postEntity) {
         int visitCount = postEntity.getPostVisitCount();
         postEntity.setPostVisitCount(++visitCount);
-        jpaPostRepository.save(postEntity);
+        postRepository.save(postEntity);
     }
 
     // 게시글 좋아요
@@ -169,7 +168,7 @@ public class PostService {
         }
         // 상태 반환
 
-        jpaPostRepository.save(postEntity);
+        postRepository.save(postEntity);
         userRepository.save(user);
         return status;
     }
@@ -205,7 +204,7 @@ public class PostService {
             dislikePostList.add(postEntity);
             status.put("dislikeCreated", true);
         }
-        jpaPostRepository.save(postEntity);
+        postRepository.save(postEntity);
         userRepository.save(user);
         return status;
     }

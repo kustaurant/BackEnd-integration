@@ -39,7 +39,7 @@ public class CommunityController {
     private final PostService postService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final PostCommentService postCommentService;
-    private final JpaPostRepository jpaPostRepository;
+    private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final PostScrapRepository postScrapRepository;
     private final PostScrapService postScrapService;
@@ -299,7 +299,7 @@ public class CommunityController {
         }
 
         // 게시글 정보 저장
-        jpaPostRepository.save(postEntity);
+        postRepository.save(postEntity);
 
         return ResponseEntity.ok("글이 성공적으로 저장되었습니다.");
     }
@@ -346,7 +346,7 @@ public class CommunityController {
         postEntity.setPostTitle(title);
         postEntity.setPostCategory(postCategory);
         postEntity.setPostBody(content);
-        jpaPostRepository.save(postEntity);
+        postRepository.save(postEntity);
 
 
         return ResponseEntity.ok("글이 성공적으로 수정되었습니다.");
