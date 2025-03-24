@@ -1,10 +1,9 @@
 package com.kustaurant.kustaurant.web.user.controller;
 
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Evaluation;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantComment;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
