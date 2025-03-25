@@ -102,7 +102,7 @@ public class RestaurantApiService {
         if (user == null || restaurant == null) {
             return false;
         }
-        return user.getRestaurantFavoriteEntityList().stream()
+        return user.getRestaurantFavoriteList().stream()
                 .anyMatch(restaurantFavorite -> restaurantFavorite.getRestaurant().equals(restaurant));
     }
 

@@ -4,13 +4,8 @@ import com.kustaurant.kustaurant.common.notice.NoticeDTO;
 import com.kustaurant.kustaurant.common.notice.NoticeRepository;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
-import com.kustaurant.kustaurant.common.post.infrastructure.Post;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostCommentRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrapRepository;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.user.domain.*;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
@@ -161,7 +156,7 @@ public class MypageApiService {
     // 유저가 즐겨찾기한 레스토랑 리스트들 반환
     public List<FavoriteRestaurantInfoDTO> getUserFavoriteRestaurantList(Integer userId) {
         User user = findUserById(userId);
-        List<RestaurantFavoriteEntity> favoriteList = user.getRestaurantFavoriteEntityList();
+        List<RestaurantFavoriteEntity> favoriteList = user.getRestaurantFavoriteList();
 
         List<FavoriteRestaurantInfoDTO> favoriteRestaurantInfoDTOs = favoriteList.stream()
                 .map(restaurantFavorite -> new FavoriteRestaurantInfoDTO(
@@ -220,7 +215,7 @@ public class MypageApiService {
     //7
     // 유저가 작성한 커뮤니티 게시글 리스트들 반환
     public List<MypagePostDTO> getWrittenUserPosts(Integer userId) {
-        List<Post> activePosts = postRepository.findActivePostsByUserId(userId);
+        List<PostEntity> activePosts = postRepository.findActivePostsByUserId(userId);
 
         return activePosts.stream()
                 .map(post -> new MypagePostDTO(
@@ -231,7 +226,7 @@ public class MypageApiService {
                         post.getPostBody().length() > 20 ? post.getPostBody().substring(0, 20) : post.getPostBody(),
                         post.getLikeCount(),
                         post.getPostCommentList().size(),
-                        post.calculateTimeAgo()
+                        post.toDomain().calculateTimeAgo()
                 ))
                 .collect(Collectors.toList());
     }
@@ -244,14 +239,14 @@ public class MypageApiService {
 
         return scrappedPosts.stream()
                 .map(scrap -> new MypagePostDTO(
-                        scrap.getPost().getPostId(),
-                        scrap.getPost().getPostCategory(),
-                        scrap.getPost().getPostTitle(),
-                        scrap.getPost().getPostPhotoList().isEmpty() ? null : scrap.getPost().getPostPhotoList().get(0).getPhotoImgUrl(),
-                        scrap.getPost().getPostBody().length() > 20 ? scrap.getPost().getPostBody().substring(0, 20) : scrap.getPost().getPostBody(),
-                        scrap.getPost().getLikeCount(),
-                        scrap.getPost().getPostCommentList().size(),
-                        scrap.getPost().calculateTimeAgo()
+                        scrap.getPostEntity().getPostId(),
+                        scrap.getPostEntity().getPostCategory(),
+                        scrap.getPostEntity().getPostTitle(),
+                        scrap.getPostEntity().getPostPhotoList().isEmpty() ? null : scrap.getPostEntity().getPostPhotoList().get(0).getPhotoImgUrl(),
+                        scrap.getPostEntity().getPostBody().length() > 20 ? scrap.getPostEntity().getPostBody().substring(0, 20) : scrap.getPostEntity().getPostBody(),
+                        scrap.getPostEntity().getLikeCount(),
+                        scrap.getPostEntity().getPostCommentList().size(),
+                        scrap.getPostEntity().toDomain().calculateTimeAgo()
                 ))
                 .collect(Collectors.toList());
     }
@@ -265,9 +260,9 @@ public class MypageApiService {
         // 데이터를 DTO 로 변환
         return commentedPosts.stream()
                 .map(comment -> new MypagePostCommentDTO(
-                        comment.getPost().getPostId(),
-                        comment.getPost().getPostCategory(),
-                        comment.getPost().getPostTitle(),
+                        comment.getPostEntity().getPostId(),
+                        comment.getPostEntity().getPostCategory(),
+                        comment.getPostEntity().getPostTitle(),
                         comment.getCommentBody().length() > 20 ? comment.getCommentBody().substring(0, 20) : comment.getCommentBody(),
                         comment.getLikeCount()
                 ))

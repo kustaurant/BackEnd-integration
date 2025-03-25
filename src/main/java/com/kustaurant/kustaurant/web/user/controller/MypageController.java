@@ -2,10 +2,10 @@ package com.kustaurant.kustaurant.web.user.controller;
 
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
-import com.kustaurant.kustaurant.common.post.infrastructure.Post;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
@@ -42,9 +42,9 @@ public class MypageController {
         // 메뉴 탭 인덱스 정보
         model.addAttribute("menuIndex", menuIndex);
         // 저장된 맛집 정보
-        List<RestaurantFavoriteEntity> favoriteList =  user.getRestaurantFavoriteEntityList();
+        List<RestaurantFavoriteEntity> favoriteList =  user.getRestaurantFavoriteList();
         favoriteList.sort(Comparator.comparing(RestaurantFavoriteEntity::getCreatedAt).reversed()); //정렬
-        model.addAttribute("restaurantFavoriteList", user.getRestaurantFavoriteEntityList());
+        model.addAttribute("restaurantFavoriteList", user.getRestaurantFavoriteList());
         // 평가한 맛집 정보
         List<Evaluation> evaluationList =  user.getEvaluationList();
         evaluationList.sort(Comparator.comparing((Evaluation e) -> { // 정렬
@@ -62,9 +62,9 @@ public class MypageController {
                         .toList();
         model.addAttribute("restaurantCommentList", activeRestaurantCommentList);
 
-        List<Post> activePostList = user.getPostList().stream()
+        List<PostEntity> activePostList = user.getPostList().stream()
                 .filter(post -> post.getStatus().equals("ACTIVE"))
-                .sorted(Comparator.comparing(Post::getCreatedAt).reversed()) // 최신 글 순으로 정렬
+                .sorted(Comparator.comparing(PostEntity::getCreatedAt).reversed()) // 최신 글 순으로 정렬
                 .toList();
 
         List<PostComment> activePostCommentList=user.getPostCommentList().stream()

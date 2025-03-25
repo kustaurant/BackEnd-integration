@@ -20,7 +20,7 @@ public class PostPhoto {
 
     @ManyToOne
     @JoinColumn(name="post_id")
-    Post post;
+    PostEntity postEntity;
 
     String photoImgUrl;
     String status;
