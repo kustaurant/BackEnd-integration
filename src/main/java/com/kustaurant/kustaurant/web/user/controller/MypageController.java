@@ -2,8 +2,8 @@ package com.kustaurant.kustaurant.web.user.controller;
 
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
-import com.kustaurant.kustaurant.common.post.infrastructure.Post;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
@@ -62,9 +62,9 @@ public class MypageController {
                         .toList();
         model.addAttribute("restaurantCommentList", activeRestaurantCommentList);
 
-        List<Post> activePostList = user.getPostList().stream()
+        List<PostEntity> activePostList = user.getPostList().stream()
                 .filter(post -> post.getStatus().equals("ACTIVE"))
-                .sorted(Comparator.comparing(Post::getCreatedAt).reversed()) // 최신 글 순으로 정렬
+                .sorted(Comparator.comparing(PostEntity::getCreatedAt).reversed()) // 최신 글 순으로 정렬
                 .toList();
 
         List<PostComment> activePostCommentList=user.getPostCommentList().stream()

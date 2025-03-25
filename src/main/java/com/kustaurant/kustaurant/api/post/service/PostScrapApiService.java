@@ -1,10 +1,8 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
-import com.kustaurant.kustaurant.common.post.infrastructure.Post;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostApiRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrapApiRepository;
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +16,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostScrapApiService {
     private final PostScrapApiRepository postScrapApiRepository;
-    private final PostApiRepository postApiRepository;
+    private final PostRepository postRepository;
     private final UserRepository userRepository;
-    public int scrapCreateOrDelete(Post post, User user) {
-        List<PostScrap> postScrapList = post.getPostScrapList();
+    public int scrapCreateOrDelete(PostEntity postEntity, User user) {
+        List<PostScrap> postScrapList = postEntity.getPostScrapList();
         List<PostScrap> userScrapList = user.getScrapList();
-        Optional<PostScrap> scrapOptional = postScrapApiRepository.findByUserAndPost(user, post);
+        Optional<PostScrap> scrapOptional = postScrapApiRepository.findByUserAndPostEntity(user, postEntity);
         int status;
 
         if (scrapOptional.isPresent()) {
@@ -33,14 +31,14 @@ public class PostScrapApiService {
             userScrapList.remove(scrap);
             status = 0; // scrapDeleted
         } else {
-            PostScrap scrap = new PostScrap(user, post, LocalDateTime.now());
+            PostScrap scrap = new PostScrap(user, postEntity, LocalDateTime.now());
             PostScrap savedScrap = postScrapApiRepository.save(scrap);
             userScrapList.add(savedScrap);
             postScrapList.add(savedScrap);
             status = 1; // scrapCreated
         }
 
-        postApiRepository.save(post);
+        postRepository.save(postEntity);
         userRepository.save(user);
         return status;
     }

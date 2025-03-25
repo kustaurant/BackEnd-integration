@@ -95,7 +95,7 @@
                         <span class="first-detail">
                             <a th:text="${post.postCategory}" href="#"></a>
                         </span>
-                        <span th:text="${post.calculateTimeAgo()}" class="second-detail updated-time">
+                        <span th:text="${post.toDomain().calculateTimeAgo()}" class="second-detail updated-time">
 
                         </span>
                         <span class="third-detail user-name">

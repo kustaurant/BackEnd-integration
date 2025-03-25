@@ -2,14 +2,13 @@ package com.kustaurant.kustaurant.api.post.controller;
 
 
 import com.kustaurant.kustaurant.common.post.domain.*;
-import com.kustaurant.kustaurant.common.post.infrastructure.Post;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.ServerException;
 import com.kustaurant.kustaurant.common.post.enums.PostCategory;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostApiRepository;
 import com.kustaurant.kustaurant.api.post.service.PostApiCommentService;
 import com.kustaurant.kustaurant.api.post.service.PostScrapApiService;
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
@@ -42,7 +41,7 @@ public class CommunityApiController {
     private final PostApiCommentService postApiCommentService;
     private final PostScrapApiService postScrapApiService;
     private final StorageApiService storageApiService;
-    private final PostApiRepository postApiRepository;
+    private final PostRepository postRepository;
     private final UserService userService;
 
     // 커뮤니티 메인 화면
@@ -88,9 +87,9 @@ public class CommunityApiController {
     public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id", example = "69") Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         postApiService.validatePostId(postId);
         User user = userService.findUserById(userId);
-        Post post = postApiService.getPost(postId);
-        postApiService.increaseVisitCount(post);
-        return ResponseEntity.ok(postApiCommentService.createPostDTOWithFlags(post,user));
+        PostEntity postEntity = postApiService.getPost(postId);
+        postApiService.increaseVisitCount(postEntity);
+        return ResponseEntity.ok(postApiCommentService.createPostDTOWithFlags(postEntity,user));
     }
 
     @GetMapping("/api/v1/community/ranking")
@@ -156,13 +155,13 @@ public class CommunityApiController {
             @Parameter(hidden = true)
             Integer userId) {
         User user = userService.findUserById(userId);
-        Post post = postApiService.getPost(Integer.valueOf(postId));
+        PostEntity postEntity = postApiService.getPost(Integer.valueOf(postId));
         PostComment postComment = postApiCommentService.createComment(content, postId, userId);
         // 대댓글 일 경우 부모 댓글과 관계 매핑
         if (!parentCommentId.isEmpty()) {
             postApiCommentService.processParentComment(postComment, parentCommentId);
         }
-        List<PostCommentDTO> postCommentDTOs = postApiCommentService.getPostCommentDTOs(post, user);
+        List<PostCommentDTO> postCommentDTOs = postApiCommentService.getPostCommentDTOs(postEntity, user);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(postCommentDTOs);
     }
@@ -211,9 +210,9 @@ public class CommunityApiController {
     })
     public ResponseEntity<ScrapToggleDTO> postScrap(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         User user = userService.findUserById(userId);
-        Post post = postApiService.getPost(postId);
-        int status = postScrapApiService.scrapCreateOrDelete(post, user); // 1 또는 0 반환
-        ScrapToggleDTO scrapToggleDTO = new ScrapToggleDTO(post.getPostScrapList().size(), status);
+        PostEntity postEntity = postApiService.getPost(postId);
+        int status = postScrapApiService.scrapCreateOrDelete(postEntity, user); // 1 또는 0 반환
+        ScrapToggleDTO scrapToggleDTO = new ScrapToggleDTO(postEntity.getPostScrapList().size(), status);
         return ResponseEntity.ok(scrapToggleDTO);
     }
 
@@ -226,9 +225,9 @@ public class CommunityApiController {
     })
     public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         User user = userService.findUserById(userId);
-        Post post = postApiService.getPost(postId);
-        int status = postApiService.likeCreateOrDelete(post, user); // 1 또는 0 반환
-        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(post.getLikeUserList().size(), status);
+        PostEntity postEntity = postApiService.getPost(postId);
+        int status = postApiService.likeCreateOrDelete(postEntity, user); // 1 또는 0 반환
+        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(postEntity.getLikeUserList().size(), status);
         return ResponseEntity.ok(likeOrDislikeDTO);
     }
 
@@ -267,10 +266,10 @@ public class CommunityApiController {
     ) {
         try {
             User user = userService.findUserById(userId);
-            Post post = new Post(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), "ACTIVE", LocalDateTime.now());
-            postApiService.create(post, user);
-            postApiRepository.save(post);
-            return ResponseEntity.ok(PostDTO.convertPostToPostDTO(post));
+            PostEntity postEntity = new PostEntity(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), "ACTIVE", LocalDateTime.now(),user);
+            postApiService.create(postEntity, user);
+            postRepository.save(postEntity);
+            return ResponseEntity.ok(PostDTO.convertPostToPostDTO(postEntity));
         } catch (Exception e) {
             throw new ServerException("게시글 생성 중 서버 오류가 발생했습니다.", e);
         }
@@ -311,9 +310,9 @@ public class CommunityApiController {
             @JwtToken @Parameter(hidden = true) Integer userId
     ) {
         try {
-            Post post = postApiService.getPost(Integer.valueOf(postId));
-            postApiService.updatePost(postUpdateDTO, post);
-            postApiRepository.save(post);
+            PostEntity postEntity = postApiService.getPost(Integer.valueOf(postId));
+            postApiService.updatePost(postUpdateDTO, postEntity);
+            postRepository.save(postEntity);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             throw new ServerException("게시글 수정 중 서버 오류가 발생했습니다.", e);

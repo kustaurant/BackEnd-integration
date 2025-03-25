@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostScrapRepository extends JpaRepository<PostScrap, Integer> {
-    Optional<PostScrap> findByUserAndPost(User user, Post post);
+    Optional<PostScrap> findByUserAndPostEntity(User user, PostEntity postEntity);
 
-    @Query("SELECT ps FROM PostScrap ps WHERE ps.user.userId = :userId AND ps.post.status = 'ACTIVE'")
+    @Query("SELECT ps FROM PostScrap ps WHERE ps.user.userId = :userId AND ps.postEntity.status = 'ACTIVE'")
     List<PostScrap> findActiveScrappedPostsByUserId(@Param("userId") Integer userId);
 }

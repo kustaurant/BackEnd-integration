@@ -1,11 +1,9 @@
 package com.kustaurant.kustaurant.web.post.service;
 
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.common.post.infrastructure.Post;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostCommentRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostRepository;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -27,11 +25,11 @@ public class PostCommentService {
     private final PostService postService;
 
     // 댓글 생성
-    public void create(Post post, User user, PostComment postComment) {
+    public void create(PostEntity postEntity, User user, PostComment postComment) {
         user.getPostCommentList().add(postComment);
-        post.getPostCommentList().add(postComment);
+        postEntity.getPostCommentList().add(postComment);
         userRepository.save(user);
-        postRepository.save(post);
+        postRepository.save(postEntity);
     }
 
     // 대댓글 생성
@@ -128,8 +126,8 @@ public class PostCommentService {
 
 
     public List<PostComment> getList(Integer postId, String sort) {
-        Post post = postService.getPost(postId);
-        Specification<PostComment> spec = getSpecByPostId(post);
+        PostEntity postEntity = postService.getPost(postId);
+        Specification<PostComment> spec = getSpecByPostId(postEntity);
         List<PostComment> postCommentList = postCommentRepository.findAll(spec);
         if (sort.equals("popular")) {
             postCommentList.sort(Comparator.comparingInt(PostComment::getLikeCount).reversed());
@@ -140,14 +138,14 @@ public class PostCommentService {
         return postCommentList;
     }
 
-    private Specification<PostComment> getSpecByPostId(Post post) {
+    private Specification<PostComment> getSpecByPostId(PostEntity postEntity) {
         return new Specification<>() {
             private static final long serialVersionUID = 1L;
 
             @Override
             public Predicate toPredicate(Root<PostComment> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
                 query.distinct(true);  // 중복을 제거
-                Predicate postIdPredicate = cb.equal(p.get("post"), post);
+                Predicate postIdPredicate = cb.equal(p.get("postEntity"), postEntity);
                 Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
 
 
