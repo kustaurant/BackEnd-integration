@@ -12,34 +12,34 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepository {
-    private final JpaPostRepository jpaPostRepository;
+    private final PostJpaRepository postJpaRepository;
 
     public Page<PostEntity> findAll(Specification<PostEntity> spec, Pageable pageable) {
-        return jpaPostRepository.findAll(spec,pageable);
+        return postJpaRepository.findAll(spec,pageable);
     }
 
     public Page<PostEntity> findAll(Pageable pageable) {
-        return jpaPostRepository.findAll(pageable);
+        return postJpaRepository.findAll(pageable);
     }
 
     public Page<PostEntity> findByStatus(String status, Pageable pageable) {
-        return jpaPostRepository.findByStatus(status,pageable);
+        return postJpaRepository.findByStatus(status,pageable);
     }
 
     public List<PostEntity> findActivePostsByUserId(Integer userId) {
-        return jpaPostRepository.findActivePostsByUserId(userId);
+        return postJpaRepository.findActivePostsByUserId(userId);
     }
 
     public Optional<PostEntity> findByStatusAndPostId(String status, Integer postId) {
-        return jpaPostRepository.findByStatusAndPostId(status,postId);
+        return postJpaRepository.findByStatusAndPostId(status,postId);
     }
 
     public PostEntity save(PostEntity postEntity){
-        return jpaPostRepository.save(postEntity);
+        return postJpaRepository.save(postEntity);
     }
 
     @Override
     public Optional<PostEntity> findById(Integer postId) {
-        return jpaPostRepository.findById(postId);
+        return postJpaRepository.findById(postId);
     }
 }

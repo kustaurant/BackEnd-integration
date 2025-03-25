@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface JpaPostRepository extends JpaRepository<PostEntity, Integer> {
+public interface PostJpaRepository extends JpaRepository<PostEntity, Integer> {
     Page<PostEntity> findAll(Specification<PostEntity> spec, Pageable pageable);
 
     Page<PostEntity> findAll(Pageable pageable);
