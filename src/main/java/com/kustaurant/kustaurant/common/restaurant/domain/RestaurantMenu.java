@@ -1,14 +1,17 @@
 package com.kustaurant.kustaurant.common.restaurant.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class RestaurantMenuDomain {
+public class RestaurantMenu {
     private Integer menuId;
 
-    RestaurantDomain restaurant;
+    @JsonIgnore
+    Restaurant restaurant;
+
     private String menuName;
     private String menuPrice;
     private String naverType;

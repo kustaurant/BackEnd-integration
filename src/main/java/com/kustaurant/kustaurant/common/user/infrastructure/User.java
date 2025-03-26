@@ -3,9 +3,9 @@ package com.kustaurant.kustaurant.common.user.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.*;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
 import com.kustaurant.kustaurant.global.webUser.UserRole;
@@ -70,7 +70,7 @@ public class User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<RestaurantFavorite> restaurantFavoriteList = new ArrayList<>();
+    private List<RestaurantFavoriteEntity> restaurantFavoriteList = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")

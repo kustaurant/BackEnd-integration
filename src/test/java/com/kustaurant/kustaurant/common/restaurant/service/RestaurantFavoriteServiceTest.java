@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.common.restaurant.service;
 
 import com.kustaurant.kustaurant.common.mock.FakeRestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +25,7 @@ class RestaurantFavoriteServiceTest {
         // Given
         User user = new User();
         user.setUserId(1);
-        RestaurantDomain restaurant = RestaurantDomain.builder()
+        Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
                 .restaurantName("곤칼")
                 .build();
@@ -43,13 +43,13 @@ class RestaurantFavoriteServiceTest {
         // Given
         User user = new User();
         user.setUserId(1);
-        RestaurantDomain restaurant = RestaurantDomain.builder()
+        Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
                 .restaurantName("곤칼")
                 .build();
 
         favoriteService.addFavorite(user, restaurant);
-        RestaurantFavoriteDomain favorite = favoriteRepository.findByUserIdAndRestaurantId(user.getUserId(), restaurant.getRestaurantId());
+        RestaurantFavorite favorite = favoriteRepository.findByUserIdAndRestaurantId(user.getUserId(), restaurant.getRestaurantId());
 
         // When
         favoriteService.deleteFavorite(favorite);
@@ -64,7 +64,7 @@ class RestaurantFavoriteServiceTest {
         // Given
         User user = new User();
         user.setUserId(1);
-        RestaurantDomain restaurant = RestaurantDomain.builder()
+        Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
                 .restaurantName("곤칼")
                 .build();
@@ -83,7 +83,7 @@ class RestaurantFavoriteServiceTest {
         // Given
         User user = new User();
         user.setUserId(1);
-        RestaurantDomain restaurant = RestaurantDomain.builder()
+        Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
                 .restaurantName("곤칼")
                 .build();

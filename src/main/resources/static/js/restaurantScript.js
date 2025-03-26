@@ -45,7 +45,7 @@ document.getElementById('favoriteImg').addEventListener('click', function() {
 });
 // 식당 Favorite 토글 요청
 function toggleFavoriteRequest() {
-    fetch(window.location.origin + "/api" + window.location.pathname + "/favorite/toggle", {
+    fetch(window.location.origin + "/web/api" + window.location.pathname + "/favorite/toggle", {
         method: 'POST',
     })
         .then(response => {

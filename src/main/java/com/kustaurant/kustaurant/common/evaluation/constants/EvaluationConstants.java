@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.common.evaluation.constants;
 
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import lombok.RequiredArgsConstructor;

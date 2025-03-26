@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDomain;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
@@ -20,9 +19,9 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     private final RestaurantFavoriteJpaRepository jpaRepository;
 
     @Override
-    public RestaurantFavoriteDomain findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
+    public RestaurantFavorite findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
         return jpaRepository.findByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId)
-                .map(RestaurantFavoriteEntity::toModel)
+                .map(RestaurantFavoriteEntity::toDomain)
                 .orElseThrow(() -> new DataNotFoundException("요청한 restaurantFavorite이 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
     }
 
@@ -35,35 +34,35 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     }
 
     @Override
-    public List<RestaurantFavoriteDomain> findByUser(Integer userId) {
+    public List<RestaurantFavorite> findByUser(Integer userId) {
         if (userId == null) {
             return List.of();
         }
         return jpaRepository.findByUser_UserId(userId).stream()
-                .map(RestaurantFavoriteEntity::toModel)
+                .map(RestaurantFavoriteEntity::toDomain)
                 .toList();
     }
 
     @Override
     @Transactional
-    public RestaurantFavoriteDomain save(RestaurantFavoriteDomain restaurantFavorite) {
-        return jpaRepository.save(RestaurantFavoriteEntity.from(restaurantFavorite)).toModel();
+    public RestaurantFavorite save(RestaurantFavorite restaurantFavorite) {
+        return jpaRepository.save(RestaurantFavoriteEntity.fromDomain(restaurantFavorite)).toDomain();
     }
 
     @Override
     @Transactional
-    public void delete(RestaurantFavoriteDomain restaurantFavorite) {
-        jpaRepository.delete(RestaurantFavoriteEntity.from(restaurantFavorite));
+    public void delete(RestaurantFavorite restaurantFavorite) {
+        jpaRepository.delete(RestaurantFavoriteEntity.fromDomain(restaurantFavorite));
     }
 
     // TODO: need to delete everything below this
     @Override
-    public Optional<RestaurantFavorite> findByUserAndRestaurant(User user, RestaurantEntity restaurant) {
+    public Optional<RestaurantFavoriteEntity> findByUserAndRestaurant(User user, RestaurantEntity restaurant) {
         return Optional.empty();
     }
 
     @Override
-    public List<RestaurantFavorite> findByUser(User user) {
+    public List<RestaurantFavoriteEntity> findByUser(User user) {
         return List.of();
     }
 

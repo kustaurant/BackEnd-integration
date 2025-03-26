@@ -9,7 +9,7 @@ import java.util.List;
 
 @Builder
 @Getter
-public class RestaurantDomain {
+public class Restaurant {
     private Integer restaurantId;
 
     private String restaurantName;

@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,35 +19,35 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     private final RestaurantJpaRepository jpaRepository;
 
     @Override
-    public RestaurantDomain getById(Integer id) {
-        return jpaRepository.findById(id).map(RestaurantEntity::toModel)
+    public Restaurant getById(Integer id) {
+        return jpaRepository.findById(id).map(RestaurantEntity::toDomain)
                 .orElseThrow(() -> new DataNotFoundException("요청한 restaurant가 존재하지 않습니다. 요청 정보 - id: " + id));
     }
 
     @Override
-    public RestaurantDomain getByIdAndStatus(Integer id, String status) {
-        return jpaRepository.findByRestaurantIdAndStatus(id, status).map(RestaurantEntity::toModel)
+    public Restaurant getByIdAndStatus(Integer id, String status) {
+        return jpaRepository.findByRestaurantIdAndStatus(id, status).map(RestaurantEntity::toDomain)
                 .orElseThrow(() -> new DataNotFoundException("요청한 restaurant가 존재하지 않습니다. 요청 정보 - id: " + id + ", status: " + status));
     }
 
     @Override
-    public List<RestaurantDomain> findByCuisineAndStatus(String cuisine, String status) {
-        return jpaRepository.findByRestaurantCuisineAndStatus(cuisine, status).stream().map(RestaurantEntity::toModel).toList();
+    public List<Restaurant> findByCuisineAndStatus(String cuisine, String status) {
+        return jpaRepository.findByRestaurantCuisineAndStatus(cuisine, status).stream().map(RestaurantEntity::toDomain).toList();
     }
 
     @Override
-    public List<RestaurantDomain> findByPositionAndStatus(String position, String status) {
-        return jpaRepository.findByRestaurantPositionAndStatus(position, status).stream().map(RestaurantEntity::toModel).toList();
+    public List<Restaurant> findByPositionAndStatus(String position, String status) {
+        return jpaRepository.findByRestaurantPositionAndStatus(position, status).stream().map(RestaurantEntity::toDomain).toList();
     }
 
     @Override
-    public List<RestaurantDomain> findByCuisineAndPositionAndStatus(String cuisine, String position, String status) {
-        return jpaRepository.findByRestaurantCuisineAndRestaurantPositionAndStatus(cuisine, position, status).stream().map(RestaurantEntity::toModel).toList();
+    public List<Restaurant> findByCuisineAndPositionAndStatus(String cuisine, String position, String status) {
+        return jpaRepository.findByRestaurantCuisineAndRestaurantPositionAndStatus(cuisine, position, status).stream().map(RestaurantEntity::toDomain).toList();
     }
 
     @Override
-    public RestaurantDomain save(RestaurantDomain restaurantDomain) {
-        return jpaRepository.save(RestaurantEntity.from(restaurantDomain)).toModel();
+    public Restaurant save(Restaurant restaurant) {
+        return jpaRepository.save(RestaurantEntity.fromDomain(restaurant)).toDomain();
     }
 
     @Override

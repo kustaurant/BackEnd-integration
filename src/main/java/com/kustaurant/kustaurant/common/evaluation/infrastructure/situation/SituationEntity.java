@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.restaurant.infrastructure.situation;
+package com.kustaurant.kustaurant.common.evaluation.infrastructure.situation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationItemScore;
@@ -8,11 +8,12 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Getter
 @Entity
 @Setter
 @Table(name="situations_tbl")
-public class Situation {
+public class SituationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer situationId;
@@ -20,16 +21,16 @@ public class Situation {
     private String situationName;
 
 
-    public Situation(Integer id, String situationName) {
+    public SituationEntity(Integer id, String situationName) {
         this.situationId=id;
         this.situationName = situationName;
     }
-    public Situation(){
+    public SituationEntity(){
 
     };
     @OneToMany(mappedBy = "situation")
     @JsonIgnore
-    private List<RestaurantSituationRelation> restaurantSituationRelationList = new ArrayList<>();
+    private List<RestaurantSituationRelationEntity> restaurantSituationRelationList = new ArrayList<>();
 
     @OneToMany(mappedBy = "situation")
     @JsonIgnore

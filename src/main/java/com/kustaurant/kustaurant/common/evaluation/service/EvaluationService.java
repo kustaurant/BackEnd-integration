@@ -1,18 +1,15 @@
 package com.kustaurant.kustaurant.common.evaluation.service;
 
-import com.kustaurant.kustaurant.api.restaurant.RestaurantApiService;
+import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.RestaurantSituationRelation;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.SituationRepository;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantSituationRelationService;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.SituationRepository;
 import com.kustaurant.kustaurant.common.restaurant.service.S3Service;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
@@ -379,9 +376,9 @@ public class EvaluationService {
     }
 
     public void insertSituation(RestaurantTierDataClass data, RestaurantEntity restaurant) {
-        for (RestaurantSituationRelation restaurantSituationRelation : restaurant.getRestaurantSituationRelationList()) {
-            if (RestaurantSpecification.hasSituation(restaurantSituationRelation)) {
-                data.addSituation(restaurantSituationRelation);
+        for (RestaurantSituationRelationEntity restaurantSituationRelationEntity : restaurant.getRestaurantSituationRelationEntityList()) {
+            if (RestaurantSpecification.hasSituation(restaurantSituationRelationEntity)) {
+                data.addSituation(restaurantSituationRelationEntity);
             }
         }
     }

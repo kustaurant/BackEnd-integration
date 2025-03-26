@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDomain;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import org.springframework.data.jpa.repository.JpaRepository;

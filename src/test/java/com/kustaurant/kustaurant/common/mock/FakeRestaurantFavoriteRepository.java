@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.mock;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDomain;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepository {
-    private final List<RestaurantFavoriteDomain> store = new ArrayList<>();
+    private final List<RestaurantFavorite> store = new ArrayList<>();
 
 
     @Override
-    public RestaurantFavoriteDomain findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
+    public RestaurantFavorite findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
         return store.stream()
                 .filter(fav -> fav.getUser().getUserId().equals(userId) &&
                         fav.getRestaurant().getRestaurantId().equals(restaurantId))
@@ -33,9 +33,9 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     }
 
     @Override
-    public List<RestaurantFavoriteDomain> findByUser(Integer userId) {
-        List<RestaurantFavoriteDomain> favorites = new ArrayList<>();
-        for (RestaurantFavoriteDomain fav : store) {
+    public List<RestaurantFavorite> findByUser(Integer userId) {
+        List<RestaurantFavorite> favorites = new ArrayList<>();
+        for (RestaurantFavorite fav : store) {
             if (fav.getUser().getUserId().equals(userId)) {
                 favorites.add(fav);
             }
@@ -44,25 +44,25 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     }
 
     @Override
-    public RestaurantFavoriteDomain save(RestaurantFavoriteDomain restaurantFavorite) {
+    public RestaurantFavorite save(RestaurantFavorite restaurantFavorite) {
         store.add(restaurantFavorite);
         return restaurantFavorite;
     }
 
     @Override
-    public void delete(RestaurantFavoriteDomain restaurantFavorite) {
+    public void delete(RestaurantFavorite restaurantFavorite) {
         store.remove(restaurantFavorite);
     }
 
 
     // TODO: need to delete everything below this
     @Override
-    public Optional<RestaurantFavorite> findByUserAndRestaurant(User user, RestaurantEntity restaurant) {
+    public Optional<RestaurantFavoriteEntity> findByUserAndRestaurant(User user, RestaurantEntity restaurant) {
         return Optional.empty();
     }
 
     @Override
-    public List<RestaurantFavorite> findByUser(User user) {
+    public List<RestaurantFavoriteEntity> findByUser(User user) {
         return List.of();
     }
 
