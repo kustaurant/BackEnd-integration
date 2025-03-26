@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Controller
 @Slf4j
-public class TierWebController {
+public class RestaurantTierWebController {
     //
     private final SituationRepository situationRepository;
     private final EvaluationRepository evaluationRepository;

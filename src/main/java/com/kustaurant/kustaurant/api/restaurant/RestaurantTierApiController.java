@@ -44,7 +44,7 @@ import java.util.stream.IntStream;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-public class TierApiController {
+public class RestaurantTierApiController {
 
     private final RestaurantTierService restaurantTierService;
 
