@@ -53,7 +53,7 @@ public class RestaurantWebController {
 
     // 식당 즐겨찾기
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @PostMapping("/api/restaurants/{restaurantId}/favorite/toggle")
+    @PostMapping("/web/api/restaurants/{restaurantId}/favorite/toggle")
     public ResponseEntity<Boolean> toggleFavorite(
             @PathVariable Integer restaurantId,
             Principal principal
