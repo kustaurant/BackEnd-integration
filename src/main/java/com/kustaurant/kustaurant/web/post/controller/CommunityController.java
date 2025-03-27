@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.web.post.controller;
 
+import com.kustaurant.kustaurant.common.post.domain.PostInteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.web.post.service.PostCommentService;
@@ -74,21 +75,16 @@ public class CommunityController {
     @GetMapping("/community/{postId}")
     public String post(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
         PostEntity postEntity = postService.getPost(postId);
-        // 조회수 증가
+        User user = customOAuth2UserService.getUser(principal.getName());
+        PostInteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postEntity, user);
         postService.increaseVisitCount(postEntity);
+
         List<PostComment> postCommentList = postCommentService.getList(postId, sort);
         model.addAttribute("postCommentList", postCommentList);
         model.addAttribute("post", postEntity);
-
-        boolean isPostScrappedByUser = false;
-        if (principal != null) {
-            User user = customOAuth2UserService.getUser(principal.getName());
-            model.addAttribute("user", user);
-            isPostScrappedByUser = postEntity.getPostScrapList().stream()
-                    .anyMatch(scrap -> scrap.getUser().equals(user));
-        }
+        model.addAttribute("user", user);
         model.addAttribute("sort", sort);
-        model.addAttribute("isPostScrappedByUser", isPostScrappedByUser);
+        model.addAttribute("postInteractionStatus", postInteractionStatus);
         return "community_post";
     }
 
@@ -189,8 +185,8 @@ public class CommunityController {
         User user = customOAuth2UserService.getUser(principal.getName());
         PostEntity postEntity = postService.getPost(postidInt);
         Map<String, Object> response = postService.likeCreateOrDelete(postEntity, user);
-        response.put("likeCount", postEntity.getLikeUserList().size());
-        response.put("dislikeCount", postEntity.getDislikeUserList().size());
+        response.put("likeCount", postEntity.getPostLikesList().size());
+        response.put("dislikeCount", postEntity.getPostDislikesList().size());
 
         return ResponseEntity.ok(response);
     }
@@ -203,8 +199,8 @@ public class CommunityController {
         User user = customOAuth2UserService.getUser(principal.getName());
         PostEntity postEntity = postService.getPost(postidInt);
         Map<String, Object> response = postService.dislikeCreateOrDelete(postEntity, user);
-        response.put("dislikeCount", postEntity.getDislikeUserList().size());
-        response.put("likeCount", postEntity.getLikeUserList().size());
+        response.put("likeCount", postEntity.getPostLikesList().size());
+        response.put("dislikeCount", postEntity.getPostDislikesList().size());
         return ResponseEntity.ok(response);
     }
 

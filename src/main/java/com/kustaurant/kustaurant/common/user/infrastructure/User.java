@@ -3,11 +3,9 @@ package com.kustaurant.kustaurant.common.user.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.*;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
 import com.kustaurant.kustaurant.global.webUser.UserRole;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -124,11 +122,11 @@ public class User {
     }
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "dislikeUserList")
-    private List<PostEntity> dislikePostList = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<PostLikesEntity> postLikesList = new ArrayList<>();
     @JsonIgnore
-    @ManyToMany(mappedBy = "likeUserList")
-    private List<PostEntity> likePostList = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<PostDislikesEntity> postDislikesList = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany(mappedBy = "dislikeUserList")
