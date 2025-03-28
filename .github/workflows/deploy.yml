@@ -25,6 +25,8 @@ jobs:
             set -e
             set -x
             cd /home/ubuntu/BackEnd-integration
+            git checkout refactor/github-actions
+
 
             # 기존 설정 파일 삭제
             rm -rf src/main/resources/application.yml || true
