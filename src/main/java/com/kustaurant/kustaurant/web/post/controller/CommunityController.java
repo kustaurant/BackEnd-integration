@@ -75,7 +75,7 @@ public class CommunityController {
     @GetMapping("/community/{postId}")
     public String post(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
         PostEntity postEntity = postService.getPost(postId);
-        User user = customOAuth2UserService.getUser(principal.getName());
+        User user = principal == null ? null : customOAuth2UserService.getUser(principal.getName());
         PostInteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postEntity, user);
         postService.increaseVisitCount(postEntity);
 

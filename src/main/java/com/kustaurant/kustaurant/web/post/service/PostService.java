@@ -221,6 +221,9 @@ public class PostService {
     }
 
     public PostInteractionStatusResponse getUserInteractionStatus(PostEntity post, User user) {
+        if (user == null){
+            return new PostInteractionStatusResponse(LikeStatus.NOT_LIKED,DislikeStatus.NOT_DISLIKED,ScrapStatus.NOT_SCRAPPED);
+        }
         boolean isLiked = postLikesJpaRepository.existsByPostEntityAndUser(post, user);
         boolean isDisliked = postDislikesJpaRepository.existsByPostEntityAndUser(post, user);
         boolean isScrapped = postScrapRepository.existsByPostEntityAndUser(post, user);
