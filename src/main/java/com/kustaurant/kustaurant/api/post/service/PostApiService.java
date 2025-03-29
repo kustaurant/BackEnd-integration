@@ -367,7 +367,7 @@ public class PostApiService {
         return PostDTO.convertPostToPostDTO(postEntity,getTotalLikeCount(postEntity));
     }
 
-    // 게시글의 좋아요 총 합을 반환하는 함수 (좋아요 총 합: 좋아요-싫어요, 현재 앱에선 좋아요와 싫어요를 구분하지 않고 좋아요 총합만 사용하고 있음)
+    // 게시글의 좋아요 총 합을 반환하는 함수 (좋아요-싫어요, 현재 앱에선 좋아요와 싫어요를 구분하지 않고 좋아요 총합만 사용하고 있음)
     public Integer getTotalLikeCount(PostEntity postEntity){
         Integer likeCount = postLikesJpaRepository.countByPostEntity(postEntity);
         Integer dislikeCount = postDislikesJpaRepository.countByPostEntity(postEntity);
