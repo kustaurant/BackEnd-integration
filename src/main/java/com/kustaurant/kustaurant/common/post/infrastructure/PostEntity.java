@@ -47,17 +47,11 @@ public class PostEntity {
     @OneToMany(mappedBy = "postEntity")
     private List<PostPhoto> postPhotoList = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(name = "post_dislikes_tbl",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> dislikeUserList = new ArrayList<>();
+    @OneToMany(mappedBy = "postEntity")
+    private List<PostLikesEntity> postLikesList = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(name = "post_likes_tbl",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> likeUserList = new ArrayList<>();
+    @OneToMany(mappedBy = "postEntity")
+    private List<PostDislikesEntity> postDislikesList = new ArrayList<>();
 
     public PostEntity(String postTitle, String postBody, String postCategory, String status, LocalDateTime createdAt, User user) {
         this.postTitle = postTitle;

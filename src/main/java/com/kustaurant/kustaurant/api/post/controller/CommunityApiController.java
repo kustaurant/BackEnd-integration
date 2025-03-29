@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.api.post.controller;
 
 
 import com.kustaurant.kustaurant.common.post.domain.*;
+import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.global.UserService;
@@ -226,8 +227,8 @@ public class CommunityApiController {
     public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         User user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(postId);
-        int status = postApiService.likeCreateOrDelete(postEntity, user); // 1 또는 0 반환
-        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(postEntity.getLikeUserList().size(), status);
+        LikeToggleStatus status = postApiService.toggleLikeStatus(postEntity, user); // 1 또는 0 반환
+        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(postEntity.getPostLikesList().size(), status.getValue());
         return ResponseEntity.ok(likeOrDislikeDTO);
     }
 

@@ -22,7 +22,7 @@ public class PostScrapService {
     public Map<String, Object> scrapCreateOfDelete(PostEntity postEntity, User user){
         List<PostScrap> postScrapList = postEntity.getPostScrapList();
         List<PostScrap> userScrapList =user.getScrapList();
-        Optional<PostScrap> scrapOptional = postScrapRepository.findByUserAndPostEntity(user, postEntity);
+        Optional<PostScrap> scrapOptional = postScrapRepository.findByPostEntityAndUser(postEntity, user);
         Map<String, Object> status = new HashMap<>();
         if(scrapOptional.isPresent()){
             PostScrap scrap = scrapOptional.get();

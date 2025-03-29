@@ -154,8 +154,8 @@ public class PostApiCommentService {
         if (user == null || postEntity == null) {
             return false;
         }
-        return postEntity.getLikeUserList().stream()
-                .anyMatch(likeUser -> likeUser.equals(user));
+        return postEntity.getPostLikesList().stream()
+                .anyMatch(postLikesEntity -> postLikesEntity.getUser().equals(user));
     }
 
     // 해당 글을 해당 유저가 싫어요를 눌렀는지의 여부
@@ -163,7 +163,7 @@ public class PostApiCommentService {
         if (user == null || postEntity == null) {
             return false;
         }
-        return postEntity.getDislikeUserList().stream()
+        return postEntity.getPostDislikesList().stream()
                 .anyMatch(dislikeUser -> dislikeUser.equals(user));
     }
 

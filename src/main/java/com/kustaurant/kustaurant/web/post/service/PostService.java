@@ -1,11 +1,10 @@
 package com.kustaurant.kustaurant.web.post.service;
 
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostRepository;
+import com.kustaurant.kustaurant.common.post.domain.PostInteractionStatusResponse;
+import com.kustaurant.kustaurant.common.post.enums.*;
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostScrapRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -27,6 +27,9 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostScrapRepository postScrapRepository;
+    private final PostLikesJpaRepository postLikesJpaRepository;
+    private final PostDislikesJpaRepository postDislikesJpaRepository;
+
     // 인기순 제한 기준 숫자
     public static  final int POPULARCOUNT = 3;
     // 페이지 숫자
@@ -134,79 +137,108 @@ public class PostService {
     }
 
     // 게시글 좋아요
+    @Transactional
     public Map<String, Object> likeCreateOrDelete(PostEntity postEntity, User user) {
-        List<User> likeUserList = postEntity.getLikeUserList();
-        List<User> dislikeUserList = postEntity.getDislikeUserList();
-        List<PostEntity> likePostList = user.getLikePostList();
-        List<PostEntity> dislikePostList = user.getDislikePostList();
         Map<String, Object> status = new HashMap<>();
-
+        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByPostEntityAndUser(postEntity, user);
+        Optional<PostDislikesEntity> dislikeOptional = postDislikesJpaRepository.findByPostEntityAndUser(postEntity, user);
         //해당 post 를 이미 like 한 경우 - 제거
-        if (likeUserList.contains(user)) {
+        if (likeOptional.isPresent()) {
+            PostLikesEntity postLikesEntity = likeOptional.get();
+
+            postLikesJpaRepository.delete(postLikesEntity);
+            postEntity.getPostLikesList().remove(likeOptional.get());
+            user.getPostLikesList().remove(likeOptional.get());
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
-            likePostList.remove(postEntity);
-            likeUserList.remove(user);
-            status.put("likeDelete", true);
+
+            status.put(PostReactionStatus.likeDelete.name(), true);
         }
         //해당 post를 이미 dislike 한 경우 - 제거하고 추가
-        else if (dislikeUserList.contains(user)) {
-            postEntity.setLikeCount(postEntity.getLikeCount() + 2);
-            dislikeUserList.remove(user);
-            dislikePostList.remove(postEntity);
-            likeUserList.add(user);
-            likePostList.add(postEntity);
-            status.put("likeChanged", true);
+        else if (dislikeOptional.isPresent()) {
+            PostDislikesEntity postDislikesEntity = dislikeOptional.get();
 
+            postDislikesJpaRepository.delete(postDislikesEntity);
+            postEntity.getPostDislikesList().remove(postDislikesEntity);
+            user.getPostDislikesList().remove(postDislikesEntity);
+
+            PostLikesEntity postLikesEntity = new PostLikesEntity(user, postEntity);
+            postLikesJpaRepository.save(postLikesEntity);
+            postEntity.getPostLikesList().add(postLikesEntity);
+            user.getPostLikesList().add(postLikesEntity);
+            postEntity.setLikeCount(postEntity.getLikeCount() + 2);
+
+            status.put(PostReactionStatus.likeChanged.name(), true);
         }
         // 처음 like 하는 경우-추가
         else {
-            status.put("likeCreated", true);
-
+            PostLikesEntity postLikesEntity = new PostLikesEntity(user, postEntity);
+            postLikesJpaRepository.save(postLikesEntity);
+            postEntity.getPostLikesList().add(postLikesEntity);
+            user.getPostLikesList().add(postLikesEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
-            likeUserList.add(user);
-            likePostList.add(postEntity);
-        }
-        // 상태 반환
 
-        postRepository.save(postEntity);
-        userRepository.save(user);
+            status.put(PostReactionStatus.likeCreated.name(), true);
+        }
         return status;
     }
 
     // 게시글 싫어요
+    @Transactional
     public Map<String, Object> dislikeCreateOrDelete(PostEntity postEntity, User user) {
-        List<User> likeUserList = postEntity.getLikeUserList();
-        List<User> dislikeUserList = postEntity.getDislikeUserList();
-        List<PostEntity> likePostList = user.getLikePostList();
-        List<PostEntity> dislikePostList = user.getDislikePostList();
         Map<String, Object> status = new HashMap<>();
+        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByPostEntityAndUser(postEntity, user);
+        Optional<PostDislikesEntity> dislikeOptional = postDislikesJpaRepository.findByPostEntityAndUser(postEntity, user);
+
         //해당 post를 이미 dislike 한 경우 - 제거
-        if (dislikeUserList.contains(user)) {
+        if (dislikeOptional.isPresent()) {
+            postDislikesJpaRepository.delete(dislikeOptional.get());
+            postEntity.getPostDislikesList().remove(dislikeOptional.get());
+            user.getPostDislikesList().remove(dislikeOptional.get());
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
-            dislikePostList.remove(postEntity);
-            dislikeUserList.remove(user);
-            status.put("dislikeDelete", true);
+
+            status.put(PostReactionStatus.dislikeDelete.name(), true);
         }
-        //해당 post를 이미 like 한 경우 - 제거하고 추가
-        else if (likeUserList.contains(user)) {
+        //해당 post 를 이미 like 한 경우 - 제거 후 추가
+        else if (likeOptional.isPresent()) {
+            PostLikesEntity postLikesEntity = likeOptional.get();
+            postLikesJpaRepository.delete(postLikesEntity);
+            postEntity.getPostLikesList().remove(postLikesEntity);
+            user.getPostLikesList().remove(postLikesEntity);
+
+            PostDislikesEntity postDislikesEntity = new PostDislikesEntity(user, postEntity,LocalDateTime.now());
+            postDislikesJpaRepository.save(postDislikesEntity);
+            postEntity.getPostDislikesList().add(postDislikesEntity);
+            user.getPostDislikesList().add(postDislikesEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() - 2);
 
-            likeUserList.remove(user);
-            likePostList.remove(postEntity);
-            dislikeUserList.add(user);
-            dislikePostList.add(postEntity);
-            status.put("dislikeChanged", true);
+            status.put(PostReactionStatus.dislikeChanged.name(), true);
         }
         // 처음 dislike 하는 경우-추가
         else {
+            PostDislikesEntity dislikesEntity = new PostDislikesEntity(user, postEntity,LocalDateTime.now());
+            postDislikesJpaRepository.save(dislikesEntity);
+            postEntity.getPostDislikesList().add(dislikesEntity);
+            user.getPostDislikesList().add(dislikesEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
-            dislikeUserList.add(user);
-            dislikePostList.add(postEntity);
-            status.put("dislikeCreated", true);
+
+            status.put(PostReactionStatus.dislikeCreated.name(), true);
         }
-        postRepository.save(postEntity);
-        userRepository.save(user);
         return status;
+    }
+
+    public PostInteractionStatusResponse getUserInteractionStatus(PostEntity post, User user) {
+        if (user == null){
+            return new PostInteractionStatusResponse(LikeStatus.NOT_LIKED,DislikeStatus.NOT_DISLIKED,ScrapStatus.NOT_SCRAPPED);
+        }
+        boolean isLiked = postLikesJpaRepository.existsByPostEntityAndUser(post, user);
+        boolean isDisliked = postDislikesJpaRepository.existsByPostEntityAndUser(post, user);
+        boolean isScrapped = postScrapRepository.existsByPostEntityAndUser(post, user);
+
+        return new PostInteractionStatusResponse(
+                isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED,
+                isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED,
+                isScrapped ? ScrapStatus.SCRAPPED : ScrapStatus.NOT_SCRAPPED
+        );
     }
 
 
