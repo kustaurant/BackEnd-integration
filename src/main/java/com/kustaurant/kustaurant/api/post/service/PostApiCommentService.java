@@ -26,6 +26,8 @@ public class PostApiCommentService {
     private final PostRepository postRepository;
     private final PostApiService postApiService;
     private final UserService userService;
+    private final PostLikesJpaRepository postLikesJpaRepository;
+    private final PostDislikesJpaRepository postDislikesJpaRepository;
 
     // 댓글 생성
     public void create(PostEntity postEntity, User user, PostComment postComment) {
@@ -204,7 +206,8 @@ public class PostApiCommentService {
 
     public PostDTO createPostDTOWithFlags(PostEntity postEntity, User user) {
         // PostDTO 생성 및 post의 flag 설정
-        PostDTO postDTO = PostDTO.convertPostToPostDTO(postEntity);
+
+        PostDTO postDTO = postApiService.convertPostToPostDTOWithLikeCount(postEntity);
         if (user != null) {
             postDTO.setIsPostMine(isPostMine(postEntity, user));
             postDTO.setIsliked(isLiked(postEntity, user));

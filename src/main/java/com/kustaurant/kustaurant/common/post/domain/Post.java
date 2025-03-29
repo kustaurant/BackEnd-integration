@@ -16,12 +16,11 @@ public class Post {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
     private final Integer postVisitCount;
-    private final Integer likeCount;
     private final Integer userId;
 
     @Builder
     public Post(Integer postId, String postTitle, String postBody, String postCategory, String status,
-                LocalDateTime createdAt, LocalDateTime updatedAt, Integer postVisitCount, Integer likeCount, Integer userId) {
+                LocalDateTime createdAt, LocalDateTime updatedAt, Integer postVisitCount, Integer userId) {
         this.postId = postId;
         this.postTitle = postTitle;
         this.postBody = postBody;
@@ -30,7 +29,6 @@ public class Post {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.postVisitCount = postVisitCount;
-        this.likeCount = likeCount;
         this.userId = userId;
     }
 

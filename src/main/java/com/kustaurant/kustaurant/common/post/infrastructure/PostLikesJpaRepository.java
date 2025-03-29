@@ -10,4 +10,7 @@ public interface PostLikesJpaRepository extends JpaRepository<PostLikesEntity,In
     Optional<PostLikesEntity> findByPostEntityAndUser(PostEntity postEntity, User user);
 
     Boolean existsByPostEntityAndUser(PostEntity postEntity, User user);
+
+    Integer countByPostEntity(PostEntity postEntity);
+
 }

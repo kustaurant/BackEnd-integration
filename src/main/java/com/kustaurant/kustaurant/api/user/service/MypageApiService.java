@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.api.user.service;
 
+import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.common.notice.NoticeDTO;
 import com.kustaurant.kustaurant.common.notice.NoticeRepository;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
@@ -9,6 +10,7 @@ import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.user.domain.*;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
+import com.kustaurant.kustaurant.web.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -29,6 +31,7 @@ public class MypageApiService {
     private final PostScrapRepository postScrapRepository;
     private final PostCommentRepository postCommentRepository;
     private final NoticeRepository noticeRepo;
+    private final PostApiService postApiService;
 
     public User findUserById(Integer userId) {
         if (userId == null) {
@@ -224,7 +227,7 @@ public class MypageApiService {
                         post.getPostTitle(),
                         post.getPostPhotoList().isEmpty() ? null : post.getPostPhotoList().get(0).getPhotoImgUrl(),
                         post.getPostBody().length() > 20 ? post.getPostBody().substring(0, 20) : post.getPostBody(),
-                        post.getLikeCount(),
+                        postApiService.getTotalLikeCount(post),
                         post.getPostCommentList().size(),
                         post.toDomain().calculateTimeAgo()
                 ))
@@ -244,7 +247,7 @@ public class MypageApiService {
                         scrap.getPostEntity().getPostTitle(),
                         scrap.getPostEntity().getPostPhotoList().isEmpty() ? null : scrap.getPostEntity().getPostPhotoList().get(0).getPhotoImgUrl(),
                         scrap.getPostEntity().getPostBody().length() > 20 ? scrap.getPostEntity().getPostBody().substring(0, 20) : scrap.getPostEntity().getPostBody(),
-                        scrap.getPostEntity().getLikeCount(),
+                        postApiService.getTotalLikeCount(scrap.getPostEntity()),
                         scrap.getPostEntity().getPostCommentList().size(),
                         scrap.getPostEntity().toDomain().calculateTimeAgo()
                 ))

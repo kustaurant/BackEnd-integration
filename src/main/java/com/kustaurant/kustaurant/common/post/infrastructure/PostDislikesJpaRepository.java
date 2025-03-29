@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface PostDislikesJpaRepository extends JpaRepository<PostDislikesEntity,Integer> {
     Optional<PostDislikesEntity> findByPostEntityAndUser(PostEntity postEntity, User user);
 
-    boolean existsByPostEntityAndUser(PostEntity post, User user);
+    boolean existsByPostEntityAndUser(PostEntity postEntity, User user);
+    Integer countByPostEntity(PostEntity postEntity);
 }

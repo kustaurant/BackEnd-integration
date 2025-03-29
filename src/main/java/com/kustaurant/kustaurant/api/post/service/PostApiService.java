@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
+import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -63,25 +65,14 @@ public class PostApiService {
             //spec의 인기순으로 먼저 정렬, 그다음 pageable의 최신순으로 두번째 정렬 기준 설정
             posts = this.postRepository.findAll(spec, pageable);
         }
-
         Page<PostDTO> result = posts.map(post -> {
-            PostDTO dto = PostDTO.convertPostToPostDTO(post);
+            PostDTO dto = convertPostToPostDTOWithLikeCount(post);
             if (postBodyType.equals("text")) {
                 dto.setPostBody(Jsoup.parse(dto.getPostBody()).text()); // HTML 제거 후 일반 텍스트 변환
             }
             return dto;
         });
         return result;  // Post 엔티티를 PostDTO로 변환
-    }
-
-    // 검색 결과 반환하기
-    public Page<PostDTO> getSearchResults(int page, String sort, String kw, String postCategory) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("createdAt"));
-        Specification<PostEntity> spec = search(kw, postCategory, sort);
-        Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        Page<PostEntity> posts = this.postRepository.findAll(spec, pageable);
-        return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
     }
 
     public PostEntity getPost(Integer id) {
@@ -92,7 +83,7 @@ public class PostApiService {
             throw new OptionalNotExistException("해당 postId의 게시글을 찾을 수 없습니다.");
         }
     }
-
+    @Transactional
     public void create(PostEntity postEntity, User user) {
         postEntity.setUser(user);
         PostEntity savedpost = postRepository.save(postEntity);
@@ -116,7 +107,6 @@ public class PostApiService {
             postLikesJpaRepository.delete(like);
             postEntity.getPostLikesList().remove(like);
             user.getPostLikesList().remove(like);
-            postEntity.setLikeCount(postEntity.getLikeCount() - 1);
             return LikeToggleStatus.CREATED; // likeDeleted
         }
         // 처음 like 하는 경우 - 추가
@@ -124,7 +114,6 @@ public class PostApiService {
             PostLikesEntity postLikesEntity = new PostLikesEntity(user, postEntity);
             postEntity.getPostLikesList().add(postLikesEntity);
             user.getPostLikesList().add(postLikesEntity);
-            postEntity.setLikeCount(postEntity.getLikeCount() + 1);
             return LikeToggleStatus.DELETED; // likeDeleted
         }
     }
@@ -372,5 +361,16 @@ public class PostApiService {
         if (postUpdateDTO.getTitle() != null) postEntity.setPostTitle(postUpdateDTO.getTitle());
         if (postUpdateDTO.getPostCategory() != null) postEntity.setPostCategory(postUpdateDTO.getPostCategory());
         if (postUpdateDTO.getContent() != null) postEntity.setPostBody(postUpdateDTO.getContent());
+    }
+
+    public PostDTO convertPostToPostDTOWithLikeCount(PostEntity postEntity) {
+        return PostDTO.convertPostToPostDTO(postEntity,getTotalLikeCount(postEntity));
+    }
+
+    // 게시글의 좋아요 총 합을 반환하는 함수 (좋아요-싫어요, 현재 앱에선 좋아요와 싫어요를 구분하지 않고 좋아요 총합만 사용하고 있음)
+    public Integer getTotalLikeCount(PostEntity postEntity){
+        Integer likeCount = postLikesJpaRepository.countByPostEntity(postEntity);
+        Integer dislikeCount = postDislikesJpaRepository.countByPostEntity(postEntity);
+        return likeCount-dislikeCount;
     }
 }

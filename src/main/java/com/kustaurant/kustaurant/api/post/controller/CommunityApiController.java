@@ -44,7 +44,8 @@ public class CommunityApiController {
     private final StorageApiService storageApiService;
     private final PostRepository postRepository;
     private final UserService userService;
-
+    private final PostLikesJpaRepository postLikesJpaRepository;
+    private final PostDislikesJpaRepository postDislikesJpaRepository;
     // 커뮤니티 메인 화면
     @GetMapping("/api/v1/community/posts")
     @Operation(summary = "커뮤니티 메인화면의 게시글 리스트 불러오기", description = "게시판 종류와 페이지, 정렬 방법을 입력받고 해당 조건에 맞는 게시글 리스트가 반환됩니다, 현재 인기순으로 설정했을 때는 좋아요가 3이상인 게시글만 반환됩니다.")
@@ -269,8 +270,8 @@ public class CommunityApiController {
             User user = userService.findUserById(userId);
             PostEntity postEntity = new PostEntity(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), "ACTIVE", LocalDateTime.now(),user);
             postApiService.create(postEntity, user);
-            postRepository.save(postEntity);
-            return ResponseEntity.ok(PostDTO.convertPostToPostDTO(postEntity));
+            PostDTO postDTO = postApiService.convertPostToPostDTOWithLikeCount(postEntity);
+            return ResponseEntity.ok(postDTO);
         } catch (Exception e) {
             throw new ServerException("게시글 생성 중 서버 오류가 발생했습니다.", e);
         }
