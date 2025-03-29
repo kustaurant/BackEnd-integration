@@ -17,6 +17,8 @@ public interface RestaurantRepository {
     List<Restaurant> findByCuisineAndPositionAndStatus(String cuisine, String position, String status);
 
     Restaurant save(Restaurant restaurant);
+    // 검색결과 페이징
+    List<Restaurant> findAll(Specification<RestaurantEntity> spec, Pageable pageable);
 
     // TODO: need to delete everything below this
     List<RestaurantEntity> findAll();
@@ -29,8 +31,6 @@ public interface RestaurantRepository {
 
     // 페이징
     Page<RestaurantEntity> findAll(Pageable pageable);
-    // 검색결과 페이징
-    Page<RestaurantEntity> findAll(Specification<RestaurantEntity> spec, Pageable pageable);
 
     List<RestaurantEntity> findByStatusAndMainTierNot(String status, Integer mainTier);
 

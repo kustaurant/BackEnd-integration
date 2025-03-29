@@ -51,6 +51,12 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     }
 
     @Override
+    public List<Restaurant> findAll(Specification<RestaurantEntity> spec, Pageable pageable) {
+        return jpaRepository.findAll(spec, pageable).toList()
+                .stream().map(RestaurantEntity::toDomain).toList();
+    }
+
+    @Override
     public List<RestaurantEntity> findAll() {
         return List.of();
     }
@@ -87,11 +93,6 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
 
     @Override
     public Page<RestaurantEntity> findAll(Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public Page<RestaurantEntity> findAll(Specification<RestaurantEntity> spec, Pageable pageable) {
         return null;
     }
 

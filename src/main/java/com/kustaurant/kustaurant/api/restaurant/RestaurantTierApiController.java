@@ -83,34 +83,12 @@ public class RestaurantTierApiController {
             @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        User user = userService.findUserById(userId);
         // page 0부터 시작하게 수정
         page--;
-        // DB 조회
-        List<RestaurantEntity> restaurants = restaurantTierService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit).toList();
+        // 조회
+        List<RestaurantTierDTO> restaurants = restaurantTierService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, userId);
 
-        if (restaurants.isEmpty()) {
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-        }
-        // 순위 표시하기
-        List<RestaurantTierDTO> responseList = new ArrayList<>();
-
-        for (int i = 0; i < limit; i++) {
-            try {
-                // 순위
-                Integer ranking = null;
-                RestaurantEntity restaurant = restaurants.get(i);
-                if (restaurant.getMainTier() > 0) {
-                    ranking = page * limit + i + 1;
-                }
-                responseList.add(RestaurantTierDTO.convertRestaurantToTierDTO(
-                        restaurant, ranking, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)));
-            } catch (IndexOutOfBoundsException ignored) {
-
-            }
-        }
-
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
     @Operation(summary = "티어표 리스트 불러오기 (Auth 버전)", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
@@ -144,34 +122,12 @@ public class RestaurantTierApiController {
             @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        User user = userService.findUserById(userId);
         // page 0부터 시작하게 수정
         page--;
         // DB 조회
-        List<RestaurantEntity> restaurants = restaurantTierService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit).toList();
+        List<RestaurantTierDTO> restaurants = restaurantTierService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, userId);
 
-        if (restaurants.isEmpty()) {
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-        }
-        // 순위 표시하기
-        List<RestaurantTierDTO> responseList = new ArrayList<>();
-
-        for (int i = 0; i < limit; i++) {
-            try {
-                // 순위
-                Integer ranking = null;
-                RestaurantEntity restaurant = restaurants.get(i);
-                if (restaurant.getMainTier() > 0) {
-                    ranking = page * limit + i + 1;
-                }
-                responseList.add(RestaurantTierDTO.convertRestaurantToTierDTO(
-                        restaurant, ranking, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)));
-            } catch (IndexOutOfBoundsException ignored) {
-
-            }
-        }
-
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
 

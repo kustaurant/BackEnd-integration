@@ -1,5 +1,8 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -11,4 +14,6 @@ public interface RestaurantJpaRepository extends JpaRepository<RestaurantEntity,
     List<RestaurantEntity> findByRestaurantCuisineAndStatus(String cuisine, String status);
     List<RestaurantEntity> findByRestaurantPositionAndStatus(String position, String status);
     List<RestaurantEntity> findByRestaurantCuisineAndRestaurantPositionAndStatus(String cuisine, String position, String status);
+
+    Page<RestaurantEntity> findAll(Specification<RestaurantEntity> spec, Pageable pageable);
 }
