@@ -149,6 +149,7 @@ public class PostService {
             postLikesJpaRepository.delete(postLikesEntity);
             postEntity.getPostLikesList().remove(likeOptional.get());
             user.getPostLikesList().remove(likeOptional.get());
+            postEntity.setLikeCount(postEntity.getLikeCount() - 1);
 
             status.put(PostReactionStatus.likeDelete.name(), true);
         }
@@ -164,6 +165,7 @@ public class PostService {
             postLikesJpaRepository.save(postLikesEntity);
             postEntity.getPostLikesList().add(postLikesEntity);
             user.getPostLikesList().add(postLikesEntity);
+            postEntity.setLikeCount(postEntity.getLikeCount() + 2);
 
             status.put(PostReactionStatus.likeChanged.name(), true);
         }
@@ -173,6 +175,7 @@ public class PostService {
             postLikesJpaRepository.save(postLikesEntity);
             postEntity.getPostLikesList().add(postLikesEntity);
             user.getPostLikesList().add(postLikesEntity);
+            postEntity.setLikeCount(postEntity.getLikeCount() + 1);
 
             status.put(PostReactionStatus.likeCreated.name(), true);
         }
@@ -191,6 +194,7 @@ public class PostService {
             postDislikesJpaRepository.delete(dislikeOptional.get());
             postEntity.getPostDislikesList().remove(dislikeOptional.get());
             user.getPostDislikesList().remove(dislikeOptional.get());
+            postEntity.setLikeCount(postEntity.getLikeCount() + 1);
 
             status.put(PostReactionStatus.dislikeDelete.name(), true);
         }
@@ -205,6 +209,7 @@ public class PostService {
             postDislikesJpaRepository.save(postDislikesEntity);
             postEntity.getPostDislikesList().add(postDislikesEntity);
             user.getPostDislikesList().add(postDislikesEntity);
+            postEntity.setLikeCount(postEntity.getLikeCount() - 2);
 
             status.put(PostReactionStatus.dislikeChanged.name(), true);
         }
@@ -214,6 +219,7 @@ public class PostService {
             postDislikesJpaRepository.save(dislikesEntity);
             postEntity.getPostDislikesList().add(dislikesEntity);
             user.getPostDislikesList().add(dislikesEntity);
+            postEntity.setLikeCount(postEntity.getLikeCount() - 1);
 
             status.put(PostReactionStatus.dislikeCreated.name(), true);
         }

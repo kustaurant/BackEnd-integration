@@ -49,7 +49,7 @@ public class PostDTO {
     @Schema(description = "작성자 여부",example = "true")
     Boolean isPostMine =false;
 
-    public static PostDTO convertPostToPostDTO(PostEntity postEntity, Integer likeCount) {
+    public static PostDTO convertPostToPostDTO(PostEntity postEntity) {
         PostDTO dto = new PostDTO();
         dto.setPostId(postEntity.getPostId());
         dto.setPostTitle(postEntity.getPostTitle());
@@ -58,7 +58,7 @@ public class PostDTO {
         dto.setPostCategory(postEntity.getPostCategory());
         dto.setCreatedAt(postEntity.getCreatedAt());
         dto.setUpdatedAt(postEntity.getUpdatedAt());
-        dto.setLikeCount(likeCount);
+        dto.setLikeCount(postEntity.getLikeCount());
         dto.setUser(UserDTO.convertUserToUserDTO(postEntity.getUser()));
         int commentCount = postEntity.getPostCommentList().stream().filter(c -> c.getStatus().equals("ACTIVE")).toList().size();
         dto.setCommentCount(commentCount);

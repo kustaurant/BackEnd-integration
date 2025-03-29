@@ -69,7 +69,7 @@ public class PostEntity {
     public Post toDomain() {
         return new Post(
                 postId, postTitle, postBody, postCategory, status,
-                createdAt, updatedAt, postVisitCount,
+                createdAt, updatedAt, postVisitCount, likeCount,
                 user.getUserId()
         );
     }
