@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.admin;
 
-import com.kustaurant.kustaurant.api.restaurant.RestaurantApiService;
+import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

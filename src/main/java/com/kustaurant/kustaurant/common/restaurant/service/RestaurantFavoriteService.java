@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.service;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
@@ -26,10 +26,10 @@ public class RestaurantFavoriteService {
 
     // 유저의 즐겨찾기 식당 Tier DTO 리스트를 반환
     public List<RestaurantTierDTO> getFavoriteRestaurantDtoList(Integer userId) {
-        List<RestaurantFavoriteDomain> favorites = restaurantFavoriteRepository.findByUser(userId);
+        List<RestaurantFavorite> favorites = restaurantFavoriteRepository.findByUser(userId);
 
         return favorites.stream()
-                .map(RestaurantFavoriteDomain::getRestaurant)
+                .map(RestaurantFavorite::getRestaurant)
                 .map(restaurantDomain -> RestaurantTierDTO.convertRestaurantToTierDTO(
                         restaurantDomain,
                         null,
@@ -40,8 +40,8 @@ public class RestaurantFavoriteService {
 
     // 즐겨찾기 토글
     @Transactional
-    public boolean toggleFavorite(User user, RestaurantDomain restaurant) {
-        RestaurantFavoriteDomain favorite;
+    public boolean toggleFavorite(User user, Restaurant restaurant) {
+        RestaurantFavorite favorite;
         try {
             // 즐겨찾기 정보 조회
             favorite = restaurantFavoriteRepository.findByUserIdAndRestaurantId(user.getUserId(), restaurant.getRestaurantId());
@@ -55,9 +55,9 @@ public class RestaurantFavoriteService {
         return false;
     }
 
-    public void addFavorite(User user, RestaurantDomain restaurant) {
+    public void addFavorite(User user, Restaurant restaurant) {
         restaurantFavoriteRepository.save(
-                RestaurantFavoriteDomain.builder()
+                RestaurantFavorite.builder()
                 .user(user)
                 .restaurant(restaurant)
                 .status("ACTIVE")
@@ -66,7 +66,7 @@ public class RestaurantFavoriteService {
         );
     }
 
-    public void deleteFavorite(RestaurantFavoriteDomain restaurantFavorite) {
+    public void deleteFavorite(RestaurantFavorite restaurantFavorite) {
         restaurantFavoriteRepository.delete(restaurantFavorite);
     }
 }

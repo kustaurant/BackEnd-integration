@@ -2,11 +2,10 @@ package com.kustaurant.kustaurant.api.user.service;
 
 import com.kustaurant.kustaurant.common.notice.NoticeDTO;
 import com.kustaurant.kustaurant.common.notice.NoticeRepository;
-import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
+import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.user.domain.*;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
@@ -157,7 +156,7 @@ public class MypageApiService {
     // 유저가 즐겨찾기한 레스토랑 리스트들 반환
     public List<FavoriteRestaurantInfoDTO> getUserFavoriteRestaurantList(Integer userId) {
         User user = findUserById(userId);
-        List<RestaurantFavorite> favoriteList = user.getRestaurantFavoriteList();
+        List<RestaurantFavoriteEntity> favoriteList = user.getRestaurantFavoriteList();
 
         List<FavoriteRestaurantInfoDTO> favoriteRestaurantInfoDTOs = favoriteList.stream()
                 .map(restaurantFavorite -> new FavoriteRestaurantInfoDTO(

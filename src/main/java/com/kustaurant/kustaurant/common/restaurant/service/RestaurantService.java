@@ -2,9 +2,9 @@ package com.kustaurant.kustaurant.common.restaurant.service;
 
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenuDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenu;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantDetailDTO;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,13 +21,13 @@ public class RestaurantService {
     private final RestaurantMenuService restaurantMenuService;
     private final EvaluationService evaluationService;
 
-    public RestaurantDomain getDomain(Integer restaurantId) {
-        return restaurantRepository.getById(restaurantId);
+    public Restaurant getActiveDomain(Integer restaurantId) {
+        return restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
     }
 
-    public RestaurantDetailDTO getRestaurantDetailDto(Integer restaurantId, Integer userId, String userAgent) {
-        RestaurantDomain restaurant = restaurantRepository.getById(restaurantId);
-        List<RestaurantMenuDomain> menus = restaurantMenuService.findMenusByRestaurantId(restaurantId);
+    public RestaurantDetailDTO getActiveRestaurantDetailDto(Integer restaurantId, Integer userId, String userAgent) {
+        Restaurant restaurant = restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
+        List<RestaurantMenu> menus = restaurantMenuService.findMenusByRestaurantId(restaurantId);
 
         boolean isEvaluated = evaluationService.isUserEvaluated(userId, restaurantId);
         boolean isFavorite = restaurantFavoriteService.isUserFavorite(userId, restaurantId);

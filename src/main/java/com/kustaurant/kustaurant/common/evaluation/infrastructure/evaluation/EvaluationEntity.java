@@ -150,7 +150,7 @@ public class EvaluationEntity {
                 .commentImgUrl(this.commentImgUrl)
                 .commentLikeCount(this.commentLikeCount)
                 .user(this.user)
-                .restaurant(this.restaurant.toModel())
+                .restaurant(this.restaurant.toDomain())
                 .build();
     }
 }

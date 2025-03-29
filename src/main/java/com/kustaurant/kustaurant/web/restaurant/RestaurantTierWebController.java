@@ -6,12 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.service.RestaurantTierService;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.SituationRepository;
-import com.kustaurant.kustaurant.api.restaurant.RestaurantApiService;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.SituationRepository;
+import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,13 +35,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Controller
 @Slf4j
-public class TierWebController {
+public class RestaurantTierWebController {
     //
     private final SituationRepository situationRepository;
     private final EvaluationRepository evaluationRepository;
     private final EvaluationService evaluationService;
     private final CustomOAuth2UserService customOAuth2UserService;
     //
+    private final RestaurantTierService restaurantTierService;
     private final RestaurantApiService restaurantApiService;
 
     public static final Integer tierPageSize = 40;
@@ -94,7 +96,7 @@ public class TierWebController {
         // User 처리
         User user = customOAuth2UserService.getUserByPrincipal(principal);
         // restaurant list 처리
-        List<RestaurantEntity> tierRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, null, true);
+        List<RestaurantEntity> tierRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, null, true);
 
         List<RestaurantTierDataClass> restaurantsData = evaluationService.convertToTierDataClassList(tierRestaurants, user, true);
         Pageable pageable = PageRequest.of(page, tierPageSize);

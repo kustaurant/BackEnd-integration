@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.api.restaurant;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.global.UserService;
@@ -70,7 +70,7 @@ public class RestaurantApiController {
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         return new ResponseEntity<>(
-                restaurantService.getRestaurantDetailDto(restaurantId, userId, userAgent),
+                restaurantService.getActiveRestaurantDetailDto(restaurantId, userId, userAgent),
                 HttpStatus.OK
         );
     }
@@ -107,7 +107,7 @@ public class RestaurantApiController {
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         return new ResponseEntity<>(
-                restaurantService.getRestaurantDetailDto(restaurantId, userId, userAgent),
+                restaurantService.getActiveRestaurantDetailDto(restaurantId, userId, userAgent),
                 HttpStatus.OK
         );
     }
@@ -129,7 +129,7 @@ public class RestaurantApiController {
         // 유저 가져오기
         User user = userService.findUserById(userId);
         // 식당 가져오기
-        RestaurantDomain restaurant = restaurantService.getDomain(restaurantId);
+        Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         // 즐겨찾기 로직
         boolean result = restaurantFavoriteService.toggleFavorite(user, restaurant);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
@@ -158,7 +158,7 @@ public class RestaurantApiController {
         // 유저 가져오기
         User user = userService.findUserById(userId);
         // 식당 가져오기
-        RestaurantDomain restaurant = restaurantService.getDomain(restaurantId);
+        Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         // 즐겨찾기 로직
         boolean result = restaurantFavoriteService.toggleFavorite(user, restaurant);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환

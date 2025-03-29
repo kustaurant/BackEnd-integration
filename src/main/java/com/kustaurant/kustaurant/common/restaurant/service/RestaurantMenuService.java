@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.service;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenuDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenu;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantMenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ public class RestaurantMenuService {
 
     private final RestaurantMenuRepository restaurantMenuRepository;
 
-    public List<RestaurantMenuDomain> findMenusByRestaurantId(Integer restaurantId) {
+    public List<RestaurantMenu> findMenusByRestaurantId(Integer restaurantId) {
         return restaurantMenuRepository.findByRestaurantOrderById(restaurantId);
     }
 }

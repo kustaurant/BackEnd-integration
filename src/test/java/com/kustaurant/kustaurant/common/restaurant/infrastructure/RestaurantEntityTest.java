@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ class RestaurantEntityTest {
         entity.setMainTier(3);
 
         // when
-        RestaurantDomain domain = entity.toModel();
+        Restaurant domain = entity.toDomain();
 
         // then
         assertEquals(entity.getRestaurantId(), domain.getRestaurantId());
@@ -64,7 +64,7 @@ class RestaurantEntityTest {
     @Test
     void 도메인_to_엔티티_함수_테스트() {
         // given
-        RestaurantDomain domain = RestaurantDomain.builder()
+        Restaurant domain = Restaurant.builder()
                 .restaurantId(123)
                 .restaurantName("테스트 식당")
                 .restaurantType("한식")
@@ -88,7 +88,7 @@ class RestaurantEntityTest {
                 .build();
 
         // when
-        RestaurantEntity entity = RestaurantEntity.from(domain);
+        RestaurantEntity entity = RestaurantEntity.fromDomain(domain);
 
         // then
         assertEquals(domain.getRestaurantId(), entity.getRestaurantId());

@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class RestaurantFavoriteDomain {
+public class RestaurantFavorite {
 
     private Integer favoriteId;
     User user;
-    RestaurantDomain restaurant;
+    Restaurant restaurant;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

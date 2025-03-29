@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.common.restaurant.domain.dto;
 
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenuDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
+import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantMenu;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -53,11 +53,11 @@ public class RestaurantDetailDTO {
     @Schema(description = "즐겨찾기 횟수")
     private Integer favoriteCount;
     @Schema(description = "메뉴 리스트")
-    private List<RestaurantMenuDomain> restaurantMenuList;
+    private List<RestaurantMenu> restaurantMenuList;
 
     public static RestaurantDetailDTO from(
-            RestaurantDomain restaurant,
-            List<RestaurantMenuDomain> restaurantMenus,
+            Restaurant restaurant,
+            List<RestaurantMenu> restaurantMenus,
             Boolean isEvaluated,
             Boolean isFavorite,
             Boolean isIOS

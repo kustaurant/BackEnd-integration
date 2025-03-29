@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.evaluation.domain;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
+import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class EvaluationDomain {
 
     // 참조키
     private User user;
-    private RestaurantDomain restaurant;
+    private Restaurant restaurant;
 
     // 추가
     private Integer likeCount;
