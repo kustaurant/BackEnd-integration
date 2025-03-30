@@ -18,6 +18,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -74,16 +75,6 @@ public class PostApiService {
         return result;  // Post 엔티티를 PostDTO로 변환
     }
 
-    // 검색 결과 반환하기
-    public Page<PostDTO> getSearchResults(int page, String sort, String kw, String postCategory) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("createdAt"));
-        Specification<PostEntity> spec = search(kw, postCategory, sort);
-        Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        Page<PostEntity> posts = this.postRepository.findAll(spec, pageable);
-        return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
-    }
-
     public PostEntity getPost(Integer id) {
         Optional<PostEntity> post = this.postRepository.findByStatusAndPostId("ACTIVE", id);
         if (post.isPresent()) {
@@ -106,7 +97,7 @@ public class PostApiService {
         postEntity.setPostVisitCount(++visitCount);
         postRepository.save(postEntity);
     }
-
+    @Transactional
     public LikeToggleStatus toggleLikeStatus(PostEntity postEntity, User user) {
         Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByPostEntityAndUser(postEntity, user);
 
@@ -117,15 +108,16 @@ public class PostApiService {
             postEntity.getPostLikesList().remove(like);
             user.getPostLikesList().remove(like);
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
-            return LikeToggleStatus.CREATED; // likeDeleted
+            return LikeToggleStatus.DELETED; // likeDeleted
         }
         // 처음 like 하는 경우 - 추가
         else {
             PostLikesEntity postLikesEntity = new PostLikesEntity(user, postEntity);
+            postLikesJpaRepository.save(postLikesEntity);
             postEntity.getPostLikesList().add(postLikesEntity);
             user.getPostLikesList().add(postLikesEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
-            return LikeToggleStatus.DELETED; // likeDeleted
+            return LikeToggleStatus.CREATED; // likeDeleted
         }
     }
 
