@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.evaluation.infrastructure;
 
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ public class RestaurantCommentReport {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
     @ManyToOne
     @JoinColumn(name = "evaluation_id")
     private EvaluationEntity evaluation;
@@ -32,15 +32,15 @@ public class RestaurantCommentReport {
     private LocalDateTime createdAt;
     private String status;
 
-    public RestaurantCommentReport(User user, RestaurantComment restaurantComment, LocalDateTime createdAt, String status) {
-        this.user = user;
+    public RestaurantCommentReport(UserEntity UserEntity, RestaurantComment restaurantComment, LocalDateTime createdAt, String status) {
+        this.user = UserEntity;
         this.evaluation = null;
         this.restaurantComment = restaurantComment;
         this.createdAt = createdAt;
         this.status = status;
     }
-    public RestaurantCommentReport(User user, EvaluationEntity evaluation, LocalDateTime createdAt, String status) {
-        this.user = user;
+    public RestaurantCommentReport(UserEntity UserEntity, EvaluationEntity evaluation, LocalDateTime createdAt, String status) {
+        this.user = UserEntity;
         this.evaluation = evaluation;
         this.restaurantComment = null;
         this.createdAt = createdAt;

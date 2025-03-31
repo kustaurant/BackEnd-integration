@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.common.evaluation.service.port;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +17,8 @@ public interface EvaluationRepository {
     // TODO: need to delete everything below this
 
     EvaluationEntity save(EvaluationEntity evaluation);
-    Optional<Evaluation> findByUserAndRestaurant(User user, RestaurantEntity restaurant);
-    Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(User user, RestaurantEntity restaurant, String status);
+    Optional<Evaluation> findByUserAndRestaurant(UserEntity UserEntity, RestaurantEntity restaurant);
+    Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(UserEntity UserEntity, RestaurantEntity restaurant, String status);
 
     Integer countByRestaurant(RestaurantEntity restaurant);
 

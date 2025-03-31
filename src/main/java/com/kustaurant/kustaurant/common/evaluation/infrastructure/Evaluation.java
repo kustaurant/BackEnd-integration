@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.common.evaluation.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,9 +25,9 @@ public class Evaluation {
 
     private String status="ACTIVE";
 
-    public Evaluation(RestaurantEntity restaurant, User user, Double evaluationScore) {
+    public Evaluation(RestaurantEntity restaurant, UserEntity UserEntity, Double evaluationScore) {
         this.restaurant = restaurant;
-        this.user = user;
+        this.user = UserEntity;
         this.evaluationScore = evaluationScore;
         this.createdAt = LocalDateTime.now();
     }
@@ -47,7 +47,7 @@ public class Evaluation {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
 
     @OneToMany(mappedBy = "evaluation")
     private List<EvaluationItemScore> evaluationItemScoreList = new ArrayList<>();
@@ -69,13 +69,13 @@ public class Evaluation {
 
     }
 
-    public Evaluation(Double evaluationScore, String status, LocalDateTime createdAt, String commentBody, String commentImgUrl, User user, RestaurantEntity restaurant) {
+    public Evaluation(Double evaluationScore, String status, LocalDateTime createdAt, String commentBody, String commentImgUrl, UserEntity UserEntity, RestaurantEntity restaurant) {
         this.evaluationScore = evaluationScore;
         this.status = status;
         this.createdAt = createdAt;
         this.commentBody = commentBody;
         this.commentImgUrl = commentImgUrl;
-        this.user = user;
+        this.user = UserEntity;
         this.restaurant = restaurant;
     }
 

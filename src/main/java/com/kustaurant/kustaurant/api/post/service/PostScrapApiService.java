@@ -3,8 +3,8 @@ package com.kustaurant.kustaurant.api.post.service;
 
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +17,11 @@ import java.util.Optional;
 public class PostScrapApiService {
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
-    public int scrapCreateOrDelete(PostEntity postEntity, User user) {
+    private final OUserRepository OUserRepository;
+    public int scrapCreateOrDelete(PostEntity postEntity, UserEntity UserEntity) {
         List<PostScrap> postScrapList = postEntity.getPostScrapList();
-        List<PostScrap> userScrapList = user.getScrapList();
-        Optional<PostScrap> scrapOptional = postScrapApiRepository.findByUserAndPostEntity(user, postEntity);
+        List<PostScrap> userScrapList = UserEntity.getScrapList();
+        Optional<PostScrap> scrapOptional = postScrapApiRepository.findByUserAndPostEntity(UserEntity, postEntity);
         int status;
 
         if (scrapOptional.isPresent()) {
@@ -31,7 +31,7 @@ public class PostScrapApiService {
             userScrapList.remove(scrap);
             status = 0; // scrapDeleted
         } else {
-            PostScrap scrap = new PostScrap(user, postEntity, LocalDateTime.now());
+            PostScrap scrap = new PostScrap(UserEntity, postEntity, LocalDateTime.now());
             PostScrap savedScrap = postScrapApiRepository.save(scrap);
             userScrapList.add(savedScrap);
             postScrapList.add(savedScrap);
@@ -39,7 +39,7 @@ public class PostScrapApiService {
         }
 
         postRepository.save(postEntity);
-        userRepository.save(user);
+        OUserRepository.save(UserEntity);
         return status;
     }
 

@@ -1,19 +1,19 @@
 package com.kustaurant.kustaurant.global;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    private final UserRepository userRepository;
+    private final OUserRepository OUserRepository;
 
-    public User findUserById(Integer userId) {
+    public UserEntity findUserById(Integer userId) {
         if (userId == null) {
             return null;
         }
-        return userRepository.findByUserIdAndStatus(userId, "ACTIVE").orElse(null);
+        return OUserRepository.findByUserIdAndStatus(userId, "ACTIVE").orElse(null);
     }
 }

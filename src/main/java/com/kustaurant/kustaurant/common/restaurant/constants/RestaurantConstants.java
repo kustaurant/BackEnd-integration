@@ -1,22 +1,22 @@
 package com.kustaurant.kustaurant.common.restaurant.constants;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 public abstract class RestaurantConstants {
     public static final String REPLACE_IMG_URL ="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/NoImgRestaurant.png";
 
-    public static String getIconImgUrl(User user, String userAgent) {
-        if (user == null) {
+    public static String getIconImgUrl(UserEntity UserEntity, String userAgent) {
+        if (UserEntity == null) {
             return null;
         }
 
         boolean isIOS = isIOS(userAgent);
 
-        if (user.getEvaluationList().size() > 60) {
+        if (UserEntity.getEvaluationList().size() > 60) {
             return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level3icon" + (isIOS ? ".svg" : ".png");
-        } else if (user.getEvaluationList().size() > 30) {
+        } else if (UserEntity.getEvaluationList().size() > 30) {
             return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level2icon" + (isIOS ? ".svg" : ".png");
         } else {
             return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/level1icon" + (isIOS ? ".svg" : ".png");
