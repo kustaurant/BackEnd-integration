@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
+import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.post.domain.PostUpdateDTO;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,6 +32,8 @@ public class PostApiService {
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostCommentApiRepository postCommentApiRepository;
     private final PostPhotoApiRepository postPhotoApiRepository;
+    private final PostLikesJpaRepository postLikesJpaRepository;
+    private final PostDislikesJpaRepository postDislikesJpaRepository;
     // 인기순 제한 기준 숫자
     public static final int POPULARCOUNT = 3;
     // 페이지 숫자
@@ -71,16 +75,6 @@ public class PostApiService {
         return result;  // Post 엔티티를 PostDTO로 변환
     }
 
-    // 검색 결과 반환하기
-    public Page<PostDTO> getSearchResults(int page, String sort, String kw, String postCategory) {
-        List<Sort.Order> sorts = new ArrayList<>();
-        sorts.add(Sort.Order.desc("createdAt"));
-        Specification<PostEntity> spec = search(kw, postCategory, sort);
-        Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        Page<PostEntity> posts = this.postRepository.findAll(spec, pageable);
-        return posts.map(PostDTO::convertPostToPostDTO);  // Post 엔티티를 PostDTO로 변환
-    }
-
     public PostEntity getPost(Integer id) {
         Optional<PostEntity> post = this.postRepository.findByStatusAndPostId("ACTIVE", id);
         if (post.isPresent()) {
@@ -103,30 +97,28 @@ public class PostApiService {
         postEntity.setPostVisitCount(++visitCount);
         postRepository.save(postEntity);
     }
-
-    public int likeCreateOrDelete(PostEntity postEntity, User user) {
-        List<User> likeUserList = postEntity.getLikeUserList();
-        List<PostEntity> likePostList = user.getLikePostList();
-        int status;
+    @Transactional
+    public LikeToggleStatus toggleLikeStatus(PostEntity postEntity, User user) {
+        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByPostEntityAndUser(postEntity, user);
 
         //해당 post 를 이미 like 한 경우 - 제거
-        if (likeUserList.contains(user)) {
+        if (likeOptional.isPresent()) {
+            PostLikesEntity like = likeOptional.get();
+            postLikesJpaRepository.delete(like);
+            postEntity.getPostLikesList().remove(like);
+            user.getPostLikesList().remove(like);
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
-            likePostList.remove(postEntity);
-            likeUserList.remove(user);
-            status = 0; // likeDeleted
+            return LikeToggleStatus.DELETED; // likeDeleted
         }
         // 처음 like 하는 경우 - 추가
         else {
+            PostLikesEntity postLikesEntity = new PostLikesEntity(user, postEntity);
+            postLikesJpaRepository.save(postLikesEntity);
+            postEntity.getPostLikesList().add(postLikesEntity);
+            user.getPostLikesList().add(postLikesEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
-            likeUserList.add(user);
-            likePostList.add(postEntity);
-            status = 1; // likeCreated
+            return LikeToggleStatus.CREATED; // likeDeleted
         }
-
-        postRepository.save(postEntity);
-        userRepository.save(user);
-        return status;
     }
 
 
