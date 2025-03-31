@@ -1,6 +1,8 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
+import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentApiRepository;
 import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;

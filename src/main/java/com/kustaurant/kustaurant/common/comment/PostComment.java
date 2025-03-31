@@ -1,5 +1,6 @@
-package com.kustaurant.kustaurant.common.post.infrastructure;
+package com.kustaurant.kustaurant.common.comment;
 
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -50,9 +51,8 @@ public class PostComment {
 
     }
 
-    @ManyToMany
-    @JoinTable(name="comment_likes_tbl",joinColumns = @JoinColumn(name="comment_id"),inverseJoinColumns = @JoinColumn(name="user_id"))
-    List<User> likeUserList = new ArrayList<>();
+    @OneToMany(mappedBy = "postComment")
+    List<PostCommentLikesEntity> postCommentLikesEntities = new ArrayList<>();
     @ManyToMany
     @JoinTable(name="comment_dislikes_tbl",joinColumns = @JoinColumn(name="comment_id"),inverseJoinColumns = @JoinColumn(name="user_id"))
 

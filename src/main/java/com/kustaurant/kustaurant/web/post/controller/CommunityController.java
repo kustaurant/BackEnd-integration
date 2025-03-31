@@ -1,9 +1,11 @@
 package com.kustaurant.kustaurant.web.post.controller;
 
+import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
 import com.kustaurant.kustaurant.common.post.domain.PostInteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.web.post.service.PostCommentService;
+import com.kustaurant.kustaurant.web.comment.PostCommentService;
 import com.kustaurant.kustaurant.web.post.service.PostScrapService;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import com.kustaurant.kustaurant.common.post.service.StorageService;

@@ -1,12 +1,15 @@
-package com.kustaurant.kustaurant.api.post.service;
+package com.kustaurant.kustaurant.api.comment;
 
 
+import com.kustaurant.kustaurant.api.post.service.PostApiService;
+import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentApiRepository;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.post.domain.PostDTO;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.domain.PostCommentDTO;
+import com.kustaurant.kustaurant.common.comment.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.enums.PostStatus;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
@@ -48,10 +51,10 @@ public class PostApiCommentService {
 
     // 댓글 좋아요 (세 가지 경우)
     public int likeCreateOrDelete(PostComment postComment, User user) {
-        List<User> likeUserList = postComment.getLikeUserList();
+        List<User> likeUserList = postComment.getPostCommentLikesEntities();
         List<User> dislikeUserList = postComment.getDislikeUserList();
-        List<PostComment> likePostCommentList = user.getLikePostCommentList();
-        List<PostComment> dislikePostCommentList = user.getDislikePostCommentList();
+        List<PostComment> likePostCommentList = user.getPostCommentLikesEntities();
+        List<PostComment> dislikePostCommentList = user.getPostCommentDislikesEntities();
         int commentLikeStatus;
 
         // 해당 postComment를 like 한 경우 - 제거
@@ -86,10 +89,10 @@ public class PostApiCommentService {
 
     // 댓글 싫어요 (세 가지 경우)
     public int dislikeCreateOrDelete(PostComment postComment, User user) {
-        List<User> likeUserList = postComment.getLikeUserList();
+        List<User> likeUserList = postComment.getPostCommentLikesEntities();
         List<User> dislikeUserList = postComment.getDislikeUserList();
-        List<PostComment> likePostCommentList = user.getLikePostCommentList();
-        List<PostComment> dislikePostCommentList = user.getDislikePostCommentList();
+        List<PostComment> likePostCommentList = user.getPostCommentLikesEntities();
+        List<PostComment> dislikePostCommentList = user.getPostCommentDislikesEntities();
         int commentLikeStatus;
 
         // 해당 postComment를 dislike 한 경우 - 제거
@@ -128,7 +131,7 @@ public class PostApiCommentService {
         if (user == null || postComment == null) {
             return false;
         }
-        return postComment.getLikeUserList().stream()
+        return postComment.getPostCommentLikesEntities().stream()
                 .anyMatch(likeUser -> likeUser.equals(user));
     }
 

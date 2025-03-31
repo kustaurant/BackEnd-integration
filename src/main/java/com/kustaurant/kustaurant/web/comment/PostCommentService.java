@@ -1,10 +1,13 @@
-package com.kustaurant.kustaurant.web.post.service;
+package com.kustaurant.kustaurant.web.comment;
 
+import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.web.post.service.PostService;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -50,10 +53,10 @@ public class PostCommentService {
 
     // 댓글 좋아요 (세가지 경우)
     public Map<String, Object> likeCreateOrDelete(PostComment postcomment, User user) {
-        List<User> likeUserList = postcomment.getLikeUserList();
+        List<User> likeUserList = postcomment.getPostCommentLikesEntities();
         List<User> dislikeUserList = postcomment.getDislikeUserList();
-        List<PostComment> likePostCommentList = user.getLikePostCommentList();
-        List<PostComment> dislikePostCommentList = user.getDislikePostCommentList();
+        List<PostComment> likePostCommentList = user.getPostCommentLikesEntities();
+        List<PostComment> dislikePostCommentList = user.getPostCommentDislikesEntities();
         Map<String, Object> status = new HashMap<>();
         //해당 postcomment를 like 한 경우 - 제거
         if (likeUserList.contains(user)) {
@@ -87,10 +90,10 @@ public class PostCommentService {
 
     // 댓글 싫어요 (세가지 경우)
     public Map<String, Object> dislikeCreateOrDelete(PostComment postcomment, User user) {
-        List<User> likeUserList = postcomment.getLikeUserList();
+        List<User> likeUserList = postcomment.getPostCommentLikesEntities();
         List<User> dislikeUserList = postcomment.getDislikeUserList();
-        List<PostComment> likePostCommentList = user.getLikePostCommentList();
-        List<PostComment> dislikePostCommentList = user.getDislikePostCommentList();
+        List<PostComment> likePostCommentList = user.getPostCommentLikesEntities();
+        List<PostComment> dislikePostCommentList = user.getPostCommentDislikesEntities();
         Map<String, Object> status = new HashMap<>();
 
         //해당 post를 이미 dislike 한 경우 - 제거

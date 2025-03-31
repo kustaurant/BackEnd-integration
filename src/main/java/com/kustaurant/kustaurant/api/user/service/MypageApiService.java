@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.api.user.service;
 
+import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
 import com.kustaurant.kustaurant.common.notice.NoticeDTO;
 import com.kustaurant.kustaurant.common.notice.NoticeRepository;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;

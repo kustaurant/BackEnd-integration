@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.web.post.service;
 
+import com.kustaurant.kustaurant.common.comment.PostComment;
 import com.kustaurant.kustaurant.common.post.domain.PostInteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.enums.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
@@ -151,7 +152,7 @@ public class PostService {
             user.getPostLikesList().remove(likeOptional.get());
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
 
-            status.put(PostReactionStatus.likeDelete.name(), true);
+            status.put(ReactionStatus.LIKE_DELETED.name(), true);
         }
         //해당 post를 이미 dislike 한 경우 - 제거하고 추가
         else if (dislikeOptional.isPresent()) {
@@ -167,7 +168,7 @@ public class PostService {
             user.getPostLikesList().add(postLikesEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() + 2);
 
-            status.put(PostReactionStatus.likeChanged.name(), true);
+            status.put(ReactionStatus.DISLIKE_TO_LIKE.name(), true);
         }
         // 처음 like 하는 경우-추가
         else {
@@ -177,7 +178,7 @@ public class PostService {
             user.getPostLikesList().add(postLikesEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
 
-            status.put(PostReactionStatus.likeCreated.name(), true);
+            status.put(ReactionStatus.LIKE_CREATED.name(), true);
         }
         return status;
     }
@@ -196,7 +197,7 @@ public class PostService {
             user.getPostDislikesList().remove(dislikeOptional.get());
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
 
-            status.put(PostReactionStatus.dislikeDelete.name(), true);
+            status.put(ReactionStatus.DISLIKE_DELETED.name(), true);
         }
         //해당 post 를 이미 like 한 경우 - 제거 후 추가
         else if (likeOptional.isPresent()) {
@@ -211,7 +212,7 @@ public class PostService {
             user.getPostDislikesList().add(postDislikesEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() - 2);
 
-            status.put(PostReactionStatus.dislikeChanged.name(), true);
+            status.put(ReactionStatus.LIKE_TO_DISLIKE.name(), true);
         }
         // 처음 dislike 하는 경우-추가
         else {
@@ -221,7 +222,7 @@ public class PostService {
             user.getPostDislikesList().add(dislikesEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
 
-            status.put(PostReactionStatus.dislikeCreated.name(), true);
+            status.put(ReactionStatus.DISLIKE_CREATED.name(), true);
         }
         return status;
     }
