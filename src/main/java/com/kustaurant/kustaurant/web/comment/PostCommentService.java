@@ -63,43 +63,42 @@ public class PostCommentService {
 
         //해당 댓글을 유저가 이미 좋아요를 누른 경우 - 좋아요 제거
         if (likeOptional.isPresent()) {
-
             PostCommentLikesEntity postCommentLikesEntity = likeOptional.get();
-            postCommentLikesJpaRepository.delete(postCommentLikesEntity);
-            user.getPostCommentLikesEntities().remove(postCommentLikesEntity);
-            postComment.getPostCommentLikesEntities().remove(postCommentLikesEntity);
+            removeCommentLike(user, postComment, postCommentLikesEntity);
             postComment.setLikeCount(postComment.getLikeCount() - 1);
 
             status.put(ReactionStatus.LIKE_DELETED.name(), true);
         }
-        //해당 댓글을 유저가 이미 싫어요를 누른 경우 - 제거하고 좋아요 추가
+        //해당 댓글을 유저가 이미 싫어요를 누른 경우 - 싫어요 제거하고 좋아요 추가
         else if (dislikeOptional.isPresent()) {
             PostCommentDislikesEntity postCommentDislikesEntity = dislikeOptional.get();
-            postCommentDislikesJpaRepository.delete(postCommentDislikesEntity);
-            user.getPostCommentDislikesEntities().remove(postCommentDislikesEntity);
-            postComment.getPostCommentDislikesEntities().remove(postCommentDislikesEntity);
-
+            removeCommentDislike(user, postComment, postCommentDislikesEntity);
+            addCommentLike(user, postComment);
             postComment.setLikeCount(postComment.getLikeCount() + 2);
-
-            PostCommentLikesEntity postCommentLikesEntity = new PostCommentLikesEntity(user,postComment);
-            postCommentLikesJpaRepository.save(postCommentLikesEntity);
-            postComment.getPostCommentLikesEntities().add(postCommentLikesEntity);
-            user.getPostCommentLikesEntities().add(postCommentLikesEntity);
 
             status.put(ReactionStatus.DISLIKE_TO_LIKE.name(), true);
         }
         // 처음 좋아요 버튼 누른 경우 - 좋아요 추가
         else {
-            PostCommentLikesEntity postCommentLikesEntity = new PostCommentLikesEntity(user,postComment);
-            postCommentLikesJpaRepository.save(postCommentLikesEntity);
-            postComment.getPostCommentLikesEntities().add(postCommentLikesEntity);
-            user.getPostCommentLikesEntities().add(postCommentLikesEntity);
+            addCommentLike(user, postComment);
             postComment.setLikeCount(postComment.getLikeCount() + 1);
 
             status.put(ReactionStatus.LIKE_CREATED.name(), true);
-
         }
         return status;
+    }
+
+    private void addCommentLike(User user, PostComment postComment) {
+        PostCommentLikesEntity postCommentLikesEntity = new PostCommentLikesEntity(user, postComment);
+        postCommentLikesJpaRepository.save(postCommentLikesEntity);
+        postComment.getPostCommentLikesEntities().add(postCommentLikesEntity);
+        user.getPostCommentLikesEntities().add(postCommentLikesEntity);
+    }
+
+    private void removeCommentDislike(User user, PostComment postComment, PostCommentDislikesEntity postCommentDislikesEntity) {
+        postCommentDislikesJpaRepository.delete(postCommentDislikesEntity);
+        user.getPostCommentDislikesEntities().remove(postCommentDislikesEntity);
+        postComment.getPostCommentDislikesEntities().remove(postCommentDislikesEntity);
     }
 
     // 댓글 싫어요 버튼 토글
@@ -113,40 +112,41 @@ public class PostCommentService {
         //해당 댓글을 유저가 이미 싫어요를 누른 경우 - 싫어요 제거
         if (dislikeOptional.isPresent()) {
             PostCommentDislikesEntity postCommentDislikesEntity = dislikeOptional.get();
-            user.getPostCommentDislikesEntities().remove(postCommentDislikesEntity);
-            postComment.getPostCommentDislikesEntities().remove(postCommentDislikesEntity);
+            removeCommentDislike(user, postComment, postCommentDislikesEntity);
             postComment.setLikeCount(postComment.getLikeCount() + 1);
-            postCommentDislikesJpaRepository.delete(postCommentDislikesEntity);
 
             status.put(ReactionStatus.DISLIKE_DELETED.name(), true);
         }
         //해당 댓글을 유저가 이미 좋아요 누른 경우 - 좋아요 제거하고 싫어요 추가
         else if (likeOptional.isPresent()) {
             PostCommentLikesEntity postCommentLikesEntity = likeOptional.get();
-            user.getPostCommentLikesEntities().remove(postCommentLikesEntity);
-            postComment.getPostCommentLikesEntities().remove(postCommentLikesEntity);
-            postCommentLikesJpaRepository.delete(postCommentLikesEntity);
-
+            removeCommentLike(user, postComment, postCommentLikesEntity);
+            addCommentDislike(user, postComment);
             postComment.setLikeCount(postComment.getLikeCount() - 2);
-
-            PostCommentDislikesEntity postCommentDislikesEntity = new PostCommentDislikesEntity(user,postComment);
-            postComment.getPostCommentDislikesEntities().add(postCommentDislikesEntity);
-            user.getPostCommentDislikesEntities().add(postCommentDislikesEntity);
-            postCommentDislikesJpaRepository.save(postCommentDislikesEntity);
 
             status.put(ReactionStatus.LIKE_TO_DISLIKE.name(), true);
         }
         // 처음 싫어요 버튼 누른 경우 - 싫어요 추가
         else {
-            PostCommentDislikesEntity postCommentDislikesEntity = new PostCommentDislikesEntity(user,postComment);
-            postComment.getPostCommentDislikesEntities().add(postCommentDislikesEntity);
-            user.getPostCommentDislikesEntities().add(postCommentDislikesEntity);
+            addCommentDislike(user, postComment);
             postComment.setLikeCount(postComment.getLikeCount() - 1);
-            postCommentDislikesJpaRepository.save(postCommentDislikesEntity);
 
             status.put(ReactionStatus.DISLIKE_CREATED.name(), true);
         }
         return status;
+    }
+
+    private void addCommentDislike(User user, PostComment comment) {
+        PostCommentDislikesEntity dislike = new PostCommentDislikesEntity(user, comment);
+        user.getPostCommentDislikesEntities().add(dislike);
+        comment.getPostCommentDislikesEntities().add(dislike);
+        postCommentDislikesJpaRepository.save(dislike);
+    }
+
+    private void removeCommentLike(User user, PostComment comment, PostCommentLikesEntity like) {
+        user.getPostCommentLikesEntities().remove(like);
+        comment.getPostCommentLikesEntities().remove(like);
+        postCommentLikesJpaRepository.delete(like);
     }
 
     public List<PostComment> getList(Integer postId, String sort) {
