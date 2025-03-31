@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.web.comment;
 
-import com.kustaurant.kustaurant.common.comment.PostComment;
-import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
+import com.kustaurant.kustaurant.common.comment.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
@@ -26,6 +25,7 @@ public class PostCommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PostService postService;
+    private final PostCommentLikesJpaRepository postCommentLikesJpaRepository;
 
     // 댓글 생성
     public void create(PostEntity postEntity, User user, PostComment postComment) {
@@ -53,10 +53,9 @@ public class PostCommentService {
 
     // 댓글 좋아요 (세가지 경우)
     public Map<String, Object> likeCreateOrDelete(PostComment postcomment, User user) {
-        List<User> likeUserList = postcomment.getPostCommentLikesEntities();
-        List<User> dislikeUserList = postcomment.getDislikeUserList();
-        List<PostComment> likePostCommentList = user.getPostCommentLikesEntities();
-        List<PostComment> dislikePostCommentList = user.getPostCommentDislikesEntities();
+        Optional<PostCommentLikesEntity> likeOptional = postCommentLikesJpaRepository.findByPostEntityAndUser(postEntity, user);
+        Optional<PostCommentDislikesEntity> dislikeOptional = postDislikesJpaRepository.findByPostEntityAndUser(postEntity, user);
+
         Map<String, Object> status = new HashMap<>();
         //해당 postcomment를 like 한 경우 - 제거
         if (likeUserList.contains(user)) {
