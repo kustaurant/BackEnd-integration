@@ -3,13 +3,13 @@ package com.kustaurant.kustaurant.api.restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class RestaurantApiService {
     private final RestaurantRepository restaurantRepository;
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
-    private final UserRepository userRepository;
+    private final OUserRepository OUserRepository;
 
 
     public static final Integer evaluationCount = 2;
@@ -104,29 +104,29 @@ public class RestaurantApiService {
     }
 
     // 해당 식당을 해당 유저가 평가 했는가?
-    public boolean isEvaluated(RestaurantEntity restaurant, User user) {
-        if (user == null || restaurant == null) {
+    public boolean isEvaluated(RestaurantEntity restaurant, UserEntity UserEntity) {
+        if (UserEntity == null || restaurant == null) {
             return false;
         }
-        return user.getEvaluationList().stream()
+        return UserEntity.getEvaluationList().stream()
                 .anyMatch(evaluation -> evaluation.getRestaurant().equals(restaurant));
     }
 
     // 해당 식당을 해당 유저가 즐겨찾기 했는가?
-    public boolean isFavorite(RestaurantEntity restaurant, User user) {
-        if (user == null || restaurant == null) {
+    public boolean isFavorite(RestaurantEntity restaurant, UserEntity UserEntity) {
+        if (UserEntity == null || restaurant == null) {
             return false;
         }
-        return user.getRestaurantFavoriteList().stream()
+        return UserEntity.getRestaurantFavoriteList().stream()
                 .anyMatch(restaurantFavorite -> restaurantFavorite.getRestaurant().equals(restaurant));
     }
 
     public List<RestaurantEntity> getRecommendedRestaurantsForUser(Integer userId) {
         // 1. 사용자의 정보를 가져옵니다.
-        User user = userRepository.findByUserId(userId).orElse(null);
+        UserEntity UserEntity = OUserRepository.findByUserId(userId).orElse(null);
 
         // 2. 사용자의 즐겨찾기 목록을 가져옵니다.
-        List<RestaurantFavorite> favorites = restaurantFavoriteRepository.findByUser(user);
+        List<RestaurantFavorite> favorites = restaurantFavoriteRepository.findByUser(UserEntity);
 
         if (favorites.isEmpty()) {
             // 즐겨찾기한 식당이 없을 경우 랜덤 식당 15개 추천

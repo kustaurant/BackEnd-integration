@@ -332,14 +332,14 @@
         <div class="modal-dialog modal-dialog-centered ">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-primary" id="exampleModalLabel" th:text="${homeModal.modalTitle}"></h1>
+                    <h1 class="modal-title fs-5 text-primary" id="exampleModalLabel" th:text="${homeModalEntity.modalTitle}"></h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <div class="modal-body text-dark" th:utext="${homeModal.modalBody}">
+                <div class="modal-body text-dark" th:utext="${homeModalEntity.modalBody}">
                 </div>
 
-                <div class="modal-body text-dark" th:text="${'(만료일: ' + homeModal.expiredAt + ')'}">
+                <div class="modal-body text-dark" th:text="${'(만료일: ' + homeModalEntity.expiredAt + ')'}">
                 </div>
 
                 <div class="modal-footer">
@@ -353,7 +353,7 @@
             </div>
         </div>
     </div>
-    <div id="ExpiredData" th:data-expired="${homeModal.expiredAt}" style="display: none"></div>
+    <div id="ExpiredData" th:data-expired="${homeModalEntity.expiredAt}" style="display: none"></div>
 
     <footer th:replace="~{footer::footerFragment}">
 

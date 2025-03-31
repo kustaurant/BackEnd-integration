@@ -3,9 +3,9 @@ package com.kustaurant.kustaurant.common.restaurant.service;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDomain;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,14 +40,14 @@ public class RestaurantFavoriteService {
 
     // 즐겨찾기 토글
     @Transactional
-    public boolean toggleFavorite(User user, RestaurantDomain restaurant) {
+    public boolean toggleFavorite(UserEntity UserEntity, RestaurantDomain restaurant) {
         RestaurantFavoriteDomain favorite;
         try {
             // 즐겨찾기 정보 조회
-            favorite = restaurantFavoriteRepository.findByUserIdAndRestaurantId(user.getUserId(), restaurant.getRestaurantId());
+            favorite = restaurantFavoriteRepository.findByUserIdAndRestaurantId(UserEntity.getUserId(), restaurant.getRestaurantId());
         } catch (DataNotFoundException e) {
             // 즐겨찾기가 안 되어 있는 경우
-            addFavorite(user, restaurant);
+            addFavorite(UserEntity, restaurant);
             return true;
         }
         // 즐겨찾기가 되어 있던 경우
@@ -55,10 +55,10 @@ public class RestaurantFavoriteService {
         return false;
     }
 
-    public void addFavorite(User user, RestaurantDomain restaurant) {
+    public void addFavorite(UserEntity UserEntity, RestaurantDomain restaurant) {
         restaurantFavoriteRepository.save(
                 RestaurantFavoriteDomain.builder()
-                .user(user)
+                .user(UserEntity)
                 .restaurant(restaurant)
                 .status("ACTIVE")
                 .createdAt(LocalDateTime.now())

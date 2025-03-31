@@ -2,9 +2,8 @@ package com.kustaurant.kustaurant.common.evaluation.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +26,7 @@ public class RestaurantComment {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
 
     @ManyToOne
     @JoinColumn(name="restaurant_id")
@@ -53,8 +52,8 @@ public class RestaurantComment {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public RestaurantComment(User user, RestaurantEntity restaurant, EvaluationEntity evaluation, String commentBody, String status, LocalDateTime createdAt) {
-        this.user = user;
+    public RestaurantComment(UserEntity UserEntity, RestaurantEntity restaurant, EvaluationEntity evaluation, String commentBody, String status, LocalDateTime createdAt) {
+        this.user = UserEntity;
         this.restaurant = restaurant;
         this.evaluation = evaluation;
         this.commentBody = commentBody;

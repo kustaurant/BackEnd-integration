@@ -1,12 +1,12 @@
 package com.kustaurant.kustaurant.api.restaurant;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
-import com.kustaurant.kustaurant.api.notice.HomeBannerApiService;
+import com.kustaurant.kustaurant.common.notice.service.HomeBannerApiService;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.web.restaurant.RestaurantWebService;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -73,13 +73,13 @@ public class HomeApiController {
             return ResponseEntity.ok(new ArrayList<>());
         }
 
-        User user = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(userId);
 
         String[] kwList = kw.split(" ");
         List<RestaurantEntity> restaurantList = restaurantWebService.searchRestaurants(kwList);
 
         return ResponseEntity.ok(restaurantList.stream().map(restaurant ->
-                RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)))
+                RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, restaurantApiService.isEvaluated(restaurant, UserEntity), restaurantApiService.isFavorite(restaurant, UserEntity)))
                 .toList());
     }
 }

@@ -2,11 +2,11 @@ package com.kustaurant.kustaurant.web.post.controller;
 
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.web.post.service.PostCommentService;
 import com.kustaurant.kustaurant.web.post.service.PostScrapService;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import com.kustaurant.kustaurant.common.post.service.StorageService;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import groovy.util.logging.Slf4j;
 import jakarta.transaction.Transactional;
@@ -82,10 +82,10 @@ public class CommunityController {
 
         boolean isPostScrappedByUser = false;
         if (principal != null) {
-            User user = customOAuth2UserService.getUser(principal.getName());
-            model.addAttribute("user", user);
+            UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
+            model.addAttribute("user", UserEntity);
             isPostScrappedByUser = postEntity.getPostScrapList().stream()
-                    .anyMatch(scrap -> scrap.getUser().equals(user));
+                    .anyMatch(scrap -> scrap.getUser().equals(UserEntity));
         }
         model.addAttribute("sort", sort);
         model.addAttribute("isPostScrappedByUser", isPostScrappedByUser);
@@ -160,9 +160,9 @@ public class CommunityController {
             @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
             Model model, Principal principal) {
         Integer postIdInt = Integer.valueOf(postId);
-        User user = customOAuth2UserService.getUser(principal.getName());
+        UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
         PostEntity postEntity = postService.getPost(postIdInt);
-        PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), postEntity, user);
+        PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), postEntity, UserEntity);
         PostComment savedPostComment = postCommentRepository.save(postComment);
 
         // 대댓글이면 부모 관계 매핑하기
@@ -170,12 +170,12 @@ public class CommunityController {
             PostComment parentComment = postCommentService.getPostCommentByCommentId(Integer.valueOf(parentCommentId));
             savedPostComment.setParentComment(parentComment);
             parentComment.getRepliesList().add(savedPostComment);
-            postCommentService.replyCreate(user, savedPostComment);
+            postCommentService.replyCreate(UserEntity, savedPostComment);
             postCommentRepository.save(parentComment);
         }
         // 댓글이면 post와 연결하면서 저장
         else {
-            postCommentService.create(postEntity, user, savedPostComment);
+            postCommentService.create(postEntity, UserEntity, savedPostComment);
         }
         postCommentRepository.save(savedPostComment);
         return ResponseEntity.ok("댓글이 성공적으로 저장되었습니다.");
@@ -186,9 +186,9 @@ public class CommunityController {
     @GetMapping("/api/post/like")
     public ResponseEntity<Map<String, Object>> postLikeCreate(@RequestParam("postId") String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = customOAuth2UserService.getUser(principal.getName());
+        UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
         PostEntity postEntity = postService.getPost(postidInt);
-        Map<String, Object> response = postService.likeCreateOrDelete(postEntity, user);
+        Map<String, Object> response = postService.likeCreateOrDelete(postEntity, UserEntity);
         response.put("likeCount", postEntity.getLikeUserList().size());
         response.put("dislikeCount", postEntity.getDislikeUserList().size());
 
@@ -200,9 +200,9 @@ public class CommunityController {
     @GetMapping("/api/post/dislike")
     public ResponseEntity<Map<String, Object>> postDislikeCreate(@RequestParam("postId") String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = customOAuth2UserService.getUser(principal.getName());
+        UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
         PostEntity postEntity = postService.getPost(postidInt);
-        Map<String, Object> response = postService.dislikeCreateOrDelete(postEntity, user);
+        Map<String, Object> response = postService.dislikeCreateOrDelete(postEntity, UserEntity);
         response.put("dislikeCount", postEntity.getDislikeUserList().size());
         response.put("likeCount", postEntity.getLikeUserList().size());
         return ResponseEntity.ok(response);
@@ -213,9 +213,9 @@ public class CommunityController {
     @GetMapping("/api/post/scrap")
     public ResponseEntity<Map<String, Object>> postScrap(@RequestParam("postId") String postId, Model model, Principal principal) {
         Integer postidInt = Integer.valueOf(postId);
-        User user = customOAuth2UserService.getUser(principal.getName());
+        UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
         PostEntity postEntity = postService.getPost(postidInt);
-        Map<String, Object> response = postScrapService.scrapCreateOfDelete(postEntity, user);
+        Map<String, Object> response = postScrapService.scrapCreateOfDelete(postEntity, UserEntity);
         return ResponseEntity.ok(response);
     }
 
@@ -239,8 +239,8 @@ public class CommunityController {
     public ResponseEntity<Map<String, Object>> likeComment(@PathVariable String commentId, Principal principal) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postCommentService.getPostCommentByCommentId(commentIdInt);
-        User user = customOAuth2UserService.getUser(principal.getName());
-        Map<String, Object> response = postCommentService.likeCreateOrDelete(postComment, user);
+        UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
+        Map<String, Object> response = postCommentService.likeCreateOrDelete(postComment, UserEntity);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
     }
@@ -251,8 +251,8 @@ public class CommunityController {
     public ResponseEntity<Map<String, Object>> dislikeComment(@PathVariable String commentId, Principal principal) {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postCommentService.getPostCommentByCommentId(commentIdInt);
-        User user = customOAuth2UserService.getUser(principal.getName());
-        Map<String, Object> response = postCommentService.dislikeCreateOrDelete(postComment, user);
+        UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
+        Map<String, Object> response = postCommentService.dislikeCreateOrDelete(postComment, UserEntity);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
     }
@@ -275,10 +275,10 @@ public class CommunityController {
             Principal principal) throws IOException {
 
         // 게시글 객체 생성
-        User user = customOAuth2UserService.getUser(principal.getName());
+        UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
 
-        PostEntity postEntity = new PostEntity(title, content, postCategory, "ACTIVE", LocalDateTime.now(),user);
-        postService.create(postEntity, user);
+        PostEntity postEntity = new PostEntity(title, content, postCategory, "ACTIVE", LocalDateTime.now(), UserEntity);
+        postService.create(postEntity, UserEntity);
 
         // TinyMCE 컨텐츠에서 <img> 태그를 파싱
         Document doc = Jsoup.parse(content);

@@ -12,7 +12,7 @@ import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationLis
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.situation.SituationRepository;
 import com.kustaurant.kustaurant.api.restaurant.RestaurantApiService;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -92,11 +92,11 @@ public class TierWebController {
             page--;
         }
         // User 처리
-        User user = customOAuth2UserService.getUserByPrincipal(principal);
+        UserEntity UserEntity = customOAuth2UserService.getUserByPrincipal(principal);
         // restaurant list 처리
         List<RestaurantEntity> tierRestaurants = restaurantApiService.getRestaurantsByCuisinesAndSituationsAndLocations(cuisines, situations, locations, null, true);
 
-        List<RestaurantTierDataClass> restaurantsData = evaluationService.convertToTierDataClassList(tierRestaurants, user, true);
+        List<RestaurantTierDataClass> restaurantsData = evaluationService.convertToTierDataClassList(tierRestaurants, UserEntity, true);
         Pageable pageable = PageRequest.of(page, tierPageSize);
 
         model.addAttribute("isJH", cuisines != null && cuisines.contains("JH"));

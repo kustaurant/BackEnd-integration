@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.global.apiUser;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -25,15 +26,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final OUserRepository OUserRepository;
 
     @Override
     protected void doFilterInternal(
@@ -50,10 +49,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 try {
                     if (jwtUtil.validateTokenForFilter(jwt)) {
                         Integer userId = jwtUtil.getUserIdFromToken(jwt);
-                        User user = userRepository.findByUserId(userId)
+                        UserEntity UserEntity = OUserRepository.findByUserId(userId)
                                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-                        Authentication authentication = getAuthentication(user);
+                        Authentication authentication = getAuthentication(UserEntity);
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     } else {
                         log.warn("Invalid JWT token: {}", jwt);
@@ -93,13 +92,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     /**
      * 사용자 객체를 기반으로 Authentication 객체를 생성하는 메서드.
      *
-     * @param user 인증에 사용할 User 객체.
+     * @param UserEntity 인증에 사용할 User 객체.
      * @return 생성된 Authentication 객체. 이는 스프링 시큐리티 컨텍스트에 저장되어 인증된 사용자를 나타내는 데 사용됨.
      */
-    private Authentication getAuthentication(User user) {
+    private Authentication getAuthentication(UserEntity UserEntity) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.getUserRole().getValue()));
+        authorities.add(new SimpleGrantedAuthority(UserEntity.getUserRole().getValue()));
 
-        return new UsernamePasswordAuthenticationToken(user.getUserId(), null, authorities);
+        return new UsernamePasswordAuthenticationToken(UserEntity.getUserId(), null, authorities);
     }
 }

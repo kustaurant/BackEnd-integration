@@ -3,7 +3,6 @@ package com.kustaurant.kustaurant.api.evaluation;
 import com.kustaurant.kustaurant.api.restaurant.RestaurantApiService;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantCommentReport;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantCommentReportRepository;
@@ -14,7 +13,7 @@ import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.Res
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantService;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
@@ -76,9 +75,9 @@ public class EvaluationApiController {
         // 식당 가져오기
         RestaurantEntity restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 유저 가져오기
-        User user = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(userId);
         // 해당 식당에 대한 이전 평가가 있을 경우 이전 평가 데이터를 반환해주고, 이전 평가가 없으면 별점 코멘트 데이터만 반환
-        return user.getEvaluationList().stream()
+        return UserEntity.getEvaluationList().stream()
                 .filter(evaluation -> evaluation.getRestaurant().equals(restaurant) && evaluation.getStatus().equals("ACTIVE"))
                 .findFirst()
                 .map(evaluation -> {
@@ -128,11 +127,11 @@ public class EvaluationApiController {
         // 식당 가져오기
         RestaurantEntity restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 유저 가져오기
-        User user = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(userId);
         // 평가 추가하기 혹은 기존 평가 업데이트하기
-        evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
+        evaluationService.createOrUpdate(UserEntity, restaurant, evaluationDTO);
         // 평가 완료 후에 업데이트된 식당 데이터를 다시 반환
-        return new ResponseEntity<>(restaurantCommentService.getRestaurantCommentList(restaurantId, user, true, userAgent), HttpStatus.OK);
+        return new ResponseEntity<>(restaurantCommentService.getRestaurantCommentList(restaurantId, UserEntity, true, userAgent), HttpStatus.OK);
     }
 
     // 리뷰 불러오기
@@ -170,9 +169,9 @@ public class EvaluationApiController {
         // 식당 가져오기
         RestaurantEntity restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 유져 가져오기
-        User user = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(userId);
         // 이 식당의 댓글 리스트 가져오기
-        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurantId, user, sort.equals("popularity"), userAgent);
+        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurantId, UserEntity, sort.equals("popularity"), userAgent);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -208,7 +207,7 @@ public class EvaluationApiController {
         // 식당 가져오기
         RestaurantEntity restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 유저 가져오기
-        User user = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(userId);
         // 평가 댓글인 경우 / 대댓글인 경우 판단
         if (!isSubComment(commentId)) { // 평가 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
@@ -217,18 +216,18 @@ public class EvaluationApiController {
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             // 댓글 좋아요 로직
-            evaluationService.likeEvaluation(user, evaluation);
+            evaluationService.likeEvaluation(UserEntity, evaluation);
 
-            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(evaluation, user));
+            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(evaluation, UserEntity));
         } else { // 대댓글인 경우
             checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
             // 코멘트 가져오기
             RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
             // 대댓글 좋아요 로직
             Map<String, String> responseMap = new HashMap<>();
-            restaurantCommentService.likeComment(user, restaurantComment, responseMap);
+            restaurantCommentService.likeComment(UserEntity, restaurantComment, responseMap);
 
-            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, user));
+            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, UserEntity));
         }
     }
 
@@ -263,7 +262,7 @@ public class EvaluationApiController {
         // 식당 가져오기
         RestaurantEntity restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 유저 가져오기
-        User user = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(userId);
         // 평가 댓글인 경우 / 대댓글인 경우 판단
         if (!isSubComment(commentId)) { // 평가 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
@@ -272,18 +271,18 @@ public class EvaluationApiController {
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             // 댓글 좋아요 로직
-            evaluationService.dislikeEvaluation(user, evaluation);
+            evaluationService.dislikeEvaluation(UserEntity, evaluation);
 
-            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(evaluation, user));
+            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(evaluation, UserEntity));
         } else { // 대댓글인 경우
             checkRestaurantIdAndCommentId(restaurant, restaurantId, commentId);
             // 코멘트 가져오기
             RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
             // 대댓글 좋아요 로직
             Map<String, String> responseMap = new HashMap<>();
-            restaurantCommentService.dislikeComment(user, restaurantComment, responseMap);
+            restaurantCommentService.dislikeComment(UserEntity, restaurantComment, responseMap);
 
-            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, user));
+            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, UserEntity));
         }
     }
 
@@ -327,13 +326,13 @@ public class EvaluationApiController {
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
         checkRestaurantIdAndEvaluationId(restaurant, restaurantId, evaluationId);
         // 유저 가져오기
-        User user = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(userId);
         // Evaluation 가져오기
         EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
         // 대댓글 달기
-        RestaurantComment restaurantComment = restaurantCommentService.addSubComment(restaurant, user, commentBody, evaluation);
+        RestaurantComment restaurantComment = restaurantCommentService.addSubComment(restaurant, UserEntity, commentBody, evaluation);
 
-        return new ResponseEntity<>(RestaurantCommentDTO.convertCommentWhenSubComment(restaurantComment, null, user, userAgent), HttpStatus.OK);
+        return new ResponseEntity<>(RestaurantCommentDTO.convertCommentWhenSubComment(restaurantComment, null, UserEntity, userAgent), HttpStatus.OK);
     }
 
     private void checkRestaurantIdAndEvaluationId(RestaurantEntity restaurant, int restaurantId, int evaluationId) {
@@ -364,7 +363,7 @@ public class EvaluationApiController {
         // 식당 가져오기
         RestaurantEntity restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 유저 가져오기
-        User user = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(userId);
         // 대댓글인지 평가 코멘트 댓글인지 판단
         if (isSubComment(commentId)) { // 대댓글인 경우
             // 이 댓글이 해당 식당의 댓글이 맞는지 확인
@@ -372,14 +371,14 @@ public class EvaluationApiController {
             // 댓글 가져오기
             RestaurantComment comment = restaurantCommentService.findCommentByCommentId(commentId);
             // 댓글 삭제
-            restaurantCommentService.deleteComment(comment, user);
+            restaurantCommentService.deleteComment(comment, UserEntity);
         } else { // 평가 코멘트 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
             checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             // 평가 및 평가의 대댓글 삭제
-            evaluationService.deleteComment(evaluation, user);
+            evaluationService.deleteComment(evaluation, UserEntity);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -401,7 +400,7 @@ public class EvaluationApiController {
         // 식당 가져오기
         RestaurantEntity restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 유저 가져오기
-        User user = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(userId);
         // 대댓글인지 평가 코멘트 댓글인지 판단
         if (isSubComment(commentId)) { // 대댓글인 경우
             // 이 댓글이 해당 식당의 댓글이 맞는지 확인
@@ -409,7 +408,7 @@ public class EvaluationApiController {
             // 댓글 가져오기
             RestaurantComment comment = restaurantCommentService.findCommentByCommentId(commentId);
             // 신고 테이블에 저장
-            restaurantCommentReportRepository.save(new RestaurantCommentReport(user, comment, LocalDateTime.now(), "ACTIVE"));
+            restaurantCommentReportRepository.save(new RestaurantCommentReport(UserEntity, comment, LocalDateTime.now(), "ACTIVE"));
         } else { // 평가 코멘트 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
             // 이 평가가 해당 식당의 평가가 맞는지 확인
@@ -417,7 +416,7 @@ public class EvaluationApiController {
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             // 신고 테이블에 저장
-            restaurantCommentReportRepository.save(new RestaurantCommentReport(user, evaluation, LocalDateTime.now(), "ACTIVE"));
+            restaurantCommentReportRepository.save(new RestaurantCommentReport(UserEntity, evaluation, LocalDateTime.now(), "ACTIVE"));
         }
 
         return new ResponseEntity<>(HttpStatus.OK);

@@ -2,14 +2,14 @@ package com.kustaurant.kustaurant.api.post.service;
 
 
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.post.domain.PostUpdateDTO;
 import com.kustaurant.kustaurant.common.post.domain.UserDTO;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.domain.PostDTO;
 import com.kustaurant.kustaurant.common.post.enums.PostStatus;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
@@ -26,7 +26,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PostApiService {
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final OUserRepository OUserRepository;
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostCommentApiRepository postCommentApiRepository;
     private final PostPhotoApiRepository postPhotoApiRepository;
@@ -90,11 +90,11 @@ public class PostApiService {
         }
     }
 
-    public void create(PostEntity postEntity, User user) {
-        postEntity.setUser(user);
+    public void create(PostEntity postEntity, UserEntity UserEntity) {
+        postEntity.setUser(UserEntity);
         PostEntity savedpost = postRepository.save(postEntity);
-        user.getPostList().add(savedpost);
-        userRepository.save(user);
+        UserEntity.getPostList().add(savedpost);
+        OUserRepository.save(UserEntity);
     }
 
     // 조회수 증가
@@ -104,28 +104,28 @@ public class PostApiService {
         postRepository.save(postEntity);
     }
 
-    public int likeCreateOrDelete(PostEntity postEntity, User user) {
-        List<User> likeUserList = postEntity.getLikeUserList();
-        List<PostEntity> likePostList = user.getLikePostList();
+    public int likeCreateOrDelete(PostEntity postEntity, UserEntity UserEntity) {
+        List<UserEntity> likeUserEntityList = postEntity.getLikeUserList();
+        List<PostEntity> likePostList = UserEntity.getLikePostList();
         int status;
 
         //해당 post 를 이미 like 한 경우 - 제거
-        if (likeUserList.contains(user)) {
+        if (likeUserEntityList.contains(UserEntity)) {
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
             likePostList.remove(postEntity);
-            likeUserList.remove(user);
+            likeUserEntityList.remove(UserEntity);
             status = 0; // likeDeleted
         }
         // 처음 like 하는 경우 - 추가
         else {
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
-            likeUserList.add(user);
+            likeUserEntityList.add(UserEntity);
             likePostList.add(postEntity);
             status = 1; // likeCreated
         }
 
         postRepository.save(postEntity);
-        userRepository.save(user);
+        OUserRepository.save(UserEntity);
         return status;
     }
 
@@ -139,9 +139,9 @@ public class PostApiService {
                 query.distinct(true);  // 중복을 제거
 
                 //조인
-                Join<PostEntity, User> u1 = p.join("user", JoinType.LEFT);
+                Join<PostEntity, UserEntity> u1 = p.join("user", JoinType.LEFT);
                 Join<PostEntity, PostComment> c = p.join("postCommentList", JoinType.LEFT);
-                Join<PostComment, User> u2 = c.join("user", JoinType.LEFT);
+                Join<PostComment, UserEntity> u2 = c.join("user", JoinType.LEFT);
                 // 액티브 조건 추가
                 Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
                 Predicate categoryPredicate;
@@ -268,9 +268,9 @@ public class PostApiService {
     public List<UserDTO> getUserListforRanking(String sort) {
         if ("cumulative".equals(sort)) {
             // 누적 기준으로 유저 리스트 가져오기 (정렬된 상태)
-            List<User> userList = userRepository.findUsersWithEvaluationCountDescending();
+            List<UserEntity> UserEntityList = OUserRepository.findUsersWithEvaluationCountDescending();
             // 유저의 평가수, 랭킹 첨부하기
-            return calculateRank(userList);
+            return calculateRank(UserEntityList);
         } else if ("quarterly".equals(sort)) {
             // 현재 날짜를 기준으로 연도와 분기 계산
             LocalDate now = LocalDate.now();
@@ -278,9 +278,9 @@ public class PostApiService {
             int currentQuarter = getCurrentQuarter(now);
 
             // 특정 분기의 평가 데이터를 기준으로 유저 리스트 가져오기
-            List<User> userList = userRepository.findUsersByEvaluationCountForQuarter(currentYear, currentQuarter);
+            List<UserEntity> UserEntityList = OUserRepository.findUsersByEvaluationCountForQuarter(currentYear, currentQuarter);
             // 분기별 순위 리스트 계산
-            return calculateRankForQuarter(userList, currentYear, currentQuarter);
+            return calculateRankForQuarter(UserEntityList, currentYear, currentQuarter);
         } else {
             throw new OptionalNotExistException("sort값이 잘못 입력되었습니다.");
         }
@@ -299,14 +299,14 @@ public class PostApiService {
         }
     }
 
-    private List<UserDTO> calculateRank(List<User> userList) {
+    private List<UserDTO> calculateRank(List<UserEntity> UserEntityList) {
         List<UserDTO> rankList = new ArrayList<>();
         int i = 0;
         int prevCount = 100000; // 이전 유저의 평가 개수
         int countSame = 1; // 동일 순위를 세기 위한 변수
-        for (User user : userList) {
-            int evaluationCount = user.getEvaluationList().size();
-            UserDTO userDTO = UserDTO.convertUserToUserDTO(user); // 필요한 정보를 UserDTO에 담음
+        for (UserEntity UserEntity : UserEntityList) {
+            int evaluationCount = UserEntity.getEvaluationList().size();
+            UserDTO userDTO = UserDTO.convertUserToUserDTO(UserEntity); // 필요한 정보를 UserDTO에 담음
 
             if (evaluationCount < prevCount) {
                 i += countSame;
@@ -323,17 +323,17 @@ public class PostApiService {
         return rankList;
     }
 
-    private List<UserDTO> calculateRankForQuarter(List<User> userList, int year, int quarter) {
+    private List<UserDTO> calculateRankForQuarter(List<UserEntity> UserEntityList, int year, int quarter) {
         List<UserDTO> rankList = new ArrayList<>();
 
         int i = 0;
         int prevCount = 100000; // 이전 유저의 평가 개수
         int countSame = 1; // 동일 순위를 세기 위한 변수
-        for (User user : userList) {
+        for (UserEntity UserEntity : UserEntityList) {
             // 특정 분기의 평가 수 계산
-            int evaluationCount = (int) user.getEvaluationList().stream().filter(e -> getYear(e.getCreatedAt()) == year && getQuarter(e.getCreatedAt()) == quarter).count();
+            int evaluationCount = (int) UserEntity.getEvaluationList().stream().filter(e -> getYear(e.getCreatedAt()) == year && getQuarter(e.getCreatedAt()) == quarter).count();
 
-            UserDTO userDTO = UserDTO.convertUserToUserDTO(user); // 필요한 정보를 UserDTO에 담음
+            UserDTO userDTO = UserDTO.convertUserToUserDTO(UserEntity); // 필요한 정보를 UserDTO에 담음
             userDTO.setEvaluationCount(evaluationCount); // 분기 내 평가 수를 설정
 
             if (evaluationCount < prevCount) {

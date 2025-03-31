@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDomain;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +22,7 @@ public class RestaurantFavoriteEntity {
     private Integer favoriteId;
     @ManyToOne
     @JoinColumn(name="user_id")
-    User user;
+    UserEntity user;
 
     @JsonIgnore
     @ManyToOne

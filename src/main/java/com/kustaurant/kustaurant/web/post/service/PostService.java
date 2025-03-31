@@ -2,11 +2,11 @@ package com.kustaurant.kustaurant.web.post.service;
 
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrapRepository;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final OUserRepository OUserRepository;
     private final PostScrapRepository postScrapRepository;
     // 인기순 제한 기준 숫자
     public static  final int POPULARCOUNT = 3;
@@ -90,11 +90,11 @@ public class PostService {
         }
     }
 
-    public void create(PostEntity postEntity, User user) {
-        postEntity.setUser(user);
+    public void create(PostEntity postEntity, UserEntity UserEntity) {
+        postEntity.setUser(UserEntity);
         PostEntity savedpost = postRepository.save(postEntity);
-        user.getPostList().add(savedpost);
-        userRepository.save(user);
+        UserEntity.getPostList().add(savedpost);
+        OUserRepository.save(UserEntity);
     }
     // 게시물 리스트에 대한 시간 경과 리스트로 반환하는 함수.
     public List<String> getTimeAgoList(Page<PostEntity> postList) {
@@ -134,26 +134,26 @@ public class PostService {
     }
 
     // 게시글 좋아요
-    public Map<String, Object> likeCreateOrDelete(PostEntity postEntity, User user) {
-        List<User> likeUserList = postEntity.getLikeUserList();
-        List<User> dislikeUserList = postEntity.getDislikeUserList();
-        List<PostEntity> likePostList = user.getLikePostList();
-        List<PostEntity> dislikePostList = user.getDislikePostList();
+    public Map<String, Object> likeCreateOrDelete(PostEntity postEntity, UserEntity UserEntity) {
+        List<UserEntity> likeUserEntityList = postEntity.getLikeUserList();
+        List<UserEntity> dislikeUserEntityList = postEntity.getDislikeUserList();
+        List<PostEntity> likePostList = UserEntity.getLikePostList();
+        List<PostEntity> dislikePostList = UserEntity.getDislikePostList();
         Map<String, Object> status = new HashMap<>();
 
         //해당 post 를 이미 like 한 경우 - 제거
-        if (likeUserList.contains(user)) {
+        if (likeUserEntityList.contains(UserEntity)) {
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
             likePostList.remove(postEntity);
-            likeUserList.remove(user);
+            likeUserEntityList.remove(UserEntity);
             status.put("likeDelete", true);
         }
         //해당 post를 이미 dislike 한 경우 - 제거하고 추가
-        else if (dislikeUserList.contains(user)) {
+        else if (dislikeUserEntityList.contains(UserEntity)) {
             postEntity.setLikeCount(postEntity.getLikeCount() + 2);
-            dislikeUserList.remove(user);
+            dislikeUserEntityList.remove(UserEntity);
             dislikePostList.remove(postEntity);
-            likeUserList.add(user);
+            likeUserEntityList.add(UserEntity);
             likePostList.add(postEntity);
             status.put("likeChanged", true);
 
@@ -163,49 +163,49 @@ public class PostService {
             status.put("likeCreated", true);
 
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
-            likeUserList.add(user);
+            likeUserEntityList.add(UserEntity);
             likePostList.add(postEntity);
         }
         // 상태 반환
 
         postRepository.save(postEntity);
-        userRepository.save(user);
+        OUserRepository.save(UserEntity);
         return status;
     }
 
     // 게시글 싫어요
-    public Map<String, Object> dislikeCreateOrDelete(PostEntity postEntity, User user) {
-        List<User> likeUserList = postEntity.getLikeUserList();
-        List<User> dislikeUserList = postEntity.getDislikeUserList();
-        List<PostEntity> likePostList = user.getLikePostList();
-        List<PostEntity> dislikePostList = user.getDislikePostList();
+    public Map<String, Object> dislikeCreateOrDelete(PostEntity postEntity, UserEntity UserEntity) {
+        List<UserEntity> likeUserEntityList = postEntity.getLikeUserList();
+        List<UserEntity> dislikeUserEntityList = postEntity.getDislikeUserList();
+        List<PostEntity> likePostList = UserEntity.getLikePostList();
+        List<PostEntity> dislikePostList = UserEntity.getDislikePostList();
         Map<String, Object> status = new HashMap<>();
         //해당 post를 이미 dislike 한 경우 - 제거
-        if (dislikeUserList.contains(user)) {
+        if (dislikeUserEntityList.contains(UserEntity)) {
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
             dislikePostList.remove(postEntity);
-            dislikeUserList.remove(user);
+            dislikeUserEntityList.remove(UserEntity);
             status.put("dislikeDelete", true);
         }
         //해당 post를 이미 like 한 경우 - 제거하고 추가
-        else if (likeUserList.contains(user)) {
+        else if (likeUserEntityList.contains(UserEntity)) {
             postEntity.setLikeCount(postEntity.getLikeCount() - 2);
 
-            likeUserList.remove(user);
+            likeUserEntityList.remove(UserEntity);
             likePostList.remove(postEntity);
-            dislikeUserList.add(user);
+            dislikeUserEntityList.add(UserEntity);
             dislikePostList.add(postEntity);
             status.put("dislikeChanged", true);
         }
         // 처음 dislike 하는 경우-추가
         else {
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
-            dislikeUserList.add(user);
+            dislikeUserEntityList.add(UserEntity);
             dislikePostList.add(postEntity);
             status.put("dislikeCreated", true);
         }
         postRepository.save(postEntity);
-        userRepository.save(user);
+        OUserRepository.save(UserEntity);
         return status;
     }
 
@@ -219,9 +219,9 @@ public class PostService {
                 query.distinct(true);  // 중복을 제거
 
                 //조인
-                Join<PostEntity, User> u1 = p.join("user", JoinType.LEFT);
+                Join<PostEntity, UserEntity> u1 = p.join("user", JoinType.LEFT);
                 Join<PostEntity, PostComment> c = p.join("postCommentList", JoinType.LEFT);
-                Join<PostComment, User> u2 = c.join("user", JoinType.LEFT);
+                Join<PostComment, UserEntity> u2 = c.join("user", JoinType.LEFT);
                 // 액티브 조건 추가
                 Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
                 Predicate categoryPredicate;

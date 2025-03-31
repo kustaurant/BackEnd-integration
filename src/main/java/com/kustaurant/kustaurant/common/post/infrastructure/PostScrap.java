@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +16,8 @@ public class PostScrap {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer scrapId;
 
-    public PostScrap(User user, PostEntity postEntity, LocalDateTime createdAt) {
-        this.user = user;
+    public PostScrap(UserEntity UserEntity, PostEntity postEntity, LocalDateTime createdAt) {
+        this.user = UserEntity;
         this.postEntity = postEntity;
         this.createdAt = createdAt;
     }
@@ -27,7 +27,7 @@ public class PostScrap {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    User user;
+    UserEntity user;
 
     @ManyToOne
     @JoinColumn(name="post_id")

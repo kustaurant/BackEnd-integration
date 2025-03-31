@@ -11,7 +11,7 @@ import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantReposi
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtag;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenu;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -33,12 +33,12 @@ public class RestaurantWebService {
     private final RestaurantService restaurantService;
     private final RestaurantCommentService restaurantCommentService;
 
-    public RestaurantDetailWebDto getRestaurantWebDetails(User user, Integer restaurantId) {
-        Integer userId = user == null ? null : user.getUserId();
+    public RestaurantDetailWebDto getRestaurantWebDetails(UserEntity UserEntity, Integer restaurantId) {
+        Integer userId = UserEntity == null ? null : UserEntity.getUserId();
         RestaurantDetailDTO restaurantDetailDto = restaurantService.getRestaurantDetailDto(restaurantId, userId, "web");
         RestaurantDomain restaurant = restaurantService.getDomain(restaurantId);
         // TODO: 이거도 userId 사용하게 바꿔야됨.
-        List<RestaurantCommentDTO> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, user, true, "web");
+        List<RestaurantCommentDTO> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, UserEntity, true, "web");
 
         return new RestaurantDetailWebDto(
                 restaurantDetailDto,

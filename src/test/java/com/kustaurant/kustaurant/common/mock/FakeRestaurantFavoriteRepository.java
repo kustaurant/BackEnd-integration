@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavoriteDoma
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 
 import java.util.ArrayList;
@@ -57,12 +57,12 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
 
     // TODO: need to delete everything below this
     @Override
-    public Optional<RestaurantFavorite> findByUserAndRestaurant(User user, RestaurantEntity restaurant) {
+    public Optional<RestaurantFavorite> findByUserAndRestaurant(UserEntity UserEntity, RestaurantEntity restaurant) {
         return Optional.empty();
     }
 
     @Override
-    public List<RestaurantFavorite> findByUser(User user) {
+    public List<RestaurantFavorite> findByUser(UserEntity UserEntity) {
         return List.of();
     }
 

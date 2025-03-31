@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
 import com.kustaurant.kustaurant.common.post.domain.Post;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,7 +36,7 @@ public class PostEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
 
     @OneToMany(mappedBy = "postEntity")
     private List<PostComment> postCommentList = new ArrayList<>();
@@ -51,21 +51,21 @@ public class PostEntity {
     @JoinTable(name = "post_dislikes_tbl",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> dislikeUserList = new ArrayList<>();
+    private List<UserEntity> dislikeUserList = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(name = "post_likes_tbl",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> likeUserList = new ArrayList<>();
+    private List<UserEntity> likeUserList = new ArrayList<>();
 
-    public PostEntity(String postTitle, String postBody, String postCategory, String status, LocalDateTime createdAt, User user) {
+    public PostEntity(String postTitle, String postBody, String postCategory, String status, LocalDateTime createdAt, UserEntity UserEntity) {
         this.postTitle = postTitle;
         this.postBody = postBody;
         this.postCategory = postCategory;
         this.status = status;
         this.createdAt = createdAt;
-        this.user = user;
+        this.user = UserEntity;
     }
 
     public PostEntity() {
@@ -80,14 +80,14 @@ public class PostEntity {
         );
     }
 
-    public static PostEntity fromDomain(Post post, User user) {
+    public static PostEntity fromDomain(Post post, UserEntity UserEntity) {
         return new PostEntity(
                 post.getPostTitle(),
                 post.getPostBody(),
                 post.getPostCategory(),
                 post.getStatus(),
                 post.getCreatedAt(),
-                user
+                UserEntity
         );
     }
 }

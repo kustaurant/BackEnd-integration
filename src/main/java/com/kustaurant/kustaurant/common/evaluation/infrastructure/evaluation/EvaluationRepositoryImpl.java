@@ -1,13 +1,9 @@
 package com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation;
 
-import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantDomain;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -42,12 +38,12 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     }
 
     @Override
-    public Optional<Evaluation> findByUserAndRestaurant(User user, RestaurantEntity restaurant) {
+    public Optional<Evaluation> findByUserAndRestaurant(UserEntity UserEntity, RestaurantEntity restaurant) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(User user, RestaurantEntity restaurant, String status) {
+    public Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(UserEntity UserEntity, RestaurantEntity restaurant, String status) {
         return Optional.empty();
     }
 
