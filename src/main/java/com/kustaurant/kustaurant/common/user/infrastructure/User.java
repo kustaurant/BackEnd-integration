@@ -3,6 +3,8 @@ package com.kustaurant.kustaurant.common.user.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentDislikesEntity;
+import com.kustaurant.kustaurant.common.comment.PostCommentLikesEntity;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
@@ -131,10 +133,10 @@ public class User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<PostComment> postCommentLikesEntities = new ArrayList<>();
+    private List<PostCommentLikesEntity> postCommentLikesEntities = new ArrayList<>();
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<PostComment> postCommentDislikesEntities = new ArrayList<>();
+    private List<PostCommentDislikesEntity> postCommentDislikesEntities = new ArrayList<>();
 
     public String getRankImg() {
         return RestaurantConstants.getIconImgUrl(this, "");

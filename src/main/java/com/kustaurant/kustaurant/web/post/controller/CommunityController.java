@@ -238,7 +238,7 @@ public class CommunityController {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postCommentService.getPostCommentByCommentId(commentIdInt);
         User user = customOAuth2UserService.getUser(principal.getName());
-        Map<String, Object> response = postCommentService.likeCreateOrDelete(postComment, user);
+        Map<String, Object> response = postCommentService.toggleCommentLike(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
     }
@@ -250,7 +250,7 @@ public class CommunityController {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postCommentService.getPostCommentByCommentId(commentIdInt);
         User user = customOAuth2UserService.getUser(principal.getName());
-        Map<String, Object> response = postCommentService.dislikeCreateOrDelete(postComment, user);
+        Map<String, Object> response = postCommentService.toggleCommentDislike(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
     }

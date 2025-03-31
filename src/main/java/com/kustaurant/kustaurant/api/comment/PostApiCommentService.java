@@ -52,7 +52,7 @@ public class PostApiCommentService {
     // 댓글 좋아요 (세 가지 경우)
     public int likeCreateOrDelete(PostComment postComment, User user) {
         List<User> likeUserList = postComment.getPostCommentLikesEntities();
-        List<User> dislikeUserList = postComment.getDislikeUserList();
+        List<User> dislikeUserList = postComment.getPostCommentDislikesEntities();
         List<PostComment> likePostCommentList = user.getPostCommentLikesEntities();
         List<PostComment> dislikePostCommentList = user.getPostCommentDislikesEntities();
         int commentLikeStatus;
@@ -90,7 +90,7 @@ public class PostApiCommentService {
     // 댓글 싫어요 (세 가지 경우)
     public int dislikeCreateOrDelete(PostComment postComment, User user) {
         List<User> likeUserList = postComment.getPostCommentLikesEntities();
-        List<User> dislikeUserList = postComment.getDislikeUserList();
+        List<User> dislikeUserList = postComment.getPostCommentDislikesEntities();
         List<PostComment> likePostCommentList = user.getPostCommentLikesEntities();
         List<PostComment> dislikePostCommentList = user.getPostCommentDislikesEntities();
         int commentLikeStatus;
@@ -140,7 +140,7 @@ public class PostApiCommentService {
         if (user == null || postComment == null) {
             return false;
         }
-        return postComment.getDislikeUserList().stream()
+        return postComment.getPostCommentDislikesEntities().stream()
                 .anyMatch(dislikeUser -> dislikeUser.equals(user));
     }
 

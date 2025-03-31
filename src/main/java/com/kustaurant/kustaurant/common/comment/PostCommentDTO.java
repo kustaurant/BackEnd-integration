@@ -53,7 +53,7 @@ public class PostCommentDTO {
     }
 
     public static PostCommentDTO convertPostCommentToPostCommentDTO(PostComment comment) {
-        return new PostCommentDTO(comment.getCommentId(), comment.getCommentBody(),comment.getStatus(),comment.getUser(), comment.getPostCommentLikesEntities().size(), comment.getDislikeUserList().size(), comment.calculateTimeAgo(), comment.getCreatedAt(), comment.getUpdatedAt(), comment.getRepliesList().stream().filter(reply -> reply.getStatus().equals("ACTIVE")).sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()).map(PostCommentDTO::convertPostCommentToPostCommentDTO).toList());
+        return new PostCommentDTO(comment.getCommentId(), comment.getCommentBody(),comment.getStatus(),comment.getUser(), comment.getPostCommentLikesEntities().size(), comment.getPostCommentDislikesEntities().size(), comment.calculateTimeAgo(), comment.getCreatedAt(), comment.getUpdatedAt(), comment.getRepliesList().stream().filter(reply -> reply.getStatus().equals("ACTIVE")).sorted(Comparator.comparing(PostComment::getCreatedAt).reversed()).map(PostCommentDTO::convertPostCommentToPostCommentDTO).toList());
     }
 
 }

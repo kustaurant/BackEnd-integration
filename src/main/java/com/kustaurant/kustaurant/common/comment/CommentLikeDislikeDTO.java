@@ -20,7 +20,7 @@ public class CommentLikeDislikeDTO {
     }
 
     public static CommentLikeDislikeDTO toCommentLikeDislikeDTO(PostComment postComment, int commentLikeStatus) {
-        return new CommentLikeDislikeDTO(postComment.getPostCommentLikesEntities().size(), postComment.getDislikeUserList().size(), commentLikeStatus);
+        return new CommentLikeDislikeDTO(postComment.getPostCommentLikesEntities().size(), postComment.getPostCommentDislikesEntities().size(), commentLikeStatus);
     }
 
 }
