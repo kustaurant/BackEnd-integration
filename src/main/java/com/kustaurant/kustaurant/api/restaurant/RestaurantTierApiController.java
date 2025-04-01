@@ -4,6 +4,7 @@ import com.kustaurant.kustaurant.common.restaurant.domain.enums.LocationEnum;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantTierService;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
@@ -14,7 +15,6 @@ import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.common.restaurant.constants.MapConstants;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -83,7 +83,7 @@ public class RestaurantTierApiController {
             @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
         // page 0부터 시작하게 수정
         page--;
         // DB 조회
@@ -144,7 +144,7 @@ public class RestaurantTierApiController {
             @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
         // page 0부터 시작하게 수정
         page--;
         // DB 조회
@@ -219,7 +219,7 @@ public class RestaurantTierApiController {
             @LocationList List<String> locations,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
 
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
         List<RestaurantEntity> tieredRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, 1, false);
@@ -328,7 +328,7 @@ public class RestaurantTierApiController {
             @LocationList List<String> locations,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
 
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
         List<RestaurantEntity> tieredRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, 1, false);

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +28,7 @@ public class EvaluationEntity {
 
     private String status="ACTIVE";
 
-    public EvaluationEntity(RestaurantEntity restaurant, User user, Double evaluationScore) {
+    public EvaluationEntity(RestaurantEntity restaurant, UserEntity user, Double evaluationScore) {
         this.restaurant = restaurant;
         this.user = user;
         this.evaluationScore = evaluationScore;
@@ -50,7 +50,7 @@ public class EvaluationEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
 
     @OneToMany(mappedBy = "evaluation")
     private List<EvaluationItemScore> evaluationItemScoreList = new ArrayList<>();
@@ -72,7 +72,7 @@ public class EvaluationEntity {
 
     }
 
-    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String commentBody, String commentImgUrl, User user, RestaurantEntity restaurant) {
+    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String commentBody, String commentImgUrl, UserEntity user, RestaurantEntity restaurant) {
         this.evaluationScore = evaluationScore;
         this.status = status;
         this.createdAt = createdAt;
