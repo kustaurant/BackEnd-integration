@@ -172,13 +172,8 @@ public class PostCommentService {
                 Predicate postIdPredicate = cb.equal(p.get("postEntity"), postEntity);
                 Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
 
-
                 return cb.and(statusPredicate, postIdPredicate);
-
-
             }
-
-
         };
     }
 }
