@@ -52,9 +52,9 @@ public class PostComment {
     }
 
     @OneToMany(mappedBy = "postComment")
-    List<PostCommentLikesEntity> postCommentLikesEntities = new ArrayList<>();
+    List<PostCommentLikeEntity> postCommentLikesEntities = new ArrayList<>();
     @OneToMany(mappedBy = "postComment")
-    List<PostCommentDislikesEntity> postCommentDislikesEntities = new ArrayList<>();
+    List<PostCommentDislikeEntity> postCommentDislikesEntities = new ArrayList<>();
 
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();

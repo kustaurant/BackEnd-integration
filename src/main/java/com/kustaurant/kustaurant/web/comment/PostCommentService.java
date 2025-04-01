@@ -27,8 +27,8 @@ public class PostCommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final PostService postService;
-    private final PostCommentLikesJpaRepository postCommentLikesJpaRepository;
-    private final PostCommentDislikesJpaRepository postCommentDislikesJpaRepository;
+    private final PostCommentLikeJpaRepository postCommentLikeJpaRepository;
+    private final PostCommentDislikeJpaRepository postCommentDislikeJpaRepository;
 
     // 댓글 생성
     public void create(PostEntity postEntity, User user, PostComment postComment) {
@@ -57,22 +57,22 @@ public class PostCommentService {
     // 댓글 좋아요 토글 버튼
     @Transactional
     public Map<String, Object> toggleCommentLike(PostComment postComment, User user) {
-        Optional<PostCommentLikesEntity> likeOptional = postCommentLikesJpaRepository.findByPostCommentAndUser(postComment, user);
-        Optional<PostCommentDislikesEntity> dislikeOptional = postCommentDislikesJpaRepository.findByPostCommentAndUser(postComment, user);
+        Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByPostCommentAndUser(postComment, user);
+        Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByPostCommentAndUser(postComment, user);
         Map<String, Object> status = new HashMap<>();
 
         //해당 댓글을 유저가 이미 좋아요를 누른 경우 - 좋아요 제거
         if (likeOptional.isPresent()) {
-            PostCommentLikesEntity postCommentLikesEntity = likeOptional.get();
-            removeCommentLike(user, postComment, postCommentLikesEntity);
+            PostCommentLikeEntity postCommentLikeEntity = likeOptional.get();
+            removeCommentLike(user, postComment, postCommentLikeEntity);
             postComment.setLikeCount(postComment.getLikeCount() - 1);
 
             status.put(ReactionStatus.LIKE_DELETED.name(), true);
         }
         //해당 댓글을 유저가 이미 싫어요를 누른 경우 - 싫어요 제거하고 좋아요 추가
         else if (dislikeOptional.isPresent()) {
-            PostCommentDislikesEntity postCommentDislikesEntity = dislikeOptional.get();
-            removeCommentDislike(user, postComment, postCommentDislikesEntity);
+            PostCommentDislikeEntity postCommentDislikeEntity = dislikeOptional.get();
+            removeCommentDislike(user, postComment, postCommentDislikeEntity);
             addCommentLike(user, postComment);
             postComment.setLikeCount(postComment.getLikeCount() + 2);
 
@@ -92,22 +92,22 @@ public class PostCommentService {
     @Transactional
     public Map<String, Object> toggleCommentDislike(PostComment postComment, User user) {
 
-        Optional<PostCommentLikesEntity> likeOptional = postCommentLikesJpaRepository.findByPostCommentAndUser(postComment, user);
-        Optional<PostCommentDislikesEntity> dislikeOptional = postCommentDislikesJpaRepository.findByPostCommentAndUser(postComment, user);
+        Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByPostCommentAndUser(postComment, user);
+        Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByPostCommentAndUser(postComment, user);
         Map<String, Object> status = new HashMap<>();
 
         //해당 댓글을 유저가 이미 싫어요를 누른 경우 - 싫어요 제거
         if (dislikeOptional.isPresent()) {
-            PostCommentDislikesEntity postCommentDislikesEntity = dislikeOptional.get();
-            removeCommentDislike(user, postComment, postCommentDislikesEntity);
+            PostCommentDislikeEntity postCommentDislikeEntity = dislikeOptional.get();
+            removeCommentDislike(user, postComment, postCommentDislikeEntity);
             postComment.setLikeCount(postComment.getLikeCount() + 1);
 
             status.put(ReactionStatus.DISLIKE_DELETED.name(), true);
         }
         //해당 댓글을 유저가 이미 좋아요 누른 경우 - 좋아요 제거하고 싫어요 추가
         else if (likeOptional.isPresent()) {
-            PostCommentLikesEntity postCommentLikesEntity = likeOptional.get();
-            removeCommentLike(user, postComment, postCommentLikesEntity);
+            PostCommentLikeEntity postCommentLikeEntity = likeOptional.get();
+            removeCommentLike(user, postComment, postCommentLikeEntity);
             addCommentDislike(user, postComment);
             postComment.setLikeCount(postComment.getLikeCount() - 2);
 
@@ -124,29 +124,29 @@ public class PostCommentService {
     }
 
     private void addCommentLike(User user, PostComment postComment) {
-        PostCommentLikesEntity postCommentLikesEntity = new PostCommentLikesEntity(user, postComment);
-        postCommentLikesJpaRepository.save(postCommentLikesEntity);
-        postComment.getPostCommentLikesEntities().add(postCommentLikesEntity);
-        user.getPostCommentLikesEntities().add(postCommentLikesEntity);
+        PostCommentLikeEntity postCommentLikeEntity = new PostCommentLikeEntity(user, postComment);
+        postCommentLikeJpaRepository.save(postCommentLikeEntity);
+        postComment.getPostCommentLikesEntities().add(postCommentLikeEntity);
+        user.getPostCommentLikesEntities().add(postCommentLikeEntity);
     }
 
     private void addCommentDislike(User user, PostComment comment) {
-        PostCommentDislikesEntity dislike = new PostCommentDislikesEntity(user, comment);
+        PostCommentDislikeEntity dislike = new PostCommentDislikeEntity(user, comment);
         user.getPostCommentDislikesEntities().add(dislike);
         comment.getPostCommentDislikesEntities().add(dislike);
-        postCommentDislikesJpaRepository.save(dislike);
+        postCommentDislikeJpaRepository.save(dislike);
     }
 
-    private void removeCommentLike(User user, PostComment comment, PostCommentLikesEntity like) {
+    private void removeCommentLike(User user, PostComment comment, PostCommentLikeEntity like) {
         user.getPostCommentLikesEntities().remove(like);
         comment.getPostCommentLikesEntities().remove(like);
-        postCommentLikesJpaRepository.delete(like);
+        postCommentLikeJpaRepository.delete(like);
     }
 
-    private void removeCommentDislike(User user, PostComment postComment, PostCommentDislikesEntity postCommentDislikesEntity) {
-        postCommentDislikesJpaRepository.delete(postCommentDislikesEntity);
-        user.getPostCommentDislikesEntities().remove(postCommentDislikesEntity);
-        postComment.getPostCommentDislikesEntities().remove(postCommentDislikesEntity);
+    private void removeCommentDislike(User user, PostComment postComment, PostCommentDislikeEntity postCommentDislikeEntity) {
+        postCommentDislikeJpaRepository.delete(postCommentDislikeEntity);
+        user.getPostCommentDislikesEntities().remove(postCommentDislikeEntity);
+        postComment.getPostCommentDislikesEntities().remove(postCommentDislikeEntity);
     }
 
     public List<PostComment> getList(Integer postId, String sort) {

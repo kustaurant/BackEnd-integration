@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.common.comment;
 
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,17 +11,17 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name="post_comments_likes_tbl_new")
-public class PostCommentLikesEntity {
+public class PostCommentLikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer postCommentLikesId;
+    Integer likeId;
 
-    public PostCommentLikesEntity(User user, PostComment postComment) {
+    public PostCommentLikeEntity(User user, PostComment postComment) {
         this.user = user;
         this.postComment = postComment;
         this.createdAt = LocalDateTime.now();
     }
-    public PostCommentLikesEntity() {
+    public PostCommentLikeEntity() {
 
     }
     @ManyToOne
