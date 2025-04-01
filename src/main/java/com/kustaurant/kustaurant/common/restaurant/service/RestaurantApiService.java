@@ -85,7 +85,8 @@ public class RestaurantApiService {
             List<String> cuisineList, List<Integer> situationList, List<String> locationList,
             Integer tierInfo, boolean isOrderByScore
     ) {
-        return restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore));
+//        return restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore));
+        return new ArrayList<>();
     }
 
     // 해당 식당을 해당 유저가 평가 했는가?

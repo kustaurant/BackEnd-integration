@@ -30,6 +30,11 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
         return evaluationJpaRepository.findByRestaurant_RestaurantIdAndStatus(restaurantId, status);
     }
 
+    @Override
+    public Integer countAllByStatus(String status) {
+        return jpaRepository.countAllByStatus(status);
+    }
+
     // TODO: need to delete everything below this.
 
     @Override
@@ -49,11 +54,6 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
 
     @Override
     public Integer countByRestaurant(RestaurantEntity restaurant) {
-        return 0;
-    }
-
-    @Override
-    public Integer countAllByStatus(String status) {
         return 0;
     }
 

@@ -18,6 +18,7 @@ public interface RestaurantRepository {
 
     Restaurant save(Restaurant restaurant);
     // 검색결과 페이징
+    List<Restaurant> findAll(Specification<RestaurantEntity> spec);
     List<Restaurant> findAll(Specification<RestaurantEntity> spec, Pageable pageable);
 
     // TODO: need to delete everything below this
@@ -39,8 +40,6 @@ public interface RestaurantRepository {
     List<RestaurantEntity> findByRestaurantCuisineAndStatusAndMainTierNot(String cuisine, String status, Integer mainTier);
 
     List<RestaurantEntity> findByRestaurantCuisineAndStatusAndRestaurantPositionAndMainTierNot(String cuisine, String status, String location, Integer mainTier);
-
-    List<RestaurantEntity> findAll(Specification<RestaurantEntity> spec);
 
     void save(RestaurantEntity restaurant);
 

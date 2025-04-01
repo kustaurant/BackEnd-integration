@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -178,8 +177,8 @@ public class RestaurantTierApiController {
         User user = userService.findUserById(userId);
 
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
-        List<RestaurantEntity> tieredRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, 1, false);
-        List<RestaurantEntity> nonTieredRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, -1, false);
+        List<RestaurantEntity> tieredRestaurants = restaurantTierService.findByConditionsTemp(cuisines, situations, locations, 1, false);
+        List<RestaurantEntity> nonTieredRestaurants = restaurantTierService.findByConditionsTemp(cuisines, situations, locations, -1, false);
 
         // 2. 상황으로 필터링하기
         List<RestaurantTierDTO> tieredRestaurantTierDTOs = tieredRestaurants.stream().map(restaurant ->
@@ -287,8 +286,8 @@ public class RestaurantTierApiController {
         User user = userService.findUserById(userId);
 
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
-        List<RestaurantEntity> tieredRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, 1, false);
-        List<RestaurantEntity> nonTieredRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, -1, false);
+        List<RestaurantEntity> tieredRestaurants = restaurantTierService.findByConditionsTemp(cuisines, situations, locations, 1, false);
+        List<RestaurantEntity> nonTieredRestaurants = restaurantTierService.findByConditionsTemp(cuisines, situations, locations, -1, false);
 
         // 2. 상황으로 필터링하기
         List<RestaurantTierDTO> tieredRestaurantTierDTOs = tieredRestaurants.stream().map(restaurant ->

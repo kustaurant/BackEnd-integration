@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
@@ -10,6 +11,7 @@ import lombok.Data;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -43,6 +45,11 @@ public class RestaurantTierDTO {
     @Schema(description = "식당 점수", example = "4.5")
     private Double restaurantScore;
 
+    @JsonIgnore
+    private List<String> situations;
+    @JsonIgnore
+    private String restaurantType;
+
     public static RestaurantTierDTO convertRestaurantToTierDTO(RestaurantEntity restaurant, Integer ranking, Boolean isEvaluated, Boolean isFavorite) {
         DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.HALF_UP);
@@ -61,7 +68,9 @@ public class RestaurantTierDTO {
                 restaurant.getRestaurantLongitude(),
                 restaurant.getRestaurantLatitude(),
                 restaurant.getPartnershipInfo(),
-                score
+                score,
+                restaurant.toDomain().getSituations(),
+                restaurant.getRestaurantType()
         );
     }
 
@@ -83,7 +92,18 @@ public class RestaurantTierDTO {
                 restaurant.getRestaurantLongitude(),
                 restaurant.getRestaurantLatitude(),
                 restaurant.getPartnershipInfo(),
-                score
+                score,
+                restaurant.getSituations(),
+                restaurant.getRestaurantType()
         );
     }
+
+    public String getTierImgUrl() {
+        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + mainTier + "tier.png";
+    }
+
+    public String getCuisineImgUrl() {
+        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/cuisine-icon/" + restaurantCuisine.replaceAll("/", "") + ".svg";
+    }
+
 }
