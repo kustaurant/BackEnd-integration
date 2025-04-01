@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
 import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,11 +39,11 @@ public class PostCommentDTO {
     private Boolean isCommentMine = false;
     @Schema(description = "작성 유저")
     UserDTO user;
-    public PostCommentDTO(Integer commentId, String commentBody, String status, User user,Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
+    public PostCommentDTO(Integer commentId, String commentBody, String status, UserEntity UserEntity, Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
         this.commentId = commentId;
         this.commentBody = commentBody;
         this.status = status;
-        this.user = UserDTO.convertUserToUserDTO(user);
+        this.user = UserDTO.convertUserToUserDTO(UserEntity);
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
         this.timeAgo = timeAgo;

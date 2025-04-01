@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/css/library/style.min.css">
   <link rel="stylesheet" href="/css/library/responsive.min.css">
   <link rel="stylesheet" href="/css/library/restaurant.css">
-  <link rel="stylesheet" href="/css/notice-style.css">
+  <link rel="stylesheet" href="/css/noticeEntity-style.css">
   <script type="text/javascript" src="/js/library/jquery.js"></script>
   <script type="text/javascript" src="/js/library/vendors.min.js"></script>
   <script type="text/javascript" src="/js/library/main.js"></script>
@@ -35,10 +35,10 @@
     </div>
   </section>
   <div class="cardlist">
-    <div th:each="noticelist:${Notice}" class="notice-card">
+    <div th:each="noticelist:${Notice}" class="noticeEntity-card">
       <a th:href="${noticelist.noticeHref}" target="_blank">
-        <p th:text="${noticelist.noticeTitle}" class="notice-title"></p>
-        <p th:text="${noticelist.createdAt}" class="notice-created-at"></p>
+        <p th:text="${noticelist.noticeTitle}" class="noticeEntity-title"></p>
+        <p th:text="${noticelist.createdAt}" class="noticeEntity-created-at"></p>
       </a>
     </div>
   </div>

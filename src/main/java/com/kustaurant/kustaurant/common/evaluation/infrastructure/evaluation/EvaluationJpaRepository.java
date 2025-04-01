@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -13,8 +13,8 @@ public interface EvaluationJpaRepository extends JpaRepository<EvaluationEntity,
 
     Integer countAllByStatus(String status);
 
-    Optional<EvaluationEntity> findByUserAndRestaurant(User user, RestaurantEntity restaurant);
-    Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(User user, RestaurantEntity restaurant, String status);
+    Optional<EvaluationEntity> findByUserAndRestaurant(UserEntity user, RestaurantEntity restaurant);
+    Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(UserEntity user, RestaurantEntity restaurant, String status);
 
     Integer countByRestaurant(RestaurantEntity restaurant);
 

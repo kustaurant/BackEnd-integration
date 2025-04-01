@@ -1,6 +1,8 @@
 package com.kustaurant.kustaurant.global.webUser;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.domain.UserStatus;
+import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
 import org.thymeleaf.util.StringUtils;
@@ -29,9 +31,11 @@ public class OAuthAttributes {
         this.nameAttributeKey = nameAttributeKey;
     }
 
-    public static OAuthAttributes of(String registrationId,
-                                     String userNameAttributeName,
-                                     Map<String, Object> attributes) {
+    public static OAuthAttributes of(
+            String registrationId,
+            String userNameAttributeName,
+            Map<String, Object> attributes
+    ) {
         if ("naver".equals(registrationId)) {
             return ofNaver("id", attributes);
         } else {
@@ -62,12 +66,12 @@ public class OAuthAttributes {
                 .build();
     }
 
-    public User webToEntity() {
-        return User.builder()
+    public UserEntity webToEntity() {
+        return UserEntity.builder()
                 .providerId(userProviderId)
                 .loginApi(loginApi)
                 .userEmail(userEmail)
-                .userNickname(StringUtils.substringBefore(userEmail, "@"))
+                .userNickname(new Nickname(StringUtils.substringBefore(userEmail, "@")))
                 .status("ACTIVE")
                 .createdAt(LocalDateTime.now())
                 .userRole(UserRole.USER)

@@ -3,6 +3,7 @@
     import com.google.gson.Gson;
     import com.google.gson.reflect.TypeToken;
     import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
+    import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
     import com.kustaurant.kustaurant.web.restaurant.MainController;
     import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
     import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
@@ -18,7 +19,6 @@
     import com.kustaurant.kustaurant.web.restaurant.RestaurantWebService;
     import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 
-    import com.kustaurant.kustaurant.common.user.infrastructure.User;
     import lombok.RequiredArgsConstructor;
     import org.slf4j.Logger;
     import org.slf4j.LoggerFactory;
@@ -57,8 +57,8 @@
                 @PathVariable Integer restaurantId
         ) {
             RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
-            User user = customOAuth2UserService.getUser(principal.getName());
-            Evaluation evaluation = evaluationRepository.findByUserAndRestaurant(user, restaurant).orElse(null);
+            UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
+            Evaluation evaluation = evaluationRepository.findByUserAndRestaurant(UserEntity, restaurant).orElse(null);
             Double mainScore = 0.0;
             model.addAttribute("restaurant", restaurant);
 
@@ -85,7 +85,7 @@
                 @RequestParam(value = "evaluationComment", required = false) String evaluationComment,
                 @RequestPart(value = "newImage", required = false) MultipartFile newImage
         ) {
-            User user = customOAuth2UserService.getUser(principal.getName());
+            UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
             RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
             // JSON 문자열을 Java List로 변환
             List<Integer> evaluationSituations = new Gson().fromJson(selectedSituationsJson, new TypeToken<List<Integer>>(){}.getType());
@@ -98,7 +98,7 @@
             evaluationDTO.setNewImage(newImage);
 
             // 평가 데이터 저장 또는 업데이트
-            evaluationService.createOrUpdate(user, restaurant, evaluationDTO);
+            evaluationService.createOrUpdate(UserEntity, restaurant, evaluationDTO);
 
             return ResponseEntity.ok("평가가 성공적으로 저장되었습니다.");
         }
@@ -142,11 +142,11 @@
                 List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurantId, null, sortComment.equals(EnumSortComment.POPULAR), "ios");
                 model.addAttribute("restaurantComments", restaurantComments);
             } else {
-                User user = customOAuth2UserService.getUser(principal.getName());
+                UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
 
-                model.addAttribute("user", user);
+                model.addAttribute("user", UserEntity);
 
-                List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurantId, user, sortComment.equals(EnumSortComment.POPULAR), "ios");
+                List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurantId, UserEntity, sortComment.equals(EnumSortComment.POPULAR), "ios");
                 model.addAttribute("restaurantComments", restaurantComments);
             }
 
@@ -163,11 +163,11 @@
             evaluationId -= EvaluationConstants.EVALUATION_ID_OFFSET;
 
             if (principal != null) {
-                User user = customOAuth2UserService.getUser(principal.getName());
+                UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
 
-                model.addAttribute("user", user);
+                model.addAttribute("user", UserEntity);
 
-                RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(evaluationId, user, "ios");
+                RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(evaluationId, UserEntity, "ios");
                 model.addAttribute("restaurantComment", restaurantCommentDTO);
             } else {
                 RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(evaluationId, null, "ios");
@@ -189,14 +189,14 @@
         ) {
             Map<String, String> responseMap = new HashMap<>();
             try {
-                User user = customOAuth2UserService.getUser(principal.getName());
+                UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
                 if (isSubComment(commentId)) { // 대댓글인 경우
                     RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-                    restaurantCommentService.likeComment(user, restaurantComment, responseMap);
+                    restaurantCommentService.likeComment(UserEntity, restaurantComment, responseMap);
                 } else { // 부모 댓글인 경우
                     int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
                     EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
-                    evaluationService.likeEvaluation(user, evaluation);
+                    evaluationService.likeEvaluation(UserEntity, evaluation);
                 }
             } catch (DataNotFoundException e) {
                 logger.error("RestaurantCommentLikeError", e);
@@ -221,14 +221,14 @@
         ) {
             Map<String, String> responseMap = new HashMap<>();
             try {
-                User user = customOAuth2UserService.getUser(principal.getName());
+                UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
                 if (isSubComment(commentId)) { // 대댓글인 경우
                     RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-                    restaurantCommentService.dislikeComment(user, restaurantComment, responseMap);
+                    restaurantCommentService.dislikeComment(UserEntity, restaurantComment, responseMap);
                 } else { // 부모 댓글인 경우
                     int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
                     EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
-                    evaluationService.dislikeEvaluation(user, evaluation);
+                    evaluationService.dislikeEvaluation(UserEntity, evaluation);
                 }
             } catch (DataNotFoundException e) {
                 logger.error("RestaurantCommentDislikeError", e);
@@ -251,23 +251,23 @@
                 @PathVariable Integer commentId,
                 Principal principal
         ) {
-            User user = customOAuth2UserService.getUser(principal.getName());
+            UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
             if (isSubComment(commentId)) {
                 RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
                 // 삭제 요청한 user가 댓글을 단 user가 아닌 경우
-                if (!restaurantComment.getUser().equals(user)) {
+                if (!restaurantComment.getUser().equals(UserEntity)) {
                     return ResponseEntity.badRequest().build();
                 }
                 // 대댓글 지우기
-                restaurantCommentService.deleteComment(restaurantComment, user);
+                restaurantCommentService.deleteComment(restaurantComment, UserEntity);
             } else {
                 int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
                 EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
-                if (!evaluation.getUser().equals(user)) {
+                if (!evaluation.getUser().equals(UserEntity)) {
                     return ResponseEntity.badRequest().build();
                 }
                 // 댓글 내용 지우기
-                evaluationService.deleteComment(evaluation, user);
+                evaluationService.deleteComment(evaluation, UserEntity);
             }
 
             return ResponseEntity.ok("success");

@@ -4,6 +4,7 @@ import com.kustaurant.kustaurant.common.restaurant.domain.enums.LocationEnum;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantTierService;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
@@ -14,7 +15,6 @@ import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.common.restaurant.constants.MapConstants;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -174,7 +175,7 @@ public class RestaurantTierApiController {
             @LocationList List<String> locations,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
 
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
         List<RestaurantEntity> tieredRestaurants = restaurantTierService.findByConditionsTemp(cuisines, situations, locations, 1, false);
@@ -283,7 +284,7 @@ public class RestaurantTierApiController {
             @LocationList List<String> locations,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
 
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
         List<RestaurantEntity> tieredRestaurants = restaurantTierService.findByConditionsTemp(cuisines, situations, locations, 1, false);

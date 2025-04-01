@@ -3,9 +3,9 @@ package com.kustaurant.kustaurant.common.restaurant.service;
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +40,7 @@ public class RestaurantFavoriteService {
 
     // 즐겨찾기 토글
     @Transactional
-    public boolean toggleFavorite(User user, Restaurant restaurant) {
+    public boolean toggleFavorite(UserEntity user, Restaurant restaurant) {
         RestaurantFavorite favorite;
         try {
             // 즐겨찾기 정보 조회
@@ -55,7 +55,7 @@ public class RestaurantFavoriteService {
         return false;
     }
 
-    public void addFavorite(User user, Restaurant restaurant) {
+    public void addFavorite(UserEntity user, Restaurant restaurant) {
         restaurantFavoriteRepository.save(
                 RestaurantFavorite.builder()
                 .user(user)

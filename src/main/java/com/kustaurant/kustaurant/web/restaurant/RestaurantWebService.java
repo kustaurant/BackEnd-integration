@@ -10,7 +10,7 @@ import com.kustaurant.kustaurant.common.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantMenuRepository;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtagEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -32,7 +32,7 @@ public class RestaurantWebService {
     private final RestaurantService restaurantService;
     private final RestaurantCommentService restaurantCommentService;
 
-    public RestaurantDetailWebDto getRestaurantWebDetails(User user, Integer restaurantId) {
+    public RestaurantDetailWebDto getRestaurantWebDetails(UserEntity user, Integer restaurantId) {
         Integer userId = user == null ? null : user.getUserId();
         RestaurantDetailDTO restaurantDetailDto = restaurantService.getActiveRestaurantDetailDto(restaurantId, userId, "web");
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);

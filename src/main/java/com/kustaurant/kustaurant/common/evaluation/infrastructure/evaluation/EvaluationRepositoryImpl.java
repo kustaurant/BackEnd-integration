@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -43,12 +43,12 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     }
 
     @Override
-    public Optional<Evaluation> findByUserAndRestaurant(User user, RestaurantEntity restaurant) {
+    public Optional<Evaluation> findByUserAndRestaurant(UserEntity user, RestaurantEntity restaurant) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(User user, RestaurantEntity restaurant, String status) {
+    public Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(UserEntity user, RestaurantEntity restaurant, String status) {
         return Optional.empty();
     }
 

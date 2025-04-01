@@ -5,16 +5,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantTierService;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.SituationRepository;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -95,7 +93,7 @@ public class RestaurantTierWebController {
             page--;
         }
         // User 처리
-        User user = customOAuth2UserService.getUserByPrincipal(principal);
+        UserEntity user = customOAuth2UserService.getUserByPrincipal(principal);
         Integer userId = user == null ? null : user.getUserId();
         // DB 조회
         List<RestaurantTierDTO> tierRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, null, true, userId);

@@ -5,6 +5,7 @@ import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
@@ -14,7 +15,6 @@ import com.kustaurant.kustaurant.api.post.service.PostApiCommentService;
 import com.kustaurant.kustaurant.api.post.service.PostScrapApiService;
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.api.post.service.StorageApiService;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -87,7 +87,7 @@ public class CommunityApiController {
     })
     public ResponseEntity<PostDTO> post(@PathVariable @Parameter(description = "게시글 id", example = "69") Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         postApiService.validatePostId(postId);
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(postId);
         postApiService.increaseVisitCount(postEntity);
         return ResponseEntity.ok(postApiCommentService.createPostDTOWithFlags(postEntity,user));
@@ -126,7 +126,7 @@ public class CommunityApiController {
             @JwtToken
             @Parameter(hidden = true)
             Integer userId) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
         PostComment postComment = postApiCommentService.createComment(content, postId, userId);
         // 대댓글 일 경우 부모 댓글과 관계 매핑
         if (!parentCommentId.isEmpty()) {
@@ -155,7 +155,7 @@ public class CommunityApiController {
             @JwtToken
             @Parameter(hidden = true)
             Integer userId) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(Integer.valueOf(postId));
         PostComment postComment = postApiCommentService.createComment(content, postId, userId);
         // 대댓글 일 경우 부모 댓글과 관계 매핑
@@ -210,7 +210,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "404", description = "해당 ID의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<ScrapToggleDTO> postScrap(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(postId);
         int status = postScrapApiService.scrapCreateOrDelete(postEntity, user); // 1 또는 0 반환
         ScrapToggleDTO scrapToggleDTO = new ScrapToggleDTO(postEntity.getPostScrapList().size(), status);
@@ -225,7 +225,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "404", description = "해당 ID의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(postId);
         LikeToggleStatus status = postApiService.toggleLikeStatus(postEntity, user); // 1 또는 0 반환
         LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(postEntity.getPostLikesList().size(), status.getValue());
@@ -244,7 +244,7 @@ public class CommunityApiController {
                                                                             @PathVariable @Parameter(description = "좋아요는 likes, 싫어요는 dislikes로 값을 설정합니다.", example = "likes") String action,
                                                                             @JwtToken @Parameter(hidden = true) Integer userId) {
         PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
         int commentLikeStatus = postApiCommentService.toggleCommentLikeOrDislike(action, postComment,user);
         CommentLikeDislikeDTO responseDTO = CommentLikeDislikeDTO.toCommentLikeDislikeDTO(postComment,commentLikeStatus);
         return ResponseEntity.ok(responseDTO);
@@ -266,7 +266,7 @@ public class CommunityApiController {
             @JwtToken @Parameter(hidden = true) Integer userId
     ) {
         try {
-            User user = userService.findUserById(userId);
+            UserEntity user = userService.findUserById(userId);
             PostEntity postEntity = new PostEntity(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), "ACTIVE", LocalDateTime.now(),user);
             postApiService.create(postEntity, user);
             postRepository.save(postEntity);
