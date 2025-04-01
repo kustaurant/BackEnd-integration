@@ -101,7 +101,7 @@ public class PostApiService {
     }
     @Transactional
     public LikeToggleStatus toggleLikeStatus(PostEntity postEntity, User user) {
-        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByPostEntityAndUser(postEntity, user);
+        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByUserAndPostEntity(user, postEntity);
 
         //해당 post 를 이미 like 한 경우 - 제거
         if (likeOptional.isPresent()) {

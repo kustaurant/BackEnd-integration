@@ -141,8 +141,8 @@ public class PostService {
     @Transactional
     public Map<String, Object> likeCreateOrDelete(PostEntity postEntity, User user) {
         Map<String, Object> status = new HashMap<>();
-        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByPostEntityAndUser(postEntity, user);
-        Optional<PostDislikesEntity> dislikeOptional = postDislikesJpaRepository.findByPostEntityAndUser(postEntity, user);
+        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByUserAndPostEntity(user, postEntity);
+        Optional<PostDislikesEntity> dislikeOptional = postDislikesJpaRepository.findByUserAndPostEntity(user, postEntity);
         //해당 post 를 이미 like 한 경우 - 제거
         if (likeOptional.isPresent()) {
             PostLikesEntity postLikesEntity = likeOptional.get();
@@ -187,8 +187,8 @@ public class PostService {
     @Transactional
     public Map<String, Object> dislikeCreateOrDelete(PostEntity postEntity, User user) {
         Map<String, Object> status = new HashMap<>();
-        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByPostEntityAndUser(postEntity, user);
-        Optional<PostDislikesEntity> dislikeOptional = postDislikesJpaRepository.findByPostEntityAndUser(postEntity, user);
+        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByUserAndPostEntity(user, postEntity);
+        Optional<PostDislikesEntity> dislikeOptional = postDislikesJpaRepository.findByUserAndPostEntity(user, postEntity);
 
         //해당 post를 이미 dislike 한 경우 - 제거
         if (dislikeOptional.isPresent()) {
@@ -227,13 +227,13 @@ public class PostService {
         return status;
     }
 
-    public InteractionStatusResponse getUserInteractionStatus(PostEntity post, User user) {
+    public InteractionStatusResponse getUserInteractionStatus(PostEntity postEntity, User user) {
         if (user == null){
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED,DislikeStatus.NOT_DISLIKED,ScrapStatus.NOT_SCRAPPED);
         }
-        boolean isLiked = postLikesJpaRepository.existsByPostEntityAndUser(post, user);
-        boolean isDisliked = postDislikesJpaRepository.existsByPostEntityAndUser(post, user);
-        boolean isScrapped = postScrapRepository.existsByPostEntityAndUser(post, user);
+        boolean isLiked = postLikesJpaRepository.existsByUserAndPostEntity(user, postEntity);
+        boolean isDisliked = postDislikesJpaRepository.existsByUserAndPostEntity(user,postEntity);
+        boolean isScrapped = postScrapRepository.existsByPostEntityAndUser(postEntity, user);
 
         return new InteractionStatusResponse(
                 isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED,

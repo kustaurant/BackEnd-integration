@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface PostCommentDislikeJpaRepository extends JpaRepository<PostCommentDislikeEntity,Integer> {
-    Optional<PostCommentDislikeEntity> findByPostCommentAndUser(PostComment postComment, User user);
+    Optional<PostCommentDislikeEntity> findByUserAndPostComment(User user, PostComment postComment);
 
-    boolean existsByPostCommentAndUser(User user, PostComment postComment);
+    boolean existsByUserAndPostComment(User user, PostComment postComment);
 }

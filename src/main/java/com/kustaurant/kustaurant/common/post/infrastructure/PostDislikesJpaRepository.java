@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface PostDislikesJpaRepository extends JpaRepository<PostDislikesEntity,Integer> {
-    Optional<PostDislikesEntity> findByPostEntityAndUser(PostEntity postEntity, User user);
+    Optional<PostDislikesEntity> findByUserAndPostEntity(User user, PostEntity postEntity);
 
-    boolean existsByPostEntityAndUser(PostEntity post, User user);
+    boolean existsByUserAndPostEntity(User user, PostEntity postEntity);
 }

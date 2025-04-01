@@ -61,8 +61,8 @@ public class PostCommentService {
     // 댓글 좋아요 토글 버튼
     @Transactional
     public Map<String, Object> toggleCommentLike(PostComment postComment, User user) {
-        Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByPostCommentAndUser(postComment, user);
-        Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByPostCommentAndUser(postComment, user);
+        Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByUserAndPostComment(user, postComment);
+        Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByUserAndPostComment(user, postComment);
         Map<String, Object> status = new HashMap<>();
 
         //해당 댓글을 유저가 이미 좋아요를 누른 경우 - 좋아요 제거
@@ -96,8 +96,8 @@ public class PostCommentService {
     @Transactional
     public Map<String, Object> toggleCommentDislike(PostComment postComment, User user) {
 
-        Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByPostCommentAndUser(postComment, user);
-        Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByPostCommentAndUser(postComment, user);
+        Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByUserAndPostComment(user, postComment);
+        Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByUserAndPostComment(user, postComment);
         Map<String, Object> status = new HashMap<>();
 
         //해당 댓글을 유저가 이미 싫어요를 누른 경우 - 싫어요 제거
@@ -185,8 +185,8 @@ public class PostCommentService {
         if (user == null) {
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
         }
-        boolean isLiked = postCommentLikeJpaRepository.existsByPostCommentAndUser(user, postComment);
-        boolean isDisliked = postCommentDislikeJpaRepository.existsByPostCommentAndUser(user, postComment);
+        boolean isLiked = postCommentLikeJpaRepository.existsByUserAndPostComment(user, postComment);
+        boolean isDisliked = postCommentDislikeJpaRepository.existsByUserAndPostComment(user, postComment);
         return new InteractionStatusResponse(isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED, isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
     }
 
