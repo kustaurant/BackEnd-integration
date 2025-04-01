@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.web.post.service;
 
 import com.kustaurant.kustaurant.common.comment.PostComment;
-import com.kustaurant.kustaurant.common.post.domain.PostInteractionStatusResponse;
+import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.enums.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
@@ -227,15 +227,15 @@ public class PostService {
         return status;
     }
 
-    public PostInteractionStatusResponse getUserInteractionStatus(PostEntity post, User user) {
+    public InteractionStatusResponse getUserInteractionStatus(PostEntity post, User user) {
         if (user == null){
-            return new PostInteractionStatusResponse(LikeStatus.NOT_LIKED,DislikeStatus.NOT_DISLIKED,ScrapStatus.NOT_SCRAPPED);
+            return new InteractionStatusResponse(LikeStatus.NOT_LIKED,DislikeStatus.NOT_DISLIKED,ScrapStatus.NOT_SCRAPPED);
         }
         boolean isLiked = postLikesJpaRepository.existsByPostEntityAndUser(post, user);
         boolean isDisliked = postDislikesJpaRepository.existsByPostEntityAndUser(post, user);
         boolean isScrapped = postScrapRepository.existsByPostEntityAndUser(post, user);
 
-        return new PostInteractionStatusResponse(
+        return new InteractionStatusResponse(
                 isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED,
                 isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED,
                 isScrapped ? ScrapStatus.SCRAPPED : ScrapStatus.NOT_SCRAPPED

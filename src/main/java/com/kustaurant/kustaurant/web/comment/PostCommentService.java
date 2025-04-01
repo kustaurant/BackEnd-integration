@@ -1,7 +1,11 @@
 package com.kustaurant.kustaurant.web.comment;
 
 import com.kustaurant.kustaurant.common.comment.*;
+import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
+import com.kustaurant.kustaurant.common.post.enums.DislikeStatus;
+import com.kustaurant.kustaurant.common.post.enums.LikeStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.common.post.enums.ScrapStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
@@ -175,5 +179,29 @@ public class PostCommentService {
                 return cb.and(statusPredicate, postIdPredicate);
             }
         };
+    }
+
+    public InteractionStatusResponse getUserInteractionStatus(PostComment postComment, User user) {
+        if (user == null) {
+            return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
+        }
+        boolean isLiked = postCommentLikeJpaRepository.existsByPostCommentAndUser(user, postComment);
+        boolean isDisliked = postCommentDislikeJpaRepository.existsByPostCommentAndUser(user, postComment);
+        return new InteractionStatusResponse(isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED, isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
+    }
+
+    public Map<Integer, InteractionStatusResponse> getCommentInteractionMap(List<PostComment> postCommentList, User user) {
+        Map<Integer, InteractionStatusResponse> commentInteractionMap = new HashMap<>();
+
+        for (PostComment comment : postCommentList) {
+            // 댓글
+            commentInteractionMap.put(comment.getCommentId(), getUserInteractionStatus(comment, user));
+
+            // 대댓글
+            for (PostComment reply : comment.getRepliesList()) {
+                commentInteractionMap.put(reply.getCommentId(), getUserInteractionStatus(reply, user));
+            }
+        }
+        return commentInteractionMap;
     }
 }

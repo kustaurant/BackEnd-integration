@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.web.post.controller;
 
 import com.kustaurant.kustaurant.common.comment.PostComment;
 import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
-import com.kustaurant.kustaurant.common.post.domain.PostInteractionStatusResponse;
+import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.web.comment.PostCommentService;
@@ -78,17 +78,25 @@ public class CommunityController {
     public String post(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
         PostEntity postEntity = postService.getPost(postId);
         User user = principal == null ? null : customOAuth2UserService.getUser(principal.getName());
-        PostInteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postEntity, user);
+        InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postEntity, user);
+
         postService.increaseVisitCount(postEntity);
 
         List<PostComment> postCommentList = postCommentService.getList(postId, sort);
+
+        Map<Integer, InteractionStatusResponse> commentInteractionMap = postCommentService.getCommentInteractionMap(postCommentList, user);
+
         model.addAttribute("postCommentList", postCommentList);
         model.addAttribute("post", postEntity);
         model.addAttribute("user", user);
         model.addAttribute("sort", sort);
         model.addAttribute("postInteractionStatus", postInteractionStatus);
+        model.addAttribute("commentInteractionMap", commentInteractionMap);
+
         return "community_post";
     }
+
+
 
     // 게시물 삭제
     @GetMapping("/api/post/delete")
