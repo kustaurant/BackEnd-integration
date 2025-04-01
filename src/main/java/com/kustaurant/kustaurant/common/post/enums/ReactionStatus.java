@@ -1,7 +1,22 @@
 package com.kustaurant.kustaurant.common.post.enums;
 
 public enum ReactionStatus {
-    LIKE_DELETED, DISLIKE_TO_LIKE, LIKE_CREATED,
-    DISLIKE_DELETED, LIKE_TO_DISLIKE, DISLIKE_CREATED
+    LIKE_CREATED(1),
+    LIKE_DELETED(0),
+    DISLIKE_TO_LIKE(1),
+    DISLIKE_CREATED(-1),
+    DISLIKE_DELETED(0),
+    LIKE_TO_DISLIKE(-1);
+
+    private final int appLikeStatus;
+
+    ReactionStatus(int appLikeStatus) {
+        this.appLikeStatus = appLikeStatus;
+    }
+
+    public int toAppLikeStatus() {
+        return appLikeStatus;
+    }
 }
+
 

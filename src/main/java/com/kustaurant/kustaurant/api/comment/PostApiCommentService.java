@@ -4,6 +4,7 @@ package com.kustaurant.kustaurant.api.comment;
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.common.comment.PostComment;
 import com.kustaurant.kustaurant.common.comment.PostCommentApiRepository;
+import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
@@ -13,6 +14,7 @@ import com.kustaurant.kustaurant.common.comment.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.enums.PostStatus;
 import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
+import com.kustaurant.kustaurant.web.comment.PostCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ public class PostApiCommentService {
     private final PostRepository postRepository;
     private final PostApiService postApiService;
     private final UserService userService;
+    private final PostCommentService postCommentService;
 
     // 댓글 생성
     public void create(PostEntity postEntity, User user, PostComment postComment) {
@@ -49,80 +52,16 @@ public class PostApiCommentService {
     }
 
 
-    // 댓글 좋아요 (세 가지 경우)
-    public int likeCreateOrDelete(PostComment postComment, User user) {
-        List<User> likeUserList = postComment.getPostCommentLikesEntities();
-        List<User> dislikeUserList = postComment.getPostCommentDislikesEntities();
-        List<PostComment> likePostCommentList = user.getPostCommentLikesEntities();
-        List<PostComment> dislikePostCommentList = user.getPostCommentDislikesEntities();
-        int commentLikeStatus;
-
-        // 해당 postComment를 like 한 경우 - 제거
-        if (likeUserList.contains(user)) {
-            postComment.setLikeCount(postComment.getLikeCount() - 1);
-            likePostCommentList.remove(postComment);
-            likeUserList.remove(user);
-            commentLikeStatus = 0; // 아무것도 누르지 않은 상태로 변경
-        }
-        // 해당 postComment를 이미 dislike 한 경우 - 제거하고 like 추가
-        else if (dislikeUserList.contains(user)) {
-            postComment.setLikeCount(postComment.getLikeCount() + 2);
-            dislikeUserList.remove(user);
-            dislikePostCommentList.remove(postComment);
-            likeUserList.add(user);
-            likePostCommentList.add(postComment);
-            commentLikeStatus = 1; // 좋아요 상태로 변경
-        }
-        // 처음 like 하는 경우 - 추가
-        else {
-            postComment.setLikeCount(postComment.getLikeCount() + 1);
-            likeUserList.add(user);
-            likePostCommentList.add(postComment);
-            commentLikeStatus = 1; // 좋아요 상태로 변경
-        }
-
-        postCommentApiRepository.save(postComment);
-        userRepository.save(user);
-
-        return commentLikeStatus;
+    public int toggleCommentLike(PostComment postComment, User user) {
+        Map<String, Object> result = postCommentService.toggleCommentLike(postComment, user);
+        ReactionStatus status = ReactionStatus.valueOf(result.keySet().iterator().next());
+        return status.toAppLikeStatus();
     }
 
-    // 댓글 싫어요 (세 가지 경우)
-    public int dislikeCreateOrDelete(PostComment postComment, User user) {
-        List<User> likeUserList = postComment.getPostCommentLikesEntities();
-        List<User> dislikeUserList = postComment.getPostCommentDislikesEntities();
-        List<PostComment> likePostCommentList = user.getPostCommentLikesEntities();
-        List<PostComment> dislikePostCommentList = user.getPostCommentDislikesEntities();
-        int commentLikeStatus;
-
-        // 해당 postComment를 dislike 한 경우 - 제거
-        if (dislikeUserList.contains(user)) {
-            postComment.setLikeCount(postComment.getLikeCount() + 1); // 싫어요를 제거하므로 좋아요 수 증가
-            dislikePostCommentList.remove(postComment);
-            dislikeUserList.remove(user);
-            commentLikeStatus = 0; // 아무것도 누르지 않은 상태로 변경
-        }
-        // 해당 postComment를 이미 like 한 경우 - 제거하고 dislike 추가
-        else if (likeUserList.contains(user)) {
-            postComment.setLikeCount(postComment.getLikeCount() - 2);
-            likeUserList.remove(user);
-            likePostCommentList.remove(postComment);
-            dislikeUserList.add(user);
-            dislikePostCommentList.add(postComment);
-            commentLikeStatus = -1; // 싫어요 상태로 변경
-        }
-        // 처음 dislike 하는 경우 - 추가
-        else {
-            postComment.setLikeCount(postComment.getLikeCount() - 1);
-            dislikeUserList.add(user);
-            dislikePostCommentList.add(postComment);
-            commentLikeStatus = -1; // 싫어요 상태로 변경
-        }
-
-        postCommentApiRepository.save(postComment);
-        userRepository.save(user);
-
-        return commentLikeStatus;
+    public int toggleCommentDislike(PostComment postComment, User user) {
+        Map<String, Object> result = postCommentService.toggleCommentDislike(postComment, user);
+        ReactionStatus status = ReactionStatus.valueOf(result.keySet().iterator().next());
+        return status.toAppLikeStatus();
     }
 
 
@@ -261,9 +200,9 @@ public class PostApiCommentService {
     public int toggleCommentLikeOrDislike(String action, PostComment postComment, User user) {
         int commentLikeStatus;
         if ("likes".equals(action)) {
-            commentLikeStatus = likeCreateOrDelete(postComment, user);
+            commentLikeStatus = toggleCommentLike(postComment, user);
         } else if ("dislikes".equals(action)) {
-            commentLikeStatus = dislikeCreateOrDelete(postComment, user);
+            commentLikeStatus = toggleCommentDislike(postComment, user);
         } else {
             throw new IllegalArgumentException("action 값이 유효하지 않습니다.");
         }
