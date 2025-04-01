@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.evaluation.domain;
 
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -23,7 +23,7 @@ public class EvaluationDomain {
     private Integer commentLikeCount = 0;
 
     // 참조키
-    private User user;
+    private UserEntity user;
     private Restaurant restaurant;
 
     // 추가

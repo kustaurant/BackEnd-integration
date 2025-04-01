@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,12 +31,12 @@ public class PostComment {
     // 웹 버전을 위한 totallikeCount 를 말함. 모바일에선 사용하지 않음
     Integer likeCount=0;
 
-    public PostComment(String commentBody, String status, LocalDateTime createdAt, PostEntity postEntity, User user) {
+    public PostComment(String commentBody, String status, LocalDateTime createdAt, PostEntity postEntity, UserEntity UserEntity) {
         this.commentBody = commentBody;
         this.status = status;
         this.createdAt = createdAt;
         this.postEntity = postEntity;
-        this.user = user;
+        this.user = UserEntity;
     }
 
     @ManyToOne
@@ -44,7 +44,7 @@ public class PostComment {
     PostEntity postEntity;
     @ManyToOne
     @JoinColumn(name="user_id")
-    User user;
+    UserEntity user;
 
     public PostComment() {
 
@@ -52,11 +52,11 @@ public class PostComment {
 
     @ManyToMany
     @JoinTable(name="comment_likes_tbl",joinColumns = @JoinColumn(name="comment_id"),inverseJoinColumns = @JoinColumn(name="user_id"))
-    List<User> likeUserList = new ArrayList<>();
+    List<UserEntity> likeUserList = new ArrayList<>();
     @ManyToMany
     @JoinTable(name="comment_dislikes_tbl",joinColumns = @JoinColumn(name="comment_id"),inverseJoinColumns = @JoinColumn(name="user_id"))
 
-    List<User> dislikeUserList = new ArrayList<>();
+    List<UserEntity> dislikeUserList = new ArrayList<>();
 
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();

@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
 import com.kustaurant.kustaurant.common.post.domain.Post;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,7 +36,7 @@ public class PostEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private UserEntity user;
 
     @OneToMany(mappedBy = "postEntity")
     private List<PostComment> postCommentList = new ArrayList<>();
@@ -53,7 +53,7 @@ public class PostEntity {
     @OneToMany(mappedBy = "postEntity")
     private List<PostDislikesEntity> postDislikesList = new ArrayList<>();
 
-    public PostEntity(String postTitle, String postBody, String postCategory, String status, LocalDateTime createdAt, User user) {
+    public PostEntity(String postTitle, String postBody, String postCategory, String status, LocalDateTime createdAt, UserEntity user) {
         this.postTitle = postTitle;
         this.postBody = postBody;
         this.postCategory = postCategory;
@@ -74,7 +74,7 @@ public class PostEntity {
         );
     }
 
-    public static PostEntity fromDomain(Post post, User user) {
+    public static PostEntity fromDomain(Post post, UserEntity user) {
         return new PostEntity(
                 post.getPostTitle(),
                 post.getPostBody(),

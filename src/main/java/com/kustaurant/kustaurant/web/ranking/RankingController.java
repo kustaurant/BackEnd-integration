@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.web.ranking;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import lombok.*;
 import org.springframework.stereotype.Controller;
@@ -16,7 +16,7 @@ import java.util.List;
 @Controller
 public class RankingController {
     private final CustomOAuth2UserService customOAuth2UserService;
-    private final UserRepository userRepository;
+    private final OUserRepository OUserRepository;
 
     @GetMapping("/ranking")
     public String ranking(
@@ -25,17 +25,17 @@ public class RankingController {
     ) {
 
         // 평가 1개 이상 한 유저 리스트
-        List<User> userList = userRepository.findUsersWithEvaluationCountDescending();
+        List<UserEntity> UserEntityList = OUserRepository.findUsersWithEvaluationCountDescending();
         // 순위 리스트
-        List<UserRank> userRankList = calculateRank(userList);
+        List<UserRank> userRankList = calculateRank(UserEntityList);
         model.addAttribute("rankList", userRankList);
         // 로그인 상태일 경우
         if (principal != null) {
-            User user = customOAuth2UserService.getUser(principal.getName());
+            UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
             boolean isAdded = false;
             for (UserRank userRank :
                     userRankList) {
-                if (userRank.getUser().equals(user)) {
+                if (userRank.getUserEntity().equals(UserEntity)) {
                     model.addAttribute("myRank", userRank);
                     isAdded = true;
                 }
@@ -50,17 +50,17 @@ public class RankingController {
         return "ranking";
     }
 
-    private List<UserRank> calculateRank(List<User> userList) {
+    private List<UserRank> calculateRank(List<UserEntity> UserEntityList) {
         List<UserRank> rankList = new ArrayList<>();
 
         int i = 0;
         int prevCount = 100000; // 이전 유저의 평가 개수
         int countSame = 1; // 동일 순위를 세기 위한 변수
-        for (User user :
-                userList) {
+        for (UserEntity UserEntity :
+                UserEntityList) {
             UserRank userRank = new UserRank();
-            userRank.setUser(user);
-            int evaluationCount = user.getEvaluationList().size();
+            userRank.setUserEntity(UserEntity);
+            int evaluationCount = UserEntity.getEvaluationList().size();
             if (evaluationCount < prevCount) {
                 i += countSame;
                 userRank.setRank(i);
@@ -81,5 +81,5 @@ public class RankingController {
 @NoArgsConstructor
 class UserRank {
     private Integer rank;
-    private User user;
+    private UserEntity UserEntity;
 }

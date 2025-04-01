@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,8 +14,8 @@ public interface RestaurantFavoriteJpaRepository extends JpaRepository<Restauran
 
     // TODO: need to delete everything below this
 
-    Optional<RestaurantFavoriteEntity> findByUserAndRestaurant(User user, RestaurantEntity restaurant);
-    List<RestaurantFavoriteEntity> findByUser(User user);
+    Optional<RestaurantFavoriteEntity> findByUserAndRestaurant(UserEntity UserEntity, RestaurantEntity restaurant);
+    List<RestaurantFavoriteEntity> findByUser(UserEntity UserEntity);
 
     Integer countByRestaurantAndStatus(RestaurantEntity restaurant, String status);
 }

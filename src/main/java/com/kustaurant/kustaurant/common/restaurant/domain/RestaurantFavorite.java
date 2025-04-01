@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.domain;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class RestaurantFavorite {
 
     private Integer favoriteId;
-    User user;
+    UserEntity user;
     Restaurant restaurant;
     private String status;
     private LocalDateTime createdAt;

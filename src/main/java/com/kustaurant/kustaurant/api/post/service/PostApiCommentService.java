@@ -2,14 +2,14 @@ package com.kustaurant.kustaurant.api.post.service;
 
 
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.post.domain.PostDTO;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.domain.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.enums.PostStatus;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostApiCommentService {
     private final PostCommentApiRepository postCommentApiRepository;
-    private final UserRepository userRepository;
+    private final OUserRepository userRepository;
     private final PostRepository postRepository;
     private final PostApiService postApiService;
     private final UserService userService;
 
     // 댓글 생성
-    public void create(PostEntity postEntity, User user, PostComment postComment) {
+    public void create(PostEntity postEntity, UserEntity user, PostComment postComment) {
         user.getPostCommentList().add(postComment);
         postEntity.getPostCommentList().add(postComment);
         userRepository.save(user);
@@ -47,9 +47,9 @@ public class PostApiCommentService {
 
 
     // 댓글 좋아요 (세 가지 경우)
-    public int likeCreateOrDelete(PostComment postComment, User user) {
-        List<User> likeUserList = postComment.getLikeUserList();
-        List<User> dislikeUserList = postComment.getDislikeUserList();
+    public int likeCreateOrDelete(PostComment postComment, UserEntity user) {
+        List<UserEntity> likeUserList = postComment.getLikeUserList();
+        List<UserEntity> dislikeUserList = postComment.getDislikeUserList();
         List<PostComment> likePostCommentList = user.getLikePostCommentList();
         List<PostComment> dislikePostCommentList = user.getDislikePostCommentList();
         int commentLikeStatus;
@@ -85,9 +85,9 @@ public class PostApiCommentService {
     }
 
     // 댓글 싫어요 (세 가지 경우)
-    public int dislikeCreateOrDelete(PostComment postComment, User user) {
-        List<User> likeUserList = postComment.getLikeUserList();
-        List<User> dislikeUserList = postComment.getDislikeUserList();
+    public int dislikeCreateOrDelete(PostComment postComment, UserEntity user) {
+        List<UserEntity> likeUserList = postComment.getLikeUserList();
+        List<UserEntity> dislikeUserList = postComment.getDislikeUserList();
         List<PostComment> likePostCommentList = user.getLikePostCommentList();
         List<PostComment> dislikePostCommentList = user.getDislikePostCommentList();
         int commentLikeStatus;
@@ -124,7 +124,7 @@ public class PostApiCommentService {
 
 
     // 해당 댓글을 해당 유저가 좋아요를 눌렀는지 여부
-    public boolean isLiked(PostComment postComment, User user) {
+    public boolean isLiked(PostComment postComment, UserEntity user) {
         if (user == null || postComment == null) {
             return false;
         }
@@ -133,7 +133,7 @@ public class PostApiCommentService {
     }
 
     // 해당 댓글을 해당 유저가 싫어요를 눌렀는지 여부
-    public boolean isDisliked(PostComment postComment, User user) {
+    public boolean isDisliked(PostComment postComment, UserEntity user) {
         if (user == null || postComment == null) {
             return false;
         }
@@ -142,7 +142,7 @@ public class PostApiCommentService {
     }
 
     // 해당 댓글의 작성자인지 여부
-    public boolean isCommentMine(PostComment postComment, User user) {
+    public boolean isCommentMine(PostComment postComment, UserEntity user) {
         if (user == null || postComment == null) {
             return false;
         }
@@ -150,7 +150,7 @@ public class PostApiCommentService {
     }
 
     // 해당 글을 유저가 좋아요를 눌렀는지의 여부
-    public boolean isLiked(PostEntity postEntity, User user) {
+    public boolean isLiked(PostEntity postEntity, UserEntity user) {
         if (user == null || postEntity == null) {
             return false;
         }
@@ -159,7 +159,7 @@ public class PostApiCommentService {
     }
 
     // 해당 글을 해당 유저가 싫어요를 눌렀는지의 여부
-    public boolean isScraped(PostEntity postEntity, User user) {
+    public boolean isScraped(PostEntity postEntity, UserEntity user) {
         if (user == null || postEntity == null) {
             return false;
         }
@@ -168,7 +168,7 @@ public class PostApiCommentService {
     }
 
     // 해당 글의 작성자인지 여부
-    public boolean isPostMine(PostEntity postEntity, User user) {
+    public boolean isPostMine(PostEntity postEntity, UserEntity user) {
         if (user == null || postEntity == null) {
             return false;
         }
@@ -176,7 +176,7 @@ public class PostApiCommentService {
     }
 
     // flags들 추가하여  PostComment DTO 생성
-    public PostCommentDTO createPostCommentDTOWithFlags(PostComment postComment, User user) {
+    public PostCommentDTO createPostCommentDTOWithFlags(PostComment postComment, UserEntity user) {
         PostCommentDTO postCommentDTO = PostCommentDTO.convertPostCommentToPostCommentDTO(postComment);
         if (user != null) {
             // 각 댓글에 대해 좋아요, 싫어요, 나의 댓글인지 여부 계산
@@ -202,7 +202,7 @@ public class PostApiCommentService {
     }
 
 
-    public PostDTO createPostDTOWithFlags(PostEntity postEntity, User user) {
+    public PostDTO createPostDTOWithFlags(PostEntity postEntity, UserEntity user) {
         // PostDTO 생성 및 post의 flag 설정
         PostDTO postDTO = PostDTO.convertPostToPostDTO(postEntity);
         if (user != null) {
@@ -218,7 +218,7 @@ public class PostApiCommentService {
         return postDTO;
     }
 
-    public List<PostCommentDTO> getPostCommentDTOs(PostEntity postEntity, User user) {
+    public List<PostCommentDTO> getPostCommentDTOs(PostEntity postEntity, UserEntity user) {
         // 각 댓글에 대한 flag 설정
         List<PostCommentDTO> commentDTOList = postEntity.getPostCommentList().stream()
                 .filter(comment -> comment.getParentComment() == null) // 부모 댓글만 처리
@@ -241,7 +241,7 @@ public class PostApiCommentService {
 
     // 댓글 생성
     public PostComment createComment(String content, String postId, Integer userId) {
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(Integer.valueOf(postId));
         PostComment postComment = new PostComment(content, PostStatus.ACTIVE.name(), LocalDateTime.now(), postEntity, user);
         return postCommentApiRepository.save(postComment);
@@ -255,7 +255,7 @@ public class PostApiCommentService {
         postCommentApiRepository.save(parentComment);
     }
 
-    public int toggleCommentLikeOrDislike(String action, PostComment postComment, User user) {
+    public int toggleCommentLikeOrDislike(String action, PostComment postComment, UserEntity user) {
         int commentLikeStatus;
         if ("likes".equals(action)) {
             commentLikeStatus = likeCreateOrDelete(postComment, user);
