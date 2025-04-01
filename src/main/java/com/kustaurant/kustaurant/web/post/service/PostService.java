@@ -28,8 +28,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostScrapRepository postScrapRepository;
-    private final PostLikesJpaRepository postLikesJpaRepository;
-    private final PostDislikesJpaRepository postDislikesJpaRepository;
+    private final PostLikeJpaRepository postLikeJpaRepository;
+    private final PostDislikeJpaRepository postDislikeJpaRepository;
 
     // 인기순 제한 기준 숫자
     public static  final int POPULARCOUNT = 3;
@@ -141,13 +141,13 @@ public class PostService {
     @Transactional
     public Map<String, Object> likeCreateOrDelete(PostEntity postEntity, User user) {
         Map<String, Object> status = new HashMap<>();
-        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByUserAndPostEntity(user, postEntity);
-        Optional<PostDislikesEntity> dislikeOptional = postDislikesJpaRepository.findByUserAndPostEntity(user, postEntity);
+        Optional<PostLikeEntity> likeOptional = postLikeJpaRepository.findByUserAndPostEntity(user, postEntity);
+        Optional<PostDislikeEntity> dislikeOptional = postDislikeJpaRepository.findByUserAndPostEntity(user, postEntity);
         //해당 post 를 이미 like 한 경우 - 제거
         if (likeOptional.isPresent()) {
-            PostLikesEntity postLikesEntity = likeOptional.get();
+            PostLikeEntity postLikeEntity = likeOptional.get();
 
-            postLikesJpaRepository.delete(postLikesEntity);
+            postLikeJpaRepository.delete(postLikeEntity);
             postEntity.getPostLikesList().remove(likeOptional.get());
             user.getPostLikesList().remove(likeOptional.get());
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
@@ -156,26 +156,26 @@ public class PostService {
         }
         //해당 post를 이미 dislike 한 경우 - 제거하고 추가
         else if (dislikeOptional.isPresent()) {
-            PostDislikesEntity postDislikesEntity = dislikeOptional.get();
+            PostDislikeEntity postDislikeEntity = dislikeOptional.get();
 
-            postDislikesJpaRepository.delete(postDislikesEntity);
-            postEntity.getPostDislikesList().remove(postDislikesEntity);
-            user.getPostDislikesList().remove(postDislikesEntity);
+            postDislikeJpaRepository.delete(postDislikeEntity);
+            postEntity.getPostDislikesList().remove(postDislikeEntity);
+            user.getPostDislikesList().remove(postDislikeEntity);
 
-            PostLikesEntity postLikesEntity = new PostLikesEntity(user, postEntity);
-            postLikesJpaRepository.save(postLikesEntity);
-            postEntity.getPostLikesList().add(postLikesEntity);
-            user.getPostLikesList().add(postLikesEntity);
+            PostLikeEntity postLikeEntity = new PostLikeEntity(user, postEntity);
+            postLikeJpaRepository.save(postLikeEntity);
+            postEntity.getPostLikesList().add(postLikeEntity);
+            user.getPostLikesList().add(postLikeEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() + 2);
 
             status.put(ReactionStatus.DISLIKE_TO_LIKE.name(), true);
         }
         // 처음 like 하는 경우-추가
         else {
-            PostLikesEntity postLikesEntity = new PostLikesEntity(user, postEntity);
-            postLikesJpaRepository.save(postLikesEntity);
-            postEntity.getPostLikesList().add(postLikesEntity);
-            user.getPostLikesList().add(postLikesEntity);
+            PostLikeEntity postLikeEntity = new PostLikeEntity(user, postEntity);
+            postLikeJpaRepository.save(postLikeEntity);
+            postEntity.getPostLikesList().add(postLikeEntity);
+            user.getPostLikesList().add(postLikeEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
 
             status.put(ReactionStatus.LIKE_CREATED.name(), true);
@@ -187,12 +187,12 @@ public class PostService {
     @Transactional
     public Map<String, Object> dislikeCreateOrDelete(PostEntity postEntity, User user) {
         Map<String, Object> status = new HashMap<>();
-        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByUserAndPostEntity(user, postEntity);
-        Optional<PostDislikesEntity> dislikeOptional = postDislikesJpaRepository.findByUserAndPostEntity(user, postEntity);
+        Optional<PostLikeEntity> likeOptional = postLikeJpaRepository.findByUserAndPostEntity(user, postEntity);
+        Optional<PostDislikeEntity> dislikeOptional = postDislikeJpaRepository.findByUserAndPostEntity(user, postEntity);
 
         //해당 post를 이미 dislike 한 경우 - 제거
         if (dislikeOptional.isPresent()) {
-            postDislikesJpaRepository.delete(dislikeOptional.get());
+            postDislikeJpaRepository.delete(dislikeOptional.get());
             postEntity.getPostDislikesList().remove(dislikeOptional.get());
             user.getPostDislikesList().remove(dislikeOptional.get());
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
@@ -201,23 +201,23 @@ public class PostService {
         }
         //해당 post 를 이미 like 한 경우 - 제거 후 추가
         else if (likeOptional.isPresent()) {
-            PostLikesEntity postLikesEntity = likeOptional.get();
-            postLikesJpaRepository.delete(postLikesEntity);
-            postEntity.getPostLikesList().remove(postLikesEntity);
-            user.getPostLikesList().remove(postLikesEntity);
+            PostLikeEntity postLikeEntity = likeOptional.get();
+            postLikeJpaRepository.delete(postLikeEntity);
+            postEntity.getPostLikesList().remove(postLikeEntity);
+            user.getPostLikesList().remove(postLikeEntity);
 
-            PostDislikesEntity postDislikesEntity = new PostDislikesEntity(user, postEntity,LocalDateTime.now());
-            postDislikesJpaRepository.save(postDislikesEntity);
-            postEntity.getPostDislikesList().add(postDislikesEntity);
-            user.getPostDislikesList().add(postDislikesEntity);
+            PostDislikeEntity postDislikeEntity = new PostDislikeEntity(user, postEntity,LocalDateTime.now());
+            postDislikeJpaRepository.save(postDislikeEntity);
+            postEntity.getPostDislikesList().add(postDislikeEntity);
+            user.getPostDislikesList().add(postDislikeEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() - 2);
 
             status.put(ReactionStatus.LIKE_TO_DISLIKE.name(), true);
         }
         // 처음 dislike 하는 경우-추가
         else {
-            PostDislikesEntity dislikesEntity = new PostDislikesEntity(user, postEntity,LocalDateTime.now());
-            postDislikesJpaRepository.save(dislikesEntity);
+            PostDislikeEntity dislikesEntity = new PostDislikeEntity(user, postEntity,LocalDateTime.now());
+            postDislikeJpaRepository.save(dislikesEntity);
             postEntity.getPostDislikesList().add(dislikesEntity);
             user.getPostDislikesList().add(dislikesEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
@@ -231,8 +231,8 @@ public class PostService {
         if (user == null){
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED,DislikeStatus.NOT_DISLIKED,ScrapStatus.NOT_SCRAPPED);
         }
-        boolean isLiked = postLikesJpaRepository.existsByUserAndPostEntity(user, postEntity);
-        boolean isDisliked = postDislikesJpaRepository.existsByUserAndPostEntity(user,postEntity);
+        boolean isLiked = postLikeJpaRepository.existsByUserAndPostEntity(user, postEntity);
+        boolean isDisliked = postDislikeJpaRepository.existsByUserAndPostEntity(user,postEntity);
         boolean isScrapped = postScrapRepository.existsByPostEntityAndUser(postEntity, user);
 
         return new InteractionStatusResponse(

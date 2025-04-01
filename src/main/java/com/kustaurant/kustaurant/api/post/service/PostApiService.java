@@ -34,8 +34,8 @@ public class PostApiService {
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostCommentApiRepository postCommentApiRepository;
     private final PostPhotoApiRepository postPhotoApiRepository;
-    private final PostLikesJpaRepository postLikesJpaRepository;
-    private final PostDislikesJpaRepository postDislikesJpaRepository;
+    private final PostLikeJpaRepository postLikeJpaRepository;
+    private final PostDislikeJpaRepository postDislikeJpaRepository;
     // 인기순 제한 기준 숫자
     public static final int POPULARCOUNT = 3;
     // 페이지 숫자
@@ -101,12 +101,12 @@ public class PostApiService {
     }
     @Transactional
     public LikeToggleStatus toggleLikeStatus(PostEntity postEntity, User user) {
-        Optional<PostLikesEntity> likeOptional = postLikesJpaRepository.findByUserAndPostEntity(user, postEntity);
+        Optional<PostLikeEntity> likeOptional = postLikeJpaRepository.findByUserAndPostEntity(user, postEntity);
 
         //해당 post 를 이미 like 한 경우 - 제거
         if (likeOptional.isPresent()) {
-            PostLikesEntity like = likeOptional.get();
-            postLikesJpaRepository.delete(like);
+            PostLikeEntity like = likeOptional.get();
+            postLikeJpaRepository.delete(like);
             postEntity.getPostLikesList().remove(like);
             user.getPostLikesList().remove(like);
             postEntity.setLikeCount(postEntity.getLikeCount() - 1);
@@ -114,10 +114,10 @@ public class PostApiService {
         }
         // 처음 like 하는 경우 - 추가
         else {
-            PostLikesEntity postLikesEntity = new PostLikesEntity(user, postEntity);
-            postLikesJpaRepository.save(postLikesEntity);
-            postEntity.getPostLikesList().add(postLikesEntity);
-            user.getPostLikesList().add(postLikesEntity);
+            PostLikeEntity postLikeEntity = new PostLikeEntity(user, postEntity);
+            postLikeJpaRepository.save(postLikeEntity);
+            postEntity.getPostLikesList().add(postLikeEntity);
+            user.getPostLikesList().add(postLikeEntity);
             postEntity.setLikeCount(postEntity.getLikeCount() + 1);
             return LikeToggleStatus.CREATED; // likeDeleted
         }

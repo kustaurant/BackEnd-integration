@@ -10,17 +10,17 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name="post_dislikes_tbl_new")
-public class PostDislikesEntity {
+public class PostDislikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer postDislikesId;
 
-    public PostDislikesEntity(User user, PostEntity postEntity, LocalDateTime createdAt) {
+    public PostDislikeEntity(User user, PostEntity postEntity, LocalDateTime createdAt) {
         this.user = user;
         this.postEntity = postEntity;
         this.createdAt = createdAt;
     }
-    public PostDislikesEntity() {
+    public PostDislikeEntity() {
 
     }
     @ManyToOne

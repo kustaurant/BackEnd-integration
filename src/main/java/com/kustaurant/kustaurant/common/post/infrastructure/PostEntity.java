@@ -49,10 +49,10 @@ public class PostEntity {
     private List<PostPhoto> postPhotoList = new ArrayList<>();
 
     @OneToMany(mappedBy = "postEntity")
-    private List<PostLikesEntity> postLikesList = new ArrayList<>();
+    private List<PostLikeEntity> postLikesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "postEntity")
-    private List<PostDislikesEntity> postDislikesList = new ArrayList<>();
+    private List<PostDislikeEntity> postDislikesList = new ArrayList<>();
 
     public PostEntity(String postTitle, String postBody, String postCategory, String status, LocalDateTime createdAt, User user) {
         this.postTitle = postTitle;

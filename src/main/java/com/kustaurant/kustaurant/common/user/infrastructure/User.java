@@ -126,10 +126,10 @@ public class User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<PostLikesEntity> postLikesList = new ArrayList<>();
+    private List<PostLikeEntity> postLikesList = new ArrayList<>();
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<PostDislikesEntity> postDislikesList = new ArrayList<>();
+    private List<PostDislikeEntity> postDislikesList = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
