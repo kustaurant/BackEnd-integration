@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class PostCommentDislikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer dislikeId;
+    Integer commentDislikeId;
 
     public PostCommentDislikeEntity(UserEntity user, PostComment postComment) {
         this.user = user;

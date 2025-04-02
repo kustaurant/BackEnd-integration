@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class PostCommentLikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer likeId;
+    Integer commentLikeId;
 
     public PostCommentLikeEntity(UserEntity user, PostComment postComment) {
         this.user = user;
