@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.comment;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ public class PostCommentLikeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer likeId;
 
-    public PostCommentLikeEntity(User user, PostComment postComment) {
+    public PostCommentLikeEntity(UserEntity user, PostComment postComment) {
         this.user = user;
         this.postComment = postComment;
         this.createdAt = LocalDateTime.now();
@@ -26,7 +26,7 @@ public class PostCommentLikeEntity {
     }
     @ManyToOne
     @JoinColumn(name = "user_id")
-    User user;
+    UserEntity user;
 
     @ManyToOne
     @JoinColumn(name="comment_id")

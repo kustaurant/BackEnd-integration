@@ -3,8 +3,8 @@ package com.kustaurant.kustaurant.web.restaurant;
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantService;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +36,7 @@ public class RestaurantWebController {
     ) {
         model.addAttribute("initialDisplayMenuCount", initialDisplayMenuCount);
         // 유저
-        User user = principal == null ? null : customOAuth2UserService.getUser(principal.getName());
+        UserEntity user = principal == null ? null : customOAuth2UserService.getUser(principal.getName());
         // 식당 정보
         RestaurantDetailWebDto restaurantDetailWebDto = restaurantWebService.getRestaurantWebDetails(user, restaurantId);
         model.addAttribute("restaurantDto", restaurantDetailWebDto);
@@ -58,7 +58,7 @@ public class RestaurantWebController {
             @PathVariable Integer restaurantId,
             Principal principal
     ) {
-        User user = customOAuth2UserService.getUser(principal.getName());
+        UserEntity user = customOAuth2UserService.getUser(principal.getName());
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         return ResponseEntity.ok(restaurantFavoriteService.toggleFavorite(user, restaurant));
     }

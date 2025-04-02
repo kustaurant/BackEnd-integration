@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.comment;
 
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,12 +32,12 @@ public class PostComment {
     // 웹 버전을 위한 totallikeCount 를 말함. 모바일에선 사용하지 않음
     Integer likeCount=0;
 
-    public PostComment(String commentBody, String status, LocalDateTime createdAt, PostEntity postEntity, User user) {
+    public PostComment(String commentBody, String status, LocalDateTime createdAt, PostEntity postEntity, UserEntity UserEntity) {
         this.commentBody = commentBody;
         this.status = status;
         this.createdAt = createdAt;
         this.postEntity = postEntity;
-        this.user = user;
+        this.user = UserEntity;
     }
 
     @ManyToOne
@@ -45,7 +45,7 @@ public class PostComment {
     PostEntity postEntity;
     @ManyToOne
     @JoinColumn(name="user_id")
-    User user;
+    UserEntity user;
 
     public PostComment() {
 

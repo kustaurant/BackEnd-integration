@@ -1,12 +1,12 @@
 package com.kustaurant.kustaurant.global.apiUser.core;
 
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.apiUser.JwtUtil;
 import com.kustaurant.kustaurant.global.apiUser.TokenResponse;
 import com.kustaurant.kustaurant.global.apiUser.apple.AppleLoginRequest;
 import com.kustaurant.kustaurant.global.apiUser.naver.NaverLoginRequest;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,12 +32,12 @@ public class UserApiLoginController {
     @PostMapping("/naver-login")
     public ResponseEntity<TokenResponse> loginWithNaver(@RequestBody NaverLoginRequest request) {
 
-        User user = userApiLoginService.processNaverLogin(
+        UserEntity UserEntity = userApiLoginService.processNaverLogin(
                 request.getProvider(),
                 request.getProviderId(),
                 request.getNaverAccessToken()
         );
-        TokenResponse tokenResponse = new TokenResponse(user.getAccessToken());
+        TokenResponse tokenResponse = new TokenResponse(UserEntity.getAccessToken());
 
         return ResponseEntity.ok(tokenResponse);
     }
@@ -50,12 +50,12 @@ public class UserApiLoginController {
     @PostMapping("/apple-login")
     public ResponseEntity<TokenResponse> loginWithApple(@RequestBody AppleLoginRequest request) {
 
-        User user = userApiLoginService.processAppleLogin(
+        UserEntity UserEntity = userApiLoginService.processAppleLogin(
                 request.getProvider(),
                 request.getIdentityToken(),
                 request.getAuthorizationCode()
         );
-        TokenResponse tokenResponse = new TokenResponse(user.getAccessToken());
+        TokenResponse tokenResponse = new TokenResponse(UserEntity.getAccessToken());
 
         return ResponseEntity.ok(tokenResponse);
     }

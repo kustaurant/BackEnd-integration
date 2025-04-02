@@ -1,0 +1,58 @@
+package com.kustaurant.kustaurant.common.user.infrastructure;
+
+import com.kustaurant.kustaurant.common.user.domain.User;
+import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Repository
+@RequiredArgsConstructor
+public class UserRepositoryImpl implements UserRepository {
+    private final UserJpaRepository userJpaRepository;
+
+    @Override
+    public User getById(Integer id) {
+        return findById(id).orElseThrow(()->new RuntimeException("유저 없음"));
+    }
+
+    @Override
+    public Optional<User> findByProviderId(String providerId) {
+        return userJpaRepository.findByProviderId(providerId).map(UserEntity::toModel);
+    }
+
+    @Override
+    public Optional<User> findByNickname(String nickname) {
+        return userJpaRepository.findByUserNickname_Value(nickname).map(UserEntity::toModel);
+    }
+
+    @Override
+    public Optional<User> findById(Integer id) {
+        return userJpaRepository.findByUserId(id).map(UserEntity::toModel);
+    }
+
+    @Override
+    public User save(User user) {
+        return userJpaRepository.save(UserEntity.from(user)).toModel();
+    }
+
+    @Override
+    public List<User> findUsersWithEvaluationCountDescending() {
+        return userJpaRepository.findUsersWithEvaluationCountDescending()
+                .stream()
+                .map(UserEntity::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<User> findUsersByEvaluationCountForQuarter(int year, int quarter) {
+        return userJpaRepository.findUsersByEvaluationCountForQuarter(year, quarter)
+                .stream()
+                .map(UserEntity::toModel)
+                .collect(Collectors.toList());
+    }
+
+}

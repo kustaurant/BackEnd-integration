@@ -7,10 +7,10 @@ import com.kustaurant.kustaurant.common.post.enums.LikeStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.common.post.enums.ScrapStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -28,14 +28,14 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PostCommentService {
     private final PostCommentRepository postCommentRepository;
-    private final UserRepository userRepository;
+    private final OUserRepository userRepository;
     private final PostRepository postRepository;
     private final PostService postService;
     private final PostCommentLikeJpaRepository postCommentLikeJpaRepository;
     private final PostCommentDislikeJpaRepository postCommentDislikeJpaRepository;
 
     // 댓글 생성
-    public void create(PostEntity postEntity, User user, PostComment postComment) {
+    public void create(PostEntity postEntity, UserEntity user, PostComment postComment) {
         user.getPostCommentList().add(postComment);
         postEntity.getPostCommentList().add(postComment);
         userRepository.save(user);
@@ -43,7 +43,7 @@ public class PostCommentService {
     }
 
     // 대댓글 생성
-    public void replyCreate(User user, PostComment postComment) {
+    public void replyCreate(UserEntity user, PostComment postComment) {
         user.getPostCommentList().add(postComment);
         userRepository.save(user);
     }
@@ -60,7 +60,7 @@ public class PostCommentService {
 
     // 댓글 좋아요 토글 버튼
     @Transactional
-    public Map<String, Object> toggleCommentLike(PostComment postComment, User user) {
+    public Map<String, Object> toggleCommentLike(PostComment postComment, UserEntity user) {
         Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByUserAndPostComment(user, postComment);
         Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByUserAndPostComment(user, postComment);
         Map<String, Object> status = new HashMap<>();
@@ -94,7 +94,7 @@ public class PostCommentService {
 
     // 댓글 싫어요 버튼 토글
     @Transactional
-    public Map<String, Object> toggleCommentDislike(PostComment postComment, User user) {
+    public Map<String, Object> toggleCommentDislike(PostComment postComment, UserEntity user) {
 
         Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByUserAndPostComment(user, postComment);
         Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByUserAndPostComment(user, postComment);
@@ -127,27 +127,27 @@ public class PostCommentService {
         return status;
     }
 
-    private void addCommentLike(User user, PostComment postComment) {
+    private void addCommentLike(UserEntity user, PostComment postComment) {
         PostCommentLikeEntity postCommentLikeEntity = new PostCommentLikeEntity(user, postComment);
         postCommentLikeJpaRepository.save(postCommentLikeEntity);
         postComment.getPostCommentLikesEntities().add(postCommentLikeEntity);
         user.getPostCommentLikesEntities().add(postCommentLikeEntity);
     }
 
-    private void addCommentDislike(User user, PostComment comment) {
+    private void addCommentDislike(UserEntity user, PostComment comment) {
         PostCommentDislikeEntity dislike = new PostCommentDislikeEntity(user, comment);
         user.getPostCommentDislikesEntities().add(dislike);
         comment.getPostCommentDislikesEntities().add(dislike);
         postCommentDislikeJpaRepository.save(dislike);
     }
 
-    private void removeCommentLike(User user, PostComment comment, PostCommentLikeEntity like) {
+    private void removeCommentLike(UserEntity user, PostComment comment, PostCommentLikeEntity like) {
         user.getPostCommentLikesEntities().remove(like);
         comment.getPostCommentLikesEntities().remove(like);
         postCommentLikeJpaRepository.delete(like);
     }
 
-    private void removeCommentDislike(User user, PostComment postComment, PostCommentDislikeEntity postCommentDislikeEntity) {
+    private void removeCommentDislike(UserEntity user, PostComment postComment, PostCommentDislikeEntity postCommentDislikeEntity) {
         postCommentDislikeJpaRepository.delete(postCommentDislikeEntity);
         user.getPostCommentDislikesEntities().remove(postCommentDislikeEntity);
         postComment.getPostCommentDislikesEntities().remove(postCommentDislikeEntity);
@@ -181,7 +181,7 @@ public class PostCommentService {
         };
     }
 
-    public InteractionStatusResponse getUserInteractionStatus(PostComment postComment, User user) {
+    public InteractionStatusResponse getUserInteractionStatus(PostComment postComment, UserEntity user) {
         if (user == null) {
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
         }
@@ -190,7 +190,7 @@ public class PostCommentService {
         return new InteractionStatusResponse(isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED, isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
     }
 
-    public Map<Integer, InteractionStatusResponse> getCommentInteractionMap(List<PostComment> postCommentList, User user) {
+    public Map<Integer, InteractionStatusResponse> getCommentInteractionMap(List<PostComment> postCommentList, UserEntity user) {
         Map<Integer, InteractionStatusResponse> commentInteractionMap = new HashMap<>();
 
         for (PostComment comment : postCommentList) {

@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,11 +17,11 @@ public class UserDTO {
     @Schema(description="유저의 랭킹",example = "2")
 
     Integer Rank;
-    public static UserDTO convertUserToUserDTO(User user) {
+    public static UserDTO convertUserToUserDTO(UserEntity UserEntity) {
         UserDTO dto = new UserDTO();
-        dto.setUserNickname(user.getUserNickname());
-        dto.setRankImg(user.getRankImg());
-        dto.setEvaluationCount(user.getEvaluationList().size());;
+        dto.setUserNickname(UserEntity.getUserNickname().getValue());
+        dto.setRankImg(UserEntity.getRankImg());
+        dto.setEvaluationCount(UserEntity.getEvaluationList().size());;
 
         return dto;
     }

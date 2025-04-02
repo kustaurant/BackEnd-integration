@@ -4,9 +4,9 @@ import com.kustaurant.kustaurant.common.comment.PostComment;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.enums.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final OUserRepository userRepository;
     private final PostScrapRepository postScrapRepository;
     private final PostLikeJpaRepository postLikeJpaRepository;
     private final PostDislikeJpaRepository postDislikeJpaRepository;
@@ -94,7 +94,7 @@ public class PostService {
         }
     }
 
-    public void create(PostEntity postEntity, User user) {
+    public void create(PostEntity postEntity, UserEntity user) {
         postEntity.setUser(user);
         PostEntity savedpost = postRepository.save(postEntity);
         user.getPostList().add(savedpost);
@@ -139,7 +139,7 @@ public class PostService {
 
     // 게시글 좋아요
     @Transactional
-    public Map<String, Object> likeCreateOrDelete(PostEntity postEntity, User user) {
+    public Map<String, Object> likeCreateOrDelete(PostEntity postEntity, UserEntity user) {
         Map<String, Object> status = new HashMap<>();
         Optional<PostLikeEntity> likeOptional = postLikeJpaRepository.findByUserAndPostEntity(user, postEntity);
         Optional<PostDislikeEntity> dislikeOptional = postDislikeJpaRepository.findByUserAndPostEntity(user, postEntity);
@@ -185,7 +185,7 @@ public class PostService {
 
     // 게시글 싫어요
     @Transactional
-    public Map<String, Object> dislikeCreateOrDelete(PostEntity postEntity, User user) {
+    public Map<String, Object> dislikeCreateOrDelete(PostEntity postEntity, UserEntity user) {
         Map<String, Object> status = new HashMap<>();
         Optional<PostLikeEntity> likeOptional = postLikeJpaRepository.findByUserAndPostEntity(user, postEntity);
         Optional<PostDislikeEntity> dislikeOptional = postDislikeJpaRepository.findByUserAndPostEntity(user, postEntity);
@@ -227,7 +227,7 @@ public class PostService {
         return status;
     }
 
-    public InteractionStatusResponse getUserInteractionStatus(PostEntity postEntity, User user) {
+    public InteractionStatusResponse getUserInteractionStatus(PostEntity postEntity, UserEntity user) {
         if (user == null){
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED,DislikeStatus.NOT_DISLIKED,ScrapStatus.NOT_SCRAPPED);
         }
@@ -252,9 +252,9 @@ public class PostService {
                 query.distinct(true);  // 중복을 제거
 
                 //조인
-                Join<PostEntity, User> u1 = p.join("user", JoinType.LEFT);
+                Join<PostEntity, UserEntity> u1 = p.join("user", JoinType.LEFT);
                 Join<PostEntity, PostComment> c = p.join("postCommentList", JoinType.LEFT);
-                Join<PostComment, User> u2 = c.join("user", JoinType.LEFT);
+                Join<PostComment, UserEntity> u2 = c.join("user", JoinType.LEFT);
                 // 액티브 조건 추가
                 Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
                 Predicate categoryPredicate;

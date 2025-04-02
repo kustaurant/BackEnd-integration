@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.global.webUser;
 
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import groovy.util.logging.Slf4j;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    private final UserRepository userRepository;
+    private final OUserRepository OUserRepository;
     private final HttpSession httpSesseion;
 
     @Override
@@ -38,26 +38,26 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuthAttributes attributes = OAuthAttributes.
                 of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        User user = saveOrUpdate(attributes);
-        httpSesseion.setAttribute("user", new SessionUser(user));
+        UserEntity UserEntity = saveOrUpdate(attributes);
+        httpSesseion.setAttribute("user", new SessionUser(UserEntity));
 
         return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())),
+                Collections.singleton(new SimpleGrantedAuthority(UserEntity.getRoleKey())),
                 attributes.getAttributes(),
                 attributes.getNameAttributeKey()
         );
     }
 
-    private User saveOrUpdate(OAuthAttributes attributes) {
-        User user = userRepository.findByProviderId(attributes.getUserProviderId())
+    private UserEntity saveOrUpdate(OAuthAttributes attributes) {
+        UserEntity UserEntity = OUserRepository.findByProviderId(attributes.getUserProviderId())
                 .map(entity -> entity.updateUserEmail(attributes.getUserEmail()))
                 .orElse(attributes.webToEntity());
 
-        return userRepository.save(user);
+        return OUserRepository.save(UserEntity);
     }
 
-    public User getUser(String userTokenId) {
-        Optional<User> user = userRepository.findByProviderId(userTokenId);
+    public UserEntity getUser(String userTokenId) {
+        Optional<UserEntity> user = OUserRepository.findByProviderId(userTokenId);
         if (user.isPresent()) {
             return user.get();
         } else {
@@ -65,11 +65,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         }
     }
 
-    public User getUserByPrincipal(Principal principal) {
+    public UserEntity getUserByPrincipal(Principal principal) {
         if (principal == null) {
             return null;
         }
-        Optional<User> user = userRepository.findByProviderId(principal.getName());
+        Optional<UserEntity> user = OUserRepository.findByProviderId(principal.getName());
         return user.orElse(null);
     }
 }

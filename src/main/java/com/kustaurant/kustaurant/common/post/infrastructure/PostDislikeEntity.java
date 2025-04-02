@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +15,7 @@ public class PostDislikeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer postDislikesId;
 
-    public PostDislikeEntity(User user, PostEntity postEntity, LocalDateTime createdAt) {
+    public PostDislikeEntity(UserEntity user, PostEntity postEntity, LocalDateTime createdAt) {
         this.user = user;
         this.postEntity = postEntity;
         this.createdAt = createdAt;
@@ -25,7 +25,7 @@ public class PostDislikeEntity {
     }
     @ManyToOne
     @JoinColumn(name = "user_id")
-    User user;
+    UserEntity user;
 
     @ManyToOne
     @JoinColumn(name="post_id")
