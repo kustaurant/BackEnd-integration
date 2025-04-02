@@ -298,7 +298,7 @@ public class CommunityController {
             // 이미지 파일 처리
             if (imgUrl != null && !imgUrl.isEmpty()) {
                 PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-                postPhoto.setPostEntity(postEntity); // 게시글과 이미지 연관관계 설정
+                postPhoto.setPost(postEntity); // 게시글과 이미지 연관관계 설정
                 postEntity.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
                 postPhotoRepository.save(postPhoto); // 이미지 정보 저장
             }
@@ -343,7 +343,7 @@ public class CommunityController {
             String imgUrl = img.attr("src");
             if (!imgUrl.isEmpty()) {
                 PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-                postPhoto.setPostEntity(postEntity);
+                postPhoto.setPost(postEntity);
                 newPhotoList.add(postPhoto);
                 postPhotoRepository.save(postPhoto);
             }

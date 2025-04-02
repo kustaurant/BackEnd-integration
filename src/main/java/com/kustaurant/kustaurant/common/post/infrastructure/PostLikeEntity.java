@@ -16,9 +16,9 @@ public class PostLikeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer postLikesId;
 
-    public PostLikeEntity(UserEntity user, PostEntity postEntity) {
+    public PostLikeEntity(UserEntity user, PostEntity post) {
         this.user = user;
-        this.postEntity = postEntity;
+        this.post = post;
         this.createdAt = LocalDateTime.now();
     }
     public PostLikeEntity() {
@@ -30,7 +30,7 @@ public class PostLikeEntity {
 
     @ManyToOne
     @JoinColumn(name="post_id")
-    PostEntity postEntity;
+    PostEntity post;
 
     LocalDateTime createdAt;
 }

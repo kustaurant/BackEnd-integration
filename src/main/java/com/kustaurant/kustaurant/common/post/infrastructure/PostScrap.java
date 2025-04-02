@@ -16,9 +16,9 @@ public class PostScrap {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer scrapId;
 
-    public PostScrap(UserEntity UserEntity, PostEntity postEntity, LocalDateTime createdAt) {
+    public PostScrap(UserEntity UserEntity, PostEntity post, LocalDateTime createdAt) {
         this.user = UserEntity;
-        this.postEntity = postEntity;
+        this.post = post;
         this.createdAt = createdAt;
     }
     public PostScrap(){
@@ -31,7 +31,7 @@ public class PostScrap {
 
     @ManyToOne
     @JoinColumn(name="post_id")
-    PostEntity postEntity;
+    PostEntity post;
 
     LocalDateTime createdAt;
 

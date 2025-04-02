@@ -15,9 +15,9 @@ public class PostDislikeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer postDislikesId;
 
-    public PostDislikeEntity(UserEntity user, PostEntity postEntity, LocalDateTime createdAt) {
+    public PostDislikeEntity(UserEntity user, PostEntity post, LocalDateTime createdAt) {
         this.user = user;
-        this.postEntity = postEntity;
+        this.post = post;
         this.createdAt = createdAt;
     }
     public PostDislikeEntity() {
@@ -29,7 +29,7 @@ public class PostDislikeEntity {
 
     @ManyToOne
     @JoinColumn(name="post_id")
-    PostEntity postEntity;
+    PostEntity post;
 
     LocalDateTime createdAt;
 }

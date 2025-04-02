@@ -32,17 +32,17 @@ public class PostComment {
     // 웹 버전을 위한 totallikeCount 를 말함. 모바일에선 사용하지 않음
     Integer likeCount=0;
 
-    public PostComment(String commentBody, String status, LocalDateTime createdAt, PostEntity postEntity, UserEntity UserEntity) {
+    public PostComment(String commentBody, String status, LocalDateTime createdAt, PostEntity post, UserEntity UserEntity) {
         this.commentBody = commentBody;
         this.status = status;
         this.createdAt = createdAt;
-        this.postEntity = postEntity;
+        this.post = post;
         this.user = UserEntity;
     }
 
     @ManyToOne
     @JoinColumn(name="post_id")
-    PostEntity postEntity;
+    PostEntity post;
     @ManyToOne
     @JoinColumn(name="user_id")
     UserEntity user;
