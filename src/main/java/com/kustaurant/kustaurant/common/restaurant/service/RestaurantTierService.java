@@ -26,15 +26,6 @@ public class RestaurantTierService {
     private final RestaurantFavoriteService restaurantFavoriteService;
     private final EvaluationService evaluationService;
 
-    // TODO: 지워야됨.
-    public List<RestaurantEntity> findByConditionsTemp(
-            List<String> cuisineList, List<Integer> situationList, List<String> locationList,
-            Integer tierInfo, boolean isOrderByScore
-    ) {
-//        return restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisineList, locationList, situationList, "ACTIVE", tierInfo, isOrderByScore));
-        return new ArrayList<>();
-    }
-
     // Cuisine, Situation, Location 조건에 맞는 식당 리스트를 반환
     public List<RestaurantTierDTO> findByConditions(
             List<String> cuisineList, List<Integer> situationList, List<String> locationList,
