@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.common.mock.FakeRestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.common.user.infrastructure.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ class RestaurantFavoriteServiceTest {
     @Test
     void 즐겨찾기_추가() {
         // Given
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setUserId(1);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
@@ -41,7 +41,7 @@ class RestaurantFavoriteServiceTest {
     @Test
     void 즐겨찾기_삭제() {
         // Given
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setUserId(1);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
@@ -62,7 +62,7 @@ class RestaurantFavoriteServiceTest {
     @Test
     void 새로_즐겨찾기_추가하는_경우() {
         // Given
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setUserId(1);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
@@ -81,7 +81,7 @@ class RestaurantFavoriteServiceTest {
     @Test
     void 이전에_즐겨찾기가_되어_있었던_경우() {
         // Given
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setUserId(1);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)

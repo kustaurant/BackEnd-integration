@@ -265,8 +265,8 @@ public class MypageApiService {
     public List<NoticeDTO> getAllNotices() {
         return noticeRepo.findAll().stream()
                 .map(notice -> new NoticeDTO(
-                        notice.getNoticeTitle(),
-                        notice.getNoticeHref(),
+                        notice.getTitle(),
+                        notice.getHref(),
                         notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 ))
                 .collect(Collectors.toList());
