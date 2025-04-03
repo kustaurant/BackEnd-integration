@@ -267,46 +267,48 @@
         <tbody id="tierTableBody">
         <th:block th:each="restaurantTierData : ${paging}">
             <!-- 메인 데이터 행 -->
-            <tr th:class="${isJH != null and isJH ? 'tr-data-when-partnership tr-main' : 'tr-data tr-main'}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantTierData.restaurant.restaurantId})} + '\''">
-                <td class="td-rank" th:text="${restaurantTierData.ranking}" style="min-width: 32px"></td>
+            <tr th:class="${isJH != null and isJH ? 'tr-data-when-partnership tr-main' : 'tr-data tr-main'}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantTierData.restaurantId})} + '\''">
+                <td class="td-rank"
+                    th:text="${isJH != null and isJH} ? '-' : ${restaurantTierData.restaurantRanking}"
+                    style="min-width: 32px"></td>
                 <td class="td-center" style="min-width: 58px; position: relative;">
                     <div style="width: fit-content; height: fit-content; padding: 0; margin: auto; position: relative;">
                         <!-- 조건에 따른 아이콘 표시 -->
-                        <img class="favorite-icon restaurant-img-bottom-icon" th:if="${restaurantTierData.isEvaluation and restaurantTierData.isFavorite}" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/check.png">
-                        <img class="favorite-icon restaurant-img-top-icon" th:if="${restaurantTierData.isEvaluation and !restaurantTierData.isFavorite}" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/check.png">
+                        <img class="favorite-icon restaurant-img-bottom-icon" th:if="${restaurantTierData.isEvaluated and restaurantTierData.isFavorite}" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/check.png">
+                        <img class="favorite-icon restaurant-img-top-icon" th:if="${restaurantTierData.isEvaluated and !restaurantTierData.isFavorite}" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/check.png">
                         <img class="favorite-icon restaurant-img-top-icon" th:if="${restaurantTierData.isFavorite}" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/star.png">
                         <!-- 식당 이미지 표시 -->
-                        <img th:if="${restaurantTierData.restaurant.restaurantImgUrl != 'no_img'}" class="td-main-img" th:src="${restaurantTierData.restaurant.restaurantImgUrl}">
-                        <img th:if="${restaurantTierData.restaurant.restaurantImgUrl == 'no_img'}" class="td-main-img" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/no_img.png">
+                        <img th:if="${restaurantTierData.restaurantImgUrl != 'no_img'}" class="td-main-img" th:src="${restaurantTierData.restaurantImgUrl}">
+                        <img th:if="${restaurantTierData.restaurantImgUrl == 'no_img'}" class="td-main-img" src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/no_img.png">
                     </div>
                 </td>
                 <td class="td-name">
                     <div class="td-name-outer">
-                        <span class="td-inner-name" th:text="${restaurantTierData.restaurant.restaurantName}"></span>
-                        <span class="td-inner-type" th:text="${restaurantTierData.restaurant.restaurantType}"></span>
-                        <span class="td-inner-type" th:text="'위치: ' + ${restaurantTierData.restaurant.restaurantPosition}"></span>
+                        <span class="td-inner-name" th:text="${restaurantTierData.restaurantName}"></span>
+                        <span class="td-inner-type" th:text="${restaurantTierData.restaurantType}"></span>
+                        <span class="td-inner-type" th:text="'위치: ' + ${restaurantTierData.restaurantPosition}"></span>
                     </div>
                 </td>
                 <td th:if="${!isJH}" class="td-center" style="min-width: 42px">
-                    <img th:if="${restaurantTierData.restaurant.mainTier > 0}" class="td-tier-img" th:src="${restaurantTierData.restaurant.getTierImgUrl(restaurantTierData.restaurant.mainTier)}">
-                    <span th:if="${restaurantTierData.restaurant.mainTier < 1}" style="padding-right: 10px;">-</span>
+                    <img th:if="${restaurantTierData.mainTier > 0}" class="td-tier-img" th:src="${restaurantTierData.getTierImgUrl()}">
+                    <span th:if="${restaurantTierData.mainTier < 1}" style="padding-right: 10px;">-</span>
                 </td>
                 <td style="min-width: 46px">
                     <div class="td-cuisine-outer">
-                        <img class="td-cuisine-img" th:src="${restaurantTierData.restaurant.getCuisineImgUrl(restaurantTierData.restaurant.restaurantCuisine)}">
-                        <span class="td-cuisine-span" th:text="${restaurantTierData.restaurant.restaurantCuisine}"></span>
+                        <img class="td-cuisine-img" th:src="${restaurantTierData.getCuisineImgUrl()}">
+                        <span class="td-cuisine-span" th:text="${restaurantTierData.restaurantCuisine}"></span>
                     </div>
                 </td>
                 <td class="td-situation">
                     <div class="td-situations-outer">
-                        <img th:each="situationEl : ${restaurantTierData.restaurantSituationRelationList}" th:src="'https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/' + ${situationEl.situation.situationName} + '.png'">
+                        <img th:each="situation : ${restaurantTierData.situations}" th:src="'https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/' + ${situation} + '.png'">
                     </div>
                 </td>
             </tr>
             <!-- 추가 정보 행 -->
             <tr th:if="${isJH}" class="tr-partnership">
                 <td colspan="6">
-                    <p th:text="'제휴 정보 - ' + ${restaurantTierData.getRestaurant().getPartnershipInfo()}">제휴 정보</p>
+                    <p th:text="'제휴 정보 - ' + ${restaurantTierData.partnershipInfo}">제휴 정보</p>
                 </td>
             </tr>
         </th:block>

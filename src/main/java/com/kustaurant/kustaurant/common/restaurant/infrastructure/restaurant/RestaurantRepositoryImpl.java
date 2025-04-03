@@ -51,6 +51,18 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     }
 
     @Override
+    public List<Restaurant> findAll(Specification<RestaurantEntity> spec) {
+        return jpaRepository.findAll(spec)
+                .stream().map(RestaurantEntity::toDomain).toList();
+    }
+
+    @Override
+    public List<Restaurant> findAll(Specification<RestaurantEntity> spec, Pageable pageable) {
+        return jpaRepository.findAll(spec, pageable).toList()
+                .stream().map(RestaurantEntity::toDomain).toList();
+    }
+
+    @Override
     public List<RestaurantEntity> findAll() {
         return List.of();
     }
@@ -91,11 +103,6 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     }
 
     @Override
-    public Page<RestaurantEntity> findAll(Specification<RestaurantEntity> spec, Pageable pageable) {
-        return null;
-    }
-
-    @Override
     public List<RestaurantEntity> findByStatusAndMainTierNot(String status, Integer mainTier) {
         return List.of();
     }
@@ -112,11 +119,6 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
 
     @Override
     public List<RestaurantEntity> findByRestaurantCuisineAndStatusAndRestaurantPositionAndMainTierNot(String cuisine, String status, String location, Integer mainTier) {
-        return List.of();
-    }
-
-    @Override
-    public List<RestaurantEntity> findAll(Specification<RestaurantEntity> spec) {
         return List.of();
     }
 

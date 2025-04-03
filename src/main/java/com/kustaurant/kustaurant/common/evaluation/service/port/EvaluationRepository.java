@@ -13,6 +13,8 @@ public interface EvaluationRepository {
 
     List<EvaluationEntity> findByRestaurantIdAndStatus(Integer restaurantId, String status);
 
+    Integer countAllByStatus(String status);
+
 
     // TODO: need to delete everything below this
 
@@ -21,8 +23,6 @@ public interface EvaluationRepository {
     Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(UserEntity UserEntity, RestaurantEntity restaurant, String status);
 
     Integer countByRestaurant(RestaurantEntity restaurant);
-
-    Integer countAllByStatus(String status);
 
     Optional<EvaluationEntity> findByEvaluationIdAndStatus(Integer evaluationId, String status);
 

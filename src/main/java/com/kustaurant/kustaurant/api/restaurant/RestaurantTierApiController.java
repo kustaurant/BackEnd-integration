@@ -83,34 +83,12 @@ public class RestaurantTierApiController {
             @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        UserEntity user = userService.findUserById(userId);
         // page 0부터 시작하게 수정
         page--;
-        // DB 조회
-        List<RestaurantEntity> restaurants = restaurantTierService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit).toList();
+        // 조회
+        List<RestaurantTierDTO> restaurants = restaurantTierService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, userId);
 
-        if (restaurants.isEmpty()) {
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-        }
-        // 순위 표시하기
-        List<RestaurantTierDTO> responseList = new ArrayList<>();
-
-        for (int i = 0; i < limit; i++) {
-            try {
-                // 순위
-                Integer ranking = null;
-                RestaurantEntity restaurant = restaurants.get(i);
-                if (restaurant.getMainTier() > 0) {
-                    ranking = page * limit + i + 1;
-                }
-                responseList.add(RestaurantTierDTO.convertRestaurantToTierDTO(
-                        restaurant, ranking, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)));
-            } catch (IndexOutOfBoundsException ignored) {
-
-            }
-        }
-
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
     @Operation(summary = "티어표 리스트 불러오기 (Auth 버전)", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
@@ -144,34 +122,12 @@ public class RestaurantTierApiController {
             @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        UserEntity user = userService.findUserById(userId);
         // page 0부터 시작하게 수정
         page--;
         // DB 조회
-        List<RestaurantEntity> restaurants = restaurantTierService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit).toList();
+        List<RestaurantTierDTO> restaurants = restaurantTierService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, userId);
 
-        if (restaurants.isEmpty()) {
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-        }
-        // 순위 표시하기
-        List<RestaurantTierDTO> responseList = new ArrayList<>();
-
-        for (int i = 0; i < limit; i++) {
-            try {
-                // 순위
-                Integer ranking = null;
-                RestaurantEntity restaurant = restaurants.get(i);
-                if (restaurant.getMainTier() > 0) {
-                    ranking = page * limit + i + 1;
-                }
-                responseList.add(RestaurantTierDTO.convertRestaurantToTierDTO(
-                        restaurant, ranking, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)));
-            } catch (IndexOutOfBoundsException ignored) {
-
-            }
-        }
-
-        return new ResponseEntity<>(responseList, HttpStatus.OK);
+        return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
 
@@ -219,70 +175,10 @@ public class RestaurantTierApiController {
             @LocationList List<String> locations,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        UserEntity user = userService.findUserById(userId);
-
-        // 1. 음식 종류랑 위치로 식당 리스트 가져오기
-        List<RestaurantEntity> tieredRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, 1, false);
-        List<RestaurantEntity> nonTieredRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, -1, false);
-
-        // 2. 상황으로 필터링하기
-        List<RestaurantTierDTO> tieredRestaurantTierDTOs = tieredRestaurants.stream().map(restaurant ->
-                RestaurantTierDTO.convertRestaurantToTierDTO(
-                        restaurant, null, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)))
-                .toList();
-        List<RestaurantTierDTO> nonTieredRestaurantTierDTOs = nonTieredRestaurants.stream().map(restaurant ->
-                        RestaurantTierDTO.convertRestaurantToTierDTO(
-                                restaurant, null, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)))
-                .toList();
-
-        // 3. 응답 생성하기
-        RestaurantTierMapDTO response = new RestaurantTierMapDTO();
-        // 3.1 즐겨찾기 리스트
-        response.setFavoriteRestaurants(restaurantFavoriteService.getFavoriteRestaurantDtoList(userId));
-        // 3.2 티어가 있는 식당 리스트
-        response.setTieredRestaurants(tieredRestaurantTierDTOs);
-        // 3.3 티어가 없는 식당 리스트
-        List<RestaurantTierDTO> nonTier16 = IntStream.range(0, nonTieredRestaurantTierDTOs.size())
-                .filter(i ->  i % 4 == 0)
-                .mapToObj(nonTieredRestaurantTierDTOs::get)
-                .toList();
-        List<RestaurantTierDTO> nonTier17 = IntStream.range(0, nonTieredRestaurantTierDTOs.size())
-                .filter(i ->  i % 4 == 1)
-                .mapToObj(nonTieredRestaurantTierDTOs::get)
-                .toList();
-        List<RestaurantTierDTO> nonTier18 = IntStream.range(0, nonTieredRestaurantTierDTOs.size())
-                .filter(i ->  i % 4 == 2)
-                .mapToObj(nonTieredRestaurantTierDTOs::get)
-                .toList();
-        List<RestaurantTierDTO> nonTier19 = IntStream.range(0, nonTieredRestaurantTierDTOs.size())
-                .filter(i ->  i % 4 == 3)
-                .mapToObj(nonTieredRestaurantTierDTOs::get)
-                .toList();
-        response.insertZoomAndRestaurants(16, nonTier16);
-        response.insertZoomAndRestaurants(17, nonTier17);
-        response.insertZoomAndRestaurants(18, nonTier18);
-        response.insertZoomAndRestaurants(19, nonTier19);
-        // 3.4 폴리곤 좌표 리스트의 리스트
-        if (locations != null && !locations.contains(("ALL"))) {
-            try {
-                for (int i = 0; i < MapConstants.LIST_OF_COORD_LIST.size(); i++) {
-                    LocationEnum locationEnum = LocationEnum.valueOf("L" + (i + 1));
-                    if (locations.contains(locationEnum.getValue())) {
-                        response.getSolidPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
-                    } else {
-                        response.getDashedPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
-                    }
-                }
-            } catch (NumberFormatException e) {
-                throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
-            }
-        } else {
-            response.setSolidPolygonCoordsList(MapConstants.LIST_OF_COORD_LIST);
-        }
-        // 3.5 지도에 보여야 하는 좌표 범위
-        response.setVisibleBounds(MapConstants.findMinMaxCoordinates(response.getSolidPolygonCoordsList()));
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(
+                restaurantTierService.getRestaurantTierMapDto(cuisines, situations, locations, userId),
+                HttpStatus.OK
+        );
     }
 
     @Operation(summary = "지도 식당 정보 불러오기 (Auth 버전)", description = "[설명]" +
@@ -328,69 +224,9 @@ public class RestaurantTierApiController {
             @LocationList List<String> locations,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        UserEntity user = userService.findUserById(userId);
-
-        // 1. 음식 종류랑 위치로 식당 리스트 가져오기
-        List<RestaurantEntity> tieredRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, 1, false);
-        List<RestaurantEntity> nonTieredRestaurants = restaurantTierService.findByConditions(cuisines, situations, locations, -1, false);
-
-        // 2. 상황으로 필터링하기
-        List<RestaurantTierDTO> tieredRestaurantTierDTOs = tieredRestaurants.stream().map(restaurant ->
-                        RestaurantTierDTO.convertRestaurantToTierDTO(
-                                restaurant, null, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)))
-                .toList();
-        List<RestaurantTierDTO> nonTieredRestaurantTierDTOs = nonTieredRestaurants.stream().map(restaurant ->
-                        RestaurantTierDTO.convertRestaurantToTierDTO(
-                                restaurant, null, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)))
-                .toList();
-
-        // 3. 응답 생성하기
-        RestaurantTierMapDTO response = new RestaurantTierMapDTO();
-        // 3.1 즐겨찾기 리스트
-        response.setFavoriteRestaurants(restaurantFavoriteService.getFavoriteRestaurantDtoList(userId));
-        // 3.2 티어가 있는 식당 리스트
-        response.setTieredRestaurants(tieredRestaurantTierDTOs);
-        // 3.3 티어가 없는 식당 리스트
-        List<RestaurantTierDTO> nonTier16 = IntStream.range(0, nonTieredRestaurantTierDTOs.size())
-                .filter(i ->  i % 4 == 0)
-                .mapToObj(nonTieredRestaurantTierDTOs::get)
-                .toList();
-        List<RestaurantTierDTO> nonTier17 = IntStream.range(0, nonTieredRestaurantTierDTOs.size())
-                .filter(i ->  i % 4 == 1)
-                .mapToObj(nonTieredRestaurantTierDTOs::get)
-                .toList();
-        List<RestaurantTierDTO> nonTier18 = IntStream.range(0, nonTieredRestaurantTierDTOs.size())
-                .filter(i ->  i % 4 == 2)
-                .mapToObj(nonTieredRestaurantTierDTOs::get)
-                .toList();
-        List<RestaurantTierDTO> nonTier19 = IntStream.range(0, nonTieredRestaurantTierDTOs.size())
-                .filter(i ->  i % 4 == 3)
-                .mapToObj(nonTieredRestaurantTierDTOs::get)
-                .toList();
-        response.insertZoomAndRestaurants(16, nonTier16);
-        response.insertZoomAndRestaurants(17, nonTier17);
-        response.insertZoomAndRestaurants(18, nonTier18);
-        response.insertZoomAndRestaurants(19, nonTier19);
-        // 3.4 폴리곤 좌표 리스트의 리스트
-        if (locations != null && !locations.contains(("ALL"))) {
-            try {
-                for (int i = 0; i < MapConstants.LIST_OF_COORD_LIST.size(); i++) {
-                    LocationEnum locationEnum = LocationEnum.valueOf("L" + (i + 1));
-                    if (locations.contains(locationEnum.getValue())) {
-                        response.getSolidPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
-                    } else {
-                        response.getDashedPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
-                    }
-                }
-            } catch (NumberFormatException e) {
-                throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
-            }
-        } else {
-            response.setSolidPolygonCoordsList(MapConstants.LIST_OF_COORD_LIST);
-        }
-        // 3.5 지도에 보여야 하는 좌표 범위
-        response.setVisibleBounds(MapConstants.findMinMaxCoordinates(response.getSolidPolygonCoordsList()));
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(
+                restaurantTierService.getRestaurantTierMapDto(cuisines, situations, locations, userId),
+                HttpStatus.OK
+        );
     }
 }

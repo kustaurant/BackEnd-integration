@@ -55,7 +55,8 @@ public class RestaurantWebService {
 
     public List<RestaurantEntity> searchRestaurants(String[] keyword) {
         Specification<RestaurantEntity> spec = createSearchSpecification(keyword);
-        return restaurantRepository.findAll(spec);
+//        return restaurantRepository.findAll(spec);
+        return new ArrayList<>();
     }
 
     private Specification<RestaurantEntity> createSearchSpecification(String[] kws) {
