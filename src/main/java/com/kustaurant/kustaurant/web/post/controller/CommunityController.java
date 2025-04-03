@@ -1,9 +1,12 @@
 package com.kustaurant.kustaurant.web.post.controller;
 
+import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
+import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.web.post.service.PostCommentService;
+import com.kustaurant.kustaurant.web.comment.PostCommentService;
 import com.kustaurant.kustaurant.web.post.service.PostScrapService;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import com.kustaurant.kustaurant.common.post.service.StorageService;
@@ -74,23 +77,26 @@ public class CommunityController {
     @GetMapping("/community/{postId}")
     public String post(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
         PostEntity postEntity = postService.getPost(postId);
-        // 조회수 증가
+        UserEntity user = principal == null ? null : customOAuth2UserService.getUser(principal.getName());
+        InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postEntity, user);
+
         postService.increaseVisitCount(postEntity);
+
         List<PostComment> postCommentList = postCommentService.getList(postId, sort);
+
+        Map<Integer, InteractionStatusResponse> commentInteractionMap = postCommentService.getCommentInteractionMap(postCommentList, user);
+
         model.addAttribute("postCommentList", postCommentList);
         model.addAttribute("post", postEntity);
-
-        boolean isPostScrappedByUser = false;
-        if (principal != null) {
-            UserEntity user = customOAuth2UserService.getUser(principal.getName());
-            model.addAttribute("user", user);
-            isPostScrappedByUser = postEntity.getPostScrapList().stream()
-                    .anyMatch(scrap -> scrap.getUser().equals(user));
-        }
+        model.addAttribute("user", user);
         model.addAttribute("sort", sort);
-        model.addAttribute("isPostScrappedByUser", isPostScrappedByUser);
+        model.addAttribute("postInteractionStatus", postInteractionStatus);
+        model.addAttribute("commentInteractionMap", commentInteractionMap);
+
         return "community_post";
     }
+
+
 
     // 게시물 삭제
     @GetMapping("/api/post/delete")
@@ -240,7 +246,7 @@ public class CommunityController {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postCommentService.getPostCommentByCommentId(commentIdInt);
         UserEntity user = customOAuth2UserService.getUser(principal.getName());
-        Map<String, Object> response = postCommentService.likeCreateOrDelete(postComment, user);
+        Map<String, Object> response = postCommentService.toggleCommentLike(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
     }
@@ -252,7 +258,7 @@ public class CommunityController {
         Integer commentIdInt = Integer.valueOf(commentId);
         PostComment postComment = postCommentService.getPostCommentByCommentId(commentIdInt);
         UserEntity user = customOAuth2UserService.getUser(principal.getName());
-        Map<String, Object> response = postCommentService.dislikeCreateOrDelete(postComment, user);
+        Map<String, Object> response = postCommentService.toggleCommentDislike(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
         return ResponseEntity.ok(response);
     }
@@ -292,7 +298,7 @@ public class CommunityController {
             // 이미지 파일 처리
             if (imgUrl != null && !imgUrl.isEmpty()) {
                 PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-                postPhoto.setPostEntity(postEntity); // 게시글과 이미지 연관관계 설정
+                postPhoto.setPost(postEntity); // 게시글과 이미지 연관관계 설정
                 postEntity.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
                 postPhotoRepository.save(postPhoto); // 이미지 정보 저장
             }
@@ -337,7 +343,7 @@ public class CommunityController {
             String imgUrl = img.attr("src");
             if (!imgUrl.isEmpty()) {
                 PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-                postPhoto.setPostEntity(postEntity);
+                postPhoto.setPost(postEntity);
                 newPhotoList.add(postPhoto);
                 postPhotoRepository.save(postPhoto);
             }

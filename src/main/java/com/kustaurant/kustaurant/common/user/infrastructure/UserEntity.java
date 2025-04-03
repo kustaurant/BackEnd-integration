@@ -2,6 +2,9 @@
 package com.kustaurant.kustaurant.common.user.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentDislikeEntity;
+import com.kustaurant.kustaurant.common.comment.PostCommentLikeEntity;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
@@ -130,17 +133,17 @@ public class UserEntity {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<PostLikesEntity> postLikesList = new ArrayList<>();
+    private List<PostLikeEntity> postLikesList = new ArrayList<>();
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    private List<PostDislikesEntity> postDislikesList = new ArrayList<>();
+    private List<PostDislikeEntity> postDislikesList = new ArrayList<>();
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "dislikeUserList")
-    private List<PostComment> dislikePostCommentList = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<PostCommentLikeEntity> postCommentLikesEntities = new ArrayList<>();
     @JsonIgnore
-    @ManyToMany(mappedBy = "likeUserList")
-    private List<PostComment> likePostCommentList = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<PostCommentDislikeEntity> postCommentDislikesEntities = new ArrayList<>();
 
     public String getRankImg() {
         return RestaurantConstants.getIconImgUrl(this, "");

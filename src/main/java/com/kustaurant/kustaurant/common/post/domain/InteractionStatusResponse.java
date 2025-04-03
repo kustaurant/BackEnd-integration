@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PostInteractionStatusResponse {
+public class InteractionStatusResponse {
     private LikeStatus liked;
     private DislikeStatus disliked;
     private ScrapStatus scrapped;

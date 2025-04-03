@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
+import com.kustaurant.kustaurant.common.comment.PostComment;
 import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
@@ -38,20 +39,20 @@ public class PostEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @OneToMany(mappedBy = "postEntity")
+    @OneToMany(mappedBy = "post")
     private List<PostComment> postCommentList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "postEntity")
+    @OneToMany(mappedBy = "post")
     private List<PostScrap> postScrapList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "postEntity")
+    @OneToMany(mappedBy = "post")
     private List<PostPhoto> postPhotoList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "postEntity")
-    private List<PostLikesEntity> postLikesList = new ArrayList<>();
+    @OneToMany(mappedBy = "post")
+    private List<PostLikeEntity> postLikesList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "postEntity")
-    private List<PostDislikesEntity> postDislikesList = new ArrayList<>();
+    @OneToMany(mappedBy = "post")
+    private List<PostDislikeEntity> postDislikesList = new ArrayList<>();
 
     public PostEntity(String postTitle, String postBody, String postCategory, String status, LocalDateTime createdAt, UserEntity user) {
         this.postTitle = postTitle;

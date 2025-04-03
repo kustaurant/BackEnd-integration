@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface PostScrapApiRepository extends JpaRepository<PostScrap, Integer> {
-    Optional<PostScrap> findByUserAndPostEntity(UserEntity UserEntity, PostEntity postEntity);
+    Optional<PostScrap> findByUserAndPost(UserEntity UserEntity, PostEntity post);
 }

@@ -21,7 +21,7 @@ public class PostScrapApiService {
     public int scrapCreateOrDelete(PostEntity postEntity, UserEntity UserEntity) {
         List<PostScrap> postScrapList = postEntity.getPostScrapList();
         List<PostScrap> userScrapList = UserEntity.getScrapList();
-        Optional<PostScrap> scrapOptional = postScrapApiRepository.findByUserAndPostEntity(UserEntity, postEntity);
+        Optional<PostScrap> scrapOptional = postScrapApiRepository.findByUserAndPost(UserEntity, postEntity);
         int status;
 
         if (scrapOptional.isPresent()) {

@@ -54,13 +54,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     const likeButtonImage = document.querySelector('#likeButton img');
                     const dislikeButtonImage = document.querySelector('#dislikeButton img');
                     // 버튼 누르기 전 상태에 따라 이미지 설정 다르게 해줌 (좋아요가 이미 눌러져있을때, 싫어요가 눌러져있을때, 둘다 없었을떄)
-                    if (data.likeDelete) {
+                    if (data.LIKE_DELETED) {
                         likeButtonImage.src = '/img/community/up.png';
 
-                    } else if (data.likeChanged) {
+                    } else if (data.DISLIKE_TO_LIKE) {
                         likeButtonImage.src = '/img/community/up-green.png';
                         dislikeButtonImage.src = '/img/community/down.png';
-                    } else if (data.likeCreated) {
+                    } else if (data.LIKE_CREATED) {
                         likeButtonImage.src = '/img/community/up-green.png';
                     }
                     document.querySelector("#postRecommendCount").textContent = "추천 " + (data.likeCount - data.dislikeCount);
@@ -99,13 +99,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     const likeButtonImage = document.querySelector('#likeButton img');
                     const dislikeButtonImage = document.querySelector('#dislikeButton img');
                     // 버튼 누르기 전 상태에 따라 이미지 설정 다르게 해줌 (싫어요가 이미 눌러져있을때, 좋아요가 눌러져있을때, 둘다 없었을떄)
-                    if (data.dislikeDelete) {
+                    if (data.DISLIKE_DELETED) {
                         dislikeButtonImage.src = '/img/community/down.png';
 
-                    } else if (data.dislikeChanged) {
+                    } else if (data.LIKE_TO_DISLIKE) {
                         likeButtonImage.src = '/img/community/up.png';
                         dislikeButtonImage.src = '/img/community/down-red.png';
-                    } else if (data.dislikeCreated) {
+                    } else if (data.DISLIKE_CREATED) {
                         dislikeButtonImage.src = '/img/community/down-red.png';
                     }
                     document.querySelector("#postRecommendCount").textContent = "추천 " + (data.likeCount - data.dislikeCount);
@@ -175,13 +175,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     const dislikeButtonImage = this.parentNode.querySelector('.comment-down img');
 
                     // 버튼 누르기 전 상태에 따라 이미지 설정 다르게 해줌 (싫어요가 이미 눌러져있을때, 좋아요가 눌러져있을때, 둘다 없었을떄)
-                    if (data.likeDelete) {
+                    if (data.LIKE_DELETED) {
                         likeButtonImage.src = '/img/community/up.png';
 
-                    } else if (data.changeToLike) {
+                    } else if (data.DISLIKE_TO_LIKE) {
                         likeButtonImage.src = '/img/community/up-green.png';
                         dislikeButtonImage.src = '/img/community/down.png';
-                    } else if (data.likeCreated) {
+                    } else if (data.LIKE_CREATED) {
                         likeButtonImage.src = '/img/community/up-green.png';
                     }
                 }).catch(error => console.error('Error:', error));
@@ -211,13 +211,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     const dislikeButtonImage = this.querySelector('img');
                     const likeButtonImage = this.parentNode.querySelector('.comment-up img');
                     // 버튼 누르기 전 상태에 따라 이미지 설정 다르게 해줌 (싫어요가 이미 눌러져있을때, 좋아요가 눌러져있을때, 둘다 없었을떄)
-                    if (data.dislikeDelete) {
+                    if (data.DISLIKE_DELETED) {
                         dislikeButtonImage.src = '/img/community/down.png';
-
-                    } else if (data.changeToDislike) {
+                    } else if (data.LIKE_TO_DISLIKE) {
                         likeButtonImage.src = '/img/community/up.png';
                         dislikeButtonImage.src = '/img/community/down-red.png';
-                    } else if (data.dislikeCreated) {
+                    } else if (data.DISLIKE_CREATED) {
                         dislikeButtonImage.src = '/img/community/down-red.png';
                     }
                 }).catch(error => console.error('Error:', error));
