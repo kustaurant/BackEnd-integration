@@ -4,11 +4,6 @@ document.addEventListener('DOMContentLoaded', function () {
     var closeButton = document.querySelector('#modal button[data-bs-dismiss="modal"]');
     var hideCheckbox = document.getElementById("flexCheckChecked");
 
-    var expiredElement = document.getElementById('ExpiredData');
-    var expiredAtString = expiredElement.getAttribute('data-expired');
-    var expiredAt = new Date(expiredAtString);
-    var currentDate = new Date();
-
     closeButton.addEventListener("click", function() {
         var expiryDate = new Date();
         expiryDate.setDate(expiryDate.getDate() + 7); // 일주일 후의 날짜 설정
@@ -22,9 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 쿠키에 hideModal이 없거나 그 값이 false일 경우에만 모달을 보여줌
     if (!hideModalCookie || hideModalCookie.split("=")[1] !== "true") {
-        if (currentDate < expiredAt) {
-            modal.style.display = "block";
-        }
+        modal.style.display = "block";
     }
 
     var swiper = new Swiper('.swiper', {

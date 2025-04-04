@@ -14,10 +14,13 @@ import java.time.LocalDateTime;
 public class NoticeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer noticeId;
+    @Column(name = "notice_id")
+    private Integer id;
 
-    String noticeTitle;
-    String noticeHref;
+    @Column(name = "notice_title")
+    String title;
+    @Column(name = "notice_href")
+    String href;
     String status;
     LocalDate createdAt;
     LocalDateTime updatedAt;
