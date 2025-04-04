@@ -1,6 +1,5 @@
-package com.kustaurant.kustaurant.common.restaurant.argument_resolver;
+package com.kustaurant.kustaurant.common.discovery.argument_resolver;
 
-import com.kustaurant.kustaurant.common.discovery.enums.LocationEnum;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
@@ -13,11 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LocationListArgumentResolver implements HandlerMethodArgumentResolver {
+public class SituationListArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(LocationList.class) != null && parameter.getParameterType().equals(List.class);
+        return parameter.getParameterAnnotation(SituationList.class) != null && parameter.getParameterType().equals(List.class);
     }
 
     @Override
@@ -27,26 +26,26 @@ public class LocationListArgumentResolver implements HandlerMethodArgumentResolv
                                   WebDataBinderFactory binderFactory) throws Exception {
         boolean isApiRequest = isApiRequest(webRequest);
 
-        String locations = webRequest.getParameter("locations");
-        if (locations == null || locations.isEmpty()) {
+        String situations = webRequest.getParameter("situations");
+        if (situations == null || situations.isEmpty()) {
             return null;
         }
 
         try {
             // 파라미터가 "ALL"이면 null 반환
-            if (locations.contains("ALL")) {
+            if (situations.contains("ALL")) {
                 return null;
             }
 
             // 문자열을 List<String>으로 변환
-            return Arrays.stream(locations.split(","))
-                    .map(c -> LocationEnum.valueOf(c.trim()).getValue())
+            return Arrays.stream(situations.split(","))
+                    .map(c -> Integer.parseInt(c.trim()))
                     .collect(Collectors.toList());
 
         } catch (IllegalArgumentException e) {
             if (isApiRequest) {
                 // API 요청의 경우 예외를 던집니다.
-                throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
+                throw new ParamException("situations 파라미터 입력이 올바르지 않습니다.");
             } else {
                 // 웹 요청의 경우 클라이언트에 리다이렉트를 지시합니다.
                 HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);

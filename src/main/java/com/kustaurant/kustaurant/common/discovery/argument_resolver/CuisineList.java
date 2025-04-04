@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.restaurant.argument_resolver;
+package com.kustaurant.kustaurant.common.discovery.argument_resolver;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SituationList {
+public @interface CuisineList {
     boolean required() default false;
 }

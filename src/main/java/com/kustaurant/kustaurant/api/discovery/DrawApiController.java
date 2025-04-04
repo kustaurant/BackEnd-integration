@@ -4,8 +4,8 @@ import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.Res
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
-import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
-import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
+import com.kustaurant.kustaurant.common.discovery.argument_resolver.CuisineList;
+import com.kustaurant.kustaurant.common.discovery.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
