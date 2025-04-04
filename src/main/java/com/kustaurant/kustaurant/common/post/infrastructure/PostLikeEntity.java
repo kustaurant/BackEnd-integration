@@ -6,25 +6,24 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
-@Table(name="post_scraps_tbl")
-public class PostScrap {
-
+@Table(name="post_likes_tbl_new")
+public class PostLikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer scrapId;
+    Integer postLikesId;
 
-    public PostScrap(UserEntity UserEntity, PostEntity post, LocalDateTime createdAt) {
-        this.user = UserEntity;
+    public PostLikeEntity(UserEntity user, PostEntity post) {
+        this.user = user;
         this.post = post;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
     }
-    public PostScrap(){
+    public PostLikeEntity() {
 
     }
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     UserEntity user;
@@ -34,5 +33,4 @@ public class PostScrap {
     PostEntity post;
 
     LocalDateTime createdAt;
-
 }

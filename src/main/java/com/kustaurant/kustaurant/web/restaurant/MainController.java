@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.web.restaurant;
 
+import com.kustaurant.kustaurant.common.modal.service.HomeModalService;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
@@ -24,9 +25,8 @@ public class MainController {
     private final RestaurantRepository restaurantRepository;
     private final RestaurantWebService restaurantWebService;
     private final EvaluationService evaluationService;
-    private final HomeModalRepository HomeModalRepository;
+    private final HomeModalService homeModalService;
     private final CustomOAuth2UserService userService;
-    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     //@Value("#{'${restaurant.cuisines}'.split(',\\s*')}")
     private List<String> cuisines = Arrays.asList(
@@ -54,18 +54,17 @@ public class MainController {
     // 홈 화면
     @GetMapping("/")
     public String root(
-            Model model,
-            Principal principal
+            Model model
     ) {
         List<RestaurantEntity> restaurants = restaurantWebService.getTopRestaurants();
         List<String> cuisines = new ArrayList<>(Arrays.asList("한식","일식","중식","양식","아시안","고기","치킨","햄버거","분식","해산물","술집","샐러드","카페","베이커리","기타","전체"));
 
-        HomeModalEntity homeModalEntity = HomeModalRepository.getHomeModalByModalId(1);
+        HomeModalEntity homeModal = homeModalService.get();
 
         model.addAttribute("cuisines", cuisines);
         model.addAttribute("restaurants",restaurants);
         model.addAttribute("currentPage","home");
-        model.addAttribute("homeModalEntity", homeModalEntity);
+        model.addAttribute("homeModal", homeModal);
         return "home";
     }
 

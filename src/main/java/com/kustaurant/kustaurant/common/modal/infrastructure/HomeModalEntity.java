@@ -13,10 +13,12 @@ import java.time.LocalDateTime;
 public class HomeModalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer modalId;
-
-    String modalTitle;
-    String modalBody;
+    @Column(name = "modal_id")
+    private Integer id;
+    @Column(name = "modal_title")
+    String title;
+    @Column(name = "modal_body")
+    String body;
     LocalDateTime createdAt;
     LocalDateTime expiredAt;
 }

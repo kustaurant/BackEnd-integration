@@ -1,6 +1,5 @@
-package com.kustaurant.kustaurant.common.post.domain;
+package com.kustaurant.kustaurant.common.comment;
 
-import com.kustaurant.kustaurant.common.post.infrastructure.PostComment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +20,7 @@ public class CommentLikeDislikeDTO {
     }
 
     public static CommentLikeDislikeDTO toCommentLikeDislikeDTO(PostComment postComment, int commentLikeStatus) {
-        return new CommentLikeDislikeDTO(postComment.getLikeUserList().size(), postComment.getDislikeUserList().size(), commentLikeStatus);
+        return new CommentLikeDislikeDTO(postComment.getPostCommentLikesEntities().size(), postComment.getPostCommentDislikesEntities().size(), commentLikeStatus);
     }
 
 }

@@ -1,6 +1,9 @@
 package com.kustaurant.kustaurant.api.post.controller;
 
 
+import com.kustaurant.kustaurant.common.comment.CommentLikeDislikeDTO;
+import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
@@ -11,7 +14,7 @@ import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.ServerException;
 import com.kustaurant.kustaurant.common.post.enums.PostCategory;
-import com.kustaurant.kustaurant.api.post.service.PostApiCommentService;
+import com.kustaurant.kustaurant.api.comment.PostApiCommentService;
 import com.kustaurant.kustaurant.api.post.service.PostScrapApiService;
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.api.post.service.StorageApiService;

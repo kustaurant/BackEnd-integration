@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.common.user.service;
 
+import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
 import com.kustaurant.kustaurant.common.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.common.notice.infrastructure.NoticeRepository;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
@@ -229,14 +231,14 @@ public class MypageApiService {
 
         return scrappedPosts.stream()
                 .map(scrap -> new MypagePostDTO(
-                        scrap.getPostEntity().getPostId(),
-                        scrap.getPostEntity().getPostCategory(),
-                        scrap.getPostEntity().getPostTitle(),
-                        scrap.getPostEntity().getPostPhotoList().isEmpty() ? null : scrap.getPostEntity().getPostPhotoList().get(0).getPhotoImgUrl(),
-                        scrap.getPostEntity().getPostBody().length() > 20 ? scrap.getPostEntity().getPostBody().substring(0, 20) : scrap.getPostEntity().getPostBody(),
-                        scrap.getPostEntity().getLikeCount(),
-                        scrap.getPostEntity().getPostCommentList().size(),
-                        scrap.getPostEntity().toDomain().calculateTimeAgo()
+                        scrap.getPost().getPostId(),
+                        scrap.getPost().getPostCategory(),
+                        scrap.getPost().getPostTitle(),
+                        scrap.getPost().getPostPhotoList().isEmpty() ? null : scrap.getPost().getPostPhotoList().get(0).getPhotoImgUrl(),
+                        scrap.getPost().getPostBody().length() > 20 ? scrap.getPost().getPostBody().substring(0, 20) : scrap.getPost().getPostBody(),
+                        scrap.getPost().getLikeCount(),
+                        scrap.getPost().getPostCommentList().size(),
+                        scrap.getPost().toDomain().calculateTimeAgo()
                 ))
                 .collect(Collectors.toList());
     }
@@ -250,9 +252,9 @@ public class MypageApiService {
         // 데이터를 DTO 로 변환
         return commentedPosts.stream()
                 .map(comment -> new MypagePostCommentDTO(
-                        comment.getPostEntity().getPostId(),
-                        comment.getPostEntity().getPostCategory(),
-                        comment.getPostEntity().getPostTitle(),
+                        comment.getPost().getPostId(),
+                        comment.getPost().getPostCategory(),
+                        comment.getPost().getPostTitle(),
                         comment.getCommentBody().length() > 20 ? comment.getCommentBody().substring(0, 20) : comment.getCommentBody(),
                         comment.getLikeCount()
                 ))
@@ -263,8 +265,8 @@ public class MypageApiService {
     public List<NoticeDTO> getAllNotices() {
         return noticeRepo.findAll().stream()
                 .map(notice -> new NoticeDTO(
-                        notice.getNoticeTitle(),
-                        notice.getNoticeHref(),
+                        notice.getTitle(),
+                        notice.getHref(),
                         notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 ))
                 .collect(Collectors.toList());

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.post.infrastructure;
+package com.kustaurant.kustaurant.common.comment;
 
 
 import org.springframework.data.jpa.domain.Specification;
