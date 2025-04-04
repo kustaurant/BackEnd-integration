@@ -15,6 +15,4 @@ public interface RestaurantJpaRepository extends JpaRepository<RestaurantEntity,
     List<RestaurantEntity> findByRestaurantPositionAndStatus(String position, String status);
     List<RestaurantEntity> findByRestaurantCuisineAndRestaurantPositionAndStatus(String cuisine, String position, String status);
 
-    List<RestaurantEntity> findAll(Specification<RestaurantEntity> spec);
-    Page<RestaurantEntity> findAll(Specification<RestaurantEntity> spec, Pageable pageable);
 }

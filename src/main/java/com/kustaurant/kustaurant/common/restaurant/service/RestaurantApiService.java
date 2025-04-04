@@ -7,13 +7,9 @@ import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantReposi
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
+import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.restaurant.constants;
+package com.kustaurant.kustaurant.common.discovery.domain;
 
 import com.kustaurant.kustaurant.common.restaurant.domain.Coordinate;
 

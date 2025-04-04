@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.api.restaurant;
+package com.kustaurant.kustaurant.api.discovery;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import lombok.RequiredArgsConstructor;

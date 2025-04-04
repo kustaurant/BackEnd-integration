@@ -22,11 +22,8 @@ import java.util.*;
 @RequiredArgsConstructor
 @Controller
 public class MainController {
-    private final RestaurantRepository restaurantRepository;
     private final RestaurantWebService restaurantWebService;
-    private final EvaluationService evaluationService;
     private final HomeModalService homeModalService;
-    private final CustomOAuth2UserService userService;
 
     //@Value("#{'${restaurant.cuisines}'.split(',\\s*')}")
     private List<String> cuisines = Arrays.asList(
@@ -86,32 +83,6 @@ public class MainController {
         return "marketing";
     }
 
-
-    // 검색 결과 화면
-    @GetMapping("/search")
-    public String search(
-            Model model,
-            @RequestParam(value = "kw", defaultValue = "") String kw,
-            Principal principal
-    ) {
-        UserEntity UserEntity = userService.getUserByPrincipal(principal);
-
-        if (kw.isEmpty()) {
-            model.addAttribute("kw", "입력된 검색어가 없습니다.");
-            return "searchResult";
-        } else {
-            model.addAttribute("kw", kw);
-        }
-
-        String[] kwList = kw.split(" "); // 검색어 공백 단위로 끊음
-        List<RestaurantEntity> restaurantList = restaurantWebService.searchRestaurants(kwList);
-
-        List<RestaurantTierDataClass> restaurantTierDataClassList = evaluationService.convertToTierDataClassList(restaurantList, UserEntity, false);
-
-        model.addAttribute("restaurantTierData", restaurantTierDataClassList);
-
-        return "searchResult";
-    }
 }
 
 

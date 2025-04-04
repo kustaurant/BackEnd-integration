@@ -1,14 +1,14 @@
-package com.kustaurant.kustaurant.common.restaurant.service;
+package com.kustaurant.kustaurant.common.discovery.service;
 
+import com.kustaurant.kustaurant.common.discovery.service.port.DiscoveryRepository;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
-import com.kustaurant.kustaurant.common.restaurant.constants.MapConstants;
+import com.kustaurant.kustaurant.common.discovery.domain.MapConstants;
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierMapDTO;
-import com.kustaurant.kustaurant.common.restaurant.domain.enums.LocationEnum;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantJpaRepository;
+import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
+import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierMapDTO;
+import com.kustaurant.kustaurant.common.discovery.enums.LocationEnum;
+import com.kustaurant.kustaurant.common.discovery.infrastructure.RestaurantSpecification;
+import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class RestaurantTierService {
 
-    private final RestaurantRepository restaurantRepository;
+    private final DiscoveryRepository discoveryRepository;
     private final RestaurantFavoriteService restaurantFavoriteService;
     private final EvaluationService evaluationService;
 
@@ -36,7 +36,7 @@ public class RestaurantTierService {
             List<String> cuisines, List<Integer> situations, List<String> locations,
             Integer tierInfo, boolean isOrderByScore, @Nullable Integer userId
     ) {
-        List<Restaurant> restaurants = restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore));
+        List<Restaurant> restaurants = discoveryRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore));
 
         if (restaurants.isEmpty()) {
             return new ArrayList<>();
@@ -67,7 +67,7 @@ public class RestaurantTierService {
     ) {
         Pageable pageable = PageRequest.of(page, size);
 
-        List<Restaurant> restaurants = restaurantRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore), pageable);
+        List<Restaurant> restaurants = discoveryRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore), pageable);
 
         if (restaurants.isEmpty()) {
             return new ArrayList<>();

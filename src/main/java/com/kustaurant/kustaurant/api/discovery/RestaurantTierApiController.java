@@ -1,19 +1,14 @@
-package com.kustaurant.kustaurant.api.restaurant;
+package com.kustaurant.kustaurant.api.discovery;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.enums.LocationEnum;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantTierService;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.discovery.service.RestaurantTierService;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
-import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierMapDTO;
-import com.kustaurant.kustaurant.common.restaurant.constants.MapConstants;
+import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
+import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,9 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * @author Ding

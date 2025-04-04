@@ -51,18 +51,6 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     }
 
     @Override
-    public List<Restaurant> findAll(Specification<RestaurantEntity> spec) {
-        return jpaRepository.findAll(spec)
-                .stream().map(RestaurantEntity::toDomain).toList();
-    }
-
-    @Override
-    public List<Restaurant> findAll(Specification<RestaurantEntity> spec, Pageable pageable) {
-        return jpaRepository.findAll(spec, pageable).toList()
-                .stream().map(RestaurantEntity::toDomain).toList();
-    }
-
-    @Override
     public List<RestaurantEntity> findAll() {
         return List.of();
     }

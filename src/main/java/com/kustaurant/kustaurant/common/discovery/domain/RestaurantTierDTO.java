@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.restaurant.domain.dto;
+package com.kustaurant.kustaurant.common.discovery.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;

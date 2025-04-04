@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.restaurant.infrastructure;
+package com.kustaurant.kustaurant.common.discovery.infrastructure;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;

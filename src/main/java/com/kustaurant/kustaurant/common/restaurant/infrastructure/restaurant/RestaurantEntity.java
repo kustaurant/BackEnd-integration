@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
+import com.kustaurant.kustaurant.common.discovery.infrastructure.RestaurantSpecification;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtagEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenuEntity;

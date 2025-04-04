@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.argument_resolver;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.enums.CuisineEnum;
+import com.kustaurant.kustaurant.common.discovery.enums.CuisineEnum;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;

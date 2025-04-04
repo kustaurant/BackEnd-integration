@@ -1,11 +1,11 @@
 
-package com.kustaurant.kustaurant.web.restaurant;
+package com.kustaurant.kustaurant.web.discovery;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantTierService;
+import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
+import com.kustaurant.kustaurant.common.discovery.service.RestaurantTierService;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;

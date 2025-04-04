@@ -1,6 +1,7 @@
-package com.kustaurant.kustaurant.web.restaurant;
+package com.kustaurant.kustaurant.web.discovery;
 
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.web.restaurant.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +16,9 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Controller
-public class DrawController {
+public class DrawWebController {
     private final RestaurantWebService restaurantWebService;
-    private static final Logger logger = LoggerFactory.getLogger(DrawController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DrawWebController.class);
 
     // 메뉴추천 화면
     @GetMapping("/recommend")

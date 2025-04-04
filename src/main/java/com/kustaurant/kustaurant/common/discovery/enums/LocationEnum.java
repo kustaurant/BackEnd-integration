@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.restaurant.domain.enums;
+package com.kustaurant.kustaurant.common.discovery.enums;
 
 import lombok.Getter;
 
