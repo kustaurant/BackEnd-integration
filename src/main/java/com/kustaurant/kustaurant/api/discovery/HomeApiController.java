@@ -3,13 +3,8 @@ package com.kustaurant.kustaurant.api.discovery;
 import com.kustaurant.kustaurant.common.discovery.service.DiscoveryHomeService;
 import com.kustaurant.kustaurant.common.discovery.service.DiscoverySearchService;
 import com.kustaurant.kustaurant.common.notice.service.HomeBannerApiService;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
-import com.kustaurant.kustaurant.web.restaurant.RestaurantWebService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -29,9 +24,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class HomeApiController {
-    private final RestaurantApiService restaurantApiService;
-    private final RestaurantWebService restaurantWebService;
-    private final UserService userService;
     private final HomeBannerApiService homeBannerApiService;
 
     private final DiscoveryHomeService discoveryHomeService;
