@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
+import com.kustaurant.kustaurant.common.post.domain.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +40,7 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Optional<PostEntity> findById(Integer postId) {
-        return postJpaRepository.findById(postId);
+    public Optional<Post> findById(Integer postId) {
+        return postJpaRepository.findById(postId).map(PostEntity::toDomain);
     }
 }

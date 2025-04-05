@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.web.comment;
 
 import com.kustaurant.kustaurant.common.comment.*;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
+import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.enums.DislikeStatus;
 import com.kustaurant.kustaurant.common.post.enums.LikeStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
@@ -154,8 +155,8 @@ public class PostCommentService {
     }
 
     public List<PostComment> getList(Integer postId, String sort) {
-        PostEntity postEntity = postService.getPost(postId);
-        Specification<PostComment> spec = getSpecByPostId(postEntity);
+        Post post = postService.getPost(postId);
+        Specification<PostComment> spec = getSpecByPostId(post);
         List<PostComment> postCommentList = postCommentRepository.findAll(spec);
         if (sort.equals("popular")) {
             postCommentList.sort(Comparator.comparingInt(PostComment::getLikeCount).reversed());
@@ -166,18 +167,13 @@ public class PostCommentService {
         return postCommentList;
     }
 
-    private Specification<PostComment> getSpecByPostId(PostEntity postEntity) {
-        return new Specification<>() {
-            private static final long serialVersionUID = 1L;
+    private Specification<PostComment> getSpecByPostId(Post post) {
+        return (p, query, cb) -> {
+            query.distinct(true);  // 중복을 제거
+            Predicate postIdPredicate = cb.equal(p.get("post").get("postId"), post.getPostId());
+            Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
 
-            @Override
-            public Predicate toPredicate(Root<PostComment> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                query.distinct(true);  // 중복을 제거
-                Predicate postIdPredicate = cb.equal(p.get("postEntity"), postEntity);
-                Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
-
-                return cb.and(statusPredicate, postIdPredicate);
-            }
+            return cb.and(statusPredicate, postIdPredicate);
         };
     }
 

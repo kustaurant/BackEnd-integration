@@ -68,12 +68,20 @@ public class PostEntity {
     }
 
     public Post toDomain() {
-        return new Post(
-                postId, postTitle, postBody, postCategory, status,
-                createdAt, updatedAt, postVisitCount, likeCount,
-                user.getUserId()
-        );
+        return Post.builder()
+                .postId(postId)
+                .postTitle(postTitle)
+                .postBody(postBody)
+                .postCategory(postCategory)
+                .status(status)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .postVisitCount(postVisitCount)
+                .likeCount(likeCount)
+                .userId(user != null ? user.getUserId() : null)
+                .build();
     }
+
 
     public static PostEntity fromDomain(Post post, UserEntity user) {
         return new PostEntity(

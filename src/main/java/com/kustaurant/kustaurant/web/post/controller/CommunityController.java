@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.web.post.controller;
 import com.kustaurant.kustaurant.common.comment.PostComment;
 import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
+import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
@@ -76,18 +77,18 @@ public class CommunityController {
     // 커뮤니티 게시글 상세 화면
     @GetMapping("/community/{postId}")
     public String post(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
-        PostEntity postEntity = postService.getPost(postId);
+        Post post = postService.getPost(postId);
         UserEntity user = principal == null ? null : customOAuth2UserService.getUser(principal.getName());
-        InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postEntity, user);
+        InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(post, user);
 
-        postService.increaseVisitCount(postEntity);
+        postService.increaseVisitCount(post);
 
         List<PostComment> postCommentList = postCommentService.getList(postId, sort);
 
         Map<Integer, InteractionStatusResponse> commentInteractionMap = postCommentService.getCommentInteractionMap(postCommentList, user);
 
         model.addAttribute("postCommentList", postCommentList);
-        model.addAttribute("post", postEntity);
+        model.addAttribute("post", post);
         model.addAttribute("user", user);
         model.addAttribute("sort", sort);
         model.addAttribute("postInteractionStatus", postInteractionStatus);
@@ -101,9 +102,8 @@ public class CommunityController {
     // 게시물 삭제
     @GetMapping("/api/post/delete")
     @Transactional
-    public ResponseEntity<String> postDelete(@RequestParam String postId) {
-        PostEntity postEntity = postService.getPost(Integer.valueOf(postId));
-
+    public ResponseEntity<String> postDelete(@RequestParam(name = "postId") Integer postId) {
+        Post post = postService.getPost(postId);
         //게시글 지워지면 그 게시글의 댓글들도 DELETED 상태로 변경
         List<PostComment> comments = postEntity.getPostCommentList();
         for (PostComment comment : comments) {

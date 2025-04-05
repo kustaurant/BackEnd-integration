@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
+import com.kustaurant.kustaurant.common.post.domain.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,5 +22,5 @@ public interface PostRepository {
 
     PostEntity save(PostEntity postEntity);
 
-    Optional<PostEntity> findById(Integer postId);
+    Optional<Post> findById(Integer postId);
 }

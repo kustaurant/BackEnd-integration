@@ -1,7 +1,9 @@
 package com.kustaurant.kustaurant.web.post.service;
 
 import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
+import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.enums.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
@@ -35,6 +37,7 @@ public class PostService {
     public static  final int POPULARCOUNT = 3;
     // 페이지 숫자
     public static  final int PAGESIZE=10;
+    private final PostCommentRepository postCommentRepository;
 
     // 메인 화면 로딩하기
     public Page<PostEntity> getList(int page, String sort) {
@@ -85,8 +88,8 @@ public class PostService {
 
     }
 
-    public PostEntity getPost(Integer id) {
-        Optional<PostEntity> post = this.postRepository.findById(id);
+    public Post getPost(Integer id) {
+        Optional<Post> post = this.postRepository.findById(id);
         if (post.isPresent()) {
             return post.get();
         } else {
@@ -227,13 +230,13 @@ public class PostService {
         return status;
     }
 
-    public InteractionStatusResponse getUserInteractionStatus(PostEntity postEntity, UserEntity user) {
+    public InteractionStatusResponse getUserInteractionStatus(Post post, UserEntity user) {
         if (user == null){
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED,DislikeStatus.NOT_DISLIKED,ScrapStatus.NOT_SCRAPPED);
         }
-        boolean isLiked = postLikeJpaRepository.existsByUserAndPost(user, postEntity);
-        boolean isDisliked = postDislikeJpaRepository.existsByUserAndPost(user,postEntity);
-        boolean isScrapped = postScrapRepository.existsByPostAndUser(postEntity, user);
+        boolean isLiked = postLikeJpaRepository.existsByUserAndPost(user, PostEntity.fromDomain(post,user));
+        boolean isDisliked = postDislikeJpaRepository.existsByUserAndPost(user,PostEntity.fromDomain(post,user));
+        boolean isScrapped = postScrapRepository.existsByUserAndPost(user,PostEntity.fromDomain(post,user));
 
         return new InteractionStatusResponse(
                 isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED,
@@ -333,7 +336,4 @@ public class PostService {
 
         };
     }
-
-
-
 }
