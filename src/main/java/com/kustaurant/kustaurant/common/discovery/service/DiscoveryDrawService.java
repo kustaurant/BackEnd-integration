@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.discovery.service;
 
 import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpecification;
+import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpec;
 import com.kustaurant.kustaurant.common.discovery.service.port.DiscoveryRepository;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class DiscoveryDrawService {
 
     public List<RestaurantTierDTO> draw(List<String> cuisines, List<String> locations) {
         List<RestaurantTierDTO> dtoList = discoveryRepository.findAll(
-                DiscoverySpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, null, "ACTIVE", null, false))
+                DiscoverySpec.withCuisinesAndLocationsAndSituations(cuisines, locations, null, "ACTIVE", null, false))
                 .stream().map(DiscoveryMapper::toDto).toList();
 
         // 조건에 맞는 식당이 없을 경우 404 에러 반환

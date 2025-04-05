@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.common.discovery.domain.MapConstants;
 import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.common.discovery.enums.LocationEnum;
-import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpecification;
+import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpec;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class DiscoveryChartService {
     ) {
         // 조건에 맞는 식당 데이터 가져오기
         List<RestaurantTierDTO> dtoList = discoveryRepository.findAll(
-                DiscoverySpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore))
+                DiscoverySpec.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore))
                 .stream().map(DiscoveryMapper::toDto).toList();
         // 각 식당의 즐찾여부, 평가여부, 랭킹 정보 채우기
         discoveryAssembler.enrichDtoList(userId, dtoList, 1);
@@ -50,7 +50,7 @@ public class DiscoveryChartService {
         Pageable pageable = PageRequest.of(page, size);
         // 조건에 맞는 식당 데이터 가져오기
         List<RestaurantTierDTO> dtoList = discoveryRepository.findAll(
-                DiscoverySpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore), pageable)
+                DiscoverySpec.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore), pageable)
                 .stream().map(DiscoveryMapper::toDto).toList();;
         // 각 식당의 즐찾여부, 평가여부, 랭킹 정보 채우기
         discoveryAssembler.enrichDtoList(userId, dtoList, page * size + 1);

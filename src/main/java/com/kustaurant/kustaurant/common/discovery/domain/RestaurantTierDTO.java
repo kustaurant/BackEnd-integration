@@ -50,30 +50,6 @@ public class RestaurantTierDTO {
     @JsonIgnore
     private String restaurantType;
 
-    public static RestaurantTierDTO convertRestaurantToTierDTO(RestaurantEntity restaurant, Integer ranking, Boolean isEvaluated, Boolean isFavorite) {
-        DecimalFormat df = new DecimalFormat("#.##");
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        Double score = restaurant.getRestaurantEvaluationCount() != 0 ? Double.parseDouble(df.format(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())) : null;
-
-        return new RestaurantTierDTO(
-                restaurant.getRestaurantId(),
-                ranking,
-                restaurant.getRestaurantName(),
-                restaurant.getRestaurantCuisine(),
-                restaurant.getRestaurantPosition() == null ? "건대 주변" : restaurant.getRestaurantPosition(),
-                restaurant.getRestaurantImgUrl() == null || restaurant.getRestaurantImgUrl().equals("no_img") ? RestaurantConstants.REPLACE_IMG_URL : restaurant.getRestaurantImgUrl(),
-                restaurant.getMainTier(),
-                isEvaluated,
-                isFavorite,
-                restaurant.getRestaurantLongitude(),
-                restaurant.getRestaurantLatitude(),
-                restaurant.getPartnershipInfo(),
-                score,
-                restaurant.toDomain().getSituations(),
-                restaurant.getRestaurantType()
-        );
-    }
-
     public String getTierImgUrl() {
         return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + mainTier + "tier.png";
     }

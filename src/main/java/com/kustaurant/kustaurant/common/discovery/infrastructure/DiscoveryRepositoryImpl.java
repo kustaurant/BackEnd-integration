@@ -27,4 +27,13 @@ public class DiscoveryRepositoryImpl implements DiscoveryRepository {
         return jpaRepository.findAll(spec, pageable).toList()
                 .stream().map(RestaurantEntity::toDomain).toList();
     }
+
+    @Override
+    public List<Restaurant> search(String[] kwList) {
+        Specification<RestaurantEntity> spec = DiscoverySearchSpec.createSearchSpecification(kwList);
+        return jpaRepository.findAll(spec)
+                .stream().map(RestaurantEntity::toDomain).toList();
+    }
+
+
 }

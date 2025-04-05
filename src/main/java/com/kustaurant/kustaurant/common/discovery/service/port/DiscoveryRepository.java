@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.common.discovery.service.port;
 
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -11,4 +12,6 @@ public interface DiscoveryRepository {
     // 티어표
     List<Restaurant> findAll(Specification<RestaurantEntity> spec);
     List<Restaurant> findAll(Specification<RestaurantEntity> spec, Pageable pageable);
+    // 검색
+    List<Restaurant> search(String[] kwList);
 }

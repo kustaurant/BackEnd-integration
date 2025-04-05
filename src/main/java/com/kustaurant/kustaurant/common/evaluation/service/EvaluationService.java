@@ -15,7 +15,7 @@ import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistExce
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
-import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpecification;
+import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpec;
 import com.kustaurant.kustaurant.global.etc.JsonData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -371,13 +371,14 @@ public class EvaluationService {
     }
 
     public void injectIsFavoriteIsEvaluation(RestaurantTierDataClass data, RestaurantEntity restaurant, UserEntity user) {
-        data.setIsEvaluation(restaurantApiService.isEvaluated(restaurant, user));
-        data.setIsFavorite(restaurantApiService.isFavorite(restaurant, user));
+        // TODO: 임시로 하드코딩함. 이후 수정해야됨.
+        data.setIsEvaluation(false);
+        data.setIsFavorite(false);
     }
 
     public void insertSituation(RestaurantTierDataClass data, RestaurantEntity restaurant) {
         for (RestaurantSituationRelationEntity restaurantSituationRelationEntity : restaurant.getRestaurantSituationRelationEntityList()) {
-            if (DiscoverySpecification.hasSituation(restaurantSituationRelationEntity)) {
+            if (DiscoverySpec.hasSituation(restaurantSituationRelationEntity)) {
                 data.addSituation(restaurantSituationRelationEntity);
             }
         }

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiscoverySpecification {
+public class DiscoverySpec {
     // TODO:
     // TODO: 상황 기준 작성 해야됨.
     public static boolean hasSituation(RestaurantSituationRelationEntity restaurantSituationRelationEntity) {

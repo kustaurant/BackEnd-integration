@@ -28,7 +28,6 @@ public interface RestaurantRepository {
     RestaurantEntity findByRestaurantId(Integer id);
 
     // 페이징
-    Page<RestaurantEntity> findAll(Pageable pageable);
 
     List<RestaurantEntity> findByStatusAndMainTierNot(String status, Integer mainTier);
 

@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.api.discovery;
 
+import com.kustaurant.kustaurant.common.discovery.service.DiscoveryHomeService;
+import com.kustaurant.kustaurant.common.discovery.service.DiscoverySearchService;
 import com.kustaurant.kustaurant.common.notice.service.HomeBannerApiService;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
@@ -31,6 +33,10 @@ public class HomeApiController {
     private final RestaurantWebService restaurantWebService;
     private final UserService userService;
     private final HomeBannerApiService homeBannerApiService;
+
+    private final DiscoveryHomeService discoveryHomeService;
+    private final DiscoverySearchService discoverySearchService;
+
     @Operation(summary = "홈화면 top맛집, 나를 위한 맛집, 배너 이미지 불러오기", description = "top 맛집과 나를 위한 맛집 리스트인 topRestaurantsByRating, restaurantsForMe 을 반환하고 홈의 배너 이미지 url리스트를 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "restaurant found", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantListsResponse.class))}),
@@ -38,12 +44,16 @@ public class HomeApiController {
     })
     @GetMapping("/api/v1/home")
     public ResponseEntity<RestaurantListsResponse> home(@JwtToken @Parameter(hidden = true)Integer userId) {
-        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = restaurantApiService.getTopRestaurants(); // 점수 높은 순으로 총 16개
+        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = discoveryHomeService.getTopRestaurants(); // 점수 높은 순으로 총 16개
         // 로그인 여부에 따라 랜덤 식당 또는 추천 식당을 반환하는 서비스 메서드를 호출합니다.
-        List<RestaurantTierDTO> restaurantsForMeDTOs = restaurantApiService.getRecommendedOrRandomRestaurants(userId);
+        List<RestaurantTierDTO> restaurantsForMeDTOs = discoveryHomeService.getRecommendedOrRandomRestaurants(userId);
         // 홈화면의 배너 이미지
         List<String> homePhotoUrls = homeBannerApiService.getHomeBannerImage();
-        RestaurantListsResponse response = new RestaurantListsResponse(topRestaurantsByRatingDTOs, restaurantsForMeDTOs, homePhotoUrls);
+        RestaurantListsResponse response = new RestaurantListsResponse(
+                topRestaurantsByRatingDTOs,
+                restaurantsForMeDTOs,
+                homePhotoUrls
+        );
         return ResponseEntity.ok(response);
     }
 
@@ -73,14 +83,8 @@ public class HomeApiController {
         if (kw == null || kw.isEmpty()) {
             return ResponseEntity.ok(new ArrayList<>());
         }
-
-        UserEntity user = userService.findUserById(userId);
-
         String[] kwList = kw.split(" ");
-        List<RestaurantEntity> restaurantList = restaurantWebService.searchRestaurants(kwList);
 
-        return ResponseEntity.ok(restaurantList.stream().map(restaurant ->
-                RestaurantTierDTO.convertRestaurantToTierDTO(restaurant, null, restaurantApiService.isEvaluated(restaurant, user), restaurantApiService.isFavorite(restaurant, user)))
-                .toList());
+        return ResponseEntity.ok(discoverySearchService.search(kwList, userId));
     }
 }

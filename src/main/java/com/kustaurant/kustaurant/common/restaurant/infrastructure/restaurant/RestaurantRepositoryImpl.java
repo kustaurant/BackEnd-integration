@@ -86,11 +86,6 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     }
 
     @Override
-    public Page<RestaurantEntity> findAll(Pageable pageable) {
-        return null;
-    }
-
-    @Override
     public List<RestaurantEntity> findByStatusAndMainTierNot(String status, Integer mainTier) {
         return List.of();
     }

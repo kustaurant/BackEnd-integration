@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.common.discovery.service;
 import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -16,15 +17,18 @@ public class DiscoveryAssembler {
     private final EvaluationService evaluationService;
 
     // Dto 객체에 데이터 채우기
-    public void enrichDtoList(Integer userId, List<RestaurantTierDTO> dtoList, int ranking) {
+    public void enrichDtoList(Integer userId, List<RestaurantTierDTO> dtoList, @Nullable Integer ranking) {
         for (RestaurantTierDTO dto : dtoList) {
-            setRanking(dto, ranking++);
+            if (ranking != null) {
+                setRanking(dto, ranking);
+                ranking += 1;
+            }
             setFavorite(dto, userId);
             setEvaluated(dto, userId);
         }
     }
     // 랭킹 설정하기
-    private void setRanking(RestaurantTierDTO dto, int ranking) {
+    private void setRanking(RestaurantTierDTO dto, Integer ranking) {
         dto.setRestaurantRanking(dto.existTier() ? ranking : null);
     }
     // 즐찾여부 설정하기 (userId가 null이면 false로 설정됨)

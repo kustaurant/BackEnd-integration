@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpecification;
+import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpec;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.hashtag.RestaurantHashtagEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.menu.RestaurantMenuEntity;
@@ -143,7 +143,7 @@ public class RestaurantEntity {
                 .restaurantScoreSum(restaurantScoreSum)
                 .mainTier(mainTier)
                 // TODO: 개선 필요해 보임
-                .situations(restaurantSituationRelationEntityList.stream().filter(DiscoverySpecification::hasSituation).map(el -> el.getSituation().getSituationName()).collect(Collectors.toList()))
+                .situations(restaurantSituationRelationEntityList.stream().filter(DiscoverySpec::hasSituation).map(el -> el.getSituation().getSituationName()).collect(Collectors.toList()))
                 .favoriteCount(this.restaurantFavorite.size())
                 .build();
     }
