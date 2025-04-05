@@ -1,15 +1,11 @@
 package com.kustaurant.kustaurant.common.discovery.service;
 
 import com.kustaurant.kustaurant.common.discovery.service.port.DiscoveryRepository;
-import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.common.discovery.domain.MapConstants;
-import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.common.discovery.enums.LocationEnum;
-import com.kustaurant.kustaurant.common.discovery.infrastructure.RestaurantSpecification;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
-import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
+import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpecification;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,86 +14,51 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RestaurantTierService {
+public class DiscoveryChartService {
 
     private final DiscoveryRepository discoveryRepository;
-    private final RestaurantFavoriteService restaurantFavoriteService;
-    private final EvaluationService evaluationService;
+    private final DiscoveryAssembler discoveryAssembler;
 
     // Cuisine, Situation, Location 조건에 맞는 식당 리스트를 반환
+    // tierInfo 설명: 1 -> 티어가 있는 것만, -1 -> 티어가 없는 것만, 그외 -> 둘 다
     public List<RestaurantTierDTO> findByConditions(
             List<String> cuisines, List<Integer> situations, List<String> locations,
             Integer tierInfo, boolean isOrderByScore, @Nullable Integer userId
     ) {
-        List<Restaurant> restaurants = discoveryRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore));
+        // 조건에 맞는 식당 데이터 가져오기
+        List<RestaurantTierDTO> dtoList = discoveryRepository.findAll(
+                DiscoverySpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore))
+                .stream().map(DiscoveryMapper::toDto).toList();
+        // 각 식당의 즐찾여부, 평가여부, 랭킹 정보 채우기
+        discoveryAssembler.enrichDtoList(userId, dtoList, 1);
 
-        if (restaurants.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<RestaurantTierDTO> responseList = new ArrayList<>();
-
-
-        // 순위
-        int ranking = 1;
-        for (Restaurant restaurant : restaurants) {
-            responseList.add(
-                    RestaurantTierDTO.convertRestaurantToTierDTO(
-                            restaurant,
-                            ranking++,
-                            evaluationService.isUserEvaluated(userId, restaurant.getRestaurantId()),
-                            restaurantFavoriteService.isUserFavorite(userId, restaurant.getRestaurantId())
-                    )
-            );
-        }
-
-        return responseList;
+        return dtoList;
     }
 
     // 위 함수의 페이징 버전
+    // tierInfo 설명: 1 -> 티어가 있는 것만, -1 -> 티어가 없는 것만, 그외 -> 둘 다
     public List<RestaurantTierDTO> findByConditionsWithPage(
             List<String> cuisines, List<Integer> situations, List<String> locations,
             Integer tierInfo, boolean isOrderByScore, int page, int size, @Nullable Integer userId
     ) {
         Pageable pageable = PageRequest.of(page, size);
+        // 조건에 맞는 식당 데이터 가져오기
+        List<RestaurantTierDTO> dtoList = discoveryRepository.findAll(
+                DiscoverySpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore), pageable)
+                .stream().map(DiscoveryMapper::toDto).toList();;
+        // 각 식당의 즐찾여부, 평가여부, 랭킹 정보 채우기
+        discoveryAssembler.enrichDtoList(userId, dtoList, page * size + 1);
 
-        List<Restaurant> restaurants = discoveryRepository.findAll(RestaurantSpecification.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore), pageable);
-
-        if (restaurants.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<RestaurantTierDTO> responseList = new ArrayList<>();
-
-        for (int i = 0; i < size; i++) {
-            try {
-                // 순위
-                Integer ranking = null;
-                Restaurant restaurant = restaurants.get(i);
-                if (restaurant.getMainTier() > 0) {
-                    ranking = page * size + i + 1;
-                }
-                responseList.add(
-                        RestaurantTierDTO.convertRestaurantToTierDTO(
-                                restaurant,
-                                ranking,
-                                evaluationService.isUserEvaluated(userId, restaurant.getRestaurantId()),
-                                restaurantFavoriteService.isUserFavorite(userId, restaurant.getRestaurantId())
-                        )
-                );
-            } catch (IndexOutOfBoundsException ignored) {
-
-            }
-        }
-
-        return responseList;
+        return dtoList;
     }
 
+    // 지도 식당 데이터 반환
     public RestaurantTierMapDTO getRestaurantTierMapDto(
             List<String> cuisines, List<Integer> situations, List<String> locations, @Nullable Integer userId
     ) {
@@ -108,7 +69,11 @@ public class RestaurantTierService {
         // 2. 응답 생성하기
         RestaurantTierMapDTO response = new RestaurantTierMapDTO();
         // 2.1 즐겨찾기 리스트
-        response.setFavoriteRestaurants(restaurantFavoriteService.getFavoriteRestaurantDtoList(userId));
+        // TODO: 나중에 이거 수정해야됨
+//        response.setFavoriteRestaurants(
+//                restaurantFavoriteService.getFavoriteRestaurantDtoList(userId)
+//                        .stream().map(DiscoveryMapper::toDto).toList()
+//        );
         // 2.2 티어가 있는 식당 리스트
         response.setTieredRestaurants(tieredRestaurantTierDTOs);
         // 2.3 티어가 없는 식당 리스트

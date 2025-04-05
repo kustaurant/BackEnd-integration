@@ -15,7 +15,7 @@ import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistExce
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
-import com.kustaurant.kustaurant.common.discovery.infrastructure.RestaurantSpecification;
+import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpecification;
 import com.kustaurant.kustaurant.global.etc.JsonData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -377,7 +377,7 @@ public class EvaluationService {
 
     public void insertSituation(RestaurantTierDataClass data, RestaurantEntity restaurant) {
         for (RestaurantSituationRelationEntity restaurantSituationRelationEntity : restaurant.getRestaurantSituationRelationEntityList()) {
-            if (RestaurantSpecification.hasSituation(restaurantSituationRelationEntity)) {
+            if (DiscoverySpecification.hasSituation(restaurantSituationRelationEntity)) {
                 data.addSituation(restaurantSituationRelationEntity);
             }
         }

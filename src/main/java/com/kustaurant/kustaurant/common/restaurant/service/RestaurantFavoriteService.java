@@ -5,7 +5,6 @@ import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,18 +23,13 @@ public class RestaurantFavoriteService {
         return restaurantFavoriteRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 
-    // 유저의 즐겨찾기 식당 Tier DTO 리스트를 반환
-    public List<RestaurantTierDTO> getFavoriteRestaurantDtoList(Integer userId) {
+    // 유저의 즐겨찾기 식당 리스트를 반환
+    public List<Restaurant> getFavoriteRestaurantDtoList(Integer userId) {
         List<RestaurantFavorite> favorites = restaurantFavoriteRepository.findByUser(userId);
 
         return favorites.stream()
                 .map(RestaurantFavorite::getRestaurant)
-                .map(restaurantDomain -> RestaurantTierDTO.convertRestaurantToTierDTO(
-                        restaurantDomain,
-                        null,
-                        null,
-                        null
-                )).toList();
+                .toList();
     }
 
     // 즐겨찾기 토글

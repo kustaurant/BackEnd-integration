@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.api.discovery;
 
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
-import com.kustaurant.kustaurant.common.discovery.service.RestaurantTierService;
+import com.kustaurant.kustaurant.common.discovery.service.DiscoveryChartService;
 import com.kustaurant.kustaurant.global.UserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.common.discovery.argument_resolver.CuisineList;
@@ -39,7 +39,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RestaurantTierApiController {
 
-    private final RestaurantTierService restaurantTierService;
+    private final DiscoveryChartService discoveryChartService;
 
     private final RestaurantApiService restaurantApiService;
     private final UserService userService;
@@ -79,7 +79,7 @@ public class RestaurantTierApiController {
         // page 0부터 시작하게 수정
         page--;
         // 조회
-        List<RestaurantTierDTO> restaurants = restaurantTierService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, userId);
+        List<RestaurantTierDTO> restaurants = discoveryChartService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, userId);
 
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
@@ -118,7 +118,7 @@ public class RestaurantTierApiController {
         // page 0부터 시작하게 수정
         page--;
         // DB 조회
-        List<RestaurantTierDTO> restaurants = restaurantTierService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, userId);
+        List<RestaurantTierDTO> restaurants = discoveryChartService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, userId);
 
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
@@ -169,7 +169,7 @@ public class RestaurantTierApiController {
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         return new ResponseEntity<>(
-                restaurantTierService.getRestaurantTierMapDto(cuisines, situations, locations, userId),
+                discoveryChartService.getRestaurantTierMapDto(cuisines, situations, locations, userId),
                 HttpStatus.OK
         );
     }
@@ -218,7 +218,7 @@ public class RestaurantTierApiController {
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         return new ResponseEntity<>(
-                restaurantTierService.getRestaurantTierMapDto(cuisines, situations, locations, userId),
+                discoveryChartService.getRestaurantTierMapDto(cuisines, situations, locations, userId),
                 HttpStatus.OK
         );
     }

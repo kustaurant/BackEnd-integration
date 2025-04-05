@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface RestaurantDiscoveryJpaRepository extends JpaRepository<RestaurantEntity, Integer> {
+public interface DiscoveryJpaRepository extends JpaRepository<RestaurantEntity, Integer> {
     List<RestaurantEntity> findAll(Specification<RestaurantEntity> spec);
     Page<RestaurantEntity> findAll(Specification<RestaurantEntity> spec, Pageable pageable);
 }

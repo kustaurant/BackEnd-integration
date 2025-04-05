@@ -12,9 +12,9 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class RestaurantDiscoveryRepositoryImpl implements DiscoveryRepository {
+public class DiscoveryRepositoryImpl implements DiscoveryRepository {
 
-    private final RestaurantDiscoveryJpaRepository jpaRepository;
+    private final DiscoveryJpaRepository jpaRepository;
 
     @Override
     public List<Restaurant> findAll(Specification<RestaurantEntity> spec) {
