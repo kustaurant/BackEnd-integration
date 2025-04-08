@@ -63,6 +63,9 @@ dependencies {
 
 	// crawling
 	implementation "org.seleniumhq.selenium:selenium-java:4.20.0"
+
+	//env
+	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 }
 
 tasks.named('test') {
