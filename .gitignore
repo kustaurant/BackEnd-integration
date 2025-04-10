@@ -39,5 +39,5 @@ out/
 ### log ###
 *.log
 
-### yml ###
-*.yml
+### env ###
+.env

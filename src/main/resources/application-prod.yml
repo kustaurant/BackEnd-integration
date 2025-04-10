@@ -1,0 +1,30 @@
+
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${PROD_DB_URL}
+    username: ${PROD_DB_USER}
+    password: ${PROD_DB_PASSWORD}
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration/prod
+    baseline-on-migrate: true #이 라인은 한번 배포한 후 지워야함
+    validate-on-migrate: true
+    out-of-order: false
+
+logging:
+  level:
+    com.kustaurant: info
+  logback:
+    rollingpolicy:
+      max-history: 30
+      max-file-size: "100MB"
+      file-name-pattern: "${LOG_FILE}.%d{yyyy-MM-dd}-%i.log"
+  pattern:
+    dateformat: "yyyy-MM-dd HH:mm:ss.SSS,Asia/Seoul"
+  file:
+    name: "logs/konstaurant.log"
