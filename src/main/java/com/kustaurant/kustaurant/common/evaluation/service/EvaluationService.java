@@ -1,21 +1,21 @@
 package com.kustaurant.kustaurant.common.evaluation.service;
 
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantApiService;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.dto.RestaurantTierDataClass;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.SituationRepository;
-import com.kustaurant.kustaurant.common.restaurant.service.S3Service;
-import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.S3Service;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.port.RestaurantRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
-import com.kustaurant.kustaurant.common.discovery.infrastructure.DiscoverySpec;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.spec.RestaurantChartSpec;
 import com.kustaurant.kustaurant.global.etc.JsonData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -378,7 +378,7 @@ public class EvaluationService {
 
     public void insertSituation(RestaurantTierDataClass data, RestaurantEntity restaurant) {
         for (RestaurantSituationRelationEntity restaurantSituationRelationEntity : restaurant.getRestaurantSituationRelationEntityList()) {
-            if (DiscoverySpec.hasSituation(restaurantSituationRelationEntity)) {
+            if (RestaurantChartSpec.hasSituation(restaurantSituationRelationEntity)) {
                 data.addSituation(restaurantSituationRelationEntity);
             }
         }

@@ -4,15 +4,15 @@ package com.kustaurant.kustaurant.web.discovery;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.common.discovery.domain.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.discovery.service.DiscoveryChartService;
+import com.kustaurant.kustaurant.common.restaurant.application.service.query.dto.RestaurantTierDTO;
+import com.kustaurant.kustaurant.common.restaurant.application.service.query.RestaurantChartService;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
-import com.kustaurant.kustaurant.common.discovery.argument_resolver.CuisineList;
-import com.kustaurant.kustaurant.common.discovery.argument_resolver.LocationList;
-import com.kustaurant.kustaurant.common.discovery.argument_resolver.SituationList;
+import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.CuisineList;
+import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.LocationList;
+import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.SituationRepository;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantApiService;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class RestaurantTierWebController {
     private final EvaluationService evaluationService;
     private final CustomOAuth2UserService customOAuth2UserService;
     //
-    private final DiscoveryChartService discoveryChartService;
+    private final RestaurantChartService restaurantChartService;
     private final RestaurantApiService restaurantApiService;
 
     public static final Integer tierPageSize = 40;
@@ -96,7 +96,7 @@ public class RestaurantTierWebController {
         UserEntity user = customOAuth2UserService.getUserByPrincipal(principal);
         Integer userId = user == null ? null : user.getUserId();
         // DB 조회
-        List<RestaurantTierDTO> tierRestaurants = discoveryChartService.findByConditions(cuisines, situations, locations, null, true, userId);
+        List<RestaurantTierDTO> tierRestaurants = restaurantChartService.findByConditions(cuisines, situations, locations, null, true, userId);
 
         Pageable pageable = PageRequest.of(page, tierPageSize);
 

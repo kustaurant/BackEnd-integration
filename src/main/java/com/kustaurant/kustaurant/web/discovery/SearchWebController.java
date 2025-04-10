@@ -1,12 +1,11 @@
 package com.kustaurant.kustaurant.web.discovery;
 
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.dto.RestaurantTierDataClass;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
-import com.kustaurant.kustaurant.web.restaurant.RestaurantWebService;
+import com.kustaurant.kustaurant.common.restaurant.presentation.web.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
