@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComm
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.comment.PostComment;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrap;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
