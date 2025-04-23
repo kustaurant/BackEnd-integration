@@ -9,4 +9,5 @@ public interface RestaurantCommentRepository extends JpaRepository<RestaurantCom
     Optional<RestaurantComment> findByCommentId(Integer commentId);
 
     Optional<RestaurantComment> findByCommentIdAndStatus(Integer commentId, String active);
+
 }

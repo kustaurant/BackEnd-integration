@@ -8,12 +8,8 @@ import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.RestaurantSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,7 +108,7 @@ public class RestaurantApiService {
         UserEntity user = userRepository.findByUserId(userId).orElse(null);
 
         // 2. 사용자의 즐겨찾기 목록을 가져옵니다.
-        List<RestaurantFavoriteEntity> favorites = restaurantFavoriteRepository.findByUser(user);
+        List<RestaurantFavoriteEntity> favorites = restaurantFavoriteRepository.findAllByUserId(user);
 
         if (favorites.isEmpty()) {
             // 즐겨찾기한 식당이 없을 경우 랜덤 식당 15개 추천

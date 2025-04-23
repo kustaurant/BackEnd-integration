@@ -58,7 +58,7 @@ public class RestaurantFavoriteService {
     public void addFavorite(UserEntity user, Restaurant restaurant) {
         restaurantFavoriteRepository.save(
                 RestaurantFavorite.builder()
-                .user(user)
+                .user(user.toModel())
                 .restaurant(restaurant)
                 .status("ACTIVE")
                 .createdAt(LocalDateTime.now())

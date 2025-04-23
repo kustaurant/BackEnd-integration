@@ -1,12 +1,16 @@
 package com.kustaurant.kustaurant.common.evaluation.domain;
 
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
+import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -23,12 +27,48 @@ public class EvaluationDomain {
     private Integer commentLikeCount = 0;
 
     // 참조키
-    private UserEntity user;
+    private User user;
     private Restaurant restaurant;
 
     // 추가
     private Integer likeCount;
     private Integer dislikeCount;
+    private List<EvaluationSituation> evaluationSituationList = new ArrayList<>();
+
+
+    public static EvaluationDomain from(EvaluationEntity entity) {
+        if (entity == null) return null;
+
+        return EvaluationDomain.builder()
+                .evaluationId(entity.getEvaluationId())
+                .evaluationScore(entity.getEvaluationScore())
+                .status(entity.getStatus())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .commentBody(entity.getCommentBody())
+                .commentImgUrl(entity.getCommentImgUrl())
+                .commentLikeCount(entity.getCommentLikeCount() != null ? entity.getCommentLikeCount() : 0)
+                .user(User.from(entity.getUser()))
+                .restaurant(Restaurant.from(entity.getRestaurant()))
+                .likeCount(entity.getRestaurantCommentLikeList() != null ? entity.getRestaurantCommentLikeList().size() : 0)
+                .dislikeCount(entity.getRestaurantCommentDislikeList() != null ? entity.getRestaurantCommentDislikeList().size() : 0)
+                .evaluationSituationList(
+                        entity.getEvaluationSituationEntityList() != null ?
+                                entity.getEvaluationSituationEntityList().stream()
+                                        .map(e -> EvaluationSituation.builder()
+                                                .situation(Situation.builder()
+                                                        .situationId(e.getSituation().getSituationId())
+                                                        .situationName(e.getSituation().getSituationName())
+                                                        .build())
+                                                .build()
+                                        )
+                                        .toList()
+                                : new ArrayList<>()
+                )
+                .build();
+    }
+
+
 
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();

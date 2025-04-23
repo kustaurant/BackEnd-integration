@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.global.webUser;
 
+import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.Getter;
@@ -8,15 +9,15 @@ import java.io.Serializable;
 
 @Getter
 public class SessionUser implements Serializable {
-    private Nickname Nickname;
-    private String userEmail;
-    private String userTokenId;
+    private String nickname;
+    private String email;
+    private String tokenId;
     private String loginApi;
 
-    public SessionUser(UserEntity UserEntity) {
-        this.Nickname = UserEntity.getUserNickname();
-        this.userEmail = UserEntity.getUserEmail();
-        this.userTokenId = UserEntity.getProviderId();
-        this.loginApi = UserEntity.getLoginApi();
+    public SessionUser(User user) {
+        this.nickname = user.getNickname().getValue();
+        this.email = user.getEmail();
+        this.tokenId = user.getProviderId();
+        this.loginApi = user.getLoginApi();
     }
 }

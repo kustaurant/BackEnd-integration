@@ -19,7 +19,7 @@ public class UserDTO {
     Integer Rank;
     public static UserDTO convertUserToUserDTO(UserEntity UserEntity) {
         UserDTO dto = new UserDTO();
-        dto.setUserNickname(UserEntity.getUserNickname().getValue());
+        dto.setUserNickname(UserEntity.getNickname().getValue());
         dto.setRankImg(UserEntity.getRankImg());
         dto.setEvaluationCount(UserEntity.getEvaluationList().size());;
 

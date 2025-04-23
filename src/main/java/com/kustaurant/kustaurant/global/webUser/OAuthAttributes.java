@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.global.webUser;
 
-import com.kustaurant.kustaurant.common.user.domain.UserStatus;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.Builder;
@@ -12,22 +11,22 @@ import java.util.Map;
 
 @Getter
 public class OAuthAttributes {
-    private Map<String, Object> attributes;
-    private String userProviderId;
-    private String loginApi;
-    private String userEmail;
-    private String nameAttributeKey;
+    private final Map<String, Object> attributes;
+    private final String providerId;
+    private final String loginApi;
+    private final String email;
+    private final String nameAttributeKey;
 
     @Builder
     public OAuthAttributes(Map<String, Object> attributes,
-                           String userProviderId,
+                           String providerId,
                            String loginApi,
-                           String userEmail,
+                           String email,
                            String nameAttributeKey) {
         this.attributes = attributes;
-        this.userProviderId = userProviderId;
+        this.providerId = providerId;
         this.loginApi = loginApi;
-        this.userEmail = userEmail;
+        this.email = email;
         this.nameAttributeKey = nameAttributeKey;
     }
 
@@ -48,9 +47,9 @@ public class OAuthAttributes {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
         return OAuthAttributes.builder()
-                .userEmail((String) response.get("email"))
+                .email((String) response.get("email"))
                 .loginApi("NAVER")
-                .userProviderId((String) response.get("id"))
+                .providerId((String) response.get("id"))
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
@@ -59,22 +58,22 @@ public class OAuthAttributes {
     private static OAuthAttributes ofGoogle(String userNameAttributeName,
                                             Map<String, Object> attributes) {
         return OAuthAttributes.builder()
-                .userProviderId((String) attributes.get("userTokenId"))
+                .providerId((String) attributes.get("userTokenId"))
                 .loginApi((String) attributes.get("loginApi"))
-                .userEmail((String) attributes.get("userEmail"))
+                .email((String) attributes.get("userEmail"))
                 .nameAttributeKey(userNameAttributeName)
                 .build();
     }
 
     public UserEntity webToEntity() {
         return UserEntity.builder()
-                .providerId(userProviderId)
+                .providerId(providerId)
                 .loginApi(loginApi)
-                .userEmail(userEmail)
-                .userNickname(new Nickname(StringUtils.substringBefore(userEmail, "@")))
+                .email(email)
+                .userNickname(new Nickname(StringUtils.substringBefore(email, "@")))
                 .status("ACTIVE")
                 .createdAt(LocalDateTime.now())
-                .userRole(UserRole.USER)
+                .role(UserRole.USER)
                 .build();
     }
 }

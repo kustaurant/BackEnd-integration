@@ -11,9 +11,8 @@ public interface OUserRepository extends JpaRepository<UserEntity,Integer> {
 
     Optional<UserEntity> findByProviderId(String providerId);
 
-    Optional<UserEntity> findByUserNickname(String userNickname);
+    Optional<UserEntity> findByNickname_Value(String userNickname);
 
-    Optional<UserEntity> findByUserEmail(String userEmail);
     Optional<UserEntity> findByUserId(Integer userId);
 
     @Query("SELECT u " +
@@ -30,5 +29,5 @@ public interface OUserRepository extends JpaRepository<UserEntity,Integer> {
             "ORDER BY COUNT(e) DESC")
     List<UserEntity> findUsersByEvaluationCountForQuarter(@Param("year") int year, @Param("quarter") int quarter);
 
-    int countByUserNicknameValueStartingWith(String prefix);
+    int countByNickname_ValueStartingWith(String prefix);
 }

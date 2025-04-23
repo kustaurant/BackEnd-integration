@@ -2,7 +2,6 @@ package com.kustaurant.kustaurant.common.evaluation.service;
 
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
@@ -32,7 +31,7 @@ import java.util.*;
 public class EvaluationService {
     private final EvaluationRepository evaluationRepository;
     private final SituationRepository situationRepository;
-    private final EvaluationItemScoreRepository evaluationItemScoreRepository;
+    private final EvaluationSituationRepository evaluationSituationRepository;
     private final RestaurantRepository restaurantRepository;
     private final RestaurantSituationRelationService restaurantSituationRelationService;
     private final EvaluationItemScoresService evaluationItemScoresService;
@@ -61,8 +60,8 @@ public class EvaluationService {
         return evaluationOptional.get();
     }
 
-    public Evaluation getByUserAndRestaurant(UserEntity user, RestaurantEntity restaurant) {
-        Optional<Evaluation> evaluation = evaluationRepository.findByUserAndRestaurant(user, restaurant);
+    public EvaluationEntity getByUserAndRestaurant(UserEntity user, RestaurantEntity restaurant) {
+        Optional<EvaluationEntity> evaluation = evaluationRepository.findByUserAndRestaurant(user, restaurant);
         return evaluation.orElse(null);
     }
 
@@ -221,8 +220,8 @@ public class EvaluationService {
         evaluationRepository.save(evaluation);
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
         // 이전 상황 데이터 삭제 & 이전에 선택한 상황에 대해 restaurant_situation_relations_tbl 테이블의 count 1씩 감소
-        for (EvaluationItemScore evaluationItemScore : evaluation.getEvaluationItemScoreList()) {
-            restaurantSituationRelationService.updateOrCreate(restaurant, evaluationItemScore.getSituation(), -1);
+        for (EvaluationSituationEntity evaluationSituationEntity : evaluation.getEvaluationSituationEntityList()) {
+            restaurantSituationRelationService.updateOrCreate(restaurant, evaluationSituationEntity.getSituation(), -1);
         }
         evaluationItemScoresService.deleteSituationsByEvaluation(evaluation);
         // 새로 추가
@@ -230,7 +229,7 @@ public class EvaluationService {
             for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {
                 // Evaluation Situation Item Table
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation -> {
-                    evaluationItemScoreRepository.save(new EvaluationItemScore(evaluation, newSituation));
+                    evaluationSituationRepository.save(new EvaluationSituationEntity(evaluation, newSituation));
                 });
                 // Restaurant Situation Relation Table
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
@@ -271,7 +270,7 @@ public class EvaluationService {
             for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {
                 // Evaluation Situation Item Table
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
-                        evaluationItemScoreRepository.save(new EvaluationItemScore(evaluation, newSituation)));
+                        evaluationSituationRepository.save(new EvaluationSituationEntity(evaluation, newSituation)));
                 // Restaurant Situation Relation Table
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
                         restaurantSituationRelationService.updateOrCreate(restaurant, newSituation, 1));
@@ -320,12 +319,12 @@ public class EvaluationService {
             int evaluationCount = 0;
             double scoreSum = 0;
 
-            for (Evaluation evaluation : restaurant.getEvaluationList()) {
+            for (EvaluationEntity evaluation : restaurant.getEvaluationList()) {
                 if (evaluation.getStatus().equals("ACTIVE")) {
                     evaluationCount++;
                     scoreSum += evaluation.getEvaluationScore();
 
-                    for (EvaluationItemScore item : evaluation.getEvaluationItemScoreList()) {
+                    for (EvaluationSituationEntity item : evaluation.getEvaluationSituationEntityList()) {
                         Integer situationId = item.getSituation().getSituationId();
                         situationCountMap.put(situationId, situationCountMap.getOrDefault(situationId, 0) + 1);
                     }

@@ -1,12 +1,12 @@
 package com.kustaurant.kustaurant.common.user.service;
 
-import com.kustaurant.kustaurant.common.comment.PostComment;
-import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
+import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.common.comment.infrastructure.OPostCommentRepository;
 import com.kustaurant.kustaurant.common.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.common.notice.infrastructure.NoticeRepository;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.user.domain.*;
@@ -30,8 +30,8 @@ public class MypageApiService {
 
     private final OUserRepository OUserRepository;
     private final PostRepository postRepository;
-    private final PostScrapRepository postScrapRepository;
-    private final PostCommentRepository postCommentRepository;
+    private final OPostScrapRepository postScrapRepository;
+    private final OPostCommentRepository postCommentRepository;
     private final NoticeRepository noticeRepo;
 
     public UserEntity findUserById(Integer userId) {
@@ -47,7 +47,7 @@ public class MypageApiService {
         UserEntity UserEntity = findUserById(userid);
 
         String iconURL = RestaurantConstants.getIconImgUrl(UserEntity, userAgent);
-        String userNickname = UserEntity.getUserNickname().getValue();
+        String userNickname = UserEntity.getNickname().getValue();
         int evalListSize = UserEntity.getEvaluationList().size();
         int commuPostListSize = UserEntity.getPostList().size();
 
@@ -60,8 +60,8 @@ public class MypageApiService {
     public ProfileDTO getProfileInfo(Integer userid){
         UserEntity UserEntity = findUserById(userid);
 
-        String userNickname = UserEntity.getUserNickname().getValue();
-        String userEmail = UserEntity.getUserEmail();
+        String userNickname = UserEntity.getNickname().getValue();
+        String userEmail = UserEntity.getEmail();
         String userPhoneNumber = UserEntity.getPhoneNumber().getValue();
 
         return new ProfileDTO(userNickname,userEmail,userPhoneNumber);
@@ -83,7 +83,7 @@ public class MypageApiService {
         // 변경값이 없음
         if ((receivedPhoneNumberStr == null || receivedPhoneNumberStr.isEmpty() ||
                 (userEntity.getPhoneNumber() != null && userEntity.getPhoneNumber().equals(receivedPhoneNumber)))
-                && userEntity.getUserNickname().equals(receivedNickname)) {
+                && userEntity.getNickname().equals(receivedNickname)) {
             throw new IllegalArgumentException("변경된 값이 없습니다.");
         }
 
@@ -94,7 +94,7 @@ public class MypageApiService {
         }
 
         // 닉네임이 변경됨
-        if (!userEntity.getUserNickname().equals(receivedNickname)) {
+        if (!userEntity.getNickname().equals(receivedNickname)) {
             validateNickname(userEntity, receivedNickname);
             updated = true;
         }
@@ -105,8 +105,8 @@ public class MypageApiService {
 
         OUserRepository.save(userEntity);
         return new ProfileDTO(
-                userEntity.getUserNickname().getValue(),
-                userEntity.getUserEmail(),
+                userEntity.getNickname().getValue(),
+                userEntity.getEmail(),
                 userEntity.getPhoneNumber().getValue()
         );
     }
@@ -124,13 +124,13 @@ public class MypageApiService {
         }
 
         // 닉네임이 이미 존재하는 경우
-        Optional<UserEntity> userOptional = OUserRepository.findByUserNickname(newNickname.getValue());
-        if (userOptional.isPresent() && !newNickname.equals(UserEntity.getUserNickname())) {
+        Optional<UserEntity> userOptional = OUserRepository.findByNickname_Value(newNickname.getValue());
+        if (userOptional.isPresent() && !newNickname.equals(UserEntity.getNickname())) {
             throw new IllegalArgumentException("해당 닉네임이 이미 존재합니다.");
         }
 
         // 닉네임이 유효한 경우 업데이트
-        UserEntity.setUserNickname(newNickname);
+        UserEntity.setNickname(newNickname);
         UserEntity.setUpdatedAt(LocalDateTime.now());
     }
 
@@ -169,7 +169,7 @@ public class MypageApiService {
     // 유저가 평가한 레스토랑 리스트들 반환
     public List<EvaluatedRestaurantInfoDTO> getUserEvaluateRestaurantList(Integer userId) {
         UserEntity UserEntity = findUserById(userId);
-        List<Evaluation> evaluationList = UserEntity.getEvaluationList();
+        List<EvaluationEntity> evaluationList = UserEntity.getEvaluationList();
 
         // 평가 리스트를 최신순으로 정렬
         evaluationList.sort((e1, e2) -> {
@@ -184,7 +184,7 @@ public class MypageApiService {
                     String userCommentBody = evaluation.getCommentBody();
 
                     // EvaluationItemScoreList 에서 각 상황 이름을 추출
-                    List<String> situationNames = evaluation.getEvaluationItemScoreList().stream()
+                    List<String> situationNames = evaluation.getEvaluationSituationEntityList().stream()
                             .map(item -> item.getSituation().getSituationName())
                             .collect(Collectors.toList());
 
@@ -227,7 +227,7 @@ public class MypageApiService {
     //8
     // 유저가 스크랩한 커뮤니티 게시글 리스트들 반환
     public List<MypagePostDTO> getScrappedUserPosts(Integer userId) {
-        List<PostScrap> scrappedPosts = postScrapRepository.findActiveScrappedPostsByUserId(userId);
+        List<PostScrapEntity> scrappedPosts = postScrapRepository.findActiveScrappedPostsByUserId(userId);
 
         return scrappedPosts.stream()
                 .map(scrap -> new MypagePostDTO(
@@ -247,7 +247,7 @@ public class MypageApiService {
     //9
     // 유저가 댓글단 커뮤니티 게시글 리스트들 반환
     public List<MypagePostCommentDTO> getCommentedUserPosts(Integer userId) {
-        List<PostComment> commentedPosts = postCommentRepository.findActiveCommentedPostsByUserId(userId);
+        List<PostCommentEntity> commentedPosts = postCommentRepository.findActiveCommentedPostsByUserId(userId);
 
         // 데이터를 DTO 로 변환
         return commentedPosts.stream()
@@ -256,7 +256,8 @@ public class MypageApiService {
                         comment.getPost().getPostCategory(),
                         comment.getPost().getPostTitle(),
                         comment.getCommentBody().length() > 20 ? comment.getCommentBody().substring(0, 20) : comment.getCommentBody(),
-                        comment.getLikeCount()
+                        comment.getLikeCount(),
+                        comment.calculateTimeAgo()
                 ))
                 .toList();
     }

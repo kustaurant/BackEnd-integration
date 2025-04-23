@@ -2,14 +2,13 @@
 
     import com.google.gson.Gson;
     import com.google.gson.reflect.TypeToken;
-    import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
     import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
     import com.kustaurant.kustaurant.web.restaurant.MainController;
     import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
     import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
     import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
     import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-    import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
+    import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
     import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantCommentDTO;
     import com.kustaurant.kustaurant.common.restaurant.domain.enums.EnumSortComment;
     import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
@@ -58,7 +57,7 @@
         ) {
             RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
             UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
-            Evaluation evaluation = evaluationRepository.findByUserAndRestaurant(UserEntity, restaurant).orElse(null);
+            EvaluationEntity evaluation = evaluationRepository.findByUserAndRestaurant(UserEntity, restaurant).orElse(null);
             Double mainScore = 0.0;
             model.addAttribute("restaurant", restaurant);
 

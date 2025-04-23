@@ -1,27 +1,29 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
+import com.kustaurant.kustaurant.common.post.domain.PostScrap;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
 @Table(name="post_scraps_tbl")
-public class PostScrap {
+public class PostScrapEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer scrapId;
 
-    public PostScrap(UserEntity UserEntity, PostEntity post, LocalDateTime createdAt) {
+    public PostScrapEntity(UserEntity UserEntity, PostEntity post, LocalDateTime createdAt) {
         this.user = UserEntity;
         this.post = post;
         this.createdAt = createdAt;
     }
-    public PostScrap(){
+    public PostScrapEntity(){
 
     }
 
@@ -34,5 +36,14 @@ public class PostScrap {
     PostEntity post;
 
     LocalDateTime createdAt;
+
+    public PostScrap toDomain() {
+        return new PostScrap(
+                scrapId,
+                user.getUserId(),
+                post.toDomain(),
+                createdAt
+        );
+    }
 
 }

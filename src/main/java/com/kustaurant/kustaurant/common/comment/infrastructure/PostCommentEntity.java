@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.comment;
+package com.kustaurant.kustaurant.common.comment.infrastructure;
 
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name="post_comments_tbl")
-public class PostComment {
+public class PostCommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer commentId;
@@ -23,16 +23,16 @@ public class PostComment {
     String status;
     @ManyToOne
     @JoinColumn(name="parent_comment_id")
-    PostComment parentComment;
+    PostCommentEntity parentComment;
 
     @OneToMany(mappedBy = "parentComment")
-    List<PostComment> repliesList = new ArrayList<>();
+    List<PostCommentEntity> repliesList = new ArrayList<>();
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     // 웹 버전을 위한 totallikeCount 를 말함. 모바일에선 사용하지 않음
     Integer likeCount=0;
 
-    public PostComment(String commentBody, String status, LocalDateTime createdAt, PostEntity post, UserEntity UserEntity) {
+    public PostCommentEntity(String commentBody, String status, LocalDateTime createdAt, PostEntity post, UserEntity UserEntity) {
         this.commentBody = commentBody;
         this.status = status;
         this.createdAt = createdAt;
@@ -47,7 +47,7 @@ public class PostComment {
     @JoinColumn(name="user_id")
     UserEntity user;
 
-    public PostComment() {
+    public PostCommentEntity() {
 
     }
 

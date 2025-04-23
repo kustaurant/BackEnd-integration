@@ -64,7 +64,7 @@ public class RestaurantFavoriteEntity {
     public RestaurantFavorite toDomain() {
         return RestaurantFavorite.builder()
                 .favoriteId(favoriteId)
-                .user(user)
+                .user(user.toModel())
                 .restaurant(restaurant.toDomain())
                 .status(status)
                 .createdAt(createdAt)
@@ -79,7 +79,7 @@ public class RestaurantFavoriteEntity {
 
         RestaurantFavoriteEntity entity = new RestaurantFavoriteEntity();
         entity.favoriteId = domain.getFavoriteId();
-        entity.user = domain.getUser();
+        entity.user = UserEntity.from(domain.getUser());
         entity.restaurant = RestaurantEntity.fromDomain(domain.getRestaurant());
         entity.status = domain.getStatus();
         entity.createdAt = domain.getCreatedAt();

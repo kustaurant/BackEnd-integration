@@ -43,6 +43,7 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
                 .toList();
     }
 
+
     @Override
     @Transactional
     public RestaurantFavorite save(RestaurantFavorite restaurantFavorite) {
@@ -55,19 +56,19 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
         jpaRepository.delete(RestaurantFavoriteEntity.fromDomain(restaurantFavorite));
     }
 
-    // TODO: need to delete everything below this
     @Override
-    public Optional<RestaurantFavoriteEntity> findByUserAndRestaurant(UserEntity user, RestaurantEntity restaurant) {
-        return Optional.empty();
+    public List<RestaurantFavorite> findSortedFavoritesByUserId(Integer userId) {
+        return jpaRepository.findSortedFavoritesByUserIdDesc(userId)
+                .stream()
+                .map(RestaurantFavorite::from) // Entity → Domain
+                .toList();
     }
 
+    // TODO: need to delete everything below this
+
     @Override
-    public List<RestaurantFavoriteEntity> findByUser(UserEntity user) {
+    public List<RestaurantFavoriteEntity> findAllByUserId(UserEntity user) {
         return List.of();
     }
 
-    @Override
-    public Integer countByRestaurantAndStatus(RestaurantEntity restaurant, String status) {
-        return 0;
-    }
 }

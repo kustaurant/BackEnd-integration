@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.common.evaluation.domain;
 
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +31,7 @@ public class EvaluationDTO {
 
     }
 
-    public static EvaluationDTO convertEvaluation(Evaluation evaluation) {
+    public static EvaluationDTO convertEvaluation(EvaluationEntity evaluation) {
         return new EvaluationDTO(
                 evaluation.getEvaluationScore(),
                 evaluation.getSituationIdList(),

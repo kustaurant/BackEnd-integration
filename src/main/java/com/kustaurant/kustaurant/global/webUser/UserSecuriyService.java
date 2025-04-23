@@ -33,6 +33,6 @@ public class UserSecuriyService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority((UserRole.USER.getValue())));
         }
         // User 엔티티 아님 , 시큐리티에서 제공하는 User 클래스
-        return new org.springframework.security.core.userdetails.User(UserEntity.getProviderId(), UserEntity.getUserPassword(),authorities);
+        return new org.springframework.security.core.userdetails.User(UserEntity.getProviderId(), "",authorities);
     }
 }

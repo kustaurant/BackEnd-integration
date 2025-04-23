@@ -1,8 +1,9 @@
-package com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation;
+package com.kustaurant.kustaurant.common.evaluation.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDomain;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
+import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationSituation;
+import com.kustaurant.kustaurant.common.evaluation.domain.Situation;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -28,9 +30,9 @@ public class EvaluationEntity {
 
     private String status="ACTIVE";
 
-    public EvaluationEntity(RestaurantEntity restaurant, UserEntity user, Double evaluationScore) {
+    public EvaluationEntity(RestaurantEntity restaurant, UserEntity UserEntity, Double evaluationScore) {
         this.restaurant = restaurant;
-        this.user = user;
+        this.user = UserEntity;
         this.evaluationScore = evaluationScore;
         this.createdAt = LocalDateTime.now();
     }
@@ -53,7 +55,7 @@ public class EvaluationEntity {
     private UserEntity user;
 
     @OneToMany(mappedBy = "evaluation")
-    private List<EvaluationItemScore> evaluationItemScoreList = new ArrayList<>();
+    private List<EvaluationSituationEntity> evaluationSituationEntityList = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "evaluation")
@@ -72,23 +74,23 @@ public class EvaluationEntity {
 
     }
 
-    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String commentBody, String commentImgUrl, UserEntity user, RestaurantEntity restaurant) {
+    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String commentBody, String commentImgUrl, UserEntity UserEntity, RestaurantEntity restaurant) {
         this.evaluationScore = evaluationScore;
         this.status = status;
         this.createdAt = createdAt;
         this.commentBody = commentBody;
         this.commentImgUrl = commentImgUrl;
-        this.user = user;
+        this.user = UserEntity;
         this.restaurant = restaurant;
     }
 
     // 평가에서 선택한 situation들의 id 리스트를 반환합니다. 이전에 선택한게 없을경우 null을 반환합니다.
     public List<Integer> getSituationIdList() {
-        if (this.evaluationItemScoreList == null || this.evaluationItemScoreList.isEmpty()) {
+        if (this.evaluationSituationEntityList == null || this.evaluationSituationEntityList.isEmpty()) {
             return null;
         }
 
-        return this.evaluationItemScoreList.stream()
+        return this.evaluationSituationEntityList.stream()
                 .map(evaluationItemScore -> evaluationItemScore.getSituation().getSituationId())
                 .toList();
     }
@@ -138,7 +140,6 @@ public class EvaluationEntity {
         return secondsDifference.toString() + "초 전";
     }
 
-    // 엔티티 -> 도메인 변환
     public EvaluationDomain toModel() {
         return EvaluationDomain.builder()
                 .evaluationId(this.evaluationId)
@@ -149,8 +150,34 @@ public class EvaluationEntity {
                 .commentBody(this.commentBody)
                 .commentImgUrl(this.commentImgUrl)
                 .commentLikeCount(this.commentLikeCount)
-                .user(this.user)
+                .user(this.user.toModel())
                 .restaurant(this.restaurant.toDomain())
+                .evaluationSituationList(
+                        this.evaluationSituationEntityList.stream()
+                                .map(entity -> EvaluationSituation.builder()
+                                        .situation(Situation.builder()
+                                                .situationId(entity.getSituation().getSituationId())
+                                                .situationName(entity.getSituation().getSituationName())
+                                                .build())
+                                        .build()
+                                ).collect(Collectors.toList())
+                )
                 .build();
     }
+
+    public static EvaluationEntity from(EvaluationDomain domain) {
+        EvaluationEntity entity = new EvaluationEntity();
+        entity.evaluationId = domain.getEvaluationId();
+        entity.evaluationScore = domain.getEvaluationScore();
+        entity.status = domain.getStatus();
+        entity.createdAt = domain.getCreatedAt();
+        entity.updatedAt = domain.getUpdatedAt();
+        entity.commentBody = domain.getCommentBody();
+        entity.commentImgUrl = domain.getCommentImgUrl();
+        entity.user = UserEntity.from(domain.getUser());
+        entity.restaurant = RestaurantEntity.fromDomain(domain.getRestaurant());
+        return entity;
+    }
+
+
 }

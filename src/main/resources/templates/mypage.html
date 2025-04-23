@@ -92,7 +92,7 @@
 
                 <div id="emailArea">
                     <p>이메일 : </p>
-                    <span th:text="${user.getUserEmail()}"></span>
+                    <span th:text="${user.getEmail()}"></span>
                 </div>
 
                 <div id="phoneNumberArea">
@@ -103,7 +103,7 @@
 
                 <div id="nicknameArea">
                     <p>닉네임 : </p>
-                    <input id=nickname type="text" th:placeholder="${user.userNickname}">
+                    <input id=nickname type="text" th:placeholder="${user.nickname}">
                 </div>
                 <div id="nicknameComment">닉네임은 30일에 한번만 변경 가능합니다.</div>
 
@@ -123,7 +123,6 @@
             <div id="countInfo">
                 <p>저장된 맛집 수 : <span th:text="${restaurantFavoriteList.size()}"></span></p>
                 <p>평가한 맛집 수 : <span th:text="${restaurantEvaluationList.size()}"></span></p>
-                <p>작성한 맛집 댓글 수 : <span th:text="${restaurantCommentList.size()}"></span></p>
                 <p>커뮤니티 작성한 글 수 : <span th:text="${postList.size()}"></span></p>
                 <p>커뮤니티 작성한 댓글 수 : <span th:text="${postCommentList.size()}"></span></p>
                 <p>커뮤니티 저장된 글 수 : <span th:text="${postScrabList.size()}"></span></p>
@@ -207,7 +206,7 @@
                             <span class="category-main-name" th:text="${restaurantEvaluation.getRestaurant().getRestaurantCuisine()}"></span>
                             <span class="category-main-score" th:text="${restaurantEvaluation.getEvaluationScore()} + '/5.0'" th:data-score="${restaurantEvaluation.getEvaluationScore()}"></span>
                         </div>
-                        <div class="evaluation-outer" th:each="situationEval: ${restaurantEvaluation.getEvaluationItemScoreList()}">
+                        <div class="evaluation-outer" th:each="situationEval: ${restaurantEvaluation.getEvaluationSituationList()}">
                             <span class="category-name" th:text="${situationEval.getSituation().getSituationName()}"></span>
                         </div>
                     </div>
@@ -235,8 +234,6 @@
                     <div class="postBox">
                         <div>
                             <a class="postLink" th:text="${postlist.postTitle}" th:href="@{/community/{postId}(postId=${postlist.postId})}"></a>
-<!--                            <span class="comment-count" th:if="${postlist.postCommentList.size()}" th:text="'['+${postlist.postCommentList.size()+']'}"></span>-->
-                            <span th:if="${#lists.size(postlist.postCommentList.?[status=='ACTIVE']) != 0}" class="comment-count" th:text="${#lists.size(postlist.postCommentList.?[status=='ACTIVE'])}">
                             </span>
                         </div>
 
@@ -270,12 +267,16 @@
 
                     <div class="postBox">
                         <div>
-                            <a class="postLink" th:text="${commentlist.commentBody}" th:href="@{/community/{postId}(postId=${commentlist.post.getPostId()})}"></a>
+                            <a class="postLink"
+                               th:text="${commentlist.commentBody}"
+                               th:href="@{/community/{postId}(postId=${commentlist.postId})}">
+                            </a>
                         </div>
 
                         <div class="underLink">
-                            <span class="category">게시글 제목 :&nbsp;</span><span class="category" th:text="${commentlist.post.getPostTitle()}"></span>
-                            <span class="createdAt" th:text="${commentlist.calculateTimeAgo()}"> </span>
+                            <span class="category">게시글 제목 :&nbsp;</span>
+                            <span class="category" th:text="${commentlist.postTitle}"></span>
+                            <span class="createdAt" th:text="${commentlist.timeAgo}"> </span>
                         </div>
 
                     </div>
@@ -294,8 +295,6 @@
         <div id="area7Contents" class="gray-border-circular">
             <p class="text-center" th:if="${#lists.isEmpty(postScrabList)}">저장된 정보가 없습니다.</p>
             <ul class="postul" th:unless="${#lists.isEmpty(postScrabList)}">
-
-                <!--                    <li th:each="post,iterStat: ${paging}" class="postli">-->
                 <li th:each="postScrab:${postScrabList}" class="postli">
                     <hr>
                     <span class="recommend-tab">
@@ -306,13 +305,10 @@
                     <div class="postBox">
                         <div>
                             <a class="postLink" th:text="${postScrab.post.postTitle}" th:href="@{/community/{postId}(postId=${postScrab.post.postId})}"></a>
-                            <span th:if="${#lists.size(postScrab.post.postCommentList.?[status=='ACTIVE']) != 0}" class="comment-count" th:text="${#lists.size(postScrab.post.postCommentList.?[status=='ACTIVE'])}"></span>
-
                         </div>
 
                         <div class="underLink">
                             <span class="category" th:text="${postScrab.post.postCategory}"></span>
-                            <span class="author" th:text="${postScrab.post.user.userNickname}"></span>
                             <span class="createdAt" th:text="${postScrab.post.calculateTimeAgo()}"> </span>
                         </div>
 

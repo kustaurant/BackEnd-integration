@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.common.evaluation.infrastructure;
 
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.SituationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,9 +8,9 @@ import lombok.Setter;
 @Getter
 @Entity
 @Setter
-@IdClass(EvaluationItemScoreId.class)
-@Table(name="evaluation_item_scores_tbl")
-public class EvaluationItemScore {
+@IdClass(EvaluationSituationId.class)
+@Table(name = "evaluation_situations_tbl")
+public class EvaluationSituationEntity {
 
     @Id
     @ManyToOne
@@ -23,13 +22,13 @@ public class EvaluationItemScore {
     @JoinColumn(name="situation_id")
     private SituationEntity situation;
 
-    public EvaluationItemScore(EvaluationEntity evaluation, SituationEntity situation) {
+    public EvaluationSituationEntity(EvaluationEntity evaluation, SituationEntity situation) {
         this.evaluation = evaluation;
         this.situation = situation;
     }
 
 
-    public EvaluationItemScore() {
+    public EvaluationSituationEntity() {
 
     }
 }

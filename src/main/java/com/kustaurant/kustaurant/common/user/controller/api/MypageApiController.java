@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.common.user.controller.api;
 
-import com.kustaurant.kustaurant.common.feedback.domain.FeedbackDTO;
 import com.kustaurant.kustaurant.common.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.common.user.domain.*;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;

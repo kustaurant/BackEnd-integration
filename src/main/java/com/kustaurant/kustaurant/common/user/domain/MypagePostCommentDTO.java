@@ -13,4 +13,5 @@ public class MypagePostCommentDTO {
     private String postTitle;
     private String postcommentBody;
     private Integer commentlikeCount;
+    private String timeAgo;
 }

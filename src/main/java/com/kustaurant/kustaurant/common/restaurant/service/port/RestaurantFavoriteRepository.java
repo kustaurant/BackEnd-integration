@@ -16,10 +16,10 @@ public interface RestaurantFavoriteRepository {
     RestaurantFavorite save(RestaurantFavorite restaurantFavorite);
     void delete(RestaurantFavorite restaurantFavorite);
 
-    // TODO: need to delete everything below this
-    Optional<RestaurantFavoriteEntity> findByUserAndRestaurant(UserEntity user, RestaurantEntity restaurant);
-    List<RestaurantFavoriteEntity> findByUser(UserEntity user);
+    List<RestaurantFavorite> findSortedFavoritesByUserId(Integer userId);
 
-    Integer countByRestaurantAndStatus(RestaurantEntity restaurant, String status);
+    // TODO: need to delete everything below this
+
+    List<RestaurantFavoriteEntity> findAllByUserId(UserEntity user);
 
 }

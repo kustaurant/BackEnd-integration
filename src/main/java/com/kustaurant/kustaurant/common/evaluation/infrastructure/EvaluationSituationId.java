@@ -7,16 +7,16 @@ import java.io.Serializable;
 import java.util.Objects;
 @Getter
 @Setter
-public class EvaluationItemScoreId implements Serializable {
+public class EvaluationSituationId implements Serializable {
     private Integer evaluation;
     private Integer situation;
 
     // Default constructor
-    public EvaluationItemScoreId() {
+    public EvaluationSituationId() {
     }
 
     // Constructor with parameters
-    public EvaluationItemScoreId(Integer evaluation, Integer situation) {
+    public EvaluationSituationId(Integer evaluation, Integer situation) {
         this.evaluation = evaluation;
         this.situation = situation;
     }
@@ -26,8 +26,8 @@ public class EvaluationItemScoreId implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof EvaluationItemScoreId)) return false;
-        EvaluationItemScoreId that = (EvaluationItemScoreId) o;
+        if (!(o instanceof EvaluationSituationId)) return false;
+        EvaluationSituationId that = (EvaluationSituationId) o;
         return Objects.equals(getEvaluation(), that.getEvaluation()) &&
                 Objects.equals(getSituation(), that.getSituation());
     }

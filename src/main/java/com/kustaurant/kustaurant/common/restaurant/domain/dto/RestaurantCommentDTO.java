@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.common.restaurant.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
@@ -53,7 +53,7 @@ public class RestaurantCommentDTO {
                 evaluation.getEvaluationId() + EvaluationConstants.EVALUATION_ID_OFFSET,
                 evaluation.getEvaluationScore(),
                 RestaurantConstants.getIconImgUrl(evaluation.getUser(), userAgent),
-                evaluation.getUser().getUserNickname().getValue(),
+                evaluation.getUser().getNickname().getValue(),
                 evaluation.calculateTimeAgo(),
                 evaluation.getCommentImgUrl(),
                 evaluation.getCommentBody(),
@@ -73,7 +73,7 @@ public class RestaurantCommentDTO {
                 comment.getCommentId(),
                 evaluationScore,
                 RestaurantConstants.getIconImgUrl(comment.getUser(), userAgent),
-                comment.getUser().getUserNickname().getValue(),
+                comment.getUser().getNickname().getValue(),
                 comment.calculateTimeAgo(),
                 null,
                 comment.getCommentBody(),

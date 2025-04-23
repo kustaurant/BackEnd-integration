@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.web.post.controller;
 
-import com.kustaurant.kustaurant.common.comment.PostComment;
-import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
+import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.common.comment.infrastructure.OPostCommentRepository;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
@@ -43,8 +43,8 @@ public class CommunityController {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final PostCommentService postCommentService;
     private final PostRepository postRepository;
-    private final PostCommentRepository postCommentRepository;
-    private final PostScrapRepository postScrapRepository;
+    private final OPostCommentRepository postCommentRepository;
+    private final OPostScrapRepository postScrapRepository;
     private final PostScrapService postScrapService;
     private final PostPhotoRepository postPhotoRepository;
     private final StorageService storageService;
@@ -82,7 +82,7 @@ public class CommunityController {
 
         postService.increaseVisitCount(postEntity);
 
-        List<PostComment> postCommentList = postCommentService.getList(postId, sort);
+        List<PostCommentEntity> postCommentList = postCommentService.getList(postId, sort);
 
         Map<Integer, InteractionStatusResponse> commentInteractionMap = postCommentService.getCommentInteractionMap(postCommentList, user);
 
@@ -105,16 +105,16 @@ public class CommunityController {
         PostEntity postEntity = postService.getPost(Integer.valueOf(postId));
 
         //게시글 지워지면 그 게시글의 댓글들도 DELETED 상태로 변경
-        List<PostComment> comments = postEntity.getPostCommentList();
-        for (PostComment comment : comments) {
+        List<PostCommentEntity> comments = postEntity.getPostCommentList();
+        for (PostCommentEntity comment : comments) {
             comment.setStatus("DELETED");
             //대댓글 삭제
-            for (PostComment reply : comment.getRepliesList()) {
+            for (PostCommentEntity reply : comment.getRepliesList()) {
                 reply.setStatus("DELETED");
             }
         }
         //게시글 지워지면 그 게시글의 scrab정보들도 다 지워야함
-        List<PostScrap> scraps = postEntity.getPostScrapList();
+        List<PostScrapEntity> scraps = postEntity.getPostScrapList();
         postScrapRepository.deleteAll(scraps);
         // 사진 삭제
         List<PostPhoto> existingPhotos = postEntity.getPostPhotoList();
@@ -131,13 +131,13 @@ public class CommunityController {
     @Transactional
     @GetMapping("/api/comment/delete")
     public ResponseEntity<Map<String, Object>> commentDelete(@RequestParam Integer commentId) {
-        PostComment postComment = postCommentService.getPostCommentByCommentId(commentId);
+        PostCommentEntity postComment = postCommentService.getPostCommentByCommentId(commentId);
         postComment.setStatus("DELETED");
-        List<PostComment> repliesList = postComment.getRepliesList();
+        List<PostCommentEntity> repliesList = postComment.getRepliesList();
         int deletedCount = 1;
         // 해당 댓글에 대한 대댓글이 존재하면 삭제
         if (!repliesList.isEmpty()) {
-            for (PostComment reply : repliesList) {
+            for (PostCommentEntity reply : repliesList) {
                 if (!reply.getStatus().equals("DELETED")) {
                     reply.setStatus("DELETED");
                     deletedCount += 1;
@@ -168,12 +168,12 @@ public class CommunityController {
         Integer postIdInt = Integer.valueOf(postId);
         UserEntity user = customOAuth2UserService.getUser(principal.getName());
         PostEntity postEntity = postService.getPost(postIdInt);
-        PostComment postComment = new PostComment(content, "ACTIVE", LocalDateTime.now(), postEntity, user);
-        PostComment savedPostComment = postCommentRepository.save(postComment);
+        PostCommentEntity postComment = new PostCommentEntity(content, "ACTIVE", LocalDateTime.now(), postEntity, user);
+        PostCommentEntity savedPostComment = postCommentRepository.save(postComment);
 
         // 대댓글이면 부모 관계 매핑하기
         if (!parentCommentId.isEmpty()) {
-            PostComment parentComment = postCommentService.getPostCommentByCommentId(Integer.valueOf(parentCommentId));
+            PostCommentEntity parentComment = postCommentService.getPostCommentByCommentId(Integer.valueOf(parentCommentId));
             savedPostComment.setParentComment(parentComment);
             parentComment.getRepliesList().add(savedPostComment);
             postCommentService.replyCreate(user, savedPostComment);
@@ -244,7 +244,7 @@ public class CommunityController {
     @GetMapping("/api/comment/like/{commentId}")
     public ResponseEntity<Map<String, Object>> likeComment(@PathVariable String commentId, Principal principal) {
         Integer commentIdInt = Integer.valueOf(commentId);
-        PostComment postComment = postCommentService.getPostCommentByCommentId(commentIdInt);
+        PostCommentEntity postComment = postCommentService.getPostCommentByCommentId(commentIdInt);
         UserEntity user = customOAuth2UserService.getUser(principal.getName());
         Map<String, Object> response = postCommentService.toggleCommentLike(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());
@@ -256,7 +256,7 @@ public class CommunityController {
     @GetMapping("/api/comment/dislike/{commentId}")
     public ResponseEntity<Map<String, Object>> dislikeComment(@PathVariable String commentId, Principal principal) {
         Integer commentIdInt = Integer.valueOf(commentId);
-        PostComment postComment = postCommentService.getPostCommentByCommentId(commentIdInt);
+        PostCommentEntity postComment = postCommentService.getPostCommentByCommentId(commentIdInt);
         UserEntity user = customOAuth2UserService.getUser(principal.getName());
         Map<String, Object> response = postCommentService.toggleCommentDislike(postComment, user);
         response.put("totalLikeCount", postComment.getLikeCount());

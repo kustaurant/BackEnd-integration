@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.comment;
+package com.kustaurant.kustaurant.common.comment.infrastructure;
 
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
@@ -16,7 +16,7 @@ public class PostCommentLikeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer commentLikeId;
 
-    public PostCommentLikeEntity(UserEntity user, PostComment postComment) {
+    public PostCommentLikeEntity(UserEntity user, PostCommentEntity postComment) {
         this.user = user;
         this.postComment = postComment;
         this.createdAt = LocalDateTime.now();
@@ -30,7 +30,7 @@ public class PostCommentLikeEntity {
 
     @ManyToOne
     @JoinColumn(name="comment_id")
-    PostComment postComment;
+    PostCommentEntity postComment;
 
     LocalDateTime createdAt;
 }

@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
-import com.kustaurant.kustaurant.common.comment.PostCommentDTO;
+import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

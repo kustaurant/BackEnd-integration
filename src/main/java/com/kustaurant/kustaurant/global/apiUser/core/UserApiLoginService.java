@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.global.apiUser.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.kustaurant.kustaurant.common.user.domain.UserStatus;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.apiUser.JwtUtil;
@@ -46,8 +45,8 @@ public class UserApiLoginService {
             userEntity = optionalUser.get();
             if(userEntity.getStatus().equals("DELETED")){
                 //탈퇴한 회원이 재가입 하는 경우
-                userEntity.setUserEmail(userEmail);
-                userEntity.setUserNickname(new Nickname(StringUtils.substringBefore(userEmail, "@")));
+                userEntity.setEmail(userEmail);
+                userEntity.setNickname(new Nickname(StringUtils.substringBefore(userEmail, "@")));
                 userEntity.setStatus("ACTIVE");
                 userEntity.setCreatedAt(LocalDateTime.now());
             }
@@ -56,11 +55,11 @@ public class UserApiLoginService {
             userEntity = UserEntity.builder()
                     .providerId(providerId)
                     .loginApi(provider)
-                    .userEmail(userEmail)
+                    .email(userEmail)
                     .userNickname(new Nickname(StringUtils.substringBefore(userEmail, "@")))
                     .status("ACTIVE")
                     .createdAt(LocalDateTime.now())
-                    .userRole(UserRole.USER)
+                    .role(UserRole.USER)
                     .build();
 
             // 회원가입 시에 DB에 저장해서 userId를 초기화함.
@@ -85,14 +84,14 @@ public class UserApiLoginService {
 
         // 사용자 정보로 기존 회원 조회 또는 새로 가입 처리
         Optional<UserEntity> optionalUser = OUserRepository.findByProviderId(userIdentifier);
-        int appleUserCount = OUserRepository.countByUserNicknameValueStartingWith("애플사용자");
+        int appleUserCount = OUserRepository.countByNickname_ValueStartingWith("애플사용자");
 
         UserEntity userEntity;
         if (optionalUser.isPresent()) {
             userEntity = optionalUser.get();
             if(userEntity.getStatus().equals("DELETED")){
                 //탈퇴한 회원이 재가입 하는 경우
-                userEntity.setUserNickname(new Nickname("애플사용자" + (appleUserCount + 1)));
+                userEntity.setNickname(new Nickname("애플사용자" + (appleUserCount + 1)));
                 userEntity.setStatus("ACTIVE");
                 userEntity.setCreatedAt(LocalDateTime.now());
             }
@@ -104,7 +103,7 @@ public class UserApiLoginService {
                     .userNickname(new Nickname("애플사용자" + (appleUserCount + 1)))
                     .status("ACTIVE")
                     .createdAt(LocalDateTime.now())
-                    .userRole(UserRole.USER)
+                    .role(UserRole.USER)
                     .build();
             OUserRepository.save(userEntity);
         }
@@ -171,11 +170,11 @@ public class UserApiLoginService {
             if (userOptional.isPresent()) {
                 UserEntity UserEntity =userOptional.get();
                 UserEntity.setStatus("DELETED");
-                UserEntity.setUserNickname(new Nickname("(탈퇴한 회원)"));
+                UserEntity.setNickname(new Nickname("(탈퇴한 회원)"));
                 UserEntity.setAccessToken(null);
                 UserEntity.setRefreshToken(null);
                 UserEntity.setPhoneNumber(null);
-                UserEntity.setUserEmail(null);
+                UserEntity.setEmail(null);
                 OUserRepository.save(UserEntity);
                 return true;
             } else {
