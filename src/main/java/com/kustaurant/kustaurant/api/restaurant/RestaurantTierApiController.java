@@ -1,19 +1,14 @@
 package com.kustaurant.kustaurant.api.restaurant;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.enums.LocationEnum;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantTierService;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.UserService;
+import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
-import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierMapDTO;
-import com.kustaurant.kustaurant.common.restaurant.constants.MapConstants;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,9 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * @author Ding
@@ -49,7 +42,7 @@ public class RestaurantTierApiController {
     private final RestaurantTierService restaurantTierService;
 
     private final RestaurantApiService restaurantApiService;
-    private final UserService userService;
+    private final OUserService userService;
     private final RestaurantFavoriteService restaurantFavoriteService;
 
     @Operation(summary = "티어표 리스트 불러오기", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +

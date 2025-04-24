@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.common.user.domain;
+package com.kustaurant.kustaurant.common.user.controller.api.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

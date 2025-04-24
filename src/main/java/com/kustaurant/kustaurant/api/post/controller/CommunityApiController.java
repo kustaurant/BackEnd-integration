@@ -9,7 +9,7 @@ import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.UserService;
+import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.ServerException;
@@ -46,7 +46,7 @@ public class CommunityApiController {
     private final PostScrapApiService postScrapApiService;
     private final StorageApiService storageApiService;
     private final PostRepository postRepository;
-    private final UserService userService;
+    private final OUserService userService;
 
     // 커뮤니티 메인 화면
     @GetMapping("/api/v1/community/posts")

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class OUserService {
     private final OUserRepository OUserRepository;
 
     public UserEntity findUserById(Integer userId) {

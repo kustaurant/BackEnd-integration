@@ -14,7 +14,7 @@ import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentServ
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.UserService;
+import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
@@ -45,7 +45,7 @@ public class EvaluationApiController {
 
     private final RestaurantService restaurantService;
 
-    private final UserService userService;
+    private final OUserService userService;
     private final RestaurantApiService restaurantApiService;
     private final RestaurantFavoriteService restaurantFavoriteService;
     private final RestaurantCommentService restaurantCommentService;

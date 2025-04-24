@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.common.notice.service.HomeBannerApiService;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.UserService;
+import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.web.restaurant.RestaurantWebService;
@@ -29,7 +29,7 @@ import java.util.List;
 public class HomeApiController {
     private final RestaurantApiService restaurantApiService;
     private final RestaurantWebService restaurantWebService;
-    private final UserService userService;
+    private final OUserService userService;
     private final HomeBannerApiService homeBannerApiService;
     @Operation(summary = "홈화면 top맛집, 나를 위한 맛집, 배너 이미지 불러오기", description = "top 맛집과 나를 위한 맛집 리스트인 topRestaurantsByRating, restaurantsForMe 을 반환하고 홈의 배너 이미지 url리스트를 반환합니다.")
     @ApiResponses(value = {

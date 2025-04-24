@@ -8,7 +8,7 @@ import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.UserService;
+import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.post.domain.PostDTO;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
@@ -30,7 +30,7 @@ public class PostApiCommentService {
     private final OUserRepository userRepository;
     private final PostRepository postRepository;
     private final PostApiService postApiService;
-    private final UserService userService;
+    private final OUserService userService;
     private final PostCommentService postCommentService;
 
     // 댓글 생성

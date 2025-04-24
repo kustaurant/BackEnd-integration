@@ -9,7 +9,7 @@ import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
-import com.kustaurant.kustaurant.common.user.domain.*;
+import com.kustaurant.kustaurant.common.user.controller.api.response.*;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;

@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.common.feedback.controller;
 
 import com.kustaurant.kustaurant.common.feedback.domain.FeedbackDTO;
 import com.kustaurant.kustaurant.common.feedback.service.FeedbackServiceImpl;
-import com.kustaurant.kustaurant.common.user.domain.MypageErrorDTO;
+import com.kustaurant.kustaurant.common.user.controller.api.response.MypageErrorDTO;
 import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
