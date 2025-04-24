@@ -120,12 +120,13 @@ public class UserApiLoginService {
 
     //3
     //새로운 액세스 토큰 발급
-    public String refreshAccessToken(String accessToken) {
+    public String refreshAccessToken(String expiredAccessToken) {
+        jwtUtil.parseAndValidate(expiredAccessToken).get("sub", Integer.class);
         Integer userId;
         try {
             // 액세스 토큰이 만료되었는지 확인
-            userId = jwtUtil.getUserIdFromToken(accessToken);
-            if (jwtUtil.validateToken(accessToken)) {
+            userId = jwtUtil.getUserIdFromToken(expiredAccessToken);
+            if (jwtUtil.validateToken(expiredAccessToken)) {
                 throw new IllegalArgumentException("액세스 토큰이 아직 유효합니다.");
             }
         } catch (ExpiredJwtException e) {
