@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.apiUser.naver;
+package com.kustaurant.kustaurant.global.auth.apiUser.naver;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.apiUser;
+package com.kustaurant.kustaurant.global.auth.apiUser;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
 
 @Slf4j
@@ -25,7 +27,7 @@ public class JwtUtil {
     // 리프레시 토큰 유효 시간
     @Value("${jwt.refreshTokenExpiration}")
     private long refreshTokenExpiration;
-    private Key key;
+    private SecretKey key;
 
     @PostConstruct
     public void init() {
@@ -50,50 +52,53 @@ public class JwtUtil {
 
     // JWT 토큰 생성 로직
     private String generateToken(Integer userId, long expirationTime) {
-        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expirationTime);
+        Instant now    = Instant.now();
+        Instant expiry = now.plusMillis(expirationTime);
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .claims( Jwts.claims()
+                        .subject(String.valueOf(userId))
+                        .build() )
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(expiry))
+                .signWith(key)
                 .compact();
     }
 
     // JWT 토큰에서 userId 추출
     public Integer getUserIdFromToken(String token) {
-        return Integer.parseInt(Jwts.parserBuilder()
-                .setSigningKey(key)
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
                 .build()
-                .parseClaimsJws(token.trim())
-                .getBody()
-                .getSubject());
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return Integer.parseInt(claims.getSubject());
     }
 
     // JWT 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
             // 토큰을 파싱하고 유효성을 검증합니다.
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            log.debug("토큰이 유효합니다: {}", token);
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+//            log.debug("토큰이 유효합니다: {}", token);
             return true;
         } catch (ExpiredJwtException e) {
             // 만료된 토큰의 경우 이 예외가 발생해야 합니다.
-            log.error("JWT 토큰이 만료되었습니다.", e);
+//            log.error("JWT 토큰이 만료되었습니다.", e);
             return false;
         } catch (JwtException e) {
             // 그 외의 경우, 토큰이 유효하지 않음을 알립니다.
-            log.error("JWT 토큰이 유효하지 않습니다.", e);
+//            log.error("JWT 토큰이 유효하지 않습니다.", e);
             return false;
         }
     }
 
-    // JWT 토큰 유효성 검증 for Filter
-    public boolean validateTokenForFilter(String token) throws ExpiredJwtException, JwtException {
-        Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-        return true;
+    public Claims parseAndValidate(String token) throws JwtException {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token.trim())
+                .getPayload();      // 유효하면 Claims 리턴, 아니면 예외
     }
-
 }

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.apiUser.apple;
+package com.kustaurant.kustaurant.global.auth.apiUser.apple;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

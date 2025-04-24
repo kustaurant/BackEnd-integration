@@ -1,6 +1,6 @@
-package com.kustaurant.kustaurant.global.apiUser.customAnno;
+package com.kustaurant.kustaurant.global.auth.apiUser.customAnno;
 
-import com.kustaurant.kustaurant.global.apiUser.JwtUtil;
+import com.kustaurant.kustaurant.global.auth.apiUser.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;

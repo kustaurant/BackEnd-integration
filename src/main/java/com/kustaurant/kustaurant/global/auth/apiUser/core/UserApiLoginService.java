@@ -1,12 +1,12 @@
-package com.kustaurant.kustaurant.global.apiUser.core;
+package com.kustaurant.kustaurant.global.auth.apiUser.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.apiUser.JwtUtil;
-import com.kustaurant.kustaurant.global.apiUser.apple.AppleApiService;
-import com.kustaurant.kustaurant.global.apiUser.naver.NaverApiService;
-import com.kustaurant.kustaurant.global.webUser.UserRole;
+import com.kustaurant.kustaurant.global.auth.apiUser.JwtUtil;
+import com.kustaurant.kustaurant.global.auth.apiUser.apple.AppleApiService;
+import com.kustaurant.kustaurant.global.auth.apiUser.naver.NaverApiService;
+import com.kustaurant.kustaurant.global.auth.webUser.UserRole;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

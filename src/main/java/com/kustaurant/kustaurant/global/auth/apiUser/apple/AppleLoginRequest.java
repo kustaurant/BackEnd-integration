@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.apiUser.apple;
+package com.kustaurant.kustaurant.global.auth.apiUser.apple;
 
 import lombok.Getter;
 import lombok.Setter;

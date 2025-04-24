@@ -12,7 +12,7 @@ import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants
 import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
-import com.kustaurant.kustaurant.global.webUser.UserRole;
+import com.kustaurant.kustaurant.global.auth.webUser.UserRole;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

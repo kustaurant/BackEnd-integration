@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.webUser;
+package com.kustaurant.kustaurant.global.auth.webUser;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.global.config;
 
-import com.kustaurant.kustaurant.global.apiUser.JwtAuthFilter;
+import com.kustaurant.kustaurant.global.auth.apiUser.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.global.config;
 
-import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtTokenArgumentResolver;
+import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtTokenArgumentResolver;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineListArgumentResolver;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationListArgumentResolver;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationListArgumentResolver;

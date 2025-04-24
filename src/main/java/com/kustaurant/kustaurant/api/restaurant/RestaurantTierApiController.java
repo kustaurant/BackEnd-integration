@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.api.restaurant;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantTierService;
 import com.kustaurant.kustaurant.global.OUserService;
-import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;

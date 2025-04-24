@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.common.user.controller.api;
 
 import com.kustaurant.kustaurant.common.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.common.user.controller.api.response.*;
-import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.common.user.service.MypageApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

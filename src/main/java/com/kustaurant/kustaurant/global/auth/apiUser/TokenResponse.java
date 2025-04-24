@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.apiUser;
+package com.kustaurant.kustaurant.global.auth.apiUser;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

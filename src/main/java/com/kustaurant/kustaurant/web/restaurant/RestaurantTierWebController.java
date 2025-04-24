@@ -7,7 +7,7 @@ import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationReposi
 import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.service.RestaurantTierService;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
+import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationList;

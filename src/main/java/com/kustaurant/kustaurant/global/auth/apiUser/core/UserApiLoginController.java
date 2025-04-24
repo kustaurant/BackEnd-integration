@@ -1,11 +1,11 @@
-package com.kustaurant.kustaurant.global.apiUser.core;
+package com.kustaurant.kustaurant.global.auth.apiUser.core;
 
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
-import com.kustaurant.kustaurant.global.apiUser.JwtUtil;
-import com.kustaurant.kustaurant.global.apiUser.TokenResponse;
-import com.kustaurant.kustaurant.global.apiUser.apple.AppleLoginRequest;
-import com.kustaurant.kustaurant.global.apiUser.naver.NaverLoginRequest;
+import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.auth.apiUser.JwtUtil;
+import com.kustaurant.kustaurant.global.auth.apiUser.TokenResponse;
+import com.kustaurant.kustaurant.global.auth.apiUser.apple.AppleLoginRequest;
+import com.kustaurant.kustaurant.global.auth.apiUser.naver.NaverLoginRequest;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

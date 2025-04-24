@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.common.user.domain;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.webUser.UserRole;
+import com.kustaurant.kustaurant.global.auth.webUser.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,17 +11,17 @@ import java.time.LocalDateTime;
 
 @Getter
 public class User {
-    private Integer id;
+    private final Integer id;
     private Nickname nickname;
     private PhoneNumber phoneNumber;
-    private String email;
-    private UserRole role;
-    private String providerId;
-    private String loginApi;
-    private String accessToken;
-    private String refreshToken;
-    private String status;
-    private LocalDateTime createdAt;
+    private final String email;
+    private final UserRole role;
+    private final String providerId;
+    private final String loginApi;
+    private final String accessToken;
+    private final String refreshToken;
+    private final String status;
+    private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @Builder

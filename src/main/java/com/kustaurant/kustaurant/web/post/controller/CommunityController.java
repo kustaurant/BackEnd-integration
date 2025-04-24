@@ -10,7 +10,7 @@ import com.kustaurant.kustaurant.web.comment.PostCommentService;
 import com.kustaurant.kustaurant.web.post.service.PostScrapService;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import com.kustaurant.kustaurant.common.post.service.StorageService;
-import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
+import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
 import groovy.util.logging.Slf4j;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

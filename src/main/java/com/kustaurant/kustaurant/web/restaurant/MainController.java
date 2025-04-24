@@ -5,13 +5,10 @@ import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantTierData
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
+import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.modal.infrastructure.HomeModalEntity;
-import com.kustaurant.kustaurant.common.modal.infrastructure.HomeModalRepository;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

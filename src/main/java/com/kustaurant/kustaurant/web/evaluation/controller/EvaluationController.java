@@ -14,7 +14,7 @@
     import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
     import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentService;
     import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-    import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
+    import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
     import com.kustaurant.kustaurant.web.restaurant.RestaurantWebService;
     import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 

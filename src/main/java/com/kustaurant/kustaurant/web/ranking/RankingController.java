@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.web.ranking;
 
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
-import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
+import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
 import lombok.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,12 +1,8 @@
 package com.kustaurant.kustaurant.mock;
 
 import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
-import com.kustaurant.kustaurant.global.webUser.UserRole;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

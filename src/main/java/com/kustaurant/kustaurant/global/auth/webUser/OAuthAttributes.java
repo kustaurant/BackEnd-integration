@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.webUser;
+package com.kustaurant.kustaurant.global.auth.webUser;
 
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
