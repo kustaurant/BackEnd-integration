@@ -1,8 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.domain;
 
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure;
 
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

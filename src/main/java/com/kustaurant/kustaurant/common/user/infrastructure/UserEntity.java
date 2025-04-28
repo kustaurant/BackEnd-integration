@@ -7,8 +7,8 @@ import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentDislik
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentLikeEntity;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.favorite.RestaurantFavoriteEntity;
-import com.kustaurant.kustaurant.common.restaurant.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
+import com.kustaurant.kustaurant.common.restaurant.application.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;

@@ -1,9 +1,9 @@
 package com.kustaurant.kustaurant.global.config;
 
+import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.CuisineListArgumentResolver;
+import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.LocationListArgumentResolver;
+import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.SituationListArgumentResolver;
 import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtTokenArgumentResolver;
-import com.kustaurant.kustaurant.common.restaurant.argument_resolver.CuisineListArgumentResolver;
-import com.kustaurant.kustaurant.common.restaurant.argument_resolver.LocationListArgumentResolver;
-import com.kustaurant.kustaurant.common.restaurant.argument_resolver.SituationListArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

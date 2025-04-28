@@ -16,10 +16,7 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -38,30 +35,22 @@ public class AppleApiService {
     //1
     //전달된 identity Token을 애플의 공개 키로 검증하고, 토큰이 유효한지 확인
     public Claims verifyAppleIdentityToken(String identityToken) {
+        Locator<Key> keyLocator = new ApplePublicKeyLocator();
+
         try {
-            Jws<Claims> claimsJws = Jwts.parserBuilder()
-                    .setSigningKeyResolver(new AppleSigningKeyResolver(applePublicKeys))
+            Jws<Claims> claimsJws = Jwts.parser()
+                    .keyLocator(keyLocator)
+                    .requireAudience(appleClientId)
                     .build()
-                    .parseClaimsJws(identityToken);
+                    .parseSignedClaims(identityToken);
 
-            Claims claims = claimsJws.getBody();
-
-            // 토큰 만료 시간 확인
-            Date expiration = claims.getExpiration();
-            if (expiration.before(new Date())) {
-                throw new RuntimeException("토큰이 만료되었습니다.");
-            }
-
-            // Audience 확인 (이 서비스의 클라이언트 ID로 설정)
-            String audience = claims.getAudience();
-            if (!appleClientId.equals(audience)) {
-                throw new RuntimeException("Invalid audience");
-            }
-
-            return claims;
-        } catch (Exception e) {
-            log.error("Failed to verify Apple identity token", e);
-            throw new RuntimeException("Invalid Apple identity token");
+            return claimsJws.getPayload();
+        } catch (ExpiredJwtException e) {
+            throw new RuntimeException("토큰이 만료되었습니다.");
+        } catch (IncorrectClaimException|MissingClaimException e) {
+            throw new RuntimeException("Apple Id 토큰이 유효하지 않습니다.",e);
+        } catch (JwtException e) {
+            throw new RuntimeException("Apple Id 토큰 검증 실패",e);
         }
     }
 
@@ -108,17 +97,8 @@ public class AppleApiService {
 
     //4
     // JWT 서명 검증 시, 헤더의 키 ID(kid)를 사용하여 해당하는 공개 키를 제공하는 역할
-    private static class AppleSigningKeyResolver extends SigningKeyResolverAdapter {
-        private final Map<String, PublicKey> applePublicKeys;
-
-        // 생성자, 애플의 공개 키들을 초기화
-        public AppleSigningKeyResolver(Map<String, PublicKey> applePublicKeys) {
-            this.applePublicKeys = applePublicKeys;
-        }
-
-        // 키 ID에 해당하는 공개 키를 반환
-        @Override
-        public Key resolveSigningKey(JwsHeader header, Claims claims) {
+    private class ApplePublicKeyLocator extends LocatorAdapter<Key> {
+        protected Key locate(ProtectedHeader header) {
             return applePublicKeys.get(header.getKeyId());
         }
     }

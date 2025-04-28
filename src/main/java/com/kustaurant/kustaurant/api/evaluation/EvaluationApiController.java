@@ -1,18 +1,18 @@
 package com.kustaurant.kustaurant.api.evaluation;
 
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantCommentReport;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantCommentReportRepository;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
-import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantCommentDTO;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentService;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantFavoriteService;
-import com.kustaurant.kustaurant.common.restaurant.service.RestaurantService;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantApiService;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantCommentService;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantFavoriteService;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantService;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.dto.RestaurantCommentDTO;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;

@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation;
 import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

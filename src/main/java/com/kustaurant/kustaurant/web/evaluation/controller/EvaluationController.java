@@ -2,22 +2,22 @@
 
     import com.google.gson.Gson;
     import com.google.gson.reflect.TypeToken;
+    import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantCommentService;
+    import com.kustaurant.kustaurant.common.restaurant.application.service.command.dto.RestaurantCommentDTO;
+    import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
+    import com.kustaurant.kustaurant.common.restaurant.presentation.enums.EnumSortComment;
+    import com.kustaurant.kustaurant.common.restaurant.presentation.web.RestaurantWebService;
     import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-    import com.kustaurant.kustaurant.web.restaurant.MainController;
     import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;
     import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDTO;
     import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
     import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
     import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
-    import com.kustaurant.kustaurant.common.restaurant.domain.dto.RestaurantCommentDTO;
-    import com.kustaurant.kustaurant.common.restaurant.domain.enums.EnumSortComment;
-    import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
-    import com.kustaurant.kustaurant.common.restaurant.service.RestaurantCommentService;
     import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
     import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
-    import com.kustaurant.kustaurant.web.restaurant.RestaurantWebService;
     import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 
+    import com.kustaurant.kustaurant.web.main.MainController;
     import lombok.RequiredArgsConstructor;
     import org.slf4j.Logger;
     import org.slf4j.LoggerFactory;

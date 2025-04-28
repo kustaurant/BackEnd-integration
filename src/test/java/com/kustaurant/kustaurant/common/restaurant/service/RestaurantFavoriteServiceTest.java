@@ -1,9 +1,10 @@
 package com.kustaurant.kustaurant.common.restaurant.service;
 
 import com.kustaurant.kustaurant.common.mock.FakeRestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;
-import com.kustaurant.kustaurant.common.restaurant.service.port.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.common.restaurant.application.service.command.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

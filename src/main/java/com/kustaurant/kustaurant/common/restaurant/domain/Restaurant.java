@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.domain;
 
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.restaurant.RestaurantEntity;
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.Builder;
 import lombok.Getter;
 
