@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.common.restaurant.application.service.command.R
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantService;
 
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
+import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

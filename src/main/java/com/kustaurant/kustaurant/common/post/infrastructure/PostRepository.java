@@ -1,9 +1,9 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
+import com.kustaurant.kustaurant.common.post.domain.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,6 +12,8 @@ public interface PostRepository {
     Page<PostEntity> findAll(Specification<PostEntity> spec, Pageable pageable);
 
     Page<PostEntity> findAll(Pageable pageable);
+
+    List<Post> findAllById(List<Integer> postIds);
 
     Page<PostEntity> findByStatus(String status, Pageable pageable);
 
@@ -22,4 +24,8 @@ public interface PostRepository {
     PostEntity save(PostEntity postEntity);
 
     Optional<PostEntity> findById(Integer postId);
+
+    List<Post> findActiveByUserId(Integer userId);
+
+
 }

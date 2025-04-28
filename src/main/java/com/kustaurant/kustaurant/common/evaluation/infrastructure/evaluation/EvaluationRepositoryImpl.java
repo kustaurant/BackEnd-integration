@@ -1,7 +1,8 @@
 package com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation;
 
+import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,14 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
         return jpaRepository.countAllByStatus(status);
     }
 
+    @Override
+    public List<EvaluationDomain> findSortedEvaluationByUserIdDesc(Integer userId) {
+        return evaluationJpaRepository.findSortedEvaluationsByUserIdDesc(userId).stream()
+                .map(EvaluationDomain::from)
+                .toList();
+    }
+
+
     // TODO: need to delete everything below this.
 
     @Override
@@ -43,7 +52,7 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     }
 
     @Override
-    public Optional<Evaluation> findByUserAndRestaurant(UserEntity user, RestaurantEntity restaurant) {
+    public Optional<EvaluationEntity> findByUserAndRestaurant(UserEntity user, RestaurantEntity restaurant) {
         return Optional.empty();
     }
 
@@ -63,7 +72,7 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     }
 
     @Override
-    public List<Evaluation> findByStatus(String status) {
+    public List<EvaluationEntity> findByStatus(String status) {
         return List.of();
     }
 }

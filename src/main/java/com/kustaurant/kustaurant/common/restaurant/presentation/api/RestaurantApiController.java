@@ -4,8 +4,8 @@ import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantService;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.UserService;
-import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.OUserService;
+import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.dto.FavoriteResponseDTO;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.dto.RestaurantDetailDTO;
@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.*;
 public class RestaurantApiController {
 
     private final RestaurantService restaurantService;
-    private final UserService userService;
+    private final OUserService userService;
     private final RestaurantFavoriteService restaurantFavoriteService;
 
     @Operation(summary = "식당 상세 화면 정보 불러오기", description = "식당 하나에 대한 상세 정보가 반환됩니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +

@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
+import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,4 +22,11 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Integer> {
     List<PostEntity> findActivePostsByUserId(@Param("userId") Integer userId);
 
     Optional<PostEntity> findByStatusAndPostId(String status, Integer postId);
+
+    @Query("""
+        SELECT p FROM PostEntity p
+        WHERE p.user.userId = :userId AND p.status = 'ACTIVE'
+        ORDER BY p.createdAt DESC""")
+    List<PostEntity> findActiveByUserIdOrderByCreatedAtDesc(@Param("userId") Integer userId);
+
 }

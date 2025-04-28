@@ -78,7 +78,7 @@ document.getElementById('saveBtn').addEventListener('click',function (){
     var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
     // 서버로 전송
-    fetch("/user/api/myPage/setNickname", {
+    fetch("/user/api/myPage/updateProfile", {
         method: "PATCH",
         headers: {
             'Content-Type': 'application/json',

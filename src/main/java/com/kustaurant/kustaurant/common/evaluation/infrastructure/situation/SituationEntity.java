@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.evaluation.infrastructure.situation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationItemScore;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationSituationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,5 +34,5 @@ public class SituationEntity {
 
     @OneToMany(mappedBy = "situation")
     @JsonIgnore
-    private List<EvaluationItemScore> evaluationItemScoreList = new ArrayList<>();
+    private List<EvaluationSituationEntity> evaluationSituationEntityList = new ArrayList<>();
 }

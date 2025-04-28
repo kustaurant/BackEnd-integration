@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
-import com.kustaurant.kustaurant.common.comment.PostComment;
+import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
@@ -40,10 +40,10 @@ public class PostEntity {
     private UserEntity user;
 
     @OneToMany(mappedBy = "post")
-    private List<PostComment> postCommentList = new ArrayList<>();
+    private List<PostCommentEntity> postCommentList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    private List<PostScrap> postScrapList = new ArrayList<>();
+    private List<PostScrapEntity> postScrapList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
     private List<PostPhoto> postPhotoList = new ArrayList<>();

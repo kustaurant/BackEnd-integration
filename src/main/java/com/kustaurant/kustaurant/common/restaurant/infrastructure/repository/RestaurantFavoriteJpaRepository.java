@@ -4,6 +4,8 @@ import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.Restaur
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,10 +15,10 @@ public interface RestaurantFavoriteJpaRepository extends JpaRepository<Restauran
     boolean existsByUser_UserIdAndRestaurant_RestaurantId(Integer userId, Integer restaurantId);
     List<RestaurantFavoriteEntity> findByUser_UserId(Integer userId);
 
-    // TODO: need to delete everything below this
+    @Query("""
+        SELECT rf FROM RestaurantFavoriteEntity rf
+        WHERE rf.user.id = :userId
+        ORDER BY rf.createdAt DESC""")
+    List<RestaurantFavoriteEntity> findSortedFavoritesByUserIdDesc(@Param("userId") Integer userId);
 
-    Optional<RestaurantFavoriteEntity> findByUserAndRestaurant(UserEntity UserEntity, RestaurantEntity restaurant);
-    List<RestaurantFavoriteEntity> findByUser(UserEntity UserEntity);
-
-    Integer countByRestaurantAndStatus(RestaurantEntity restaurant, String status);
 }

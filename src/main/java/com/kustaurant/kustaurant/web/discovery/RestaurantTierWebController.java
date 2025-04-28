@@ -7,13 +7,13 @@ import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationReposi
 import com.kustaurant.kustaurant.common.restaurant.application.service.query.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.application.service.query.RestaurantChartService;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.webUser.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.situation.SituationRepository;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantApiService;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
+import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,14 +35,9 @@ import java.util.stream.Collectors;
 @Controller
 @Slf4j
 public class RestaurantTierWebController {
-    //
-    private final SituationRepository situationRepository;
     private final EvaluationRepository evaluationRepository;
-    private final EvaluationService evaluationService;
     private final CustomOAuth2UserService customOAuth2UserService;
-    //
     private final RestaurantChartService restaurantChartService;
-    private final RestaurantApiService restaurantApiService;
 
     public static final Integer tierPageSize = 40;
     // 티어표 지도 중앙 좌표

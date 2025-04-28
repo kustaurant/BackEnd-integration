@@ -1,16 +1,16 @@
 package com.kustaurant.kustaurant.api.post.controller;
 
 
-import com.kustaurant.kustaurant.common.comment.CommentLikeDislikeDTO;
-import com.kustaurant.kustaurant.common.comment.PostComment;
-import com.kustaurant.kustaurant.common.comment.PostCommentDTO;
+import com.kustaurant.kustaurant.common.comment.dto.CommentLikeDislikeDTO;
+import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.UserService;
-import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.OUserService;
+import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.ServerException;
 import com.kustaurant.kustaurant.common.post.enums.PostCategory;
@@ -46,7 +46,7 @@ public class CommunityApiController {
     private final PostScrapApiService postScrapApiService;
     private final StorageApiService storageApiService;
     private final PostRepository postRepository;
-    private final UserService userService;
+    private final OUserService userService;
 
     // 커뮤니티 메인 화면
     @GetMapping("/api/v1/community/posts")
@@ -130,7 +130,7 @@ public class CommunityApiController {
             @Parameter(hidden = true)
             Integer userId) {
         UserEntity user = userService.findUserById(userId);
-        PostComment postComment = postApiCommentService.createComment(content, postId, userId);
+        PostCommentEntity postComment = postApiCommentService.createComment(content, postId, userId);
         // 대댓글 일 경우 부모 댓글과 관계 매핑
         if (!parentCommentId.isEmpty()) {
             postApiCommentService.processParentComment(postComment, parentCommentId);
@@ -160,7 +160,7 @@ public class CommunityApiController {
             Integer userId) {
         UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(Integer.valueOf(postId));
-        PostComment postComment = postApiCommentService.createComment(content, postId, userId);
+        PostCommentEntity postComment = postApiCommentService.createComment(content, postId, userId);
         // 대댓글 일 경우 부모 댓글과 관계 매핑
         if (!parentCommentId.isEmpty()) {
             postApiCommentService.processParentComment(postComment, parentCommentId);
@@ -246,7 +246,7 @@ public class CommunityApiController {
     public ResponseEntity<CommentLikeDislikeDTO> toggleCommentLikeOrDislike(@PathVariable @Parameter(description = "댓글 id입니다", example = "30") Integer commentId,
                                                                             @PathVariable @Parameter(description = "좋아요는 likes, 싫어요는 dislikes로 값을 설정합니다.", example = "likes") String action,
                                                                             @JwtToken @Parameter(hidden = true) Integer userId) {
-        PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
+        PostCommentEntity postComment = postApiCommentService.getPostCommentByCommentId(commentId);
         UserEntity user = userService.findUserById(userId);
         int commentLikeStatus = postApiCommentService.toggleCommentLikeOrDislike(action, postComment,user);
         CommentLikeDislikeDTO responseDTO = CommentLikeDislikeDTO.toCommentLikeDislikeDTO(postComment,commentLikeStatus);

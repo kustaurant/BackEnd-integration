@@ -18,7 +18,7 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     @Override
     public RestaurantFavorite findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
         return store.stream()
-                .filter(fav -> fav.getUser().getUserId().equals(userId) &&
+                .filter(fav -> fav.getUser().getId().equals(userId) &&
                         fav.getRestaurant().getRestaurantId().equals(restaurantId))
                 .findFirst()
                 .orElseThrow(() -> new DataNotFoundException("Favorite not found"));
@@ -28,20 +28,15 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     @Override
     public boolean existsByUserAndRestaurant(Integer userId, Integer restaurantId) {
         return store.stream()
-                .anyMatch(fav -> fav.getUser().getUserId().equals(userId) &&
+                .anyMatch(fav -> fav.getUser().getId().equals(userId) &&
                         fav.getRestaurant().getRestaurantId().equals(restaurantId));
     }
 
     @Override
     public List<RestaurantFavorite> findByUser(Integer userId) {
-        List<RestaurantFavorite> favorites = new ArrayList<>();
-        for (RestaurantFavorite fav : store) {
-            if (fav.getUser().getUserId().equals(userId)) {
-                favorites.add(fav);
-            }
-        }
-        return favorites;
+        return List.of();
     }
+
 
     @Override
     public RestaurantFavorite save(RestaurantFavorite restaurantFavorite) {
@@ -54,20 +49,18 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
         store.remove(restaurantFavorite);
     }
 
-
-    // TODO: need to delete everything below this
     @Override
-    public Optional<RestaurantFavoriteEntity> findByUserAndRestaurant(UserEntity user, RestaurantEntity restaurant) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<RestaurantFavoriteEntity> findByUser(UserEntity user) {
+    public List<RestaurantFavorite> findSortedFavoritesByUserId(Integer userId) {
         return List.of();
     }
 
+
+    // TODO: need to delete everything below this
+
     @Override
-    public Integer countByRestaurantAndStatus(RestaurantEntity restaurant, String status) {
-        return 0;
+    public List<RestaurantFavoriteEntity> findAllByUserId(UserEntity user) {
+        return List.of();
     }
+
+
 }

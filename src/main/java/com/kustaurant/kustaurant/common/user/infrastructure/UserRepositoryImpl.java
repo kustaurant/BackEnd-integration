@@ -26,7 +26,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findByNickname(String nickname) {
-        return userJpaRepository.findByUserNickname_Value(nickname).map(UserEntity::toModel);
+        return userJpaRepository.findByNickname_Value(nickname).map(UserEntity::toModel);
     }
 
     @Override

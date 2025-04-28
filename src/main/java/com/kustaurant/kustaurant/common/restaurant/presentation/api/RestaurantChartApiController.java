@@ -2,14 +2,14 @@ package com.kustaurant.kustaurant.common.restaurant.presentation.api;
 
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.application.service.query.RestaurantChartService;
-import com.kustaurant.kustaurant.global.UserService;
-import com.kustaurant.kustaurant.global.apiUser.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.common.restaurant.application.service.query.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.application.service.query.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantFavoriteService;
+import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -42,7 +42,7 @@ public class RestaurantChartApiController {
     private final RestaurantChartService restaurantChartService;
 
     private final RestaurantApiService restaurantApiService;
-    private final UserService userService;
+    private final OUserService userService;
     private final RestaurantFavoriteService restaurantFavoriteService;
 
     @Operation(summary = "티어표 리스트 불러오기", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +

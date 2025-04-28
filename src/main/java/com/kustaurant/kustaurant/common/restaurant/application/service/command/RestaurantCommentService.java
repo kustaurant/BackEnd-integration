@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.application.service.command;
 
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.*;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.port.RestaurantRepository;

@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.restaurant.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.RestaurantComment;
 import com.kustaurant.kustaurant.common.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.spec.RestaurantChartSpec;
@@ -54,19 +54,13 @@ public class RestaurantEntity {
 
 
     // 다른 테이블과의 관계 매핑
-    @ManyToMany
-    @JsonIgnore
-    @JoinTable(name = "restaurant_hashtag_relations_tbl", joinColumns = @JoinColumn(name = "restaurant_id"),
-            inverseJoinColumns = @JoinColumn(name="hashtag_id"))
-    List<RestaurantHashtagEntity> restaurantHashtagList = new ArrayList<>();
-
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
     List<RestaurantSituationRelationEntity> restaurantSituationRelationEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
-    private List<Evaluation> evaluationList=new ArrayList<>();
+    private List<EvaluationEntity> evaluationList=new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
@@ -86,7 +80,7 @@ public class RestaurantEntity {
         }
 
         return evaluationList.stream()
-                .mapToDouble(Evaluation::getEvaluationScore) // 평가 점수로 변환
+                .mapToDouble(EvaluationEntity::getEvaluationScore) // 평가 점수로 변환
                 .average() // 평균 계산
                 .orElse(0.0); // 평가가 없는 경우 0 반환
     }

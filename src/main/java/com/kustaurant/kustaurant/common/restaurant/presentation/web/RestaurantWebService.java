@@ -9,7 +9,6 @@ import com.kustaurant.kustaurant.common.restaurant.application.service.command.R
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantService;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.port.RestaurantMenuRepository;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.port.RestaurantRepository;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantHashtagEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -68,7 +67,6 @@ public class RestaurantWebService {
                 query.distinct(true);  // 중복을 제거
 
                 // 조인
-                Join<RestaurantEntity, RestaurantHashtagEntity> joinHashtag = root.join("restaurantHashtagList", JoinType.LEFT);
                 Join<RestaurantEntity, RestaurantMenuEntity> joinMenu = root.join("restaurantMenuList", JoinType.LEFT);
                 //Join<Restaurant, Situation> joinSituation = root.join("situationList", JoinType.LEFT);
 
@@ -79,13 +77,12 @@ public class RestaurantWebService {
                     Predicate namePredicate = cb.like(root.get("restaurantName"), "%" + kw + "%");
                     Predicate typePredicate = cb.like(root.get("restaurantType"), "%" + kw + "%");
                     Predicate cuisinePredicate = cb.like(root.get("restaurantCuisine"), "%" + kw + "%");
-                    Predicate hashtagPredicate = cb.like(joinHashtag.get("hashtagName"), "%" + kw + "%");
                     Predicate menuPredicate = cb.like(joinMenu.get("menuName"), "%" + kw + "%");
 
                     // 각 Predicate를 predicates 리스트에 추가합니다.
                     predicates.add(cb.and(
                             cb.equal(root.get("status"), "ACTIVE"),
-                            cb.or(namePredicate, typePredicate, cuisinePredicate, hashtagPredicate, menuPredicate)));
+                            cb.or(namePredicate, typePredicate, cuisinePredicate, menuPredicate)));
                 }
 
                 // predicates 리스트에 있는 모든 Predicate를 and() 메소드에 전달하여 모든 조건을 결합합니다.
