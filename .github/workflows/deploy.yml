@@ -3,7 +3,7 @@ name: Github-actions 자동 배포
 on:
   push:
     branches:
-      - refactor/github-actions
+      - main
 
 jobs:
   Deploy:
@@ -11,7 +11,7 @@ jobs:
 
 
     steps:
-      - name: SSH로 LightSail 인스턴스 접속해서 원격에서 최신 코드 pull 받고 빌드, 실행 하기
+      - name: SSH로 LightSail 인스턴스 접속해서 원격에서 최신 코드 pull 받고 빌드 -> 빌드 파일 실행 하기
         uses: appleboy/ssh-action@v1
         env:
           ENV_FILE: ${{ secrets.ENV_FILE }}
@@ -40,7 +40,7 @@ jobs:
             sudo fuser -k -n tcp 8080 || true
             
             # 새로운 JAR 파일 실행
-            JAR=RestaurantTier-0.1.0-SNAPSHOT.jar
+            JAR=build/libs/RestaurantTier-0.1.0-SNAPSHOT.jar
             LOG=$HOME/logs/kustaurant.log
             export SPRING_PROFILES_ACTIVE=prod
             mkdir -p $HOME/logs
