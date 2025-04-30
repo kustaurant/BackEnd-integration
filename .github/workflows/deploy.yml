@@ -14,30 +14,24 @@ jobs:
       - name: SSH로 LightSail 인스턴스 접속해서 원격에서 it pull 받고 빌드, 실행 하기
         uses: appleboy/ssh-action@v1
         env:
-          APPLICATION_YML: ${{ secrets.APPLICATION_YML }}
-          AUTH_YML: ${{ secrets.AUTH_YML }}
+          ENV_FILE: ${{ secrets.ENV_FILE }}
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
-          envs: APPLICATION_YML, AUTH_YML
+          envs: ENV_FILE
           script: |
             set -e
             set -x
+            
             cd /home/ubuntu/BackEnd-integration
             git checkout refactor/github-actions
-
-
-            # 기존 설정 파일 삭제
-            rm -rf src/main/resources/application.yml || true
-            rm -rf src/main/resources/auth.yml || true
 
             # 최신 코드 가져오기
             git pull origin refactor/github-actions
 
-            # base64로부터 복원
-            echo "$APPLICATION_YML" | base64 -d > src/main/resources/application.yml
-            echo "$AUTH_YML" | base64 -d > src/main/resources/auth.yml
+            # .env 파일 복원
+            echo "$ENV_FILE" | base64 -d > .env
 
             # 빌드 수행
             chmod +x ./gradlew
@@ -47,7 +41,7 @@ jobs:
             
             # 새로운 JAR 파일 실행
             JAR=RestaurantTier-0.1.0-SNAPSHOT.jar
-            LOG=/dev/null
+            LOG=$HOME/logs/kustaurant.log
             export SPRING_PROFILES_ACTIVE=prod
             mkdir -p $HOME/logs
 
