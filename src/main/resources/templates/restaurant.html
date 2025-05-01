@@ -19,7 +19,7 @@
     <!-- End Google Tag Manager -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <title th:text="${'쿠스토랑 - ' + restaurant.getRestaurantName()}"></title>
+    <title th:text="${'쿠스토랑 - ' + restaurantDto.restaurantDetail.getRestaurantName()}"></title>
     <meta charset="UTF-8"/>
 
     <!-- 아이콘 라이브러리-->
@@ -61,66 +61,66 @@
 
     <div class="inner-container">
         <div class="basic-info left-justified">
-            <img th:if="${restaurant.restaurantImgUrl != 'no_img'}" th:id="mainImg" th:src="${restaurant.restaurantImgUrl}">
-            <img th:if="${restaurant.restaurantImgUrl == 'no_img'}" th:id="mainImg" src="/img/restaurant/no_img.png">
+            <img th:if="${restaurantDto.restaurantDetail.restaurantImgUrl != 'no_img'}" th:id="mainImg" th:src="${restaurantDto.restaurantDetail.restaurantImgUrl}">
+            <img th:if="${restaurantDto.restaurantDetail.restaurantImgUrl == 'no_img'}" th:id="mainImg" src="/img/restaurant/no_img.png">
             <div class="texts left-justified">
                 <div id="restaurantNameOuter">
-                    <div id="restaurantName" th:text="${restaurant.restaurantName}"></div>
+                    <div id="restaurantName" th:text="${restaurantDto.restaurantDetail.restaurantName}"></div>
                     <div id="favoriteContainer">
-                        <img id="favoriteImg" th:class="${isFavoriteExist} ? 'after-favorite' : 'before-favorite'"
-                             th:src="${isFavoriteExist} ? 'https://s-lol-web.op.gg/images/icon/icon-bookmark-on-w.svg?v=1702977255104' : 'https://s-lol-web.op.gg/images/icon/icon-bookmark.svg?v=1702977255104'">
+                        <img id="favoriteImg" th:class="${restaurantDto.restaurantDetail.isFavorite} ? 'after-favorite' : 'before-favorite'"
+                             th:src="${restaurantDto.restaurantDetail.isFavorite} ? 'https://s-lol-web.op.gg/images/icon/icon-bookmark-on-w.svg?v=1702977255104' : 'https://s-lol-web.op.gg/images/icon/icon-bookmark.svg?v=1702977255104'">
                     </div>
                 </div>
-                <span id="restaurantType" th:text="${restaurant.restaurantType}"></span>
-                <span id="restaurantAddress" th:text="${restaurant.restaurantAddress}"></span>
-                <span id="restaurantTel" th:text="${restaurant.restaurantTel}"></span>
-                <a id="naverMapLink" target="_blank" th:href="${restaurant.getRestaurantUrl()}">네이버 지도로 이동하기</a>
+                <span id="restaurantType" th:text="${restaurantDto.domain.restaurantType}"></span>
+                <span id="restaurantAddress" th:text="${restaurantDto.restaurantDetail.restaurantAddress}"></span>
+                <span id="restaurantTel" th:text="${restaurantDto.domain.restaurantTel}"></span>
+                <a id="naverMapLink" target="_blank" th:href="${restaurantDto.restaurantDetail.naverMapUrl}">네이버 지도로 이동하기</a>
             </div>
         </div>
         <div>
             <div class="cuisine-tier-info left-justified" id="tierInfoContainer">
-                <span th:class="'cuisine-tier tier' + ${restaurant.getMainTier()}">
-                    <img class="tier-cuisine-img" th:src="${restaurant.getCuisineImgUrl(restaurant.getRestaurantCuisine())}">
-                    <span th:text="${restaurant.getRestaurantCuisine()} + ' '"></span>
-                    <span th:text="${restaurant.getMainTier()} + '티어'" th:if="${restaurant.getMainTier() != -1}"></span>
-                    <span th:if="${restaurant.getMainTier() == -1}">- 평가 데이터가 부족합니다.</span>
+                <span th:class="'cuisine-tier tier' + ${restaurantDto.restaurantDetail.mainTier}">
+                    <img class="tier-cuisine-img" th:src="${restaurantDto.restaurantDetail.restaurantCuisineImgUrl}">
+                    <span th:text="${restaurantDto.restaurantDetail.restaurantCuisine} + ' '"></span>
+                    <span th:text="${restaurantDto.restaurantDetail.mainTier} + '티어'" th:if="${restaurantDto.restaurantDetail.mainTier != -1}"></span>
+                    <span th:if="${restaurantDto.restaurantDetail.mainTier == -1}">- 평가 데이터가 부족합니다.</span>
                 </span>
             </div>
             <div class="situation-tier-info left-justified">
-                <span th:each="situationTier : ${situationTierList}" class="situation-tier tier-1">
-                    <img class="tier-situation-img" th:src="'https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/'+${situationTier.getSituation().getSituationName()}+'.png'">
-                    <span th:text="${situationTier.getSituation().getSituationName()} + ' '"></span>
+                <span th:each="situation : ${restaurantDto.restaurantDetail.situationList}" class="situation-tier tier-1">
+                    <img class="tier-situation-img" th:src="'https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/'+${situation}+'.png'">
+                    <span th:text="${situation} + ' '"></span>
                 </span>
             </div>
         </div>
         <div class="stats-info">
             <div class="stat-data" style="margin-right: 10px;">
                 <div class="stat-name">페이지 방문 횟수</div>
-                <div id="statVisitors" class="stat-value" th:text="${visitCountData}"></div>
+                <div id="statVisitors" class="stat-value" th:text="${restaurantDto.domain.visitCount}"></div>
             </div>
             <div class="stat-data">
                 <div class="stat-name">평가 데이터 개수</div>
-                <div id="statDatas" class="stat-value" th:text="${evaluationCountData} + '개'"></div>
+                <div id="statDatas" class="stat-value" th:text="${restaurantDto.restaurantDetail.evaluationCount} + '개'"></div>
             </div>
             <div class="stat-data">
                 <div class="stat-name">즐겨찾기 수</div>
-                <div id="favoriteCount" class="stat-value" th:text="${favoriteCount} + '개'"></div>
+                <div id="favoriteCount" class="stat-value" th:text="${restaurantDto.restaurantDetail.favoriteCount} + '개'"></div>
             </div>
         </div>
     </div>
 
 
-    <div class="inner-container" th:if="${restaurant.getPartnershipInfo()}">
-        <div class="stat-name" th:text="'제휴 정보 - ' + ${restaurant.getPartnershipInfo()}"></div>
+    <div class="inner-container" th:if="${restaurantDto.restaurantDetail.partnershipInfo}">
+        <div class="stat-name" th:text="'제휴 정보 - ' + ${restaurantDto.restaurantDetail.partnershipInfo}"></div>
     </div>
 
 
-    <div id="menuContainer" class="inner-container" th:if="${#lists.size(menus) > 0 && menus[0].menuName != 'no_menu'}">
+    <div id="menuContainer" class="inner-container" th:if="${#lists.size(restaurantDto.restaurantDetail.restaurantMenuList) > 0 && restaurantDto.restaurantDetail.restaurantMenuList[0].menuName != 'no_menu'}">
         <div id="menuTopDiv" style="height:110px; width:100%; position: absolute; top: -110px; left: 0; visibility: hidden;"></div>
         <div class="section-title">메뉴</div>
         <div id="menuInfoContainer">
             <ul class="menu-ul" id="menuUL">
-                <li th:each="menu, iterStat : ${menus}" th:if="${iterStat.index < initialDisplayMenuCount}">
+                <li th:each="menu, iterStat : ${restaurantDto.restaurantDetail.restaurantMenuList}" th:if="${iterStat.index < initialDisplayMenuCount}">
                     <img th:if="${(menu.naverType eq 'type1' or menu.naverType eq 'type3') and menu.menuImgUrl != 'icon'}" th:src="${menu.menuImgUrl}" alt="menu img">
                     <img th:if="${(menu.naverType eq 'type1' or menu.naverType eq 'type3') and menu.menuImgUrl == 'icon'}" src="/img/favicon.png" alt="menu img">
                     <div class="menu-text-container">
@@ -132,7 +132,7 @@
                 </li>
             </ul>
         </div>
-        <div id="menuUnfoldButton" class="unfold-button" th:if="${#lists.size(menus) > 3}">펼치기</div>
+        <div id="menuUnfoldButton" class="unfold-button" th:if="${#lists.size(restaurantDto.restaurantDetail.restaurantMenuList) > 3}">펼치기</div>
     </div>
     <div id="mapContainer" class="inner-container">
         <div id="mapTopDiv" style="height:110px; width:100%; position: absolute; top: -110px; left: 0; visibility: hidden;"></div>
@@ -140,7 +140,9 @@
         <div id="mapUnfoldButton" class="unfold-button">펼치기</div>
     </div>
 
-    <a class="inner-container evaluation-button button" id="evaluationButton" th:href="@{/evaluation/{restuarantId}(restuarantId=${restaurant.restaurantId})}" th:text="${evaluationButton}"></a>
+    <a class="inner-container evaluation-button button" id="evaluationButton"
+       th:href="@{/evaluation/{restuarantId}(restuarantId=${restaurantDto.restaurantDetail.restaurantId})}"
+       th:text="${evaluationButton}"></a>
 
     <!-- 댓글 쓰는 부분 : 기능 변경으로 삭제 -->
     <div class="comment-container">
@@ -182,7 +184,7 @@
                             <span th:text="${restaurantComment.commentScore}"></span>
                         </div>
                         <div class="nick-date-div">
-                            <img class="icon" th:src="${restaurantComment.user.getRankImg()}">
+                            <img class="icon" th:src="${restaurantComment.userEntity.getRankImg()}">
                             <span class="nick-span" th:text="${restaurantComment.commentNickname}"></span>
                             <span class="date-span" th:text="${restaurantComment.commentTime}"></span>
                             <!-- Button trigger modal -->
@@ -267,6 +269,6 @@
 </body>
 <!-- 자바스크립트 데이터 전달용 태그 -->
 <div id="restaurantInfo"
-     th:attr="data-name=${restaurant.restaurantName}, data-latitude=${restaurant.restaurantLatitude}, data-longitude=${restaurant.restaurantLongitude}">
+     th:attr="data-name=${restaurantDto.restaurantDetail.restaurantName}, data-latitude=${restaurantDto.domain.restaurantLatitude}, data-longitude=${restaurantDto.domain.restaurantLongitude}">
 </div>
 </html>

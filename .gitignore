@@ -39,5 +39,5 @@ out/
 ### log ###
 *.log
 
-### yml ###
-src/main/resources/*.yml
+### env ###
+.env

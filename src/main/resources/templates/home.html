@@ -326,34 +326,43 @@
         </div>
     </section>
 
+    <!-- Modal 전체를 조건부 렌더링 -->
+    <div th:if="${homeModal != null}">
 
-    <!-- Modal -->
-    <div class="modal" id="modal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered ">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-primary" id="exampleModalLabel" th:text="${homeModal.modalTitle}"></h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
+        <!-- Modal -->
+        <div class="modal" id="modal" data-bs-backdrop="static" tabindex="-1"
+             aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
 
-                <div class="modal-body text-dark" th:utext="${homeModal.modalBody}">
-                </div>
-
-                <div class="modal-body text-dark" th:text="${'(만료일: ' + homeModal.expiredAt + ')'}">
-                </div>
-
-                <div class="modal-footer">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
-                        <label class="form-check-label" for="flexCheckChecked">
-                            일주일동안 보지 않기
-                        </label>
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5 text-primary" id="exampleModalLabel"
+                            th:text="${homeModal.title}"></h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
                     </div>
+
+                    <div class="modal-body text-dark" th:utext="${homeModal.body}">
+                    </div>
+
+                    <div class="modal-body text-dark"
+                         th:text="${'(만료일: ' + homeModal.expiredAt + ')'}">
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                            <label class="form-check-label" for="flexCheckChecked">
+                                일주일동안 보지 않기
+                            </label>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
-    <div id="ExpiredData" th:data-expired="${homeModal.expiredAt}" style="display: none"></div>
+
 
     <footer th:replace="~{footer::footerFragment}">
 

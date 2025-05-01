@@ -45,7 +45,7 @@ document.getElementById('favoriteImg').addEventListener('click', function() {
 });
 // 식당 Favorite 토글 요청
 function toggleFavoriteRequest() {
-    fetch(window.location.origin + "/api" + window.location.pathname + "/favorite/toggle", {
+    fetch(window.location.origin + "/web/api" + window.location.pathname + "/favorite/toggle", {
         method: 'POST',
     })
         .then(response => {
@@ -79,6 +79,7 @@ function toggleFavoriteHTML(favoriteImg) {
 
 // 메뉴
 function fillMenuInfo(data, num) { //num은 처음 표시할 메뉴 개수임. -1일 경우 모든 메뉴 표시
+    console.log(data);
   const menuInfoContainer = document.getElementById('menuInfoContainer');
   menuInfoContainer.innerHTML = '';
   const menuUl = document.createElement('ul');

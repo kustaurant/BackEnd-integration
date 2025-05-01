@@ -95,7 +95,7 @@
                         <span class="first-detail">
                             <a th:text="${post.postCategory}" href="#"></a>
                         </span>
-                        <span th:text="${post.calculateTimeAgo()}" class="second-detail updated-time">
+                        <span th:text="${post.toDomain().calculateTimeAgo()}" class="second-detail updated-time">
 
                         </span>
                         <span class="third-detail user-name">
@@ -142,20 +142,20 @@
 
         <div class="post-like">
             <button type="button" id="likeButton" class="post-button" th:data-post-id="${post.postId}">
-                <img th:if="${post.likeUserList.contains(user)}" src="/img/community/up-green.png">
-                <img th:unless="${post.likeUserList.contains(user)}" src="/img/community/up.png">
-                <span th:text="${post.likeUserList.size()}"></span>
+                <img th:if="${postInteractionStatus.liked.isLiked()}" src="/img/community/up-green.png">
+                <img th:unless="${postInteractionStatus.liked.isLiked()}" src="/img/community/up.png">
+                <span th:text="${post.postLikesList.size()}"></span>
             </button>
             <button type="button" id="dislikeButton" class="post-button" th:data-post-id="${post.postId}">
-                <img th:if="${post.dislikeUserList.contains(user)}" src="/img/community/down-red.png">
-                <img th:unless="${post.dislikeUserList.contains(user)}" src="/img/community/down.png">
-                <span th:if="${post.dislikeUserList.size() >0}" th:text="'-'+${post.dislikeUserList.size()}"></span>
-                <span th:if="${post.dislikeUserList.size() ==0}" th:text="${post.dislikeUserList.size()}"></span>
+                <img th:if="${postInteractionStatus.disliked.isDisliked()}" src="/img/community/down-red.png">
+                <img th:unless="${postInteractionStatus.disliked.isDisliked()}" src="/img/community/down.png">
+                <span th:if="${post.postDislikesList.size() >0}" th:text="'-'+${post.postDislikesList.size()}"></span>
+                <span th:if="${post.postDislikesList.size() ==0}" th:text="${post.postDislikesList.size()}"></span>
 
             </button>
             <button type="button" id="scrap" class="post-button" th:data-post-id="${post.postId}">
-                <img th:if="${isPostScrappedByUser}" src="/img/community/scrap-green.png">
-                <img th:unless="${isPostScrappedByUser}" src="/img/community/scrap.png">
+                <img th:if="${postInteractionStatus.scrapped.isScrapped()}" src="/img/community/scrap-green.png">
+                <img th:unless="${postInteractionStatus.scrapped.isScrapped()}" src="/img/community/scrap.png">
 
             </button>
         </div>
@@ -196,16 +196,13 @@
                         <div class="comment-div">
                             <div class="comment-left">
                                 <button class="comment-up" type="button" th:data-id="${comment.commentId}">
-                                    <img th:if="${comment.likeUserList.contains(user)}"
-                                         src="/img/community/up-green.png">
-                                    <img th:unless="${comment.likeUserList.contains(user)}" src="/img/community/up.png">
+                                    <img th:if="${commentInteractionMap[comment.commentId]?.liked?.isLiked()}" src="/img/community/up-green.png">
+                                    <img th:unless="${commentInteractionMap[comment.commentId]?.liked?.isLiked()}" src="/img/community/up.png">
                                 </button>
                                 <span class="totalLikeCount" th:text="${comment.likeCount}"></span>
                                 <button class="comment-down" type="button" th:data-id="${comment.commentId}">
-                                    <img th:if="${comment.dislikeUserList.contains(user)}"
-                                         src="/img/community/down-red.png">
-                                    <img th:unless="${comment.dislikeUserList.contains(user)}"
-                                         src="/img/community/down.png">
+                                    <img th:if="${commentInteractionMap[comment.commentId]?.disliked?.isDisliked()}" src="/img/community/down-red.png">
+                                    <img th:unless="${commentInteractionMap[comment.commentId]?.disliked?.isDisliked()}" src="/img/community/down.png">
                                 </button>
                             </div>
                             <div class="comment-content">
@@ -250,24 +247,18 @@
                                         </div>
                                         <div class="comment-left">
                                             <button class="comment-up" type="button" th:data-id="${reply.commentId}">
-                                                <img th:if="${reply.likeUserList.contains(user)}"
-                                                     src="/img/community/up-green.png">
-                                                <img th:unless="${reply.likeUserList.contains(user)}"
-                                                     src="/img/community/up.png">
+                                                <img th:if="${commentInteractionMap[reply.commentId]?.liked?.isLiked()}" src="/img/community/up-green.png">
+                                                <img th:unless="${commentInteractionMap[reply.commentId]?.liked?.isLiked()}" src="/img/community/up.png">
                                             </button>
                                             <span class="totalLikeCount" th:text="${reply.likeCount}"></span>
                                             <button class="comment-down" type="button" th:data-id="${reply.commentId}">
-                                                <img th:if="${reply.dislikeUserList.contains(user)}"
-                                                     src="/img/community/down-red.png">
-                                                <img th:unless="${reply.dislikeUserList.contains(user)}"
-                                                     src="/img/community/down.png">
+                                                <img th:if="${commentInteractionMap[reply.commentId]?.disliked?.isDisliked()}" src="/img/community/down-red.png">
+                                                <img th:unless="${commentInteractionMap[reply.commentId]?.disliked?.isDisliked()}" src="/img/community/down.png">
                                             </button>
                                         </div>
                                         <div class="comment-content">
                                             <div class="comment-name">
                                                 <img th:src="${reply.user.getRankImg()}">
-
-
                                                 <span class="user-name" th:text="${reply.user.userNickname}"></span>
                                                 <span th:text="${reply.calculateTimeAgo()}"></span>
                                             </div>
