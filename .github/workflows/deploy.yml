@@ -58,8 +58,11 @@ jobs:
             
             sudo fuser -k -n tcp 8080 || true
             
-            # 새로운 JAR 파일 실행
-            JAR=build/libs/RestaurantTier-0.1.0-SNAPSHOT.jar
+            # build.gradle에서 version 추출
+            VERSION=$(grep '^version' build.gradle | sed -E "s/version *= *'([^']+)'/\1/")
+            JAR=build/libs/RestaurantTier-$VERSION.jar
+
+            # 빌드 파일 실행
             LOG=$HOME/logs/kustaurant.log
             export SPRING_PROFILES_ACTIVE=prod
             mkdir -p $HOME/logs
