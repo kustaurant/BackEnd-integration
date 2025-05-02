@@ -16,24 +16,24 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PostScrapService {
-    private final PostScrapRepository postScrapRepository;
+    private final OPostScrapRepository postScrapRepository;
     private final PostRepository postRepository;
     private final OUserRepository userRepository;
     public Map<String, Object> scrapCreateOfDelete(PostEntity postEntity, UserEntity user){
-        List<PostScrap> postScrapList = postEntity.getPostScrapList();
-        List<PostScrap> userScrapList =user.getScrapList();
-        Optional<PostScrap> scrapOptional = postScrapRepository.findByPostAndUser(postEntity, user);
+        List<PostScrapEntity> postScrapList = postEntity.getPostScrapList();
+        List<PostScrapEntity> userScrapList =user.getScrapList();
+        Optional<PostScrapEntity> scrapOptional = postScrapRepository.findByPostAndUser(postEntity, user);
         Map<String, Object> status = new HashMap<>();
         if(scrapOptional.isPresent()){
-            PostScrap scrap = scrapOptional.get();
+            PostScrapEntity scrap = scrapOptional.get();
             postScrapRepository.delete(scrap);
             postScrapList.remove(scrap);
             userScrapList.remove(scrap);
             status.put("scrapDelete",true);
         }
         else{
-            PostScrap scrap = new PostScrap(user, postEntity, LocalDateTime.now());
-            PostScrap savedScrap= postScrapRepository.save(scrap);
+            PostScrapEntity scrap = new PostScrapEntity(user, postEntity, LocalDateTime.now());
+            PostScrapEntity savedScrap= postScrapRepository.save(scrap);
             userScrapList.add(savedScrap);
             postScrapList.add(savedScrap);
             status.put("scrapCreated",true);

@@ -184,7 +184,7 @@
                             <span th:text="${restaurantComment.commentScore}"></span>
                         </div>
                         <div class="nick-date-div">
-                            <img class="icon" th:src="${restaurantComment.user.getRankImg()}">
+                            <img class="icon" th:src="${restaurantComment.userEntity.getRankImg()}">
                             <span class="nick-span" th:text="${restaurantComment.commentNickname}"></span>
                             <span class="date-span" th:text="${restaurantComment.commentTime}"></span>
                             <!-- Button trigger modal -->

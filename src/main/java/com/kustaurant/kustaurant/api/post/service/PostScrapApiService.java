@@ -19,20 +19,20 @@ public class PostScrapApiService {
     private final PostRepository postRepository;
     private final OUserRepository OUserRepository;
     public int scrapCreateOrDelete(PostEntity postEntity, UserEntity UserEntity) {
-        List<PostScrap> postScrapList = postEntity.getPostScrapList();
-        List<PostScrap> userScrapList = UserEntity.getScrapList();
-        Optional<PostScrap> scrapOptional = postScrapApiRepository.findByUserAndPost(UserEntity, postEntity);
+        List<PostScrapEntity> postScrapList = postEntity.getPostScrapList();
+        List<PostScrapEntity> userScrapList = UserEntity.getScrapList();
+        Optional<PostScrapEntity> scrapOptional = postScrapApiRepository.findByUserAndPost(UserEntity, postEntity);
         int status;
 
         if (scrapOptional.isPresent()) {
-            PostScrap scrap = scrapOptional.get();
+            PostScrapEntity scrap = scrapOptional.get();
             postScrapApiRepository.delete(scrap);
             postScrapList.remove(scrap);
             userScrapList.remove(scrap);
             status = 0; // scrapDeleted
         } else {
-            PostScrap scrap = new PostScrap(UserEntity, postEntity, LocalDateTime.now());
-            PostScrap savedScrap = postScrapApiRepository.save(scrap);
+            PostScrapEntity scrap = new PostScrapEntity(UserEntity, postEntity, LocalDateTime.now());
+            PostScrapEntity savedScrap = postScrapApiRepository.save(scrap);
             userScrapList.add(savedScrap);
             postScrapList.add(savedScrap);
             status = 1; // scrapCreated

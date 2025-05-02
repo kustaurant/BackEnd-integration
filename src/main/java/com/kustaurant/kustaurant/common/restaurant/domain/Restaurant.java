@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.common.restaurant.domain;
 
+import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -36,4 +37,35 @@ public class Restaurant {
 
     private List<String> situations = new ArrayList<>();
     private Integer favoriteCount = 0;
+
+    public String getCuisineImgUrl(String cuisine) {
+        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/cuisine-icon/" + restaurantCuisine.replaceAll("/", "") + ".svg";
+    }
+
+    public static Restaurant from(RestaurantEntity entity) {
+        return Restaurant.builder()
+                .restaurantId(entity.getRestaurantId())
+                .restaurantName(entity.getRestaurantName())
+                .restaurantType(entity.getRestaurantType())
+                .restaurantPosition(entity.getRestaurantPosition())
+                .restaurantAddress(entity.getRestaurantAddress())
+                .restaurantTel(entity.getRestaurantTel())
+                .restaurantUrl(entity.getRestaurantUrl())
+                .restaurantImgUrl(entity.getRestaurantImgUrl())
+                .restaurantCuisine(entity.getRestaurantCuisine())
+                .restaurantLatitude(entity.getRestaurantLatitude())
+                .restaurantLongitude(entity.getRestaurantLongitude())
+                .partnershipInfo(entity.getPartnershipInfo())
+                .status(entity.getStatus())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .restaurantVisitCount(entity.getRestaurantVisitCount())
+                .visitCount(entity.getVisitCount())
+                .restaurantEvaluationCount(entity.getRestaurantEvaluationCount())
+                .restaurantScoreSum(entity.getRestaurantScoreSum())
+                .mainTier(entity.getMainTier())
+                .favoriteCount(entity.getRestaurantFavorite().size())
+                .build();
+    }
+
 }

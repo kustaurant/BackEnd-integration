@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.web.post.service;
 
-import com.kustaurant.kustaurant.common.comment.PostComment;
-import com.kustaurant.kustaurant.common.comment.PostCommentRepository;
+import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.enums.*;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final OUserRepository userRepository;
-    private final PostScrapRepository postScrapRepository;
+    private final OPostScrapRepository postScrapRepository;
     private final PostLikeJpaRepository postLikeJpaRepository;
     private final PostDislikeJpaRepository postDislikeJpaRepository;
 
@@ -37,7 +36,6 @@ public class PostService {
     public static  final int POPULARCOUNT = 3;
     // 페이지 숫자
     public static  final int PAGESIZE=10;
-    private final PostCommentRepository postCommentRepository;
 
     // 메인 화면 로딩하기
     public Page<PostEntity> getList(int page, String sort) {
@@ -256,8 +254,8 @@ public class PostService {
 
                 //조인
                 Join<PostEntity, UserEntity> u1 = p.join("user", JoinType.LEFT);
-                Join<PostEntity, PostComment> c = p.join("postCommentList", JoinType.LEFT);
-                Join<PostComment, UserEntity> u2 = c.join("user", JoinType.LEFT);
+                Join<PostEntity, PostCommentEntity> c = p.join("postCommentList", JoinType.LEFT);
+                Join<PostCommentEntity, UserEntity> u2 = c.join("user", JoinType.LEFT);
                 // 액티브 조건 추가
                 Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
                 Predicate categoryPredicate;
@@ -336,4 +334,7 @@ public class PostService {
 
         };
     }
+
+
+
 }

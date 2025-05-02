@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
-import com.kustaurant.kustaurant.common.comment.PostComment;
-import com.kustaurant.kustaurant.common.comment.PostCommentApiRepository;
+import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentApiRepository;
 import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
@@ -134,8 +134,8 @@ public class PostApiService {
 
                 //조인
                 Join<PostEntity, UserEntity> u1 = p.join("user", JoinType.LEFT);
-                Join<PostEntity, PostComment> c = p.join("postCommentList", JoinType.LEFT);
-                Join<PostComment, UserEntity> u2 = c.join("user", JoinType.LEFT);
+                Join<PostEntity, PostCommentEntity> c = p.join("postCommentList", JoinType.LEFT);
+                Join<PostCommentEntity, UserEntity> u2 = c.join("user", JoinType.LEFT);
                 // 액티브 조건 추가
                 Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
                 Predicate categoryPredicate;
@@ -235,10 +235,10 @@ public class PostApiService {
     }
 
     private void deleteComments(PostEntity postEntity) {
-        List<PostComment> comments = postEntity.getPostCommentList();
-        for (PostComment comment : comments) {
+        List<PostCommentEntity> comments = postEntity.getPostCommentList();
+        for (PostCommentEntity comment : comments) {
             comment.setStatus("DELETED");
-            for (PostComment reply : comment.getRepliesList()) {
+            for (PostCommentEntity reply : comment.getRepliesList()) {
                 reply.setStatus("DELETED");
             }
             postCommentApiRepository.save(comment);
@@ -246,7 +246,7 @@ public class PostApiService {
     }
 
     private void deleteScraps(PostEntity postEntity) {
-        List<PostScrap> scraps = postEntity.getPostScrapList();
+        List<PostScrapEntity> scraps = postEntity.getPostScrapList();
         postScrapApiRepository.deleteAll(scraps);
     }
 

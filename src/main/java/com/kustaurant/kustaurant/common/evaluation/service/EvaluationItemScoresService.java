@@ -1,8 +1,7 @@
 package com.kustaurant.kustaurant.common.evaluation.service;
 
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.Evaluation;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationItemScoreRepository;
-import com.kustaurant.kustaurant.common.evaluation.infrastructure.evaluation.EvaluationEntity;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
+import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationSituationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,12 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class EvaluationItemScoresService {
-    private final EvaluationItemScoreRepository evaluationItemScoreRepository;
+    private final EvaluationSituationRepository evaluationSituationRepository;
 
     @Transactional
     public void deleteSituationsByEvaluation(EvaluationEntity evaluation) {
         if (evaluation != null) {
-            evaluationItemScoreRepository.deleteByEvaluation(evaluation);
+            evaluationSituationRepository.deleteByEvaluation(evaluation);
         }
     }
 }

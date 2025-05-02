@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.web.comment;
 
-import com.kustaurant.kustaurant.common.comment.*;
+import com.kustaurant.kustaurant.common.comment.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.enums.DislikeStatus;
@@ -13,10 +13,7 @@ import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.web.post.service.PostService;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -28,7 +25,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class PostCommentService {
-    private final PostCommentRepository postCommentRepository;
+    private final OPostCommentRepository postCommentRepository;
     private final OUserRepository userRepository;
     private final PostRepository postRepository;
     private final PostService postService;
@@ -36,7 +33,7 @@ public class PostCommentService {
     private final PostCommentDislikeJpaRepository postCommentDislikeJpaRepository;
 
     // 댓글 생성
-    public void create(PostEntity postEntity, UserEntity user, PostComment postComment) {
+    public void create(PostEntity postEntity, UserEntity user, PostCommentEntity postComment) {
         user.getPostCommentList().add(postComment);
         postEntity.getPostCommentList().add(postComment);
         userRepository.save(user);
@@ -44,14 +41,14 @@ public class PostCommentService {
     }
 
     // 대댓글 생성
-    public void replyCreate(UserEntity user, PostComment postComment) {
+    public void replyCreate(UserEntity user, PostCommentEntity postComment) {
         user.getPostCommentList().add(postComment);
         userRepository.save(user);
     }
 
     // 댓글 조회
-    public PostComment getPostCommentByCommentId(Integer commentId) {
-        Optional<PostComment> postComment = postCommentRepository.findById(commentId);
+    public PostCommentEntity getPostCommentByCommentId(Integer commentId) {
+        Optional<PostCommentEntity> postComment = postCommentRepository.findById(commentId);
         if (postComment.isPresent()) {
             return postComment.get();
         } else {
@@ -61,7 +58,7 @@ public class PostCommentService {
 
     // 댓글 좋아요 토글 버튼
     @Transactional
-    public Map<String, Object> toggleCommentLike(PostComment postComment, UserEntity user) {
+    public Map<String, Object> toggleCommentLike(PostCommentEntity postComment, UserEntity user) {
         Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByUserAndPostComment(user, postComment);
         Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByUserAndPostComment(user, postComment);
         Map<String, Object> status = new HashMap<>();
@@ -95,7 +92,7 @@ public class PostCommentService {
 
     // 댓글 싫어요 버튼 토글
     @Transactional
-    public Map<String, Object> toggleCommentDislike(PostComment postComment, UserEntity user) {
+    public Map<String, Object> toggleCommentDislike(PostCommentEntity postComment, UserEntity user) {
 
         Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByUserAndPostComment(user, postComment);
         Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByUserAndPostComment(user, postComment);
@@ -128,46 +125,46 @@ public class PostCommentService {
         return status;
     }
 
-    private void addCommentLike(UserEntity user, PostComment postComment) {
+    private void addCommentLike(UserEntity user, PostCommentEntity postComment) {
         PostCommentLikeEntity postCommentLikeEntity = new PostCommentLikeEntity(user, postComment);
         postCommentLikeJpaRepository.save(postCommentLikeEntity);
         postComment.getPostCommentLikesEntities().add(postCommentLikeEntity);
         user.getPostCommentLikesEntities().add(postCommentLikeEntity);
     }
 
-    private void addCommentDislike(UserEntity user, PostComment comment) {
+    private void addCommentDislike(UserEntity user, PostCommentEntity comment) {
         PostCommentDislikeEntity dislike = new PostCommentDislikeEntity(user, comment);
         user.getPostCommentDislikesEntities().add(dislike);
         comment.getPostCommentDislikesEntities().add(dislike);
         postCommentDislikeJpaRepository.save(dislike);
     }
 
-    private void removeCommentLike(UserEntity user, PostComment comment, PostCommentLikeEntity like) {
+    private void removeCommentLike(UserEntity user, PostCommentEntity comment, PostCommentLikeEntity like) {
         user.getPostCommentLikesEntities().remove(like);
         comment.getPostCommentLikesEntities().remove(like);
         postCommentLikeJpaRepository.delete(like);
     }
 
-    private void removeCommentDislike(UserEntity user, PostComment postComment, PostCommentDislikeEntity postCommentDislikeEntity) {
+    private void removeCommentDislike(UserEntity user, PostCommentEntity postComment, PostCommentDislikeEntity postCommentDislikeEntity) {
         postCommentDislikeJpaRepository.delete(postCommentDislikeEntity);
         user.getPostCommentDislikesEntities().remove(postCommentDislikeEntity);
         postComment.getPostCommentDislikesEntities().remove(postCommentDislikeEntity);
     }
 
-    public List<PostComment> getList(Integer postId, String sort) {
+    public List<PostCommentEntity> getList(Integer postId, String sort) {
         Post post = postService.getPost(postId);
-        Specification<PostComment> spec = getSpecByPostId(post);
-        List<PostComment> postCommentList = postCommentRepository.findAll(spec);
+        Specification<PostCommentEntity> spec = getSpecByPostId(post);
+        List<PostCommentEntity> postCommentList = postCommentRepository.findAll(spec);
         if (sort.equals("popular")) {
-            postCommentList.sort(Comparator.comparingInt(PostComment::getLikeCount).reversed());
+            postCommentList.sort(Comparator.comparingInt(PostCommentEntity::getLikeCount).reversed());
         } else {
-            postCommentList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
+            postCommentList.sort(Comparator.comparing(PostCommentEntity::getCreatedAt).reversed());
 
         }
         return postCommentList;
     }
 
-    private Specification<PostComment> getSpecByPostId(Post post) {
+    private Specification<PostCommentEntity> getSpecByPostId(Post post) {
         return (p, query, cb) -> {
             query.distinct(true);  // 중복을 제거
             Predicate postIdPredicate = cb.equal(p.get("post").get("postId"), post.getPostId());
@@ -177,7 +174,7 @@ public class PostCommentService {
         };
     }
 
-    public InteractionStatusResponse getUserInteractionStatus(PostComment postComment, UserEntity user) {
+    public InteractionStatusResponse getUserInteractionStatus(PostCommentEntity postComment, UserEntity user) {
         if (user == null) {
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
         }
@@ -186,15 +183,15 @@ public class PostCommentService {
         return new InteractionStatusResponse(isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED, isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
     }
 
-    public Map<Integer, InteractionStatusResponse> getCommentInteractionMap(List<PostComment> postCommentList, UserEntity user) {
+    public Map<Integer, InteractionStatusResponse> getCommentInteractionMap(List<PostCommentEntity> postCommentList, UserEntity user) {
         Map<Integer, InteractionStatusResponse> commentInteractionMap = new HashMap<>();
 
-        for (PostComment comment : postCommentList) {
+        for (PostCommentEntity comment : postCommentList) {
             // 댓글
             commentInteractionMap.put(comment.getCommentId(), getUserInteractionStatus(comment, user));
 
             // 대댓글
-            for (PostComment reply : comment.getRepliesList()) {
+            for (PostCommentEntity reply : comment.getRepliesList()) {
                 commentInteractionMap.put(reply.getCommentId(), getUserInteractionStatus(reply, user));
             }
         }
