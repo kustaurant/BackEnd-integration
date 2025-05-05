@@ -3,10 +3,15 @@ package com.kustaurant.kustaurant.api.post.service;
 
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentApiRepository;
+import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
+import com.kustaurant.kustaurant.common.post.service.port.PostLikeRepository;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.post.domain.PostUpdateDTO;
 import com.kustaurant.kustaurant.common.post.domain.UserDTO;
@@ -30,11 +35,11 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PostApiService {
     private final PostRepository postRepository;
-    private final OUserRepository userRepository;
+    private final UserRepository userRepository;
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostCommentApiRepository postCommentApiRepository;
-    private final PostPhotoApiRepository postPhotoApiRepository;
-    private final PostLikeJpaRepository postLikeJpaRepository;
+    private final PostPhotoJpaRepository postPhotoJpaRepository;
+    private final PostLikeRepository postLikeRepository;
     private final PostDislikeJpaRepository postDislikeJpaRepository;
     // 인기순 제한 기준 숫자
     public static final int POPULARCOUNT = 3;
@@ -100,9 +105,13 @@ public class PostApiService {
         postRepository.save(postEntity);
     }
     @Transactional
-    public LikeToggleStatus toggleLikeStatus(PostEntity postEntity, UserEntity user) {
-        Optional<PostLikeEntity> likeOptional = postLikeJpaRepository.findByUserAndPost(user, postEntity);
+    public LikeToggleStatus toggleLikeStatus(Integer postId, String providerId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new OptionalNotExistException("게시글이 존재하지 않습니다."));
 
+        User user = userRepository.findByProviderId(providerId)
+                .orElseThrow(() -> new OptionalNotExistException("유저가 존재하지 않습니다."));
+        Boolean likeExisted = postLikeRepository.existsByUserAndPost(user, post);
         //해당 post 를 이미 like 한 경우 - 제거
         if (likeOptional.isPresent()) {
             PostLikeEntity like = likeOptional.get();
@@ -114,7 +123,7 @@ public class PostApiService {
         }
         // 처음 like 하는 경우 - 추가
         else {
-            PostLikeEntity postLikeEntity = new PostLikeEntity(user, postEntity);
+            PostLikeEntity postLikeEntity = new PostLikeEntity(user, postEntity, LocalDateTime.now());
             postLikeJpaRepository.save(postLikeEntity);
             postEntity.getPostLikesList().add(postLikeEntity);
             user.getPostLikesList().add(postLikeEntity);
@@ -253,7 +262,7 @@ public class PostApiService {
     private void deletePhotos(PostEntity postEntity) {
         List<PostPhoto> photos = postEntity.getPostPhotoList();
         if (photos != null) {
-            postPhotoApiRepository.deleteAll(photos);
+            postPhotoJpaRepository.deleteAll(photos);
             postEntity.setPostPhotoList(null); // 기존 사진과의 연결 해제
         }
     }

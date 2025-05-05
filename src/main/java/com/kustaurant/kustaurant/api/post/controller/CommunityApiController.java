@@ -6,8 +6,8 @@ import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity
 import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
-import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;

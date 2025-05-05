@@ -6,7 +6,7 @@ import com.kustaurant.kustaurant.common.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.domain.PostScrap;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostRepository;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;

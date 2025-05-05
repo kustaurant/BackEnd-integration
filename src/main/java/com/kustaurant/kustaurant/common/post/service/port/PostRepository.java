@@ -1,6 +1,7 @@
-package com.kustaurant.kustaurant.common.post.infrastructure;
+package com.kustaurant.kustaurant.common.post.service.port;
 
 import com.kustaurant.kustaurant.common.post.domain.Post;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

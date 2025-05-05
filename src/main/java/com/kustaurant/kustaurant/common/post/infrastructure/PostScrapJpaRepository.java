@@ -1,10 +1,14 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
+import com.kustaurant.kustaurant.common.post.domain.Post;
+import com.kustaurant.kustaurant.common.user.domain.User;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostScrapJpaRepository extends JpaRepository<PostEntity, Integer> {
     @Query("""
@@ -12,4 +16,13 @@ public interface PostScrapJpaRepository extends JpaRepository<PostEntity, Intege
         WHERE ps.user.id = :userId
         ORDER BY ps.createdAt DESC""")
     List<PostScrapEntity> findByUserIdOrderByCreatedAtDesc(@Param("userId") Integer userId);
+
+    Optional<PostScrapEntity> findByPostAndUser(PostEntity post, UserEntity user);
+
+    @Query("SELECT ps FROM PostScrapEntity ps WHERE ps.user.userId = :userId AND ps.post.status = 'ACTIVE'")
+    List<PostScrapEntity> findActiveScrappedPostsByUserId(@Param("userId") Integer userId);
+
+    boolean existsByUserAndPost(User user, Post post);
+
+    Integer user(UserEntity user);
 }

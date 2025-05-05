@@ -55,4 +55,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .collect(Collectors.toList());
     }
 
+    public Optional<UserEntity> findEntityById(Integer id) {
+        return userJpaRepository.findByUserId(id);
+    }
 }

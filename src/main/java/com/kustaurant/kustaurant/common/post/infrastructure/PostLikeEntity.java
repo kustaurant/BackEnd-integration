@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
+import com.kustaurant.kustaurant.common.post.domain.PostDislike;
+import com.kustaurant.kustaurant.common.post.domain.PostLike;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,10 +18,10 @@ public class PostLikeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer postLikesId;
 
-    public PostLikeEntity(UserEntity user, PostEntity post) {
+    public PostLikeEntity(UserEntity user, PostEntity post, LocalDateTime createdAt) {
         this.user = user;
         this.post = post;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = createdAt;
     }
     public PostLikeEntity() {
 
@@ -33,4 +35,22 @@ public class PostLikeEntity {
     PostEntity post;
 
     LocalDateTime createdAt;
+
+    public PostLike toDomain() {
+        return new PostLike(
+                this.postLikesId,
+                this.user.toModel(),
+                this.post.toDomain(),
+                this.createdAt
+        );
+    }
+
+    public static PostLikeEntity from(PostLike postLike) {
+        UserEntity userEntity = UserEntity.from(postLike.getUser());
+        return new PostLikeEntity(
+                userEntity,
+                PostEntity.from(postLike.getPost(), userEntity),
+                postLike.getCreatedAt()
+        );
+    }
 }

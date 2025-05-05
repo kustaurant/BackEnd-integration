@@ -7,6 +7,7 @@ import com.kustaurant.kustaurant.common.notice.infrastructure.NoticeRepository;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.restaurant.application.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.user.controller.api.response.*;

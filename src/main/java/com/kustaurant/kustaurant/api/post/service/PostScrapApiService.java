@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.api.post.service;
 
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import lombok.RequiredArgsConstructor;

@@ -7,7 +7,7 @@ import com.kustaurant.kustaurant.common.post.enums.DislikeStatus;
 import com.kustaurant.kustaurant.common.post.enums.LikeStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.common.post.enums.ScrapStatus;
-import com.kustaurant.kustaurant.common.post.infrastructure.*;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;

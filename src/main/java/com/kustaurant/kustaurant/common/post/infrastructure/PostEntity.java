@@ -83,7 +83,7 @@ public class PostEntity {
     }
 
 
-    public static PostEntity fromDomain(Post post, UserEntity user) {
+    public static PostEntity from(Post post, UserEntity user) {
         return new PostEntity(
                 post.getPostTitle(),
                 post.getPostBody(),

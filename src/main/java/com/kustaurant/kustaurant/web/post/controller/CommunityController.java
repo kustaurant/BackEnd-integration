@@ -6,6 +6,8 @@ import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.common.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.web.comment.PostCommentService;
 import com.kustaurant.kustaurant.web.post.service.PostScrapService;
@@ -45,9 +47,9 @@ public class CommunityController {
     private final PostCommentService postCommentService;
     private final PostRepository postRepository;
     private final OPostCommentRepository postCommentRepository;
-    private final OPostScrapRepository postScrapRepository;
+    private final PostScrapRepository postScrapRepository;
     private final PostScrapService postScrapService;
-    private final PostPhotoRepository postPhotoRepository;
+    private final PostPhotoJpaRepository postPhotoJpaRepository;
     private final StorageService storageService;
 
     // 커뮤니티 메인 화면
@@ -77,11 +79,10 @@ public class CommunityController {
     // 커뮤니티 게시글 상세 화면
     @GetMapping("/community/{postId}")
     public String post(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
-        Post post = postService.getPost(postId);
-        UserEntity user = principal == null ? null : customOAuth2UserService.getUser(principal.getName());
-        InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(post, user);
+        String userName = principal == null ? null : principal.getName();
+        InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postId, userName);
 
-        postService.increaseVisitCount(post);
+        postService.increaseVisitCount(post,userName);
 
         List<PostCommentEntity> postCommentList = postCommentService.getList(postId, sort);
 
@@ -119,7 +120,7 @@ public class CommunityController {
         // 사진 삭제
         List<PostPhoto> existingPhotos = postEntity.getPostPhotoList();
         if (existingPhotos != null) {
-            postPhotoRepository.deleteAll(existingPhotos);
+            postPhotoJpaRepository.deleteAll(existingPhotos);
             postEntity.setPostPhotoList(null); // 기존 리스트 연결 해제
         }
         // 글 삭제
@@ -194,7 +195,7 @@ public class CommunityController {
         Integer postidInt = Integer.valueOf(postId);
         UserEntity user = customOAuth2UserService.getUser(principal.getName());
         PostEntity postEntity = postService.getPost(postidInt);
-        Map<String, Object> response = postService.likeCreateOrDelete(postEntity, user);
+        Map<String, Object> response = postService.likeCreateOrDelete(postidInt, principal.getName());
         response.put("likeCount", postEntity.getPostLikesList().size());
         response.put("dislikeCount", postEntity.getPostDislikesList().size());
 
@@ -300,7 +301,7 @@ public class CommunityController {
                 PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
                 postPhoto.setPost(postEntity); // 게시글과 이미지 연관관계 설정
                 postEntity.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
-                postPhotoRepository.save(postPhoto); // 이미지 정보 저장
+                postPhotoJpaRepository.save(postPhoto); // 이미지 정보 저장
             }
         }
 
@@ -331,7 +332,7 @@ public class CommunityController {
         // 기존 연관된 사진 정보 삭제
         List<PostPhoto> existingPhotos = postEntity.getPostPhotoList();
         if (existingPhotos != null) {
-            postPhotoRepository.deleteAll(existingPhotos);
+            postPhotoJpaRepository.deleteAll(existingPhotos);
             postEntity.setPostPhotoList(null); // 기존 리스트 연결 해제
         }
 
@@ -345,7 +346,7 @@ public class CommunityController {
                 PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
                 postPhoto.setPost(postEntity);
                 newPhotoList.add(postPhoto);
-                postPhotoRepository.save(postPhoto);
+                postPhotoJpaRepository.save(postPhoto);
             }
         }
         postEntity.setPostPhotoList(newPhotoList);

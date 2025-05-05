@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentApiRepository;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.common.post.infrastructure.*;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.OUserService;

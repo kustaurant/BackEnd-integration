@@ -2,6 +2,8 @@ package com.kustaurant.kustaurant.web.post.service;
 
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.common.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PostScrapService {
-    private final OPostScrapRepository postScrapRepository;
+    private final PostScrapRepository postScrapRepository;
     private final PostRepository postRepository;
     private final OUserRepository userRepository;
     public Map<String, Object> scrapCreateOfDelete(PostEntity postEntity, UserEntity user){

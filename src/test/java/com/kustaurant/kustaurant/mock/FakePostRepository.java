@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.mock;
 
 import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostRepository;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
