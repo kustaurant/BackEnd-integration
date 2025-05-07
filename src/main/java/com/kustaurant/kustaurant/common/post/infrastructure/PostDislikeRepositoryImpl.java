@@ -37,15 +37,34 @@ public class PostDislikeRepositoryImpl implements PostDislikeRepository {
     }
 
     @Override
-    public PostDislike save(PostDislike postDislike) {
-        PostDislikeEntity entity = PostDislikeEntity.from(postDislike);
-        return postDislikeJpaRepository.save(entity).toDomain();
-    }
-
-    @Override
     public PostDislike delete(PostDislike postDislike) {
         PostDislikeEntity entity = PostDislikeEntity.from(postDislike);
         postDislikeJpaRepository.delete(entity);
         return postDislike;
     }
+
+    @Override
+    public void save(PostDislike postDislike) {
+        UserEntity userEntity = userRepositoryImpl.findEntityById(postDislike.getUser().getId())
+                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
+
+        PostEntity postEntity = postRepositoryImpl.findEntityById(postDislike.getPost().getId())
+                .orElseThrow(() -> new DataNotFoundException("게시글이 존재하지 않습니다"));
+
+        PostLikeEntity entity = PostDislikeEntity.from(postDislike, userEntity, postEntity);
+        postDislikeJpaRepository.save(entity);
+    }
+
+    @Override
+    public void deleteByUserAndPost(User user, Post post) {
+        UserEntity userEntity = userRepositoryImpl.findEntityById(user.getId())
+                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
+
+        PostEntity postEntity = postRepositoryImpl.findEntityById(post.getId())
+                .orElseThrow(() -> new DataNotFoundException("게시글이 존재하지 않습니다"));
+
+        postDislikeJpaRepository.findByUserAndPost(userEntity, postEntity)
+                .ifPresent(postDislikeJpaRepository::delete);
+    }
+
 }

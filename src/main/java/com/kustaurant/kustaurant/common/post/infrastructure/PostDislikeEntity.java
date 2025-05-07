@@ -39,7 +39,6 @@ public class PostDislikeEntity {
 
     public PostDislike toDomain() {
         return new PostDislike(
-                this.postDislikesId,
                 this.user.toModel(),
                 this.post.toDomain(),
                 this.createdAt
@@ -54,4 +53,13 @@ public class PostDislikeEntity {
                 postDislike.getCreatedAt()
         );
     }
+
+    public static PostDislikeEntity from(PostDislike postDislike, UserEntity user, PostEntity post) {
+        PostDislikeEntity postDislikeEntity = new PostDislikeEntity();
+        postDislikeEntity.setUser(user);
+        postDislikeEntity.setPost(post);
+        postDislikeEntity.setCreatedAt(postDislike.getCreatedAt());
+        return postDislikeEntity;
+    }
+
 }

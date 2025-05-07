@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.common.post.infrastructure;
 
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.post.domain.Post;
+import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -83,14 +84,14 @@ public class PostEntity {
     }
 
 
-    public static PostEntity from(Post post, UserEntity user) {
+    public static PostEntity from(Post post, User user) {
         return new PostEntity(
-                post.getPostTitle(),
-                post.getPostBody(),
-                post.getPostCategory(),
+                post.getTitle(),
+                post.getBody(),
+                post.getCategory(),
                 post.getStatus(),
                 post.getCreatedAt(),
-                user
+                UserEntity.from(user)
         );
     }
 }

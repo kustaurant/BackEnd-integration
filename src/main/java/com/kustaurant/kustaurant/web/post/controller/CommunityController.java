@@ -59,7 +59,7 @@ public class CommunityController {
             @RequestParam(defaultValue = "전체") String postCategory,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(defaultValue = "recent") String sort) {
-        Page<PostEntity> paging;
+        Page<Post> paging;
         // 따로 전송된 카테고리 값이 없을떄
         if (postCategory.equals("전체")) {
             paging = postService.getList(page, sort);

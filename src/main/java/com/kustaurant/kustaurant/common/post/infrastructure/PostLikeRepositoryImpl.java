@@ -21,17 +21,46 @@ public class PostLikeRepositoryImpl implements PostLikeRepository {
 
     @Override
     public Optional<PostLike> findByUserAndPost(User user, Post post) {
-        PostEntity postEntity = postRepositoryImpl.findEntityById(post.getPostId())
-                .orElseThrow(() -> new DataNotFoundException("페이지를 찾을 수 없습니다."));
+        Optional<PostEntity> postEntityOpt = postRepositoryImpl.findEntityById(post.getId());
+        Optional<UserEntity> userEntityOpt = userRepositoryImpl.findEntityById(user.getId());
 
-        UserEntity userEntity = userRepositoryImpl.findEntityById(user.getId())
-                .orElseThrow(() -> new DataNotFoundException("유저를 찾을 수 없습니다."));
+        if (postEntityOpt.isEmpty() || userEntityOpt.isEmpty()) {
+            return Optional.empty();
+        }
 
-        return postLikeJpaRepository.findByUserAndPost(userEntity,postEntity);
+        return postLikeJpaRepository
+                .findByUserAndPost(userEntityOpt.get(), postEntityOpt.get())
+                .map(PostLikeEntity::toDomain);
     }
 
     @Override
     public Boolean existsByUserAndPost(User user, Post post) {
         return null;
     }
+
+
+    @Override
+    public void save(PostLike postLike) {
+        UserEntity userEntity = userRepositoryImpl.findEntityById(postLike.getUser().getId())
+                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
+
+        PostEntity postEntity = postRepositoryImpl.findEntityById(postLike.getPost().getId())
+                .orElseThrow(() -> new DataNotFoundException("게시글이 존재하지 않습니다"));
+
+        PostLikeEntity entity = PostLikeEntity.from(postLike, userEntity, postEntity);
+        postLikeJpaRepository.save(entity);
+    }
+
+    @Override
+    public void deleteByUserAndPost(User user, Post post) {
+        UserEntity userEntity = userRepositoryImpl.findEntityById(user.getId())
+                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
+
+        PostEntity postEntity = postRepositoryImpl.findEntityById(post.getId())
+                .orElseThrow(() -> new DataNotFoundException("게시글이 존재하지 않습니다"));
+
+        postLikeJpaRepository.findByUserAndPost(userEntity, postEntity)
+                .ifPresent(postLikeJpaRepository::delete);
+    }
+
 }

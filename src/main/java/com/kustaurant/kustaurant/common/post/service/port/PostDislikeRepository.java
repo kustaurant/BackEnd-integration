@@ -13,7 +13,9 @@ import java.util.Optional;
 public interface PostDislikeRepository {
     Optional<PostDislike> findByUserAndPost(User user, Post post);
     boolean existsByUserAndPost(User user, Post post);
-    PostDislike save(PostDislike postDislike);
     PostDislike delete(PostDislike postDislike);
+
+    void save(PostDislike postDislike);
+    void deleteByUserAndPost(User user, Post post);
 
 }

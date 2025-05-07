@@ -8,13 +8,12 @@ import java.time.LocalDateTime;
 @Getter
 public class PostLike {
 
-    private final Integer id;
+    private Integer id;
     private final User user;
     private final Post post;
     private final LocalDateTime createdAt;
 
-    public PostLike(Integer id, User user, Post post, LocalDateTime createdAt) {
-        this.id = id;
+    public PostLike(User user, Post post, LocalDateTime createdAt) {
         this.user = user;
         this.post = post;
         this.createdAt = createdAt;

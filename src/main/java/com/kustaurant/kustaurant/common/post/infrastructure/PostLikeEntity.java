@@ -53,4 +53,13 @@ public class PostLikeEntity {
                 postLike.getCreatedAt()
         );
     }
+
+    public static PostLikeEntity from(PostLike postLike, UserEntity user, PostEntity post) {
+        PostLikeEntity postLikeEntity = new PostLikeEntity();
+        postLikeEntity.setUser(user);
+        postLikeEntity.setPost(post);
+        postLikeEntity.setCreatedAt(postLike.getCreatedAt());
+        return postLikeEntity;
+    }
+
 }
