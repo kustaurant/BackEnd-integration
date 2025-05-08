@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.common.post.infrastructure;
 
 import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +50,11 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
+    public Post save(Post post) {
+        return null;
+    }
+
+    @Override
     public Optional<Post> findById(Integer postId) {
         return postJpaRepository.findById(postId).map(PostEntity::toDomain);
     }
@@ -61,8 +67,15 @@ public class PostRepositoryImpl implements PostRepository {
                 .toList();
     }
 
-    public Optional<PostEntity> findEntityById(Integer postId) {
-        return postJpaRepository.findById(postId);
+    @Override
+    public void increaseVisitCount(Integer postId) {
+        PostEntity post = postJpaRepository.findById(postId)
+                .orElseThrow(() -> new DataNotFoundException("게시글이 존재하지 않습니다"));
+        post.setPostVisitCount(post.getPostVisitCount() + 1);
     }
 
+    @Override
+    public void delete(Post post) {
+
+    }
 }

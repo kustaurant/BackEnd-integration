@@ -30,13 +30,8 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
     }
 
     @Override
-    public List<PostScrapEntity> findActiveScrappedPostsByUserId(Integer userId) {
-        return postScrapJpaRepository.findActiveScrappedPostsByUserId(userId);
-    }
-
-    @Override
-    public boolean existsByUserAndPost(User user, Post post) {
-        return postScrapJpaRepository.existsByUserAndPost(user,post);
+    public boolean existsByUserIdAndPostId(Integer userId, Integer postId) {
+        return postScrapJpaRepository.existsByUserIdAndPostId(userId,postId);
     }
 
     @Override

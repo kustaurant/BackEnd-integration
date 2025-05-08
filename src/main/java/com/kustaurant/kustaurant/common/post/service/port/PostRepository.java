@@ -15,5 +15,7 @@ public interface PostRepository {
     Page<Post> findAll(Pageable pageable);
     Page<Post> findAll(Specification<PostEntity> spec, Pageable pageable);
     Page<Post> findByStatus(String status, Pageable pageable);
+
+    void increaseVisitCount(Integer postId);
     void delete(Post post);
 }

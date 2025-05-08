@@ -11,11 +11,8 @@ import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import java.util.Optional;
 
 public interface PostDislikeRepository {
-    Optional<PostDislike> findByUserAndPost(User user, Post post);
-    boolean existsByUserAndPost(User user, Post post);
-    PostDislike delete(PostDislike postDislike);
-
-    void save(PostDislike postDislike);
-    void deleteByUserAndPost(User user, Post post);
-
+    Optional<PostDislike> findByUserIdAndPostId(Integer userId, Integer postId);
+    boolean existsByUserIdAndPostId(Integer userId, Integer postId);
+    PostDislike save(PostDislike postDislike);
+    void deleteByUserIdAndPostId(Integer userId, Integer postId);
 }

@@ -17,10 +17,9 @@ public interface PostScrapRepository {
 
     Optional<PostScrapEntity> findByPostAndUser(PostEntity post, UserEntity user);
 
-    List<PostScrapEntity> findActiveScrappedPostsByUserId(@Param("userId") Integer userId);
-
-    boolean existsByUserAndPost(User user, Post post);
+    boolean existsByUserIdAndPostId(Integer userId, Integer postId);
 
     void delete(PostScrap postScrap);
+
     void save(PostScrap postScrap);
 }

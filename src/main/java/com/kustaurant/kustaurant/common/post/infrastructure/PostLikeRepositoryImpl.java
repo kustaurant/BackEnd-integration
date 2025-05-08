@@ -16,50 +16,28 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostLikeRepositoryImpl implements PostLikeRepository {
     private final PostLikeJpaRepository postLikeJpaRepository;
-    private final UserRepositoryImpl userRepositoryImpl;
-    private final PostRepositoryImpl postRepositoryImpl;
 
     @Override
-    public Optional<PostLike> findByUserAndPost(User user, Post post) {
-        Optional<PostEntity> postEntityOpt = postRepositoryImpl.findEntityById(post.getId());
-        Optional<UserEntity> userEntityOpt = userRepositoryImpl.findEntityById(user.getId());
-
-        if (postEntityOpt.isEmpty() || userEntityOpt.isEmpty()) {
-            return Optional.empty();
-        }
-
+    public Optional<PostLike> findByUserIdAndPostId(Integer userId, Integer postId) {
         return postLikeJpaRepository
-                .findByUserAndPost(userEntityOpt.get(), postEntityOpt.get())
+                .findByUserIdAndPostId(userId,postId)
                 .map(PostLikeEntity::toDomain);
     }
 
     @Override
-    public Boolean existsByUserAndPost(User user, Post post) {
-        return null;
+    public Boolean existsByUserIdAndPostId(Integer userId, Integer postId) {
+        return postLikeJpaRepository.existsByUserIdAndPostId(userId,postId);
     }
-
 
     @Override
     public void save(PostLike postLike) {
-        UserEntity userEntity = userRepositoryImpl.findEntityById(postLike.getUser().getId())
-                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
-
-        PostEntity postEntity = postRepositoryImpl.findEntityById(postLike.getPost().getId())
-                .orElseThrow(() -> new DataNotFoundException("게시글이 존재하지 않습니다"));
-
-        PostLikeEntity entity = PostLikeEntity.from(postLike, userEntity, postEntity);
+        PostLikeEntity entity = PostLikeEntity.from(postLike);
         postLikeJpaRepository.save(entity);
     }
 
     @Override
-    public void deleteByUserAndPost(User user, Post post) {
-        UserEntity userEntity = userRepositoryImpl.findEntityById(user.getId())
-                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
-
-        PostEntity postEntity = postRepositoryImpl.findEntityById(post.getId())
-                .orElseThrow(() -> new DataNotFoundException("게시글이 존재하지 않습니다"));
-
-        postLikeJpaRepository.findByUserAndPost(userEntity, postEntity)
+    public void deleteByUserIdAndPostId(Integer userId, Integer postId) {
+        postLikeJpaRepository.findByUserIdAndPostId(userId,postId)
                 .ifPresent(postLikeJpaRepository::delete);
     }
 

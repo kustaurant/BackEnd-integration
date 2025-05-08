@@ -22,7 +22,7 @@ public interface PostScrapJpaRepository extends JpaRepository<PostEntity, Intege
     @Query("SELECT ps FROM PostScrapEntity ps WHERE ps.user.userId = :userId AND ps.post.status = 'ACTIVE'")
     List<PostScrapEntity> findActiveScrappedPostsByUserId(@Param("userId") Integer userId);
 
-    boolean existsByUserAndPost(User user, Post post);
+    boolean existsByUserIdAndPostId(Integer userId, Integer postId);
 
     Integer user(UserEntity user);
 }

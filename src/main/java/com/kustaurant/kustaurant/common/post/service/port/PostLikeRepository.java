@@ -8,11 +8,11 @@ import com.kustaurant.kustaurant.common.user.domain.User;
 import java.util.Optional;
 
 public interface PostLikeRepository {
-    Optional<PostLike> findByUserAndPost(User user, Post post);
+    Optional<PostLike> findByUserIdAndPostId(Integer userId, Integer postId);
 
-    Boolean existsByUserAndPost(User user, Post post);
+    Boolean existsByUserIdAndPostId(Integer userId, Integer postId);
 
     void save(PostLike postLike);
-    void deleteByUserAndPost(User user, Post post);
 
+    void deleteByUserIdAndPostId(Integer userId, Integer postId);
 }

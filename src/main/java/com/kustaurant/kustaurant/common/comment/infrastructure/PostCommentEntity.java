@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.common.comment.infrastructure;
 
+import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import jakarta.persistence.*;
@@ -83,5 +84,52 @@ public class PostCommentEntity {
         // 초 차이 계산
         Long secondsDifference = ChronoUnit.SECONDS.between(past, now);
         return secondsDifference + "초 전";
+    }
+    // TODO: from, toDomain 검토 필요
+    public static PostCommentEntity from(PostComment comment) {
+        PostCommentEntity entity = new PostCommentEntity();
+        entity.setCommentId(comment.getCommentId());
+        entity.setCommentBody(comment.getCommentBody());
+        entity.setStatus(comment.getStatus());
+        entity.setLikeCount(comment.getLikeCount());
+        entity.setCreatedAt(comment.getCreatedAt());
+        entity.setUpdatedAt(comment.getUpdatedAt());
+
+        if (comment.getUserId() != null) {
+            UserEntity userEntity = new UserEntity();
+            userEntity.setUserId(comment.getUserId());
+            entity.setUser(userEntity);
+        }
+
+        // postId 처리
+        if (comment.getPostId() != null) {
+            PostEntity postEntity = new PostEntity();
+            postEntity.setPostId(comment.getPostId());
+            entity.setPost(postEntity);
+        }
+
+        // parentCommentId 처리
+        if (comment.getParentCommentId() != null) {
+            PostCommentEntity parent = new PostCommentEntity();
+            parent.setCommentId(comment.getParentCommentId());
+            entity.setParentComment(parent);
+        }
+
+        return entity;
+    }
+
+    public PostComment toDomain() {
+        return PostComment.builder()
+                .commentId(this.commentId)
+                .commentBody(this.commentBody)
+                .postId(this.post.getPostId())
+                .userId(this.user.getUserId())
+                .parentCommentId(this.parentComment != null ? this.parentComment.getCommentId() : null)
+                .likeCount(this.likeCount)
+                .status(this.status)
+                .createdAt(this.createdAt)
+                .updatedAt(this.updatedAt)
+                .replies(this.repliesList.stream().map(PostCommentEntity::toDomain).toList())
+                .build();
     }
 }

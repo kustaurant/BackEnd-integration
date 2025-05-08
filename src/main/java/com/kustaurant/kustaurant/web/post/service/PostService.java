@@ -141,13 +141,10 @@ public class PostService {
     }
 
     // 조회수 증가
-//    @Transactional
-//    public void increaseVisitCount(Post post, UserEntity user) {
-//        int visitCount = post.getVisitCount();
-//
-//        PostEntity postEntity = PostEntity.from(post, user);
-//        postEntity.setPostVisitCount(++visitCount);
-//    }
+    @Transactional
+    public void increaseVisitCount(Integer postId) {
+        postRepository.increaseVisitCount(postId);
+    }
 
     @Transactional
     public Map<String, Object> likeCreateOrDelete(Integer postId, String providerId) {
@@ -211,16 +208,14 @@ public class PostService {
     }
 
 
-    public InteractionStatusResponse getUserInteractionStatus(Integer postId, String userName) {
-        Post post = getPost(postId);
-        if (userName == null) {
+    public InteractionStatusResponse getUserInteractionStatus(Integer postId, Integer userId) {
+        if (userId == null) {
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
         }
-        User user = userRepository.findByProviderId(userName).orElse(null);
 
-        boolean isLiked = postLikeRepository.existsByUserAndPost(user, post);
-        boolean isDisliked = postDislikeRepository.existsByUserAndPost(user, post);
-        boolean isScrapped = postScrapRepository.existsByUserAndPost(user, post);
+        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean isDisliked = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean isScrapped = postScrapRepository.existsByUserIdAndPostId(userId, postId);
 
         return new InteractionStatusResponse(
                 isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED,

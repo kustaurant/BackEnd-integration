@@ -16,54 +16,28 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostDislikeRepositoryImpl implements PostDislikeRepository {
     private final PostDislikeJpaRepository postDislikeJpaRepository;
-    private final UserRepositoryImpl userRepositoryImpl;
-    private final PostRepositoryImpl postRepositoryImpl;
+
 
     @Override
-    public Optional<PostDislike> findByUserAndPost(User user, Post post) {
-        PostEntity postEntity = postRepositoryImpl.findEntityById(post.getPostId())
-                .orElseThrow(() -> new DataNotFoundException("페이지를 찾을 수 없습니다."));
+    public Optional<PostDislike> findByUserIdAndPostId(Integer userId, Integer postId) {
 
-        UserEntity userEntity = userRepositoryImpl.findEntityById(user.getId())
-                .orElseThrow(() -> new DataNotFoundException("유저를 찾을 수 없습니다."));
-
-        return postDislikeJpaRepository.findByUserAndPost(userEntity, postEntity)
+        return postDislikeJpaRepository.findByUserIdAndPostId(userId, postId)
                 .map(PostDislikeEntity::toDomain);
     }
 
     @Override
-    public boolean existsByUserAndPost(User user, Post post) {
-        return postDislikeJpaRepository.existsByUserAndPost();
+    public boolean existsByUserIdAndPostId(Integer userId, Integer postId) {
+        return postDislikeJpaRepository.existsByUserIdAndPostId(userId, postId);
     }
 
     @Override
-    public PostDislike delete(PostDislike postDislike) {
-        PostDislikeEntity entity = PostDislikeEntity.from(postDislike);
-        postDislikeJpaRepository.delete(entity);
-        return postDislike;
+    public PostDislike save(PostDislike postDislike) {
+        return postDislikeJpaRepository.save(PostDislikeEntity.from(postDislike)).toDomain();
     }
 
     @Override
-    public void save(PostDislike postDislike) {
-        UserEntity userEntity = userRepositoryImpl.findEntityById(postDislike.getUser().getId())
-                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
-
-        PostEntity postEntity = postRepositoryImpl.findEntityById(postDislike.getPost().getId())
-                .orElseThrow(() -> new DataNotFoundException("게시글이 존재하지 않습니다"));
-
-        PostLikeEntity entity = PostDislikeEntity.from(postDislike, userEntity, postEntity);
-        postDislikeJpaRepository.save(entity);
-    }
-
-    @Override
-    public void deleteByUserAndPost(User user, Post post) {
-        UserEntity userEntity = userRepositoryImpl.findEntityById(user.getId())
-                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
-
-        PostEntity postEntity = postRepositoryImpl.findEntityById(post.getId())
-                .orElseThrow(() -> new DataNotFoundException("게시글이 존재하지 않습니다"));
-
-        postDislikeJpaRepository.findByUserAndPost(userEntity, postEntity)
+    public void deleteByUserIdAndPostId(Integer userId, Integer postId) {
+        postDislikeJpaRepository.findByUserIdAndPostId(userId, postId)
                 .ifPresent(postDislikeJpaRepository::delete);
     }
 

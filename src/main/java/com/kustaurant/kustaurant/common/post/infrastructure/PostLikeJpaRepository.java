@@ -5,10 +5,12 @@ import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PostLikeJpaRepository extends JpaRepository<PostLikeEntity,Integer> {
-    Optional<PostLikeEntity> findByUserAndPost(UserEntity user, PostEntity post);
+    Optional<PostLikeEntity> findByUserIdAndPostId(Integer userId, Integer postId);
 
-    Boolean existsByUserAndPost(UserEntity user, PostEntity post);
+    Boolean existsByUserIdAndPostId(Integer userId, Integer postId);
+
 }

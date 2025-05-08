@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.web.post.controller;
 
+import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.comment.infrastructure.OPostCommentRepository;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
@@ -8,6 +9,8 @@ import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.post.service.port.PostScrapRepository;
+import com.kustaurant.kustaurant.common.user.controller.port.UserService;
+import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.web.comment.PostCommentService;
 import com.kustaurant.kustaurant.web.post.service.PostScrapService;
@@ -37,6 +40,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
+
 @lombok.extern.slf4j.Slf4j
 @Slf4j
 @Controller
@@ -51,6 +55,7 @@ public class CommunityController {
     private final PostScrapService postScrapService;
     private final PostPhotoJpaRepository postPhotoJpaRepository;
     private final StorageService storageService;
+    private final UserService userService;
 
     // 커뮤니티 메인 화면
     @GetMapping("/community")
@@ -79,15 +84,18 @@ public class CommunityController {
     // 커뮤니티 게시글 상세 화면
     @GetMapping("/community/{postId}")
     public String post(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
-        String userName = principal == null ? null : principal.getName();
-        InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postId, userName);
+        Integer userId = principal == null ? null : Integer.valueOf(principal.getName());
+        InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postId, userId);
 
-        postService.increaseVisitCount(post,userName);
+        postService.increaseVisitCount(postId);
 
-        List<PostCommentEntity> postCommentList = postCommentService.getList(postId, sort);
+        List<PostComment> postCommentList = postCommentService.getList(postId, sort);
 
-        Map<Integer, InteractionStatusResponse> commentInteractionMap = postCommentService.getCommentInteractionMap(postCommentList, user);
+        Map<Integer, InteractionStatusResponse> commentInteractionMap = postCommentService.getCommentInteractionMap(postCommentList, userId);
 
+        // TODO: 도메인 대신 DTO 만들어서 반환하기
+        User user = userService.getActiveUserById(userId);
+        Post post = postService.getPost(postId);
         model.addAttribute("postCommentList", postCommentList);
         model.addAttribute("post", post);
         model.addAttribute("user", user);
@@ -97,7 +105,6 @@ public class CommunityController {
 
         return "community_post";
     }
-
 
 
     // 게시물 삭제
@@ -284,7 +291,7 @@ public class CommunityController {
         // 게시글 객체 생성
         UserEntity user = customOAuth2UserService.getUser(principal.getName());
 
-        PostEntity postEntity = new PostEntity(title, content, postCategory, "ACTIVE", LocalDateTime.now(),user);
+        PostEntity postEntity = new PostEntity(title, content, postCategory, "ACTIVE", LocalDateTime.now(), user);
         postService.create(postEntity, user);
 
         // TinyMCE 컨텐츠에서 <img> 태그를 파싱
@@ -380,7 +387,6 @@ public class CommunityController {
             Map<String, Object> response = new HashMap<>();
             response.put("rs_st", 0); // 성공 상태 코드
             response.put("rs_data", fileInfo);
-
 
 
             return ResponseEntity.ok(response);

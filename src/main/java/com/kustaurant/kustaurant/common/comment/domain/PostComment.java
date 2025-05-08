@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.comment.domain;
 
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class PostComment {
     private final Integer parentCommentId;
     private final List<PostComment> replies;
 
+    @Builder
     public PostComment(Integer commentId, String commentBody, String status, Integer likeCount,
                        LocalDateTime createdAt, LocalDateTime updatedAt,
                        Integer userId, Integer postId, Integer parentCommentId,
