@@ -5,11 +5,15 @@ plugins {
 }
 
 group = 'com.kustaurant'
-// 배포 버젼 (여기서 번경해야 버젼 바뀜)
-version = '0.0.6-SNAPSHOT'
-// 배포 자바 버젼 ( 서버컴퓨터의 자바버전)
+// 배포 버젼
+version = '0.1.0-SNAPSHOT'
+// 배포 자바 버젼
 java {
 	sourceCompatibility = '17'
+}
+// jar 제외하고 bootjar 로만 실행파일생성
+jar {
+	enabled = false
 }
 
 configurations {
