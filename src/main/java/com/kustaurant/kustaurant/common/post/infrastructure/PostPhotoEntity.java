@@ -23,6 +23,10 @@ public class PostPhotoEntity {
 
     public PostPhotoEntity() {
     }
+    public PostPhotoEntity(String photoImgUrl, String status) {
+        this.photoImgUrl = photoImgUrl;
+        this.status = status;
+    }
 
     public PostPhotoEntity(String photoImgUrl, String status, PostEntity post) {
         this.photoImgUrl = photoImgUrl;

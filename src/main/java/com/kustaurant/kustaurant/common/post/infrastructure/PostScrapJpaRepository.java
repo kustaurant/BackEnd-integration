@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
 import com.kustaurant.kustaurant.common.post.domain.Post;
+import com.kustaurant.kustaurant.common.post.domain.PostScrap;
 import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface PostScrapJpaRepository extends JpaRepository<PostEntity, Integer> {
+public interface PostScrapJpaRepository extends JpaRepository<PostScrapEntity, Integer> {
     @Query("""
         SELECT ps FROM PostScrapEntity ps
         WHERE ps.user.id = :userId
@@ -27,4 +28,6 @@ public interface PostScrapJpaRepository extends JpaRepository<PostEntity, Intege
     Integer user(UserEntity user);
 
     void deleteByPostId(Integer postId);
+
+    Optional<PostScrapEntity> findByUserIdAndPostId(Integer userId, Integer postId);
 }

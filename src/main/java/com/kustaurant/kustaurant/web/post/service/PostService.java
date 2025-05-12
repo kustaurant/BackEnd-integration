@@ -2,10 +2,7 @@ package com.kustaurant.kustaurant.web.post.service;
 
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
-import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
-import com.kustaurant.kustaurant.common.post.domain.Post;
-import com.kustaurant.kustaurant.common.post.domain.PostDislike;
-import com.kustaurant.kustaurant.common.post.domain.PostLike;
+import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.post.enums.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.service.port.*;
@@ -38,6 +35,7 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final PostDislikeRepository postDislikeRepository;
     private final PostPhotoRepository postPhotoRepository;
+    private final ImageExtractor imageExtractor;
 
 
     // 인기순 제한 기준 숫자
@@ -104,14 +102,8 @@ public class PostService {
         }
     }
 
-    //    @Transactional
-//    public void create(PostEntity postEntity, UserEntity user) {
-//        postEntity.setUser(user);
-//        PostEntity savedpost = postRepository.save(postEntity);
-//        userRepository.save(user);
-//    }
     // 게시물 리스트에 대한 시간 경과 리스트로 반환하는 함수.
-    public List<String> getTimeAgoList(Page<PostEntity> postList) {
+    public List<String> getTimeAgoList(Page<Post> postList) {
         LocalDateTime now = LocalDateTime.now();
 
         // postList의 createdAt 필드를 문자열 형식으로 만들어 timeAgoList에 할당
@@ -147,7 +139,7 @@ public class PostService {
     }
 
     @Transactional
-    public Map<String, Object> likeCreateOrDelete(Integer postId, Integer userId) {
+    public ReactionToggleResponse toggleLike(Integer postId, Integer userId) {
         Post post = getPost(postId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
@@ -169,14 +161,17 @@ public class PostService {
 
         postRepository.save(post);
 
-        return Map.of(result.name(), true);
+        return new ReactionToggleResponse(
+                result,
+                post.getLikes().size(),
+                post.getDislikes().size()
+        );
     }
 
 
     // 게시글 싫어요
     @Transactional
-    public Map<String, Object> dislikeCreateOrDelete(Integer postId, Integer userId) {
-        Map<String, Object> status = new HashMap<>();
+    public ReactionToggleResponse toggleDislike(Integer postId, Integer userId) {
         Post post = getPost(postId);
         User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
         ReactionStatus result = post.toggleDislike(user, LocalDateTime.now());
@@ -195,7 +190,11 @@ public class PostService {
         }
 
         postRepository.save(post);
-        return Map.of(result.name(), true);
+        return new ReactionToggleResponse(
+                result,
+                post.getLikes().size(),
+                post.getDislikes().size()
+        );
     }
 
 
@@ -327,4 +326,36 @@ public class PostService {
         postRepository.save(post);
     }
 
+    public void create(String title, String category, String body, Integer userId) {
+        Post post = Post.builder()
+                .title(title)
+                .category(category)
+                .body(body)
+                .status(PostStatus.ACTIVE)
+                .netLikes(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .authorId(userId)
+                .build();
+        postRepository.save(post);
+
+        List<String> imageUrls = imageExtractor.extract(body);
+        for (String imageUrl : imageUrls) {
+            postPhotoRepository.save(new PostPhoto(imageUrl,"ACTIVE"));
+        }
+    }
+
+
+    @Transactional
+    public void update(Integer postId, String title, String category, String body) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+        List<String> imageUrls = imageExtractor.extract(body);
+        post.update(title, body, category, imageUrls);
+
+        postPhotoRepository.deleteByPostId(postId);
+        postPhotoRepository.saveAll(post.getPhotos());
+        postRepository.save(post);
+    }
 }

@@ -15,15 +15,13 @@ import java.util.Optional;
 public interface PostScrapRepository {
     List<PostScrap> findByUserId(Integer userId);
 
-    Optional<PostScrapEntity> findByPostAndUser(PostEntity post, UserEntity user);
-
     boolean existsByUserIdAndPostId(Integer userId, Integer postId);
 
     void delete(PostScrap postScrap);
 
     void deleteByPostId(Integer postId);
 
-
+    Optional<PostScrap> findByUserIdAndPostId(Integer userId,Integer postId);
 
     void save(PostScrap postScrap);
 }

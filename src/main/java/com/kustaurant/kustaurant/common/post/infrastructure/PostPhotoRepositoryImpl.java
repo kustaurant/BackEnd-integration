@@ -35,4 +35,8 @@ public class PostPhotoRepositoryImpl implements PostPhotoRepository {
     public void deleteByPostId(Integer postId) {
         postPhotoJpaRepository.deleteByPostId(postId);
     }
+
+    @Override
+    public void saveAll(List<PostPhoto> photos) {
+    }
 }

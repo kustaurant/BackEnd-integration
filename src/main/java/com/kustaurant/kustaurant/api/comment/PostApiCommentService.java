@@ -53,13 +53,13 @@ public class PostApiCommentService {
 
 
     public int toggleCommentLike(PostCommentEntity postComment, UserEntity user) {
-        Map<String, Object> result = postCommentService.toggleCommentLike(postComment, user);
+        Map<String, Object> result = postCommentService.toggleLike(postComment, user);
         ReactionStatus status = ReactionStatus.valueOf(result.keySet().iterator().next());
         return status.toAppLikeStatus();
     }
 
     public int toggleCommentDislike(PostCommentEntity postComment, UserEntity user) {
-        Map<String, Object> result = postCommentService.toggleCommentDislike(postComment, user);
+        Map<String, Object> result = postCommentService.toggleDislike(postComment, user);
         ReactionStatus status = ReactionStatus.valueOf(result.keySet().iterator().next());
         return status.toAppLikeStatus();
     }

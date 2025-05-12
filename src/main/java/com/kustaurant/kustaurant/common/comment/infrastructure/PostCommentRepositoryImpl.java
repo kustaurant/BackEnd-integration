@@ -42,6 +42,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
                 .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
 
         entity.setStatus(comment.getStatus());
+        entity.setLikeCount(comment.getNetLikes());
 
         for (PostComment reply : comment.getReplies()) {
             PostCommentEntity replyEntity = entity.getRepliesList().stream()
@@ -49,6 +50,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
                     .findFirst()
                     .orElseThrow(() -> new DataNotFoundException("대댓글이 존재하지 않습니다."));
             replyEntity.setStatus(reply.getStatus());
+            replyEntity.setLikeCount(reply.getNetLikes());
         }
 
         postCommentJpaRepository.save(entity);

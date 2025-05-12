@@ -18,10 +18,7 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
 
     @Override
     public List<PostScrap> findByUserId(Integer userId) {
-        return postScrapJpaRepository.findByUserIdOrderByCreatedAtDesc(userId)
-                .stream()
-                .map(PostScrap::from)
-                .toList();
+        return postScrapJpaRepository.findByUserIdOrderByCreatedAtDesc(userId).stream().map(PostScrap::from).toList();
     }
 
     @Override
@@ -42,6 +39,11 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
     @Override
     public void deleteByPostId(Integer postId) {
         postScrapJpaRepository.deleteByPostId(postId);
+    }
+
+    @Override
+    public Optional<PostScrap> findByUserIdAndPostId(Integer userId, Integer postId) {
+        return postScrapJpaRepository.findByUserIdAndPostId(userId, postId).map(PostScrapEntity::toDomain);
     }
 
 

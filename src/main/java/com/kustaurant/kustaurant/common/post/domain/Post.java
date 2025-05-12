@@ -3,11 +3,9 @@ package com.kustaurant.kustaurant.common.post.domain;
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.post.enums.PostStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostPhotoEntity;
 import com.kustaurant.kustaurant.common.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,7 +21,7 @@ public class Post {
     private String category;
     private PostStatus status;
     private Integer authorId;
-    private Integer netLikeCount;
+    private Integer netLikes;
     private Integer visitCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -34,15 +32,14 @@ public class Post {
     private List<PostPhoto> photos;
     private List<PostScrap> scraps;
 
-
-    public Post(String title, String body, String category, PostStatus status, LocalDateTime createdAt, Integer authorId, Integer netLikeCount, Integer visitCount) {
+    public Post(String title, String body, String category, PostStatus status, LocalDateTime createdAt, Integer authorId, Integer netLikes, Integer visitCount) {
         this.title = title;
         this.body = body;
         this.category = category;
         this.status = status;
         this.createdAt = createdAt;
         this.authorId = authorId;
-        this.netLikeCount = netLikeCount != null ? netLikeCount : 0;
+        this.netLikes = netLikes != null ? netLikes : 0;
         this.visitCount = visitCount != null ? visitCount : 0;
         this.likes = new ArrayList<>();
         this.dislikes = new ArrayList<>();
@@ -63,6 +60,16 @@ public class Post {
 
     public void delete() {
         this.status = PostStatus.DELETED;
+    }
+
+    public void update(String title, String body, String category, List<String> imageUrls) {
+        this.title = title;
+        this.body = body;
+        this.category = category;
+        this.photos.clear();
+        for (String url : imageUrls) {
+            this.photos.add(PostPhoto.of(this.id, url));
+        }
     }
 
     public void addLike(PostLike like) {
@@ -156,12 +163,13 @@ public class Post {
         return ReactionStatus.DISLIKE_CREATED;
     }
 
+
     public void increaseLikeCount(int amount) {
-        this.netLikeCount += amount;
+        this.netLikes += amount;
     }
 
     public void decreaseLikeCount(int amount) {
-        this.netLikeCount -= amount;
+        this.netLikes -= amount;
     }
 
 }

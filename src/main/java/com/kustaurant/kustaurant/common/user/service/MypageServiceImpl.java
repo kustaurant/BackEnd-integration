@@ -67,7 +67,7 @@ public class MypageServiceImpl implements MypageService {
                 .map(comment -> new MypageWebPostCommentDTO(
                         comment.getCommentId(),
                         comment.getCommentBody(),
-                        comment.getLikeCount(),
+                        comment.getNetLikes(),
                         comment.calculateTimeAgo(),
                         postIdToTitle.getOrDefault(comment.getPostId(), "알 수 없음"),
                         comment.getPostId()

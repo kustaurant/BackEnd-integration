@@ -81,7 +81,7 @@ public class PostEntity {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .visitCount(postVisitCount)
-                .netLikeCount(netLikeCount)
+                .netLikes(netLikeCount)
                 .authorId(user.getUserId())
                 .build();
     }
@@ -96,7 +96,7 @@ public class PostEntity {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .visitCount(postVisitCount)
-                .netLikeCount(netLikeCount)
+                .netLikes(netLikeCount)
                 .authorId(user.getUserId());
 
         if (includeComments) {

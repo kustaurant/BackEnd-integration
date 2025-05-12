@@ -9,4 +9,6 @@ public interface PostPhotoRepository {
     void save(PostPhoto postPhoto);
     void deleteById(Integer photoId);
     void deleteByPostId(Integer postId);
+    void saveAll(List<PostPhoto> photos);
+
 }

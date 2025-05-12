@@ -96,7 +96,7 @@ public class PostCommentEntity {
         entity.setCommentId(comment.getCommentId());
         entity.setCommentBody(comment.getCommentBody());
         entity.setStatus(comment.getStatus());
-        entity.setLikeCount(comment.getLikeCount());
+        entity.setLikeCount(comment.getNetLikes());
         entity.setCreatedAt(comment.getCreatedAt());
         entity.setUpdatedAt(comment.getUpdatedAt());
 

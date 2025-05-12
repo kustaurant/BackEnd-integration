@@ -64,7 +64,7 @@ public class PostRepositoryImpl implements PostRepository {
         postEntity.setPostCategory(post.getCategory());
         postEntity.setStatus(post.getStatus());
         postEntity.setUpdatedAt(LocalDateTime.now());
-        postEntity.setNetLikeCount(post.getNetLikeCount());
+        postEntity.setNetLikeCount(post.getNetLikes());
         postEntity.setPostVisitCount(post.getVisitCount());
 
         // 댓글 상태 반영 (Soft delete)
