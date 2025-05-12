@@ -9,7 +9,6 @@ import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.service.port.PostLikeRepository;
 import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
@@ -105,15 +104,15 @@ public class PostApiService {
         postRepository.save(postEntity);
     }
     @Transactional
-    public LikeToggleStatus toggleLikeStatus(Integer postId, String providerId) {
+    public LikeToggleStatus toggleLikeStatus(Integer postId, Integer userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new OptionalNotExistException("게시글이 존재하지 않습니다."));
 
-        User user = userRepository.findByProviderId(providerId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new OptionalNotExistException("유저가 존재하지 않습니다."));
-        Boolean likeExisted = postLikeRepository.existsByUserAndPost(user, post);
+        Boolean likeExisted = postLikeRepository.existsByUserIdAndPostId(userId, postId);
         //해당 post 를 이미 like 한 경우 - 제거
-        if (likeOptional.isPresent()) {
+        if (likeExisted) {
             PostLikeEntity like = likeOptional.get();
             postLikeJpaRepository.delete(like);
             postEntity.getPostLikesList().remove(like);
@@ -260,7 +259,7 @@ public class PostApiService {
     }
 
     private void deletePhotos(PostEntity postEntity) {
-        List<PostPhoto> photos = postEntity.getPostPhotoList();
+        List<PostPhotoEntity> photos = postEntity.getPostPhotoEntityList();
         if (photos != null) {
             postPhotoJpaRepository.deleteAll(photos);
             postEntity.setPostPhotoList(null); // 기존 사진과의 연결 해제

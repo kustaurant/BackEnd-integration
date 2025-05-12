@@ -5,6 +5,8 @@ import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity
 import com.kustaurant.kustaurant.common.comment.infrastructure.OPostCommentRepository;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.domain.Post;
+import com.kustaurant.kustaurant.common.post.domain.PostDetailView;
+import com.kustaurant.kustaurant.common.post.enums.PostStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
@@ -93,70 +95,36 @@ public class CommunityController {
 
         Map<Integer, InteractionStatusResponse> commentInteractionMap = postCommentService.getCommentInteractionMap(postCommentList, userId);
 
-        // TODO: 도메인 대신 DTO 만들어서 반환하기
+        // TODO: user, post 도메인 대신 post, user DTO 로 반환하기
         User user = userService.getActiveUserById(userId);
         Post post = postService.getPost(postId);
-        model.addAttribute("postCommentList", postCommentList);
-        model.addAttribute("post", post);
-        model.addAttribute("user", user);
-        model.addAttribute("sort", sort);
-        model.addAttribute("postInteractionStatus", postInteractionStatus);
-        model.addAttribute("commentInteractionMap", commentInteractionMap);
+        PostDetailView view = PostDetailView.builder()
+                .post(post)
+                .postCommentList(postCommentList)
+                .sort(sort)
+                .postInteractionStatus(postInteractionStatus)
+                .commentInteractionMap(commentInteractionMap)
+                .user(user).build();
+        model.addAttribute("view", view);
 
         return "community_post";
     }
 
 
-    // 게시물 삭제
+
     @GetMapping("/api/post/delete")
-    @Transactional
     public ResponseEntity<String> postDelete(@RequestParam(name = "postId") Integer postId) {
-        Post post = postService.getPost(postId);
-        //게시글 지워지면 그 게시글의 댓글들도 DELETED 상태로 변경
-        List<PostCommentEntity> comments = postEntity.getPostCommentList();
-        for (PostCommentEntity comment : comments) {
-            comment.setStatus("DELETED");
-            //대댓글 삭제
-            for (PostCommentEntity reply : comment.getRepliesList()) {
-                reply.setStatus("DELETED");
-            }
-        }
-        //게시글 지워지면 그 게시글의 scrab정보들도 다 지워야함
-        List<PostScrapEntity> scraps = postEntity.getPostScrapList();
-        postScrapRepository.deleteAll(scraps);
-        // 사진 삭제
-        List<PostPhoto> existingPhotos = postEntity.getPostPhotoList();
-        if (existingPhotos != null) {
-            postPhotoJpaRepository.deleteAll(existingPhotos);
-            postEntity.setPostPhotoList(null); // 기존 리스트 연결 해제
-        }
-        // 글 삭제
-        postEntity.setStatus("DELETED");
-        return ResponseEntity.ok("post delete complete");
+        postService.deletePost(postId);
+        return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
     }
+
 
     // 댓글 ,대댓글 삭제
     @Transactional
     @GetMapping("/api/comment/delete")
     public ResponseEntity<Map<String, Object>> commentDelete(@RequestParam Integer commentId) {
-        PostCommentEntity postComment = postCommentService.getPostCommentByCommentId(commentId);
-        postComment.setStatus("DELETED");
-        List<PostCommentEntity> repliesList = postComment.getRepliesList();
-        int deletedCount = 1;
-        // 해당 댓글에 대한 대댓글이 존재하면 삭제
-        if (!repliesList.isEmpty()) {
-            for (PostCommentEntity reply : repliesList) {
-                if (!reply.getStatus().equals("DELETED")) {
-                    reply.setStatus("DELETED");
-                    deletedCount += 1;
-                }
+        int deletedCount = postCommentService.deleteComment(commentId);
 
-            }
-
-        }
-
-
-        // 응답에 삭제된 개수 포함
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("deletedCount", deletedCount);
@@ -199,12 +167,13 @@ public class CommunityController {
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/post/like")
     public ResponseEntity<Map<String, Object>> postLikeCreate(@RequestParam("postId") String postId, Model model, Principal principal) {
-        Integer postidInt = Integer.valueOf(postId);
-        UserEntity user = customOAuth2UserService.getUser(principal.getName());
-        PostEntity postEntity = postService.getPost(postidInt);
-        Map<String, Object> response = postService.likeCreateOrDelete(postidInt, principal.getName());
-        response.put("likeCount", postEntity.getPostLikesList().size());
-        response.put("dislikeCount", postEntity.getPostDislikesList().size());
+        Integer postIdInt = Integer.valueOf(postId);
+        Integer userId = Integer.valueOf(principal.getName());
+
+        Post post = postService.getPost(postIdInt);
+        Map<String, Object> response = postService.likeCreateOrDelete(postIdInt, userId);
+        response.put("likeCount", post.getLikes().size());
+        response.put("dislikeCount",post.getDislikes().size());
 
         return ResponseEntity.ok(response);
     }
@@ -213,12 +182,12 @@ public class CommunityController {
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/post/dislike")
     public ResponseEntity<Map<String, Object>> postDislikeCreate(@RequestParam("postId") String postId, Model model, Principal principal) {
-        Integer postidInt = Integer.valueOf(postId);
-        UserEntity user = customOAuth2UserService.getUser(principal.getName());
-        PostEntity postEntity = postService.getPost(postidInt);
-        Map<String, Object> response = postService.dislikeCreateOrDelete(postEntity, user);
-        response.put("likeCount", postEntity.getPostLikesList().size());
-        response.put("dislikeCount", postEntity.getPostDislikesList().size());
+        Integer postIdInt = Integer.valueOf(postId);
+        Integer userId = Integer.valueOf(principal.getName());
+        Post post = postService.getPost(postIdInt);
+        Map<String, Object> response = postService.dislikeCreateOrDelete(postIdInt,userId);
+        response.put("likeCount", post.getLikes().size());
+        response.put("dislikeCount",post.getDislikes().size());
         return ResponseEntity.ok(response);
     }
 
@@ -305,10 +274,10 @@ public class CommunityController {
 
             // 이미지 파일 처리
             if (imgUrl != null && !imgUrl.isEmpty()) {
-                PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-                postPhoto.setPost(postEntity); // 게시글과 이미지 연관관계 설정
-                postEntity.getPostPhotoList().add(postPhoto); // post의 이미지 리스트에 추가
-                postPhotoJpaRepository.save(postPhoto); // 이미지 정보 저장
+                PostPhotoEntity postPhotoEntity = new PostPhotoEntity(imgUrl, "ACTIVE");
+                postPhotoEntity.setPost(postEntity); // 게시글과 이미지 연관관계 설정
+                postEntity.getPostPhotoEntityList().add(postPhotoEntity); // post의 이미지 리스트에 추가
+                postPhotoJpaRepository.save(postPhotoEntity); // 이미지 정보 저장
             }
         }
 
@@ -337,23 +306,23 @@ public class CommunityController {
     ) {
         PostEntity postEntity = postService.getPost(Integer.valueOf(postId));
         // 기존 연관된 사진 정보 삭제
-        List<PostPhoto> existingPhotos = postEntity.getPostPhotoList();
+        List<PostPhotoEntity> existingPhotos = postEntity.getPostPhotoEntityList();
         if (existingPhotos != null) {
             postPhotoJpaRepository.deleteAll(existingPhotos);
             postEntity.setPostPhotoList(null); // 기존 리스트 연결 해제
         }
 
         // 새로운 사진 정보 처리 로직 (기존 로직 유지)
-        List<PostPhoto> newPhotoList = new ArrayList<>();
+        List<PostPhotoEntity> newPhotoList = new ArrayList<>();
         Document doc = Jsoup.parse(content);
         Elements imgTags = doc.select("img");
         for (Element img : imgTags) {
             String imgUrl = img.attr("src");
             if (!imgUrl.isEmpty()) {
-                PostPhoto postPhoto = new PostPhoto(imgUrl, "ACTIVE");
-                postPhoto.setPost(postEntity);
-                newPhotoList.add(postPhoto);
-                postPhotoJpaRepository.save(postPhoto);
+                PostPhotoEntity postPhotoEntity = new PostPhotoEntity(imgUrl, "ACTIVE");
+                postPhotoEntity.setPost(postEntity);
+                newPhotoList.add(postPhotoEntity);
+                postPhotoJpaRepository.save(postPhotoEntity);
             }
         }
         postEntity.setPostPhotoList(newPhotoList);

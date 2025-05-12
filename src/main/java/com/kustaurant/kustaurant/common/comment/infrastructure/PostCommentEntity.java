@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.comment.infrastructure;
 
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
+import com.kustaurant.kustaurant.common.post.enums.PostStatus;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import jakarta.persistence.*;
@@ -21,7 +22,10 @@ public class PostCommentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer commentId;
     String commentBody;
-    String status;
+
+    @Enumerated(EnumType.STRING)
+    PostStatus status;
+
     @ManyToOne
     @JoinColumn(name="parent_comment_id")
     PostCommentEntity parentComment;
@@ -33,7 +37,7 @@ public class PostCommentEntity {
     // 웹 버전을 위한 totallikeCount 를 말함. 모바일에선 사용하지 않음
     Integer likeCount=0;
 
-    public PostCommentEntity(String commentBody, String status, LocalDateTime createdAt, PostEntity post, UserEntity UserEntity) {
+    public PostCommentEntity(String commentBody, PostStatus status, LocalDateTime createdAt, PostEntity post, UserEntity UserEntity) {
         this.commentBody = commentBody;
         this.status = status;
         this.createdAt = createdAt;
@@ -85,6 +89,7 @@ public class PostCommentEntity {
         Long secondsDifference = ChronoUnit.SECONDS.between(past, now);
         return secondsDifference + "초 전";
     }
+
     // TODO: from, toDomain 검토 필요
     public static PostCommentEntity from(PostComment comment) {
         PostCommentEntity entity = new PostCommentEntity();

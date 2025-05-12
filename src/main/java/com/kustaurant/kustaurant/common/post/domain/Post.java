@@ -1,10 +1,13 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
+import com.kustaurant.kustaurant.common.post.enums.PostStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostPhoto;
+import com.kustaurant.kustaurant.common.post.infrastructure.PostPhotoEntity;
 import com.kustaurant.kustaurant.common.user.domain.User;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,16 +15,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Getter
+@Builder
 public class Post {
     private Integer id;
     private String title;
     private String body;
     private String category;
-    private String status;
-    private LocalDateTime createdAt;
-    private User author;
-    private Integer likeCount;
+    private PostStatus status;
+    private Integer authorId;
+    private Integer netLikeCount;
     private Integer visitCount;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     private List<PostLike> likes;
     private List<PostDislike> dislikes;
@@ -29,14 +34,15 @@ public class Post {
     private List<PostPhoto> photos;
     private List<PostScrap> scraps;
 
-    public Post(String title, String body, String category, String status, LocalDateTime createdAt, User author, Integer likeCount, Integer visitCount) {
+
+    public Post(String title, String body, String category, PostStatus status, LocalDateTime createdAt, Integer authorId, Integer netLikeCount, Integer visitCount) {
         this.title = title;
         this.body = body;
         this.category = category;
         this.status = status;
         this.createdAt = createdAt;
-        this.author = author;
-        this.likeCount = likeCount != null ? likeCount : 0;
+        this.authorId = authorId;
+        this.netLikeCount = netLikeCount != null ? netLikeCount : 0;
         this.visitCount = visitCount != null ? visitCount : 0;
         this.likes = new ArrayList<>();
         this.dislikes = new ArrayList<>();
@@ -56,7 +62,7 @@ public class Post {
     }
 
     public void delete() {
-        this.status = "DELETED";
+        this.status = PostStatus.DELETED;
     }
 
     public void addLike(PostLike like) {
@@ -94,7 +100,7 @@ public class Post {
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();
         long diffInMinutes = java.time.Duration.between(createdAt, now).toMinutes();
-        
+
         if (diffInMinutes < 1) {
             return "방금 전";
         } else if (diffInMinutes < 60) {
@@ -151,11 +157,11 @@ public class Post {
     }
 
     public void increaseLikeCount(int amount) {
-        this.likeCount += amount;
+        this.netLikeCount += amount;
     }
 
     public void decreaseLikeCount(int amount) {
-        this.likeCount -= amount;
+        this.netLikeCount -= amount;
     }
 
 }

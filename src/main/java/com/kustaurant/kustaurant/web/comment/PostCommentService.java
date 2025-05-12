@@ -200,4 +200,17 @@ public class PostCommentService {
         }
         return commentInteractionMap;
     }
+
+    @Transactional
+    public int deleteComment(Integer commentId) {
+        PostComment comment = postCommentRepository.findByIdWithReplies(commentId)
+                .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
+
+        comment.delete();  // 도메인 내에서 댓글 + 대댓글 상태 변경
+
+        postCommentRepository.save(comment); // 변경 반영
+
+        return 1 + comment.getReplies().size(); // 삭제된 댓글 수 리턴
+    }
+
 }

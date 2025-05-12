@@ -21,5 +21,9 @@ public interface PostScrapRepository {
 
     void delete(PostScrap postScrap);
 
+    void deleteByPostId(Integer postId);
+
+
+
     void save(PostScrap postScrap);
 }

@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.comment.domain;
 
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.common.post.enums.PostStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,7 +13,7 @@ import java.util.List;
 public class PostComment {
     private final Integer commentId;
     private final String commentBody;
-    private final String status;
+    private PostStatus status;
     private final Integer likeCount;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
@@ -23,7 +24,7 @@ public class PostComment {
     private final List<PostComment> replies;
 
     @Builder
-    public PostComment(Integer commentId, String commentBody, String status, Integer likeCount,
+    public PostComment(Integer commentId, String commentBody, PostStatus status, Integer likeCount,
                        LocalDateTime createdAt, LocalDateTime updatedAt,
                        Integer userId, Integer postId, Integer parentCommentId,
                        List<PostComment> replies) {
@@ -79,5 +80,11 @@ public class PostComment {
         return seconds + "초 전";
     }
 
+    public void delete() {
+        this.status = PostStatus.DELETED;
+        for (PostComment reply : replies) {
+            reply.status = PostStatus.DELETED;
+        }
+    }
 
 }

@@ -25,4 +25,6 @@ public interface PostScrapJpaRepository extends JpaRepository<PostEntity, Intege
     boolean existsByUserIdAndPostId(Integer userId, Integer postId);
 
     Integer user(UserEntity user);
+
+    void deleteByPostId(Integer postId);
 }

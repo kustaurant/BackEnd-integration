@@ -59,13 +59,13 @@ public class PostDTO {
         dto.setPostCategory(postEntity.getPostCategory());
         dto.setCreatedAt(postEntity.getCreatedAt());
         dto.setUpdatedAt(postEntity.getUpdatedAt());
-        dto.setLikeCount(postEntity.getLikeCount());
+        dto.setLikeCount(postEntity.getNetLikeCount());
         dto.setUser(UserDTO.convertUserToUserDTO(postEntity.getUser()));
         int commentCount = postEntity.getPostCommentList().stream().filter(c -> c.getStatus().equals("ACTIVE")).toList().size();
         dto.setCommentCount(commentCount);
         dto.setTimeAgo(postEntity.toDomain().calculateTimeAgo());
-        if(!postEntity.getPostPhotoList().isEmpty()){
-            dto.setPostPhotoImgUrl(postEntity.getPostPhotoList().get(0).getPhotoImgUrl());
+        if(!postEntity.getPostPhotoEntityList().isEmpty()){
+            dto.setPostPhotoImgUrl(postEntity.getPostPhotoEntityList().get(0).getPhotoImgUrl());
         }else{
             dto.setPostPhotoImgUrl(null);
         }

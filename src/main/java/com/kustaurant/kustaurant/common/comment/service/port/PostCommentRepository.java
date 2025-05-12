@@ -12,4 +12,8 @@ public interface PostCommentRepository {
     List<PostComment> findAll(Specification<PostComment> spec);
 
     Optional<PostComment> findById(Integer comment_id);
+
+    Optional<PostComment> findByIdWithReplies(Integer commentId);
+    PostComment save(PostComment comment);
+
 }

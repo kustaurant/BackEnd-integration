@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.common.comment.infrastructure;
 
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.service.port.PostCommentRepository;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
@@ -29,4 +30,29 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     public Optional<PostComment> findById(Integer comment_id) {
         return postCommentJpaRepository.findById(comment_id).map(PostCommentEntity::toDomain);
     }
+    @Override
+    public Optional<PostComment> findByIdWithReplies(Integer commentId) {
+        return postCommentJpaRepository.findById(commentId)
+                .map(PostCommentEntity::toDomain);
+    }
+
+    @Override
+    public PostComment save(PostComment comment) {
+        PostCommentEntity entity = postCommentJpaRepository.findById(comment.getCommentId())
+                .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
+
+        entity.setStatus(comment.getStatus());
+
+        for (PostComment reply : comment.getReplies()) {
+            PostCommentEntity replyEntity = entity.getRepliesList().stream()
+                    .filter(r -> r.getCommentId().equals(reply.getCommentId()))
+                    .findFirst()
+                    .orElseThrow(() -> new DataNotFoundException("대댓글이 존재하지 않습니다."));
+            replyEntity.setStatus(reply.getStatus());
+        }
+
+        postCommentJpaRepository.save(entity);
+        return entity.toDomain();
+    }
+
 }

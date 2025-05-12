@@ -26,18 +26,24 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
 
     @Override
     public Optional<PostScrapEntity> findByPostAndUser(PostEntity post, UserEntity user) {
-        return postScrapJpaRepository.findByPostAndUser(post,user);
+        return postScrapJpaRepository.findByPostAndUser(post, user);
     }
 
     @Override
     public boolean existsByUserIdAndPostId(Integer userId, Integer postId) {
-        return postScrapJpaRepository.existsByUserIdAndPostId(userId,postId);
+        return postScrapJpaRepository.existsByUserIdAndPostId(userId, postId);
     }
 
     @Override
     public void delete(PostScrap postScrap) {
 
     }
+
+    @Override
+    public void deleteByPostId(Integer postId) {
+        postScrapJpaRepository.deleteByPostId(postId);
+    }
+
 
     @Override
     public void save(PostScrap postScrap) {

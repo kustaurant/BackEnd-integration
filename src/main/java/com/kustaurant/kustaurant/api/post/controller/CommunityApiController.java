@@ -230,7 +230,7 @@ public class CommunityApiController {
     public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(postId);
-        LikeToggleStatus status = postApiService.toggleLikeStatus(postEntity, user); // 1 또는 0 반환
+        LikeToggleStatus status = postApiService.toggleLikeStatus(postId, userId); // 1 또는 0 반환
         LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(postEntity.getPostLikesList().size(), status.getValue());
         return ResponseEntity.ok(likeOrDislikeDTO);
     }

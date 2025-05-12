@@ -10,12 +10,24 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository {
+    List<PostEntity> findActivePostsByUserId(Integer userId);
+
+    Optional<PostEntity> findByStatusAndPostId(String status, Integer postId);
+
+    PostEntity save(PostEntity postEntity);
+
     Post save(Post post);
     Optional<Post> findById(Integer id);
+    Optional<Post> findByIdWithComments(Integer id);
     Page<Post> findAll(Pageable pageable);
     Page<Post> findAll(Specification<PostEntity> spec, Pageable pageable);
+
+    List<Post> findAllById(List<Integer> ids);
+
     Page<Post> findByStatus(String status, Pageable pageable);
 
     void increaseVisitCount(Integer postId);
     void delete(Post post);
+
+    List<Post> findActiveByUserId(Integer userId);
 }

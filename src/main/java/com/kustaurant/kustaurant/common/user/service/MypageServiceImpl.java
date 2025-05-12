@@ -59,8 +59,8 @@ public class MypageServiceImpl implements MypageService {
 
         Map<Integer, String> postIdToTitle = postRepository.findAllById(postIds).stream()
                 .collect(Collectors.toMap(
-                        Post::getPostId,
-                        Post::getPostTitle
+                        Post::getId,
+                        Post::getTitle
                 ));
 
         return postComments.stream()

@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.web.post.service;
 
+import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.domain.Post;
@@ -7,10 +8,7 @@ import com.kustaurant.kustaurant.common.post.domain.PostDislike;
 import com.kustaurant.kustaurant.common.post.domain.PostLike;
 import com.kustaurant.kustaurant.common.post.enums.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
-import com.kustaurant.kustaurant.common.post.service.port.PostDislikeRepository;
-import com.kustaurant.kustaurant.common.post.service.port.PostLikeRepository;
-import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.common.post.service.port.PostScrapRepository;
+import com.kustaurant.kustaurant.common.post.service.port.*;
 import com.kustaurant.kustaurant.common.user.controller.port.UserService;
 import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
@@ -39,6 +37,8 @@ public class PostService {
     private final PostScrapRepository postScrapRepository;
     private final PostLikeRepository postLikeRepository;
     private final PostDislikeRepository postDislikeRepository;
+    private final PostPhotoRepository postPhotoRepository;
+
 
     // 인기순 제한 기준 숫자
     public static final int POPULARCOUNT = 3;
@@ -147,25 +147,19 @@ public class PostService {
     }
 
     @Transactional
-    public Map<String, Object> likeCreateOrDelete(Integer postId, String providerId) {
+    public Map<String, Object> likeCreateOrDelete(Integer postId, Integer userId) {
         Post post = getPost(postId);
-        User user = userRepository.findByProviderId(providerId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
 
         ReactionStatus result = post.toggleLike(user, LocalDateTime.now());
 
-        syncLikeState(post, user, result);
-
-        return Map.of(result.name(), true);
-    }
-
-    private void syncLikeState(Post post, User user, ReactionStatus result) {
         switch (result) {
             case LIKE_DELETED -> {
-                postLikeRepository.deleteByUserAndPost(user, post);
+                postLikeRepository.deleteByUserIdAndPostId(userId, postId);
             }
             case DISLIKE_TO_LIKE -> {
-                postDislikeRepository.deleteByUserAndPost(user, post);
+                postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
                 postLikeRepository.save(new PostLike(user, post, LocalDateTime.now()));
             }
             case LIKE_CREATED -> {
@@ -174,29 +168,25 @@ public class PostService {
         }
 
         postRepository.save(post);
+
+        return Map.of(result.name(), true);
     }
 
 
     // 게시글 싫어요
     @Transactional
-    public Map<String, Object> dislikeCreateOrDelete(Integer postId, String providerId) {
+    public Map<String, Object> dislikeCreateOrDelete(Integer postId, Integer userId) {
         Map<String, Object> status = new HashMap<>();
         Post post = getPost(postId);
-        User user = userRepository.findByProviderId(providerId).orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
         ReactionStatus result = post.toggleDislike(user, LocalDateTime.now());
 
-        syncDislikeState(post, user, result);
-
-        return Map.of(result.name(), true);
-    }
-
-    private void syncDislikeState(Post post, User user, ReactionStatus result) {
         switch (result) {
             case DISLIKE_DELETED -> {
-                postDislikeRepository.deleteByUserAndPost(user, post);
+                postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
             }
             case LIKE_TO_DISLIKE -> {
-                postLikeRepository.deleteByUserAndPost(user, post);
+                postLikeRepository.deleteByUserIdAndPostId(userId, postId);
                 postDislikeRepository.save(new PostDislike(user, post, LocalDateTime.now()));
             }
             case DISLIKE_CREATED -> {
@@ -205,6 +195,7 @@ public class PostService {
         }
 
         postRepository.save(post);
+        return Map.of(result.name(), true);
     }
 
 
@@ -254,8 +245,6 @@ public class PostService {
                     return cb.and(statusPredicate, likeCountPredicate, categoryPredicate, cb.or(cb.like(p.get("postTitle"), "%" + kw + "%"), // 제목
                             cb.like(p.get("postBody"), "%" + kw + "%"),      // 내용
                             cb.like(u1.get("userNickname"), "%" + kw + "%")    // 글 작성자
-//                            ,cb.like(c.get("commentBody"), "%" + kw + "%"),      // 댓글 내용
-//                            cb.like(u2.get("userNickname"), "%" + kw + "%") // 댓글 작성자
                     ));
                 }
                 // 검색 조건 결합
@@ -314,5 +303,28 @@ public class PostService {
         };
     }
 
+
+    @Transactional
+    public void deletePost(Integer postId) {
+        Post post = postRepository.findByIdWithComments(postId)
+                .orElseThrow(() -> new DataNotFoundException("게시물이 존재하지 않습니다."));
+
+        // 게시물 상태 변경
+        post.delete();
+        // 댓글 삭제
+        post.getComments().forEach(comment -> {
+            comment.delete();
+            comment.getReplies().forEach(PostComment::delete);
+        });
+
+        // 스크랩 삭제
+        postScrapRepository.deleteByPostId(postId);
+
+        // 사진 삭제
+        postPhotoRepository.deleteByPostId(postId);
+
+        // 저장
+        postRepository.save(post);
+    }
 
 }
