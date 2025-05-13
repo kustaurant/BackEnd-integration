@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
 import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
+import com.kustaurant.kustaurant.common.post.enums.PostStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class PostDTO {
     @Schema(description = "게시글 내용", example = "건대 중문 근처 갈일 있는데 맛집 추천해주세요")
     String postBody;
     @Schema(description = "게시글 상태", example = "ACTIVE")
-    String status;
+    PostStatus status;
     @Schema(description = "게시글 카테고리", example = "자유게시판")
     String postCategory;
     @Schema(description = "게시글이 생성된 날짜", example = "2024-05-19T18:09:06")

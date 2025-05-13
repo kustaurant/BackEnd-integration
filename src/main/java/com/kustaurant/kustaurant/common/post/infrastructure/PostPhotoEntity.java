@@ -23,6 +23,7 @@ public class PostPhotoEntity {
 
     public PostPhotoEntity() {
     }
+
     public PostPhotoEntity(String photoImgUrl, String status) {
         this.photoImgUrl = photoImgUrl;
         this.status = status;
@@ -35,18 +36,10 @@ public class PostPhotoEntity {
     }
 
     public PostPhoto toDomain() {
-        return PostPhoto.builder()
-                .id(photoId)
-                .photoImgUrl(photoImgUrl)
-                .status(status)
-                .build();
+        return new PostPhoto(this.photoImgUrl, this.status);
     }
 
     public static PostPhotoEntity from(PostPhoto postPhoto, PostEntity postEntity) {
-        return new PostPhotoEntity(
-                postPhoto.getPhotoImgUrl(),
-                postPhoto.getStatus(),
-                postEntity
-        );
+        return new PostPhotoEntity(postPhoto.getPhotoImgUrl(), postPhoto.getStatus(), postEntity);
     }
 }

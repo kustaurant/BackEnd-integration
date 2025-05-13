@@ -17,7 +17,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
 
     @Override
     public List<PostComment> findActiveByUserId(Integer userId) {
-        return postCommentJpaRepository.findActiveByUserIdOrderByCreatedAtDesc(userId).stream().map(PostComment::from).toList();
+        return postCommentJpaRepository.findActiveByUserIdOrderByCreatedAtDesc(userId).stream().map(PostCommentEntity::toDomain).toList();
     }
 
     @Override

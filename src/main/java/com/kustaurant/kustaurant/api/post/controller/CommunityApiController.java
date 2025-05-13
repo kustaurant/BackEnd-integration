@@ -6,6 +6,7 @@ import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity
 import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
+import com.kustaurant.kustaurant.common.post.enums.PostStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
@@ -270,7 +271,7 @@ public class CommunityApiController {
     ) {
         try {
             UserEntity user = userService.findUserById(userId);
-            PostEntity postEntity = new PostEntity(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), "ACTIVE", LocalDateTime.now(),user);
+            PostEntity postEntity = new PostEntity(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), PostStatus.ACTIVE, LocalDateTime.now(),user);
             postApiService.create(postEntity, user);
             postRepository.save(postEntity);
             return ResponseEntity.ok(PostDTO.convertPostToPostDTO(postEntity));

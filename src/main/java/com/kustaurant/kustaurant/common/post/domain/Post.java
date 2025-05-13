@@ -33,23 +33,6 @@ public class Post {
     private List<PostPhoto> photos;
     private List<PostScrap> scraps;
 
-    public Post(String title, String body, String category, PostStatus status, LocalDateTime createdAt, Integer authorId, Integer netLikes, Integer visitCount) {
-        this.title = title;
-        this.body = body;
-        this.category = category;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.authorId = authorId;
-        this.netLikes = netLikes != null ? netLikes : 0;
-        this.visitCount = visitCount != null ? visitCount : 0;
-        this.comments = new ArrayList<>();
-        this.photos = new ArrayList<>();
-        this.scraps = new ArrayList<>();
-    }
-
-    public static Post create(String title, String body, String category, Integer authorId) {
-        return new Post(title, body, category, PostStatus.ACTIVE, LocalDateTime.now(), authorId, 0, 0);
-    }
 
     public void delete() {
         this.status = PostStatus.DELETED;

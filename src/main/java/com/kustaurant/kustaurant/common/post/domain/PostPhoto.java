@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 public class PostPhoto {
     private Integer id;
     private final String photoImgUrl;
