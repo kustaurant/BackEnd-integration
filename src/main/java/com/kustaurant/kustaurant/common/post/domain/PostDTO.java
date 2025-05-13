@@ -59,7 +59,7 @@ public class PostDTO {
         dto.setPostCategory(postEntity.getPostCategory());
         dto.setCreatedAt(postEntity.getCreatedAt());
         dto.setUpdatedAt(postEntity.getUpdatedAt());
-        dto.setLikeCount(postEntity.getNetLikeCount());
+        dto.setLikeCount(postEntity.getNetLikes());
         dto.setUser(UserDTO.convertUserToUserDTO(postEntity.getUser()));
         int commentCount = postEntity.getPostCommentList().stream().filter(c -> c.getStatus().equals("ACTIVE")).toList().size();
         dto.setCommentCount(commentCount);

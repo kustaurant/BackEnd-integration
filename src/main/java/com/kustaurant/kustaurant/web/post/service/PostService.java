@@ -107,13 +107,11 @@ public class PostService {
         LocalDateTime now = LocalDateTime.now();
 
         // postList의 createdAt 필드를 문자열 형식으로 만들어 timeAgoList에 할당
-        List<String> timeAgoList = postList.stream()
-                .map(post -> {
-                    LocalDateTime createdAt = post.getCreatedAt();
-                    // datetime 타입의 createdAt을 string 타입으로 변환해주는 함수
-                    return timeAgo(now, createdAt);
-                })
-                .collect(Collectors.toList());
+        List<String> timeAgoList = postList.stream().map(post -> {
+            LocalDateTime createdAt = post.getCreatedAt();
+            // datetime 타입의 createdAt을 string 타입으로 변환해주는 함수
+            return timeAgo(now, createdAt);
+        }).collect(Collectors.toList());
         return timeAgoList;
 
     }
@@ -141,10 +139,11 @@ public class PostService {
     @Transactional
     public ReactionToggleResponse toggleLike(Integer postId, Integer userId) {
         Post post = getPost(postId);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
+        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean isDisliked = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
 
-        ReactionStatus result = post.toggleLike(user, LocalDateTime.now());
+        ReactionStatus result = post.toggleLike(isLiked, isDisliked);
 
         switch (result) {
             case LIKE_DELETED -> {
@@ -152,20 +151,16 @@ public class PostService {
             }
             case DISLIKE_TO_LIKE -> {
                 postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
-                postLikeRepository.save(new PostLike(user, post, LocalDateTime.now()));
+                postLikeRepository.save(new PostLike(userId, postId, LocalDateTime.now()));
             }
             case LIKE_CREATED -> {
-                postLikeRepository.save(new PostLike(user, post, LocalDateTime.now()));
+                postLikeRepository.save(new PostLike(userId, postId, LocalDateTime.now()));
             }
         }
 
         postRepository.save(post);
 
-        return new ReactionToggleResponse(
-                result,
-                post.getLikes().size(),
-                post.getDislikes().size()
-        );
+        return new ReactionToggleResponse(result, post.getLikeCount(), post.getDislikeCount());
     }
 
 
@@ -173,8 +168,9 @@ public class PostService {
     @Transactional
     public ReactionToggleResponse toggleDislike(Integer postId, Integer userId) {
         Post post = getPost(postId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
-        ReactionStatus result = post.toggleDislike(user, LocalDateTime.now());
+        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean isDisliked = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
+        ReactionStatus result = post.toggleDislike(isLiked, isDisliked);
 
         switch (result) {
             case DISLIKE_DELETED -> {
@@ -182,19 +178,16 @@ public class PostService {
             }
             case LIKE_TO_DISLIKE -> {
                 postLikeRepository.deleteByUserIdAndPostId(userId, postId);
-                postDislikeRepository.save(new PostDislike(user, post, LocalDateTime.now()));
+                postDislikeRepository.save(new PostDislike(userId, postId, LocalDateTime.now()));
             }
             case DISLIKE_CREATED -> {
-                postDislikeRepository.save(new PostDislike(user, post, LocalDateTime.now()));
+                postDislikeRepository.save(new PostDislike(userId, postId, LocalDateTime.now()));
             }
         }
 
         postRepository.save(post);
-        return new ReactionToggleResponse(
-                result,
-                post.getLikes().size(),
-                post.getDislikes().size()
-        );
+
+        return new ReactionToggleResponse(result, post.getLikeCount(), post.getDislikeCount());
     }
 
 
@@ -207,11 +200,7 @@ public class PostService {
         boolean isDisliked = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
         boolean isScrapped = postScrapRepository.existsByUserIdAndPostId(userId, postId);
 
-        return new InteractionStatusResponse(
-                isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED,
-                isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED,
-                isScrapped ? ScrapStatus.SCRAPPED : ScrapStatus.NOT_SCRAPPED
-        );
+        return new InteractionStatusResponse(isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED, isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED, isScrapped ? ScrapStatus.SCRAPPED : ScrapStatus.NOT_SCRAPPED);
     }
 
 
@@ -294,19 +283,14 @@ public class PostService {
                 Predicate likeCountPredicate = cb.greaterThanOrEqualTo(p.get("likeCount"), POPULARCOUNT);
                 return cb.and(statusPredicate, likeCountPredicate     // 글 작성자
                 );
-
-
             }
-
-
         };
     }
 
 
     @Transactional
     public void deletePost(Integer postId) {
-        Post post = postRepository.findByIdWithComments(postId)
-                .orElseThrow(() -> new DataNotFoundException("게시물이 존재하지 않습니다."));
+        Post post = postRepository.findByIdWithComments(postId).orElseThrow(() -> new DataNotFoundException("게시물이 존재하지 않습니다."));
 
         // 게시물 상태 변경
         post.delete();
@@ -327,29 +311,19 @@ public class PostService {
     }
 
     public void create(String title, String category, String body, Integer userId) {
-        Post post = Post.builder()
-                .title(title)
-                .category(category)
-                .body(body)
-                .status(PostStatus.ACTIVE)
-                .netLikes(0)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .authorId(userId)
-                .build();
+        Post post = Post.builder().title(title).category(category).body(body).status(PostStatus.ACTIVE).netLikes(0).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).authorId(userId).build();
         postRepository.save(post);
 
         List<String> imageUrls = imageExtractor.extract(body);
         for (String imageUrl : imageUrls) {
-            postPhotoRepository.save(new PostPhoto(imageUrl,"ACTIVE"));
+            postPhotoRepository.save(new PostPhoto(imageUrl, "ACTIVE"));
         }
     }
 
 
     @Transactional
     public void update(Integer postId, String title, String category, String body) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         List<String> imageUrls = imageExtractor.extract(body);
         post.update(title, body, category, imageUrls);

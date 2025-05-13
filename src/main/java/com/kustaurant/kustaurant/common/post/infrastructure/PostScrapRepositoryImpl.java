@@ -22,11 +22,6 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
     }
 
     @Override
-    public Optional<PostScrapEntity> findByPostAndUser(PostEntity post, UserEntity user) {
-        return postScrapJpaRepository.findByPostAndUser(post, user);
-    }
-
-    @Override
     public boolean existsByUserIdAndPostId(Integer userId, Integer postId) {
         return postScrapJpaRepository.existsByUserIdAndPostId(userId, postId);
     }
@@ -46,9 +41,9 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
         return postScrapJpaRepository.findByUserIdAndPostId(userId, postId).map(PostScrapEntity::toDomain);
     }
 
-
     @Override
     public void save(PostScrap postScrap) {
-
+        PostScrapEntity postScrapEntity = PostScrapEntity.from(postScrap);
+        postScrapJpaRepository.save(postScrapEntity);
     }
 }

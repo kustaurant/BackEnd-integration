@@ -41,9 +41,23 @@ public class PostScrapEntity {
         return new PostScrap(
                 scrapId,
                 user.getUserId(),
-                post.toDomain(),
+                post.getPostId(),
                 createdAt
         );
+    }
+    public static PostScrapEntity from(PostScrap postScrap) {
+        UserEntity user = new UserEntity();
+        user.setUserId(postScrap.getUserId());
+
+        PostEntity post = new PostEntity();
+        post.setPostId(postScrap.getPostId());
+
+        PostScrapEntity entity = new PostScrapEntity();
+        entity.setUser(user);
+        entity.setPost(post);
+        entity.setCreatedAt(postScrap.getCreatedAt());
+
+        return entity;
     }
 
 }

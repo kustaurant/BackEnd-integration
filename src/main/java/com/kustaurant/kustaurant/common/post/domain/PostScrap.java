@@ -9,18 +9,28 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class PostScrap {
-    private final Integer scrapId;
-    private final Integer userId;
-    private final Post post;
+    private Integer scrapId;
+    private Integer userId;
+    private Integer postId;
     private final LocalDateTime createdAt;
 
     public static PostScrap from(PostScrapEntity entity) {
         return new PostScrap(
                 entity.getScrapId(),
                 entity.getUser().getUserId(),
-                entity.getPost().toDomain(),
+                entity.getPost().getPostId(),
                 entity.getCreatedAt()
         );
+    }
+
+    private PostScrap(Integer userId, Integer postId, LocalDateTime createdAt) {
+        this.userId = userId;
+        this.postId = postId;
+        this.createdAt = createdAt;
+    }
+
+    public static PostScrap create(Integer userId, Integer postId) {
+        return new PostScrap(userId, postId, LocalDateTime.now());
     }
 
 }

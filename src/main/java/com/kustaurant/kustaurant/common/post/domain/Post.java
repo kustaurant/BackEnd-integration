@@ -22,12 +22,13 @@ public class Post {
     private PostStatus status;
     private Integer authorId;
     private Integer netLikes;
+    private Integer likeCount;
+    private Integer dislikeCount;
     private Integer visitCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private List<PostLike> likes;
-    private List<PostDislike> dislikes;
+
     private List<PostComment> comments;
     private List<PostPhoto> photos;
     private List<PostScrap> scraps;
@@ -41,21 +42,13 @@ public class Post {
         this.authorId = authorId;
         this.netLikes = netLikes != null ? netLikes : 0;
         this.visitCount = visitCount != null ? visitCount : 0;
-        this.likes = new ArrayList<>();
-        this.dislikes = new ArrayList<>();
         this.comments = new ArrayList<>();
         this.photos = new ArrayList<>();
         this.scraps = new ArrayList<>();
     }
 
-    public void increaseVisitCount() {
-        this.visitCount++;
-    }
-
-    public void update(String title, String content, String category) {
-        this.title = title;
-        this.body = content;
-        this.category = category;
+    public static Post create(String title, String body, String category, Integer authorId) {
+        return new Post(title, body, category, PostStatus.ACTIVE, LocalDateTime.now(), authorId, 0, 0);
     }
 
     public void delete() {
@@ -68,41 +61,10 @@ public class Post {
         this.category = category;
         this.photos.clear();
         for (String url : imageUrls) {
-            this.photos.add(PostPhoto.of(this.id, url));
+            this.photos.add(new PostPhoto(url, "ACTIVE"));
         }
     }
 
-    public void addLike(PostLike like) {
-        this.likes.add(like);
-    }
-
-    public void removeLike(PostLike like) {
-        this.likes.remove(like);
-    }
-
-    public void addDislike(PostDislike dislike) {
-        this.dislikes.add(dislike);
-    }
-
-    public void removeDislike(PostDislike dislike) {
-        this.dislikes.remove(dislike);
-    }
-
-    public void addComment(PostComment comment) {
-        this.comments.add(comment);
-    }
-
-    public void addPhoto(PostPhoto photo) {
-        this.photos.add(photo);
-    }
-
-    public void addScrap(PostScrap scrap) {
-        this.scraps.add(scrap);
-    }
-
-    public void removeScrap(PostScrap scrap) {
-        this.scraps.remove(scrap);
-    }
 
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();
@@ -119,58 +81,62 @@ public class Post {
         }
     }
 
-    public ReactionStatus toggleLike(User user, LocalDateTime now) {
-        Optional<PostLike> like = likes.stream().filter(l -> l.getUser().equals(user)).findFirst();
-        Optional<PostDislike> dislike = dislikes.stream().filter(d -> d.getUser().equals(user)).findFirst();
-
-        if (like.isPresent()) {
-            removeLike(like.get());
+    public ReactionStatus toggleLike(boolean isLikedBefore, boolean isDislikedBefore) {
+        if (isLikedBefore) {
             decreaseLikeCount(1);
             return ReactionStatus.LIKE_DELETED;
         }
 
-        if (dislike.isPresent()) {
-            removeDislike(dislike.get());
-            addLike(new PostLike(user, this, now));
-            increaseLikeCount(2);
+        if (isDislikedBefore) {
+            decreaseDislikeCount(1);
+            increaseLikeCount(1);
             return ReactionStatus.DISLIKE_TO_LIKE;
         }
 
-        addLike(new PostLike(user, this, now));
         increaseLikeCount(1);
         return ReactionStatus.LIKE_CREATED;
     }
 
-    public ReactionStatus toggleDislike(User user, LocalDateTime now) {
-        Optional<PostLike> like = likes.stream().filter(l -> l.getUser().equals(user)).findFirst();
-        Optional<PostDislike> dislike = dislikes.stream().filter(d -> d.getUser().equals(user)).findFirst();
-
-        if (dislike.isPresent()) {
-            removeDislike(dislike.get());
-            increaseLikeCount(1);
-            return ReactionStatus.DISLIKE_DELETED;
-        }
-
-        if (like.isPresent()) {
-            removeLike(like.get());
-            addDislike(new PostDislike(user, this, now));
-            decreaseLikeCount(2);
+    public ReactionStatus toggleDislike(boolean isLikedBefore, boolean isDislikedBefore) {
+        if (isLikedBefore) {
+            decreaseLikeCount(1);
+            increaseDislikeCount(1);
             return ReactionStatus.LIKE_TO_DISLIKE;
         }
 
-        addDislike(new PostDislike(user, this, now));
-        decreaseLikeCount(1);
+        if (isDislikedBefore) {
+            decreaseDislikeCount(1);
+            return ReactionStatus.DISLIKE_DELETED;
+        }
+
+        increaseDislikeCount(1);
         return ReactionStatus.DISLIKE_CREATED;
     }
 
-
     public void increaseLikeCount(int amount) {
-        this.netLikes += amount;
+        this.likeCount += amount;
+        updateNetLikes();
     }
 
     public void decreaseLikeCount(int amount) {
-        this.netLikes -= amount;
+        this.likeCount -= amount;
+        updateNetLikes();
     }
+
+    public void increaseDislikeCount(int amount) {
+        this.dislikeCount += amount;
+        updateNetLikes();
+    }
+
+    public void decreaseDislikeCount(int amount) {
+        this.dislikeCount -= amount;
+        updateNetLikes();
+    }
+
+    private void updateNetLikes() {
+        this.netLikes = this.likeCount - this.dislikeCount;
+    }
+
 
 }
 

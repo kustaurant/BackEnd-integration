@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.web.post.service;
 
+import com.kustaurant.kustaurant.common.post.domain.PostScrap;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.post.service.port.PostScrapRepository;
@@ -16,29 +17,23 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostScrapService {
     private final PostScrapRepository postScrapRepository;
-    private final PostRepository postRepository;
-    private final UserRepository userRepository;
 
     public Map<String, Object> toggleScrap(Integer userId, Integer postId) {
 
-        Optional<PostScrapEntity> scrapOptional = postScrapRepository.findByUserIdAndPostId(userId, postId);
+        Optional<PostScrap> scrapOptional = postScrapRepository.findByUserIdAndPostId(userId, postId);
         Map<String, Object> status = new HashMap<>();
         if (scrapOptional.isPresent()) {
-            PostScrapEntity scrap = scrapOptional.get();
+            PostScrap scrap = scrapOptional.get();
             postScrapRepository.delete(scrap);
-            postScrapList.remove(scrap);
-            userScrapList.remove(scrap);
+
             status.put("scrapDelete", true);
         } else {
-            PostScrapEntity scrap = new PostScrapEntity(user, postEntity, LocalDateTime.now());
-            PostScrapEntity savedScrap = postScrapRepository.save(scrap);
-            userScrapList.add(savedScrap);
-            postScrapList.add(savedScrap);
+            PostScrap scrap = PostScrap.create(userId, postId);
+            postScrapRepository.save(scrap);
             status.put("scrapCreated", true);
 
         }
-        postRepository.save(postEntity);
-        userRepository.save(user);
+
         return status;
     }
 

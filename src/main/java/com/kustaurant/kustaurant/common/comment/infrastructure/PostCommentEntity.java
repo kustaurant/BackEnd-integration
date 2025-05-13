@@ -34,8 +34,7 @@ public class PostCommentEntity {
     List<PostCommentEntity> repliesList = new ArrayList<>();
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    // 웹 버전을 위한 totallikeCount 를 말함. 모바일에선 사용하지 않음
-    Integer likeCount=0;
+    Integer likeCount=0; // 이 likeCount는 좋아요 수에서 싫어요 수를 뺀 순 좋아요 수를 의미
 
     public PostCommentEntity(String commentBody, PostStatus status, LocalDateTime createdAt, PostEntity post, UserEntity UserEntity) {
         this.commentBody = commentBody;
@@ -90,7 +89,6 @@ public class PostCommentEntity {
         return secondsDifference + "초 전";
     }
 
-    // TODO: from, toDomain 검토 필요
     public static PostCommentEntity from(PostComment comment) {
         PostCommentEntity entity = new PostCommentEntity();
         entity.setCommentId(comment.getCommentId());
@@ -114,9 +112,9 @@ public class PostCommentEntity {
         }
 
         // parentCommentId 처리
-        if (comment.getParentCommentId() != null) {
+        if (comment.getParentComment() != null) {
             PostCommentEntity parent = new PostCommentEntity();
-            parent.setCommentId(comment.getParentCommentId());
+            parent.setCommentId(comment.getParentComment().getCommentId());
             entity.setParentComment(parent);
         }
 
@@ -129,8 +127,8 @@ public class PostCommentEntity {
                 .commentBody(this.commentBody)
                 .postId(this.post.getPostId())
                 .userId(this.user.getUserId())
-                .parentCommentId(this.parentComment != null ? this.parentComment.getCommentId() : null)
-                .likeCount(this.likeCount)
+                .parentComment(this.parentComment != null ? this.parentComment.toDomain() : null)
+                .netLikes(this.likeCount)
                 .status(this.status)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)

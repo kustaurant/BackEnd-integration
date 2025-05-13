@@ -217,7 +217,7 @@ public class MypageApiService {
                         post.getPostTitle(),
                         post.getPostPhotoEntityList().isEmpty() ? null : post.getPostPhotoEntityList().get(0).getPhotoImgUrl(),
                         post.getPostBody().length() > 20 ? post.getPostBody().substring(0, 20) : post.getPostBody(),
-                        post.getNetLikeCount(),
+                        post.getNetLikes(),
                         post.getPostCommentList().size(),
                         post.toDomain().calculateTimeAgo()
                 ))
@@ -237,7 +237,7 @@ public class MypageApiService {
                         scrap.getPost().getPostTitle(),
                         scrap.getPost().getPostPhotoEntityList().isEmpty() ? null : scrap.getPost().getPostPhotoEntityList().get(0).getPhotoImgUrl(),
                         scrap.getPost().getPostBody().length() > 20 ? scrap.getPost().getPostBody().substring(0, 20) : scrap.getPost().getPostBody(),
-                        scrap.getPost().getNetLikeCount(),
+                        scrap.getPost().getNetLikes(),
                         scrap.getPost().getPostCommentList().size(),
                         scrap.getPost().toDomain().calculateTimeAgo()
                 ))

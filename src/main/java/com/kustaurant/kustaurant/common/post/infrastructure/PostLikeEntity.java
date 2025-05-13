@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name="post_likes_tbl_new")
+@Table(name = "post_likes_tbl_new")
 public class PostLikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,43 +23,32 @@ public class PostLikeEntity {
         this.post = post;
         this.createdAt = createdAt;
     }
+
     public PostLikeEntity() {
 
     }
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     UserEntity user;
 
     @ManyToOne
-    @JoinColumn(name="post_id")
+    @JoinColumn(name = "post_id")
     PostEntity post;
 
     LocalDateTime createdAt;
 
     public PostLike toDomain() {
-        return new PostLike(
-                this.postLikesId,
-                this.user.toModel(),
-                this.post.toDomain(),
-                this.createdAt
-        );
+        return new PostLike(this.user.getUserId(), this.post.getPostId(), this.createdAt);
     }
 
     public static PostLikeEntity from(PostLike postLike) {
-        UserEntity userEntity = UserEntity.from(postLike.getUser());
-        return new PostLikeEntity(
-                userEntity,
-                PostEntity.from(postLike.getPost(), userEntity),
-                postLike.getCreatedAt()
-        );
-    }
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUserId(postLike.getUserId());
 
-    public static PostLikeEntity from(PostLike postLike, UserEntity user, PostEntity post) {
-        PostLikeEntity postLikeEntity = new PostLikeEntity();
-        postLikeEntity.setUser(user);
-        postLikeEntity.setPost(post);
-        postLikeEntity.setCreatedAt(postLike.getCreatedAt());
-        return postLikeEntity;
+        PostEntity postEntity = new PostEntity();
+        postEntity.setPostId(postLike.getPostId());
+        return new PostLikeEntity(userEntity, postEntity, postLike.getCreatedAt());
     }
 
 }

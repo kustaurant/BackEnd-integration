@@ -37,7 +37,7 @@ public class PostEntity {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Integer postVisitCount = 0;
-    private Integer netLikeCount = 0;
+    private Integer netLikes = 0;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -81,7 +81,9 @@ public class PostEntity {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .visitCount(postVisitCount)
-                .netLikes(netLikeCount)
+                .netLikes(netLikes)
+                .likeCount(postLikesList.size())
+                .dislikeCount(postDislikesList.size())
                 .authorId(user.getUserId())
                 .build();
     }
@@ -96,7 +98,7 @@ public class PostEntity {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .visitCount(postVisitCount)
-                .netLikes(netLikeCount)
+                .netLikes(netLikes)
                 .authorId(user.getUserId());
 
         if (includeComments) {
@@ -120,19 +122,6 @@ public class PostEntity {
             postBuilder.scraps(scraps);
         }
 
-        if (includeLikes) {
-            List<PostLike> likes = postLikesList.stream()
-                    .map(PostLikeEntity::toDomain)
-                    .toList();
-            postBuilder.likes(likes);
-        }
-
-        if (includeDislikes) {
-            List<PostDislike> dislikes = postDislikesList.stream()
-                    .map(PostDislikeEntity::toDomain)
-                    .toList();
-            postBuilder.dislikes(dislikes);
-        }
 
         return postBuilder.build();
     }

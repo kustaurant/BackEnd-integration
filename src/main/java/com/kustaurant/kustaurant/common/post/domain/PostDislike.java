@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 public class PostDislike {
 
     private Integer id;
-    private final User user;
-    private final Post post;
+    private Integer userId;
+    private Integer postId;
     private final LocalDateTime createdAt;
 
-    public PostDislike(User user, Post post, LocalDateTime createdAt) {
-        this.user = user;
-        this.post = post;
+    public PostDislike(Integer userId, Integer postId, LocalDateTime createdAt) {
+        this.userId = userId;
+        this.postId = postId;
         this.createdAt = createdAt;
     }
 }
