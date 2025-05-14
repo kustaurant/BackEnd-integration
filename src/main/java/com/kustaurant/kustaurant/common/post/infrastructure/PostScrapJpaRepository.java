@@ -1,8 +1,5 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
-import com.kustaurant.kustaurant.common.post.domain.Post;
-import com.kustaurant.kustaurant.common.post.domain.PostScrap;
-import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,16 +15,15 @@ public interface PostScrapJpaRepository extends JpaRepository<PostScrapEntity, I
         ORDER BY ps.createdAt DESC""")
     List<PostScrapEntity> findByUserIdOrderByCreatedAtDesc(@Param("userId") Integer userId);
 
-    Optional<PostScrapEntity> findByPostAndUser(PostEntity post, UserEntity user);
 
     @Query("SELECT ps FROM PostScrapEntity ps WHERE ps.user.userId = :userId AND ps.post.status = 'ACTIVE'")
     List<PostScrapEntity> findActiveScrappedPostsByUserId(@Param("userId") Integer userId);
 
-    boolean existsByUserIdAndPostId(Integer userId, Integer postId);
+    boolean existsByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
 
     Integer user(UserEntity user);
 
-    void deleteByPostId(Integer postId);
+    void deleteByPost_PostId(Integer postId);
 
-    Optional<PostScrapEntity> findByUserIdAndPostId(Integer userId, Integer postId);
+    Optional<PostScrapEntity> findByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
 }

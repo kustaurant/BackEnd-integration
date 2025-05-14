@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.common.comment.dto;
 
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.post.domain.UserDTO;
-import com.kustaurant.kustaurant.common.post.enums.PostStatus;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -20,7 +20,7 @@ public class PostCommentDTO {
     @Schema(description = "댓글 내용", example = "안녕하세요~")
     private String commentBody;
     @Schema(description = "댓글 상태 (활성화 or 삭제)", example = "ACTIVE")
-    private PostStatus status;
+    private ContentStatus status;
     @Schema(description = "좋아요 수", example = "3")
     private Integer likeCount;
     @Schema(description = "싫어요 수", example = "2")
@@ -41,7 +41,7 @@ public class PostCommentDTO {
     private Boolean isCommentMine = false;
     @Schema(description = "작성 유저")
     UserDTO user;
-    public PostCommentDTO(Integer commentId, String commentBody, PostStatus status, UserEntity UserEntity, Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
+    public PostCommentDTO(Integer commentId, String commentBody, ContentStatus status, UserEntity UserEntity, Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
         this.commentId = commentId;
         this.commentBody = commentBody;
         this.status = status;

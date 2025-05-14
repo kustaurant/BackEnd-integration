@@ -14,26 +14,14 @@ public class PostPhotoRepositoryImpl implements PostPhotoRepository {
     private final PostPhotoJpaRepository postPhotoJpaRepository;
 
     @Override
-    public List<PostPhoto> findByPostId(Integer postId) {
-        return postPhotoJpaRepository.findByPostId(postId).stream()
-                .map(PostPhotoEntity::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public void save(PostPhoto postPhoto) {
         // PostPhotoEntity 변환 시 PostEntity가 필요하다면 추가적으로 처리해야 함
         throw new UnsupportedOperationException("PostEntity 주입 로직 필요");
     }
 
     @Override
-    public void deleteById(Integer photoId) {
-        postPhotoJpaRepository.deleteById(photoId);
-    }
-
-    @Override
-    public void deleteByPostId(Integer postId) {
-        postPhotoJpaRepository.deleteByPostId(postId);
+    public void deleteByPost_PostId(Integer postId) {
+        postPhotoJpaRepository.deleteByPost_PostId(postId);
     }
 
     @Override

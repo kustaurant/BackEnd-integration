@@ -10,7 +10,6 @@ import com.kustaurant.kustaurant.common.post.enums.DislikeStatus;
 import com.kustaurant.kustaurant.common.post.enums.LikeStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.common.post.enums.ScrapStatus;
-import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
@@ -60,10 +59,9 @@ public class PostCommentService {
     public ReactionToggleResponse toggleLike(Integer userId, Integer commentId) {
         PostComment comment = postCommentRepository.findById(commentId)
                 .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다."));
-
-        ReactionStatus status = comment.toggleLike(user);
+        boolean isLikedBefore = postCommentLikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
+        boolean isDislikedBefore = postCommentDislikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
+        ReactionStatus status = comment.toggleLike(isLikedBefore,isDislikedBefore);
         postCommentRepository.save(comment);
 
         return new ReactionToggleResponse(status, comment.getNetLikes());
@@ -73,10 +71,10 @@ public class PostCommentService {
     public ReactionToggleResponse toggleDislike(Integer userId, Integer commentId) {
         PostComment comment = postCommentRepository.findById(commentId)
                 .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다."));
+        boolean isLikedBefore = postCommentLikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
+        boolean isDislikedBefore = postCommentDislikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
 
-        ReactionStatus status = comment.toggleDislike(user);
+        ReactionStatus status = comment.toggleDislike(isLikedBefore, isDislikedBefore);
         postCommentRepository.save(comment);
 
         return new ReactionToggleResponse(status, comment.getNetLikes());
@@ -135,8 +133,8 @@ public class PostCommentService {
         if (userId == null) {
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
         }
-        boolean isLiked = postCommentLikeJpaRepository.existsByUserIdAndCommentId(userId, commentId);
-        boolean isDisliked = postCommentDislikeJpaRepository.existsByUserIdAndCommentId(userId, commentId);
+        boolean isLiked = postCommentLikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
+        boolean isDisliked = postCommentDislikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
         return new InteractionStatusResponse(isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED, isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
     }
 

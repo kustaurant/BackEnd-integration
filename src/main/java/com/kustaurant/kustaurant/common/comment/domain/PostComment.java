@@ -1,10 +1,7 @@
 package com.kustaurant.kustaurant.common.comment.domain;
 
-import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentDislike;
-import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentLike;
-import com.kustaurant.kustaurant.common.post.enums.PostStatus;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.common.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,7 +15,7 @@ public class PostComment {
 
     private final Integer commentId;
     private final String commentBody;
-    private PostStatus status;
+    private ContentStatus status;
     private Integer netLikes;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
@@ -26,13 +23,13 @@ public class PostComment {
     private final Integer userId;
     private final Integer postId;
 
-    private List<PostCommentLike> likes;
-    private List<PostCommentDislike> dislikes;
+    private Integer likeCount;
+    private Integer dislikeCount;
     private PostComment parentComment;
     private final List<PostComment> replies;
 
     @Builder
-    public PostComment(Integer commentId, String commentBody, PostStatus status, Integer netLikes,
+    public PostComment(Integer commentId, String commentBody, ContentStatus status, Integer likeCount, Integer dislikeCount, Integer netLikes,
                        LocalDateTime createdAt, LocalDateTime updatedAt,
                        Integer userId, Integer postId,
                        PostComment parentComment, List<PostComment> replies) {
@@ -40,6 +37,8 @@ public class PostComment {
         this.commentBody = commentBody;
         this.status = status;
         this.netLikes = netLikes;
+        this.likeCount = likeCount;
+        this.dislikeCount = dislikeCount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.userId = userId;
@@ -51,7 +50,7 @@ public class PostComment {
     public static PostComment create(String commentBody, Integer userId, Integer postId) {
         return PostComment.builder()
                 .commentBody(commentBody)
-                .status(PostStatus.ACTIVE)
+                .status(ContentStatus.ACTIVE)
                 .netLikes(0)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -67,9 +66,9 @@ public class PostComment {
     }
 
     public void delete() {
-        this.status = PostStatus.DELETED;
+        this.status = ContentStatus.DELETED;
         for (PostComment reply : replies) {
-            reply.status = PostStatus.DELETED;
+            reply.status = ContentStatus.DELETED;
         }
     }
 
@@ -96,45 +95,59 @@ public class PostComment {
         return seconds + "초 전";
     }
 
-    public ReactionStatus toggleLike(User user) {
-        boolean liked = likes.stream().anyMatch(l -> l.isBy(user));
-        boolean disliked = dislikes.stream().anyMatch(d -> d.isBy(user));
-
-        if (liked) {
-            likes.removeIf(l -> l.isBy(user));
-            netLikes--;
+    public ReactionStatus toggleLike(boolean isLikedBefore, boolean isDislikedBefore) {
+        if (isLikedBefore) {
+            decreaseLikeCount(1);
             return ReactionStatus.LIKE_DELETED;
-        } else {
-            if (disliked) {
-                dislikes.removeIf(d -> d.isBy(user));
-                netLikes += 2;
-                return ReactionStatus.DISLIKE_TO_LIKE;
-            } else {
-                likes.add(PostCommentLike.create(user, this));
-                netLikes++;
-                return ReactionStatus.LIKE_CREATED;
-            }
         }
+
+        if (isDislikedBefore) {
+            decreaseDislikeCount(1);
+            increaseLikeCount(1);
+            return ReactionStatus.DISLIKE_TO_LIKE;
+        }
+
+        increaseLikeCount(1);
+        return ReactionStatus.LIKE_CREATED;
     }
 
-    public ReactionStatus toggleDislike(User user) {
-        boolean liked = likes.stream().anyMatch(l -> l.isBy(user));
-        boolean disliked = dislikes.stream().anyMatch(d -> d.isBy(user));
-
-        if (disliked) {
-            dislikes.removeIf(d -> d.isBy(user));
-            netLikes++;
-            return ReactionStatus.DISLIKE_DELETED;
-        } else {
-            if (liked) {
-                likes.removeIf(l -> l.isBy(user));
-                netLikes -= 2;
-                return ReactionStatus.LIKE_TO_DISLIKE;
-            } else {
-                dislikes.add(PostCommentDislike.create(user, this));
-                netLikes--;
-                return ReactionStatus.DISLIKE_CREATED;
-            }
+    public ReactionStatus toggleDislike(boolean isLikedBefore, boolean isDislikedBefore) {
+        if (isLikedBefore) {
+            decreaseLikeCount(1);
+            increaseDislikeCount(1);
+            return ReactionStatus.LIKE_TO_DISLIKE;
         }
+
+        if (isDislikedBefore) {
+            decreaseDislikeCount(1);
+            return ReactionStatus.DISLIKE_DELETED;
+        }
+
+        increaseDislikeCount(1);
+        return ReactionStatus.DISLIKE_CREATED;
+    }
+
+    public void increaseLikeCount(int amount) {
+        this.likeCount += amount;
+        updateNetLikes();
+    }
+
+    public void decreaseLikeCount(int amount) {
+        this.likeCount -= amount;
+        updateNetLikes();
+    }
+
+    public void increaseDislikeCount(int amount) {
+        this.dislikeCount += amount;
+        updateNetLikes();
+    }
+
+    public void decreaseDislikeCount(int amount) {
+        this.dislikeCount -= amount;
+        updateNetLikes();
+    }
+
+    private void updateNetLikes() {
+        this.netLikes = this.likeCount - this.dislikeCount;
     }
 }

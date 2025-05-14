@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.common.post.infrastructure;
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.post.domain.Post;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class PostRepositoryImpl implements PostRepository {
                 .collect(Collectors.toList());
     }
     @Override
-    public Page<Post> findByStatus(String status, Pageable pageable) {
+    public Page<Post> findByStatus(ContentStatus status, Pageable pageable) {
         return postJpaRepository.findByStatus(status,pageable).map(PostEntity::toDomain);
     }
     @Override

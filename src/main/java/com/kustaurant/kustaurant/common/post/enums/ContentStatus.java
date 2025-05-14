@@ -1,5 +1,5 @@
 package com.kustaurant.kustaurant.common.post.enums;
 
-public enum PostStatus {
+public enum ContentStatus {
     ACTIVE, DELETED;
 }

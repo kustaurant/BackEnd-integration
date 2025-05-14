@@ -36,6 +36,12 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
         return jpaRepository.countAllByStatus(status);
     }
 
+
+    public List<EvaluationDomain> findByUserId(Integer userId) {
+        return evaluationJpaRepository.findByUser_UserId(userId).stream().map(EvaluationDomain::from).toList();
+    }
+
+
     @Override
     public List<EvaluationDomain> findSortedEvaluationByUserIdDesc(Integer userId) {
         return evaluationJpaRepository.findSortedEvaluationsByUserIdDesc(userId).stream()

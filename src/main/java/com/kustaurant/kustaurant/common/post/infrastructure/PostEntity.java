@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.common.post.infrastructure;
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.post.domain.*;
-import com.kustaurant.kustaurant.common.post.enums.PostStatus;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
@@ -32,7 +32,9 @@ public class PostEntity {
     private String postTitle;
     private String postBody;
     @Enumerated(EnumType.STRING)
-    private PostStatus status;
+    @Column(columnDefinition = "varchar(20)")
+    private ContentStatus status;
+
     private String postCategory;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -58,7 +60,7 @@ public class PostEntity {
     @OneToMany(mappedBy = "post")
     private List<PostDislikeEntity> postDislikesList = new ArrayList<>();
 
-    public PostEntity(String postTitle, String postBody, String postCategory, PostStatus status, LocalDateTime createdAt, UserEntity user) {
+    public PostEntity(String postTitle, String postBody, String postCategory, ContentStatus status, LocalDateTime createdAt, UserEntity user) {
         this.postTitle = postTitle;
         this.postBody = postBody;
         this.postCategory = postCategory;
@@ -85,6 +87,11 @@ public class PostEntity {
                 .likeCount(postLikesList.size())
                 .dislikeCount(postDislikesList.size())
                 .authorId(user.getUserId())
+                .photos(postPhotoEntityList.stream()
+                        .map(PostPhotoEntity::toDomain)
+                        .toList())
+                .comments(postCommentList.stream().map(PostCommentEntity::toDomain).toList())
+                .scraps(postScrapList.stream().map(PostScrapEntity::toDomain).toList())
                 .build();
     }
 

@@ -1,14 +1,11 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
-import com.kustaurant.kustaurant.common.post.domain.Post;
-import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
 public interface PostDislikeJpaRepository extends JpaRepository<PostDislikeEntity,Integer> {
-    Optional<PostDislikeEntity> findByUserIdAndPostId(Integer userId, Integer postId);
+    Optional<PostDislikeEntity> findByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
 
-    boolean existsByUserIdAndPostId(Integer userId, Integer postId);
+    boolean existsByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
 }

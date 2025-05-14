@@ -4,7 +4,7 @@ package com.kustaurant.kustaurant.api.comment;
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentApiRepository;
-import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.common.post.domain.ReactionToggleResponse;
 import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
@@ -13,7 +13,7 @@ import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistExce
 import com.kustaurant.kustaurant.common.post.domain.PostDTO;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
-import com.kustaurant.kustaurant.common.post.enums.PostStatus;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.web.comment.PostCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -49,19 +49,6 @@ public class PostApiCommentService {
         } else {
             throw new OptionalNotExistException("해당 id의 댓글이 존재하지 않습니다.");
         }
-    }
-
-
-    public int toggleCommentLike(PostCommentEntity postComment, UserEntity user) {
-        Map<String, Object> result = postCommentService.toggleLike(postComment, user);
-        ReactionStatus status = ReactionStatus.valueOf(result.keySet().iterator().next());
-        return status.toAppLikeStatus();
-    }
-
-    public int toggleCommentDislike(PostCommentEntity postComment, UserEntity user) {
-        Map<String, Object> result = postCommentService.toggleDislike(postComment, user);
-        ReactionStatus status = ReactionStatus.valueOf(result.keySet().iterator().next());
-        return status.toAppLikeStatus();
     }
 
 
@@ -174,10 +161,10 @@ public class PostApiCommentService {
     // 댓글 삭제
     public void deleteComment(Integer commentId, Integer userId) {
         PostCommentEntity postComment = getPostCommentByCommentId(commentId);
-        postComment.setStatus("DELETED");
+        postComment.setStatus(ContentStatus.DELETED);
 
         // 대댓글 상태 변경
-        postComment.getRepliesList().forEach(reply -> reply.setStatus("DELETED"));
+        postComment.getRepliesList().forEach(reply -> reply.setStatus(ContentStatus.DELETED));
         postCommentApiRepository.save(postComment);
     }
 
@@ -185,7 +172,7 @@ public class PostApiCommentService {
     public PostCommentEntity createComment(String content, String postId, Integer userId) {
         UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(Integer.valueOf(postId));
-        PostCommentEntity postComment = new PostCommentEntity(content, PostStatus.ACTIVE.name(), LocalDateTime.now(), postEntity, user);
+        PostCommentEntity postComment = new PostCommentEntity(content, ContentStatus.ACTIVE, LocalDateTime.now(), postEntity, user);
         return postCommentApiRepository.save(postComment);
     }
 
@@ -197,15 +184,15 @@ public class PostApiCommentService {
         postCommentApiRepository.save(parentComment);
     }
 
-    public int toggleCommentLikeOrDislike(String action, PostCommentEntity postComment, UserEntity user) {
-        int commentLikeStatus;
+    public ReactionToggleResponse toggleCommentLikeOrDislike(String action, Integer userId, Integer commentId) {
+        ReactionToggleResponse reactionToggleResponse;
         if ("likes".equals(action)) {
-            commentLikeStatus = toggleCommentLike(postComment, user);
+            reactionToggleResponse = postCommentService.toggleLike(userId, commentId);
         } else if ("dislikes".equals(action)) {
-            commentLikeStatus = toggleCommentDislike(postComment, user);
+            reactionToggleResponse = postCommentService.toggleDislike(userId, commentId);
         } else {
             throw new IllegalArgumentException("action 값이 유효하지 않습니다.");
         }
-        return commentLikeStatus;
+        return reactionToggleResponse;
     }
 }

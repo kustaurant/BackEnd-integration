@@ -101,7 +101,7 @@
                 src="/img/community/fire.png" th:if="${sort.equals('recent')}">인기</a>
     </div>
     <ul id="postul">
-        <li th:each="post,iterStat: ${paging}" class="postli">
+        <li th:each="post,iterStat: ${postList}" class="postli">
         <span class="recommend-tab">
             <img src="/img/community/up.png">
             <span th:text="${post.likeCount}"></span>
@@ -109,7 +109,7 @@
             <div class="postBox">
                 <div>
                     <a class="postLink" th:text="${post.postTitle}" th:href="@{/community/{postId}(postId=${post.postId})}"></a>
-                    <span th:if="${#lists.size(post.postCommentList.?[status=='ACTIVE']) != 0}" class="comment-count" th:text="'[' + ${#lists.size(post.postCommentList.?[status=='ACTIVE'])} + ']'">
+                    <span th:if="${post.commentCount!=0}" class="comment-count" th:text="'[' + ${post.commentCount} + ']'">
                     </span>
                 </div>
 
@@ -117,14 +117,14 @@
                     <span id="category" th:text="${post.postCategory}"></span>
 
                     <!--     현재 postList의 인덱스에 해당하는 포스트의 생성시간으로부터의 경과 표시 (ex.1시간 전)               -->
-                    <span id="createdAt" th:text="${post.toDomain().calculateTimeAgo()}"> </span>
+                    <span id="createdAt" th:text="${post.timeAgo}"> </span>
                     <span id="author" th:text="${post.user.userNickname}"></span>
                 </div>
             </div>
 
             <!-- 게시글에 사진이 있으면 썸네일 표시 -->
-            <img class="postImage" th:if="${!post.postPhotoList.isEmpty()}"
-                 th:src="${post.postPhotoList[0].photoImgUrl}"/>
+            <img class="postImage" th:if="${!post.postPhotoImgUrl!=null}"
+                 th:src="${post.postPhotoImgUrl}"/>
         </li>
     </ul>
 

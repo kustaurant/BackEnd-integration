@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.comment.infrastructure;
 
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
-import com.kustaurant.kustaurant.common.post.enums.PostStatus;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import jakarta.persistence.*;
@@ -23,8 +23,9 @@ public class PostCommentEntity {
     Integer commentId;
     String commentBody;
 
+    @Column(columnDefinition = "varchar(20)")
     @Enumerated(EnumType.STRING)
-    PostStatus status;
+    ContentStatus status;
 
     @ManyToOne
     @JoinColumn(name="parent_comment_id")
@@ -36,7 +37,7 @@ public class PostCommentEntity {
     LocalDateTime updatedAt;
     Integer likeCount=0; // 이 likeCount는 좋아요 수에서 싫어요 수를 뺀 순 좋아요 수를 의미
 
-    public PostCommentEntity(String commentBody, PostStatus status, LocalDateTime createdAt, PostEntity post, UserEntity UserEntity) {
+    public PostCommentEntity(String commentBody, ContentStatus status, LocalDateTime createdAt, PostEntity post, UserEntity UserEntity) {
         this.commentBody = commentBody;
         this.status = status;
         this.createdAt = createdAt;
@@ -132,7 +133,8 @@ public class PostCommentEntity {
                 .status(this.status)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
-                .replies(this.repliesList.stream().map(PostCommentEntity::toDomain).toList())
+                // TODO: 순환참조 안되게 대댓글 넣어줘야함
+//                .replies(this.repliesList.stream().map(PostCommentEntity::toDomain).toList())
                 .build();
     }
 }

@@ -51,7 +51,7 @@ public class PostService {
         if (sort.isEmpty() || sort.equals("recent")) {
             sorts.add(Sort.Order.desc("createdAt"));
             Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-            return this.postRepository.findByStatus("ACTIVE", pageable);
+            return this.postRepository.findByStatus(ContentStatus.ACTIVE, pageable);
 
         }
 
@@ -304,20 +304,21 @@ public class PostService {
         postScrapRepository.deleteByPostId(postId);
 
         // 사진 삭제
-        postPhotoRepository.deleteByPostId(postId);
+        postPhotoRepository.deleteByPost_PostId(postId);
 
         // 저장
         postRepository.save(post);
     }
 
-    public void create(String title, String category, String body, Integer userId) {
-        Post post = Post.builder().title(title).category(category).body(body).status(PostStatus.ACTIVE).netLikes(0).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).authorId(userId).build();
-        postRepository.save(post);
+    public Post create(String title, String category, String body, Integer userId) {
+        Post post = Post.builder().title(title).category(category).body(body).status(ContentStatus.ACTIVE).netLikes(0).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).authorId(userId).build();
+        Post savedPost = postRepository.save(post);
 
         List<String> imageUrls = imageExtractor.extract(body);
         for (String imageUrl : imageUrls) {
             postPhotoRepository.save(new PostPhoto(imageUrl, "ACTIVE"));
         }
+        return savedPost;
     }
 
 
@@ -328,8 +329,19 @@ public class PostService {
         List<String> imageUrls = imageExtractor.extract(body);
         post.update(title, body, category, imageUrls);
 
-        postPhotoRepository.deleteByPostId(postId);
+        postPhotoRepository.deleteByPost_PostId(postId);
         postPhotoRepository.saveAll(post.getPhotos());
         postRepository.save(post);
+    }
+
+    public List<PostDTO> getDTOs(Page<Post> paging) {
+        List<PostDTO> postDTOList = new ArrayList<>();
+        for (Post post : paging) {
+            User user = userService.getActiveUserById(post.getId());
+            PostDTO postDTO = PostDTO.from(post,user);
+            postDTO.setUser(UserDTO.from(user));
+            postDTOList.add(postDTO);
+        }
+        return postDTOList;
     }
 }

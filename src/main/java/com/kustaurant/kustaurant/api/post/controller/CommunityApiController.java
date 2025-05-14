@@ -5,10 +5,12 @@ import com.kustaurant.kustaurant.common.comment.dto.CommentLikeDislikeDTO;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.domain.*;
-import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
-import com.kustaurant.kustaurant.common.post.enums.PostStatus;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.common.user.controller.port.UserService;
+import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
@@ -19,6 +21,7 @@ import com.kustaurant.kustaurant.api.comment.PostApiCommentService;
 import com.kustaurant.kustaurant.api.post.service.PostScrapApiService;
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.api.post.service.StorageApiService;
+import com.kustaurant.kustaurant.web.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -48,6 +51,8 @@ public class CommunityApiController {
     private final StorageApiService storageApiService;
     private final PostRepository postRepository;
     private final OUserService userService;
+    private final UserService userServiceNew;
+    private final PostService postService;
 
     // 커뮤니티 메인 화면
     @GetMapping("/api/v1/community/posts")
@@ -93,7 +98,7 @@ public class CommunityApiController {
         postApiService.validatePostId(postId);
         UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(postId);
-        postApiService.increaseVisitCount(postEntity);
+        postService.increaseVisitCount(postId);
         return ResponseEntity.ok(postApiCommentService.createPostDTOWithFlags(postEntity,user));
     }
 
@@ -231,8 +236,8 @@ public class CommunityApiController {
     public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(@PathVariable Integer postId, @JwtToken @Parameter(hidden = true) Integer userId) {
         UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(postId);
-        LikeToggleStatus status = postApiService.toggleLikeStatus(postId, userId); // 1 또는 0 반환
-        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(postEntity.getPostLikesList().size(), status.getValue());
+        ReactionStatus status = postApiService.toggleLike(postId, userId); // 1 또는 0 반환
+        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(postEntity.getPostLikesList().size(), status.toAppLikeStatus());
         return ResponseEntity.ok(likeOrDislikeDTO);
     }
 
@@ -249,7 +254,7 @@ public class CommunityApiController {
                                                                             @JwtToken @Parameter(hidden = true) Integer userId) {
         PostCommentEntity postComment = postApiCommentService.getPostCommentByCommentId(commentId);
         UserEntity user = userService.findUserById(userId);
-        int commentLikeStatus = postApiCommentService.toggleCommentLikeOrDislike(action, postComment,user);
+        int commentLikeStatus = postApiCommentService.toggleCommentLikeOrDislike(action,userId,commentId).getStatus().toAppLikeStatus();
         CommentLikeDislikeDTO responseDTO = CommentLikeDislikeDTO.toCommentLikeDislikeDTO(postComment,commentLikeStatus);
         return ResponseEntity.ok(responseDTO);
     }
@@ -270,11 +275,9 @@ public class CommunityApiController {
             @JwtToken @Parameter(hidden = true) Integer userId
     ) {
         try {
-            UserEntity user = userService.findUserById(userId);
-            PostEntity postEntity = new PostEntity(postUpdateDTO.getTitle(), postUpdateDTO.getContent(), postUpdateDTO.getPostCategory(), PostStatus.ACTIVE, LocalDateTime.now(),user);
-            postApiService.create(postEntity, user);
-            postRepository.save(postEntity);
-            return ResponseEntity.ok(PostDTO.convertPostToPostDTO(postEntity));
+            Post post = postService.create(postUpdateDTO.getTitle(), postUpdateDTO.getPostCategory(), postUpdateDTO.getContent(), userId);
+            User user = userServiceNew.getActiveUserById(userId);
+            return ResponseEntity.ok(PostDTO.from(post,user));
         } catch (Exception e) {
             throw new ServerException("게시글 생성 중 서버 오류가 발생했습니다.", e);
         }

@@ -1,16 +1,13 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
-import com.kustaurant.kustaurant.common.post.enums.PostStatus;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.common.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 @Builder
@@ -19,7 +16,7 @@ public class Post {
     private String title;
     private String body;
     private String category;
-    private PostStatus status;
+    private ContentStatus status;
     private Integer authorId;
     private Integer netLikes;
     private Integer likeCount;
@@ -35,7 +32,7 @@ public class Post {
 
 
     public void delete() {
-        this.status = PostStatus.DELETED;
+        this.status = ContentStatus.DELETED;
     }
 
     public void update(String title, String body, String category, List<String> imageUrls) {
@@ -119,7 +116,5 @@ public class Post {
     private void updateNetLikes() {
         this.netLikes = this.likeCount - this.dislikeCount;
     }
-
-
 }
 

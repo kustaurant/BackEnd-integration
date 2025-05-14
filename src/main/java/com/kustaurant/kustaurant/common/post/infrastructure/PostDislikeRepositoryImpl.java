@@ -1,12 +1,7 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
-import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.domain.PostDislike;
 import com.kustaurant.kustaurant.common.post.service.port.PostDislikeRepository;
-import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserRepositoryImpl;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -21,13 +16,13 @@ public class PostDislikeRepositoryImpl implements PostDislikeRepository {
     @Override
     public Optional<PostDislike> findByUserIdAndPostId(Integer userId, Integer postId) {
 
-        return postDislikeJpaRepository.findByUserIdAndPostId(userId, postId)
+        return postDislikeJpaRepository.findByUser_UserIdAndPost_PostId(userId, postId)
                 .map(PostDislikeEntity::toDomain);
     }
 
     @Override
     public boolean existsByUserIdAndPostId(Integer userId, Integer postId) {
-        return postDislikeJpaRepository.existsByUserIdAndPostId(userId, postId);
+        return postDislikeJpaRepository.existsByUser_UserIdAndPost_PostId(userId, postId);
     }
 
     @Override
@@ -37,7 +32,7 @@ public class PostDislikeRepositoryImpl implements PostDislikeRepository {
 
     @Override
     public void deleteByUserIdAndPostId(Integer userId, Integer postId) {
-        postDislikeJpaRepository.findByUserIdAndPostId(userId, postId)
+        postDislikeJpaRepository.findByUser_UserIdAndPost_PostId(userId, postId)
                 .ifPresent(postDislikeJpaRepository::delete);
     }
 

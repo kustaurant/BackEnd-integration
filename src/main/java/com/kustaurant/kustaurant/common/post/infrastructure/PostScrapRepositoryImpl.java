@@ -1,10 +1,7 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
-import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.domain.PostScrap;
 import com.kustaurant.kustaurant.common.post.service.port.PostScrapRepository;
-import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -23,7 +20,7 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
 
     @Override
     public boolean existsByUserIdAndPostId(Integer userId, Integer postId) {
-        return postScrapJpaRepository.existsByUserIdAndPostId(userId, postId);
+        return postScrapJpaRepository.existsByUser_UserIdAndPost_PostId(userId, postId);
     }
 
     @Override
@@ -33,12 +30,12 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
 
     @Override
     public void deleteByPostId(Integer postId) {
-        postScrapJpaRepository.deleteByPostId(postId);
+        postScrapJpaRepository.deleteByPost_PostId(postId);
     }
 
     @Override
     public Optional<PostScrap> findByUserIdAndPostId(Integer userId, Integer postId) {
-        return postScrapJpaRepository.findByUserIdAndPostId(userId, postId).map(PostScrapEntity::toDomain);
+        return postScrapJpaRepository.findByUser_UserIdAndPost_PostId(userId, postId).map(PostScrapEntity::toDomain);
     }
 
     @Override

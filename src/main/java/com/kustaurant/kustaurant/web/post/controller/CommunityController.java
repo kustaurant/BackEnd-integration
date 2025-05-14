@@ -1,10 +1,7 @@
 package com.kustaurant.kustaurant.web.post.controller;
 
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
-import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
-import com.kustaurant.kustaurant.common.post.domain.Post;
-import com.kustaurant.kustaurant.common.post.domain.PostDetailView;
-import com.kustaurant.kustaurant.common.post.domain.ReactionToggleResponse;
+import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.user.controller.port.UserService;
 import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.web.comment.PostCommentService;
@@ -55,6 +52,11 @@ public class CommunityController {
         model.addAttribute("postCategory", postCategory);
         model.addAttribute("sort", sort);
         model.addAttribute("paging", paging);
+
+        List<PostDTO> postDTOList = postService.getDTOs(paging);
+
+
+        model.addAttribute("postList", postDTOList);
         return "community";
     }
 

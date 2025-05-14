@@ -12,7 +12,7 @@ public interface EvaluationRepository {
     boolean existsByUserAndRestaurant(Integer userId, Integer restaurantId);
     List<EvaluationEntity> findByRestaurantIdAndStatus(Integer restaurantId, String status);
     Integer countAllByStatus(String status);
-
+    List<EvaluationDomain> findByUserId(Integer userId);
     List<EvaluationDomain> findSortedEvaluationByUserIdDesc(Integer userId);
     // TODO: need to delete everything below this
 

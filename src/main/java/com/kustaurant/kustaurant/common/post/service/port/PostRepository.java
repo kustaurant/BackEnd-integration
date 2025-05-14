@@ -1,7 +1,9 @@
 package com.kustaurant.kustaurant.common.post.service.port;
 
 import com.kustaurant.kustaurant.common.post.domain.Post;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import org.openqa.selenium.remote.http.Contents;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,7 +26,7 @@ public interface PostRepository {
 
     List<Post> findAllById(List<Integer> ids);
 
-    Page<Post> findByStatus(String status, Pageable pageable);
+    Page<Post> findByStatus(ContentStatus status, Pageable pageable);
 
     void increaseVisitCount(Integer postId);
     void delete(Post post);
