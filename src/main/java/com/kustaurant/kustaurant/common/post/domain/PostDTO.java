@@ -47,10 +47,13 @@ public class PostDTO {
     Integer postVisitCount;
     @Schema(description = "스크랩 수", example = "")
     Integer scrapCount;
+    @Builder.Default
     @Schema(description = "스크랩 여부", example = "false")
     Boolean isScraped = false;
+    @Builder.Default
     @Schema(description = "좋아요 여부", example = "true")
     Boolean isliked = false;
+    @Builder.Default
     @Schema(description = "작성자 여부", example = "true")
     Boolean isPostMine = false;
 

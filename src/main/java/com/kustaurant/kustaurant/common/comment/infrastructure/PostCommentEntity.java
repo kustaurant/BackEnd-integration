@@ -133,6 +133,8 @@ public class PostCommentEntity {
                 .status(this.status)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
+                .likeCount(this.postCommentLikesEntities.size())
+                .dislikeCount(this.postCommentDislikesEntities.size())
                 // TODO: 순환참조 안되게 대댓글 넣어줘야함
 //                .replies(this.repliesList.stream().map(PostCommentEntity::toDomain).toList())
                 .build();

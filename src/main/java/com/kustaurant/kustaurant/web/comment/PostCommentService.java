@@ -64,7 +64,7 @@ public class PostCommentService {
         ReactionStatus status = comment.toggleLike(isLikedBefore,isDislikedBefore);
         postCommentRepository.save(comment);
 
-        return new ReactionToggleResponse(status, comment.getNetLikes());
+        return new ReactionToggleResponse(status, comment.getNetLikes(), comment.getLikeCount(), comment.getDislikeCount());
     }
 
     @Transactional
@@ -77,7 +77,7 @@ public class PostCommentService {
         ReactionStatus status = comment.toggleDislike(isLikedBefore, isDislikedBefore);
         postCommentRepository.save(comment);
 
-        return new ReactionToggleResponse(status, comment.getNetLikes());
+        return new ReactionToggleResponse(status, comment.getNetLikes(), comment.getLikeCount(), comment.getDislikeCount());
     }
 
     private void addCommentLike(UserEntity user, PostCommentEntity postComment) {

@@ -160,7 +160,7 @@ public class PostService {
 
         postRepository.save(post);
 
-        return new ReactionToggleResponse(result, post.getLikeCount(), post.getDislikeCount());
+        return new ReactionToggleResponse(result, post.getLikeCount() - post.getDislikeCount(), post.getLikeCount(), post.getDislikeCount());
     }
 
 
@@ -187,7 +187,7 @@ public class PostService {
 
         postRepository.save(post);
 
-        return new ReactionToggleResponse(result, post.getLikeCount(), post.getDislikeCount());
+        return new ReactionToggleResponse(result, post.getLikeCount() - post.getDislikeCount(), post.getLikeCount(), post.getDislikeCount());
     }
 
 
@@ -338,7 +338,7 @@ public class PostService {
         List<PostDTO> postDTOList = new ArrayList<>();
         for (Post post : paging) {
             User user = userService.getActiveUserById(post.getId());
-            PostDTO postDTO = PostDTO.from(post,user);
+            PostDTO postDTO = PostDTO.from(post, user);
             postDTO.setUser(UserDTO.from(user));
             postDTOList.add(postDTO);
         }

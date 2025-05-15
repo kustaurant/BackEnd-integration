@@ -4,12 +4,14 @@ import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @Getter
 public class PostComment {
 
@@ -17,8 +19,10 @@ public class PostComment {
     private final String commentBody;
     private ContentStatus status;
     private Integer netLikes;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    @Setter
+    private LocalDateTime createdAt;
+    @Setter
+    private LocalDateTime updatedAt;
 
     private final Integer userId;
     private final Integer postId;
@@ -28,30 +32,13 @@ public class PostComment {
     private PostComment parentComment;
     private final List<PostComment> replies;
 
-    @Builder
-    public PostComment(Integer commentId, String commentBody, ContentStatus status, Integer likeCount, Integer dislikeCount, Integer netLikes,
-                       LocalDateTime createdAt, LocalDateTime updatedAt,
-                       Integer userId, Integer postId,
-                       PostComment parentComment, List<PostComment> replies) {
-        this.commentId = commentId;
-        this.commentBody = commentBody;
-        this.status = status;
-        this.netLikes = netLikes;
-        this.likeCount = likeCount;
-        this.dislikeCount = dislikeCount;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.userId = userId;
-        this.postId = postId;
-        this.parentComment = parentComment;
-        this.replies = replies != null ? replies : new ArrayList<>();
-    }
-
     public static PostComment create(String commentBody, Integer userId, Integer postId) {
         return PostComment.builder()
                 .commentBody(commentBody)
                 .status(ContentStatus.ACTIVE)
                 .netLikes(0)
+                .likeCount(0)
+                .dislikeCount(0)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .userId(userId)

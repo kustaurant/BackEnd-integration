@@ -12,17 +12,10 @@ public class ReactionToggleResponse {
     private int dislikeCount;
     private int netLikes;
 
-    public ReactionToggleResponse(ReactionStatus status, int likeCount, int dislikeCount) {
-        this.status = status;
-        this.likeCount = likeCount;
-        this.dislikeCount = dislikeCount;
-    }
-
-    public ReactionToggleResponse(ReactionStatus status, int netLikes) {
+    public ReactionToggleResponse(ReactionStatus status, int netLikes, int likeCount, int dislikeCount) {
         this.status = status;
         this.netLikes = netLikes;
-    }
-    public ReactionToggleResponse(){
-
+        this.likeCount = likeCount;
+        this.dislikeCount = dislikeCount;
     }
 }
