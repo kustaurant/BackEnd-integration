@@ -35,7 +35,7 @@
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
-    <title th:text="'쿠스토랑-' + ${post.postTitle}"></title>
+    <title th:text="'쿠스토랑-' + ${view.post.title}"></title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -88,31 +88,31 @@
 <main id="content">
     <div class="post">
         <div class="post-top">
-            <h1 class="post-title" th:text="${post.postTitle}" th:data-id="${post.postId}"></h1>
+            <h1 class="post-title" th:text="${view.post.title}" th:data-id="${view.post.id}"></h1>
             <div>
                 <div class="post-details">
                     <div class="post-detail">
                         <span class="first-detail">
-                            <a th:text="${post.postCategory}" href="#"></a>
+                            <a th:text="${view.post.category}" href="#"></a>
                         </span>
-                        <span th:text="${post.toDomain().calculateTimeAgo()}" class="second-detail updated-time">
+                        <span th:text="${view.post.calculateTimeAgo()}" class="second-detail updated-time">
 
                         </span>
                         <span class="third-detail user-name">
-                        <img th:src="${post.user.getRankImg()}">
-                        <span th:text="${post.user.userNickname} ">
+                        <img th:src="${view.post.author.getRankImg()}">
+                        <span th:text="${view.post.author.userNickname} ">
                         </span>
                         </span>
 
                     </div>
                     <div class="post-detail">
-                        <span th:text="'조회수 '+ ${post.postVisitCount}" class="first-detail">
+                        <span th:text="'조회수 '+ ${view.post.visitCount}" class="first-detail">
 
                         </span>
                         <!--                        <span th:text="'댓글 '+ ${post.postCommentList.size()}" class="second-detail"></span>-->
                         <span id="commentCount" class="second-detail"
-                              th:text="'댓글 '+ ${#lists.size(post.postCommentList.?[status=='ACTIVE'])}"></span>
-                        <span th:text="'추천 '+ ${post.likeCount}"
+                              th:text="'댓글 '+ ${#lists.size(view.post.postCommentList.?[status=='ACTIVE'])}"></span>
+                        <span th:text="'추천 '+ ${view.post.likeCount}"
                               class="third-detail" id="postRecommendCount">
 
                         </span>
@@ -120,13 +120,13 @@
                 </div>
             </div>
             <!-- 글 수정 버튼 -->
-            <a th:href="'/community/post/update?postId=' + ${post.postId}" th:if="${post.user==user}" type="button" class="post-update" th:data-id="${post.postId}">
+            <a th:href="'/community/post/update?postId=' + ${view.post.postId}" th:if="${view.post.user==user}" type="button" class="post-update" th:data-id="${view.post.postId}">
                 수정
             </a>
 
             <!-- 글 삭제 버튼 -->
-            <button th:if="${post.user==user}" type="button" class="post-delete" data-bs-toggle="modal"
-                    data-bs-target="#postModal" th:data-id="${post.postId}" th:data-type="post"
+            <button th:if="${view.post.user==user}" type="button" class="post-delete" data-bs-toggle="modal"
+                    data-bs-target="#postModal" th:data-id="${view.post.postId}" th:data-type="post"
                     data-action="postDelete">
                 삭제
             </button>
@@ -134,28 +134,28 @@
         <div class="post-body">
             <div>
                 <article>
-                    <p th:utext="${post.postBody}">
+                    <p th:utext="${view.post.postBody}">
                     </p>
                 </article>
             </div>
         </div>
 
         <div class="post-like">
-            <button type="button" id="likeButton" class="post-button" th:data-post-id="${post.postId}">
-                <img th:if="${postInteractionStatus.liked.isLiked()}" src="/img/community/up-green.png">
-                <img th:unless="${postInteractionStatus.liked.isLiked()}" src="/img/community/up.png">
-                <span th:text="${post.postLikesList.size()}"></span>
+            <button type="button" id="likeButton" class="post-button" th:data-post-id="${view.post.postId}">
+                <img th:if="${view.postInteractionStatus.liked.isLiked()}" src="/img/community/up-green.png">
+                <img th:unless="${view.postInteractionStatus.liked.isLiked()}" src="/img/community/up.png">
+                <span th:text="${view.post.likes.size()}"></span>
             </button>
-            <button type="button" id="dislikeButton" class="post-button" th:data-post-id="${post.postId}">
-                <img th:if="${postInteractionStatus.disliked.isDisliked()}" src="/img/community/down-red.png">
-                <img th:unless="${postInteractionStatus.disliked.isDisliked()}" src="/img/community/down.png">
-                <span th:if="${post.postDislikesList.size() >0}" th:text="'-'+${post.postDislikesList.size()}"></span>
-                <span th:if="${post.postDislikesList.size() ==0}" th:text="${post.postDislikesList.size()}"></span>
+            <button type="button" id="dislikeButton" class="post-button" th:data-post-id="${view.post.postId}">
+                <img th:if="${view.postInteractionStatus.disliked.isDisliked()}" src="/img/community/down-red.png">
+                <img th:unless="${view.postInteractionStatus.disliked.isDisliked()}" src="/img/community/down.png">
+                <span th:if="${view.post.dislikes.size() >0}" th:text="'-'+${view.post.dislikes.size()}"></span>
+                <span th:if="${view.post.dislikes.size() ==0}" th:text="${view.post.dislikes.size()}"></span>
 
             </button>
-            <button type="button" id="scrap" class="post-button" th:data-post-id="${post.postId}">
-                <img th:if="${postInteractionStatus.scrapped.isScrapped()}" src="/img/community/scrap-green.png">
-                <img th:unless="${postInteractionStatus.scrapped.isScrapped()}" src="/img/community/scrap.png">
+            <button type="button" id="scrap" class="post-button" th:data-post-id="${view.post.postId}">
+                <img th:if="${view.postInteractionStatus.scrapped.isScrapped()}" src="/img/community/scrap-green.png">
+                <img th:unless="${view.postInteractionStatus.scrapped.isScrapped()}" src="/img/community/scrap.png">
 
             </button>
         </div>
@@ -191,18 +191,18 @@
 
         <div class="comment-list">
             <ul class="comment-ul">
-                <div th:each="comment,loop:${postCommentList}">
-                    <li class="comment-li" th:if="${comment.parentComment==null}" th:data-id="${comment.commentId}">
+                <div th:each="comment,loop:${view.postCommentList}">
+                    <li class="comment-li" th:if="${comment.parentCommentId==null}" th:data-id="${comment.commentId}">
                         <div class="comment-div">
                             <div class="comment-left">
                                 <button class="comment-up" type="button" th:data-id="${comment.commentId}">
-                                    <img th:if="${commentInteractionMap[comment.commentId]?.liked?.isLiked()}" src="/img/community/up-green.png">
-                                    <img th:unless="${commentInteractionMap[comment.commentId]?.liked?.isLiked()}" src="/img/community/up.png">
+                                    <img th:if="${view.commentInteractionMap[comment.commentId]?.liked?.isLiked()}" src="/img/community/up-green.png">
+                                    <img th:unless="${view.commentInteractionMap[comment.commentId]?.liked?.isLiked()}" src="/img/community/up.png">
                                 </button>
-                                <span class="totalLikeCount" th:text="${comment.likeCount}"></span>
-                                <button class="comment-down" type="button" th:data-id="${comment.commentId}">
-                                    <img th:if="${commentInteractionMap[comment.commentId]?.disliked?.isDisliked()}" src="/img/community/down-red.png">
-                                    <img th:unless="${commentInteractionMap[comment.commentId]?.disliked?.isDisliked()}" src="/img/community/down.png">
+                                <span class="totalLikeCount" th:text="${view.comment.likeCount}"></span>
+                                <button class="comment-down" type="button" th:data-id="${view.comment.commentId}">
+                                    <img th:if="${view.commentInteractionMap[comment.commentId]?.disliked?.isDisliked()}" src="/img/community/down-red.png">
+                                    <img th:unless="${view.commentInteractionMap[comment.commentId]?.disliked?.isDisliked()}" src="/img/community/down.png">
                                 </button>
                             </div>
                             <div class="comment-content">
@@ -247,13 +247,13 @@
                                         </div>
                                         <div class="comment-left">
                                             <button class="comment-up" type="button" th:data-id="${reply.commentId}">
-                                                <img th:if="${commentInteractionMap[reply.commentId]?.liked?.isLiked()}" src="/img/community/up-green.png">
-                                                <img th:unless="${commentInteractionMap[reply.commentId]?.liked?.isLiked()}" src="/img/community/up.png">
+                                                <img th:if="${view.commentInteractionMap[reply.commentId]?.liked?.isLiked()}" src="/img/community/up-green.png">
+                                                <img th:unless="${view.commentInteractionMap[reply.commentId]?.liked?.isLiked()}" src="/img/community/up.png">
                                             </button>
                                             <span class="totalLikeCount" th:text="${reply.likeCount}"></span>
                                             <button class="comment-down" type="button" th:data-id="${reply.commentId}">
-                                                <img th:if="${commentInteractionMap[reply.commentId]?.disliked?.isDisliked()}" src="/img/community/down-red.png">
-                                                <img th:unless="${commentInteractionMap[reply.commentId]?.disliked?.isDisliked()}" src="/img/community/down.png">
+                                                <img th:if="${view.commentInteractionMap[reply.commentId]?.disliked?.isDisliked()}" src="/img/community/down-red.png">
+                                                <img th:unless="${view.commentInteractionMap[reply.commentId]?.disliked?.isDisliked()}" src="/img/community/down.png">
                                             </button>
                                         </div>
                                         <div class="comment-content">

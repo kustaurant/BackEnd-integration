@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.common.comment.infrastructure;
 
+import com.kustaurant.kustaurant.common.comment.domain.PostComment;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import jakarta.persistence.*;
@@ -20,7 +22,11 @@ public class PostCommentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer commentId;
     String commentBody;
-    String status;
+
+    @Column(columnDefinition = "varchar(20)")
+    @Enumerated(EnumType.STRING)
+    ContentStatus status;
+
     @ManyToOne
     @JoinColumn(name="parent_comment_id")
     PostCommentEntity parentComment;
@@ -29,10 +35,9 @@ public class PostCommentEntity {
     List<PostCommentEntity> repliesList = new ArrayList<>();
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    // 웹 버전을 위한 totallikeCount 를 말함. 모바일에선 사용하지 않음
-    Integer likeCount=0;
+    Integer likeCount=0; // 이 likeCount는 좋아요 수에서 싫어요 수를 뺀 순 좋아요 수를 의미
 
-    public PostCommentEntity(String commentBody, String status, LocalDateTime createdAt, PostEntity post, UserEntity UserEntity) {
+    public PostCommentEntity(String commentBody, ContentStatus status, LocalDateTime createdAt, PostEntity post, UserEntity UserEntity) {
         this.commentBody = commentBody;
         this.status = status;
         this.createdAt = createdAt;
@@ -83,5 +88,55 @@ public class PostCommentEntity {
         // 초 차이 계산
         Long secondsDifference = ChronoUnit.SECONDS.between(past, now);
         return secondsDifference + "초 전";
+    }
+
+    public static PostCommentEntity from(PostComment comment) {
+        PostCommentEntity entity = new PostCommentEntity();
+        entity.setCommentId(comment.getCommentId());
+        entity.setCommentBody(comment.getCommentBody());
+        entity.setStatus(comment.getStatus());
+        entity.setLikeCount(comment.getNetLikes());
+        entity.setCreatedAt(comment.getCreatedAt());
+        entity.setUpdatedAt(comment.getUpdatedAt());
+
+        if (comment.getUserId() != null) {
+            UserEntity userEntity = new UserEntity();
+            userEntity.setUserId(comment.getUserId());
+            entity.setUser(userEntity);
+        }
+
+        // postId 처리
+        if (comment.getPostId() != null) {
+            PostEntity postEntity = new PostEntity();
+            postEntity.setPostId(comment.getPostId());
+            entity.setPost(postEntity);
+        }
+
+        // parentCommentId 처리
+        if (comment.getParentComment() != null) {
+            PostCommentEntity parent = new PostCommentEntity();
+            parent.setCommentId(comment.getParentComment().getCommentId());
+            entity.setParentComment(parent);
+        }
+
+        return entity;
+    }
+
+    public PostComment toDomain() {
+        return PostComment.builder()
+                .commentId(this.commentId)
+                .commentBody(this.commentBody)
+                .postId(this.post.getPostId())
+                .userId(this.user.getUserId())
+                .parentComment(this.parentComment != null ? this.parentComment.toDomain() : null)
+                .netLikes(this.likeCount)
+                .status(this.status)
+                .createdAt(this.createdAt)
+                .updatedAt(this.updatedAt)
+                .likeCount(this.postCommentLikesEntities.size())
+                .dislikeCount(this.postCommentDislikesEntities.size())
+                // TODO: 순환참조 안되게 대댓글 넣어줘야함
+//                .replies(this.repliesList.stream().map(PostCommentEntity::toDomain).toList())
+                .build();
     }
 }

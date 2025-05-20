@@ -1,57 +1,62 @@
 package com.kustaurant.kustaurant.common.comment.domain;
 
-import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
+@Builder
 @Getter
 public class PostComment {
+
     private final Integer commentId;
     private final String commentBody;
-    private final String status;
-    private final Integer likeCount;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    private ContentStatus status;
+    private Integer netLikes;
+    @Setter
+    private LocalDateTime createdAt;
+    @Setter
+    private LocalDateTime updatedAt;
 
     private final Integer userId;
     private final Integer postId;
-    private final Integer parentCommentId;
+
+    private Integer likeCount;
+    private Integer dislikeCount;
+    private PostComment parentComment;
     private final List<PostComment> replies;
 
-    public PostComment(Integer commentId, String commentBody, String status, Integer likeCount,
-                       LocalDateTime createdAt, LocalDateTime updatedAt,
-                       Integer userId, Integer postId, Integer parentCommentId,
-                       List<PostComment> replies) {
-        this.commentId = commentId;
-        this.commentBody = commentBody;
-        this.status = status;
-        this.likeCount = likeCount;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.userId = userId;
-        this.postId = postId;
-        this.parentCommentId = parentCommentId;
-        this.replies = replies;
+    public static PostComment create(String commentBody, Integer userId, Integer postId) {
+        return PostComment.builder()
+                .commentBody(commentBody)
+                .status(ContentStatus.ACTIVE)
+                .netLikes(0)
+                .likeCount(0)
+                .dislikeCount(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .userId(userId)
+                .postId(postId)
+                .replies(new ArrayList<>())
+                .build();
     }
 
-    public static PostComment from(PostCommentEntity entity) {
-        return new PostComment(
-                entity.getCommentId(),
-                entity.getCommentBody(),
-                entity.getStatus(),
-                entity.getLikeCount(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt(),
-                entity.getUser().getUserId(),
-                entity.getPost().getPostId(),
-                entity.getParentComment() != null ? entity.getParentComment().getCommentId() : null,
-                entity.getRepliesList().stream()
-                        .map(PostComment::from)
-                        .toList()
-        );
+    public void setParent(PostComment parent) {
+        this.parentComment = parent;
+        parent.replies.add(this);
+    }
+
+    public void delete() {
+        this.status = ContentStatus.DELETED;
+        for (PostComment reply : replies) {
+            reply.status = ContentStatus.DELETED;
+        }
     }
 
     public String calculateTimeAgo() {
@@ -77,5 +82,59 @@ public class PostComment {
         return seconds + "초 전";
     }
 
+    public ReactionStatus toggleLike(boolean isLikedBefore, boolean isDislikedBefore) {
+        if (isLikedBefore) {
+            decreaseLikeCount(1);
+            return ReactionStatus.LIKE_DELETED;
+        }
 
+        if (isDislikedBefore) {
+            decreaseDislikeCount(1);
+            increaseLikeCount(1);
+            return ReactionStatus.DISLIKE_TO_LIKE;
+        }
+
+        increaseLikeCount(1);
+        return ReactionStatus.LIKE_CREATED;
+    }
+
+    public ReactionStatus toggleDislike(boolean isLikedBefore, boolean isDislikedBefore) {
+        if (isLikedBefore) {
+            decreaseLikeCount(1);
+            increaseDislikeCount(1);
+            return ReactionStatus.LIKE_TO_DISLIKE;
+        }
+
+        if (isDislikedBefore) {
+            decreaseDislikeCount(1);
+            return ReactionStatus.DISLIKE_DELETED;
+        }
+
+        increaseDislikeCount(1);
+        return ReactionStatus.DISLIKE_CREATED;
+    }
+
+    public void increaseLikeCount(int amount) {
+        this.likeCount += amount;
+        updateNetLikes();
+    }
+
+    public void decreaseLikeCount(int amount) {
+        this.likeCount -= amount;
+        updateNetLikes();
+    }
+
+    public void increaseDislikeCount(int amount) {
+        this.dislikeCount += amount;
+        updateNetLikes();
+    }
+
+    public void decreaseDislikeCount(int amount) {
+        this.dislikeCount -= amount;
+        updateNetLikes();
+    }
+
+    private void updateNetLikes() {
+        this.netLikes = this.likeCount - this.dislikeCount;
+    }
 }

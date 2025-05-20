@@ -3,16 +3,20 @@ package com.kustaurant.kustaurant.api.post.service;
 
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentApiRepository;
-import com.kustaurant.kustaurant.common.post.enums.LikeToggleStatus;
+import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.common.post.domain.Post;
+import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
-import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.common.user.domain.User;
+import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.common.post.domain.PostUpdateDTO;
 import com.kustaurant.kustaurant.common.post.domain.UserDTO;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.post.domain.PostDTO;
-import com.kustaurant.kustaurant.common.post.enums.PostStatus;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.web.post.service.PostService;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
@@ -30,26 +34,26 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PostApiService {
     private final PostRepository postRepository;
-    private final OUserRepository userRepository;
+    private final UserRepository userRepository;
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostCommentApiRepository postCommentApiRepository;
-    private final PostPhotoApiRepository postPhotoApiRepository;
-    private final PostLikeJpaRepository postLikeJpaRepository;
-    private final PostDislikeJpaRepository postDislikeJpaRepository;
+    private final PostPhotoJpaRepository postPhotoJpaRepository;
+    private final EvaluationRepository evaluationRepository;
     // 인기순 제한 기준 숫자
     public static final int POPULARCOUNT = 3;
     // 페이지 숫자
     public static final int PAGESIZE = 10;
+    private final PostService postService;
 
     // 메인 화면 로딩하기
-    public Page<PostDTO> getPosts(int page, String sort, String koreanCategory,String postBodyType) {
-        Page<PostEntity> posts;
+    public Page<PostDTO> getPosts(int page, String sort, String koreanCategory, String postBodyType) {
+        Page<Post> posts;
         if (koreanCategory.equals("전체")) {
             List<Sort.Order> sorts = new ArrayList<>();
             if (sort.isEmpty() || sort.equals("recent")) {
                 sorts.add(Sort.Order.desc("createdAt"));
                 Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-                posts = this.postRepository.findByStatus("ACTIVE", pageable);
+                posts = this.postRepository.findByStatus(ContentStatus.ACTIVE, pageable);
             } else if (sort.equals("popular")) {
                 sorts.add(Sort.Order.desc("createdAt"));
                 Specification<PostEntity> spec = getSpecByPopularOver5();
@@ -68,7 +72,8 @@ public class PostApiService {
         }
 
         Page<PostDTO> result = posts.map(post -> {
-            PostDTO dto = PostDTO.convertPostToPostDTO(post);
+            // TODO: PostDTO에 UserDTO 추가
+            PostDTO dto = PostDTO.from(post);
             if (postBodyType.equals("text")) {
                 dto.setPostBody(Jsoup.parse(dto.getPostBody()).text()); // HTML 제거 후 일반 텍스트 변환
             }
@@ -86,87 +91,11 @@ public class PostApiService {
         }
     }
 
-    public void create(PostEntity postEntity, UserEntity user) {
-        postEntity.setUser(user);
-        PostEntity savedpost = postRepository.save(postEntity);
-        user.getPostList().add(savedpost);
-        userRepository.save(user);
-    }
-
-    // 조회수 증가
-    public void increaseVisitCount(PostEntity postEntity) {
-        int visitCount = postEntity.getPostVisitCount();
-        postEntity.setPostVisitCount(++visitCount);
-        postRepository.save(postEntity);
-    }
     @Transactional
-    public LikeToggleStatus toggleLikeStatus(PostEntity postEntity, UserEntity user) {
-        Optional<PostLikeEntity> likeOptional = postLikeJpaRepository.findByUserAndPost(user, postEntity);
-
-        //해당 post 를 이미 like 한 경우 - 제거
-        if (likeOptional.isPresent()) {
-            PostLikeEntity like = likeOptional.get();
-            postLikeJpaRepository.delete(like);
-            postEntity.getPostLikesList().remove(like);
-            user.getPostLikesList().remove(like);
-            postEntity.setLikeCount(postEntity.getLikeCount() - 1);
-            return LikeToggleStatus.DELETED; // likeDeleted
-        }
-        // 처음 like 하는 경우 - 추가
-        else {
-            PostLikeEntity postLikeEntity = new PostLikeEntity(user, postEntity);
-            postLikeJpaRepository.save(postLikeEntity);
-            postEntity.getPostLikesList().add(postLikeEntity);
-            user.getPostLikesList().add(postLikeEntity);
-            postEntity.setLikeCount(postEntity.getLikeCount() + 1);
-            return LikeToggleStatus.CREATED; // likeDeleted
-        }
+    public ReactionStatus toggleLike(Integer postId, Integer userId) {
+        return postService.toggleLike(postId, userId).getStatus();
     }
 
-
-    private Specification<PostEntity> search(String kw, String postCategory, String sort) {
-        return new Specification<>() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public Predicate toPredicate(Root<PostEntity> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                query.distinct(true);  // 중복을 제거
-
-                //조인
-                Join<PostEntity, UserEntity> u1 = p.join("user", JoinType.LEFT);
-                Join<PostEntity, PostCommentEntity> c = p.join("postCommentList", JoinType.LEFT);
-                Join<PostCommentEntity, UserEntity> u2 = c.join("user", JoinType.LEFT);
-                // 액티브 조건 추가
-                Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
-                Predicate categoryPredicate;
-                // sort
-                Predicate likeCountPredicate;
-                if (sort.equals("popular")) {
-                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("likeCount"), POPULARCOUNT);
-                } else {
-                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("likeCount"), -1000);
-                }
-
-                // 검색 조건 결합 (카테고리 설정이 되어있을때는 검색 시 카테고리 안에서 검색을 한다).
-                if (!postCategory.equals("전체")) {
-                    categoryPredicate = cb.equal(p.get("postCategory"), postCategory);
-                    return cb.and(statusPredicate, likeCountPredicate, categoryPredicate, cb.or(cb.like(p.get("postTitle"), "%" + kw + "%"), // 제목
-                            cb.like(p.get("postBody"), "%" + kw + "%"),      // 내용
-                            cb.like(u1.get("userNickname"), "%" + kw + "%")    // 글 작성자
-//                            ,cb.like(c.get("commentBody"), "%" + kw + "%"),      // 댓글 내용
-//                            cb.like(u2.get("userNickname"), "%" + kw + "%") // 댓글 작성자
-                    ));
-                }
-                // 검색 조건 결합
-                return cb.and(statusPredicate, likeCountPredicate, cb.or(cb.like(p.get("postTitle"), "%" + kw + "%"), // 제목
-                        cb.like(p.get("postBody"), "%" + kw + "%"),      // 내용
-                        cb.like(u1.get("userNickname"), "%" + kw + "%")    // 글 작성자
-//                        ,cb.like(c.get("commentBody"), "%" + kw + "%"),      // 댓글 내용
-//                        cb.like(u2.get("userNickname"), "%" + kw + "%") // 댓글 작성자
-                ));
-            }
-        };
-    }
 
     private Specification<PostEntity> getSpecByCategoryAndPopularCount(String postCategory, String sort) {
         return new Specification<>() {
@@ -230,16 +159,16 @@ public class PostApiService {
         deleteComments(postEntity);
         deleteScraps(postEntity);
         deletePhotos(postEntity);
-        postEntity.setStatus(PostStatus.DELETED.name());
+        postEntity.setStatus(ContentStatus.DELETED);
         postRepository.save(postEntity);
     }
 
     private void deleteComments(PostEntity postEntity) {
         List<PostCommentEntity> comments = postEntity.getPostCommentList();
         for (PostCommentEntity comment : comments) {
-            comment.setStatus("DELETED");
+            comment.setStatus(ContentStatus.DELETED);
             for (PostCommentEntity reply : comment.getRepliesList()) {
-                reply.setStatus("DELETED");
+                reply.setStatus(ContentStatus.DELETED);
             }
             postCommentApiRepository.save(comment);
         }
@@ -251,10 +180,10 @@ public class PostApiService {
     }
 
     private void deletePhotos(PostEntity postEntity) {
-        List<PostPhoto> photos = postEntity.getPostPhotoList();
+        List<PostPhotoEntity> photos = postEntity.getPostPhotoEntityList();
         if (photos != null) {
-            postPhotoApiRepository.deleteAll(photos);
-            postEntity.setPostPhotoList(null); // 기존 사진과의 연결 해제
+            postPhotoJpaRepository.deleteAll(photos);
+            postEntity.setPostPhotoEntityList(null); // 기존 사진과의 연결 해제
         }
     }
 
@@ -262,7 +191,7 @@ public class PostApiService {
     public List<UserDTO> getUserListforRanking(String sort) {
         if ("cumulative".equals(sort)) {
             // 누적 기준으로 유저 리스트 가져오기 (정렬된 상태)
-            List<UserEntity> userList = userRepository.findUsersWithEvaluationCountDescending();
+            List<User> userList = userRepository.findUsersWithEvaluationCountDescending();
             // 유저의 평가수, 랭킹 첨부하기
             return calculateRank(userList);
         } else if ("quarterly".equals(sort)) {
@@ -272,7 +201,7 @@ public class PostApiService {
             int currentQuarter = getCurrentQuarter(now);
 
             // 특정 분기의 평가 데이터를 기준으로 유저 리스트 가져오기
-            List<UserEntity> userList = userRepository.findUsersByEvaluationCountForQuarter(currentYear, currentQuarter);
+            List<User> userList = userRepository.findUsersByEvaluationCountForQuarter(currentYear, currentQuarter);
             // 분기별 순위 리스트 계산
             return calculateRankForQuarter(userList, currentYear, currentQuarter);
         } else {
@@ -293,14 +222,14 @@ public class PostApiService {
         }
     }
 
-    private List<UserDTO> calculateRank(List<UserEntity> userList) {
+    private List<UserDTO> calculateRank(List<User> userList) {
         List<UserDTO> rankList = new ArrayList<>();
         int i = 0;
         int prevCount = 100000; // 이전 유저의 평가 개수
         int countSame = 1; // 동일 순위를 세기 위한 변수
-        for (UserEntity user : userList) {
-            int evaluationCount = user.getEvaluationList().size();
-            UserDTO userDTO = UserDTO.convertUserToUserDTO(user); // 필요한 정보를 UserDTO에 담음
+        for (User user : userList) {
+            int evaluationCount = user.getEvaluationCount();
+            UserDTO userDTO = UserDTO.from(user); // 필요한 정보를 UserDTO에 담음
 
             if (evaluationCount < prevCount) {
                 i += countSame;
@@ -317,17 +246,22 @@ public class PostApiService {
         return rankList;
     }
 
-    private List<UserDTO> calculateRankForQuarter(List<UserEntity> userList, int year, int quarter) {
+    private List<UserDTO> calculateRankForQuarter(List<User> userList, int year, int quarter) {
         List<UserDTO> rankList = new ArrayList<>();
 
         int i = 0;
         int prevCount = 100000; // 이전 유저의 평가 개수
         int countSame = 1; // 동일 순위를 세기 위한 변수
-        for (UserEntity user : userList) {
+        for (User user : userList) {
             // 특정 분기의 평가 수 계산
-            int evaluationCount = (int) user.getEvaluationList().stream().filter(e -> getYear(e.getCreatedAt()) == year && getQuarter(e.getCreatedAt()) == quarter).count();
+            int evaluationCount = Math.toIntExact(evaluationRepository.findByUserId(user.getId())
+                    .stream()
+                    .filter(evaluation -> getYear(evaluation.getCreatedAt()) == year && getQuarter(evaluation.getCreatedAt()) == quarter)
+                    .count());
+            ;
 
-            UserDTO userDTO = UserDTO.convertUserToUserDTO(user); // 필요한 정보를 UserDTO에 담음
+
+            UserDTO userDTO = UserDTO.from(user); // 필요한 정보를 UserDTO에 담음
             userDTO.setEvaluationCount(evaluationCount); // 분기 내 평가 수를 설정
 
             if (evaluationCount < prevCount) {

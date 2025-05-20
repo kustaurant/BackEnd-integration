@@ -1,21 +1,20 @@
 package com.kustaurant.kustaurant.web.comment;
 
+import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.*;
+import com.kustaurant.kustaurant.common.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
+import com.kustaurant.kustaurant.common.post.domain.Post;
+import com.kustaurant.kustaurant.common.post.domain.ReactionToggleResponse;
 import com.kustaurant.kustaurant.common.post.enums.DislikeStatus;
 import com.kustaurant.kustaurant.common.post.enums.LikeStatus;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.common.post.enums.ScrapStatus;
-import com.kustaurant.kustaurant.common.post.infrastructure.*;
-import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.web.post.service.PostService;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -27,30 +26,28 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class PostCommentService {
-    private final OPostCommentRepository postCommentRepository;
-    private final OUserRepository userRepository;
-    private final PostRepository postRepository;
+    private final PostCommentRepository postCommentRepository;
     private final PostService postService;
     private final PostCommentLikeJpaRepository postCommentLikeJpaRepository;
     private final PostCommentDislikeJpaRepository postCommentDislikeJpaRepository;
+    private final UserRepository userRepository;
 
-    // 댓글 생성
-    public void create(PostEntity postEntity, UserEntity user, PostCommentEntity postComment) {
-        user.getPostCommentList().add(postComment);
-        postEntity.getPostCommentList().add(postComment);
-        userRepository.save(user);
-        postRepository.save(postEntity);
+    @Transactional
+    public void createComment(String content, Integer postId, Integer parentCommentId, Integer userId) {
+        PostComment comment = PostComment.create(content, userId, postId);
+        if (parentCommentId != null) {
+            PostComment parent = postCommentRepository.findById(parentCommentId)
+                    .orElseThrow(() -> new DataNotFoundException("부모 댓글을 찾을 수 없습니다."));
+            comment.setParent(parent);
+        }
+
+        postCommentRepository.save(comment);
     }
 
-    // 대댓글 생성
-    public void replyCreate(UserEntity user, PostCommentEntity postComment) {
-        user.getPostCommentList().add(postComment);
-        userRepository.save(user);
-    }
-
+    @Transactional
     // 댓글 조회
-    public PostCommentEntity getPostCommentByCommentId(Integer commentId) {
-        Optional<PostCommentEntity> postComment = postCommentRepository.findById(commentId);
+    public PostComment getPostCommentByCommentId(Integer commentId) {
+        Optional<PostComment> postComment = postCommentRepository.findById(commentId);
         if (postComment.isPresent()) {
             return postComment.get();
         } else {
@@ -58,73 +55,29 @@ public class PostCommentService {
         }
     }
 
-    // 댓글 좋아요 토글 버튼
     @Transactional
-    public Map<String, Object> toggleCommentLike(PostCommentEntity postComment, UserEntity user) {
-        Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByUserAndPostComment(user, postComment);
-        Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByUserAndPostComment(user, postComment);
-        Map<String, Object> status = new HashMap<>();
+    public ReactionToggleResponse toggleLike(Integer userId, Integer commentId) {
+        PostComment comment = postCommentRepository.findById(commentId)
+                .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
+        boolean isLikedBefore = postCommentLikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
+        boolean isDislikedBefore = postCommentDislikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
+        ReactionStatus status = comment.toggleLike(isLikedBefore,isDislikedBefore);
+        postCommentRepository.save(comment);
 
-        //해당 댓글을 유저가 이미 좋아요를 누른 경우 - 좋아요 제거
-        if (likeOptional.isPresent()) {
-            PostCommentLikeEntity postCommentLikeEntity = likeOptional.get();
-            removeCommentLike(user, postComment, postCommentLikeEntity);
-            postComment.setLikeCount(postComment.getLikeCount() - 1);
-
-            status.put(ReactionStatus.LIKE_DELETED.name(), true);
-        }
-        //해당 댓글을 유저가 이미 싫어요를 누른 경우 - 싫어요 제거하고 좋아요 추가
-        else if (dislikeOptional.isPresent()) {
-            PostCommentDislikeEntity postCommentDislikeEntity = dislikeOptional.get();
-            removeCommentDislike(user, postComment, postCommentDislikeEntity);
-            addCommentLike(user, postComment);
-            postComment.setLikeCount(postComment.getLikeCount() + 2);
-
-            status.put(ReactionStatus.DISLIKE_TO_LIKE.name(), true);
-        }
-        // 처음 좋아요 버튼 누른 경우 - 좋아요 추가
-        else {
-            addCommentLike(user, postComment);
-            postComment.setLikeCount(postComment.getLikeCount() + 1);
-
-            status.put(ReactionStatus.LIKE_CREATED.name(), true);
-        }
-        return status;
+        return new ReactionToggleResponse(status, comment.getNetLikes(), comment.getLikeCount(), comment.getDislikeCount());
     }
 
-    // 댓글 싫어요 버튼 토글
     @Transactional
-    public Map<String, Object> toggleCommentDislike(PostCommentEntity postComment, UserEntity user) {
+    public ReactionToggleResponse toggleDislike(Integer userId, Integer commentId) {
+        PostComment comment = postCommentRepository.findById(commentId)
+                .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
+        boolean isLikedBefore = postCommentLikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
+        boolean isDislikedBefore = postCommentDislikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
 
-        Optional<PostCommentLikeEntity> likeOptional = postCommentLikeJpaRepository.findByUserAndPostComment(user, postComment);
-        Optional<PostCommentDislikeEntity> dislikeOptional = postCommentDislikeJpaRepository.findByUserAndPostComment(user, postComment);
-        Map<String, Object> status = new HashMap<>();
+        ReactionStatus status = comment.toggleDislike(isLikedBefore, isDislikedBefore);
+        postCommentRepository.save(comment);
 
-        //해당 댓글을 유저가 이미 싫어요를 누른 경우 - 싫어요 제거
-        if (dislikeOptional.isPresent()) {
-            PostCommentDislikeEntity postCommentDislikeEntity = dislikeOptional.get();
-            removeCommentDislike(user, postComment, postCommentDislikeEntity);
-            postComment.setLikeCount(postComment.getLikeCount() + 1);
-
-            status.put(ReactionStatus.DISLIKE_DELETED.name(), true);
-        }
-        //해당 댓글을 유저가 이미 좋아요 누른 경우 - 좋아요 제거하고 싫어요 추가
-        else if (likeOptional.isPresent()) {
-            PostCommentLikeEntity postCommentLikeEntity = likeOptional.get();
-            removeCommentLike(user, postComment, postCommentLikeEntity);
-            addCommentDislike(user, postComment);
-            postComment.setLikeCount(postComment.getLikeCount() - 2);
-
-            status.put(ReactionStatus.LIKE_TO_DISLIKE.name(), true);
-        }
-        // 처음 싫어요 버튼 누른 경우 - 싫어요 추가
-        else {
-            addCommentDislike(user, postComment);
-            postComment.setLikeCount(postComment.getLikeCount() - 1);
-
-            status.put(ReactionStatus.DISLIKE_CREATED.name(), true);
-        }
-        return status;
+        return new ReactionToggleResponse(status, comment.getNetLikes(), comment.getLikeCount(), comment.getDislikeCount());
     }
 
     private void addCommentLike(UserEntity user, PostCommentEntity postComment) {
@@ -153,55 +106,64 @@ public class PostCommentService {
         postComment.getPostCommentDislikesEntities().remove(postCommentDislikeEntity);
     }
 
-    public List<PostCommentEntity> getList(Integer postId, String sort) {
-        PostEntity postEntity = postService.getPost(postId);
-        Specification<PostCommentEntity> spec = getSpecByPostId(postEntity);
-        List<PostCommentEntity> postCommentList = postCommentRepository.findAll(spec);
+    public List<PostComment> getList(Integer postId, String sort) {
+        Post post = postService.getPost(postId);
+        Specification<PostComment> spec = getSpecByPostId(post);
+        List<PostComment> postCommentList = postCommentRepository.findAll(spec);
         if (sort.equals("popular")) {
-            postCommentList.sort(Comparator.comparingInt(PostCommentEntity::getLikeCount).reversed());
+            postCommentList.sort(Comparator.comparingInt(PostComment::getNetLikes).reversed());
         } else {
-            postCommentList.sort(Comparator.comparing(PostCommentEntity::getCreatedAt).reversed());
+            postCommentList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
 
         }
         return postCommentList;
     }
 
-    private Specification<PostCommentEntity> getSpecByPostId(PostEntity postEntity) {
-        return new Specification<>() {
-            private static final long serialVersionUID = 1L;
+    private Specification<PostComment> getSpecByPostId(Post post) {
+        return (p, query, cb) -> {
+            query.distinct(true);  // 중복을 제거
+            Predicate postIdPredicate = cb.equal(p.get("post").get("postId"), post.getId());
+            Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
 
-            @Override
-            public Predicate toPredicate(Root<PostCommentEntity> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                query.distinct(true);  // 중복을 제거
-                Predicate postIdPredicate = cb.equal(p.get("postEntity"), postEntity);
-                Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
-
-                return cb.and(statusPredicate, postIdPredicate);
-            }
+            return cb.and(statusPredicate, postIdPredicate);
         };
     }
 
-    public InteractionStatusResponse getUserInteractionStatus(PostCommentEntity postComment, UserEntity user) {
-        if (user == null) {
+    public InteractionStatusResponse getUserInteractionStatus(Integer commentId, Integer userId) {
+        if (userId == null) {
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
         }
-        boolean isLiked = postCommentLikeJpaRepository.existsByUserAndPostComment(user, postComment);
-        boolean isDisliked = postCommentDislikeJpaRepository.existsByUserAndPostComment(user, postComment);
+        boolean isLiked = postCommentLikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
+        boolean isDisliked = postCommentDislikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
         return new InteractionStatusResponse(isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED, isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
     }
 
-    public Map<Integer, InteractionStatusResponse> getCommentInteractionMap(List<PostCommentEntity> postCommentList, UserEntity user) {
+    public Map<Integer, InteractionStatusResponse> getCommentInteractionMap(List<PostComment> postCommentList, Integer userId) {
+
         Map<Integer, InteractionStatusResponse> commentInteractionMap = new HashMap<>();
 
-        for (PostCommentEntity comment : postCommentList) {
+        for (PostComment comment : postCommentList) {
             // 댓글
-            commentInteractionMap.put(comment.getCommentId(), getUserInteractionStatus(comment, user));
+            commentInteractionMap.put(comment.getCommentId(), getUserInteractionStatus(comment.getCommentId(), userId));
 
             // 대댓글
-            for (PostCommentEntity reply : comment.getRepliesList()) {
-                commentInteractionMap.put(reply.getCommentId(), getUserInteractionStatus(reply, user));
+            for (PostComment reply : comment.getReplies()) {
+                commentInteractionMap.put(reply.getCommentId(), getUserInteractionStatus(reply.getCommentId(), userId));
             }
         }
         return commentInteractionMap;
     }
+
+    @Transactional
+    public int deleteComment(Integer commentId) {
+        PostComment comment = postCommentRepository.findByIdWithReplies(commentId)
+                .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
+
+        comment.delete();  // 도메인 내에서 댓글 + 대댓글 상태 변경
+
+        postCommentRepository.save(comment); // 변경 반영
+
+        return 1 + comment.getReplies().size(); // 삭제된 댓글 수 리턴
+    }
+
 }

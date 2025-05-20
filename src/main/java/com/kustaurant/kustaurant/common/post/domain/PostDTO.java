@@ -1,8 +1,11 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
 import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 public class PostDTO {
     @Schema(description = "게시글 ID", example = "1")
     Integer postId;
@@ -19,7 +23,7 @@ public class PostDTO {
     @Schema(description = "게시글 내용", example = "건대 중문 근처 갈일 있는데 맛집 추천해주세요")
     String postBody;
     @Schema(description = "게시글 상태", example = "ACTIVE")
-    String status;
+    ContentStatus status;
     @Schema(description = "게시글 카테고리", example = "자유게시판")
     String postCategory;
     @Schema(description = "게시글이 생성된 날짜", example = "2024-05-19T18:09:06")
@@ -30,9 +34,9 @@ public class PostDTO {
     Integer likeCount;
     @Schema(description = "작성자 정보")
     UserDTO user;
-    @Schema(description = "작성 경과 시간",example = "5시간 전")
+    @Schema(description = "작성 경과 시간", example = "5시간 전")
     String timeAgo;
-    @Schema(description = "댓글 수",example = "13")
+    @Schema(description = "댓글 수", example = "13")
     Integer commentCount;
     @Schema(description = "댓글 목록")
     List<PostCommentDTO> postCommentList;
@@ -43,34 +47,61 @@ public class PostDTO {
     Integer postVisitCount;
     @Schema(description = "스크랩 수", example = "")
     Integer scrapCount;
+    @Builder.Default
     @Schema(description = "스크랩 여부", example = "false")
-    Boolean isScraped =false;
+    Boolean isScraped = false;
+    @Builder.Default
     @Schema(description = "좋아요 여부", example = "true")
-    Boolean isliked =false;
-    @Schema(description = "작성자 여부",example = "true")
-    Boolean isPostMine =false;
+    Boolean isliked = false;
+    @Builder.Default
+    @Schema(description = "작성자 여부", example = "true")
+    Boolean isPostMine = false;
 
     public static PostDTO convertPostToPostDTO(PostEntity postEntity) {
-        PostDTO dto = new PostDTO();
-        dto.setPostId(postEntity.getPostId());
-        dto.setPostTitle(postEntity.getPostTitle());
-        dto.setPostBody(postEntity.getPostBody());
-        dto.setStatus(postEntity.getStatus());
-        dto.setPostCategory(postEntity.getPostCategory());
-        dto.setCreatedAt(postEntity.getCreatedAt());
-        dto.setUpdatedAt(postEntity.getUpdatedAt());
-        dto.setLikeCount(postEntity.getLikeCount());
-        dto.setUser(UserDTO.convertUserToUserDTO(postEntity.getUser()));
-        int commentCount = postEntity.getPostCommentList().stream().filter(c -> c.getStatus().equals("ACTIVE")).toList().size();
-        dto.setCommentCount(commentCount);
-        dto.setTimeAgo(postEntity.toDomain().calculateTimeAgo());
-        if(!postEntity.getPostPhotoList().isEmpty()){
-            dto.setPostPhotoImgUrl(postEntity.getPostPhotoList().get(0).getPhotoImgUrl());
-        }else{
-            dto.setPostPhotoImgUrl(null);
+        return PostDTO.builder()
+                .postId(postEntity.getPostId())
+                .postTitle(postEntity.getPostTitle())
+                .postBody(postEntity.getPostBody())
+                .status(postEntity.getStatus())
+                .postCategory(postEntity.getPostCategory())
+                .createdAt(postEntity.getCreatedAt())
+                .updatedAt(postEntity.getUpdatedAt())
+                .likeCount(postEntity.getNetLikes())
+                .user(UserDTO.convertUserToUserDTO(postEntity.getUser()))
+                .commentCount((int) postEntity.getPostCommentList().stream()
+                        .filter(c -> c.getStatus().equals(ContentStatus.ACTIVE))
+                        .count())
+                .timeAgo(postEntity.toDomain().calculateTimeAgo())
+                .postPhotoImgUrl(!postEntity.getPostPhotoEntityList().isEmpty() ?
+                        postEntity.getPostPhotoEntityList().get(0).getPhotoImgUrl() : null)
+                .postVisitCount(postEntity.getPostVisitCount())
+                .scrapCount(postEntity.getPostScrapList().size())
+                .build();
+    }
+
+    public static PostDTO from(Post post) {
+        return from(post, null);
+    }
+
+    public static PostDTO from(Post post, User user) {
+        PostDTO postDTO = PostDTO.builder()
+                .postId(post.getId())
+                .postTitle(post.getTitle())
+                .postBody(post.getBody())
+                .postCategory(post.getCategory())
+                .status(post.getStatus())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .likeCount(post.getNetLikes())
+                .timeAgo(post.calculateTimeAgo())
+                .postPhotoImgUrl(!post.getPhotos().isEmpty() ? post.getPhotos().get(0).getPhotoImgUrl() : null)
+                .commentCount(post.getComments().size())
+                .postVisitCount(post.getVisitCount())
+                .scrapCount(post.getScraps().size())
+                .build();
+        if (user != null) {
+            postDTO.setUser(UserDTO.from(user));
         }
-        dto.setPostVisitCount(postEntity.getPostVisitCount());
-        dto.setScrapCount(postEntity.getPostScrapList().size());
-        return dto;
+        return postDTO;
     }
 }

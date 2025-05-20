@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,7 +17,7 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Integer> {
 
     Page<PostEntity> findAll(Pageable pageable);
 
-    Page<PostEntity> findByStatus(String status, Pageable pageable);
+    Page<PostEntity> findByStatus(ContentStatus status, Pageable pageable);
 
     @Query("SELECT p FROM PostEntity p WHERE p.user.userId = :userId AND p.status = 'ACTIVE'")
     List<PostEntity> findActivePostsByUserId(@Param("userId") Integer userId);

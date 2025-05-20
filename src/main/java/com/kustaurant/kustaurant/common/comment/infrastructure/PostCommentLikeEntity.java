@@ -33,4 +33,13 @@ public class PostCommentLikeEntity {
     PostCommentEntity postComment;
 
     LocalDateTime createdAt;
+
+    public PostCommentLike toDomain(){
+        return PostCommentLike.builder()
+                .commentLikeId(commentLikeId)
+                .userId(user.getUserId())
+                .commentId(postComment.getCommentId())
+                .createdAt(createdAt)
+                .build();
+    }
 }

@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.common.user.domain;
 
+import com.kustaurant.kustaurant.common.restaurant.application.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
@@ -21,11 +22,13 @@ public class User {
     private final String accessToken;
     private final String refreshToken;
     private final String status;
+    private final String rankImg;
+    private final Integer evaluationCount;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @Builder
-    public User(Integer id, Nickname nickname, PhoneNumber phoneNumber, String email, UserRole role, String providerId, String loginApi, String accessToken, String refreshToken, String status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(Integer id, Nickname nickname, PhoneNumber phoneNumber, String email, UserRole role, String providerId, String loginApi, String accessToken, String refreshToken, String status, String rankImg, Integer evaluationCount, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
@@ -36,6 +39,8 @@ public class User {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.status = status;
+        this.rankImg = rankImg;
+        this.evaluationCount = evaluationCount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -69,7 +74,8 @@ public class User {
                 .status(entity.getStatus())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
+                .evaluationCount(entity.getEvaluationList().size())
+                .rankImg(entity.getRankImg())
                 .build();
     }
-
 }

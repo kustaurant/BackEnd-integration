@@ -28,7 +28,7 @@ class HomeModalServiceTest {
     void 만료되지_않은_modal은_조회된다(){
         //g
         //테스트시간
-        LocalDateTime testTime = LocalDateTime.of(2025, 4, 3, 12, 0);
+        LocalDateTime testTime = LocalDateTime.of(2026, 4, 3, 12, 0);
 
         HomeModalEntity modal = new HomeModalEntity();
         modal.setTitle("유효한 모달");
