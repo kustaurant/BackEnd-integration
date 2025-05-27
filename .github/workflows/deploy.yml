@@ -3,7 +3,7 @@ name: Github-actions 자동 배포
 on:
   push:
     branches:
-      - refactor/post
+      - main
 
 jobs:
   Deploy:
