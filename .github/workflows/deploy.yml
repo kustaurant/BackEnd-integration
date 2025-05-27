@@ -1,10 +1,10 @@
 name: Github-actions 자동 배포
 
-
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+
 jobs:
   Deploy:
     runs-on: ubuntu-latest
@@ -12,23 +12,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Validate Git tag and build.gradle version match
-        run: |
-          # 태그에서 버전 추출
-          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
-          
-          # build.gradle에서 version 추출
-          FILE_VERSION=$(grep "^version" build.gradle | sed -E "s/version *= *'([^']+)'/\1/")
-          
-          echo "Git tag version: $TAG_VERSION"
-          echo "build.gradle version: $FILE_VERSION"
-          
-          # 태그와 build.gradle의 실행 파일 버전이 같은지 확인
-          if [ "$TAG_VERSION" != "$FILE_VERSION" ]; then
-            echo "error: Tag version ($TAG_VERSION) does not match build.gradle version ($FILE_VERSION)."
-            exit 1
-          fi
 
       - name: SSH로 LightSail 인스턴스 접속해서 원격에서 최신 코드 pull 받고 빌드 -> 빌드 파일 실행 하기
         uses: appleboy/ssh-action@v1
