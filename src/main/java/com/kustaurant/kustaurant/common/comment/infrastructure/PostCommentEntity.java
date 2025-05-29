@@ -122,21 +122,37 @@ public class PostCommentEntity {
         return entity;
     }
 
-    public PostComment toDomain() {
-        return PostComment.builder()
+    public PostComment toDomain(boolean includeParent, boolean includeReplies) {
+        PostComment.PostCommentBuilder builder = PostComment.builder()
                 .commentId(this.commentId)
                 .commentBody(this.commentBody)
                 .postId(this.post.getPostId())
                 .userId(this.user.getUserId())
-                .parentComment(this.parentComment != null ? this.parentComment.toDomain() : null)
                 .netLikes(this.likeCount)
                 .status(this.status)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
                 .likeCount(this.postCommentLikesEntities.size())
-                .dislikeCount(this.postCommentDislikesEntities.size())
-                // TODO: 순환참조 안되게 대댓글 넣어줘야함
-//                .replies(this.repliesList.stream().map(PostCommentEntity::toDomain).toList())
-                .build();
+                .dislikeCount(this.postCommentDislikesEntities.size());
+
+        if (includeParent && this.parentComment != null) {
+            builder.parentComment(this.parentComment.toDomain(false, false)); // 깊이 제한
+        }
+
+        if (includeReplies && this.repliesList != null && !this.repliesList.isEmpty()) {
+            List<PostComment> replies = new ArrayList<>();
+            for (PostCommentEntity replyEntity : this.repliesList) {
+                replies.add(replyEntity.toDomain(false, false)); // 자식도 깊이 제한
+            }
+            builder.replies(replies);
+        } else {
+            builder.replies(new ArrayList<>());
+        }
+
+        return builder.build();
+    }
+
+    public PostComment toDomain() {
+        return toDomain(true, true);
     }
 }

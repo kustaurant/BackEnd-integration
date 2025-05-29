@@ -65,8 +65,10 @@ public class CommunityController {
     @GetMapping("/community/{postId}")
     public String postDetail(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
         Integer userId = null;
+        User user = null;
         if (principal != null) {
             userId = Integer.valueOf(principal.getName());
+            user = userService.getActiveUserById(userId);
         }
         InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postId, userId);
 
@@ -77,9 +79,15 @@ public class CommunityController {
         Map<Integer, InteractionStatusResponse> commentInteractionMap = postCommentService.getCommentInteractionMap(postCommentList, userId);
 
         // TODO: user, post 도메인 대신 post, user DTO 로 반환하기
-        User user = userService.getActiveUserById(userId);
         Post post = postService.getPost(postId);
-        PostDetailView view = PostDetailView.builder().post(post).postCommentList(postCommentList).sort(sort).postInteractionStatus(postInteractionStatus).commentInteractionMap(commentInteractionMap).user(user).build();
+        PostDetailView view = PostDetailView.builder()
+                .post(post)
+                .postCommentList(postCommentList)
+                .sort(sort)
+                .postInteractionStatus(postInteractionStatus)
+                .commentInteractionMap(commentInteractionMap)
+                .user(user)
+                .build();
         model.addAttribute("view", view);
 
         return "community_post";

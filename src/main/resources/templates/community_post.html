@@ -99,8 +99,8 @@
 
                         </span>
                         <span class="third-detail user-name">
-                        <img th:src="${view.post.author.getRankImg()}">
-                        <span th:text="${view.post.author.userNickname} ">
+                        <img th:src="${view.user.getRankImg()}">
+                        <span th:text="${view.user.nickname} ">
                         </span>
                         </span>
 
@@ -125,7 +125,7 @@
             </a>
 
             <!-- 글 삭제 버튼 -->
-            <button th:if="${view.post.user==user}" type="button" class="post-delete" data-bs-toggle="modal"
+            <button th:if="${view.user==user}" type="button" class="post-delete" data-bs-toggle="modal"
                     data-bs-target="#postModal" th:data-id="${view.post.postId}" th:data-type="post"
                     data-action="postDelete">
                 삭제
