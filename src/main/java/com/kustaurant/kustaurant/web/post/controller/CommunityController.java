@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.*;
 
 @lombok.extern.slf4j.Slf4j
@@ -62,7 +63,11 @@ public class CommunityController {
 
     // 커뮤니티 게시글 상세 화면
     @GetMapping("/community/{postId}")
-    public String postDetail(Model model, @PathVariable Integer postId, @AuthenticationPrincipal(expression = "user.id") Integer userId, @RequestParam(defaultValue = "recent") String sort) {
+    public String postDetail(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
+        Integer userId = null;
+        if (principal != null) {
+            userId = Integer.valueOf(principal.getName());
+        }
         InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postId, userId);
 
         postService.increaseVisitCount(postId);
@@ -105,7 +110,8 @@ public class CommunityController {
     // 댓글 or 대댓글 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/comment/create")
-    public ResponseEntity<String> createComment(@RequestParam(name = "content", defaultValue = "") String content, @RequestParam(name = "postId") Integer postId, @RequestParam(name = "parentCommentId", defaultValue = "") Integer parentCommentId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<String> createComment(@RequestParam(name = "content", defaultValue = "") String content, @RequestParam(name = "postId") Integer postId, @RequestParam(name = "parentCommentId", defaultValue = "") Integer parentCommentId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         postCommentService.createComment(content, postId, parentCommentId, userId);
         return ResponseEntity.ok("댓글이 성공적으로 저장되었습니다.");
     }
@@ -113,7 +119,8 @@ public class CommunityController {
     // 게시글 좋아요 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/post/like")
-    public ResponseEntity<ReactionToggleResponse> togglePostLike(@RequestParam("postId") Integer postId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<ReactionToggleResponse> togglePostLike(@RequestParam("postId") Integer postId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postService.toggleLike(postId, userId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
@@ -121,7 +128,8 @@ public class CommunityController {
     // 게시글 싫어요 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/post/dislike")
-    public ResponseEntity<ReactionToggleResponse> togglePostDislike(@RequestParam("postId") Integer postId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<ReactionToggleResponse> togglePostDislike(@RequestParam("postId") Integer postId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postService.toggleDislike(postId, userId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
@@ -129,7 +137,8 @@ public class CommunityController {
     // 게시글 스크랩
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/post/scrap")
-    public ResponseEntity<Map<String, Object>> toggleScrap(@RequestParam("postId") Integer postId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<Map<String, Object>> toggleScrap(@RequestParam("postId") Integer postId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         Map<String, Object> response = postScrapService.toggleScrap(postId, userId);
         return ResponseEntity.ok(response);
     }
@@ -151,7 +160,8 @@ public class CommunityController {
     // 게시글 댓글 좋아요
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/comment/like/{commentId}")
-    public ResponseEntity<ReactionToggleResponse> toggleCommentLike(@PathVariable Integer commentId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<ReactionToggleResponse> toggleCommentLike(@PathVariable Integer commentId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postCommentService.toggleLike(userId, commentId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
@@ -159,7 +169,8 @@ public class CommunityController {
     // 게시글 댓글 싫어요
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/comment/dislike/{commentId}")
-    public ResponseEntity<ReactionToggleResponse> toggleCommentDislike(@PathVariable Integer commentId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<ReactionToggleResponse> toggleCommentDislike(@PathVariable Integer commentId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postCommentService.toggleDislike(userId, commentId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
@@ -175,7 +186,8 @@ public class CommunityController {
     // 게시글 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/community/post/create")
-    public ResponseEntity<String> createPost(@RequestParam("title") String title, @RequestParam("postCategory") String category, @RequestParam("content") String content, @AuthenticationPrincipal(expression = "user.id") Integer userId) throws IOException {
+    public ResponseEntity<String> createPost(@RequestParam("title") String title, @RequestParam("postCategory") String category, @RequestParam("content") String content, Principal principal) throws IOException {
+        Integer userId = Integer.valueOf(principal.getName());
         postService.create(title, category, content, userId);
         return ResponseEntity.ok("글이 성공적으로 저장되었습니다.");
     }

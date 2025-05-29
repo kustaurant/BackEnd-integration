@@ -13,6 +13,7 @@ import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -337,7 +339,7 @@ public class PostService {
     public List<PostDTO> getDTOs(Page<Post> paging) {
         List<PostDTO> postDTOList = new ArrayList<>();
         for (Post post : paging) {
-            User user = userService.getActiveUserById(post.getId());
+            User user = userService.getActiveUserById(post.getAuthorId());
             PostDTO postDTO = PostDTO.from(post, user);
             postDTO.setUser(UserDTO.from(user));
             postDTOList.add(postDTO);

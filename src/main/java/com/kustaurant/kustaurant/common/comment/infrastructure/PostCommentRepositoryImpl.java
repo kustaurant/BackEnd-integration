@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Repository
@@ -23,7 +24,9 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     @Override
     public List<PostComment> findAll(Specification<PostComment> spec) {
         List<PostCommentEntity> postCommentEntities = postCommentJpaRepository.findAll();
-        return postCommentEntities.stream().map(PostCommentEntity::toDomain).toList();
+        return postCommentEntities.stream()
+                .map(PostCommentEntity::toDomain)
+                .collect(Collectors.toList());
     }
 
     @Override

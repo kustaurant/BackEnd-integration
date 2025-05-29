@@ -110,6 +110,7 @@ public class PostCommentService {
         Post post = postService.getPost(postId);
         Specification<PostComment> spec = getSpecByPostId(post);
         List<PostComment> postCommentList = postCommentRepository.findAll(spec);
+
         if (sort.equals("popular")) {
             postCommentList.sort(Comparator.comparingInt(PostComment::getNetLikes).reversed());
         } else {
