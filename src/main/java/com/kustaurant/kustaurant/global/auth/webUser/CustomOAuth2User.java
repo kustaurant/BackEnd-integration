@@ -1,31 +1,32 @@
 package com.kustaurant.kustaurant.global.auth.webUser;
 
-import com.kustaurant.kustaurant.common.user.domain.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
-public class CustomOAuth2User implements OAuth2User {
+public final class CustomOAuth2User implements OAuth2User, Serializable {
 
-    private final User user;
-    private final Collection<? extends GrantedAuthority> authorities;
+    private final Integer userId;
+    private final Set<? extends GrantedAuthority> authorities;
     private final Map<String, Object> attributes;
 
-    public CustomOAuth2User(User user,
-                            Collection<? extends GrantedAuthority> authorities,
+    public CustomOAuth2User(Integer userId,
+                            Set<? extends GrantedAuthority> authorities,
                             Map<String, Object> attributes) {
-        this.user = user;
+        this.userId = userId;
         this.authorities = authorities;
         this.attributes = attributes;
     }
 
     @Override
     public String getName() {
-        return String.valueOf(user.getId());
+        return String.valueOf(userId);
     }
 
     @Override

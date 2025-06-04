@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.mock;
 
 import com.kustaurant.kustaurant.global.service.port.ClockHolder;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
