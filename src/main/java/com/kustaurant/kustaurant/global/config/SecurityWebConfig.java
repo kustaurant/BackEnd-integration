@@ -42,7 +42,6 @@ public class SecurityWebConfig {
                         .anyRequest().permitAll()) // 모든 요청 허용
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/user/login")
-                        .defaultSuccessUrl("/")
                         .failureUrl("/user/login?error")
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(customLoginSuccessHandler)) // 로그인 성공 핸들러

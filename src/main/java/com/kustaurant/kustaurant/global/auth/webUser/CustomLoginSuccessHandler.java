@@ -25,47 +25,19 @@ public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         clearSession(request);
 
-        SavedRequest savedRequest = requestCache.getRequest(request, response);
-
-        /**
-         * prevPage가 존재하는 경우 = 사용자가 직접 /auth/login 경로로 로그인 요청
-         * 기존 Session의 prevPage attribute 제거
-         */
-        /*String prevPage = (String) request.getSession().getAttribute("prevPage");
-        if (prevPage != null) {
-            request.getSession().removeAttribute("prevPage");
+        // 1) 로그인 전 요청이 저장돼 있으면 그곳으로
+        SavedRequest saved = requestCache.getRequest(request, response);
+        if (saved != null) {
+            redirectStrategy.sendRedirect(request, response, saved.getRedirectUrl());
+            return;
         }
 
-        // 기본 URI
-        String uri = "/";
-
-        if (prevPage != null && !prevPage.isEmpty()) {
-            // 회원가입 - 로그인으로 넘어온 경우 "/"로 redirect
-            if (prevPage.contains("/auth/join")) {
-                uri = "/";
-            } else {
-                uri = prevPage;
-            }
-        }*/
-
-        String prevRequestUrl = (String) request.getSession().getAttribute("currentUrl");
-        if (prevRequestUrl != null) {
-            request.getSession().removeAttribute("currentUrl");
-        }
-        String uri = "/";
-        if (prevRequestUrl != null && !prevRequestUrl.isEmpty()) {
-            if (prevRequestUrl.contains("/auth/join")) {
-                uri = "/";
-            } else {
-                uri = prevRequestUrl;
-            }
-        }
-
-        redirectStrategy.sendRedirect(request, response, uri);
+        // 2) 그 외엔 메인 페이지로
+        redirectStrategy.sendRedirect(request, response, "/");
     }
 
     // 로그인 실패 후 성공 시 남아있는 에러 세션 제거
-    protected void clearSession(HttpServletRequest request) {
+    private void clearSession(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
