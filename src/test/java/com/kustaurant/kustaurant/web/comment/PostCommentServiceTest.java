@@ -136,7 +136,7 @@ class PostCommentServiceTest {
         when(commentRepository.findAll(any())).thenReturn(new ArrayList<>(List.of(comment1, comment2)));
 
         // When
-        List<PostComment> result = commentService.getList(postId, "popular");
+        List<PostComment> result = commentService.getParentComments(postId, "popular");
 
         // Then
         assertThat(result.get(0).getNetLikes()).isEqualTo(10);
@@ -156,7 +156,7 @@ class PostCommentServiceTest {
         when(commentRepository.findAll(any())).thenReturn(new ArrayList<>(List.of(older, newer)));
 
         // When
-        List<PostComment> result = commentService.getList(postId, "recent");
+        List<PostComment> result = commentService.getParentComments(postId, "recent");
 
         // Then
         assertThat(result.get(0).getCreatedAt()).isAfter(result.get(1).getCreatedAt());

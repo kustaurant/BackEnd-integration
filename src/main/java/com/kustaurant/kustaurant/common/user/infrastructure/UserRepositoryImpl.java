@@ -1,11 +1,13 @@
 package com.kustaurant.kustaurant.common.user.infrastructure;
 
+import com.kustaurant.kustaurant.common.post.domain.UserDTO;
 import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,6 +56,18 @@ public class UserRepositoryImpl implements UserRepository {
                 .map(UserEntity::toModel)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Map<Integer, UserDTO> getUserDTOMapByIds(List<Integer> ids) {
+        return userJpaRepository.findAllById(
+                        ids.stream().map(Integer::longValue).toList()
+                ).stream()
+                .collect(Collectors.toMap(
+                        UserEntity::getUserId,
+                        UserDTO::convertUserToUserDTO
+                ));
+    }
+
 
     public Optional<UserEntity> findEntityById(Integer id) {
         return userJpaRepository.findByUserId(id);

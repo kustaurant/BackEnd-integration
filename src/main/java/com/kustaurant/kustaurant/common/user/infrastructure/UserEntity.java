@@ -18,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import java.util.List;
 @Entity
 @Table(name = "users_tbl")
 @NoArgsConstructor
+@Slf4j
 public class UserEntity {
 
     @Id
@@ -170,6 +172,7 @@ public class UserEntity {
                 .refreshToken(refreshToken)
                 .status(status)
                 .createdAt(createdAt)
+                .rankImg(getRankImg())
                 .build();
     }
 

@@ -30,8 +30,14 @@ public class PostDTO {
     LocalDateTime createdAt;
     @Schema(description = "게시글이 업데이트된 날짜", example = "2024-05-20T18:09:06")
     LocalDateTime updatedAt;
-    @Schema(description = "좋아요 개수", example = "3")
+    @Schema(description = "총 좋아요 개수 (좋아요-싫어요)", example = "3")
     Integer likeCount;
+
+
+    @Schema(description = "좋아요 개수", example = "3")
+    Integer likeOnlyCount;
+    @Schema(description = "싫어요 개수", example = "3")
+    Integer dislikeOnlyCount;
     @Schema(description = "작성자 정보")
     UserDTO user;
     @Schema(description = "작성 경과 시간", example = "5시간 전")
@@ -67,6 +73,8 @@ public class PostDTO {
                 .createdAt(postEntity.getCreatedAt())
                 .updatedAt(postEntity.getUpdatedAt())
                 .likeCount(postEntity.getNetLikes())
+                .likeOnlyCount(postEntity.getPostLikesList().size())
+                .dislikeOnlyCount(postEntity.getPostDislikesList().size())
                 .user(UserDTO.convertUserToUserDTO(postEntity.getUser()))
                 .commentCount((int) postEntity.getPostCommentList().stream()
                         .filter(c -> c.getStatus().equals(ContentStatus.ACTIVE))
@@ -93,6 +101,8 @@ public class PostDTO {
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .likeCount(post.getNetLikes())
+                .likeOnlyCount(post.getLikeCount())
+                .dislikeOnlyCount(post.getDislikeCount())
                 .timeAgo(post.calculateTimeAgo())
                 .postPhotoImgUrl(!post.getPhotos().isEmpty() ? post.getPhotos().get(0).getPhotoImgUrl() : null)
                 .commentCount(post.getComments().size())

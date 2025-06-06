@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.web.post.controller;
 
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
+import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.user.controller.port.UserService;
 import com.kustaurant.kustaurant.common.user.domain.User;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,37 +61,14 @@ public class CommunityController {
         return "community";
     }
 
-    // 커뮤니티 게시글 상세 화면
     @GetMapping("/community/{postId}")
     public String postDetail(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
-        Integer userId = null;
-        User user = null;
-        if (principal != null) {
-            userId = Integer.valueOf(principal.getName());
-            user = userService.getActiveUserById(userId);
-        }
-        InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postId, userId);
-
-        postService.increaseVisitCount(postId);
-
-        List<PostComment> postCommentList = postCommentService.getList(postId, sort);
-
-        Map<Integer, InteractionStatusResponse> commentInteractionMap = postCommentService.getCommentInteractionMap(postCommentList, userId);
-
-        // TODO: user, post 도메인 대신 post, user DTO 로 반환하기
-        Post post = postService.getPost(postId);
-        PostDetailView view = PostDetailView.builder()
-                .post(post)
-                .postCommentList(postCommentList)
-                .sort(sort)
-                .postInteractionStatus(postInteractionStatus)
-                .commentInteractionMap(commentInteractionMap)
-                .user(user)
-                .build();
+        Integer userId = (principal != null) ? Integer.valueOf(principal.getName()) : null;
+        PostDetailView view = postCommentService.buildPostDetailView(postId, userId, sort);
         model.addAttribute("view", view);
-
         return "community_post";
     }
+
 
 
     @GetMapping("/api/post/delete")

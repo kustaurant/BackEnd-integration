@@ -7,6 +7,7 @@ import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -16,6 +17,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
+@Slf4j
 @Table(name="post_comments_tbl")
 public class PostCommentEntity {
     @Id
@@ -142,17 +144,20 @@ public class PostCommentEntity {
         if (includeReplies && this.repliesList != null && !this.repliesList.isEmpty()) {
             List<PostComment> replies = new ArrayList<>();
             for (PostCommentEntity replyEntity : this.repliesList) {
-                replies.add(replyEntity.toDomain(false, false)); // 자식도 깊이 제한
+                if (!replyEntity.getCommentId().equals(this.commentId)) {
+                    replies.add(replyEntity.toDomain(false, true));
+                }
             }
             builder.replies(replies);
         } else {
             builder.replies(new ArrayList<>());
         }
 
+
         return builder.build();
     }
 
     public PostComment toDomain() {
-        return toDomain(true, true);
+        return toDomain(false, true);
     }
 }
