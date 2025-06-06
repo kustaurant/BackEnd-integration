@@ -3,7 +3,6 @@ package com.kustaurant.kustaurant.common.user.domain;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.auth.session.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 

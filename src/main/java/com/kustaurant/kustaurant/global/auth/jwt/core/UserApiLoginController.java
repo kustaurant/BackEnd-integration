@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.global.auth.jwt.core;
 
-import com.kustaurant.kustaurant.global.auth.jwt.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtToken;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
 import com.kustaurant.kustaurant.global.auth.jwt.TokenResponse;
 import com.kustaurant.kustaurant.global.auth.jwt.apple.AppleLoginRequest;

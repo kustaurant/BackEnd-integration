@@ -3,25 +3,28 @@ package com.kustaurant.kustaurant.global.config;
 import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.CuisineListArgumentResolver;
 import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.LocationListArgumentResolver;
 import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.SituationListArgumentResolver;
-import com.kustaurant.kustaurant.global.auth.jwt.customAnno.JwtTokenArgumentResolver;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserArgumentResolver;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtTokenArgumentResolver;
+import com.kustaurant.kustaurant.global.auth.session.MyInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+@RequiredArgsConstructor
+public class WebMvcConfig implements WebMvcConfigurer {
     private final JwtTokenArgumentResolver jwtTokenArgumentResolver;
-
-    public WebConfig(JwtTokenArgumentResolver jwtTokenArgumentResolver) {
-        this.jwtTokenArgumentResolver = jwtTokenArgumentResolver;
-    }
+    private final AuthUserArgumentResolver authUserArgumentResolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(jwtTokenArgumentResolver);
+        resolvers.add(authUserArgumentResolver);
         resolvers.add(new CuisineListArgumentResolver());
         resolvers.add(new SituationListArgumentResolver());
         resolvers.add(new LocationListArgumentResolver());
@@ -33,5 +36,10 @@ public class WebConfig implements WebMvcConfigurer {
         // 예: "file:./postImage/"는 현재 작업 디렉토리에 있는 postImage 폴더를 가리킵니다.
         registry.addResourceHandler("/postImage/**")
                 .addResourceLocations("file:./postImage/");
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new MyInterceptor());
     }
 }

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.auth.jwt.customAnno;
+package com.kustaurant.kustaurant.global.auth.argumentResolver;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

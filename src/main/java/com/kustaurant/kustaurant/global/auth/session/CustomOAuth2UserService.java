@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.global.auth.session;
 
 import com.kustaurant.kustaurant.common.user.domain.User;
+import com.kustaurant.kustaurant.common.user.domain.UserRole;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;

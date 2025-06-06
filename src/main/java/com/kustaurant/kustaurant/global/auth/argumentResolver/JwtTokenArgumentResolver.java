@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.auth.jwt.customAnno;
+package com.kustaurant.kustaurant.global.auth.argumentResolver;
 
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;

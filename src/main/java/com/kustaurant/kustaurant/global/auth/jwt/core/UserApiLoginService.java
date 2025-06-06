@@ -9,7 +9,7 @@ import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
 import com.kustaurant.kustaurant.global.auth.jwt.TokenResponse;
 import com.kustaurant.kustaurant.global.auth.jwt.apple.AppleApiService;
 import com.kustaurant.kustaurant.global.auth.jwt.naver.NaverApiService;
-import com.kustaurant.kustaurant.global.auth.session.UserRole;
+import com.kustaurant.kustaurant.common.user.domain.UserRole;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

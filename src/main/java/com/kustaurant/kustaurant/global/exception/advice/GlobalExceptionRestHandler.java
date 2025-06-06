@@ -1,10 +1,7 @@
 package com.kustaurant.kustaurant.global.exception.advice;
 
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
-import com.kustaurant.kustaurant.global.exception.exception.ParamException;
-import com.kustaurant.kustaurant.global.exception.exception.ServerException;
+import com.kustaurant.kustaurant.global.exception.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -94,5 +91,15 @@ public class GlobalExceptionRestHandler {
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException e) {
         log.error("[AuthenticationException]", e);
         return new ResponseEntity<>(new ErrorResponse("UNAUTHORIZED", e.getMessage()), HttpStatus.UNAUTHORIZED);
+    }
+
+    //임시로 둔 인증관련 예외
+    @ExceptionHandler(UnauthenticatedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthenticatedException(UnauthenticatedException e) {
+        log.error("[UnauthenticatedException]", e);
+        return new ResponseEntity<>(
+                new ErrorResponse("UNAUTHORIZED", e.getMessage()),
+                HttpStatus.UNAUTHORIZED
+        );
     }
 }
