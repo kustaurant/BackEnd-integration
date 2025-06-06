@@ -1,9 +1,12 @@
 package com.kustaurant.kustaurant.common.user.controller.web;
 
 import com.kustaurant.kustaurant.common.user.controller.port.MypageService;
+import com.kustaurant.kustaurant.common.user.controller.port.UserService;
 import com.kustaurant.kustaurant.common.user.controller.web.response.MypageDataDTO;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,31 +21,28 @@ import java.security.Principal;
 @RequestMapping("/user")
 public class MypageController {
     private final MypageService mypageService;
-    private final UserRepository userRepository;
-    private final CustomOAuth2UserService customOAuth2UserService;
+    private final UserService userService;
 
-    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/myPage")
     public String myPage(
             @RequestParam(value = "menu-index", defaultValue = "0") int menuIndex,
-            Principal principal,
+            @AuthUser AuthUserInfo user,
             Model model
     ){
-        UserEntity userEntity = customOAuth2UserService.getUser(principal.getName());
-        MypageDataDTO mypageData = mypageService.getMypageData(userEntity.getUserId());
+        MypageDataDTO data = mypageService.getMypageData(user.id());
 
         // 메뉴 탭 인덱스 정보
         model.addAttribute("menuIndex", menuIndex);
-        model.addAttribute("user", userEntity);
-        model.addAttribute("restaurantFavoriteList", mypageData.getRestaurantFavoriteList());
-        model.addAttribute("restaurantEvaluationList", mypageData.getRestaurantEvaluationList());
-        model.addAttribute("postList", mypageData.getPostList());
-        model.addAttribute("postCommentList", mypageData.getPostCommentList());
-        model.addAttribute("postScrabList", mypageData.getPostScrapList());
+        model.addAttribute("user", userService.getActiveUserById(user.id()));
+        model.addAttribute("restaurantFavoriteList", data.getRestaurantFavoriteList());
+        model.addAttribute("restaurantEvaluationList", data.getRestaurantEvaluationList());
+        model.addAttribute("postList", data.getPostList());
+        model.addAttribute("postCommentList", data.getPostCommentList());
+        model.addAttribute("postScrabList", data.getPostScrapList());
 
         return "mypage";
     }
-
 
 
 //    @PreAuthorize("isAuthenticated() and hasRole('USER')")
@@ -51,7 +51,7 @@ public class MypageController {
 //            @RequestBody Map<String, String> requestBody,
 //            Principal principal
 //    ) {
-////        User user = customOAuth2User.getUser();
+//        User user = customOAuth2User.getUser();
 //        UserEntity userEntity = customOAuth2UserService.getUser(principal.getName());
 //        String newNickname = requestBody.get("newNickname");
 //        String newPhoneNum = requestBody.get("newPhoneNum");

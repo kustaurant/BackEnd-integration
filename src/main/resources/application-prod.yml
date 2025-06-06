@@ -27,4 +27,4 @@ logging:
   pattern:
     dateformat: "yyyy-MM-dd HH:mm:ss.SSS,Asia/Seoul"
   file:
-    name: "logs/konstaurant.log"
+    name: "logs/kustaurant.log"

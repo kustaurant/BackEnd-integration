@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.config;
+package com.kustaurant.kustaurant.global.config.security;
 
 import com.kustaurant.kustaurant.global.auth.jwt.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
