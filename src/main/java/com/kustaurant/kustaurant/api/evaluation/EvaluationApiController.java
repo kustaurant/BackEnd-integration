@@ -15,7 +15,7 @@ import com.kustaurant.kustaurant.common.restaurant.application.service.command.d
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.OUserService;
-import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.auth.jwt.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import io.swagger.v3.oas.annotations.Operation;

@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.common.restaurant.application.service.command.R
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantService;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.OUserService;
-import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.auth.jwt.customAnno.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.dto.FavoriteResponseDTO;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.dto.RestaurantDetailDTO;

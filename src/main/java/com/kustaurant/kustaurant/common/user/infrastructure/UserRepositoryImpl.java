@@ -55,4 +55,9 @@ public class UserRepositoryImpl implements UserRepository {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public int countByLoginApi(String loginApi) {
+        return userJpaRepository.countByLoginApi(loginApi);
+    }
+
 }

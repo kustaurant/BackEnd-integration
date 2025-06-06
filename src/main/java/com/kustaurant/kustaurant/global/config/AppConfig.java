@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.global.config;
 
-import com.kustaurant.kustaurant.global.auth.webUser.MyInterceptor;
+import com.kustaurant.kustaurant.global.auth.session.MyInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

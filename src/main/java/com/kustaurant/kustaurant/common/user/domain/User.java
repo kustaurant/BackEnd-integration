@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.common.user.domain;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.auth.webUser.UserRole;
+import com.kustaurant.kustaurant.global.auth.session.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,14 +18,12 @@ public class User {
     private final UserRole role;
     private final String providerId;
     private final String loginApi;
-    private final String accessToken;
-    private final String refreshToken;
     private final String status;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @Builder
-    public User(Integer id, Nickname nickname, PhoneNumber phoneNumber, String email, UserRole role, String providerId, String loginApi, String accessToken, String refreshToken, String status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(Integer id, Nickname nickname, PhoneNumber phoneNumber, String email, UserRole role, String providerId, String loginApi, String status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
@@ -33,8 +31,6 @@ public class User {
         this.role = role;
         this.providerId = providerId;
         this.loginApi = loginApi;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -64,12 +60,14 @@ public class User {
                 .role(entity.getRole())
                 .providerId(entity.getProviderId())
                 .loginApi(entity.getLoginApi())
-                .accessToken(entity.getAccessToken())
-                .refreshToken(entity.getRefreshToken())
                 .status(entity.getStatus())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
+    }
+
+    public boolean isDeleted() {
+        return "DELETED".equalsIgnoreCase(this.status);
     }
 
 }

@@ -2,24 +2,16 @@ package com.kustaurant.kustaurant.common.user.controller.web;
 
 import com.kustaurant.kustaurant.common.user.controller.port.MypageService;
 import com.kustaurant.kustaurant.common.user.controller.web.response.MypageDataDTO;
-import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
-import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2User;
-import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
+import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.*;
 
 @RequiredArgsConstructor
 @Controller

@@ -14,4 +14,6 @@ public interface UserRepository {
 
     List<User> findUsersWithEvaluationCountDescending();
     List<User> findUsersByEvaluationCountForQuarter(int year, int quarter);
+
+    int countByLoginApi(String apple);
 }

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.auth.apiUser;
+package com.kustaurant.kustaurant.global.auth.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,4 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TokenResponse {
     private String accessToken;
+    private String refreshToken;
 }

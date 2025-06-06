@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.global.config;
 
-import com.kustaurant.kustaurant.global.auth.webUser.CustomLoginSuccessHandler;
-import com.kustaurant.kustaurant.global.auth.webUser.CustomLogoutSuccessHandler;
-import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
+import com.kustaurant.kustaurant.global.auth.session.CustomLoginSuccessHandler;
+import com.kustaurant.kustaurant.global.auth.session.CustomLogoutSuccessHandler;
+import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

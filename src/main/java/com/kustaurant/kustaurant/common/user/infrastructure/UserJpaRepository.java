@@ -26,4 +26,6 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
             "ORDER BY COUNT(e) DESC")
     List<UserEntity> findUsersByEvaluationCountForQuarter(@Param("year") int year, @Param("quarter") int quarter);
 
+    @Query("select count(u) from UserEntity u where u.loginApi = :loginApi")
+    int countByLoginApi(@Param("loginApi") String loginApi);
 }

@@ -1,15 +1,10 @@
-package com.kustaurant.kustaurant.global.auth.apiUser;
+package com.kustaurant.kustaurant.global.auth.jwt;
 
-import com.kustaurant.kustaurant.common.user.controller.port.UserService;
-import com.kustaurant.kustaurant.common.user.domain.User;
-
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,37 +25,34 @@ import java.util.List;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserService userService;
 
     @Override
     protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
+            HttpServletRequest req,
+            HttpServletResponse res,
+            FilterChain chain
+    ) throws IOException, ServletException {
 
-        String token = getJwtFromRequest(request);
-
+        String token = getJwtFromRequest(req);
         if (StringUtils.hasText(token)) {
             try {
-                Claims claims = jwtUtil.parseAndValidate(token);
-                User user = userService.getActiveUserById(Integer.parseInt(claims.getSubject()));
-
+                JwtUtil.ParsedToken tk = jwtUtil.parse(token);
+                //권한 세팅
                 Authentication auth = new UsernamePasswordAuthenticationToken(
-                        user, null, List.of(new SimpleGrantedAuthority(user.getRole().name())));
+                        tk.userId(),
+                        null,
+                        List.of(new SimpleGrantedAuthority(tk.role())));
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
             } catch (ExpiredJwtException e) {
-                log.warn("Expired JWT token: {}...", token.substring(0, 10));
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 토큰 만료");
+                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 만료");
                 return;
-
-            } catch (JwtException | NumberFormatException e) {
-                log.warn("Invalid JWT token: {}...", token.substring(0, 10));
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 토큰 오류");
+            } catch (JwtException e) {
+                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 오류");
                 return;
             }
         }
-        filterChain.doFilter(request, response);
+        chain.doFilter(req, res);
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {

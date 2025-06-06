@@ -12,7 +12,7 @@ import com.kustaurant.kustaurant.common.restaurant.application.constants.Restaur
 import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
-import com.kustaurant.kustaurant.global.auth.webUser.UserRole;
+import com.kustaurant.kustaurant.global.auth.session.UserRole;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -149,8 +149,6 @@ public class UserEntity {
         userEntity.role =user.getRole();
         userEntity.providerId=user.getProviderId();
         userEntity.loginApi=user.getLoginApi();
-        userEntity.accessToken=user.getAccessToken();
-        userEntity.refreshToken=user.getRefreshToken();
         userEntity.status=user.getStatus();
         userEntity.createdAt=user.getCreatedAt();
 
@@ -166,8 +164,6 @@ public class UserEntity {
                 .role(role)
                 .providerId(providerId)
                 .loginApi(loginApi)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .status(status)
                 .createdAt(createdAt)
                 .build();

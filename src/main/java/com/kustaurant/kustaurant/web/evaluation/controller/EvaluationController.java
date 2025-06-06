@@ -14,7 +14,7 @@
     import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
     import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
     import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-    import com.kustaurant.kustaurant.global.auth.webUser.CustomOAuth2UserService;
+    import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
     import com.kustaurant.kustaurant.common.evaluation.service.EvaluationService;
 
     import com.kustaurant.kustaurant.web.main.MainController;

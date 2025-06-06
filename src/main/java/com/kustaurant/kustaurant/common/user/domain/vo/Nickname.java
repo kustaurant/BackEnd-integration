@@ -25,6 +25,13 @@ public class Nickname {
         this.value = value;
     }
 
+    public static Nickname fromEmail(String email) {
+        //이메일의 @ 앞부분을 최대 0글자까지 잘라 닉네임으로 사용
+        String prefix = email.substring(0, email.indexOf('@'));
+        if (prefix.length() > 10) {prefix = prefix.substring(0, 10);}
+        return new Nickname(prefix);
+    }
+
     public String getValue() {
         return value;
     }

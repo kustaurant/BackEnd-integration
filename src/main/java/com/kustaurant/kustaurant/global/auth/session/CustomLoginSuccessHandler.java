@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.auth.webUser;
+package com.kustaurant.kustaurant.global.auth.session;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

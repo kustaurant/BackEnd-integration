@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.common.restaurant.application.service.query.Res
 import com.kustaurant.kustaurant.common.restaurant.application.service.query.RestaurantSearchService;
 import com.kustaurant.kustaurant.common.notice.service.HomeBannerApiService;
 import com.kustaurant.kustaurant.common.restaurant.application.service.query.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.auth.jwt.customAnno.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

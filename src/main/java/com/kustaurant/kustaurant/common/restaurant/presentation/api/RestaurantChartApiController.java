@@ -9,7 +9,7 @@ import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolve
 import com.kustaurant.kustaurant.common.restaurant.application.service.query.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.common.restaurant.application.service.query.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantFavoriteService;
-import com.kustaurant.kustaurant.global.auth.apiUser.customAnno.JwtToken;
+import com.kustaurant.kustaurant.global.auth.jwt.customAnno.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

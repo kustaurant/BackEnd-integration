@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.auth.webUser;
+package com.kustaurant.kustaurant.global.auth.session;
 
 import lombok.Getter;
 
