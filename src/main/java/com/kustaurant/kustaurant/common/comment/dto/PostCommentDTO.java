@@ -87,7 +87,6 @@ public class PostCommentDTO {
                                 .orElse(List.of())
                                 .stream()
                                 .filter(reply -> reply.getStatus() == ContentStatus.ACTIVE)
-                                .peek(reply -> log.info("↳ Recursing into reply commentId: {}", reply.getCommentId()))
                                 .map(reply -> PostCommentDTO.from(reply, userDtoMap))
                                 .toList()
                 )

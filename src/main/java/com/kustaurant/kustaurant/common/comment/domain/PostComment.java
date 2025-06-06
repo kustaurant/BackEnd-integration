@@ -137,8 +137,4 @@ public class PostComment {
     private void updateNetLikes() {
         this.netLikes = this.likeCount - this.dislikeCount;
     }
-
-    public void setReplies(List<PostComment> replies) {
-        this.replies = replies;
-    }
 }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@Slf4j
 public class PostDTO {
     @Schema(description = "게시글 ID", example = "1")
     Integer postId;
@@ -105,7 +107,9 @@ public class PostDTO {
                 .dislikeOnlyCount(post.getDislikeCount())
                 .timeAgo(post.calculateTimeAgo())
                 .postPhotoImgUrl(!post.getPhotos().isEmpty() ? post.getPhotos().get(0).getPhotoImgUrl() : null)
-                .commentCount(post.getComments().size())
+                .commentCount((int) post.getComments().stream()
+                        .filter(c -> c.getStatus() == ContentStatus.ACTIVE)
+                        .count())
                 .postVisitCount(post.getVisitCount())
                 .scrapCount(post.getScraps().size())
                 .build();

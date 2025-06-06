@@ -69,14 +69,11 @@ public class CommunityController {
         return "community_post";
     }
 
-
-
     @GetMapping("/api/post/delete")
     public ResponseEntity<String> deletePost(@RequestParam(name = "postId") Integer postId) {
         postService.deletePost(postId);
         return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
     }
-
 
     // 댓글 ,대댓글 삭제
     @Transactional

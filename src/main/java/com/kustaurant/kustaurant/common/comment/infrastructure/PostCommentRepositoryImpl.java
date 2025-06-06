@@ -5,6 +5,7 @@ import com.kustaurant.kustaurant.common.comment.service.port.PostCommentReposito
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Repository
+@Slf4j
 public class PostCommentRepositoryImpl implements PostCommentRepository {
     private final PostCommentJpaRepository postCommentJpaRepository;
 
@@ -31,6 +33,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
             return cb.and(postIdPredicate, parentNull, statusActive);
         };
         List<PostCommentEntity> parentComments = postCommentJpaRepository.findAll(spec);
+        
         return parentComments.stream()
                 .map(PostCommentEntity::toDomain)
                 .collect(Collectors.toList());

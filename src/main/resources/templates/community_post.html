@@ -111,7 +111,7 @@
                         </span>
                         <!--                        <span th:text="'댓글 '+ ${post.postCommentList.size()}" class="second-detail"></span>-->
                         <span id="commentCount" class="second-detail"
-                              th:text="'댓글 '+ ${#lists.size(view.post.postCommentList.?[status=='ACTIVE'])}"></span>
+                              th:text="'댓글 '+ ${view.post.commentCount}"></span>
                         <span th:text="'추천 '+ ${view.post.likeCount}"
                               class="third-detail" id="postRecommendCount">
 
@@ -239,7 +239,7 @@
                         <ul th:if="${not comment.repliesList.isEmpty()}" class="reply-ul">
                             <li class="comment-li" th:each="reply, loop:${comment.repliesList}"
                                 th:data-id="${reply.commentId}">
-                                <div th:if="${reply.status.equals('ACTIVE')}">
+                                <div th:if="${reply.status == T(com.kustaurant.kustaurant.common.post.enums.ContentStatus).ACTIVE}">
 
                                     <div class="comment-div">
                                         <div class="reply-mark">
@@ -258,7 +258,7 @@
                                         </div>
                                         <div class="comment-content">
                                             <div class="comment-name">
-                                                <img th:src="${reply.user.getRankImg()}">
+                                                <img th:src="${reply.user.rankImg}">
                                                 <span class="user-name" th:text="${reply.user.userNickname}"></span>
                                                 <span th:text="${reply.timeAgo}"></span>
                                             </div>
