@@ -92,7 +92,7 @@ public class CommunityController {
     // 댓글 or 대댓글 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/comment/create")
-    public ResponseEntity<String> createComment(@RequestParam(name = "content", defaultValue = "") String content, @RequestParam(name = "postId") Integer postId, @RequestParam(name = "parentCommentId", defaultValue = "") Integer parentCommentId, Principal principal) {
+    public ResponseEntity<String> createComment(@RequestParam(name = "content", defaultValue = "") String content, @RequestParam(name = "postId") Integer postId, @RequestParam(name = "parentCommentId", required = false) Integer parentCommentId, Principal principal) {
         Integer userId = Integer.valueOf(principal.getName());
         postCommentService.createComment(content, postId, parentCommentId, userId);
         return ResponseEntity.ok("댓글이 성공적으로 저장되었습니다.");

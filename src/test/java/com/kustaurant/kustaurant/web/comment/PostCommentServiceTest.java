@@ -6,6 +6,7 @@ import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentLikeJp
 import com.kustaurant.kustaurant.common.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.common.user.controller.port.UserService;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.web.post.service.PostService;
@@ -28,6 +29,7 @@ class PostCommentServiceTest {
     private PostService postService;
     private UserRepository userRepository;
     private PostCommentService commentService;
+    private UserService userService;
 
     @BeforeEach
     void setUp() {
@@ -37,7 +39,7 @@ class PostCommentServiceTest {
         postService = mock(PostService.class);
         userRepository = mock(UserRepository.class);
 
-        commentService = new PostCommentService(commentRepository, postService, likeRepository, dislikeRepository, userRepository);
+        commentService = new PostCommentService(commentRepository, postService, likeRepository, dislikeRepository,userService);
     }
 
     @Test
@@ -133,7 +135,7 @@ class PostCommentServiceTest {
         comment1.increaseLikeCount(5);
         comment2.increaseLikeCount(10);
         when(postService.getPost(postId)).thenReturn(post);
-        when(commentRepository.findAll(any())).thenReturn(new ArrayList<>(List.of(comment1, comment2)));
+        when(commentRepository.findParentComments(any())).thenReturn(new ArrayList<>(List.of(comment1, comment2)));
 
         // When
         List<PostComment> result = commentService.getParentComments(postId, "popular");
@@ -153,7 +155,7 @@ class PostCommentServiceTest {
         older.setCreatedAt(LocalDateTime.now().minusMinutes(10));
         newer.setCreatedAt(LocalDateTime.now());
         when(postService.getPost(postId)).thenReturn(post);
-        when(commentRepository.findAll(any())).thenReturn(new ArrayList<>(List.of(older, newer)));
+        when(commentRepository.findParentComments(any())).thenReturn(new ArrayList<>(List.of(older, newer)));
 
         // When
         List<PostComment> result = commentService.getParentComments(postId, "recent");
