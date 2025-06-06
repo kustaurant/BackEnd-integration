@@ -1,6 +1,9 @@
 package com.kustaurant.kustaurant.common.comment.infrastructure;
 
 import com.kustaurant.kustaurant.common.comment.service.port.PostCommentDislikeRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserJpaRepository;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -11,10 +14,25 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostCommentDislikeRepositoryImpl implements PostCommentDislikeRepository {
     private final PostCommentDislikeJpaRepository postCommentDislikeJpaRepository;
-
+    private final UserJpaRepository userJpaRepository;
+    private final PostCommentJpaRepository postCommentJpaRepository;
     @Override
     public void save(PostCommentDislike dislike) {
+        UserEntity userEntity = userJpaRepository.findByUserId(dislike.getUserId())
+                .orElseThrow(() -> new DataNotFoundException("유저 없음"));
+        PostCommentEntity commentEntity = postCommentJpaRepository.findById(dislike.getCommentId())
+                .orElseThrow(() -> new DataNotFoundException("댓글 없음"));
 
+        PostCommentDislikeEntity entity = toEntity(dislike, userEntity, commentEntity);
+        postCommentDislikeJpaRepository.save(entity);
+    }
+
+    public PostCommentDislikeEntity toEntity(PostCommentDislike dislike, UserEntity userEntity, PostCommentEntity commentEntity) {
+        return PostCommentDislikeEntity.builder()
+                .user(userEntity)
+                .postComment(commentEntity)
+                .createdAt(dislike.getCreatedAt())
+                .build();
     }
 
     @Override
@@ -30,5 +48,20 @@ public class PostCommentDislikeRepositoryImpl implements PostCommentDislikeRepos
     @Override
     public Optional<PostCommentDislike> findByUserIdAndCommentId(Integer userId, Integer commentId) {
         return Optional.empty();
+    }
+
+    @Override
+    public boolean existsByUserIdAndCommentId(Integer userId, Integer commentId) {
+        return postCommentDislikeJpaRepository.existsByUser_UserIdAndPostComment_CommentId(userId, commentId);
+    }
+
+    @Override
+    public void deleteByUserIdAndCommentId(Integer userId, Integer commentId) {
+        postCommentDislikeJpaRepository.deleteByUser_UserIdAndPostComment_CommentId(userId, commentId);
+    }
+
+    @Override
+    public int countByCommentId(Integer commentId) {
+        return postCommentDislikeJpaRepository.countByPostComment_CommentId(commentId);
     }
 }

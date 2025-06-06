@@ -11,4 +11,6 @@ public interface PostCommentLikeRepository {
      void save(PostCommentLike postCommentLike);
      void deleteByUserIdAndCommentId(Integer userId, Integer commentId);
      boolean existsByUserIdAndCommentId(Integer userId, Integer commentId);
+
+    int countByCommentId(Integer commentId);
 }

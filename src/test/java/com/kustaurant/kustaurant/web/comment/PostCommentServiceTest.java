@@ -3,6 +3,8 @@ package com.kustaurant.kustaurant.web.comment;
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentDislikeJpaRepository;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentLikeJpaRepository;
+import com.kustaurant.kustaurant.common.comment.service.port.PostCommentDislikeRepository;
+import com.kustaurant.kustaurant.common.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.common.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
@@ -30,7 +32,8 @@ class PostCommentServiceTest {
     private UserRepository userRepository;
     private PostCommentService commentService;
     private UserService userService;
-
+    private PostCommentLikeRepository postCommentLikeRepository;
+    private PostCommentDislikeRepository postCommentDislikeRepository;
     @BeforeEach
     void setUp() {
         commentRepository = mock(PostCommentRepository.class);
@@ -38,8 +41,10 @@ class PostCommentServiceTest {
         dislikeRepository = mock(PostCommentDislikeJpaRepository.class);
         postService = mock(PostService.class);
         userRepository = mock(UserRepository.class);
+        postCommentDislikeRepository = mock(PostCommentDislikeRepository.class);
+        postCommentLikeRepository = mock(PostCommentLikeRepository.class);
 
-        commentService = new PostCommentService(commentRepository, postService, likeRepository, dislikeRepository,userService);
+        commentService = new PostCommentService(commentRepository, postService, likeRepository, dislikeRepository,userService, postCommentLikeRepository, postCommentDislikeRepository);
     }
 
     @Test
