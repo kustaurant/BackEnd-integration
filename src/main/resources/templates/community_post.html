@@ -239,7 +239,7 @@
                         <ul th:if="${not comment.repliesList.isEmpty()}" class="reply-ul">
                             <li class="comment-li" th:each="reply, loop:${comment.repliesList}"
                                 th:data-id="${reply.commentId}">
-                                <div th:if="${reply.status == T(com.kustaurant.kustaurant.common.post.enums.ContentStatus).ACTIVE}">
+                                <div th:if="${reply.status == 'ACTIVE'}">
 
                                     <div class="comment-div">
                                         <div class="reply-mark">

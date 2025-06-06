@@ -25,7 +25,7 @@ public class PostDTO {
     @Schema(description = "게시글 내용", example = "건대 중문 근처 갈일 있는데 맛집 추천해주세요")
     String postBody;
     @Schema(description = "게시글 상태", example = "ACTIVE")
-    ContentStatus status;
+    String status;
     @Schema(description = "게시글 카테고리", example = "자유게시판")
     String postCategory;
     @Schema(description = "게시글이 생성된 날짜", example = "2024-05-19T18:09:06")
@@ -70,7 +70,7 @@ public class PostDTO {
                 .postId(postEntity.getPostId())
                 .postTitle(postEntity.getPostTitle())
                 .postBody(postEntity.getPostBody())
-                .status(postEntity.getStatus())
+                .status(postEntity.getStatus().name())
                 .postCategory(postEntity.getPostCategory())
                 .createdAt(postEntity.getCreatedAt())
                 .updatedAt(postEntity.getUpdatedAt())
@@ -99,7 +99,7 @@ public class PostDTO {
                 .postTitle(post.getTitle())
                 .postBody(post.getBody())
                 .postCategory(post.getCategory())
-                .status(post.getStatus())
+                .status(post.getStatus().name())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .likeCount(post.getNetLikes())

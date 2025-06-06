@@ -80,8 +80,8 @@ public class CommunityController {
     @GetMapping("/api/comment/delete")
     public ResponseEntity<Map<String, Object>> deleteComment(@RequestParam Integer commentId) {
         int deletedCount = postCommentService.deleteComment(commentId);
-
         Map<String, Object> response = new HashMap<>();
+
         response.put("success", true);
         response.put("deletedCount", deletedCount);
         response.put("message", "comment delete complete");

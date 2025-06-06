@@ -27,7 +27,7 @@ public class PostCommentDTO {
     @Schema(description = "댓글 내용", example = "안녕하세요~")
     private String commentBody;
     @Schema(description = "댓글 상태 (활성화 or 삭제)", example = "ACTIVE")
-    private ContentStatus status;
+    private String status;
     @Schema(description = "좋아요 수", example = "3")
     private Integer likeCount;
     @Schema(description = "싫어요 수", example = "2")
@@ -53,7 +53,7 @@ public class PostCommentDTO {
         return PostCommentDTO.builder()
                 .commentId(comment.getCommentId())
                 .commentBody(comment.getCommentBody())
-                .status(comment.getStatus())
+                .status(comment.getStatus().name())
                 .user(UserDTO.convertUserToUserDTO(comment.getUser()))
                 .likeCount(comment.getPostCommentLikesEntities().size())
                 .dislikeCount(comment.getPostCommentDislikesEntities().size())
@@ -75,7 +75,7 @@ public class PostCommentDTO {
         return PostCommentDTO.builder()
                 .commentId(comment.getCommentId())
                 .commentBody(comment.getCommentBody())
-                .status(comment.getStatus())
+                .status(comment.getStatus().name())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .user(userDtoMap.get(comment.getUserId()))
