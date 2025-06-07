@@ -225,20 +225,17 @@ public class PostCommentService {
 
     private List<PostComment> collectAllReplies(PostComment comment) {
         List<PostComment> all = new ArrayList<>();
-        all.add(comment); // 자기 자신 추가
-        for (PostComment reply : comment.getReplies()) {
-            all.addAll(collectAllReplies(reply)); // 자식의 자식까지 재귀적으로 추가
-        }
+        all.add(comment);
+        all.addAll(comment.getReplies());
         return all;
     }
 
     public void fillInteractionMap(PostComment comment, Integer userId, Map<Integer, InteractionStatusResponse> map) {
         map.put(comment.getCommentId(), getUserInteractionStatus(comment.getCommentId(), userId));
         for (PostComment reply : comment.getReplies()) {
-            fillInteractionMap(reply, userId, map);
+            map.put(reply.getCommentId(), getUserInteractionStatus(reply.getCommentId(), userId));
         }
     }
-
 
     @Transactional
     public int deleteComment(Integer commentId) {

@@ -36,9 +36,7 @@ public class PostScrapService {
                     .build();
             postScrapRepository.save(scrap);
             status.put("scrapCreated", true);
-
         }
-
         return status;
     }
 
