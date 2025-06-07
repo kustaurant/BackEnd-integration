@@ -176,7 +176,7 @@ public class CommunityController {
     @GetMapping("/community/post/update")
     public String updatePost(@RequestParam Integer postId, Model model) {
         Post post = postService.getPost(postId);
-        model.addAttribute("post", post);
+        model.addAttribute("post", PostDTO.from(post));
         return "community_update";
     }
 

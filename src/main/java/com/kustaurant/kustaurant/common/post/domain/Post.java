@@ -39,11 +39,13 @@ public class Post {
         this.title = title;
         this.body = body;
         this.category = category;
-        this.photos.clear();
+
+        this.photos = new java.util.ArrayList<>();
         for (String url : imageUrls) {
             this.photos.add(new PostPhoto(url, "ACTIVE"));
         }
     }
+
 
 
     public String calculateTimeAgo() {

@@ -215,12 +215,20 @@ public class PostCommentService {
         postDTO.setPostCommentList(commentDTOs);
 
         // 7. 최종 뷰 조합
-        return PostDetailView.builder()
+        PostDetailView.PostDetailViewBuilder builder = PostDetailView.builder()
                 .post(postDTO)
                 .postInteractionStatus(postService.getUserInteractionStatus(postId, userId))
                 .commentInteractionMap(commentInteractionMap)
-                .sort(sort)
-                .build();
+                .sort(sort);
+
+        // currentUser 추가
+        if (currentUser != null) {
+            builder.currentUser(UserDTO.from(currentUser));
+        } else {
+            builder.currentUser(null);
+        }
+
+        return builder.build();
     }
 
     private List<PostComment> collectAllReplies(PostComment comment) {
