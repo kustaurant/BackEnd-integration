@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
 import com.kustaurant.kustaurant.common.post.domain.PostPhoto;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,14 +24,22 @@ public class PostPhotoEntity {
     private PostEntity post;
 
     private String photoImgUrl;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(20)")
+    private ContentStatus status;
 
     public PostPhotoEntity() {
 
     }
 
     public PostPhoto toDomain() {
-        return new PostPhoto(this.photoImgUrl, this.status);
+        return new PostPhoto(
+                this.photoId,
+                this.post.getPostId(),
+                this.photoImgUrl,
+                this.status
+        );
     }
 
     public static PostPhotoEntity from(PostPhoto postPhoto, PostEntity postEntity) {

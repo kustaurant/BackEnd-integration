@@ -317,8 +317,13 @@ public class PostService {
         Post savedPost = postRepository.save(post);
 
         List<String> imageUrls = imageExtractor.extract(body);
+
         for (String imageUrl : imageUrls) {
-            postPhotoRepository.save(new PostPhoto(imageUrl, "ACTIVE"));
+            postPhotoRepository.save(PostPhoto.builder()
+                    .postId(savedPost.getId())
+                    .photoImgUrl(imageUrl)
+                    .status(ContentStatus.ACTIVE)
+                    .build());
         }
         return savedPost;
     }

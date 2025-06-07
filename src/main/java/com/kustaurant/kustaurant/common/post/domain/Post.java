@@ -42,7 +42,11 @@ public class Post {
 
         this.photos = new java.util.ArrayList<>();
         for (String url : imageUrls) {
-            this.photos.add(new PostPhoto(url, "ACTIVE"));
+            this.photos.add(PostPhoto.builder()
+                    .postId(this.id)
+                    .photoImgUrl(url)
+                    .status(ContentStatus.ACTIVE)
+                    .build());
         }
     }
 
