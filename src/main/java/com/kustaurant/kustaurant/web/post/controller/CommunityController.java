@@ -126,13 +126,15 @@ public class CommunityController {
     @GetMapping("/community/search")
     public String search(Model model, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "kw", defaultValue = "") String kw, @RequestParam(defaultValue = "recent") String sort, @RequestParam(defaultValue = "전체") String postCategory) {
 
-        Page<Post> paging = this.postService.getList(page, sort, kw, postCategory);
+        Page<PostDTO> paging = postService.getList(page, sort, kw, postCategory);
         List<String> timeAgoList = postService.getTimeAgoList(paging);
         model.addAttribute("timeAgoList", timeAgoList);
         model.addAttribute("paging", paging);
         model.addAttribute("postSearchKw", kw);
         model.addAttribute("sort", sort);
         model.addAttribute("postCategory", postCategory);
+        model.addAttribute("postList", paging.getContent());
+
         return "community";
     }
 

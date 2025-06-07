@@ -92,8 +92,8 @@ public class PostDTO {
     public static PostDTO from(Post post) {
         return from(post, null);
     }
-
-    public static PostDTO from(Post post, User user) {
+    // 게시글 작성자를 넣어줘야 하는 경우
+    public static PostDTO from(Post post, User author) {
         PostDTO postDTO = PostDTO.builder()
                 .postId(post.getId())
                 .postTitle(post.getTitle())
@@ -113,8 +113,8 @@ public class PostDTO {
                 .postVisitCount(post.getVisitCount())
                 .scrapCount(post.getScraps().size())
                 .build();
-        if (user != null) {
-            postDTO.setUser(UserDTO.from(user));
+        if (author != null) {
+            postDTO.setUser(UserDTO.from(author));
         }
         return postDTO;
     }

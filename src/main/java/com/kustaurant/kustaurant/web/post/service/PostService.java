@@ -68,18 +68,24 @@ public class PostService {
 
     }
 
-    // 검색 결과 반환하기
-    public Page<Post> getList(int page, String sort, String kw, String postCategory) {
+    // 검색결과 반환
+    public Page<PostDTO> getList(int page, String sort, String kw, String postCategory) {
         List<Sort.Order> sorts = new ArrayList<>();
-
-        // 인기순 최신순 모두 최신순으로
         sorts.add(Sort.Order.desc("createdAt"));
 
         Specification<PostEntity> spec = search(kw, postCategory, sort);
-
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        return this.postRepository.findAll(spec, pageable);
+        Page<Post> postEntityPage = this.postRepository.findAll(spec, pageable);
+
+        return postEntityPage
+                .map(postEntity -> {
+                    User user = userService.getActiveUserById(postEntity.getAuthorId());
+                    PostDTO postDTO = PostDTO.from(postEntity, user);
+                    postDTO.setUser(UserDTO.from(user));
+                    return postDTO;
+                });
     }
+
 
 
     //  드롭다운에서 카테고리가 설정된 상태에서 게시물 반환하기
@@ -105,16 +111,12 @@ public class PostService {
     }
 
     // 게시물 리스트에 대한 시간 경과 리스트로 반환하는 함수.
-    public List<String> getTimeAgoList(Page<Post> postList) {
+    public List<String> getTimeAgoList(Page<PostDTO> postList) {
         LocalDateTime now = LocalDateTime.now();
-
-        // postList의 createdAt 필드를 문자열 형식으로 만들어 timeAgoList에 할당
-        List<String> timeAgoList = postList.stream().map(post -> {
+        return postList.stream().map(post -> {
             LocalDateTime createdAt = post.getCreatedAt();
-            // datetime 타입의 createdAt을 string 타입으로 변환해주는 함수
             return timeAgo(now, createdAt);
         }).collect(Collectors.toList());
-        return timeAgoList;
 
     }
 
@@ -221,9 +223,9 @@ public class PostService {
                 // sort
                 Predicate likeCountPredicate;
                 if (sort.equals("popular")) {
-                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("likeCount"), POPULARCOUNT);
+                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("netLikes"), POPULARCOUNT);
                 } else {
-                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("likeCount"), -1000);
+                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("netLikes"), -1000);
                 }
 
                 // 검색 조건 결합 (카테고리 설정이 되어있을때는 검색 시 카테고리 안에서 검색을 한다).
@@ -237,7 +239,7 @@ public class PostService {
                 // 검색 조건 결합
                 return cb.and(statusPredicate, likeCountPredicate, cb.or(cb.like(p.get("postTitle"), "%" + kw + "%"), // 제목
                         cb.like(p.get("postBody"), "%" + kw + "%"),      // 내용
-                        cb.like(u1.get("userNickname"), "%" + kw + "%")    // 글 작성자
+                        cb.like(u1.get("nickname").get("value"), "%" + kw + "%")    // 글 작성자
 //                        ,cb.like(c.get("commentBody"), "%" + kw + "%"),      // 댓글 내용
 //                        cb.like(u2.get("userNickname"), "%" + kw + "%") // 댓글 작성자
                 ));
