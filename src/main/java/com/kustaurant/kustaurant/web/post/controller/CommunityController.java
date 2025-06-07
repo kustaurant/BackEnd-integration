@@ -17,10 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -60,6 +57,7 @@ public class CommunityController {
         return "community";
     }
 
+    // 커뮤니티 게시글 상세 화면
     @GetMapping("/community/{postId}")
     public String postDetail(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
         Integer userId = (principal != null) ? Integer.valueOf(principal.getName()) : null;
@@ -68,24 +66,24 @@ public class CommunityController {
         return "community_post";
     }
 
-    @GetMapping("/api/post/delete")
-    public ResponseEntity<String> deletePost(@RequestParam(name = "postId") Integer postId) {
+    // 게시글 삭제
+    @DeleteMapping("/api/post/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Integer postId) {
+        log.info("Deleting post with ID: {}", postId);
         postService.deletePost(postId);
         return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
     }
 
-    // 댓글 ,대댓글 삭제
+    // 댓글 삭제
+    @DeleteMapping("/api/comment/{commentId}")
     @Transactional
-    @GetMapping("/api/comment/delete")
-    public ResponseEntity<Map<String, Object>> deleteComment(@RequestParam Integer commentId) {
+    public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable Integer commentId) {
         int deletedCount = postCommentService.deleteComment(commentId);
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("success", true);
-        response.put("deletedCount", deletedCount);
-        response.put("message", "comment delete complete");
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "deletedCount", deletedCount,
+                "message", "comment delete complete"
+        ));
     }
 
     // 댓글 or 대댓글 생성
@@ -215,7 +213,6 @@ public class CommunityController {
             return ResponseEntity.internalServerError().body(Map.of("rs_st", -1, "rs_msg", "이미지 업로드 실패"));
         }
     }
-
 
     // 댓글 입력창 포커스시 로그인 상태 확인
     @PreAuthorize("isAuthenticated() and hasRole('USER')")

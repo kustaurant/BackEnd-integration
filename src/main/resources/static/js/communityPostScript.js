@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-
+    // CSRF 토큰 가져오기
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
     // 댓글 입력 창 focus 시 로그인 상태 확인
     document.querySelector(".comment-content").addEventListener("focus", function () {
         fetch("/api/login/comment-write", { method: 'GET' })
@@ -308,47 +310,40 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-// 게시글 삭제 함수
+    // 게시글 삭제 함수
     function deletePost(postId) {
-
-        fetch("/api/post/delete?postId=" + postId, {
-            method: 'GET'
+        fetch(`/api/post/${postId}`, {
+            method: 'DELETE',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
         })
             .then(response => {
                 if (response.ok) {
                     window.location.href = "/community";
-                    return response.json()
                 }
             })
-            .then(data => {
-                console.log(data)
-            }).catch(error => console.error('Error:', error));
-
-
+            .catch(error => console.error('Error:', error));
     }
 
-// 댓글 삭제 함수
+    // 댓글 삭제 함수
     function deleteComment(commentId) {
-        // const commentLi = this.closest('.comment-li');
-        // const commentId = commentLi.getAttribute('data-id');
-        fetch("/api/comment/delete?commentId=" + commentId, {
-            method: 'GET'
+        fetch(`/api/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
         })
-            .then(response => response.json()) // 먼저 JSON으로 변환
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     document.querySelector(`[data-id="${commentId}"]`).closest('.comment-li').remove();
 
-                    // 삭제된 댓글 + 대댓글 수만큼 댓글 수 업데이트
                     const commentCountSpan = document.querySelector("#commentCount");
                     let currentCount = parseInt(commentCountSpan.innerText.replace('댓글 ', ''));
-                    // data.deletedCount는 삭제된 댓글과 대댓글의 총 개수
                     commentCountSpan.innerText = '댓글 ' + (currentCount - data.deletedCount);
                 }
             })
             .catch(error => console.error('Error:', error));
-
     }
-
-
 })
