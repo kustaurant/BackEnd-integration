@@ -17,7 +17,6 @@ public interface PostRepository {
     Optional<PostEntity> findByStatusAndPostId(String status, Integer postId);
 
     PostEntity save(PostEntity postEntity);
-    Post save(Post post, Integer userId);   // 신규 저장(생성)
     Post save(Post post);
     Optional<Post> findById(Integer id);
     Optional<Post> findByIdWithComments(Integer id);

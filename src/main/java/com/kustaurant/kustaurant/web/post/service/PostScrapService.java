@@ -6,13 +6,14 @@ import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostScrapService {
@@ -28,7 +29,11 @@ public class PostScrapService {
 
             status.put("scrapDelete", true);
         } else {
-            PostScrap scrap = PostScrap.create(userId, postId);
+            PostScrap scrap = PostScrap.builder().
+                    userId(userId)
+                    .postId(postId)
+                    .createdAt(LocalDateTime.now())
+                    .build();
             postScrapRepository.save(scrap);
             status.put("scrapCreated", true);
 

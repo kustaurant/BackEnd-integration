@@ -120,7 +120,7 @@ public class CommunityController {
     @GetMapping("/api/post/scrap")
     public ResponseEntity<Map<String, Object>> toggleScrap(@RequestParam("postId") Integer postId, Principal principal) {
         Integer userId = Integer.valueOf(principal.getName());
-        Map<String, Object> response = postScrapService.toggleScrap(postId, userId);
+        Map<String, Object> response = postScrapService.toggleScrap(userId,postId);
         return ResponseEntity.ok(response);
     }
 

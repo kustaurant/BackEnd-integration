@@ -56,69 +56,64 @@ public class PostRepositoryImpl implements PostRepository {
         return postJpaRepository.save(postEntity);
     }
 
-    // 1. 신규 게시글 저장
-    @Override
-    public Post save(Post post, Integer userId) {
-        if (post.getId() == null) {
-            UserEntity userEntity = userJpaRepository.findByUserId(userId)
-                    .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다."));
 
-            PostEntity postEntity = PostEntity.from(post, userEntity);
-
-            // 저장
-            PostEntity saved = postJpaRepository.save(postEntity);
-            return saved.toDomain();
-        } else {
-            // 2. 기존 게시글 수정
-            return save(post); // 아래 save(post) 재사용!
-        }
-    }
     @Override
     public Post save(Post post) {
-        PostEntity postEntity = postJpaRepository.findById(post.getId())
-                .orElseThrow(() -> new DataNotFoundException("게시물이 존재하지 않습니다."));
+        UserEntity userEntity = userJpaRepository.findByUserId(post.getAuthorId())
+                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다."));
 
-        // 도메인 → 엔티티 상태 반영
-        postEntity.setPostTitle(post.getTitle());
-        postEntity.setPostBody(post.getBody());
-        postEntity.setPostCategory(post.getCategory());
-        postEntity.setStatus(post.getStatus());
-        postEntity.setUpdatedAt(LocalDateTime.now());
-        postEntity.setNetLikes(post.getNetLikes());
-        postEntity.setPostVisitCount(post.getVisitCount());
+        PostEntity postEntity;
+        if (post.getId() == null) {
+            postEntity = PostEntity.from(post, userEntity);
+            postEntity.setCreatedAt(LocalDateTime.now());
+            postEntity.setUpdatedAt(LocalDateTime.now());
+        } else {
+            postEntity = postJpaRepository.findById(post.getId())
+                    .orElseThrow(() -> new DataNotFoundException("게시물이 존재하지 않습니다."));
 
-        // === 댓글/대댓글 상태 반영 (Soft Delete 등) ===
-        if (post.getComments() != null && !post.getComments().isEmpty()) {
-            for (PostComment comment : post.getComments()) {
-                // 1. 댓글 동기화
-                PostCommentEntity entity = postEntity.getPostCommentList().stream()
-                        .filter(e -> e.getCommentId().equals(comment.getCommentId()))
-                        .findFirst()
-                        .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
+            // 엔티티 상태 동기화
+            postEntity.setPostTitle(post.getTitle());
+            postEntity.setPostBody(post.getBody());
+            postEntity.setPostCategory(post.getCategory());
+            postEntity.setStatus(post.getStatus());
+            postEntity.setUpdatedAt(LocalDateTime.now());
+            postEntity.setNetLikes(post.getNetLikes());
+            postEntity.setPostVisitCount(post.getVisitCount());
 
-                entity.setStatus(comment.getStatus());
-                entity.setLikeCount(comment.getNetLikes());
+            // === 댓글 및 대댓글 상태 동기화 ===
+            if (post.getComments() != null && !post.getComments().isEmpty()) {
+                for (PostComment comment : post.getComments()) {
+                    // 댓글 엔티티 찾기
+                    PostCommentEntity entity = postEntity.getPostCommentList().stream()
+                            .filter(e -> e.getCommentId().equals(comment.getCommentId()))
+                            .findFirst()
+                            .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
 
-                // 2. 대댓글 동기화
-                if (comment.getReplies() != null) {
-                    for (PostComment reply : comment.getReplies()) {
-                        PostCommentEntity replyEntity = entity.getRepliesList().stream()
-                                .filter(r -> r.getCommentId().equals(reply.getCommentId()))
-                                .findFirst()
-                                .orElseThrow(() -> new DataNotFoundException("대댓글이 존재하지 않습니다."));
+                    // 댓글 상태 동기화 (예: soft delete, netLikes 등)
+                    entity.setStatus(comment.getStatus());
+                    entity.setLikeCount(comment.getNetLikes());
 
-                        replyEntity.setStatus(reply.getStatus());
-                        replyEntity.setLikeCount(reply.getNetLikes());
+                    // 대댓글(2 depth) 동기화
+                    if (comment.getReplies() != null && !comment.getReplies().isEmpty()) {
+                        for (PostComment reply : comment.getReplies()) {
+                            PostCommentEntity replyEntity = entity.getRepliesList().stream()
+                                    .filter(r -> r.getCommentId().equals(reply.getCommentId()))
+                                    .findFirst()
+                                    .orElseThrow(() -> new DataNotFoundException("대댓글이 존재하지 않습니다."));
+
+                            replyEntity.setStatus(reply.getStatus());
+                            replyEntity.setLikeCount(reply.getNetLikes());
+                        }
                     }
                 }
             }
         }
 
-
-        // 저장 및 반환
         PostEntity saved = postJpaRepository.save(postEntity);
         return saved.toDomain();
     }
+
+
 
 
     @Override
