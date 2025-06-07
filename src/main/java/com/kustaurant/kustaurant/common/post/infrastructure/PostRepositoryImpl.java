@@ -5,6 +5,8 @@ import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity
 import com.kustaurant.kustaurant.common.post.domain.Post;
 import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.user.infrastructure.UserJpaRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepository {
     private final PostJpaRepository postJpaRepository;
-
+    private final UserJpaRepository userJpaRepository;
     @Override
     public Page<Post> findAll(Specification<PostEntity> spec, Pageable pageable) {
         return postJpaRepository.findAll(spec,pageable).map(PostEntity::toDomain);
@@ -54,12 +56,29 @@ public class PostRepositoryImpl implements PostRepository {
         return postJpaRepository.save(postEntity);
     }
 
+    // 1. 신규 게시글 저장
+    @Override
+    public Post save(Post post, Integer userId) {
+        if (post.getId() == null) {
+            UserEntity userEntity = userJpaRepository.findByUserId(userId)
+                    .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다."));
+
+            PostEntity postEntity = PostEntity.from(post, userEntity);
+
+            // 저장
+            PostEntity saved = postJpaRepository.save(postEntity);
+            return saved.toDomain();
+        } else {
+            // 2. 기존 게시글 수정
+            return save(post); // 아래 save(post) 재사용!
+        }
+    }
     @Override
     public Post save(Post post) {
         PostEntity postEntity = postJpaRepository.findById(post.getId())
                 .orElseThrow(() -> new DataNotFoundException("게시물이 존재하지 않습니다."));
 
-        // 도메인 -> 엔티티 상태 반영
+        // 도메인 → 엔티티 상태 반영
         postEntity.setPostTitle(post.getTitle());
         postEntity.setPostBody(post.getBody());
         postEntity.setPostCategory(post.getCategory());
@@ -68,16 +87,19 @@ public class PostRepositoryImpl implements PostRepository {
         postEntity.setNetLikes(post.getNetLikes());
         postEntity.setPostVisitCount(post.getVisitCount());
 
-        // 댓글 상태 반영 (Soft delete)
+        // === 댓글/대댓글 상태 반영 (Soft Delete 등) ===
         if (post.getComments() != null && !post.getComments().isEmpty()) {
             for (PostComment comment : post.getComments()) {
+                // 1. 댓글 동기화
                 PostCommentEntity entity = postEntity.getPostCommentList().stream()
                         .filter(e -> e.getCommentId().equals(comment.getCommentId()))
                         .findFirst()
                         .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
 
                 entity.setStatus(comment.getStatus());
+                entity.setLikeCount(comment.getNetLikes());
 
+                // 2. 대댓글 동기화
                 if (comment.getReplies() != null) {
                     for (PostComment reply : comment.getReplies()) {
                         PostCommentEntity replyEntity = entity.getRepliesList().stream()
@@ -86,13 +108,15 @@ public class PostRepositoryImpl implements PostRepository {
                                 .orElseThrow(() -> new DataNotFoundException("대댓글이 존재하지 않습니다."));
 
                         replyEntity.setStatus(reply.getStatus());
+                        replyEntity.setLikeCount(reply.getNetLikes());
                     }
                 }
             }
         }
 
-        PostEntity saved = postJpaRepository.save(postEntity);
 
+        // 저장 및 반환
+        PostEntity saved = postJpaRepository.save(postEntity);
         return saved.toDomain();
     }
 

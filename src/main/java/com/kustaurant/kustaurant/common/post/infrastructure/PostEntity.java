@@ -134,14 +134,14 @@ public class PostEntity {
     }
 
 
-    public static PostEntity from(Post post, User user) {
+    public static PostEntity from(Post post, UserEntity userEntity) {
         return new PostEntity(
                 post.getTitle(),
                 post.getBody(),
                 post.getCategory(),
                 post.getStatus(),
                 post.getCreatedAt(),
-                UserEntity.from(user)
+                userEntity
         );
     }
 

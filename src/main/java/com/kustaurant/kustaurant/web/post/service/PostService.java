@@ -140,57 +140,54 @@ public class PostService {
 
     @Transactional
     public ReactionToggleResponse toggleLike(Integer postId, Integer userId) {
-        Post post = getPost(postId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
-        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
-        boolean isDisliked = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean isLikedBefore = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean isDislikedBefore = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
 
-        ReactionStatus result = post.toggleLike(isLiked, isDisliked);
-
-        switch (result) {
-            case LIKE_DELETED -> {
-                postLikeRepository.deleteByUserIdAndPostId(userId, postId);
-            }
-            case DISLIKE_TO_LIKE -> {
-                postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
-                postLikeRepository.save(new PostLike(userId, postId, LocalDateTime.now()));
-            }
-            case LIKE_CREATED -> {
-                postLikeRepository.save(new PostLike(userId, postId, LocalDateTime.now()));
-            }
+        ReactionStatus status;
+        if (isLikedBefore) {
+            postLikeRepository.deleteByUserIdAndPostId(userId, postId);
+            status = ReactionStatus.LIKE_DELETED;
+        } else if (isDislikedBefore) {
+            postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
+            postLikeRepository.save(new PostLike(userId, postId, LocalDateTime.now()));
+            status = ReactionStatus.DISLIKE_TO_LIKE;
+        } else {
+            postLikeRepository.save(new PostLike(userId, postId, LocalDateTime.now()));
+            status = ReactionStatus.LIKE_CREATED;
         }
 
-        postRepository.save(post);
+        int likeCount = postLikeRepository.countByPostId(postId);
+        int dislikeCount = postDislikeRepository.countByPostId(postId);
 
-        return new ReactionToggleResponse(result, post.getLikeCount() - post.getDislikeCount(), post.getLikeCount(), post.getDislikeCount());
+        return new ReactionToggleResponse(status, likeCount - dislikeCount, likeCount, dislikeCount);
     }
 
 
-    // 게시글 싫어요
+
     @Transactional
     public ReactionToggleResponse toggleDislike(Integer postId, Integer userId) {
-        Post post = getPost(postId);
-        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
-        boolean isDisliked = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
-        ReactionStatus result = post.toggleDislike(isLiked, isDisliked);
+        boolean isLikedBefore = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean isDislikedBefore = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
 
-        switch (result) {
-            case DISLIKE_DELETED -> {
-                postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
-            }
-            case LIKE_TO_DISLIKE -> {
-                postLikeRepository.deleteByUserIdAndPostId(userId, postId);
-                postDislikeRepository.save(new PostDislike(userId, postId, LocalDateTime.now()));
-            }
-            case DISLIKE_CREATED -> {
-                postDislikeRepository.save(new PostDislike(userId, postId, LocalDateTime.now()));
-            }
+        ReactionStatus status;
+        if (isDislikedBefore) {
+            postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
+            status = ReactionStatus.DISLIKE_DELETED;
+        } else if (isLikedBefore) {
+            postLikeRepository.deleteByUserIdAndPostId(userId, postId);
+            postDislikeRepository.save(new PostDislike(userId, postId, LocalDateTime.now()));
+            status = ReactionStatus.LIKE_TO_DISLIKE;
+        } else {
+            postDislikeRepository.save(new PostDislike(userId, postId, LocalDateTime.now()));
+            status = ReactionStatus.DISLIKE_CREATED;
         }
 
-        postRepository.save(post);
+        int likeCount = postLikeRepository.countByPostId(postId);
+        int dislikeCount = postDislikeRepository.countByPostId(postId);
 
-        return new ReactionToggleResponse(result, post.getLikeCount() - post.getDislikeCount(), post.getLikeCount(), post.getDislikeCount());
+        return new ReactionToggleResponse(status, likeCount - dislikeCount, likeCount, dislikeCount);
     }
+
 
 
     public InteractionStatusResponse getUserInteractionStatus(Integer postId, Integer userId) {

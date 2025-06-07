@@ -39,5 +39,10 @@ public class PostLikeRepositoryImpl implements PostLikeRepository {
                 });
     }
 
+    @Override
+    public int countByPostId(Integer postId) {
+        return postLikeJpaRepository.countByPost_PostId(postId);
+    }
+
 
 }

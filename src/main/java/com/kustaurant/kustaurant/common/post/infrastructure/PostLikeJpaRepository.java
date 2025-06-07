@@ -9,4 +9,5 @@ public interface PostLikeJpaRepository extends JpaRepository<PostLikeEntity,Inte
 
     Boolean existsByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
 
+    int countByPost_PostId(Integer postId);
 }
