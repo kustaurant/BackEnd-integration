@@ -2,12 +2,16 @@ package com.kustaurant.kustaurant.common.post.infrastructure;
 
 import com.kustaurant.kustaurant.common.post.domain.PostPhoto;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
 @Table(name = "post_photoes_tbl")
 public class PostPhotoEntity {
     @Id
@@ -22,17 +26,7 @@ public class PostPhotoEntity {
     private String status;
 
     public PostPhotoEntity() {
-    }
 
-    public PostPhotoEntity(String photoImgUrl, String status) {
-        this.photoImgUrl = photoImgUrl;
-        this.status = status;
-    }
-
-    public PostPhotoEntity(String photoImgUrl, String status, PostEntity post) {
-        this.photoImgUrl = photoImgUrl;
-        this.status = status;
-        this.post = post;
     }
 
     public PostPhoto toDomain() {
@@ -40,6 +34,10 @@ public class PostPhotoEntity {
     }
 
     public static PostPhotoEntity from(PostPhoto postPhoto, PostEntity postEntity) {
-        return new PostPhotoEntity(postPhoto.getPhotoImgUrl(), postPhoto.getStatus(), postEntity);
+        return PostPhotoEntity.builder()
+                .post(postEntity)
+                .photoImgUrl(postPhoto.getPhotoImgUrl())
+                .status(postPhoto.getStatus())
+                .build();
     }
 }

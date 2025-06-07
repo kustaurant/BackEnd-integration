@@ -144,8 +144,6 @@ public class CommunityController {
     public ResponseEntity<ReactionToggleResponse> toggleCommentLike(@PathVariable Integer commentId, Principal principal) {
         Integer userId = Integer.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postCommentService.toggleLike(userId, commentId);
-        log.info("likeCount: {}, dislikeCount: {}, status: {}", reactionToggleResponse.getLikeCount(), reactionToggleResponse.getDislikeCount(), reactionToggleResponse.getStatus());
-
         return ResponseEntity.ok(reactionToggleResponse);
     }
 
@@ -155,8 +153,6 @@ public class CommunityController {
     public ResponseEntity<ReactionToggleResponse> toggleCommentDislike(@PathVariable Integer commentId, Principal principal) {
         Integer userId = Integer.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postCommentService.toggleDislike(userId, commentId);
-        log.info("likeCount: {}, dislikeCount: {}, status: {}, netlikes:{}", reactionToggleResponse.getLikeCount(), reactionToggleResponse.getDislikeCount(), reactionToggleResponse.getStatus(), reactionToggleResponse.getNetLikes());
-
         return ResponseEntity.ok(reactionToggleResponse);
     }
 
@@ -166,7 +162,6 @@ public class CommunityController {
     public String writePost() {
         return "community_write";
     }
-
 
     // 게시글 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")

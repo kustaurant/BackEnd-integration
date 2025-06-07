@@ -94,7 +94,7 @@ public class PostService {
         return this.postRepository.findAll(spec, pageable);
 
     }
-
+    @Transactional
     public Post getPost(Integer id) {
         Optional<Post> post = this.postRepository.findById(id);
         if (post.isPresent()) {
@@ -309,6 +309,7 @@ public class PostService {
         postRepository.save(post);
     }
 
+    @Transactional
     public Post create(String title, String category, String body, Integer userId) {
         Post post = Post.builder().title(title).category(category).body(body).status(ContentStatus.ACTIVE).netLikes(0).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).authorId(userId).build();
         Post savedPost = postRepository.save(post);
