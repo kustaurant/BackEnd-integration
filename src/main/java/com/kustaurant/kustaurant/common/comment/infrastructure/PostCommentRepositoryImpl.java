@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.common.comment.infrastructure;
 
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.service.port.PostCommentRepository;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
         Specification<PostCommentEntity> spec = (root, query, cb) -> {
             Predicate postIdPredicate = cb.equal(root.get("post").get("postId"), postId);
             Predicate parentNull = cb.isNull(root.get("parentComment"));
-            Predicate statusActive = cb.equal(root.get("status"), "ACTIVE");
+            Predicate statusActive = cb.equal(root.get("status"), ContentStatus.ACTIVE);
             return cb.and(postIdPredicate, parentNull, statusActive);
         };
         List<PostCommentEntity> parentComments = postCommentJpaRepository.findAll(spec);
