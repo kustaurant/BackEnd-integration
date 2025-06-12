@@ -1,8 +1,6 @@
-package com.kustaurant.kustaurant.common.user.domain;
+package com.kustaurant.kustaurant.common.user.domain.enums;
 
 import lombok.Getter;
-
-import java.util.Arrays;
 
 @Getter
 public enum UserRole {

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.auth.jwt;
+package com.kustaurant.kustaurant.global.auth.jwt.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.common.user.domain;
 
+import com.kustaurant.kustaurant.common.user.domain.enums.UserRole;
+import com.kustaurant.kustaurant.common.user.domain.enums.UserStatus;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
@@ -13,16 +15,27 @@ public class User {
     private final Integer id;
     private Nickname nickname;
     private PhoneNumber phoneNumber;
-    private final String email;
+    private String email;
     private final UserRole role;
     private final String providerId;
     private final String loginApi;
-    private final String status;
+    private UserStatus status;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     @Builder
-    public User(Integer id, Nickname nickname, PhoneNumber phoneNumber, String email, UserRole role, String providerId, String loginApi, String status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(
+            Integer id,
+            Nickname nickname,
+            PhoneNumber phoneNumber,
+            String email,
+            UserRole role,
+            String providerId,
+            String loginApi,
+            UserStatus status,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
+    ) {
         this.id = id;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
@@ -65,8 +78,26 @@ public class User {
                 .build();
     }
 
-    public boolean isDeleted() {
-        return "DELETED".equalsIgnoreCase(this.status);
+    public void revive(String email, Nickname nickname) {
+        if (this.status != UserStatus.DELETED) return;
+
+        this.status = UserStatus.ACTIVE;
+        this.email = email;
+        this.nickname  = nickname;
+        this.updatedAt = LocalDateTime.now();
     }
 
+    public boolean isDeleted() {
+        return this.status == UserStatus.DELETED;
+    }
+
+    public void delete() {
+        if (this.status == UserStatus.DELETED) {
+            throw new IllegalStateException("이미 탈퇴한 회원입니다.");
+        }
+
+        this.status   = UserStatus.DELETED;
+        this.nickname = new Nickname("(탈퇴한 회원)");
+        this.updatedAt = LocalDateTime.now();
+    }
 }

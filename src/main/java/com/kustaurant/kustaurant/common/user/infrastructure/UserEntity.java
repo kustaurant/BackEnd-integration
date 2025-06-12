@@ -10,9 +10,10 @@ import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.common.restaurant.application.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.common.user.domain.User;
+import com.kustaurant.kustaurant.common.user.domain.enums.UserStatus;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.domain.vo.PhoneNumber;
-import com.kustaurant.kustaurant.common.user.domain.UserRole;
+import com.kustaurant.kustaurant.common.user.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,8 +51,9 @@ public class UserEntity {
     @AttributeOverride(name = "value", column = @Column(name = "nickname", unique = true, nullable = false))
     private Nickname nickname;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private UserStatus status;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -70,9 +72,6 @@ public class UserEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<EvaluationEntity> evaluationList = new ArrayList<>();
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "user")
-//    private List<FeedbackEntity> feedbackList = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
@@ -103,19 +102,25 @@ public class UserEntity {
     private List<RestaurantCommentReport> restaurantCommentReportList = new ArrayList<>();
 
     @Builder
-    public UserEntity(String providerId, String loginApi, String email, PhoneNumber userPhoneNumber, Nickname userNickname, UserRole role, String status, LocalDateTime createdAt) {
+    public UserEntity(
+            String providerId,
+            String loginApi,
+            String email,
+            PhoneNumber phoneNumber,
+            Nickname userNickname,
+            UserRole role,
+            UserStatus status,
+            LocalDateTime createdAt
+    ) {
         this.providerId = providerId;
         this.loginApi = loginApi;
         this.email = email;
-        this.phoneNumber =userPhoneNumber;
+        this.phoneNumber =phoneNumber;
         this.nickname = userNickname;
         this.role = role;
         this.status = status;
         this.createdAt = createdAt;
-
-
     }
-
 
     public UserEntity updateUserEmail(String userEmail) {
         this.email = userEmail;
@@ -141,18 +146,15 @@ public class UserEntity {
     }
 
     public static UserEntity from(User user) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.userId =user.getId();
-        userEntity.nickname=user.getNickname();
-        userEntity.email =user.getEmail();
-        userEntity.phoneNumber=user.getPhoneNumber();
-        userEntity.role =user.getRole();
-        userEntity.providerId=user.getProviderId();
-        userEntity.loginApi=user.getLoginApi();
-        userEntity.status=user.getStatus();
-        userEntity.createdAt=user.getCreatedAt();
-
-        return userEntity;
+        return UserEntity.builder()
+                .providerId(user.getProviderId())
+                .loginApi(user.getLoginApi())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .role(user.getRole())
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 
     public User toModel(){

@@ -71,7 +71,16 @@ public class JwtUtil {
         return Integer.parseInt(claims.getSubject());
     }
 
-    /** ---------- 토큰 파싱/검증 ---------- */
+    public boolean isValid(String token) {
+        try {
+            // 내부에서 서명 + 만료일 + 헤더/클레임 형식 전부 체크
+            parseAndValidate(token.trim());
+            return true;
+        } catch (JwtException e) { // ExpiredJwtException 포함
+            return false;
+        }
+    }
+
     public Claims parseAndValidate(String token) throws JwtException {
         try {
             return Jwts.parser()
@@ -82,16 +91,6 @@ public class JwtUtil {
             //서로다른 jwt라이브러리로 별도의 예외처리 해줘서 응답상태 통일해야함
         } catch (io.jsonwebtoken.JwtException e) {
             throw new AccessTokenInvalidException(e);
-        }
-    }
-
-    public boolean isValid(String token) {
-        try {
-            // 내부에서 서명 + 만료일 + 헤더/클레임 형식 전부 체크
-            parseAndValidate(token.trim());
-            return true;
-        } catch (JwtException e) { // ExpiredJwtException 포함
-            return false;
         }
     }
 

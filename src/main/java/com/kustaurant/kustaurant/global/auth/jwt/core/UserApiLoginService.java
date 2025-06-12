@@ -2,14 +2,19 @@ package com.kustaurant.kustaurant.global.auth.jwt.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.kustaurant.kustaurant.common.user.domain.User;
+import com.kustaurant.kustaurant.common.user.domain.enums.UserStatus;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtProperties;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
-import com.kustaurant.kustaurant.global.auth.jwt.TokenResponse;
+import com.kustaurant.kustaurant.global.auth.jwt.response.TokenResponse;
 import com.kustaurant.kustaurant.global.auth.jwt.apple.AppleApiService;
+import com.kustaurant.kustaurant.global.auth.jwt.apple.AppleLoginRequest;
 import com.kustaurant.kustaurant.global.auth.jwt.naver.NaverApiService;
-import com.kustaurant.kustaurant.common.user.domain.UserRole;
+import com.kustaurant.kustaurant.common.user.domain.enums.UserRole;
+import com.kustaurant.kustaurant.global.auth.jwt.naver.NaverLoginRequest;
+import com.kustaurant.kustaurant.global.exception.exception.auth.RefreshTokenInvalidException;
+import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +38,12 @@ public class UserApiLoginService {
 
     //1
     //네이버 로그인 처리
-    public TokenResponse processNaverLogin(String provider, String providerId, String naverAccessToken) {
-        // 네이버 API를 통해 사용자 정보 가져오기
+    public TokenResponse processNaverLogin(NaverLoginRequest req) {
+        String provider = req.provider();
+        String providerId = req.providerId();
+        String naverAccessToken = req.naverAccessToken();
+
+        /* 1) 네이버 API를 통해 사용자 정보 가져오기 */
         JsonNode userInfo = naverApiService.getUserInfo(naverAccessToken);
         String userEmail = userInfo.path("email").asText();
 
@@ -51,11 +60,13 @@ public class UserApiLoginService {
         return new TokenResponse(access, refresh);
     }
 
-
-
     //2
     // 애플 로그인 처리
-    public TokenResponse processAppleLogin(String provider, String identityToken, String authorizationCode) {
+    public TokenResponse processAppleLogin(AppleLoginRequest req) {
+        String provider = req.provider();
+        String identityToken = req.identityToken();
+        String authorizationCode = req.authorizationCode();
+
         // identityToken 검증 및 사용자 정보 가져오기
         Claims claims = appleApiService.verifyAppleIdentityToken(identityToken);
         String appleId = claims.getSubject(); // `sub` claim이 사용자 ID
@@ -77,7 +88,8 @@ public class UserApiLoginService {
     public String refreshAccessToken(String refreshToken) {
         JwtUtil.ParsedToken tk= jwtUtil.parse(refreshToken);
         String stored = refreshStore.get(tk.userId());
-        if(!refreshToken.equals(stored)) throw new IllegalArgumentException("[refresh토큰 불일치]");
+
+        if(!refreshToken.equals(stored)) throw new RefreshTokenInvalidException();
 
         return jwtUtil.generateAccessToken(tk.userId(), tk.role());
     }
@@ -91,23 +103,14 @@ public class UserApiLoginService {
     //5
     //회원탈퇴 처리
     @Transactional
-    public boolean deleteUserById(Integer userId) {
-        return userRepository.findById(userId)
-                .map(u -> {
-                    User deleted = User.builder()
-                            .id(u.getId())
-                            .providerId(u.getProviderId())
-                            .loginApi(u.getLoginApi())
-                            .role(u.getRole())
-                            .status("DELETED")
-                            .nickname(new Nickname("(탈퇴한 회원)"))
-                            .createdAt(u.getCreatedAt())
-                            .build();
-                    userRepository.save(deleted);
-                    refreshStore.delete(userId);
-                    return true;
-                })
-                .orElse(false);
+    public void deleteUserById(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        user.delete();
+        refreshStore.delete(userId);
+
+        log.info("[User 회원탈퇴] id={}", userId);
     }
 
     //6
@@ -129,42 +132,18 @@ public class UserApiLoginService {
 
     /** 탈퇴 회원을 재활성화 for Naver */
     private User rejoinIfDeleted(User user, String email) {
-        if (!user.isDeleted()) {
-            return user;
+        if (user.isDeleted()) {
+            user.revive(email, Nickname.fromEmail(email));
         }
-
-        User revived = User.builder()
-                .id(user.getId()) // 기존 PK 유지
-                .providerId(user.getProviderId())
-                .loginApi(user.getLoginApi())
-                .role(user.getRole())
-                .email(email)
-                .nickname(Nickname.fromEmail(email))   // email → 닉네임
-                .status("ACTIVE")
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        return userRepository.save(revived);
+        return user;
     }
 
     /** 탈퇴 회원을 재활성화 for Apple */
     private User rejoinIfDeleted(User user) {
-        if (!user.isDeleted()) {
-            return user;
+        if (user.isDeleted()) {
+            user.revive(null, new Nickname(nextAppleNickname()));
         }
-
-        User revived = User.builder()
-                .id(user.getId()) // 기존 PK 유지
-                .providerId(user.getProviderId())
-                .loginApi(user.getLoginApi())
-                .role(user.getRole())
-                .email(null)
-                .nickname(new Nickname(nextAppleNickname()))
-                .status("ACTIVE")
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        return userRepository.save(revived);
+        return user;
     }
 
     /** 신규 회원 생성 for NAVER*/
@@ -175,7 +154,7 @@ public class UserApiLoginService {
                 .email(email)
                 .nickname(Nickname.fromEmail(email))
                 .role(UserRole.USER)
-                .status("ACTIVE")
+                .status(UserStatus.ACTIVE)
                 .createdAt(LocalDateTime.now())
                 .build();
         return userRepository.save(newUser);
@@ -188,7 +167,7 @@ public class UserApiLoginService {
                 .loginApi(provider)
                 .nickname(new Nickname(nextAppleNickname()))
                 .role(UserRole.USER)
-                .status("ACTIVE")
+                .status(UserStatus.ACTIVE)
                 .createdAt(LocalDateTime.now())
                 .build();
         return userRepository.save(newUser);

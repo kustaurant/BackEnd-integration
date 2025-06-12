@@ -1,5 +1,6 @@
-package com.kustaurant.kustaurant.global.exception;
+package com.kustaurant.kustaurant.global.exception.exception.business;
 
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter

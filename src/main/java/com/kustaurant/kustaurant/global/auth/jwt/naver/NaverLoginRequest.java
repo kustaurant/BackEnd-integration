@@ -1,12 +1,12 @@
 package com.kustaurant.kustaurant.global.auth.jwt.naver;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
 
-@Getter
-@Setter
-public class NaverLoginRequest {
-    private String provider;
-    private String providerId;
-    private String naverAccessToken;
-}
+public record NaverLoginRequest (
+    @NotBlank
+    String provider,
+    @NotBlank
+    String providerId,
+    @NotBlank
+    String naverAccessToken
+){}

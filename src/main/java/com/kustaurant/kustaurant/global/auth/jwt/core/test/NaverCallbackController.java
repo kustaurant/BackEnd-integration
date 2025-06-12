@@ -1,7 +1,8 @@
-package com.kustaurant.kustaurant.global.auth.jwt.core;
+package com.kustaurant.kustaurant.global.auth.jwt.core.test;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,9 +14,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+@Profile("local")
 @RestController
 @RequiredArgsConstructor
 public class NaverCallbackController {
+
+    /** 로컬에서 테스트하는용 컨트롤러 입니다 */
+
     @Value("${naver.client-id}")
     private String clientId;
 
