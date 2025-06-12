@@ -6,7 +6,7 @@ import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.web.comment.PostCommentService;
+import com.kustaurant.kustaurant.common.comment.controller.web.PostCommentService;
 import com.kustaurant.kustaurant.web.post.service.PostScrapService;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import com.kustaurant.kustaurant.common.post.service.StorageService;

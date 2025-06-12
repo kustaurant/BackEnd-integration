@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin;
+package com.kustaurant.kustaurant.common.admin;
 
 import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantApiService;
 import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;

@@ -1,4 +1,4 @@
-    package com.kustaurant.kustaurant.web.evaluation.controller;
+    package com.kustaurant.kustaurant.common.evaluation.controller.web;
 
     import com.google.gson.Gson;
     import com.google.gson.reflect.TypeToken;

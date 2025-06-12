@@ -1,15 +1,19 @@
 package com.kustaurant.kustaurant.global.config.security;
 
+import com.kustaurant.kustaurant.global.auth.jwt.CustomAccessDeniedHandler;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtAuthFilter;
+import com.kustaurant.kustaurant.global.auth.jwt.JwtAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -19,34 +23,65 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityApiConfig {
 
-    private final JwtAuthFilter jwtAuthFilter;
+    private final JwtAuthFilter jwtAuthFilter;                     // JWT 검증 필터
+    private final JwtAuthenticationEntryPoint entryPoint;          // 401 JSON
+    private final CustomAccessDeniedHandler accessDeniedHandler;   // 403 JSON
 
     @Bean(name = "filterChainApi")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/api/v*/**")
-                .httpBasic(AbstractHttpConfigurer::disable) // HTTP 기본 인증 비활성화
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 활성화
-                .csrf(AbstractHttpConfigurer::disable) // CSRF 보호 기능 비활성화
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션관리 정책을 STATELESS 로 설정
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v*/auth/**").authenticated() // /api/vX/auth/** 경로는 인증 요구
-                        .anyRequest().permitAll()) // 그 외의 모든 요청은 인증 없이 허용
-                .addFilterBefore(jwtAuthFilter, SecurityContextPersistenceFilter.class); // JWT 인증 필터 추가
 
-        return http.build();
+        return http
+                /* 이 체인은 아래 경로만 적용 */
+            .securityMatcher("/api/v*/**")
+
+                /* 기본 설정 */
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                /* 2) 인증/권한 실패 → JSON 응답 */
+                .exceptionHandling(c -> c
+                        .authenticationEntryPoint(entryPoint)      // 401
+                        .accessDeniedHandler(accessDeniedHandler)) // 403
+
+                /* 3) URL별 권한 */
+                .authorizeHttpRequests(c -> c
+                        .requestMatchers("/api/v*/auth/**").authenticated()
+                        .anyRequest().permitAll())
+
+                /* 4) JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 삽입 */
+                .addFilterBefore(jwtAuthFilter, AuthorizationFilter.class)
+
+                .build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*"); // 모든 도메인 허용
-        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
-        configuration.addAllowedHeader("*"); // 모든 헤더 허용
-        configuration.setAllowCredentials(true); // 자격 증명 허용
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+    /** local(dev) */
+    @Bean(name = "corsConfigurationSource") @Profile("local")
+    public CorsConfigurationSource corsLocal() {
+        CorsConfiguration c = new CorsConfiguration();
+        c.addAllowedOriginPattern("*");
+        c.addAllowedMethod(CorsConfiguration.ALL);
+        c.addAllowedHeader(CorsConfiguration.ALL);
+        c.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource s = new UrlBasedCorsConfigurationSource();
+        s.registerCorsConfiguration("/**", c);
+        return s;
+    }
+
+    /** prod */
+    @Bean(name = "corsConfigurationSource") @Profile("prod")
+    public CorsConfigurationSource corsProd() {
+        CorsConfiguration c = new CorsConfiguration();
+        c.addAllowedOrigin("https://kustaurant.com");
+        c.addAllowedMethod(CorsConfiguration.ALL);
+        c.addAllowedHeader(CorsConfiguration.ALL);
+        c.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource s = new UrlBasedCorsConfigurationSource();
+        s.registerCorsConfiguration("/**", c);
+        return s;
     }
 }

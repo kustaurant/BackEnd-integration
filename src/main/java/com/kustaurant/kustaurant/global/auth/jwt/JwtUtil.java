@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.global.auth.jwt;
 
+import com.kustaurant.kustaurant.global.exception.exception.auth.AccessTokenInvalidException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -51,6 +52,7 @@ public class JwtUtil {
                 .claims( Jwts.claims()
                         .subject(String.valueOf(userId))
                         .add("role",role)
+                        .add("tokenType", ttl == jwtProperties.getAccessTtl() ? "AT" : "RT")
                         .build() )
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
@@ -71,11 +73,16 @@ public class JwtUtil {
 
     /** ---------- 토큰 파싱/검증 ---------- */
     public Claims parseAndValidate(String token) throws JwtException {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token.trim())
-                .getPayload();  // 유효하면 Claims 리턴, 아니면 예외
+        try {
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token.trim())
+                    .getPayload();
+            //서로다른 jwt라이브러리로 별도의 예외처리 해줘서 응답상태 통일해야함
+        } catch (io.jsonwebtoken.JwtException e) {
+            throw new AccessTokenInvalidException(e);
+        }
     }
 
     public boolean isValid(String token) {
@@ -88,10 +95,11 @@ public class JwtUtil {
         }
     }
 
-    public record ParsedToken(Integer userId, String role) {}
+    public record ParsedToken(Integer userId, String role, String tokenType) {}
     public ParsedToken parse(String token) {
         Claims c = parseAndValidate(token);
         return new ParsedToken(Integer.valueOf(c.getSubject()),
-                (String) c.get("role"));
+                (String) c.get("role"),
+                (String) c.get("tokenType"));
     }
 }

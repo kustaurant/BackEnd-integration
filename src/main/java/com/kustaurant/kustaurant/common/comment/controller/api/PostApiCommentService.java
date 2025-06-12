@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.api.comment;
+package com.kustaurant.kustaurant.common.comment.controller.api;
 
 
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
@@ -14,7 +14,7 @@ import com.kustaurant.kustaurant.common.post.domain.PostDTO;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.enums.PostStatus;
-import com.kustaurant.kustaurant.web.comment.PostCommentService;
+import com.kustaurant.kustaurant.common.comment.controller.web.PostCommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -2,6 +2,8 @@ package com.kustaurant.kustaurant.common.user.controller.api;
 
 import com.kustaurant.kustaurant.common.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.common.user.controller.api.response.*;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtToken;
 import com.kustaurant.kustaurant.common.user.service.MypageApiService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,16 +62,16 @@ public class MypageApiController {
     @GetMapping("/auth/mypage")
     public ResponseEntity<MypageMainDTO> getMypageView2(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
-            @Parameter(hidden = true) @JwtToken Integer userId
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
         MypageMainDTO mypageMainDTO;
 
-        if (userId == null) {
+        if (user.id() == null) {
             // 로그인하지 않은 사용자일 경우, 빈 객체 반환
             mypageMainDTO = new MypageMainDTO(); // 기본 생성자를 통해 빈 객체 생성
         } else {
             // 로그인한 사용자의 마이페이지 정보 로드
-            mypageMainDTO = mypageApiService.getMypageInfo(userId, userAgent);
+            mypageMainDTO = mypageApiService.getMypageInfo(user.id(), userAgent);
         }
 
         return new ResponseEntity<>(mypageMainDTO, HttpStatus.OK);

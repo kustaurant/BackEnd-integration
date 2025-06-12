@@ -14,7 +14,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.ServerException;
 import com.kustaurant.kustaurant.common.post.enums.PostCategory;
-import com.kustaurant.kustaurant.api.comment.PostApiCommentService;
+import com.kustaurant.kustaurant.common.comment.controller.api.PostApiCommentService;
 import com.kustaurant.kustaurant.api.post.service.PostScrapApiService;
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.api.post.service.StorageApiService;

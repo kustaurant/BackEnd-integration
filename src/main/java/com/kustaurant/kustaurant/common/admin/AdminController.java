@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin;
+package com.kustaurant.kustaurant.common.admin;
 
 import com.kustaurant.kustaurant.common.restaurant.presentation.enums.CuisineEnum;
 import com.kustaurant.kustaurant.common.restaurant.presentation.enums.LocationEnum;

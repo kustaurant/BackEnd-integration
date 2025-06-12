@@ -1,9 +1,8 @@
 package com.kustaurant.kustaurant.global.auth.argumentResolver;
 
-import com.kustaurant.kustaurant.common.user.controller.port.UserService;
 import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2User;
 import com.kustaurant.kustaurant.common.user.domain.UserRole;
-import com.kustaurant.kustaurant.global.exception.exception.UnauthenticatedException;
+import com.kustaurant.kustaurant.global.exception.exception.auth.UnauthenticatedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
@@ -34,7 +33,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
         /* ---------- 세션(Web) + JWT(App) 공통 처리 ---------- */
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
-            throw new UnauthenticatedException("로그인이 필요합니다.");
+            throw new UnauthenticatedException("SecurityContext 인증 객체가 없거나 비활성화됨");
         }
 
         /* ───────────── principal → userId 추출 ───────────── */
@@ -44,7 +43,8 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
         } else if (auth.getPrincipal() instanceof Integer uid) {                // 앱 JWT
             userId = uid;
         } else {
-            throw new UnauthenticatedException("지원하지 않는 principal 타입");
+            throw new UnauthenticatedException(
+                    "지원하지 않는 principal 타입: " + auth.getPrincipal().getClass().getName());
         }
 
         /* ───────────── 권한(ROLE) 추출 및 매핑 ───────────── */

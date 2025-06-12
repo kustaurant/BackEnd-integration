@@ -1,5 +1,9 @@
 package com.kustaurant.kustaurant.global.auth.jwt;
 
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
+import com.kustaurant.kustaurant.global.exception.exception.auth.AccessTokenExpiredException;
+import com.kustaurant.kustaurant.global.exception.exception.auth.AccessTokenInvalidException;
+import com.kustaurant.kustaurant.global.exception.exception.auth.JwtAuthException;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -37,6 +41,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token)) {
             try {
                 JwtUtil.ParsedToken tk = jwtUtil.parse(token);
+
+                if (!"AT".equals(tk.tokenType())) {
+                    throw new AccessTokenInvalidException();
+                }
                 //권한 세팅
                 Authentication auth = new UsernamePasswordAuthenticationToken(
                         tk.userId(),
@@ -45,11 +53,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
             } catch (ExpiredJwtException e) {
-                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 만료");
-                return;
+                throw new AccessTokenExpiredException();
             } catch (JwtException e) {
-                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT 오류");
-                return;
+                throw new AccessTokenInvalidException();
             }
         }
         chain.doFilter(req, res);

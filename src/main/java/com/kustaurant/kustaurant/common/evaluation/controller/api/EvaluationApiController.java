@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.api.evaluation;
+package com.kustaurant.kustaurant.common.evaluation.controller.api;
 
 import com.kustaurant.kustaurant.common.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.common.evaluation.constants.EvaluationConstants;

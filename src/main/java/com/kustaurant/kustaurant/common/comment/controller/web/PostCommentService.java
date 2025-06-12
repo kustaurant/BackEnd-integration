@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.web.comment;
+package com.kustaurant.kustaurant.common.comment.controller.web;
 
 import com.kustaurant.kustaurant.common.comment.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.domain.InteractionStatusResponse;

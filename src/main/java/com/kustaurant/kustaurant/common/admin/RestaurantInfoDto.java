@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin;
+package com.kustaurant.kustaurant.common.admin;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
