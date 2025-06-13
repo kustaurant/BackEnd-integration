@@ -105,7 +105,7 @@ public class UserApiLoginController {
 
 
     //5
-    @Operation(summary = "로그아웃", description = "서버측 Refresh 제거 (Access 는 클라이언트가 폐기)")
+    @Operation(summary = "로그아웃", description = "서버측 Refresh 제거")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "로그아웃 성공")
     })

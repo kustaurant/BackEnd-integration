@@ -1,21 +1,20 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
-import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
-import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentApiRepository;
-import com.kustaurant.kustaurant.common.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.common.post.domain.Post;
-import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.common.post.infrastructure.*;
-import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.comment.infrastructure.PostCommentApiRepository;
+import com.kustaurant.kustaurant.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.post.domain.Post;
+import com.kustaurant.kustaurant.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.post.infrastructure.*;
+import com.kustaurant.kustaurant.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.user.domain.User;
+import com.kustaurant.kustaurant.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
-import com.kustaurant.kustaurant.common.post.domain.PostUpdateDTO;
-import com.kustaurant.kustaurant.common.post.domain.UserDTO;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.domain.PostDTO;
-import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.post.domain.PostUpdateDTO;
+import com.kustaurant.kustaurant.post.domain.UserDTO;
+import com.kustaurant.kustaurant.post.domain.PostDTO;
+import com.kustaurant.kustaurant.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.global.config;
 
-import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.CuisineListArgumentResolver;
-import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.LocationListArgumentResolver;
-import com.kustaurant.kustaurant.common.restaurant.presentation.argument_resolver.SituationListArgumentResolver;
+import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.CuisineListArgumentResolver;
+import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.LocationListArgumentResolver;
+import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.SituationListArgumentResolver;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserArgumentResolver;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtTokenArgumentResolver;
 import com.kustaurant.kustaurant.global.auth.session.MyInterceptor;

@@ -1,11 +1,12 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
-import com.kustaurant.kustaurant.common.post.infrastructure.*;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
+import com.kustaurant.kustaurant.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.post.infrastructure.PostScrapApiRepository;
+import com.kustaurant.kustaurant.post.infrastructure.PostScrapEntity;
+import com.kustaurant.kustaurant.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.infrastructure.OUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

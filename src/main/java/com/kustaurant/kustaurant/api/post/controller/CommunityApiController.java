@@ -1,23 +1,22 @@
 package com.kustaurant.kustaurant.api.post.controller;
 
 
-import com.kustaurant.kustaurant.common.comment.dto.CommentLikeDislikeDTO;
-import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
-import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
-import com.kustaurant.kustaurant.common.post.domain.*;
-import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
-import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.common.user.controller.port.UserService;
-import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.comment.dto.CommentLikeDislikeDTO;
+import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.comment.dto.PostCommentDTO;
+import com.kustaurant.kustaurant.post.domain.*;
+import com.kustaurant.kustaurant.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.user.controller.port.UserService;
+import com.kustaurant.kustaurant.user.domain.User;
+import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtToken;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.ServerException;
-import com.kustaurant.kustaurant.common.post.enums.PostCategory;
-import com.kustaurant.kustaurant.common.comment.controller.api.PostApiCommentService;
+import com.kustaurant.kustaurant.post.enums.PostCategory;
+import com.kustaurant.kustaurant.comment.controller.api.PostApiCommentService;
 import com.kustaurant.kustaurant.api.post.service.PostScrapApiService;
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.api.post.service.StorageApiService;
@@ -39,7 +38,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController

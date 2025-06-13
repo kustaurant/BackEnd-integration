@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.global.auth.argumentResolver;
 
 import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2User;
-import com.kustaurant.kustaurant.common.user.domain.enums.UserRole;
+import com.kustaurant.kustaurant.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.global.exception.exception.auth.UnauthenticatedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;

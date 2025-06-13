@@ -76,7 +76,7 @@ public class JwtUtil {
             // 내부에서 서명 + 만료일 + 헤더/클레임 형식 전부 체크
             parseAndValidate(token.trim());
             return true;
-        } catch (JwtException e) { // ExpiredJwtException 포함
+        } catch (JwtException | AccessTokenInvalidException e) {
             return false;
         }
     }

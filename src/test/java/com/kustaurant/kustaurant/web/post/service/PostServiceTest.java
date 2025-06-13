@@ -1,21 +1,18 @@
 package com.kustaurant.kustaurant.web.post.service;
 
-import com.kustaurant.kustaurant.common.post.domain.ImageExtractor;
-import com.kustaurant.kustaurant.common.post.domain.Post;
-import com.kustaurant.kustaurant.common.post.domain.PostPhoto;
-import com.kustaurant.kustaurant.common.post.domain.ReactionToggleResponse;
-import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.common.post.service.port.*;
-import com.kustaurant.kustaurant.common.user.controller.port.UserService;
-import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.post.domain.ImageExtractor;
+import com.kustaurant.kustaurant.post.domain.Post;
+import com.kustaurant.kustaurant.post.domain.PostPhoto;
+import com.kustaurant.kustaurant.post.domain.ReactionToggleResponse;
+import com.kustaurant.kustaurant.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.post.service.port.*;
+import com.kustaurant.kustaurant.user.controller.port.UserService;
+import com.kustaurant.kustaurant.user.domain.User;
+import com.kustaurant.kustaurant.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.mock.FakePostRepository;
-import com.kustaurant.kustaurant.mock.FakeUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.security.core.parameters.P;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

@@ -1,9 +1,9 @@
 package com.kustaurant.kustaurant.mock;
 
-import com.kustaurant.kustaurant.common.restaurant.domain.RestaurantFavorite;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
-import com.kustaurant.kustaurant.common.restaurant.application.service.command.port.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
+import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
+import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 
 import java.util.ArrayList;

@@ -1,9 +1,9 @@
 package com.kustaurant.kustaurant.global.auth.session;
 
-import com.kustaurant.kustaurant.common.user.domain.enums.UserRole;
-import com.kustaurant.kustaurant.common.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.domain.enums.UserRole;
+import com.kustaurant.kustaurant.user.domain.enums.UserStatus;
+import com.kustaurant.kustaurant.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
 import org.thymeleaf.util.StringUtils;

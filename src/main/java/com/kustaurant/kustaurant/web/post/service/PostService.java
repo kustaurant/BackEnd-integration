@@ -1,15 +1,15 @@
 package com.kustaurant.kustaurant.web.post.service;
 
-import com.kustaurant.kustaurant.common.comment.domain.PostComment;
-import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
-import com.kustaurant.kustaurant.common.post.domain.*;
-import com.kustaurant.kustaurant.common.post.enums.*;
-import com.kustaurant.kustaurant.common.post.infrastructure.*;
-import com.kustaurant.kustaurant.common.post.service.port.*;
-import com.kustaurant.kustaurant.common.user.controller.port.UserService;
-import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.comment.domain.PostComment;
+import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.post.domain.*;
+import com.kustaurant.kustaurant.post.enums.*;
+import com.kustaurant.kustaurant.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.post.service.port.*;
+import com.kustaurant.kustaurant.user.controller.port.UserService;
+import com.kustaurant.kustaurant.user.domain.User;
+import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;

@@ -1,15 +1,17 @@
 package com.kustaurant.kustaurant.web.comment;
 
-import com.kustaurant.kustaurant.common.comment.domain.PostComment;
-import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentDislikeJpaRepository;
-import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentLikeJpaRepository;
-import com.kustaurant.kustaurant.common.comment.service.port.PostCommentDislikeRepository;
-import com.kustaurant.kustaurant.common.comment.service.port.PostCommentLikeRepository;
-import com.kustaurant.kustaurant.common.comment.service.port.PostCommentRepository;
-import com.kustaurant.kustaurant.common.post.domain.*;
-import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.common.user.controller.port.UserService;
-import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.comment.controller.web.PostCommentService;
+import com.kustaurant.kustaurant.comment.domain.PostComment;
+import com.kustaurant.kustaurant.comment.infrastructure.PostCommentDislikeJpaRepository;
+import com.kustaurant.kustaurant.comment.infrastructure.PostCommentLikeJpaRepository;
+import com.kustaurant.kustaurant.comment.service.port.PostCommentDislikeRepository;
+import com.kustaurant.kustaurant.comment.service.port.PostCommentLikeRepository;
+import com.kustaurant.kustaurant.comment.service.port.PostCommentRepository;
+import com.kustaurant.kustaurant.post.domain.Post;
+import com.kustaurant.kustaurant.post.domain.ReactionToggleResponse;
+import com.kustaurant.kustaurant.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.user.controller.port.UserService;
+import com.kustaurant.kustaurant.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
