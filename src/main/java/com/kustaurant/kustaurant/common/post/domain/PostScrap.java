@@ -2,25 +2,27 @@ package com.kustaurant.kustaurant.common.post.domain;
 
 import com.kustaurant.kustaurant.common.post.infrastructure.PostScrapEntity;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
+@Builder
 public class PostScrap {
-    private final Integer scrapId;
-    private final Integer userId;
-    private final Post post;
+    private Integer scrapId;
+    private Integer userId;
+    private Integer postId;
     private final LocalDateTime createdAt;
 
     public static PostScrap from(PostScrapEntity entity) {
-        return new PostScrap(
-                entity.getScrapId(),
-                entity.getUser().getUserId(),
-                entity.getPost().toDomain(),
-                entity.getCreatedAt()
-        );
+        return PostScrap.builder()
+                .scrapId(entity.getScrapId())
+                .userId(entity.getUser().getUserId())
+                .postId(entity.getPost().getPostId())
+                .createdAt(entity.getCreatedAt())
+                .build();
     }
 
 }

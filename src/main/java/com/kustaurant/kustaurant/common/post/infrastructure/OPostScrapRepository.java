@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
-import com.kustaurant.kustaurant.common.post.domain.PostScrap;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,5 +14,5 @@ public interface OPostScrapRepository extends JpaRepository<PostScrapEntity, Int
     @Query("SELECT ps FROM PostScrapEntity ps WHERE ps.user.userId = :userId AND ps.post.status = 'ACTIVE'")
     List<PostScrapEntity> findActiveScrappedPostsByUserId(@Param("userId") Integer userId);
 
-    boolean existsByPostAndUser(PostEntity post, UserEntity user);
+    boolean existsByUserAndPost(UserEntity user, PostEntity post);
 }

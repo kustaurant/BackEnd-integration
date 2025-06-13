@@ -1,7 +1,9 @@
 package com.kustaurant.kustaurant.common.post.infrastructure;
 
+import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
-import com.kustaurant.kustaurant.common.post.domain.Post;
+import com.kustaurant.kustaurant.common.post.domain.*;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -28,12 +30,15 @@ public class PostEntity {
 
     private String postTitle;
     private String postBody;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(20)")
+    private ContentStatus status;
+
     private String postCategory;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Integer postVisitCount = 0;
-    private Integer likeCount = 0;
+    private Integer netLikes = 0;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -46,7 +51,7 @@ public class PostEntity {
     private List<PostScrapEntity> postScrapList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    private List<PostPhoto> postPhotoList = new ArrayList<>();
+    private List<PostPhotoEntity> postPhotoEntityList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
     private List<PostLikeEntity> postLikesList = new ArrayList<>();
@@ -54,7 +59,7 @@ public class PostEntity {
     @OneToMany(mappedBy = "post")
     private List<PostDislikeEntity> postDislikesList = new ArrayList<>();
 
-    public PostEntity(String postTitle, String postBody, String postCategory, String status, LocalDateTime createdAt, UserEntity user) {
+    public PostEntity(String postTitle, String postBody, String postCategory, ContentStatus status, LocalDateTime createdAt, UserEntity user) {
         this.postTitle = postTitle;
         this.postBody = postBody;
         this.postCategory = postCategory;
@@ -68,21 +73,75 @@ public class PostEntity {
     }
 
     public Post toDomain() {
-        return new Post(
-                postId, postTitle, postBody, postCategory, status,
-                createdAt, updatedAt, postVisitCount, likeCount,
-                user.getUserId()
+        return Post.builder()
+                .id(postId)
+                .title(postTitle)
+                .body(postBody)
+                .category(postCategory)
+                .status(status)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .visitCount(postVisitCount)
+                .netLikes(netLikes)
+                .likeCount(postLikesList.size())
+                .dislikeCount(postDislikesList.size())
+                .authorId(user.getUserId())
+                .photos(postPhotoEntityList.stream()
+                        .map(PostPhotoEntity::toDomain)
+                        .toList())
+                .comments(postCommentList.stream().map(PostCommentEntity::toDomain).toList())
+                .scraps(postScrapList.stream().map(PostScrapEntity::toDomain).toList())
+                .build();
+    }
+
+    public Post toDomain(boolean includeComments, boolean includePhotos, boolean includeScraps, boolean includeLikes, boolean includeDislikes) {
+        Post.PostBuilder postBuilder = Post.builder()
+                .id(postId)
+                .title(postTitle)
+                .body(postBody)
+                .category(postCategory)
+                .status(status)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .visitCount(postVisitCount)
+                .netLikes(netLikes)
+                .authorId(user.getUserId());
+
+        if (includeComments) {
+            List<PostComment> comments = postCommentList.stream()
+                    .map(PostCommentEntity::toDomain)
+                    .toList();
+            postBuilder.comments(comments);
+        }
+
+        if (includePhotos) {
+            List<PostPhoto> photos = postPhotoEntityList.stream()
+                    .map(PostPhotoEntity::toDomain)
+                    .toList();
+            postBuilder.photos(photos);
+        }
+
+        if (includeScraps) {
+            List<PostScrap> scraps = postScrapList.stream()
+                    .map(PostScrapEntity::toDomain)
+                    .toList();
+            postBuilder.scraps(scraps);
+        }
+
+
+        return postBuilder.build();
+    }
+
+
+    public static PostEntity from(Post post, UserEntity userEntity) {
+        return new PostEntity(
+                post.getTitle(),
+                post.getBody(),
+                post.getCategory(),
+                post.getStatus(),
+                post.getCreatedAt(),
+                userEntity
         );
     }
 
-    public static PostEntity fromDomain(Post post, UserEntity user) {
-        return new PostEntity(
-                post.getPostTitle(),
-                post.getPostBody(),
-                post.getPostCategory(),
-                post.getStatus(),
-                post.getCreatedAt(),
-                user
-        );
-    }
 }

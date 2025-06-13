@@ -1,227 +1,157 @@
 document.addEventListener('DOMContentLoaded', function () {
-
+    // CSRF 토큰 가져오기
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
     // 댓글 입력 창 focus 시 로그인 상태 확인
-    document.querySelector(".comment-content").addEventListener("focus",
-        function () {
-            fetch("/api/login/comment-write", {
-                method: 'GET'
+    document.querySelector(".comment-content").addEventListener("focus", function () {
+        fetch("/api/login/comment-write", { method: 'GET' })
+            .then(response => {
+                if (response.ok && response.redirected) {
+                    window.location.href = "/user/login";
+                    return;
+                }
+                return response.json();
             })
+            .catch(error => console.error('Error:', error));
+    });
+
+    // === ENUM to 이미지 매핑 ===
+    const likeStatusImg = {
+        LIKE_CREATED: { like: '/img/community/up-green.png', dislike: '/img/community/down.png' },
+        LIKE_DELETED: { like: '/img/community/up.png', dislike: '/img/community/down.png' },
+        DISLIKE_TO_LIKE: { like: '/img/community/up-green.png', dislike: '/img/community/down.png' },
+        DISLIKE_CREATED: { like: '/img/community/up.png', dislike: '/img/community/down-red.png' },
+        DISLIKE_DELETED: { like: '/img/community/up.png', dislike: '/img/community/down.png' },
+        LIKE_TO_DISLIKE: { like: '/img/community/up.png', dislike: '/img/community/down-red.png' },
+    };
+
+    // 게시글 좋아요
+    document.getElementById("likeButton").addEventListener('click', function () {
+        var postId = this.dataset.postId;
+        fetch("/api/post/like?postId=" + postId, { method: 'GET' })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = "/user/login";
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 숫자 업데이트
+                document.querySelector("#likeButton > span").textContent = data.likeCount;
+                document.querySelector("#dislikeButton > span").textContent = data.dislikeCount === 0 ? 0 : "-" + data.dislikeCount;
+                document.querySelector("#postRecommendCount").textContent = "추천 " + (data.likeCount - data.dislikeCount);
+
+                // 이미지 처리 (enum status 기반)
+                const likeButtonImage = document.querySelector('#likeButton img');
+                const dislikeButtonImage = document.querySelector('#dislikeButton img');
+                if (likeStatusImg[data.status]) {
+                    likeButtonImage.src = likeStatusImg[data.status].like;
+                    dislikeButtonImage.src = likeStatusImg[data.status].dislike;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    // 게시글 싫어요
+    document.getElementById("dislikeButton").addEventListener('click', function (event) {
+        event.preventDefault();
+        var postId = this.dataset.postId;
+        fetch("/api/post/dislike?postId=" + postId, { method: 'GET' })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = "/user/login";
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.querySelector("#likeButton > span").textContent = data.likeCount;
+                document.querySelector("#dislikeButton > span").textContent = data.dislikeCount === 0 ? 0 : "-" + data.dislikeCount;
+                document.querySelector("#postRecommendCount").textContent = "추천 " + (data.likeCount - data.dislikeCount);
+
+                const likeButtonImage = document.querySelector('#likeButton img');
+                const dislikeButtonImage = document.querySelector('#dislikeButton img');
+                if (likeStatusImg[data.status]) {
+                    likeButtonImage.src = likeStatusImg[data.status].like;
+                    dislikeButtonImage.src = likeStatusImg[data.status].dislike;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    // 게시글 스크랩
+    document.getElementById("scrap").addEventListener('click', function (event) {
+        event.preventDefault();
+        var postId = this.dataset.postId;
+        fetch("/api/post/scrap?postId=" + postId, { method: 'GET' })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = "/user/login";
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                const scrapImage = document.querySelector('#scrap img');
+                if (data.scrapDelete) scrapImage.src = '/img/community/scrap.png';
+                else if (data.scrapCreated) scrapImage.src = '/img/community/scrap-green.png';
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    // === 댓글/대댓글 좋아요 싫어요 ===
+    document.querySelectorAll('.comment-up').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+            const commentId = this.getAttribute('data-id');
+            fetch(`/api/comment/like/${commentId}`, { method: 'GET' })
                 .then(response => {
-                    if (response.ok) {
-                        // 로그인이 안되어 있을떄
-                        if (response.redirected) {
-                            window.location.href = "/user/login";
-                            return;
-                        }
-                        return response.json()
+                    if (response.redirected) {
+                        window.location.href = "/user/login";
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // data.status는 enum string
+                    this.parentNode.querySelector(".totalLikeCount").textContent = data.netLikes;
+                    const likeButtonImage = this.querySelector('img');
+                    const dislikeButtonImage = this.parentNode.querySelector('.comment-down img');
+                    if (likeStatusImg[data.status]) {
+                        likeButtonImage.src = likeStatusImg[data.status].like;
+                        dislikeButtonImage.src = likeStatusImg[data.status].dislike;
                     }
                 })
                 .catch(error => console.error('Error:', error));
-
-        })
-
-
-    // 게시글 좋아요
-    document.getElementById("likeButton").addEventListener('click',
-        function (event) {
-
-            var postId = this.dataset.postId;
-            fetch("/api/post/like?postId=" + postId, {
-                method: 'GET'
-            })
-                .then(response => {
-                        if (response.redirected) {
-                            window.location.href = "/user/login";
-                            return;
-                        }
-                        else{
-                            console.log("리다이렉트 안됨")
-                            console.log(response)
-
-                        }
-                        return response.json()
-
-                })
-                .then(data => {
-                    if (data.dislikeCount === 0) {
-                        document.querySelector("#dislikeButton > span").textContent = 0
-                    } else {
-                        document.querySelector("#dislikeButton > span").textContent = "-" + data.dislikeCount;
-
-                    }
-                    document.querySelector("#likeButton > span").textContent = data.likeCount;
-
-                    const likeButtonImage = document.querySelector('#likeButton img');
-                    const dislikeButtonImage = document.querySelector('#dislikeButton img');
-                    // 버튼 누르기 전 상태에 따라 이미지 설정 다르게 해줌 (좋아요가 이미 눌러져있을때, 싫어요가 눌러져있을때, 둘다 없었을떄)
-                    if (data.LIKE_DELETED) {
-                        likeButtonImage.src = '/img/community/up.png';
-
-                    } else if (data.DISLIKE_TO_LIKE) {
-                        likeButtonImage.src = '/img/community/up-green.png';
-                        dislikeButtonImage.src = '/img/community/down.png';
-                    } else if (data.LIKE_CREATED) {
-                        likeButtonImage.src = '/img/community/up-green.png';
-                    }
-                    document.querySelector("#postRecommendCount").textContent = "추천 " + (data.likeCount - data.dislikeCount);
-                }).catch(error => console.error('Error:', error));
-
-        }
-    )
-
-    // 게시글 싫어요
-    document.getElementById("dislikeButton").addEventListener('click',
-        function (event) {
-
-            event.preventDefault()
-            var postId = this.dataset.postId;
-            fetch("/api/post/dislike?postId=" + postId, {
-                method: 'GET'
-            })
-                .then(response => {
-                    if (response.ok) {
-                        if (response.redirected) {
-                            window.location.href = "/user/login";
-                            return;
-                        }
-                        return response.json()
-                    }
-                })
-                .then(data => {
-                    if (data.dislikeCount === 0) {
-                        document.querySelector("#dislikeButton > span").textContent = 0
-                    } else {
-                        document.querySelector("#dislikeButton > span").textContent = "-" + data.dislikeCount;
-
-                    }
-                    document.querySelector("#likeButton > span").textContent = data.likeCount;
-
-                    const likeButtonImage = document.querySelector('#likeButton img');
-                    const dislikeButtonImage = document.querySelector('#dislikeButton img');
-                    // 버튼 누르기 전 상태에 따라 이미지 설정 다르게 해줌 (싫어요가 이미 눌러져있을때, 좋아요가 눌러져있을때, 둘다 없었을떄)
-                    if (data.DISLIKE_DELETED) {
-                        dislikeButtonImage.src = '/img/community/down.png';
-
-                    } else if (data.LIKE_TO_DISLIKE) {
-                        likeButtonImage.src = '/img/community/up.png';
-                        dislikeButtonImage.src = '/img/community/down-red.png';
-                    } else if (data.DISLIKE_CREATED) {
-                        dislikeButtonImage.src = '/img/community/down-red.png';
-                    }
-                    document.querySelector("#postRecommendCount").textContent = "추천 " + (data.likeCount - data.dislikeCount);
-
-                }).catch(error => console.error('Error:', error));
-        }
-    )
-
-    //게시글 스크랩 버튼 리스너
-    document.getElementById("scrap").addEventListener('click',
-
-        function (event) {
-            event.preventDefault()
-            var postId = this.dataset.postId;
-            fetch("/api/post/scrap?postId=" + postId, {
-                method: 'GET'
-            })
-                .then(response => {
-                    if (response.ok) {
-                        if (response.redirected) {
-                            window.location.href = "/user/login";
-                            return;
-                        }
-                        return response.json()
-                    }
-                })
-                .then(data => {
-                    const scrapImage = document.querySelector('#scrap img');
-                    // 스크랩 되어있던 거 였으면 일반 이미지로 변환
-                    if (data.scrapDelete) {
-                        scrapImage.src = '/img/community/scrap.png';
-
-                    }
-                    // 스크랩 안되어 있었으면 녹색 스크랩 이미지로 변환
-                    else if (data.scrapCreated) {
-                        scrapImage.src = '/img/community/scrap-green.png';
-                    }
-                }).catch(error => console.error('Error:', error));
-
-        }
-    )
-
-    // 댓글 좋아요 버튼 리스너
-    document.querySelectorAll('.comment-up').forEach(button => {
-
-        button.addEventListener('click', function (event) {
-            event.preventDefault()
-
-            const commentId = this.getAttribute('data-id'); // data-id 속성에서 댓글 ID 가져오기
-            fetch(`/api/comment/like/${commentId}`, { // 서버에 GET 요청 보내기
-                method: 'GET'
-            })
-                .then(response => {
-                    if (response.ok) {
-                        if (response.redirected) {
-                            window.location.href = "/user/login";
-                            return;
-                        }
-                        return response.json()
-                    }
-                })
-                .then(data => {
-
-                    this.parentNode.querySelector(".totalLikeCount").textContent = data.totalLikeCount
-
-                    const likeButtonImage = this.querySelector('img');
-                    const dislikeButtonImage = this.parentNode.querySelector('.comment-down img');
-
-                    // 버튼 누르기 전 상태에 따라 이미지 설정 다르게 해줌 (싫어요가 이미 눌러져있을때, 좋아요가 눌러져있을때, 둘다 없었을떄)
-                    if (data.LIKE_DELETED) {
-                        likeButtonImage.src = '/img/community/up.png';
-
-                    } else if (data.DISLIKE_TO_LIKE) {
-                        likeButtonImage.src = '/img/community/up-green.png';
-                        dislikeButtonImage.src = '/img/community/down.png';
-                    } else if (data.LIKE_CREATED) {
-                        likeButtonImage.src = '/img/community/up-green.png';
-                    }
-                }).catch(error => console.error('Error:', error));
         });
     });
 
-    // 댓글 싫어요 버튼 리스너
     document.querySelectorAll('.comment-down').forEach(button => {
         button.addEventListener('click', function (event) {
-            event.preventDefault()
+            event.preventDefault();
             const commentId = this.getAttribute('data-id');
-            fetch(`/api/comment/dislike/${commentId}`, {
-                method: 'GET'
-            })
+            fetch(`/api/comment/dislike/${commentId}`, { method: 'GET' })
                 .then(response => {
-                    if (response.ok) {
-                        if (response.redirected) {
-                            window.location.href = "/user/login";
-                            return;
-                        }
-                        return response.json()
+                    if (response.redirected) {
+                        window.location.href = "/user/login";
+                        return;
                     }
+                    return response.json();
                 })
                 .then(data => {
-                    this.parentNode.querySelector(".totalLikeCount").textContent = data.totalLikeCount
-
+                    this.parentNode.querySelector(".totalLikeCount").textContent = data.netLikes;
                     const dislikeButtonImage = this.querySelector('img');
                     const likeButtonImage = this.parentNode.querySelector('.comment-up img');
-                    // 버튼 누르기 전 상태에 따라 이미지 설정 다르게 해줌 (싫어요가 이미 눌러져있을때, 좋아요가 눌러져있을때, 둘다 없었을떄)
-                    if (data.DISLIKE_DELETED) {
-                        dislikeButtonImage.src = '/img/community/down.png';
-                    } else if (data.LIKE_TO_DISLIKE) {
-                        likeButtonImage.src = '/img/community/up.png';
-                        dislikeButtonImage.src = '/img/community/down-red.png';
-                    } else if (data.DISLIKE_CREATED) {
-                        dislikeButtonImage.src = '/img/community/down-red.png';
+                    if (likeStatusImg[data.status]) {
+                        likeButtonImage.src = likeStatusImg[data.status].like;
+                        dislikeButtonImage.src = likeStatusImg[data.status].dislike;
                     }
-                }).catch(error => console.error('Error:', error));
+                })
+                .catch(error => console.error('Error:', error));
         });
     });
+
     // 대댓글 달기 버튼 리스너
     document.querySelectorAll('.reply').forEach(function (button) {
         button.addEventListener('click', function (event) {
@@ -380,47 +310,40 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-// 게시글 삭제 함수
+    // 게시글 삭제 함수
     function deletePost(postId) {
-
-        fetch("/api/post/delete?postId=" + postId, {
-            method: 'GET'
+        fetch(`/api/post/${postId}`, {
+            method: 'DELETE',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
         })
             .then(response => {
                 if (response.ok) {
                     window.location.href = "/community";
-                    return response.json()
                 }
             })
-            .then(data => {
-                console.log(data)
-            }).catch(error => console.error('Error:', error));
-
-
+            .catch(error => console.error('Error:', error));
     }
 
-// 댓글 삭제 함수
+    // 댓글 삭제 함수
     function deleteComment(commentId) {
-        // const commentLi = this.closest('.comment-li');
-        // const commentId = commentLi.getAttribute('data-id');
-        fetch("/api/comment/delete?commentId=" + commentId, {
-            method: 'GET'
+        fetch(`/api/comment/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
         })
-            .then(response => response.json()) // 먼저 JSON으로 변환
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     document.querySelector(`[data-id="${commentId}"]`).closest('.comment-li').remove();
 
-                    // 삭제된 댓글 + 대댓글 수만큼 댓글 수 업데이트
                     const commentCountSpan = document.querySelector("#commentCount");
                     let currentCount = parseInt(commentCountSpan.innerText.replace('댓글 ', ''));
-                    // data.deletedCount는 삭제된 댓글과 대댓글의 총 개수
                     commentCountSpan.innerText = '댓글 ' + (currentCount - data.deletedCount);
                 }
             })
             .catch(error => console.error('Error:', error));
-
     }
-
-
 })

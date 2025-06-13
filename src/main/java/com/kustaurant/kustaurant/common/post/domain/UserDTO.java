@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
+import com.kustaurant.kustaurant.common.restaurant.application.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -23,6 +25,14 @@ public class UserDTO {
         dto.setRankImg(UserEntity.getRankImg());
         dto.setEvaluationCount(UserEntity.getEvaluationList().size());;
 
+        return dto;
+    }
+
+    public static UserDTO from(User user) {
+        UserDTO dto = new UserDTO();
+        dto.setUserNickname(user.getNickname().getValue());;
+        dto.setRankImg(user.getRankImg());
+        dto.setEvaluationCount(user.getEvaluationCount());
         return dto;
     }
 }

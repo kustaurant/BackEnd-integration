@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.api.post.service;
 
 import com.kustaurant.kustaurant.common.post.infrastructure.*;
 import com.kustaurant.kustaurant.common.post.infrastructure.PostEntity;
+import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.user.infrastructure.OUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,11 @@ public class PostScrapApiService {
             userScrapList.remove(scrap);
             status = 0; // scrapDeleted
         } else {
-            PostScrapEntity scrap = new PostScrapEntity(UserEntity, postEntity, LocalDateTime.now());
+            PostScrapEntity scrap = PostScrapEntity.builder()
+                    .user(UserEntity)
+                    .post(postEntity)
+                    .createdAt(LocalDateTime.now())
+                    .build();
             PostScrapEntity savedScrap = postScrapApiRepository.save(scrap);
             userScrapList.add(savedScrap);
             postScrapList.add(savedScrap);

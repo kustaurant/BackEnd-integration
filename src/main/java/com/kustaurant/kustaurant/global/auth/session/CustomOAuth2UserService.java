@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.global.auth.session;
 
 import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.domain.enums.UserRole;
+import com.kustaurant.kustaurant.common.user.domain.enums.UserStatus;
 import com.kustaurant.kustaurant.common.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
@@ -51,7 +52,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                             .nickname(nickname)
                             .role(UserRole.USER)
                             .loginApi(attrs.getLoginApi())
-                            .status("ACTIVE")
+                            .status(UserStatus.ACTIVE)
                             .createdAt(LocalDateTime.now())
                             .build();
 

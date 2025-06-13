@@ -25,4 +25,6 @@ public interface EvaluationJpaRepository extends JpaRepository<EvaluationEntity,
     List<EvaluationEntity> findSortedEvaluationsByUserIdDesc(@Param("userId") Integer userId);
 
     List<EvaluationEntity> findByStatus(String status);
+
+    List<EvaluationEntity> findByUser_UserId(Integer userId);
 }

@@ -12,7 +12,6 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration/prod
-    baseline-on-migrate: true #이 라인은 한번 배포한 후 지워야함
     validate-on-migrate: true
     out-of-order: false
 

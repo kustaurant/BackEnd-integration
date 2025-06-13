@@ -20,6 +20,8 @@ public class User {
     private final String providerId;
     private final String loginApi;
     private UserStatus status;
+    private final String rankImg;
+    private final Integer evaluationCount;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -33,6 +35,8 @@ public class User {
             String providerId,
             String loginApi,
             UserStatus status,
+            String rankImg,
+            Integer evaluationCount,
             LocalDateTime createdAt,
             LocalDateTime updatedAt
     ) {
@@ -44,6 +48,8 @@ public class User {
         this.providerId = providerId;
         this.loginApi = loginApi;
         this.status = status;
+        this.rankImg = rankImg;
+        this.evaluationCount = evaluationCount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -75,6 +81,8 @@ public class User {
                 .status(entity.getStatus())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
+                .evaluationCount(entity.getEvaluationList().size())
+                .rankImg(entity.getRankImg())
                 .build();
     }
 

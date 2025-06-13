@@ -1,0 +1,53 @@
+name: Github-actions 자동 배포
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: SSH로 LightSail 인스턴스 접속해서 원격에서 최신 코드 pull 받고 빌드 -> 빌드 파일 실행 하기
+        uses: appleboy/ssh-action@v1
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+          envs: ENV_FILE
+          script: |
+            set -e
+            set -x
+            
+            cd /home/ubuntu/BackEnd-integration
+            git checkout main
+
+            # 최신 코드 가져오기
+            git pull origin main
+
+            # .env 파일 복원
+            echo "$ENV_FILE" | base64 -d > .env
+
+            # 빌드 수행
+            chmod +x ./gradlew
+            ./gradlew clean build
+            
+            sudo fuser -k -n tcp 8080 || true
+            
+            # build.gradle에서 version 추출
+            VERSION=$(grep '^version' build.gradle | sed -E "s/version *= *'([^']+)'/\1/")
+            JAR=build/libs/RestaurantTier-$VERSION.jar
+
+            # 빌드 파일 실행
+            LOG=$HOME/logs/kustaurant.log
+            export SPRING_PROFILES_ACTIVE=prod
+            mkdir -p $HOME/logs
+
+            nohup java -jar  $JAR > $LOG 2>&1 &

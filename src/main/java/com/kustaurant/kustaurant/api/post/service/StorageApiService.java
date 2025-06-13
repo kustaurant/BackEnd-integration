@@ -2,7 +2,6 @@ package com.kustaurant.kustaurant.api.post.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.kustaurant.kustaurant.common.post.infrastructure.PostPhotoApiRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +19,6 @@ public class StorageApiService {
     @Autowired
     private AmazonS3Client amazonS3Client;
 
-    private final PostPhotoApiRepository postPhotoApiRepository;
     // 아마존 s3에 이미지 저장하는 함수
     public String storeImage(MultipartFile file) {
         try {

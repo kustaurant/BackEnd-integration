@@ -1,60 +1,126 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
+import com.kustaurant.kustaurant.common.comment.domain.PostComment;
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Getter
+@Builder
 public class Post {
-    private final Integer postId;
-    private final String postTitle;
-    private final String postBody;
-    private final String postCategory;
-    private final String status;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
-    private final Integer postVisitCount;
-    private final Integer likeCount;
-    private final Integer userId;
+    private Integer id;
+    private String title;
+    private String body;
+    private String category;
+    private ContentStatus status;
+    private Integer authorId;
+    private Integer netLikes;
+    private Integer likeCount;
+    private Integer dislikeCount;
+    private Integer visitCount;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    @Builder
-    public Post(Integer postId, String postTitle, String postBody, String postCategory, String status,
-                LocalDateTime createdAt, LocalDateTime updatedAt, Integer postVisitCount, Integer likeCount, Integer userId) {
-        this.postId = postId;
-        this.postTitle = postTitle;
-        this.postBody = postBody;
-        this.postCategory = postCategory;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.postVisitCount = postVisitCount;
-        this.likeCount = likeCount;
-        this.userId = userId;
+
+    private List<PostComment> comments;
+    private List<PostPhoto> photos;
+    private List<PostScrap> scraps;
+
+
+    public void delete() {
+        this.status = ContentStatus.DELETED;
     }
+
+    public void update(String title, String body, String category, List<String> imageUrls) {
+        this.title = title;
+        this.body = body;
+        this.category = category;
+
+        this.photos = new java.util.ArrayList<>();
+        for (String url : imageUrls) {
+            this.photos.add(PostPhoto.builder()
+                    .postId(this.id)
+                    .photoImgUrl(url)
+                    .status(ContentStatus.ACTIVE)
+                    .build());
+        }
+    }
+
+
 
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime past = this.createdAt;
+        long diffInMinutes = java.time.Duration.between(createdAt, now).toMinutes();
 
-        long yearsDifference = ChronoUnit.YEARS.between(past, now);
-        if (yearsDifference > 0) return yearsDifference + "년 전";
+        if (diffInMinutes < 1) {
+            return "방금 전";
+        } else if (diffInMinutes < 60) {
+            return diffInMinutes + "분 전";
+        } else if (diffInMinutes < 1440) { // 24시간
+            return (diffInMinutes / 60) + "시간 전";
+        } else {
+            return (diffInMinutes / 1440) + "일 전";
+        }
+    }
 
-        long monthsDifference = ChronoUnit.MONTHS.between(past, now);
-        if (monthsDifference > 0) return monthsDifference + "달 전";
+    public ReactionStatus toggleLike(boolean isLikedBefore, boolean isDislikedBefore) {
+        if (isLikedBefore) {
+            decreaseLikeCount(1);
+            return ReactionStatus.LIKE_DELETED;
+        }
 
-        long daysDifference = ChronoUnit.DAYS.between(past, now);
-        if (daysDifference > 0) return daysDifference + "일 전";
+        if (isDislikedBefore) {
+            decreaseDislikeCount(1);
+            increaseLikeCount(1);
+            return ReactionStatus.DISLIKE_TO_LIKE;
+        }
 
-        long hoursDifference = ChronoUnit.HOURS.between(past, now);
-        if (hoursDifference > 0) return hoursDifference + "시간 전";
+        increaseLikeCount(1);
+        return ReactionStatus.LIKE_CREATED;
+    }
 
-        long minutesDifference = ChronoUnit.MINUTES.between(past, now);
-        if (minutesDifference > 0) return minutesDifference + "분 전";
+    public ReactionStatus toggleDislike(boolean isLikedBefore, boolean isDislikedBefore) {
+        if (isLikedBefore) {
+            decreaseLikeCount(1);
+            increaseDislikeCount(1);
+            return ReactionStatus.LIKE_TO_DISLIKE;
+        }
 
-        long secondsDifference = ChronoUnit.SECONDS.between(past, now);
-        return secondsDifference + "초 전";
+        if (isDislikedBefore) {
+            decreaseDislikeCount(1);
+            return ReactionStatus.DISLIKE_DELETED;
+        }
+
+        increaseDislikeCount(1);
+        return ReactionStatus.DISLIKE_CREATED;
+    }
+
+    public void increaseLikeCount(int amount) {
+        this.likeCount += amount;
+        updateNetLikes();
+    }
+
+    public void decreaseLikeCount(int amount) {
+        this.likeCount -= amount;
+        updateNetLikes();
+    }
+
+    public void increaseDislikeCount(int amount) {
+        this.dislikeCount += amount;
+        updateNetLikes();
+    }
+
+    public void decreaseDislikeCount(int amount) {
+        this.dislikeCount -= amount;
+        updateNetLikes();
+    }
+
+    private void updateNetLikes() {
+        this.netLikes = this.likeCount - this.dislikeCount;
     }
 }
 
