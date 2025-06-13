@@ -1,10 +1,12 @@
 package com.kustaurant.kustaurant.mock;
 
+import com.kustaurant.kustaurant.common.post.domain.UserDTO;
 import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class FakeUserRepository implements UserRepository {
@@ -65,5 +67,10 @@ public class FakeUserRepository implements UserRepository {
     @Override
     public List<User> findUsersByEvaluationCountForQuarter(int year, int quarter) {
         return List.of();
+    }
+
+    @Override
+    public Map<Integer, UserDTO> getUserDTOMapByIds(List<Integer> ids) {
+        return Map.of();
     }
 }

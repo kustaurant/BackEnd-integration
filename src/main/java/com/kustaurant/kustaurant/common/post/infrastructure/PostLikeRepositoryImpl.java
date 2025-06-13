@@ -33,7 +33,16 @@ public class PostLikeRepositoryImpl implements PostLikeRepository {
     @Override
     public void deleteByUserIdAndPostId(Integer userId, Integer postId) {
         postLikeJpaRepository.findByUser_UserIdAndPost_PostId(userId,postId)
-                .ifPresent(postLikeJpaRepository::delete);
+                .ifPresent(entity -> {
+                    postLikeJpaRepository.delete(entity);
+                    postLikeJpaRepository.flush(); // 즉시 DB 반영
+                });
     }
+
+    @Override
+    public int countByPostId(Integer postId) {
+        return postLikeJpaRepository.countByPost_PostId(postId);
+    }
+
 
 }

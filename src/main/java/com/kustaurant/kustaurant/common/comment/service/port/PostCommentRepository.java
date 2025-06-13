@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface PostCommentRepository {
     List<PostComment> findActiveByUserId(Integer userId);
 
-    List<PostComment> findAll(Specification<PostComment> spec);
+    List<PostComment> findParentComments(Integer postId);
 
     Optional<PostComment> findById(Integer comment_id);
 

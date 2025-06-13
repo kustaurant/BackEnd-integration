@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.web.post.controller;
 
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
+import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.user.controller.port.UserService;
 import com.kustaurant.kustaurant.common.user.domain.User;
@@ -14,17 +15,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.*;
 
 @lombok.extern.slf4j.Slf4j
@@ -55,57 +53,44 @@ public class CommunityController {
 
         List<PostDTO> postDTOList = postService.getDTOs(paging);
 
-
         model.addAttribute("postList", postDTOList);
         return "community";
     }
 
     // 커뮤니티 게시글 상세 화면
     @GetMapping("/community/{postId}")
-    public String postDetail(Model model, @PathVariable Integer postId, @AuthenticationPrincipal(expression = "user.id") Integer userId, @RequestParam(defaultValue = "recent") String sort) {
-        InteractionStatusResponse postInteractionStatus = postService.getUserInteractionStatus(postId, userId);
-
-        postService.increaseVisitCount(postId);
-
-        List<PostComment> postCommentList = postCommentService.getList(postId, sort);
-
-        Map<Integer, InteractionStatusResponse> commentInteractionMap = postCommentService.getCommentInteractionMap(postCommentList, userId);
-
-        // TODO: user, post 도메인 대신 post, user DTO 로 반환하기
-        User user = userService.getActiveUserById(userId);
-        Post post = postService.getPost(postId);
-        PostDetailView view = PostDetailView.builder().post(post).postCommentList(postCommentList).sort(sort).postInteractionStatus(postInteractionStatus).commentInteractionMap(commentInteractionMap).user(user).build();
+    public String postDetail(Model model, @PathVariable Integer postId, Principal principal, @RequestParam(defaultValue = "recent") String sort) {
+        Integer userId = (principal != null) ? Integer.valueOf(principal.getName()) : null;
+        PostDetailView view = postCommentService.buildPostDetailView(postId, userId, sort);
         model.addAttribute("view", view);
-
         return "community_post";
     }
 
-
-    @GetMapping("/api/post/delete")
-    public ResponseEntity<String> deletePost(@RequestParam(name = "postId") Integer postId) {
+    // 게시글 삭제
+    @DeleteMapping("/api/post/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Integer postId) {
+        log.info("Deleting post with ID: {}", postId);
         postService.deletePost(postId);
         return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
     }
 
-
-    // 댓글 ,대댓글 삭제
+    // 댓글 삭제
+    @DeleteMapping("/api/comment/{commentId}")
     @Transactional
-    @GetMapping("/api/comment/delete")
-    public ResponseEntity<Map<String, Object>> deleteComment(@RequestParam Integer commentId) {
+    public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable Integer commentId) {
         int deletedCount = postCommentService.deleteComment(commentId);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("deletedCount", deletedCount);
-        response.put("message", "comment delete complete");
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "deletedCount", deletedCount,
+                "message", "comment delete complete"
+        ));
     }
 
     // 댓글 or 대댓글 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/comment/create")
-    public ResponseEntity<String> createComment(@RequestParam(name = "content", defaultValue = "") String content, @RequestParam(name = "postId") Integer postId, @RequestParam(name = "parentCommentId", defaultValue = "") Integer parentCommentId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<String> createComment(@RequestParam(name = "content", defaultValue = "") String content, @RequestParam(name = "postId") Integer postId, @RequestParam(name = "parentCommentId", required = false) Integer parentCommentId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         postCommentService.createComment(content, postId, parentCommentId, userId);
         return ResponseEntity.ok("댓글이 성공적으로 저장되었습니다.");
     }
@@ -113,7 +98,8 @@ public class CommunityController {
     // 게시글 좋아요 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/post/like")
-    public ResponseEntity<ReactionToggleResponse> togglePostLike(@RequestParam("postId") Integer postId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<ReactionToggleResponse> togglePostLike(@RequestParam("postId") Integer postId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postService.toggleLike(postId, userId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
@@ -121,7 +107,8 @@ public class CommunityController {
     // 게시글 싫어요 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/post/dislike")
-    public ResponseEntity<ReactionToggleResponse> togglePostDislike(@RequestParam("postId") Integer postId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<ReactionToggleResponse> togglePostDislike(@RequestParam("postId") Integer postId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postService.toggleDislike(postId, userId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
@@ -129,8 +116,9 @@ public class CommunityController {
     // 게시글 스크랩
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/post/scrap")
-    public ResponseEntity<Map<String, Object>> toggleScrap(@RequestParam("postId") Integer postId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
-        Map<String, Object> response = postScrapService.toggleScrap(postId, userId);
+    public ResponseEntity<Map<String, Object>> toggleScrap(@RequestParam("postId") Integer postId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
+        Map<String, Object> response = postScrapService.toggleScrap(userId,postId);
         return ResponseEntity.ok(response);
     }
 
@@ -138,20 +126,23 @@ public class CommunityController {
     @GetMapping("/community/search")
     public String search(Model model, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "kw", defaultValue = "") String kw, @RequestParam(defaultValue = "recent") String sort, @RequestParam(defaultValue = "전체") String postCategory) {
 
-        Page<Post> paging = this.postService.getList(page, sort, kw, postCategory);
+        Page<PostDTO> paging = postService.getList(page, sort, kw, postCategory);
         List<String> timeAgoList = postService.getTimeAgoList(paging);
         model.addAttribute("timeAgoList", timeAgoList);
         model.addAttribute("paging", paging);
         model.addAttribute("postSearchKw", kw);
         model.addAttribute("sort", sort);
         model.addAttribute("postCategory", postCategory);
+        model.addAttribute("postList", paging.getContent());
+
         return "community";
     }
 
     // 게시글 댓글 좋아요
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/comment/like/{commentId}")
-    public ResponseEntity<ReactionToggleResponse> toggleCommentLike(@PathVariable Integer commentId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<ReactionToggleResponse> toggleCommentLike(@PathVariable Integer commentId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postCommentService.toggleLike(userId, commentId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
@@ -159,7 +150,8 @@ public class CommunityController {
     // 게시글 댓글 싫어요
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/comment/dislike/{commentId}")
-    public ResponseEntity<ReactionToggleResponse> toggleCommentDislike(@PathVariable Integer commentId, @AuthenticationPrincipal(expression = "user.id") Integer userId) {
+    public ResponseEntity<ReactionToggleResponse> toggleCommentDislike(@PathVariable Integer commentId, Principal principal) {
+        Integer userId = Integer.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postCommentService.toggleDislike(userId, commentId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
@@ -171,11 +163,11 @@ public class CommunityController {
         return "community_write";
     }
 
-
     // 게시글 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/community/post/create")
-    public ResponseEntity<String> createPost(@RequestParam("title") String title, @RequestParam("postCategory") String category, @RequestParam("content") String content, @AuthenticationPrincipal(expression = "user.id") Integer userId) throws IOException {
+    public ResponseEntity<String> createPost(@RequestParam("title") String title, @RequestParam("postCategory") String category, @RequestParam("content") String content, Principal principal) throws IOException {
+        Integer userId = Integer.valueOf(principal.getName());
         postService.create(title, category, content, userId);
         return ResponseEntity.ok("글이 성공적으로 저장되었습니다.");
     }
@@ -184,7 +176,7 @@ public class CommunityController {
     @GetMapping("/community/post/update")
     public String updatePost(@RequestParam Integer postId, Model model) {
         Post post = postService.getPost(postId);
-        model.addAttribute("post", post);
+        model.addAttribute("post", PostDTO.from(post));
         return "community_update";
     }
 
@@ -223,7 +215,6 @@ public class CommunityController {
             return ResponseEntity.internalServerError().body(Map.of("rs_st", -1, "rs_msg", "이미지 업로드 실패"));
         }
     }
-
 
     // 댓글 입력창 포커스시 로그인 상태 확인
     @PreAuthorize("isAuthenticated() and hasRole('USER')")

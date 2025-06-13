@@ -1,16 +1,16 @@
 package com.kustaurant.kustaurant.common.post.domain;
 
+import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
+@AllArgsConstructor
 public class PostPhoto {
     private Integer id;
-    private final String photoImgUrl;
-    private String status;
-
-    public PostPhoto(String photoImgUrl, String status) {
-        this.photoImgUrl = photoImgUrl;
-        this.status = status;
-    }
+    private Integer postId;
+    private String photoImgUrl;
+    private ContentStatus status;
 }

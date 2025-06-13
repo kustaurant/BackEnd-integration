@@ -13,6 +13,7 @@ import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -66,18 +68,24 @@ public class PostService {
 
     }
 
-    // 검색 결과 반환하기
-    public Page<Post> getList(int page, String sort, String kw, String postCategory) {
+    // 검색결과 반환
+    public Page<PostDTO> getList(int page, String sort, String kw, String postCategory) {
         List<Sort.Order> sorts = new ArrayList<>();
-
-        // 인기순 최신순 모두 최신순으로
         sorts.add(Sort.Order.desc("createdAt"));
 
         Specification<PostEntity> spec = search(kw, postCategory, sort);
-
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        return this.postRepository.findAll(spec, pageable);
+        Page<Post> postEntityPage = this.postRepository.findAll(spec, pageable);
+
+        return postEntityPage
+                .map(postEntity -> {
+                    User user = userService.getActiveUserById(postEntity.getAuthorId());
+                    PostDTO postDTO = PostDTO.from(postEntity, user);
+                    postDTO.setUser(UserDTO.from(user));
+                    return postDTO;
+                });
     }
+
 
 
     //  드롭다운에서 카테고리가 설정된 상태에서 게시물 반환하기
@@ -92,7 +100,7 @@ public class PostService {
         return this.postRepository.findAll(spec, pageable);
 
     }
-
+    @Transactional
     public Post getPost(Integer id) {
         Optional<Post> post = this.postRepository.findById(id);
         if (post.isPresent()) {
@@ -103,16 +111,12 @@ public class PostService {
     }
 
     // 게시물 리스트에 대한 시간 경과 리스트로 반환하는 함수.
-    public List<String> getTimeAgoList(Page<Post> postList) {
+    public List<String> getTimeAgoList(Page<PostDTO> postList) {
         LocalDateTime now = LocalDateTime.now();
-
-        // postList의 createdAt 필드를 문자열 형식으로 만들어 timeAgoList에 할당
-        List<String> timeAgoList = postList.stream().map(post -> {
+        return postList.stream().map(post -> {
             LocalDateTime createdAt = post.getCreatedAt();
-            // datetime 타입의 createdAt을 string 타입으로 변환해주는 함수
             return timeAgo(now, createdAt);
         }).collect(Collectors.toList());
-        return timeAgoList;
 
     }
 
@@ -138,57 +142,54 @@ public class PostService {
 
     @Transactional
     public ReactionToggleResponse toggleLike(Integer postId, Integer userId) {
-        Post post = getPost(postId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다"));
-        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
-        boolean isDisliked = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean isLikedBefore = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean isDislikedBefore = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
 
-        ReactionStatus result = post.toggleLike(isLiked, isDisliked);
-
-        switch (result) {
-            case LIKE_DELETED -> {
-                postLikeRepository.deleteByUserIdAndPostId(userId, postId);
-            }
-            case DISLIKE_TO_LIKE -> {
-                postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
-                postLikeRepository.save(new PostLike(userId, postId, LocalDateTime.now()));
-            }
-            case LIKE_CREATED -> {
-                postLikeRepository.save(new PostLike(userId, postId, LocalDateTime.now()));
-            }
+        ReactionStatus status;
+        if (isLikedBefore) {
+            postLikeRepository.deleteByUserIdAndPostId(userId, postId);
+            status = ReactionStatus.LIKE_DELETED;
+        } else if (isDislikedBefore) {
+            postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
+            postLikeRepository.save(new PostLike(userId, postId, LocalDateTime.now()));
+            status = ReactionStatus.DISLIKE_TO_LIKE;
+        } else {
+            postLikeRepository.save(new PostLike(userId, postId, LocalDateTime.now()));
+            status = ReactionStatus.LIKE_CREATED;
         }
 
-        postRepository.save(post);
+        int likeCount = postLikeRepository.countByPostId(postId);
+        int dislikeCount = postDislikeRepository.countByPostId(postId);
 
-        return new ReactionToggleResponse(result, post.getLikeCount() - post.getDislikeCount(), post.getLikeCount(), post.getDislikeCount());
+        return new ReactionToggleResponse(status, likeCount - dislikeCount, likeCount, dislikeCount);
     }
 
 
-    // 게시글 싫어요
+
     @Transactional
     public ReactionToggleResponse toggleDislike(Integer postId, Integer userId) {
-        Post post = getPost(postId);
-        boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
-        boolean isDisliked = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
-        ReactionStatus result = post.toggleDislike(isLiked, isDisliked);
+        boolean isLikedBefore = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+        boolean isDislikedBefore = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
 
-        switch (result) {
-            case DISLIKE_DELETED -> {
-                postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
-            }
-            case LIKE_TO_DISLIKE -> {
-                postLikeRepository.deleteByUserIdAndPostId(userId, postId);
-                postDislikeRepository.save(new PostDislike(userId, postId, LocalDateTime.now()));
-            }
-            case DISLIKE_CREATED -> {
-                postDislikeRepository.save(new PostDislike(userId, postId, LocalDateTime.now()));
-            }
+        ReactionStatus status;
+        if (isDislikedBefore) {
+            postDislikeRepository.deleteByUserIdAndPostId(userId, postId);
+            status = ReactionStatus.DISLIKE_DELETED;
+        } else if (isLikedBefore) {
+            postLikeRepository.deleteByUserIdAndPostId(userId, postId);
+            postDislikeRepository.save(new PostDislike(userId, postId, LocalDateTime.now()));
+            status = ReactionStatus.LIKE_TO_DISLIKE;
+        } else {
+            postDislikeRepository.save(new PostDislike(userId, postId, LocalDateTime.now()));
+            status = ReactionStatus.DISLIKE_CREATED;
         }
 
-        postRepository.save(post);
+        int likeCount = postLikeRepository.countByPostId(postId);
+        int dislikeCount = postDislikeRepository.countByPostId(postId);
 
-        return new ReactionToggleResponse(result, post.getLikeCount() - post.getDislikeCount(), post.getLikeCount(), post.getDislikeCount());
+        return new ReactionToggleResponse(status, likeCount - dislikeCount, likeCount, dislikeCount);
     }
+
 
 
     public InteractionStatusResponse getUserInteractionStatus(Integer postId, Integer userId) {
@@ -222,9 +223,9 @@ public class PostService {
                 // sort
                 Predicate likeCountPredicate;
                 if (sort.equals("popular")) {
-                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("likeCount"), POPULARCOUNT);
+                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("netLikes"), POPULARCOUNT);
                 } else {
-                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("likeCount"), -1000);
+                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("netLikes"), -1000);
                 }
 
                 // 검색 조건 결합 (카테고리 설정이 되어있을때는 검색 시 카테고리 안에서 검색을 한다).
@@ -238,7 +239,7 @@ public class PostService {
                 // 검색 조건 결합
                 return cb.and(statusPredicate, likeCountPredicate, cb.or(cb.like(p.get("postTitle"), "%" + kw + "%"), // 제목
                         cb.like(p.get("postBody"), "%" + kw + "%"),      // 내용
-                        cb.like(u1.get("userNickname"), "%" + kw + "%")    // 글 작성자
+                        cb.like(u1.get("nickname").get("value"), "%" + kw + "%")    // 글 작성자
 //                        ,cb.like(c.get("commentBody"), "%" + kw + "%"),      // 댓글 내용
 //                        cb.like(u2.get("userNickname"), "%" + kw + "%") // 댓글 작성자
                 ));
@@ -310,13 +311,19 @@ public class PostService {
         postRepository.save(post);
     }
 
+    @Transactional
     public Post create(String title, String category, String body, Integer userId) {
         Post post = Post.builder().title(title).category(category).body(body).status(ContentStatus.ACTIVE).netLikes(0).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).authorId(userId).build();
         Post savedPost = postRepository.save(post);
 
         List<String> imageUrls = imageExtractor.extract(body);
+
         for (String imageUrl : imageUrls) {
-            postPhotoRepository.save(new PostPhoto(imageUrl, "ACTIVE"));
+            postPhotoRepository.save(PostPhoto.builder()
+                    .postId(savedPost.getId())
+                    .photoImgUrl(imageUrl)
+                    .status(ContentStatus.ACTIVE)
+                    .build());
         }
         return savedPost;
     }
@@ -337,7 +344,7 @@ public class PostService {
     public List<PostDTO> getDTOs(Page<Post> paging) {
         List<PostDTO> postDTOList = new ArrayList<>();
         for (Post post : paging) {
-            User user = userService.getActiveUserById(post.getId());
+            User user = userService.getActiveUserById(post.getAuthorId());
             PostDTO postDTO = PostDTO.from(post, user);
             postDTO.setUser(UserDTO.from(user));
             postDTOList.add(postDTO);

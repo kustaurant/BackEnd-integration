@@ -1,8 +1,10 @@
 package com.kustaurant.kustaurant.common.user.service.port;
 
+import com.kustaurant.kustaurant.common.post.domain.UserDTO;
 import com.kustaurant.kustaurant.common.user.domain.User;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserRepository {
@@ -14,4 +16,7 @@ public interface UserRepository {
 
     List<User> findUsersWithEvaluationCountDescending();
     List<User> findUsersByEvaluationCountForQuarter(int year, int quarter);
+
+    Map<Integer, UserDTO> getUserDTOMapByIds(List<Integer> ids);
+
 }

@@ -32,7 +32,11 @@ public class PostScrapApiService {
             userScrapList.remove(scrap);
             status = 0; // scrapDeleted
         } else {
-            PostScrapEntity scrap = new PostScrapEntity(UserEntity, postEntity, LocalDateTime.now());
+            PostScrapEntity scrap = PostScrapEntity.builder()
+                    .user(UserEntity)
+                    .post(postEntity)
+                    .createdAt(LocalDateTime.now())
+                    .build();
             PostScrapEntity savedScrap = postScrapApiRepository.save(scrap);
             userScrapList.add(savedScrap);
             postScrapList.add(savedScrap);

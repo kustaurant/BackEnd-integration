@@ -36,4 +36,9 @@ public class PostDislikeRepositoryImpl implements PostDislikeRepository {
                 .ifPresent(postDislikeJpaRepository::delete);
     }
 
+    @Override
+    public int countByPostId(Integer postId) {
+        return postDislikeJpaRepository.countByPost_PostId(postId);
+    }
+
 }

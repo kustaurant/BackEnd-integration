@@ -4,7 +4,6 @@ import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
-import com.kustaurant.kustaurant.common.user.domain.User;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -134,14 +133,14 @@ public class PostEntity {
     }
 
 
-    public static PostEntity from(Post post, User user) {
+    public static PostEntity from(Post post, UserEntity userEntity) {
         return new PostEntity(
                 post.getTitle(),
                 post.getBody(),
                 post.getCategory(),
                 post.getStatus(),
                 post.getCreatedAt(),
-                UserEntity.from(user)
+                userEntity
         );
     }
 

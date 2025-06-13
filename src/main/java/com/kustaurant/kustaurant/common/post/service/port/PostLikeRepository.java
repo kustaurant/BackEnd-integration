@@ -15,4 +15,6 @@ public interface PostLikeRepository {
     void save(PostLike postLike);
 
     void deleteByUserIdAndPostId(Integer userId, Integer postId);
+
+    int countByPostId(Integer postId);
 }

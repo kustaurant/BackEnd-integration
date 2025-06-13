@@ -30,7 +30,7 @@ public class PostComment {
     private Integer likeCount;
     private Integer dislikeCount;
     private PostComment parentComment;
-    private final List<PostComment> replies;
+    private List<PostComment> replies;
 
     public static PostComment create(String commentBody, Integer userId, Integer postId) {
         return PostComment.builder()

@@ -15,9 +15,8 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostDetailView {
-    private Post post;
-    private User user;
-    private List<PostComment> postCommentList;
+    private PostDTO post;
+    private UserDTO currentUser;
     private String sort;
     private InteractionStatusResponse postInteractionStatus;
     private Map<Integer, InteractionStatusResponse> commentInteractionMap;

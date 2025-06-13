@@ -15,4 +15,6 @@ public interface PostDislikeRepository {
     boolean existsByUserIdAndPostId(Integer userId, Integer postId);
     PostDislike save(PostDislike postDislike);
     void deleteByUserIdAndPostId(Integer userId, Integer postId);
+
+    int countByPostId(Integer postId);
 }

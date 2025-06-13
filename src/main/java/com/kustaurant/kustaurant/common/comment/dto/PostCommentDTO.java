@@ -1,26 +1,33 @@
 package com.kustaurant.kustaurant.common.comment.dto;
 
+import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.common.post.domain.UserDTO;
 import com.kustaurant.kustaurant.common.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.common.user.infrastructure.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Getter
 @Setter
+@Builder
+@Slf4j
 public class PostCommentDTO {
     @Schema(description = "댓글 id", example = "100")
     Integer commentId;
     @Schema(description = "댓글 내용", example = "안녕하세요~")
     private String commentBody;
     @Schema(description = "댓글 상태 (활성화 or 삭제)", example = "ACTIVE")
-    private ContentStatus status;
+    private String status;
     @Schema(description = "좋아요 수", example = "3")
     private Integer likeCount;
     @Schema(description = "싫어요 수", example = "2")
@@ -41,21 +48,48 @@ public class PostCommentDTO {
     private Boolean isCommentMine = false;
     @Schema(description = "작성 유저")
     UserDTO user;
-    public PostCommentDTO(Integer commentId, String commentBody, ContentStatus status, UserEntity UserEntity, Integer likeCount, Integer dislikeCount, String timeAgo, LocalDateTime createdAt, LocalDateTime updatedAt, List<PostCommentDTO> repliesList) {
-        this.commentId = commentId;
-        this.commentBody = commentBody;
-        this.status = status;
-        this.user = UserDTO.convertUserToUserDTO(UserEntity);
-        this.likeCount = likeCount;
-        this.dislikeCount = dislikeCount;
-        this.timeAgo = timeAgo;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.repliesList = repliesList;
-    }
 
     public static PostCommentDTO convertPostCommentToPostCommentDTO(PostCommentEntity comment) {
-        return new PostCommentDTO(comment.getCommentId(), comment.getCommentBody(),comment.getStatus(),comment.getUser(), comment.getPostCommentLikesEntities().size(), comment.getPostCommentDislikesEntities().size(), comment.calculateTimeAgo(), comment.getCreatedAt(), comment.getUpdatedAt(), comment.getRepliesList().stream().filter(reply -> reply.getStatus().equals("ACTIVE")).sorted(Comparator.comparing(PostCommentEntity::getCreatedAt).reversed()).map(PostCommentDTO::convertPostCommentToPostCommentDTO).toList());
+        return PostCommentDTO.builder()
+                .commentId(comment.getCommentId())
+                .commentBody(comment.getCommentBody())
+                .status(comment.getStatus().name())
+                .user(UserDTO.convertUserToUserDTO(comment.getUser()))
+                .likeCount(comment.getPostCommentLikesEntities().size())
+                .dislikeCount(comment.getPostCommentDislikesEntities().size())
+                .timeAgo(comment.calculateTimeAgo())
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
+                .repliesList(
+                        comment.getRepliesList().stream()
+                                .filter(reply -> reply.getStatus().equals(ContentStatus.ACTIVE))
+                                .sorted(Comparator.comparing(PostCommentEntity::getCreatedAt).reversed())
+                                .map(PostCommentDTO::convertPostCommentToPostCommentDTO)
+                                .toList()
+                )
+                .build();
     }
 
+
+    public static PostCommentDTO from(PostComment comment, Map<Integer, UserDTO> userDtoMap) {
+        return PostCommentDTO.builder()
+                .commentId(comment.getCommentId())
+                .commentBody(comment.getCommentBody())
+                .status(comment.getStatus().name())
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
+                .user(userDtoMap.get(comment.getUserId()))
+                .likeCount(comment.getLikeCount())
+                .dislikeCount(comment.getDislikeCount())
+                .timeAgo(comment.calculateTimeAgo())
+                .repliesList(
+                        Optional.ofNullable(comment.getReplies())
+                                .orElse(List.of())
+                                .stream()
+                                .filter(reply -> reply.getStatus() == ContentStatus.ACTIVE)
+                                .map(reply -> PostCommentDTO.from(reply, userDtoMap))
+                                .toList()
+                )
+                .build();
+    }
 }

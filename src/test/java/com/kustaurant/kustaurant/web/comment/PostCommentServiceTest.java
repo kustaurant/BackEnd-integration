@@ -3,9 +3,12 @@ package com.kustaurant.kustaurant.web.comment;
 import com.kustaurant.kustaurant.common.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentDislikeJpaRepository;
 import com.kustaurant.kustaurant.common.comment.infrastructure.PostCommentLikeJpaRepository;
+import com.kustaurant.kustaurant.common.comment.service.port.PostCommentDislikeRepository;
+import com.kustaurant.kustaurant.common.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.common.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.common.post.domain.*;
 import com.kustaurant.kustaurant.common.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.common.user.controller.port.UserService;
 import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.web.post.service.PostService;
@@ -28,7 +31,9 @@ class PostCommentServiceTest {
     private PostService postService;
     private UserRepository userRepository;
     private PostCommentService commentService;
-
+    private UserService userService;
+    private PostCommentLikeRepository postCommentLikeRepository;
+    private PostCommentDislikeRepository postCommentDislikeRepository;
     @BeforeEach
     void setUp() {
         commentRepository = mock(PostCommentRepository.class);
@@ -36,8 +41,10 @@ class PostCommentServiceTest {
         dislikeRepository = mock(PostCommentDislikeJpaRepository.class);
         postService = mock(PostService.class);
         userRepository = mock(UserRepository.class);
+        postCommentDislikeRepository = mock(PostCommentDislikeRepository.class);
+        postCommentLikeRepository = mock(PostCommentLikeRepository.class);
 
-        commentService = new PostCommentService(commentRepository, postService, likeRepository, dislikeRepository, userRepository);
+        commentService = new PostCommentService(commentRepository, postService, likeRepository, dislikeRepository,userService, postCommentLikeRepository, postCommentDislikeRepository);
     }
 
     @Test
@@ -133,10 +140,10 @@ class PostCommentServiceTest {
         comment1.increaseLikeCount(5);
         comment2.increaseLikeCount(10);
         when(postService.getPost(postId)).thenReturn(post);
-        when(commentRepository.findAll(any())).thenReturn(new ArrayList<>(List.of(comment1, comment2)));
+        when(commentRepository.findParentComments(any())).thenReturn(new ArrayList<>(List.of(comment1, comment2)));
 
         // When
-        List<PostComment> result = commentService.getList(postId, "popular");
+        List<PostComment> result = commentService.getParentComments(postId, "popular");
 
         // Then
         assertThat(result.get(0).getNetLikes()).isEqualTo(10);
@@ -153,10 +160,10 @@ class PostCommentServiceTest {
         older.setCreatedAt(LocalDateTime.now().minusMinutes(10));
         newer.setCreatedAt(LocalDateTime.now());
         when(postService.getPost(postId)).thenReturn(post);
-        when(commentRepository.findAll(any())).thenReturn(new ArrayList<>(List.of(older, newer)));
+        when(commentRepository.findParentComments(any())).thenReturn(new ArrayList<>(List.of(older, newer)));
 
         // When
-        List<PostComment> result = commentService.getList(postId, "recent");
+        List<PostComment> result = commentService.getParentComments(postId, "recent");
 
         // Then
         assertThat(result.get(0).getCreatedAt()).isAfter(result.get(1).getCreatedAt());

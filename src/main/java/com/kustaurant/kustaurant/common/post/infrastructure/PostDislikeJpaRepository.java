@@ -8,4 +8,6 @@ public interface PostDislikeJpaRepository extends JpaRepository<PostDislikeEntit
     Optional<PostDislikeEntity> findByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
 
     boolean existsByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
+
+    int countByPost_PostId(Integer postId);
 }

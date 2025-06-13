@@ -35,7 +35,7 @@
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
-    <title th:text="'쿠스토랑-' + ${view.post.title}"></title>
+    <title th:text="'쿠스토랑-' + ${view.post.postTitle}"></title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -88,30 +88,30 @@
 <main id="content">
     <div class="post">
         <div class="post-top">
-            <h1 class="post-title" th:text="${view.post.title}" th:data-id="${view.post.id}"></h1>
+            <h1 class="post-title" th:text="${view.post.postTitle}" th:data-id="${view.post.postId}"></h1>
             <div>
                 <div class="post-details">
                     <div class="post-detail">
                         <span class="first-detail">
-                            <a th:text="${view.post.category}" href="#"></a>
+                            <a th:text="${view.post.postCategory}" href="#"></a>
                         </span>
-                        <span th:text="${view.post.calculateTimeAgo()}" class="second-detail updated-time">
+                        <span th:text="${view.post.timeAgo}" class="second-detail updated-time">
 
                         </span>
                         <span class="third-detail user-name">
-                        <img th:src="${view.post.author.getRankImg()}">
-                        <span th:text="${view.post.author.userNickname} ">
+                        <img th:src="${view.post.user.rankImg}">
+                        <span th:text="${view.post.user.userNickname} ">
                         </span>
                         </span>
 
                     </div>
                     <div class="post-detail">
-                        <span th:text="'조회수 '+ ${view.post.visitCount}" class="first-detail">
+                        <span th:text="'조회수 '+ ${view.post.postVisitCount}" class="first-detail">
 
                         </span>
                         <!--                        <span th:text="'댓글 '+ ${post.postCommentList.size()}" class="second-detail"></span>-->
                         <span id="commentCount" class="second-detail"
-                              th:text="'댓글 '+ ${#lists.size(view.post.postCommentList.?[status=='ACTIVE'])}"></span>
+                              th:text="'댓글 '+ ${view.post.commentCount}"></span>
                         <span th:text="'추천 '+ ${view.post.likeCount}"
                               class="third-detail" id="postRecommendCount">
 
@@ -120,16 +120,22 @@
                 </div>
             </div>
             <!-- 글 수정 버튼 -->
-            <a th:href="'/community/post/update?postId=' + ${view.post.postId}" th:if="${view.post.user==user}" type="button" class="post-update" th:data-id="${view.post.postId}">
+            <a th:if="${view.post.user != null and view.currentUser != null and view.post.user.userNickname == view.currentUser.userNickname}"
+               th:href="'/community/post/update?postId=' + ${view.post.postId}"
+               type="button" class="post-update"
+               th:data-id="${view.post.postId}">
                 수정
             </a>
 
             <!-- 글 삭제 버튼 -->
-            <button th:if="${view.post.user==user}" type="button" class="post-delete" data-bs-toggle="modal"
-                    data-bs-target="#postModal" th:data-id="${view.post.postId}" th:data-type="post"
-                    data-action="postDelete">
+            <button th:if="${view.post.user != null and view.currentUser != null and view.post.user.userNickname == view.currentUser.userNickname}"
+                    type="button" class="post-delete"
+                    data-bs-toggle="modal" data-bs-target="#postModal"
+                    th:data-id="${view.post.postId}"
+                    th:data-type="post" data-action="postDelete">
                 삭제
             </button>
+
         </div>
         <div class="post-body">
             <div>
@@ -144,13 +150,13 @@
             <button type="button" id="likeButton" class="post-button" th:data-post-id="${view.post.postId}">
                 <img th:if="${view.postInteractionStatus.liked.isLiked()}" src="/img/community/up-green.png">
                 <img th:unless="${view.postInteractionStatus.liked.isLiked()}" src="/img/community/up.png">
-                <span th:text="${view.post.likes.size()}"></span>
+                <span th:text="${view.post.likeOnlyCount}"></span>
             </button>
             <button type="button" id="dislikeButton" class="post-button" th:data-post-id="${view.post.postId}">
                 <img th:if="${view.postInteractionStatus.disliked.isDisliked()}" src="/img/community/down-red.png">
                 <img th:unless="${view.postInteractionStatus.disliked.isDisliked()}" src="/img/community/down.png">
-                <span th:if="${view.post.dislikes.size() >0}" th:text="'-'+${view.post.dislikes.size()}"></span>
-                <span th:if="${view.post.dislikes.size() ==0}" th:text="${view.post.dislikes.size()}"></span>
+                <span th:if="${view.post.dislikeOnlyCount >0}" th:text="'-'+${view.post.dislikeOnlyCount}"></span>
+                <span th:if="${view.post.dislikeOnlyCount ==0}" th:text="${view.post.dislikeOnlyCount}"></span>
 
             </button>
             <button type="button" id="scrap" class="post-button" th:data-post-id="${view.post.postId}">
@@ -182,35 +188,35 @@
 
         </div>
         <div class="comment-filter">
-            <a th:href="@{/community/{postId}(postId=${post.postId}, sort='recent')}"
+            <a th:href="@{/community/{postId}(postId=${view.post.postId}, sort='recent')}"
                th:class="${sort == 'recent' ? 'latest filter current-page' : 'latest filter'}">최신순</a>
-            <a th:href="@{/community/{postId}(postId=${post.postId}, sort='popular')}"
+            <a th:href="@{/community/{postId}(postId=${view.post.postId}, sort='popular')}"
                th:class="${sort == 'popular' ? 'popularity filter current-page' : 'popularity filter'}">인기순</a>
 
         </div>
 
         <div class="comment-list">
             <ul class="comment-ul">
-                <div th:each="comment,loop:${view.postCommentList}">
-                    <li class="comment-li" th:if="${comment.parentCommentId==null}" th:data-id="${comment.commentId}">
+                <div th:each="comment,loop:${view.post.postCommentList}">
+                    <li class="comment-li" th:data-id="${comment.commentId}">
                         <div class="comment-div">
                             <div class="comment-left">
                                 <button class="comment-up" type="button" th:data-id="${comment.commentId}">
                                     <img th:if="${view.commentInteractionMap[comment.commentId]?.liked?.isLiked()}" src="/img/community/up-green.png">
                                     <img th:unless="${view.commentInteractionMap[comment.commentId]?.liked?.isLiked()}" src="/img/community/up.png">
                                 </button>
-                                <span class="totalLikeCount" th:text="${view.comment.likeCount}"></span>
-                                <button class="comment-down" type="button" th:data-id="${view.comment.commentId}">
+                                <span class="totalLikeCount" th:text="${comment.likeCount}"></span>
+                                <button class="comment-down" type="button" th:data-id="${comment.commentId}">
                                     <img th:if="${view.commentInteractionMap[comment.commentId]?.disliked?.isDisliked()}" src="/img/community/down-red.png">
                                     <img th:unless="${view.commentInteractionMap[comment.commentId]?.disliked?.isDisliked()}" src="/img/community/down.png">
                                 </button>
                             </div>
                             <div class="comment-content">
                                 <div class="comment-name">
-                                    <img th:src="${comment.user.getRankImg()}">
+                                    <img th:src="${comment.user.rankImg}">
 
                                     <span class="user-name" th:text="${comment.user.userNickname}"></span>
-                                    <span th:text="${comment.calculateTimeAgo()}"></span>
+                                    <span th:text="${comment.timeAgo}"></span>
                                 </div>
                                 <div class="comment-body">
                                     <div>
@@ -218,7 +224,7 @@
                                     </div>
                                 </div>
                                 <ul style="padding-left: 0;">
-                                    <li th:if="${comment.user==user}">
+                                    <li th:if="${comment.user != null and view.currentUser != null and comment.user.userNickname == view.currentUser.userNickname}">
                                         <!-- 댓글 삭제 버튼 -->
                                         <button class="comment-button comment-delete" data-bs-toggle="modal"
                                                 data-bs-target="#commentModal" th:data-id="${comment.commentId}"
@@ -239,7 +245,7 @@
                         <ul th:if="${not comment.repliesList.isEmpty()}" class="reply-ul">
                             <li class="comment-li" th:each="reply, loop:${comment.repliesList}"
                                 th:data-id="${reply.commentId}">
-                                <div th:if="${reply.status.equals('ACTIVE')}">
+                                <div th:if="${reply.status == 'ACTIVE'}">
 
                                     <div class="comment-div">
                                         <div class="reply-mark">
@@ -258,9 +264,9 @@
                                         </div>
                                         <div class="comment-content">
                                             <div class="comment-name">
-                                                <img th:src="${reply.user.getRankImg()}">
+                                                <img th:src="${reply.user.rankImg}">
                                                 <span class="user-name" th:text="${reply.user.userNickname}"></span>
-                                                <span th:text="${reply.calculateTimeAgo()}"></span>
+                                                <span th:text="${reply.timeAgo}"></span>
                                             </div>
                                             <div class="comment-body">
                                                 <div>
@@ -268,7 +274,7 @@
                                                 </div>
                                             </div>
                                             <ul style="padding-left: 0;">
-                                                <li th:if="${reply.user == user}">
+                                                <li th:if="${reply.user == view.currentUser}">
                                                     <!-- 대댓글 삭제 버튼 -->
                                                     <button class="comment-button comment-delete" data-bs-toggle="modal"
                                                             data-bs-target="#commentModal"
