@@ -1,14 +1,14 @@
 package com.kustaurant.kustaurant.web.post.controller;
 
-import com.kustaurant.kustaurant.common.comment.domain.PostComment;
-import com.kustaurant.kustaurant.common.comment.dto.PostCommentDTO;
-import com.kustaurant.kustaurant.common.post.domain.*;
-import com.kustaurant.kustaurant.common.user.controller.port.UserService;
-import com.kustaurant.kustaurant.common.user.domain.User;
-import com.kustaurant.kustaurant.web.comment.PostCommentService;
+import com.kustaurant.kustaurant.comment.controller.web.PostCommentService;
+import com.kustaurant.kustaurant.post.domain.Post;
+import com.kustaurant.kustaurant.post.domain.PostDTO;
+import com.kustaurant.kustaurant.post.domain.PostDetailView;
+import com.kustaurant.kustaurant.post.domain.ReactionToggleResponse;
+import com.kustaurant.kustaurant.user.controller.port.UserService;
 import com.kustaurant.kustaurant.web.post.service.PostScrapService;
 import com.kustaurant.kustaurant.web.post.service.PostService;
-import com.kustaurant.kustaurant.common.post.service.StorageService;
+import com.kustaurant.kustaurant.post.service.StorageService;
 import groovy.util.logging.Slf4j;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

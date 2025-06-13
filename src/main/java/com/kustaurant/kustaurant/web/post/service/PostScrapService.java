@@ -1,10 +1,7 @@
 package com.kustaurant.kustaurant.web.post.service;
 
-import com.kustaurant.kustaurant.common.post.domain.PostScrap;
-import com.kustaurant.kustaurant.common.post.infrastructure.*;
-import com.kustaurant.kustaurant.common.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.common.post.service.port.PostScrapRepository;
-import com.kustaurant.kustaurant.common.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.post.domain.PostScrap;
+import com.kustaurant.kustaurant.post.service.port.PostScrapRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

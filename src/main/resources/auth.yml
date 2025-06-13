@@ -22,5 +22,5 @@ apple:
 # jwt
 jwt:
   secret: ${JWT_SECRET}
-  accessTokenExpiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
-  refreshTokenExpiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+  access-ttl: 15m
+  refresh-ttl: 7d

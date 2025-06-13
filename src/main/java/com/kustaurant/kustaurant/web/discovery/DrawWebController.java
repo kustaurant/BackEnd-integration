@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.web.discovery;
 
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.kustaurant.common.restaurant.presentation.web.RestaurantWebService;
+import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
+import com.kustaurant.kustaurant.restaurant.presentation.web.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

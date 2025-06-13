@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.admin;
 
-import com.kustaurant.kustaurant.common.restaurant.application.service.command.RestaurantApiService;
-import com.kustaurant.kustaurant.common.restaurant.infrastructure.entity.RestaurantEntity;
+import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantApiService;
+import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
