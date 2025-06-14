@@ -11,8 +11,9 @@ import com.kustaurant.kustaurant.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.user.controller.port.MypageService;
-import com.kustaurant.kustaurant.user.controller.web.response.MypageDataDTO;
-import com.kustaurant.kustaurant.user.controller.web.response.MypageWebPostCommentDTO;
+import com.kustaurant.kustaurant.user.controller.web.response.MypageDataView;
+import com.kustaurant.kustaurant.user.controller.web.response.PostCommentView;
+import com.kustaurant.kustaurant.user.controller.web.response.ScrappedPostView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,7 @@ public class MypageServiceImpl implements MypageService {
         return postScrapRepository.findByUserId(userId);
     }
 
-    private List<MypageWebPostCommentDTO> convertCommentsToDTOs(List<PostComment> postComments) {
+    private List<PostCommentView> convertCommentsToDTOs(List<PostComment> postComments) {
         List<Integer> postIds = postComments.stream()
                 .map(PostComment::getPostId)
                 .distinct()
@@ -64,7 +65,7 @@ public class MypageServiceImpl implements MypageService {
                 ));
 
         return postComments.stream()
-                .map(comment -> new MypageWebPostCommentDTO(
+                .map(comment -> new PostCommentView(
                         comment.getCommentId(),
                         comment.getCommentBody(),
                         comment.getNetLikes(),
@@ -75,17 +76,22 @@ public class MypageServiceImpl implements MypageService {
                 .toList();
     }
 
-    @Override
-    public MypageDataDTO getMypageData(Integer userId) {
-        List<PostComment> comments = getActivePostComments(userId);
-        List<MypageWebPostCommentDTO> postCommentDTO = convertCommentsToDTOs(comments);
+    private List<ScrappedPostView> getScrapViews(Integer userId) {
+        return postScrapRepository.findScrapViewsByUserId(userId);
+    }
 
-        return MypageDataDTO.builder()
+    @Override
+    public MypageDataView getMypageData(Integer userId) {
+        List<PostComment> comments = getActivePostComments(userId);
+        List<PostCommentView> postCommentDTO = convertCommentsToDTOs(comments);
+        List<ScrappedPostView> postScrapDTO = getScrapViews(userId);
+
+        return MypageDataView.builder()
                 .restaurantFavoriteList(getRestaurantFavorites(userId))
                 .restaurantEvaluationList(getEvaluations(userId))
                 .postList(getActivePosts(userId))
                 .postCommentList(postCommentDTO)
-                .postScrapList(getPostScraps(userId))
+                .postScrapList(postScrapDTO)
                 .build();
     }
 }

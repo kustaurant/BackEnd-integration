@@ -125,7 +125,7 @@
                 <p>평가한 맛집 수 : <span th:text="${restaurantEvaluationList.size()}"></span></p>
                 <p>커뮤니티 작성한 글 수 : <span th:text="${postList.size()}"></span></p>
                 <p>커뮤니티 작성한 댓글 수 : <span th:text="${postCommentList.size()}"></span></p>
-                <p>커뮤니티 저장된 글 수 : <span th:text="${postScrabList.size()}"></span></p>
+                <p>커뮤니티 저장된 글 수 : <span th:text="${postScrapList.size()}"></span></p>
             </div>
 
             <hr class="margin25px">
@@ -233,12 +233,12 @@
 
                     <div class="postBox">
                         <div>
-                            <a class="postLink" th:text="${postlist.postTitle}" th:href="@{/community/{postId}(postId=${postlist.postId})}"></a>
+                            <a class="postLink" th:text="${postlist.title}" th:href="@{/community/{postId}(postId=${postlist.id})}"></a>
                             </span>
                         </div>
 
                             <div class="underLink">
-                                <span class="category" th:text="${postlist.postCategory}"></span>
+                                <span class="category" th:text="${postlist.category}"></span>
                                 <span class="createdAt" th:text="${postlist.calculateTimeAgo()}"> </span>
                             </div>
 
@@ -293,23 +293,23 @@
 
     <div id="Area6" class="hidden">
         <div id="area7Contents" class="gray-border-circular">
-            <p class="text-center" th:if="${#lists.isEmpty(postScrabList)}">저장된 정보가 없습니다.</p>
-            <ul class="postul" th:unless="${#lists.isEmpty(postScrabList)}">
-                <li th:each="postScrab:${postScrabList}" class="postli">
+            <p class="text-center" th:if="${#lists.isEmpty(postScrapList)}">저장된 정보가 없습니다.</p>
+            <ul class="postul" th:unless="${#lists.isEmpty(postScrapList)}">
+                <li th:each="postScrap:${postScrapList}" class="postli">
                     <hr>
                     <span class="recommend-tab">
                         <img class="likecount" src="../img/community/up.png" alt="이미지">
-                        <span th:text="${postScrab.post.likeCount}"></span>
+                        <span th:text="${postScrap.likeCount}"></span>
                     </span>
 
                     <div class="postBox">
                         <div>
-                            <a class="postLink" th:text="${postScrab.post.postTitle}" th:href="@{/community/{postId}(postId=${postScrab.post.postId})}"></a>
+                            <a class="postLink" th:text="${postScrap.title}" th:href="@{/community/{postId}(postId=${postScrap.postId})}"></a>
                         </div>
 
                         <div class="underLink">
-                            <span class="category" th:text="${postScrab.post.postCategory}"></span>
-                            <span class="createdAt" th:text="${postScrab.post.calculateTimeAgo()}"> </span>
+                            <span class="category" th:text="${postScrap.category}"></span>
+<!--                            <span class="createdAt" th:text="${postScrap.post.calculateTimeAgo()}"> </span>-->
                         </div>
 
                     </div>

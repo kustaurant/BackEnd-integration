@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.post.service.port;
 
 import com.kustaurant.kustaurant.post.domain.PostScrap;
+import com.kustaurant.kustaurant.user.controller.web.response.ScrappedPostView;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +18,6 @@ public interface PostScrapRepository {
     Optional<PostScrap> findByUserIdAndPostId(Integer userId,Integer postId);
 
     void save(PostScrap postScrap);
+
+    public List<ScrappedPostView> findScrapViewsByUserId(Integer userId);
 }

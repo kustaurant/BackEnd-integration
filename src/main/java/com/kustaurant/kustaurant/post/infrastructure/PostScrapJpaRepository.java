@@ -15,15 +15,20 @@ public interface PostScrapJpaRepository extends JpaRepository<PostScrapEntity, I
         ORDER BY ps.createdAt DESC""")
     List<PostScrapEntity> findByUserIdOrderByCreatedAtDesc(@Param("userId") Integer userId);
 
-
-    @Query("SELECT ps FROM PostScrapEntity ps WHERE ps.user.userId = :userId AND ps.post.status = 'ACTIVE'")
-    List<PostScrapEntity> findActiveScrappedPostsByUserId(@Param("userId") Integer userId);
-
     boolean existsByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
 
-    Integer user(UserEntity user);
 
     void deleteByPost_PostId(Integer postId);
 
     Optional<PostScrapEntity> findByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
+
+    @Query("""
+        select ps
+          from PostScrapEntity ps
+          join fetch ps.post p
+         where ps.user.userId = :userId
+           and p.status     = 'ACTIVE'
+         order by ps.createdAt desc
+    """)
+    List<PostScrapEntity> findWithPostByUserId(@Param("userId") Integer userId);
 }

@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.post.infrastructure;
 
 import com.kustaurant.kustaurant.post.domain.PostScrap;
 import com.kustaurant.kustaurant.post.service.port.PostScrapRepository;
+import com.kustaurant.kustaurant.user.controller.web.response.ScrappedPostView;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.user.infrastructure.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
     private final PostScrapJpaRepository postScrapJpaRepository;
     private final UserJpaRepository userJpaRepository;
     private final PostJpaRepository postJpaRepository;
+
     @Override
     public List<PostScrap> findByUserId(Integer userId) {
         return postScrapJpaRepository.findByUserIdOrderByCreatedAtDesc(userId).stream().map(PostScrap::from).toList();
@@ -58,4 +60,22 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
 
         postScrapJpaRepository.save(postScrapEntity);
     }
+
+    @Override
+    public List<ScrappedPostView> findScrapViewsByUserId(Integer userId) {
+        return postScrapJpaRepository.findWithPostByUserId(userId).stream()
+                .map(e -> {
+                    PostEntity p = e.getPost();   // join-fetch 로 이미 로딩됨
+                    return ScrappedPostView.builder()
+                            .postId(p.getPostId())
+                            .title(p.getPostTitle())
+                            .category(p.getPostCategory())
+                            .likeCount(p.getNetLikes())
+//                            .timeAgo(TimeUtil.timeAgo(p.getCreatedAt()))
+                            .build();
+                })
+                .toList();
+    }
+
+
 }

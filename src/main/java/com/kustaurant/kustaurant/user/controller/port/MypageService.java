@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.post.domain.Post;
 import com.kustaurant.kustaurant.post.domain.PostScrap;
 import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
-import com.kustaurant.kustaurant.user.controller.web.response.MypageDataDTO;
+import com.kustaurant.kustaurant.user.controller.web.response.MypageDataView;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ public interface MypageService {
     List<PostComment> getActivePostComments(Integer userId);
     List<PostScrap> getPostScraps(Integer userId);
 
-    MypageDataDTO getMypageData(Integer userId);
+    MypageDataView getMypageData(Integer userId);
 }

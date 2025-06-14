@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.user.service;
 import com.kustaurant.kustaurant.post.domain.UserDTO;
 import com.kustaurant.kustaurant.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.domain.User;
+import com.kustaurant.kustaurant.user.domain.enums.UserStatus;
 import com.kustaurant.kustaurant.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getActiveUserById(Integer id) {
         return userRepository.findById(id)
-                .filter(user -> "ACTIVE".equals(user.getStatus()))
-//                .filter(user->user.getStatus()== UserStatus.ACTIVE)
+//                .filter(user -> "ACTIVE".equals(user.getStatus()))
+                .filter(user->user.getStatus()== UserStatus.ACTIVE)
                 .orElseThrow(()->new DataNotFoundException("User" + id + " not found"));
     }
 

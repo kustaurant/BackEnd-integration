@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class MypageWebPostCommentDTO {
+public class PostCommentView {
     private final Integer commentId;
     private final String commentBody;
     private final Integer likeCount;
