@@ -1,11 +1,14 @@
 package com.kustaurant.kustaurant.user.service;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.post.domain.UserDTO;
 import com.kustaurant.kustaurant.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.domain.User;
 import com.kustaurant.kustaurant.user.domain.enums.UserStatus;
 import com.kustaurant.kustaurant.user.service.port.UserRepository;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +25,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id)
 //                .filter(user -> "ACTIVE".equals(user.getStatus()))
                 .filter(user->user.getStatus()== UserStatus.ACTIVE)
-                .orElseThrow(()->new DataNotFoundException("User" + id + " not found"));
+                .orElseThrow(()->new DataNotFoundException(USER_NOT_FOUND, id, "유저"));
     }
 
     @Override

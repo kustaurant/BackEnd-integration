@@ -12,7 +12,7 @@ import com.kustaurant.kustaurant.post.domain.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.service.port.UserRepository;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

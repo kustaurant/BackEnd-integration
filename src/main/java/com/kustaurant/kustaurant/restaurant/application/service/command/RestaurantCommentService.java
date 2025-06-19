@@ -1,15 +1,17 @@
 package com.kustaurant.kustaurant.restaurant.application.service.command;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
 import com.kustaurant.kustaurant.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.evaluation.service.EvaluationService;
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantRepository;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.restaurant.application.service.command.dto.RestaurantCommentDTO;
 import com.kustaurant.kustaurant.user.infrastructure.OUserRepository;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ public class RestaurantCommentService {
     public RestaurantComment findCommentByCommentId(Integer commentId) {
         Optional<RestaurantComment> commentOptional = restaurantCommentRepository.findByCommentIdAndStatus(commentId, "ACTIVE");
         if (commentOptional.isEmpty()) {
-            throw new OptionalNotExistException(commentId + " 코멘트가 없습니다.");
+            throw new DataNotFoundException(RESTAURANT_COMMENT_NOT_FOUND, commentId, "식당 대댓글");
         }
         return commentOptional.get();
     }
@@ -109,7 +111,7 @@ public class RestaurantCommentService {
             );
             return restaurantCommentDTO;
         } else {
-            throw new DataNotFoundException("comment not found");
+            throw new DataNotFoundException(EVALUATION_NOT_FOUND, evaluationId, "평가");
         }
     }
 

@@ -1,10 +1,13 @@
 package com.kustaurant.kustaurant.restaurant.infrastructure.repository;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +24,7 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     public RestaurantFavorite findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
         return jpaRepository.findByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId)
                 .map(RestaurantFavoriteEntity::toDomain)
-                .orElseThrow(() -> new DataNotFoundException("요청한 restaurantFavorite이 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
+                .orElseThrow(() -> new DataNotFoundException(RESTAURANT_FAVORITE_NOT_FOUND, "요청한 restaurantFavorite이 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
     }
 
     @Override

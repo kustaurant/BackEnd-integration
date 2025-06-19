@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

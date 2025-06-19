@@ -1,13 +1,16 @@
 package com.kustaurant.kustaurant.post.infrastructure;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
 import com.kustaurant.kustaurant.comment.domain.PostComment;
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.post.domain.Post;
 import com.kustaurant.kustaurant.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.user.infrastructure.UserJpaRepository;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,7 +63,7 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public Post save(Post post) {
         UserEntity userEntity = userJpaRepository.findByUserId(post.getAuthorId())
-                .orElseThrow(() -> new DataNotFoundException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND, post.getAuthorId(), "유저"));
 
         PostEntity postEntity;
         if (post.getId() == null) {
@@ -69,7 +72,7 @@ public class PostRepositoryImpl implements PostRepository {
             postEntity.setUpdatedAt(LocalDateTime.now());
         } else {
             postEntity = postJpaRepository.findById(post.getId())
-                    .orElseThrow(() -> new DataNotFoundException("게시물이 존재하지 않습니다."));
+                    .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUNT, post.getId(), "게시물"));
 
             // 엔티티 상태 동기화
             postEntity.setPostTitle(post.getTitle());
@@ -87,7 +90,7 @@ public class PostRepositoryImpl implements PostRepository {
                     PostCommentEntity entity = postEntity.getPostCommentList().stream()
                             .filter(e -> e.getCommentId().equals(comment.getCommentId()))
                             .findFirst()
-                            .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
+                            .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, comment.getCommentId(), "댓글"));
 
                     // 댓글 상태 동기화 (예: soft delete, netLikes 등)
                     entity.setStatus(comment.getStatus());
@@ -99,7 +102,7 @@ public class PostRepositoryImpl implements PostRepository {
                             PostCommentEntity replyEntity = entity.getRepliesList().stream()
                                     .filter(r -> r.getCommentId().equals(reply.getCommentId()))
                                     .findFirst()
-                                    .orElseThrow(() -> new DataNotFoundException("대댓글이 존재하지 않습니다."));
+                                    .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, "대댓글이 존재하지 않습니다."));
 
                             replyEntity.setStatus(reply.getStatus());
                             replyEntity.setLikeCount(reply.getNetLikes());
@@ -129,7 +132,7 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public void increaseVisitCount(Integer postId) {
         PostEntity post = postJpaRepository.findById(postId)
-                .orElseThrow(() -> new DataNotFoundException("게시글이 존재하지 않습니다"));
+                .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUNT, postId, "게시글"));
         post.setPostVisitCount(post.getPostVisitCount() + 1);
     }
 

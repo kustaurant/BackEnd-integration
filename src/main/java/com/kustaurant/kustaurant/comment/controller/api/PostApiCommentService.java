@@ -1,16 +1,19 @@
 package com.kustaurant.kustaurant.comment.controller.api;
 
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
 import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.comment.controller.web.PostCommentService;
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentApiRepository;
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.post.domain.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.OUserService;
-import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.post.domain.PostDTO;
 import com.kustaurant.kustaurant.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.comment.dto.PostCommentDTO;
@@ -47,7 +50,7 @@ public class PostApiCommentService {
         if (postComment.isPresent()) {
             return postComment.get();
         } else {
-            throw new OptionalNotExistException("해당 id의 댓글이 존재하지 않습니다.");
+            throw new DataNotFoundException(COMMENT_NOT_FOUNT, commentId, "댓글");
         }
     }
 

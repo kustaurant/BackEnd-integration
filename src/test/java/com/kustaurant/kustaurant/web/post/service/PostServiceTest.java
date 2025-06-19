@@ -9,7 +9,7 @@ import com.kustaurant.kustaurant.post.service.port.*;
 import com.kustaurant.kustaurant.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.domain.User;
 import com.kustaurant.kustaurant.user.service.port.UserRepository;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

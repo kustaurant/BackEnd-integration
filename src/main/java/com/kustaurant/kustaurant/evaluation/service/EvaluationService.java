@@ -1,6 +1,10 @@
 package com.kustaurant.kustaurant.evaluation.service;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
 import com.kustaurant.kustaurant.evaluation.infrastructure.*;
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantApiService;
 import com.kustaurant.kustaurant.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.restaurant.application.service.command.dto.RestaurantTierDataClass;
@@ -10,7 +14,6 @@ import com.kustaurant.kustaurant.evaluation.infrastructure.situation.SituationRe
 import com.kustaurant.kustaurant.restaurant.application.service.command.S3Service;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantRepository;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.evaluation.domain.EvaluationDTO;
@@ -55,7 +58,7 @@ public class EvaluationService {
     public EvaluationEntity getByEvaluationId(Integer evaluationId) {
         Optional<EvaluationEntity> evaluationOptional = evaluationRepository.findByEvaluationIdAndStatus(evaluationId, "ACTIVE");
         if (evaluationOptional.isEmpty()) {
-            throw new OptionalNotExistException(evaluationId + " 평가가 없습니다.");
+            throw new DataNotFoundException(EVALUATION_NOT_FOUND, evaluationId, "평가");
         }
         return evaluationOptional.get();
     }

@@ -52,6 +52,8 @@ public class GlobalExceptionRestHandler {
     ) {
         ErrorCode errorCode = ex.getErrorCode();
 
+        log.error("[BusinessException] {} {}", req.getMethod(), req.getRequestURI(), ex);
+
         return ResponseEntity
                 .status(errorCode.getStatus())
                 .body(ApiErrorResponse.of(errorCode));

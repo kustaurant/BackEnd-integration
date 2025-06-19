@@ -1,7 +1,10 @@
 package com.kustaurant.kustaurant.web.post.service;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
 import com.kustaurant.kustaurant.comment.domain.PostComment;
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.post.domain.*;
 import com.kustaurant.kustaurant.post.enums.*;
 import com.kustaurant.kustaurant.post.infrastructure.PostEntity;
@@ -10,7 +13,7 @@ import com.kustaurant.kustaurant.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.domain.User;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.user.service.port.UserRepository;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -106,7 +109,7 @@ public class PostService {
         if (post.isPresent()) {
             return post.get();
         } else {
-            throw new DataNotFoundException("post not found");
+            throw new DataNotFoundException(POST_NOT_FOUNT, id, "게시글");
         }
     }
 
@@ -291,7 +294,8 @@ public class PostService {
 
     @Transactional
     public void deletePost(Integer postId) {
-        Post post = postRepository.findByIdWithComments(postId).orElseThrow(() -> new DataNotFoundException("게시물이 존재하지 않습니다."));
+        Post post = postRepository.findByIdWithComments(postId)
+                .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUNT, postId, "게시글"));
 
         // 게시물 상태 변경
         post.delete();
