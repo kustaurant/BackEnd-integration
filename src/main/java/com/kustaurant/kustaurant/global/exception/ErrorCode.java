@@ -18,6 +18,17 @@ public enum ErrorCode {
 
     /* ──── RESTAURANT ──── */
     RESTAURANT_NOT_FOUND  (HttpStatus.NOT_FOUND,            "RESTAURANT-001", "식당을 찾을 수 없습니다."),
+    RESTAURANT_COMMENT_NOT_FOUND (HttpStatus.NOT_FOUND, "RESTAURANT-002", "식당 대댓글을 찾을 수 없습니다."),
+    RESTAURANT_FAVORITE_NOT_FOUND (HttpStatus.NOT_FOUND, "RESTAURANT-003", "식당 즐겨찾기를 찾을 수 없습니다."),
+
+    /* ──── EVALUATION ──── */
+    EVALUATION_NOT_FOUND (HttpStatus.NOT_FOUND, "EVALUATION-001", "평가를 찾을 수 없습니다."),
+
+    /* ──── POST ──── */
+    POST_NOT_FOUNT (HttpStatus.NOT_FOUND, "POST-001", "게시글을 찾을 수 없습니다."),
+
+    /* ──── COMMENT ──── */
+    COMMENT_NOT_FOUNT (HttpStatus.NOT_FOUND, "COMMENT-001", "댓글을 찾을 수 없습니다."),
 
     /* ──── AUTH ──── */
     UNAUTHORIZED (HttpStatus.UNAUTHORIZED, "AUTH-401-UNAUTHORIZED", "인증이 필요합니다."),

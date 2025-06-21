@@ -1,8 +1,11 @@
 package com.kustaurant.kustaurant.restaurant.application.service.command;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantRepository;
-import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +22,7 @@ public class RestaurantApiService {
     public RestaurantEntity findRestaurantById(Integer restaurantId) {
         Optional<RestaurantEntity> restaurantOptional = restaurantRepository.findByRestaurantIdAndStatus(restaurantId, "ACTIVE");
         if (restaurantOptional.isEmpty()) {
-            throw new OptionalNotExistException(restaurantId + " 식당이 없습니다.");
+            throw new DataNotFoundException(RESTAURANT_NOT_FOUND, restaurantId, "식당");
         }
         return restaurantOptional.get();
     }

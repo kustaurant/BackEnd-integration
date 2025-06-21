@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.restaurant.presentation.web;
 
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.application.service.command.dto.RestaurantCommentDTO;
 import com.kustaurant.kustaurant.restaurant.application.service.command.dto.RestaurantDetailDTO;
@@ -10,7 +11,7 @@ import com.kustaurant.kustaurant.restaurant.application.service.command.Restaura
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantMenuRepository;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantRepository;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Join;
@@ -104,7 +105,7 @@ public class RestaurantWebService {
         if (restaurant.isPresent()) {
             return restaurant.get();
         } else {
-            throw new DataNotFoundException("restaurant not found");
+            throw new DataNotFoundException(ErrorCode.RESTAURANT_NOT_FOUND, id, "식당");
         }
     }
 

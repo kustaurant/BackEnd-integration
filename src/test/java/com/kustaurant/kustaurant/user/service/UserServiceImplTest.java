@@ -4,10 +4,9 @@ import com.kustaurant.kustaurant.user.domain.User;
 import com.kustaurant.kustaurant.user.domain.enums.UserStatus;
 import com.kustaurant.kustaurant.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.user.domain.vo.PhoneNumber;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.mock.FakeUserRepository;
-import com.kustaurant.kustaurant.user.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

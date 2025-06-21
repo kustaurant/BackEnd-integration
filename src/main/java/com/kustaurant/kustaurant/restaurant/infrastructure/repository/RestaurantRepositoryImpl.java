@@ -1,11 +1,14 @@
 package com.kustaurant.kustaurant.restaurant.infrastructure.repository;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.restaurant.application.service.query.port.RestaurantQueryRepository;
 import com.kustaurant.kustaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantRepository;
 import com.kustaurant.kustaurant.restaurant.infrastructure.spec.RestaurantSearchSpec;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,13 +49,13 @@ public class RestaurantRepositoryImpl implements RestaurantQueryRepository, Rest
     @Override
     public Restaurant getById(Integer id) {
         return jpaRepository.findById(id).map(RestaurantEntity::toDomain)
-                .orElseThrow(() -> new DataNotFoundException("요청한 restaurant가 존재하지 않습니다. 요청 정보 - id: " + id));
+                .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND, id, "식당"));
     }
 
     @Override
     public Restaurant getByIdAndStatus(Integer id, String status) {
         return jpaRepository.findByRestaurantIdAndStatus(id, status).map(RestaurantEntity::toDomain)
-                .orElseThrow(() -> new DataNotFoundException("요청한 restaurant가 존재하지 않습니다. 요청 정보 - id: " + id + ", status: " + status));
+                .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND, "요청한 restaurant가 존재하지 않습니다. 요청 정보 - id: " + id + ", status: " + status));
     }
 
     @Override

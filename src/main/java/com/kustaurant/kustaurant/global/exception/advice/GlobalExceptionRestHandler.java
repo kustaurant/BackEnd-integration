@@ -7,13 +7,15 @@ import com.kustaurant.kustaurant.global.exception.exception.auth.JwtAuthExceptio
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(annotations = RestController.class)
 public class GlobalExceptionRestHandler {
 
     /**   1. Bean Validation 오류   */
@@ -51,6 +53,8 @@ public class GlobalExceptionRestHandler {
             HttpServletRequest req
     ) {
         ErrorCode errorCode = ex.getErrorCode();
+
+        log.error("[BusinessException] {} {}", req.getMethod(), req.getRequestURI(), ex);
 
         return ResponseEntity
                 .status(errorCode.getStatus())

@@ -1,9 +1,12 @@
 package com.kustaurant.kustaurant.restaurant.application.service.query;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.application.service.query.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
 import com.kustaurant.kustaurant.restaurant.application.service.query.port.RestaurantQueryRepository;
-import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +30,7 @@ public class RestaurantDrawService {
 
         // 조건에 맞는 식당이 없을 경우 404 에러 반환
         if (dtoList.isEmpty()) {
-            throw new OptionalNotExistException("해당 조건에 맞는 맛집이 존재하지 않습니다.");
+            throw new DataNotFoundException(RESTAURANT_NOT_FOUND, "해당 조건에 맞는 맛집이 존재하지 않습니다.");
         }
 
         return pickRandomUnique(dtoList);

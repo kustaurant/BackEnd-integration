@@ -13,7 +13,7 @@
     import com.kustaurant.kustaurant.evaluation.infrastructure.RestaurantComment;
     import com.kustaurant.kustaurant.evaluation.service.port.EvaluationRepository;
     import com.kustaurant.kustaurant.evaluation.infrastructure.EvaluationEntity;
-    import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+    import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
     import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
     import com.kustaurant.kustaurant.evaluation.service.EvaluationService;
 

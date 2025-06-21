@@ -1,10 +1,13 @@
 package com.kustaurant.kustaurant.mock;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +22,7 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
                 .filter(fav -> fav.getUser().getId().equals(userId) &&
                         fav.getRestaurant().getRestaurantId().equals(restaurantId))
                 .findFirst()
-                .orElseThrow(() -> new DataNotFoundException("Favorite not found"));
+                .orElseThrow(() -> new DataNotFoundException(RESTAURANT_FAVORITE_NOT_FOUND, "Favorite not found - UserId:" + userId + ", RestaurantId:" + restaurantId));
 
     }
 

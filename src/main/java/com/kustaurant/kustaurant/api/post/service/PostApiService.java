@@ -1,16 +1,18 @@
 package com.kustaurant.kustaurant.api.post.service;
 
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.POST_NOT_FOUNT;
+
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentApiRepository;
 import com.kustaurant.kustaurant.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.post.domain.Post;
 import com.kustaurant.kustaurant.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.infrastructure.*;
 import com.kustaurant.kustaurant.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.user.domain.User;
 import com.kustaurant.kustaurant.user.service.port.UserRepository;
-import com.kustaurant.kustaurant.global.exception.exception.OptionalNotExistException;
 import com.kustaurant.kustaurant.post.domain.PostUpdateDTO;
 import com.kustaurant.kustaurant.post.domain.UserDTO;
 import com.kustaurant.kustaurant.post.domain.PostDTO;
@@ -86,7 +88,7 @@ public class PostApiService {
         if (post.isPresent()) {
             return post.get();
         } else {
-            throw new OptionalNotExistException("해당 postId의 게시글을 찾을 수 없습니다.");
+            throw new DataNotFoundException(POST_NOT_FOUNT, id, "게시글");
         }
     }
 
@@ -204,7 +206,7 @@ public class PostApiService {
             // 분기별 순위 리스트 계산
             return calculateRankForQuarter(userList, currentYear, currentQuarter);
         } else {
-            throw new OptionalNotExistException("sort값이 잘못 입력되었습니다.");
+            throw new DataNotFoundException(POST_NOT_FOUNT, "sort값이 잘못 입력되었습니다.");
         }
     }
 

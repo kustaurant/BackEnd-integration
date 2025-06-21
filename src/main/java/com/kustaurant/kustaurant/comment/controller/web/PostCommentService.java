@@ -1,11 +1,14 @@
 package com.kustaurant.kustaurant.comment.controller.web;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
 import com.kustaurant.kustaurant.comment.domain.PostComment;
 import com.kustaurant.kustaurant.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.comment.infrastructure.*;
 import com.kustaurant.kustaurant.comment.service.port.PostCommentDislikeRepository;
 import com.kustaurant.kustaurant.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.comment.service.port.PostCommentRepository;
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.post.domain.*;
 import com.kustaurant.kustaurant.post.enums.DislikeStatus;
 import com.kustaurant.kustaurant.post.enums.LikeStatus;
@@ -13,7 +16,7 @@ import com.kustaurant.kustaurant.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.enums.ScrapStatus;
 import com.kustaurant.kustaurant.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.domain.User;
-import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +45,7 @@ public class PostCommentService {
         PostComment comment = PostComment.create(content, userId, postId);
         if (parentCommentId != null) {
             PostComment parent = postCommentRepository.findById(parentCommentId)
-                    .orElseThrow(() -> new DataNotFoundException("부모 댓글을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, "부모 댓글을 찾을 수 없습니다."));
             comment.setParent(parent);
         }
         postCommentRepository.save(comment);
@@ -55,14 +58,14 @@ public class PostCommentService {
         if (postComment.isPresent()) {
             return postComment.get();
         } else {
-            throw new DataNotFoundException("PostComment not found");
+            throw new DataNotFoundException(COMMENT_NOT_FOUNT, commentId, "댓글");
         }
     }
 
     @Transactional
     public ReactionToggleResponse toggleLike(Integer userId, Integer commentId) {
         PostComment comment = postCommentRepository.findById(commentId)
-                .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, commentId, "댓글"));
 
         boolean isLikedBefore = postCommentLikeRepository.existsByUserIdAndCommentId(userId, commentId);
         boolean isDislikedBefore = postCommentDislikeRepository.existsByUserIdAndCommentId(userId, commentId);
@@ -98,7 +101,7 @@ public class PostCommentService {
     @Transactional
     public ReactionToggleResponse toggleDislike(Integer userId, Integer commentId) {
         PostComment comment = postCommentRepository.findById(commentId)
-                .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, "댓글이 존재하지 않습니다."));
 
         boolean isLikedBefore = postCommentLikeRepository.existsByUserIdAndCommentId(userId, commentId);
         boolean isDislikedBefore = postCommentDislikeRepository.existsByUserIdAndCommentId(userId, commentId);
@@ -245,7 +248,7 @@ public class PostCommentService {
     @Transactional
     public int deleteComment(Integer commentId) {
         PostComment comment = postCommentRepository.findByIdWithReplies(commentId)
-                .orElseThrow(() -> new DataNotFoundException("댓글이 존재하지 않습니다."));
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, commentId, "댓글"));
 
         comment.delete();  // 도메인 내에서 댓글 + 대댓글 상태 변경
 
