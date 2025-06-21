@@ -1,11 +1,13 @@
 package com.kustaurant.kustaurant.restaurant.presentation.web;
 
+import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtToken;
 import com.kustaurant.kustaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantService;
 
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -32,16 +34,14 @@ public class RestaurantWebController {
     public String restaurant(
             Model model,
             @PathVariable Integer restaurantId,
-            Principal principal
+            @Parameter(hidden = true) @JwtToken Integer userId
     ) {
         model.addAttribute("initialDisplayMenuCount", initialDisplayMenuCount);
-        // 유저
-        UserEntity user = principal == null ? null : customOAuth2UserService.getUser(principal.getName());
         // 식당 정보
-        RestaurantDetailWebDto restaurantDetailWebDto = restaurantWebService.getRestaurantWebDetails(user, restaurantId);
+        RestaurantDetailWebDto restaurantDetailWebDto = restaurantWebService.getRestaurantWebDetails(userId, restaurantId);
         model.addAttribute("restaurantDto", restaurantDetailWebDto);
         String evaluationButton =
-                (user != null && restaurantDetailWebDto.getRestaurantDetail().getIsEvaluated()) ? "다시 평가하기" : " 평가하기";
+                (userId != null && restaurantDetailWebDto.getRestaurantDetail().getIsEvaluated()) ? "다시 평가하기" : " 평가하기";
         model.addAttribute("evaluationButton", evaluationButton);
         // 메뉴 정보
         model.addAttribute("menus", restaurantDetailWebDto.getRestaurantDetail().getRestaurantMenuList());

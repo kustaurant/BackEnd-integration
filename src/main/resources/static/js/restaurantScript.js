@@ -213,7 +213,7 @@ function toggleButton(buttonNumber) {
     const commentsUl = document.getElementById('commentList');
     const currentButton = document.getElementById(`button${buttonNumber}`);
     const queryParameter = buttonNumber === 1 ? 'POPULAR' : 'LATEST';
-    const apiUrl = "/api" + window.location.pathname + "/comments?sort=" + queryParameter;
+    const apiUrl = "/web/api" + window.location.pathname + "/comments?sort=" + queryParameter;
     fetch(apiUrl)
         .then(response => {
             if (!response.ok) {
@@ -243,7 +243,7 @@ function toggleButton(buttonNumber) {
 
 // 댓글 달기 요청
 function sendComment() {
-    const apiUrl = window.location.origin + "/api" + window.location.pathname + "/comments";
+    const apiUrl = window.location.origin + "/web/api" + window.location.pathname + "/comments";
     const currentUrl = window.location.href;
     const commentInput = document.getElementById('commentInput');
     const commentBody = commentInput.value.trim();
@@ -289,7 +289,7 @@ function sendComment() {
 function commentLike(button) {
     const commentId = button.getAttribute("data-id");
     const parentCommentId = button.getAttribute("data-parent-id");
-    const apiUrl = window.location.origin + `/api/restaurants/comments/${commentId}/like`;
+    const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}/like`;
     fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -314,7 +314,7 @@ function commentLike(button) {
 function commentDislike(button) {
     const commentId = button.getAttribute("data-id");
     const parentCommentId = button.getAttribute("data-parent-id");
-    const apiUrl = window.location.origin + `/api/restaurants/comments/${commentId}/dislike`;
+    const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}/dislike`;
     fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -337,7 +337,7 @@ function commentDislike(button) {
 }
 // 댓글 하나 html 교체
 function changeCommentHtml(commentId, commentLi) {
-    const apiUrl = window.location.origin + `/api/restaurants/comments/${commentId}`;
+    const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}`;
     fetch(apiUrl, {
         method: "GET",
     })
@@ -356,7 +356,7 @@ function deleteComment(deleteButton) {
     var deleteAgreeButton = document.getElementById('deleteAgreeButton');
 
     deleteAgreeButton.onclick = function() {
-        const apiUrl = window.location.origin + `/api/restaurants/comments/${commentId}`;
+        const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}`;
         fetch(apiUrl, {
             method: "DELETE",
         })
