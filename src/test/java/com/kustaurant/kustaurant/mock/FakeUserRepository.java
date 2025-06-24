@@ -76,4 +76,9 @@ public class FakeUserRepository implements UserRepository {
     public Map<Integer, UserDTO> getUserDTOMapByIds(List<Integer> ids) {
         return Map.of();
     }
+
+    @Override
+    public User getReference(Integer userId) {
+        return getById(userId);
+    }
 }

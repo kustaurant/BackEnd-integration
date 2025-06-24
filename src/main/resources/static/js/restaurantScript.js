@@ -47,6 +47,10 @@ document.getElementById('favoriteImg').addEventListener('click', function() {
 function toggleFavoriteRequest() {
     fetch(window.location.origin + "/web/api" + window.location.pathname + "/favorite/toggle", {
         method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
+        }
     })
         .then(response => {
             if (response.redirected) {
@@ -167,31 +171,31 @@ if (unfoldButton) {
 }
 
 // 네이버 지도 펼쳤다 접기
-document.getElementById('mapUnfoldButton').addEventListener('click', function() {
-    const thisText = this.textContent;
-    const mapDiv = document.getElementById('map');
-    const mapContainer = document.getElementById('mapContainer');
-    const width = parseFloat(getComputedStyle(this).width);
-
-    if (thisText === '펼치기') {
-        this.textContent = '접기';
-        let newHeight = width * 0.6;
-        if (newHeight < 400) {
-            newHeight = 400;
-        }
-        resize(width, newHeight);
-        // 지도가 가장 위로 오도록 화면 스크롤
-        document.getElementById('mapTopDiv').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        //window.scrollBy(0, -110);
-    } else {
-        this.textContent = '펼치기';
-        resize(width, 150);
-    }
-});
-function resize(width, height){
-    var Size = new naver.maps.Size(width, height);
-    map.setSize(Size);
-}
+// document.getElementById('mapUnfoldButton').addEventListener('click', function() {
+//     const thisText = this.textContent;
+//     const mapDiv = document.getElementById('map');
+//     const mapContainer = document.getElementById('mapContainer');
+//     const width = parseFloat(getComputedStyle(this).width);
+//
+//     if (thisText === '펼치기') {
+//         this.textContent = '접기';
+//         let newHeight = width * 0.6;
+//         if (newHeight < 400) {
+//             newHeight = 400;
+//         }
+//         resize(width, newHeight);
+//         // 지도가 가장 위로 오도록 화면 스크롤
+//         document.getElementById('mapTopDiv').scrollIntoView({ behavior: 'smooth', block: 'start' });
+//         //window.scrollBy(0, -110);
+//     } else {
+//         this.textContent = '펼치기';
+//         resize(width, 150);
+//     }
+// });
+// function resize(width, height){
+//     var Size = new naver.maps.Size(width, height);
+//     map.setSize(Size);
+// }
 
 // 댓글 입력 창 글자 제한
 // const commentTextArea = document.getElementById('commentInput');
@@ -206,8 +210,17 @@ function resize(width, height){
 //     }
 // });
 
+// csrf 토큰 읽어오기
+// CSRF 토큰 가져오기
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
 // 댓글 인기순, 최신순 토글 초기화
-let activeButton = document.getElementById('button1');
+const btn1 = document.getElementById('button1');
+const btn2 = document.getElementById('button2');
+let activeButton = btn1;
+btn1.addEventListener('click', () => toggleButton(1));
+btn2.addEventListener('click', () => toggleButton(2));
 // 댓글 인기순, 최신순 토글 함수
 function toggleButton(buttonNumber) {
     const commentsUl = document.getElementById('commentList');
@@ -254,7 +267,8 @@ function sendComment() {
     fetch(apiUrl, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
         },
         body: JSON.stringify({
             commentBody: commentBody,
@@ -272,8 +286,8 @@ function sendComment() {
                 } else if (response.status === 400) {
                     // 메시지가 빈 경우
                     commentInput.value = '';
-                    return response.text().then(errorMessege => {
-                        alert(errorMessege);
+                    return response.text().then(errorMessage => {
+                        alert(errorMessage);
                     })
                 } else {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -290,10 +304,12 @@ function commentLike(button) {
     const commentId = button.getAttribute("data-id");
     const parentCommentId = button.getAttribute("data-parent-id");
     const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}/like`;
+
     fetch(apiUrl, {
-        method: "GET",
+        method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
         },
     })
         .then(response => {
@@ -315,10 +331,12 @@ function commentDislike(button) {
     const commentId = button.getAttribute("data-id");
     const parentCommentId = button.getAttribute("data-parent-id");
     const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}/dislike`;
+
     fetch(apiUrl, {
-        method: "GET",
+        method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
         },
     })
         .then(response => {
@@ -359,6 +377,7 @@ function deleteComment(deleteButton) {
         const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}`;
         fetch(apiUrl, {
             method: "DELETE",
+            [csrfHeader]: csrfToken
         })
             .then(response => {
                 if (!response.ok) {

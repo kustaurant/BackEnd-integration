@@ -50,7 +50,7 @@ public class EvaluationEntity {
     @OneToMany(mappedBy = "evaluation")
     private List<RestaurantCommentDislike> restaurantCommentDislikeList = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
@@ -66,7 +66,7 @@ public class EvaluationEntity {
     private List<RestaurantComment> restaurantCommentList = new ArrayList<>();
 
     @JsonIgnore
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="restaurant_id")
     private RestaurantEntity restaurant;
 

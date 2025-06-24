@@ -4,6 +4,7 @@ import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2User;
 import com.kustaurant.kustaurant.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.global.exception.exception.auth.UnauthenticatedException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,7 +43,9 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
             userId = oAuthUser.getUserId();
         } else if (auth.getPrincipal() instanceof Integer uid) {                // 앱 JWT
             userId = uid;
-        } else {
+        } else if (auth.getPrincipal() instanceof String s && "anonymousUser".equals(s)) {
+            return new AuthUserInfo(null, UserRole.GUEST);
+        }else {
             throw new UnauthenticatedException(
                     "지원하지 않는 principal 타입: " + auth.getPrincipal().getClass().getName());
         }

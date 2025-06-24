@@ -12,17 +12,26 @@ import java.time.LocalDateTime;
 public class RestaurantFavorite {
 
     private Integer favoriteId;
-    User user;
-    Restaurant restaurant;
+    private Integer userId;
+    private Integer restaurantId;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public static RestaurantFavorite create(Integer userId, Integer restaurantId) {
+        return RestaurantFavorite.builder()
+                .userId(userId)
+                .restaurantId(restaurantId)
+                .status("ACTIVE")
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
     public static RestaurantFavorite from(RestaurantFavoriteEntity entity) {
         return RestaurantFavorite.builder()
                 .favoriteId(entity.getFavoriteId())
-                .user(User.from(entity.getUser()))
-                .restaurant(Restaurant.from(entity.getRestaurant()))
+                .userId(entity.getUser().getUserId())
+                .restaurantId(entity.getRestaurant().getRestaurantId())
                 .status(entity.getStatus())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())

@@ -18,7 +18,7 @@
             <span th:text="${restaurantComment.commentScore}"></span>
         </div>
         <div class="nick-date-div">
-            <img th:src="${restaurantComment.userEntity.getRankImg()}">
+            <img th:src="${restaurantComment.getCommentIconImgUrl()}">
             <span class="nick-span" th:text="${restaurantComment.commentNickname}"></span>
             <span class="date-span" th:text="${restaurantComment.commentTime}"></span>
             <!-- Button trigger modal -->
@@ -51,7 +51,7 @@
         </div>
         <div class="body-div">
             <div class="nick-date-div">
-                <img th:src="${reply.userEntity.getRankImg()}">
+                <img th:src="${reply.getCommentIconImgUrl()}">
                 <span class="nick-span" th:text="${reply.commentNickname}"></span>
                 <span class="date-span" th:text="${reply.commentTime}"></span>
                 <!-- Button trigger modal -->

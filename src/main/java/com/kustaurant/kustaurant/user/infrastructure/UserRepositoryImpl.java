@@ -73,6 +73,11 @@ public class UserRepositoryImpl implements UserRepository {
                 ));
     }
 
+    @Override
+    public User getReference(Integer userId) {
+        return userJpaRepository.getReferenceById((long) userId).toModel();
+    }
+
 
     public Optional<UserEntity> findEntityById(Integer id) {
         return userJpaRepository.findByUserId(id);

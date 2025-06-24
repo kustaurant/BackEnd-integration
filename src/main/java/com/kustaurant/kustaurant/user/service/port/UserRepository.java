@@ -21,4 +21,5 @@ public interface UserRepository {
 
     Map<Integer, UserDTO> getUserDTOMapByIds(List<Integer> ids);
 
+    User getReference(Integer userId);
 }

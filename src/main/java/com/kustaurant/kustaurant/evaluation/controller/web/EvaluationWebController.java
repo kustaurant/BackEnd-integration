@@ -148,7 +148,7 @@
 
         // 식당 댓글 좋아요
         @PreAuthorize("isAuthenticated() and hasRole('USER')")
-        @GetMapping("/web/api/restaurants/comments/{commentId}/like")
+        @PostMapping("/web/api/restaurants/comments/{commentId}/like")
         public ResponseEntity<Map<String, String>> likeRestaurantComment(
                 @PathVariable Integer commentId,
                 @Parameter(hidden = true) @JwtToken Integer userId
@@ -179,7 +179,7 @@
 
         // 식당 댓글 싫어요
         @PreAuthorize("isAuthenticated() and hasRole('USER')")
-        @GetMapping("/web/api/restaurants/comments/{commentId}/dislike")
+        @PostMapping("/web/api/restaurants/comments/{commentId}/dislike")
         public ResponseEntity<Map<String, String>> dislikeRestaurantComment(
                 @PathVariable Integer commentId,
                 @Parameter(hidden = true) @JwtToken Integer userId
