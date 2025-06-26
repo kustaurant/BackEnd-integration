@@ -17,7 +17,7 @@ public class Post {
     private String body;
     private String category;
     private ContentStatus status;
-    private Integer authorId;
+    private Long authorId;
     private Integer netLikes;
     private Integer likeCount;
     private Integer dislikeCount;

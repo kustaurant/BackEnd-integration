@@ -13,14 +13,14 @@ public class PostLikeRepositoryImpl implements PostLikeRepository {
     private final PostLikeJpaRepository postLikeJpaRepository;
 
     @Override
-    public Optional<PostLike> findByUserIdAndPostId(Integer userId, Integer postId) {
+    public Optional<PostLike> findByUserIdAndPostId(Long userId, Integer postId) {
         return postLikeJpaRepository
                 .findByUser_UserIdAndPost_PostId(userId,postId)
                 .map(PostLikeEntity::toDomain);
     }
 
     @Override
-    public Boolean existsByUserIdAndPostId(Integer userId, Integer postId) {
+    public Boolean existsByUserIdAndPostId(Long userId, Integer postId) {
         return postLikeJpaRepository.existsByUser_UserIdAndPost_PostId(userId,postId);
     }
 
@@ -31,7 +31,7 @@ public class PostLikeRepositoryImpl implements PostLikeRepository {
     }
 
     @Override
-    public void deleteByUserIdAndPostId(Integer userId, Integer postId) {
+    public void deleteByUserIdAndPostId(Long userId, Integer postId) {
         postLikeJpaRepository.findByUser_UserIdAndPost_PostId(userId,postId)
                 .ifPresent(entity -> {
                     postLikeJpaRepository.delete(entity);

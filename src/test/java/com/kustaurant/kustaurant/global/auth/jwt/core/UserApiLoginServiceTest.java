@@ -10,11 +10,11 @@ import com.kustaurant.kustaurant.global.auth.jwt.naver.NaverApiService;
 import com.kustaurant.kustaurant.global.auth.jwt.naver.NaverLoginRequest;
 import com.kustaurant.kustaurant.global.auth.jwt.response.TokenResponse;
 import com.kustaurant.kustaurant.global.exception.exception.auth.RefreshTokenInvalidException;
-import com.kustaurant.kustaurant.user.domain.User;
-import com.kustaurant.kustaurant.user.domain.enums.UserRole;
-import com.kustaurant.kustaurant.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
+import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
+import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -67,7 +67,7 @@ class UserApiLoginServiceTest {
                     "naverAccess"
             );
             User user = User.builder()
-                    .id(1)
+                    .id(1L)
                     .nickname(new Nickname("테스트유저"))
                     .email("a@b.com")
                     .providerId("PROVIDER_ID")
@@ -82,8 +82,8 @@ class UserApiLoginServiceTest {
 
             when(naverApiService.getUserInfo("naverAccess")).thenReturn(naverInfo);
             when(userRepository.findByProviderId("PID123")).thenReturn(Optional.of(user));
-            when(jwtUtil.generateAccessToken(1, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(1, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccessToken(1L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefreshToken(1L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
@@ -93,7 +93,7 @@ class UserApiLoginServiceTest {
             assertThat(tokenResponse.accessToken()).isEqualTo(ACCESS);
             assertThat(tokenResponse.refreshToken()).isEqualTo(REFRESH);
 
-            verify(refreshStore).save(1, REFRESH, Duration.ofDays(15));
+            verify(refreshStore).save(1L, REFRESH, Duration.ofDays(15));
             verify(userRepository, never()).save(any());
         }
 
@@ -112,7 +112,7 @@ class UserApiLoginServiceTest {
                     .thenReturn(Optional.empty());
 
             User newUser = User.builder()
-                    .id(99)
+                    .id(99L)
                     .nickname(new Nickname("테스트유저"))
                     .email("new@user.com")
                     .providerId("NEW_PID")
@@ -123,8 +123,8 @@ class UserApiLoginServiceTest {
                     .build();
             when(userRepository.save(any(User.class))).thenReturn(newUser);
 
-            when(jwtUtil.generateAccessToken(99, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(99, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccessToken(99L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefreshToken(99L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             // w
@@ -135,7 +135,7 @@ class UserApiLoginServiceTest {
             assertThat(token.refreshToken()).isEqualTo(REFRESH);
 
             verify(userRepository, times(1)).save(any(User.class));
-            verify(refreshStore).save(99, REFRESH, Duration.ofDays(15));
+            verify(refreshStore).save(99L, REFRESH, Duration.ofDays(15));
         }
 
         @Test
@@ -149,7 +149,7 @@ class UserApiLoginServiceTest {
                     .put("email", "re@join.com");
 
             User deletedUser = User.builder()
-                    .id(7)
+                    .id(7L)
                     .providerId("PID_DEL")
                     .loginApi("NAVER")
                     .email("re@join.com")
@@ -163,8 +163,8 @@ class UserApiLoginServiceTest {
             when(userRepository.findByProviderId("PID_DEL"))
                     .thenReturn(Optional.of(deletedUser));
 
-            when(jwtUtil.generateAccessToken(7, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(7, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccessToken(7L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefreshToken(7L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             // w
@@ -178,7 +178,7 @@ class UserApiLoginServiceTest {
             verify(naverApiService).getUserInfo("naverAccess");
             verify(userRepository).findByProviderId("PID_DEL");
             verify(userRepository, never()).save(any());
-            verify(refreshStore).save(7, REFRESH, Duration.ofDays(15));
+            verify(refreshStore).save(7L, REFRESH, Duration.ofDays(15));
         }
     }
 
@@ -207,7 +207,7 @@ class UserApiLoginServiceTest {
             when(appleApiService.verifyAppleIdentityToken(ID_TOKEN)).thenReturn(claims);
 
             User user = User.builder()
-                    .id(1)
+                    .id(1L)
                     .providerId(APPLE_ID)
                     .loginApi("APPLE")
                     .status(UserStatus.ACTIVE)
@@ -216,8 +216,8 @@ class UserApiLoginServiceTest {
                     .build();
 
             when(userRepository.findByProviderId(APPLE_ID)).thenReturn(Optional.of(user));
-            when(jwtUtil.generateAccessToken(1, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(1, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccessToken(1L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefreshToken(1L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
@@ -226,7 +226,7 @@ class UserApiLoginServiceTest {
             //t
             assertThat(res.accessToken()).isEqualTo(ACCESS);
             assertThat(res.refreshToken()).isEqualTo(REFRESH);
-            verify(refreshStore).save(1, REFRESH, Duration.ofDays(15));
+            verify(refreshStore).save(1L, REFRESH, Duration.ofDays(15));
             verify(userRepository, never()).save(any());
         }
 
@@ -242,7 +242,7 @@ class UserApiLoginServiceTest {
             when(userRepository.findByProviderId(APPLE_ID)).thenReturn(Optional.empty());
 
             User newUser = User.builder()
-                    .id(99)
+                    .id(99L)
                     .providerId(APPLE_ID)
                     .loginApi("APPLE")
                     .status(UserStatus.ACTIVE)
@@ -251,8 +251,8 @@ class UserApiLoginServiceTest {
                     .build();
 
             when(userRepository.save(any(User.class))).thenReturn(newUser);
-            when(jwtUtil.generateAccessToken(99, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(99, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccessToken(99L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefreshToken(99L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
@@ -262,7 +262,7 @@ class UserApiLoginServiceTest {
             assertThat(res.accessToken()).isEqualTo(ACCESS);
             assertThat(res.refreshToken()).isEqualTo(REFRESH);
             verify(userRepository).save(any(User.class));
-            verify(refreshStore).save(99, REFRESH, Duration.ofDays(15));
+            verify(refreshStore).save(99L, REFRESH, Duration.ofDays(15));
         }
 
         @Test
@@ -276,7 +276,7 @@ class UserApiLoginServiceTest {
             when(appleApiService.verifyAppleIdentityToken(ID_TOKEN)).thenReturn(claims);
 
             User deleted = User.builder()
-                    .id(7)
+                    .id(7L)
                     .providerId(APPLE_ID)
                     .loginApi("APPLE")
                     .status(UserStatus.DELETED)
@@ -285,8 +285,8 @@ class UserApiLoginServiceTest {
                     .build();
 
             when(userRepository.findByProviderId(APPLE_ID)).thenReturn(Optional.of(deleted));
-            when(jwtUtil.generateAccessToken(7, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(7, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccessToken(7L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefreshToken(7L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
@@ -299,7 +299,7 @@ class UserApiLoginServiceTest {
             assertThat(deleted.getNickname().getValue()).isEqualTo("애플사용자1");
 
             verify(userRepository, never()).save(any());
-            verify(refreshStore).save(7, REFRESH, Duration.ofDays(15));
+            verify(refreshStore).save(7L, REFRESH, Duration.ofDays(15));
         }
     }
 
@@ -313,7 +313,7 @@ class UserApiLoginServiceTest {
         @DisplayName("정상 refresh token이면 새로운 access token을 발급한다")
         void refreshAccessToken_success() {
             //g
-            int userId = 1;
+            Long userId = 1L;
             String role = "ROLE_USER";
             JwtUtil.ParsedToken parsedToken = new JwtUtil.ParsedToken(userId, role, "RT");
 
@@ -332,10 +332,10 @@ class UserApiLoginServiceTest {
         @DisplayName("저장값과 불일치 -> RefreshTokenInvalidException 발생")
         void refreshAccessToken_mismatch() {
             //g
-            JwtUtil.ParsedToken parsed = new JwtUtil.ParsedToken(1, "ROLE_USER", "RT");
+            JwtUtil.ParsedToken parsed = new JwtUtil.ParsedToken(1L, "ROLE_USER", "RT");
 
             when(jwtUtil.parse(REFRESH)).thenReturn(parsed);
-            when(refreshStore.get(1)).thenReturn("DIFFERENT");
+            when(refreshStore.get(1L)).thenReturn("DIFFERENT");
 
             //w + d
             assertThatThrownBy(() -> service.refreshAccessToken(REFRESH))
@@ -353,7 +353,7 @@ class UserApiLoginServiceTest {
         @DisplayName("logoutUser()는 Redis에서 Refresh 토큰을 삭제한다")
         void logoutUser_deletesRefresh() {
             //g
-            int userId = 55;
+            Long userId = 55L;
 
             // when
             service.logoutUser(userId);
@@ -374,7 +374,7 @@ class UserApiLoginServiceTest {
         @DisplayName("deleteUserById()는 status를 DELETED로 바꾸고 Refresh도 삭제한다")
         void deleteUser_marksDeleted() {
             //g
-            int userId = 99;
+            Long userId = 99L;
             User testUser = User.builder()
                     .id(userId)
                     .providerId("PID99")

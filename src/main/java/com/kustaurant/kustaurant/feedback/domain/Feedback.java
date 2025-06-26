@@ -1,28 +1,27 @@
 package com.kustaurant.kustaurant.feedback.domain;
 
-import com.kustaurant.kustaurant.user.domain.User;
-import com.kustaurant.kustaurant.global.service.port.ClockHolder;
+import com.kustaurant.kustaurant.feedback.controller.Request.FeedbackRequest;
+import com.kustaurant.kustaurant.common.service.port.ClockHolder;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Builder
 public class Feedback {
-    private final User writer;
+    private final Integer id;
+    private final Long writer;
     private final String comment;
     private final LocalDateTime createdAt;
 
-    @Builder
-    public Feedback(User writer, String comment, LocalDateTime createdAt) {
-        this.writer = writer;
-        this.comment = comment;
-        this.createdAt = createdAt;
-    }
-
-    public static Feedback from(User writer, FeedbackCreate feedbackCreate, ClockHolder clockHolder) {
+    public static Feedback from(
+            Long writer,
+            FeedbackRequest req,
+            ClockHolder clockHolder
+    ) {
         return Feedback.builder()
-                .comment(feedbackCreate.getComment())
+                .comment(req.comment())
                 .writer(writer)
                 .createdAt(clockHolder.now())
                 .build();

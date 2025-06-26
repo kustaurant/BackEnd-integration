@@ -2,11 +2,10 @@ package com.kustaurant.kustaurant.restaurant.infrastructure.repository;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,14 +20,14 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     private final RestaurantFavoriteJpaRepository jpaRepository;
 
     @Override
-    public RestaurantFavorite findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
+    public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Integer restaurantId) {
         return jpaRepository.findByUser_UserIdAndRestaurant_RestaurantId(userId, restaurantId)
                 .map(RestaurantFavoriteEntity::toDomain)
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_FAVORITE_NOT_FOUND, "요청한 restaurantFavorite이 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
     }
 
     @Override
-    public boolean existsByUserAndRestaurant(Integer userId, Integer restaurantId) {
+    public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
         if (userId == null || restaurantId == null) {
             return false;
         }
@@ -36,7 +35,7 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     }
 
     @Override
-    public List<RestaurantFavorite> findByUser(Integer userId) {
+    public List<RestaurantFavorite> findByUser(Long userId) {
         if (userId == null) {
             return List.of();
         }
@@ -59,18 +58,11 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     }
 
     @Override
-    public List<RestaurantFavorite> findSortedFavoritesByUserId(Integer userId) {
+    public List<RestaurantFavorite> findSortedFavoritesByUserId(Long userId) {
         return jpaRepository.findSortedFavoritesByUserIdDesc(userId)
                 .stream()
                 .map(RestaurantFavorite::from) // Entity → Domain
                 .toList();
-    }
-
-    // TODO: need to delete everything below this
-
-    @Override
-    public List<RestaurantFavoriteEntity> findAllByUserId(UserEntity user) {
-        return List.of();
     }
 
 }

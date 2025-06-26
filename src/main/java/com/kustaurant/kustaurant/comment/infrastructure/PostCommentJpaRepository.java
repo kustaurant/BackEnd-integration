@@ -10,7 +10,7 @@ import java.util.List;
 public interface PostCommentJpaRepository extends JpaRepository<PostCommentEntity, Integer>, JpaSpecificationExecutor<PostCommentEntity> {
     @Query("""
         SELECT pc FROM PostCommentEntity pc
-        WHERE pc.user.id = :userId AND pc.status = 'ACTIVE'
+        WHERE pc.userId = :userId AND pc.status = 'ACTIVE'
         ORDER BY pc.createdAt DESC""")
-    List<PostCommentEntity> findActiveByUserIdOrderByCreatedAtDesc(@Param("userId") Integer userId);
+    List<PostCommentEntity> findActiveByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
 }

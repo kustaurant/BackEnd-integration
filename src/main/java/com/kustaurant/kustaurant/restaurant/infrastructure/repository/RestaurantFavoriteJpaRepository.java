@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RestaurantFavoriteJpaRepository extends JpaRepository<RestaurantFavoriteEntity, Integer> {
-    Optional<RestaurantFavoriteEntity> findByUser_UserIdAndRestaurant_RestaurantId(Integer userId, Integer restaurantId);
-    boolean existsByUser_UserIdAndRestaurant_RestaurantId(Integer userId, Integer restaurantId);
-    List<RestaurantFavoriteEntity> findByUser_UserId(Integer userId);
+    Optional<RestaurantFavoriteEntity> findByUser_UserIdAndRestaurant_RestaurantId(Long userId, Integer restaurantId);
+    boolean existsByUser_UserIdAndRestaurant_RestaurantId(Long userId, Integer restaurantId);
+    List<RestaurantFavoriteEntity> findByUser_UserId(Long userId);
 
     @Query("""
         SELECT rf FROM RestaurantFavoriteEntity rf
         WHERE rf.user.id = :userId
         ORDER BY rf.createdAt DESC""")
-    List<RestaurantFavoriteEntity> findSortedFavoritesByUserIdDesc(@Param("userId") Integer userId);
+    List<RestaurantFavoriteEntity> findSortedFavoritesByUserIdDesc(@Param("userId") Long userId);
 
 }

@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.feedback.infrastructure;
 
+import com.kustaurant.kustaurant.feedback.controller.Request.FeedbackRequest;
 import com.kustaurant.kustaurant.feedback.domain.Feedback;
 import com.kustaurant.kustaurant.feedback.service.port.FeedbackRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +15,13 @@ public class FeedbackRepositoryImple implements FeedbackRepository {
     private final FeedbackJpaRepository feedbackJpaRepository;
 
     @Override
-    public List<Feedback> findAllByUserId(Integer userId) {
+    public List<Feedback> findAllByUserId(Long userId) {
         return feedbackJpaRepository.findAllByUser_UserId(userId)
                 .stream().map(FeedbackEntity::toModel).collect(Collectors.toList());
     }
 
     @Override
-    public Feedback save(Feedback feedback) {
-        return null;
+    public void save(Feedback feedback) {
+        feedbackJpaRepository.save(FeedbackEntity.from(feedback.getWriter(), feedback));
     }
 }

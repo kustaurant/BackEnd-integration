@@ -4,12 +4,11 @@ import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.comment.domain.PostComment;
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.post.domain.Post;
 import com.kustaurant.kustaurant.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.user.infrastructure.UserJpaRepository;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserJpaRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,7 +46,7 @@ public class PostRepositoryImpl implements PostRepository {
         return postJpaRepository.findByStatus(status,pageable).map(PostEntity::toDomain);
     }
     @Override
-    public List<PostEntity> findActivePostsByUserId(Integer userId) {
+    public List<PostEntity> findActivePostsByUserId(Long userId) {
         return postJpaRepository.findActivePostsByUserId(userId);
     }
     @Override
@@ -142,7 +141,7 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public List<Post> findActiveByUserId(Integer userId) {
+    public List<Post> findActiveByUserId(Long userId) {
         return postJpaRepository.findActivePostsByUserId(userId).stream().map(PostEntity::toDomain).toList();
     }
 }

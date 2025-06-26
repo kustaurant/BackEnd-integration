@@ -25,7 +25,7 @@ public class RestaurantService {
         return restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
     }
 
-    public RestaurantDetailDTO getActiveRestaurantDetailDto(Integer restaurantId, Integer userId, String userAgent) {
+    public RestaurantDetailDTO getActiveRestaurantDetailDto(Integer restaurantId, Long userId, String userAgent) {
         Restaurant restaurant = restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
         List<RestaurantMenu> menus = restaurantMenuService.findMenusByRestaurantId(restaurantId);
 

@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.evaluation.domain;
 
 import com.kustaurant.kustaurant.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.user.domain.User;
+import com.kustaurant.kustaurant.user.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -26,7 +26,7 @@ public class EvaluationDomain {
     private Integer commentLikeCount = 0;
 
     // 참조키
-    private User user;
+    private Long userId;
     private Restaurant restaurant;
 
     // 추가
@@ -47,7 +47,7 @@ public class EvaluationDomain {
                 .commentBody(entity.getCommentBody())
                 .commentImgUrl(entity.getCommentImgUrl())
                 .commentLikeCount(entity.getCommentLikeCount() != null ? entity.getCommentLikeCount() : 0)
-                .user(User.from(entity.getUser()))
+                .userId(entity.getUserId())
                 .restaurant(Restaurant.from(entity.getRestaurant()))
                 .likeCount(entity.getRestaurantCommentLikeList() != null ? entity.getRestaurantCommentLikeList().size() : 0)
                 .dislikeCount(entity.getRestaurantCommentDislikeList() != null ? entity.getRestaurantCommentDislikeList().size() : 0)

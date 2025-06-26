@@ -29,7 +29,7 @@ public class RestaurantChartService {
     // tierInfo 설명: 1 -> 티어가 있는 것만, -1 -> 티어가 없는 것만, 그외 -> 둘 다
     public List<RestaurantTierDTO> findByConditions(
             List<String> cuisines, List<Integer> situations, List<String> locations,
-            Integer tierInfo, boolean isOrderByScore, @Nullable Integer userId
+            Integer tierInfo, boolean isOrderByScore, @Nullable Long userId
     ) {
         // 조건에 맞는 식당 데이터 가져오기
         List<RestaurantTierDTO> dtoList = restaurantQueryRepository.findAll(
@@ -45,7 +45,7 @@ public class RestaurantChartService {
     // tierInfo 설명: 1 -> 티어가 있는 것만, -1 -> 티어가 없는 것만, 그외 -> 둘 다
     public List<RestaurantTierDTO> findByConditionsWithPage(
             List<String> cuisines, List<Integer> situations, List<String> locations,
-            Integer tierInfo, boolean isOrderByScore, int page, int size, @Nullable Integer userId
+            Integer tierInfo, boolean isOrderByScore, int page, int size, @Nullable Long userId
     ) {
         Pageable pageable = PageRequest.of(page, size);
         // 조건에 맞는 식당 데이터 가져오기
@@ -60,7 +60,7 @@ public class RestaurantChartService {
 
     // 지도 식당 데이터 반환
     public RestaurantTierMapDTO getRestaurantTierMapDto(
-            List<String> cuisines, List<Integer> situations, List<String> locations, @Nullable Integer userId
+            List<String> cuisines, List<Integer> situations, List<String> locations, @Nullable Long userId
     ) {
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
         List<RestaurantTierDTO> tieredRestaurantTierDTOs = findByConditions(cuisines, situations, locations, 1, false, userId);

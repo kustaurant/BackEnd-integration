@@ -12,14 +12,14 @@ import java.time.LocalDateTime;
 @Builder
 public class PostScrap {
     private Integer scrapId;
-    private Integer userId;
+    private Long userId;
     private Integer postId;
     private final LocalDateTime createdAt;
 
     public static PostScrap from(PostScrapEntity entity) {
         return PostScrap.builder()
                 .scrapId(entity.getScrapId())
-                .userId(entity.getUser().getUserId())
+                .userId(entity.getUserId())
                 .postId(entity.getPost().getPostId())
                 .createdAt(entity.getCreatedAt())
                 .build();

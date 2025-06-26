@@ -33,7 +33,7 @@ public class RestaurantHomeService {
     }
 
 
-    public List<RestaurantTierDTO> getRecommendedOrRandomRestaurants(Integer userId) {
+    public List<RestaurantTierDTO> getRecommendedOrRandomRestaurants(Long userId) {
         List<RestaurantTierDTO> dtoList = new ArrayList<>(restaurantQueryRepository.findAll(
                         RestaurantChartSpec.withCuisinesAndLocationsAndSituations(null, null, null, "ACTIVE", null, true))
                 .stream().map(RestaurantQueryMapper::toDto).toList());
@@ -57,7 +57,7 @@ public class RestaurantHomeService {
                 .subList(0, Math.min(dtoList.size(), RECOMMENDATION_SIZE));
     }
 
-    public String getFavoriteCuisine(Integer userId) {
+    public String getFavoriteCuisine(Long userId) {
         // 1. 즐겨찾기한 식당을 가져옵니다.
         List<Restaurant> favoriteRestaurants = restaurantFavoriteService.getFavoriteRestaurantDtoList(userId);
 

@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.post.infrastructure;
 
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,14 +12,14 @@ public interface PostScrapJpaRepository extends JpaRepository<PostScrapEntity, I
         SELECT ps FROM PostScrapEntity ps
         WHERE ps.user.id = :userId
         ORDER BY ps.createdAt DESC""")
-    List<PostScrapEntity> findByUserIdOrderByCreatedAtDesc(@Param("userId") Integer userId);
+    List<PostScrapEntity> findByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
 
-    boolean existsByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
+    boolean existsByUser_UserIdAndPost_PostId(Long userId, Integer postId);
 
 
     void deleteByPost_PostId(Integer postId);
 
-    Optional<PostScrapEntity> findByUser_UserIdAndPost_PostId(Integer userId, Integer postId);
+    Optional<PostScrapEntity> findByUser_UserIdAndPost_PostId(Long userId, Integer postId);
 
     @Query("""
         select ps
@@ -30,5 +29,5 @@ public interface PostScrapJpaRepository extends JpaRepository<PostScrapEntity, I
            and p.status     = 'ACTIVE'
          order by ps.createdAt desc
     """)
-    List<PostScrapEntity> findWithPostByUserId(@Param("userId") Integer userId);
+    List<PostScrapEntity> findWithPostByUserId(@Param("userId") Long userId);
 }

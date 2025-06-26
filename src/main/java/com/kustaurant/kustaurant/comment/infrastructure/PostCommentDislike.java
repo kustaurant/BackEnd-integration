@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.comment.infrastructure;
 
 import com.kustaurant.kustaurant.comment.domain.PostComment;
-import com.kustaurant.kustaurant.user.domain.User;
+import com.kustaurant.kustaurant.user.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 public class PostCommentDislike {
-    private Integer userId;
+    private Long userId;
     private Integer commentId;
     private LocalDateTime createdAt;
 
@@ -17,7 +17,7 @@ public class PostCommentDislike {
         return new PostCommentDislike(user.getId(), comment.getCommentId(), LocalDateTime.now());
     }
 
-    public PostCommentDislike(Integer userId, Integer commentId, LocalDateTime createdAt) {
+    public PostCommentDislike(Long userId, Integer commentId, LocalDateTime createdAt) {
         this.userId = userId;
         this.commentId = commentId;
         this.createdAt = createdAt;

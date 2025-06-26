@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostCommentRepository {
-    List<PostComment> findActiveByUserId(Integer userId);
+    List<PostComment> findActiveByUserId(Long userId);
 
     List<PostComment> findParentComments(Integer postId);
 

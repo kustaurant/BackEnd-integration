@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.restaurant.application.service.command.Restaura
 import com.kustaurant.kustaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,17 +25,17 @@ class RestaurantFavoriteServiceTest {
     void 즐겨찾기_추가() {
         // Given
         UserEntity user = new UserEntity();
-        user.setUserId(1);
+        user.setId(1L);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
                 .restaurantName("곤칼")
                 .build();
 
         // When
-        favoriteService.addFavorite(user, restaurant);
+        favoriteService.addFavorite(user.getId(), restaurant);
 
         // Then
-        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getUserId(), restaurant.getRestaurantId()))
+        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getId(), restaurant.getRestaurantId()))
                 .isTrue();
     }
 
@@ -43,20 +43,20 @@ class RestaurantFavoriteServiceTest {
     void 즐겨찾기_삭제() {
         // Given
         UserEntity user = new UserEntity();
-        user.setUserId(1);
+        user.setId(1L);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
                 .restaurantName("곤칼")
                 .build();
 
-        favoriteService.addFavorite(user, restaurant);
-        RestaurantFavorite favorite = favoriteRepository.findByUserIdAndRestaurantId(user.getUserId(), restaurant.getRestaurantId());
+        favoriteService.addFavorite(user.getId(), restaurant);
+        RestaurantFavorite favorite = favoriteRepository.findByUserIdAndRestaurantId(user.getId(), restaurant.getRestaurantId());
 
         // When
         favoriteService.deleteFavorite(favorite);
 
         // Then
-        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getUserId(), restaurant.getRestaurantId()))
+        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getId(), restaurant.getRestaurantId()))
                 .isFalse();
     }
 
@@ -64,7 +64,7 @@ class RestaurantFavoriteServiceTest {
     void 새로_즐겨찾기_추가하는_경우() {
         // Given
         UserEntity user = new UserEntity();
-        user.setUserId(1);
+        user.setId(1L);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
                 .restaurantName("곤칼")
@@ -75,7 +75,7 @@ class RestaurantFavoriteServiceTest {
 
         // Then
         assertThat(result).isTrue();
-        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getUserId(), restaurant.getRestaurantId()))
+        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getId(), restaurant.getRestaurantId()))
                 .isTrue();
     }
 
@@ -83,21 +83,21 @@ class RestaurantFavoriteServiceTest {
     void 이전에_즐겨찾기가_되어_있었던_경우() {
         // Given
         UserEntity user = new UserEntity();
-        user.setUserId(1);
+        user.setId(1L);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(1)
                 .restaurantName("곤칼")
                 .build();
 
         // 즐겨찾기 추가
-        favoriteService.addFavorite(user, restaurant);
+        favoriteService.addFavorite(user.getId(), restaurant);
 
         // When
         boolean result = favoriteService.toggleFavorite(user, restaurant);
 
         // Then
         assertThat(result).isFalse();
-        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getUserId(), restaurant.getRestaurantId()))
+        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getId(), restaurant.getRestaurantId()))
                 .isFalse();
     }
 

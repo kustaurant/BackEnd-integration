@@ -24,7 +24,7 @@ public class PostComment {
     @Setter
     private LocalDateTime updatedAt;
 
-    private final Integer userId;
+    private final Long userId;
     private final Integer postId;
 
     private Integer likeCount;
@@ -32,7 +32,7 @@ public class PostComment {
     private PostComment parentComment;
     private List<PostComment> replies;
 
-    public static PostComment create(String commentBody, Integer userId, Integer postId) {
+    public static PostComment create(String commentBody, Long userId, Integer postId) {
         return PostComment.builder()
                 .commentBody(commentBody)
                 .status(ContentStatus.ACTIVE)

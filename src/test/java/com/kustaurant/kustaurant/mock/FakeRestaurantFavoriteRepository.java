@@ -2,11 +2,10 @@ package com.kustaurant.kustaurant.mock;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 
 import java.util.ArrayList;
@@ -17,7 +16,7 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
 
 
     @Override
-    public RestaurantFavorite findByUserIdAndRestaurantId(Integer userId, Integer restaurantId) {
+    public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Integer restaurantId) {
         return store.stream()
                 .filter(fav -> fav.getUser().getId().equals(userId) &&
                         fav.getRestaurant().getRestaurantId().equals(restaurantId))
@@ -27,14 +26,14 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     }
 
     @Override
-    public boolean existsByUserAndRestaurant(Integer userId, Integer restaurantId) {
+    public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
         return store.stream()
                 .anyMatch(fav -> fav.getUser().getId().equals(userId) &&
                         fav.getRestaurant().getRestaurantId().equals(restaurantId));
     }
 
     @Override
-    public List<RestaurantFavorite> findByUser(Integer userId) {
+    public List<RestaurantFavorite> findByUser(Long userId) {
         return List.of();
     }
 
@@ -51,17 +50,8 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     }
 
     @Override
-    public List<RestaurantFavorite> findSortedFavoritesByUserId(Integer userId) {
+    public List<RestaurantFavorite> findSortedFavoritesByUserId(Long userId) {
         return List.of();
     }
-
-
-    // TODO: need to delete everything below this
-
-    @Override
-    public List<RestaurantFavoriteEntity> findAllByUserId(UserEntity user) {
-        return List.of();
-    }
-
 
 }

@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.comment.dto;
 
 import com.kustaurant.kustaurant.comment.domain.PostComment;
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.domain.UserDTO;
 import com.kustaurant.kustaurant.post.enums.ContentStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -48,7 +49,14 @@ public class PostCommentDTO {
     @Schema(description = "작성 유저")
     UserDTO user;
 
-    public static PostCommentDTO convertPostCommentToPostCommentDTO(PostCommentEntity comment) {
+    public static PostCommentDTO convertPostCommentToPostCommentDTO(
+            PostCommentEntity comment
+    ) {
+        String timeAgo = TimeAgoUtil.toKor(
+                comment.getUpdatedAt() != null ? comment.getUpdatedAt()
+                        : comment.getCreatedAt()
+        );
+
         return PostCommentDTO.builder()
                 .commentId(comment.getCommentId())
                 .commentBody(comment.getCommentBody())
@@ -56,7 +64,7 @@ public class PostCommentDTO {
                 .user(UserDTO.convertUserToUserDTO(comment.getUser()))
                 .likeCount(comment.getPostCommentLikesEntities().size())
                 .dislikeCount(comment.getPostCommentDislikesEntities().size())
-                .timeAgo(comment.calculateTimeAgo())
+                .timeAgo(timeAgo)
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .repliesList(
@@ -70,7 +78,7 @@ public class PostCommentDTO {
     }
 
 
-    public static PostCommentDTO from(PostComment comment, Map<Integer, UserDTO> userDtoMap) {
+    public static PostCommentDTO from(PostComment comment, Map<Long, UserDTO> userDtoMap) {
         return PostCommentDTO.builder()
                 .commentId(comment.getCommentId())
                 .commentBody(comment.getCommentBody())

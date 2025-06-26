@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.domain;
 
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
-import com.kustaurant.kustaurant.user.domain.User;
+import com.kustaurant.kustaurant.user.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class RestaurantFavorite {
 
     private Integer favoriteId;
-    User user;
+    private Long userId;
     Restaurant restaurant;
     private String status;
     private LocalDateTime createdAt;
@@ -21,7 +21,7 @@ public class RestaurantFavorite {
     public static RestaurantFavorite from(RestaurantFavoriteEntity entity) {
         return RestaurantFavorite.builder()
                 .favoriteId(entity.getFavoriteId())
-                .user(User.from(entity.getUser()))
+                .userId(entity.getUserId())
                 .restaurant(Restaurant.from(entity.getRestaurant()))
                 .status(entity.getStatus())
                 .createdAt(entity.getCreatedAt())

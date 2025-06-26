@@ -10,11 +10,11 @@ public interface PostCommentDislikeRepository {
      void save(PostCommentDislike dislike);
      void deleteById(Integer id);
      List<PostCommentDislike> findByCommentId(Integer commentId);
-     Optional<PostCommentDislike> findByUserIdAndCommentId(Integer userId, Integer commentId);
+     Optional<PostCommentDislike> findByUserIdAndCommentId(Long userId, Integer commentId);
 
-    boolean existsByUserIdAndCommentId(Integer userId, Integer commentId);
+    boolean existsByUserIdAndCommentId(Long userId, Integer commentId);
 
-    void deleteByUserIdAndCommentId(Integer userId, Integer commentId);
+    void deleteByUserIdAndCommentId(Long userId, Integer commentId);
 
     int countByCommentId(Integer commentId);
 }

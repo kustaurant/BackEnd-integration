@@ -1,11 +1,11 @@
 package com.kustaurant.kustaurant.global.auth.session;
 
-import com.kustaurant.kustaurant.user.domain.User;
-import com.kustaurant.kustaurant.user.domain.enums.UserRole;
-import com.kustaurant.kustaurant.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
+import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
+import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

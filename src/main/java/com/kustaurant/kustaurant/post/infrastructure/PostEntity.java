@@ -6,7 +6,7 @@ import com.kustaurant.kustaurant.post.domain.Post;
 import com.kustaurant.kustaurant.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.domain.PostScrap;
 import com.kustaurant.kustaurant.post.enums.ContentStatus;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,9 +42,8 @@ public class PostEntity {
     private Integer postVisitCount = 0;
     private Integer netLikes = 0;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @OneToMany(mappedBy = "post")
     private List<PostCommentEntity> postCommentList = new ArrayList<>();
@@ -61,13 +60,13 @@ public class PostEntity {
     @OneToMany(mappedBy = "post")
     private List<PostDislikeEntity> postDislikesList = new ArrayList<>();
 
-    public PostEntity(String postTitle, String postBody, String postCategory, ContentStatus status, LocalDateTime createdAt, UserEntity user) {
+    public PostEntity(String postTitle, String postBody, String postCategory, ContentStatus status, LocalDateTime createdAt, Long userId) {
         this.postTitle = postTitle;
         this.postBody = postBody;
         this.postCategory = postCategory;
         this.status = status;
         this.createdAt = createdAt;
-        this.user = user;
+        this.userId = userId;
     }
 
     public PostEntity() {
@@ -87,7 +86,7 @@ public class PostEntity {
                 .netLikes(netLikes)
                 .likeCount(postLikesList.size())
                 .dislikeCount(postDislikesList.size())
-                .authorId(user.getUserId())
+                .authorId(userId)
                 .photos(postPhotoEntityList.stream()
                         .map(PostPhotoEntity::toDomain)
                         .toList())
@@ -96,7 +95,13 @@ public class PostEntity {
                 .build();
     }
 
-    public Post toDomain(boolean includeComments, boolean includePhotos, boolean includeScraps, boolean includeLikes, boolean includeDislikes) {
+    public Post toDomain(
+            boolean includeComments,
+            boolean includePhotos,
+            boolean includeScraps,
+            boolean includeLikes,
+            boolean includeDislikes
+    ) {
         Post.PostBuilder postBuilder = Post.builder()
                 .id(postId)
                 .title(postTitle)
@@ -107,7 +112,7 @@ public class PostEntity {
                 .updatedAt(updatedAt)
                 .visitCount(postVisitCount)
                 .netLikes(netLikes)
-                .authorId(user.getUserId());
+                .authorId(userId);
 
         if (includeComments) {
             List<PostComment> comments = postCommentList.stream()
@@ -135,14 +140,14 @@ public class PostEntity {
     }
 
 
-    public static PostEntity from(Post post, UserEntity userEntity) {
+    public static PostEntity from(Post post) {
         return new PostEntity(
                 post.getTitle(),
                 post.getBody(),
                 post.getCategory(),
                 post.getStatus(),
                 post.getCreatedAt(),
-                userEntity
+                post.getAuthorId()
         );
     }
 

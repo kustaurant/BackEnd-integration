@@ -10,7 +10,7 @@ import com.kustaurant.kustaurant.restaurant.application.service.command.Restaura
 import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantService;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantMenuRepository;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantRepository;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

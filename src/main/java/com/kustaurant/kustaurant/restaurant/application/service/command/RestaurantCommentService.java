@@ -4,14 +4,14 @@ import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.evaluation.service.EvaluationService;
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantRepository;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.restaurant.application.service.command.dto.RestaurantCommentDTO;
-import com.kustaurant.kustaurant.user.infrastructure.OUserRepository;
+import com.kustaurant.kustaurant.user.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +31,7 @@ public class RestaurantCommentService {
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final RestaurantRepository restaurantRepository;
     private final OUserRepository OUserRepository;
+    private final UserRepository userRepository;
     private final EvaluationService evaluationService;
 
     public RestaurantComment findCommentByCommentId(Integer commentId) {

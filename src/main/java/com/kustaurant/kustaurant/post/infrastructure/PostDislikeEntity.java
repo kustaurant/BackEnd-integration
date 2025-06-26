@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.post.infrastructure;
 
 import com.kustaurant.kustaurant.post.domain.PostDislike;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,7 +39,7 @@ public class PostDislikeEntity {
 
     public PostDislike toDomain() {
         return new PostDislike(
-                this.user.getUserId(),
+                this.user.getId(),
                 this.post.getPostId(),
                 this.createdAt
         );
@@ -47,7 +47,7 @@ public class PostDislikeEntity {
 
     public static PostDislikeEntity from(PostDislike postDislike) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setUserId(postDislike.getUserId());
+        userEntity.setId(postDislike.getUserId());
         PostEntity postEntity = new PostEntity();
         postEntity.setPostId(postDislike.getPostId());
 

@@ -19,7 +19,7 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Integer> {
     Page<PostEntity> findByStatus(ContentStatus status, Pageable pageable);
 
     @Query("SELECT p FROM PostEntity p WHERE p.user.userId = :userId AND p.status = 'ACTIVE'")
-    List<PostEntity> findActivePostsByUserId(@Param("userId") Integer userId);
+    List<PostEntity> findActivePostsByUserId(@Param("userId") Long userId);
 
     Optional<PostEntity> findByStatusAndPostId(String status, Integer postId);
 

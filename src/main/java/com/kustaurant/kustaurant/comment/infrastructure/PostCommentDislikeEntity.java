@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.comment.infrastructure;
 
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

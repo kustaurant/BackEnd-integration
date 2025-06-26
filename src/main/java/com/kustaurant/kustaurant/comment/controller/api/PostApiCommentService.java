@@ -7,13 +7,12 @@ import com.kustaurant.kustaurant.api.post.service.PostApiService;
 import com.kustaurant.kustaurant.comment.controller.web.PostCommentService;
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentApiRepository;
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.post.domain.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.user.infrastructure.OUserRepository;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.OUserService;
+import com.kustaurant.kustaurant.user.user.infrastructure.OUserRepository;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.OUserService;
 import com.kustaurant.kustaurant.post.domain.PostDTO;
 import com.kustaurant.kustaurant.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.comment.dto.PostCommentDTO;
@@ -162,7 +161,7 @@ public class PostApiCommentService {
     }
 
     // 댓글 삭제
-    public void deleteComment(Integer commentId, Integer userId) {
+    public void deleteComment(Integer commentId, Long userId) {
         PostCommentEntity postComment = getPostCommentByCommentId(commentId);
         postComment.setStatus(ContentStatus.DELETED);
 
@@ -172,7 +171,7 @@ public class PostApiCommentService {
     }
 
     // 댓글 생성
-    public PostCommentEntity createComment(String content, String postId, Integer userId) {
+    public PostCommentEntity createComment(String content, String postId, Long userId) {
         UserEntity user = userService.findUserById(userId);
         PostEntity postEntity = postApiService.getPost(Integer.valueOf(postId));
         PostCommentEntity postComment = new PostCommentEntity(content, ContentStatus.ACTIVE, LocalDateTime.now(), postEntity, user);
@@ -187,7 +186,7 @@ public class PostApiCommentService {
         postCommentApiRepository.save(parentComment);
     }
 
-    public ReactionToggleResponse toggleCommentLikeOrDislike(String action, Integer userId, Integer commentId) {
+    public ReactionToggleResponse toggleCommentLikeOrDislike(String action, Long userId, Integer commentId) {
         ReactionToggleResponse reactionToggleResponse;
         if ("likes".equals(action)) {
             reactionToggleResponse = postCommentService.toggleLike(userId, commentId);

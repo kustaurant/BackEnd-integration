@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.web.ranking;
 
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.user.infrastructure.OUserRepository;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.OUserRepository;
 import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
 import lombok.*;
 import org.springframework.stereotype.Controller;
@@ -60,7 +60,7 @@ public class RankingController {
                 UserEntityList) {
             UserRank userRank = new UserRank();
             userRank.setUserEntity(UserEntity);
-            int evaluationCount = UserEntity.getEvaluationList().size();
+            int evaluationCount = UserEntity.getStats().getRatedRestCnt();
             if (evaluationCount < prevCount) {
                 i += countSame;
                 userRank.setRank(i);

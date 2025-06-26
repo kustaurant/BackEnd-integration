@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.web.discovery;
 import com.kustaurant.kustaurant.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.restaurant.application.service.command.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.restaurant.presentation.web.RestaurantWebService;
 import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;

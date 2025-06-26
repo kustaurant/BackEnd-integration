@@ -3,17 +3,17 @@ package com.kustaurant.kustaurant.evaluation.service.port;
 import com.kustaurant.kustaurant.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface EvaluationRepository {
-    boolean existsByUserAndRestaurant(Integer userId, Integer restaurantId);
+    boolean existsByUserAndRestaurant(Long userId, Integer restaurantId);
     List<EvaluationEntity> findByRestaurantIdAndStatus(Integer restaurantId, String status);
     Integer countAllByStatus(String status);
-    List<EvaluationDomain> findByUserId(Integer userId);
-    List<EvaluationDomain> findSortedEvaluationByUserIdDesc(Integer userId);
+    List<EvaluationDomain> findByUserId(Long userId);
+    List<EvaluationDomain> findSortedEvaluationByUserIdDesc(Long userId);
     // TODO: need to delete everything below this
 
     EvaluationEntity save(EvaluationEntity evaluation);

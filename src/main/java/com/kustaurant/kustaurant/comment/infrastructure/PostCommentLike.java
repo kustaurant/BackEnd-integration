@@ -9,12 +9,12 @@ import java.time.LocalDateTime;
 @Getter
 public class PostCommentLike {
     private Integer commentLikeId;
-    private Integer userId;
+    private Long userId;
     private Integer commentId;
     private LocalDateTime createdAt;
 
 
-    public PostCommentLike(Integer commentLikeId, Integer userId, Integer commentId, LocalDateTime createdAt) {
+    public PostCommentLike(Integer commentLikeId, Long userId, Integer commentId, LocalDateTime createdAt) {
         this.commentLikeId = commentLikeId;
         this.userId = userId;
         this.commentId = commentId;

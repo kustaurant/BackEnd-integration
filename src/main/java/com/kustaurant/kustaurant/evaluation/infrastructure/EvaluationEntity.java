@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.evaluation.domain.EvaluationSituation;
 import com.kustaurant.kustaurant.evaluation.domain.Situation;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,29 +18,16 @@ import java.util.stream.Collectors;
 
 @Getter
 @Entity
-@Setter
 // 한 사용자가 한 식당을 중복 평가 할 수 없음
 @Table(name="evaluations_tbl")
 public class EvaluationEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer evaluationId;
 
     private Double evaluationScore;
-
     private String status="ACTIVE";
-
-    public EvaluationEntity(RestaurantEntity restaurant, UserEntity UserEntity, Double evaluationScore) {
-        this.restaurant = restaurant;
-        this.user = UserEntity;
-        this.evaluationScore = evaluationScore;
-        this.createdAt = LocalDateTime.now();
-    }
-
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
-
     // 평가 내용 관련
     private String commentBody;
     private String commentImgUrl;
@@ -50,37 +37,39 @@ public class EvaluationEntity {
     @OneToMany(mappedBy = "evaluation")
     private List<RestaurantCommentDislike> restaurantCommentDislikeList = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @OneToMany(mappedBy = "evaluation")
     private List<EvaluationSituationEntity> evaluationSituationEntityList = new ArrayList<>();
-
     @JsonIgnore
     @OneToMany(mappedBy = "evaluation")
     private List<RestaurantCommentReport> restaurantCommentReportList = new ArrayList<>();
-
     @JsonIgnore
     @OneToMany(mappedBy = "evaluation")
     private List<RestaurantComment> restaurantCommentList = new ArrayList<>();
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="restaurant_id")
     private RestaurantEntity restaurant;
 
     public EvaluationEntity() {
-
     }
 
-    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String commentBody, String commentImgUrl, UserEntity UserEntity, RestaurantEntity restaurant) {
+    public EvaluationEntity(RestaurantEntity restaurant, Long userId, Double evaluationScore) {
+        this.restaurant = restaurant;
+        this.userId = userId;
+        this.evaluationScore = evaluationScore;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String commentBody, String commentImgUrl, Long userId, RestaurantEntity restaurant) {
         this.evaluationScore = evaluationScore;
         this.status = status;
         this.createdAt = createdAt;
         this.commentBody = commentBody;
         this.commentImgUrl = commentImgUrl;
-        this.user = UserEntity;
+        this.userId = userId;
         this.restaurant = restaurant;
     }
 
@@ -150,7 +139,7 @@ public class EvaluationEntity {
                 .commentBody(this.commentBody)
                 .commentImgUrl(this.commentImgUrl)
                 .commentLikeCount(this.commentLikeCount)
-                .user(this.user.toModel())
+                .userId(this.userId)
                 .restaurant(this.restaurant.toDomain())
                 .evaluationSituationList(
                         this.evaluationSituationEntityList.stream()
@@ -174,7 +163,7 @@ public class EvaluationEntity {
         entity.updatedAt = domain.getUpdatedAt();
         entity.commentBody = domain.getCommentBody();
         entity.commentImgUrl = domain.getCommentImgUrl();
-        entity.user = UserEntity.from(domain.getUser());
+        entity.userId = domain.getUserId();
         entity.restaurant = RestaurantEntity.fromDomain(domain.getRestaurant());
         return entity;
     }

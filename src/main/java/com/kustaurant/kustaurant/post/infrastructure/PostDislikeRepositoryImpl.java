@@ -14,14 +14,14 @@ public class PostDislikeRepositoryImpl implements PostDislikeRepository {
 
 
     @Override
-    public Optional<PostDislike> findByUserIdAndPostId(Integer userId, Integer postId) {
+    public Optional<PostDislike> findByUserIdAndPostId(Long userId, Integer postId) {
 
         return postDislikeJpaRepository.findByUser_UserIdAndPost_PostId(userId, postId)
                 .map(PostDislikeEntity::toDomain);
     }
 
     @Override
-    public boolean existsByUserIdAndPostId(Integer userId, Integer postId) {
+    public boolean existsByUserIdAndPostId(Long userId, Integer postId) {
         return postDislikeJpaRepository.existsByUser_UserIdAndPost_PostId(userId, postId);
     }
 
@@ -31,7 +31,7 @@ public class PostDislikeRepositoryImpl implements PostDislikeRepository {
     }
 
     @Override
-    public void deleteByUserIdAndPostId(Integer userId, Integer postId) {
+    public void deleteByUserIdAndPostId(Long userId, Integer postId) {
         postDislikeJpaRepository.findByUser_UserIdAndPost_PostId(userId, postId)
                 .ifPresent(postDislikeJpaRepository::delete);
     }

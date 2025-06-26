@@ -1,15 +1,15 @@
 package com.kustaurant.kustaurant.feedback.controller;
 
-import com.kustaurant.kustaurant.feedback.domain.FeedbackDTO;
+import com.kustaurant.kustaurant.feedback.controller.Request.FeedbackRequest;
 import com.kustaurant.kustaurant.feedback.service.FeedbackServiceImpl;
-import com.kustaurant.kustaurant.user.controller.api.response.MypageErrorDTO;
-import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtToken;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,31 +20,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class FeedbackApiController {
-    private final FeedbackServiceImpl feedbackServiceImpl;
+    private final FeedbackServiceImpl feedbackService;
 
     //피드백 보내기
     @Operation(
-            summary = "피드백 보내기 기능입니다",
-            description = "피드백을 보냅니다."
+            summary = "피드백 보내기",
+            description = "사용자 피드백을 저장합니다."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "피드백 감사합니다."),
             @ApiResponse(responseCode = "400", description = "내용이 없습니다."),
     })
     @PostMapping("/auth/mypage/feedback")
-    public ResponseEntity<MypageErrorDTO> sendFeedback(
-            @Parameter(hidden = true) @JwtToken Integer userId,
-            @RequestBody FeedbackDTO feedbackDTO
+    public ResponseEntity<String> sendFeedback(
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user,
+            @Valid @RequestBody FeedbackRequest req
     ){
-        String comments = feedbackDTO.getComments();
-        MypageErrorDTO response = new MypageErrorDTO();
+        feedbackService.create(user.id(),req);
 
-        if (comments == null) {
-            response.setError("내용이 없습니다.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-//        feedbackServiceImpl.create()
-        response.setError("피드백 감사합니다.");
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok("피드백 감사합니다!");
     }
 }

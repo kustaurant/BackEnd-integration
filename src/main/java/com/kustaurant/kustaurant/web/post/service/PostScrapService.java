@@ -16,7 +16,7 @@ import java.util.Optional;
 public class PostScrapService {
     private final PostScrapRepository postScrapRepository;
 
-    public Map<String, Object> toggleScrap(Integer userId, Integer postId) {
+    public Map<String, Object> toggleScrap(Long userId, Integer postId) {
 
         Optional<PostScrap> scrapOptional = postScrapRepository.findByUserIdAndPostId(userId, postId);
         Map<String, Object> status = new HashMap<>();

@@ -5,8 +5,8 @@ import com.kustaurant.kustaurant.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.post.infrastructure.PostScrapApiRepository;
 import com.kustaurant.kustaurant.post.infrastructure.PostScrapEntity;
 import com.kustaurant.kustaurant.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.user.infrastructure.OUserRepository;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.OUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +20,7 @@ public class PostScrapApiService {
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostRepository postRepository;
     private final OUserRepository OUserRepository;
+
     public int scrapCreateOrDelete(PostEntity postEntity, UserEntity UserEntity) {
         List<PostScrapEntity> postScrapList = postEntity.getPostScrapList();
         List<PostScrapEntity> userScrapList = UserEntity.getScrapList();
@@ -34,7 +35,7 @@ public class PostScrapApiService {
             status = 0; // scrapDeleted
         } else {
             PostScrapEntity scrap = PostScrapEntity.builder()
-                    .user(UserEntity)
+                    .userId(UserEntity)
                     .post(postEntity)
                     .createdAt(LocalDateTime.now())
                     .build();

@@ -1,18 +1,18 @@
 package com.kustaurant.kustaurant.post.infrastructure;
 
 import com.kustaurant.kustaurant.post.domain.PostScrap;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @Entity
-@Builder
+@NoArgsConstructor
 @Table(name="post_scraps_tbl")
 public class PostScrapEntity {
 
@@ -20,42 +20,43 @@ public class PostScrapEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer scrapId;
 
-    public PostScrapEntity(Integer scrapId, UserEntity UserEntity, PostEntity postEntity, LocalDateTime createdAt) {
-        this.scrapId = scrapId;
-        this.user = UserEntity;
-        this.post = postEntity;
-        this.createdAt = createdAt;
-
-    }
-    public PostScrapEntity(){
-
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    UserEntity user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @ManyToOne
     @JoinColumn(name="post_id")
     PostEntity post;
 
-    LocalDateTime createdAt;
+    private LocalDateTime createdAt;
+
+    @Builder
+    private PostScrapEntity(
+            Integer scrapId,
+            Long userId,
+            PostEntity post,
+            LocalDateTime createdAt
+    ) {
+        this.scrapId = scrapId;
+        this.userId    = userId;
+        this.post      = post;
+        this.createdAt = createdAt;
+    }
+
 
     public PostScrap toDomain() {
         return new PostScrap(
                 scrapId,
-                user.getUserId(),
+                userId,
                 post.getPostId(),
                 createdAt
         );
     }
-    public static PostScrapEntity from(PostScrap postScrap, UserEntity user, PostEntity post) {
-        PostScrapEntity entity = new PostScrapEntity();
-        entity.setUser(user);
-        entity.setPost(post);
-        entity.setCreatedAt(postScrap.getCreatedAt());
-        return entity;
+    public static PostScrapEntity from(PostScrap postScrap, PostEntity post) {
+        return PostScrapEntity.builder()
+                .scrapId(postScrap.getScrapId())
+                .userId(postScrap.getUserId())
+                .post(post)
+                .createdAt(postScrap.getCreatedAt())
+                .build();
     }
-
-
 }

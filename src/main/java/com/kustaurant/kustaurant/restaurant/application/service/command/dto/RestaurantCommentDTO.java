@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.infrastructure.RestaurantComment;
 import com.kustaurant.kustaurant.restaurant.application.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

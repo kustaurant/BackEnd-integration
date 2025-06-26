@@ -7,10 +7,10 @@ import java.util.Optional;
 public interface PostCommentLikeRepository {
     // Define methods for PostCommentLikeRepository here
     // For example:
-     Optional<PostCommentLike> findByUserIdAndCommentId(Integer userId, Integer commentId);
+     Optional<PostCommentLike> findByUserIdAndCommentId(Long userId, Integer commentId);
      void save(PostCommentLike postCommentLike);
-     void deleteByUserIdAndCommentId(Integer userId, Integer commentId);
-     boolean existsByUserIdAndCommentId(Integer userId, Integer commentId);
+     void deleteByUserIdAndCommentId(Long userId, Integer commentId);
+     boolean existsByUserIdAndCommentId(Long userId, Integer commentId);
 
     int countByCommentId(Integer commentId);
 }

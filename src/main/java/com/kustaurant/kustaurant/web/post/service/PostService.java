@@ -4,15 +4,14 @@ import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.comment.domain.PostComment;
 import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.post.domain.*;
 import com.kustaurant.kustaurant.post.enums.*;
 import com.kustaurant.kustaurant.post.infrastructure.PostEntity;
 import com.kustaurant.kustaurant.post.service.port.*;
-import com.kustaurant.kustaurant.user.controller.port.UserService;
-import com.kustaurant.kustaurant.user.domain.User;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.user.user.controller.port.UserService;
+import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
@@ -144,7 +143,7 @@ public class PostService {
     }
 
     @Transactional
-    public ReactionToggleResponse toggleLike(Integer postId, Integer userId) {
+    public ReactionToggleResponse toggleLike(Integer postId, Long userId) {
         boolean isLikedBefore = postLikeRepository.existsByUserIdAndPostId(userId, postId);
         boolean isDislikedBefore = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
 
@@ -170,7 +169,7 @@ public class PostService {
 
 
     @Transactional
-    public ReactionToggleResponse toggleDislike(Integer postId, Integer userId) {
+    public ReactionToggleResponse toggleDislike(Integer postId, Long userId) {
         boolean isLikedBefore = postLikeRepository.existsByUserIdAndPostId(userId, postId);
         boolean isDislikedBefore = postDislikeRepository.existsByUserIdAndPostId(userId, postId);
 
@@ -195,7 +194,7 @@ public class PostService {
 
 
 
-    public InteractionStatusResponse getUserInteractionStatus(Integer postId, Integer userId) {
+    public InteractionStatusResponse getUserInteractionStatus(Integer postId, Long userId) {
         if (userId == null) {
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
         }
@@ -316,7 +315,7 @@ public class PostService {
     }
 
     @Transactional
-    public Post create(String title, String category, String body, Integer userId) {
+    public Post create(String title, String category, String body, Long userId) {
         Post post = Post.builder().title(title).category(category).body(body).status(ContentStatus.ACTIVE).netLikes(0).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).authorId(userId).build();
         Post savedPost = postRepository.save(post);
 

@@ -8,14 +8,13 @@ import com.kustaurant.kustaurant.comment.infrastructure.*;
 import com.kustaurant.kustaurant.comment.service.port.PostCommentDislikeRepository;
 import com.kustaurant.kustaurant.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.comment.service.port.PostCommentRepository;
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.post.domain.*;
 import com.kustaurant.kustaurant.post.enums.DislikeStatus;
 import com.kustaurant.kustaurant.post.enums.LikeStatus;
 import com.kustaurant.kustaurant.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.enums.ScrapStatus;
-import com.kustaurant.kustaurant.user.controller.port.UserService;
-import com.kustaurant.kustaurant.user.domain.User;
+import com.kustaurant.kustaurant.user.user.controller.port.UserService;
+import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +40,7 @@ public class PostCommentService {
     private final PostCommentDislikeRepository postCommentDislikeRepository;
 
     @Transactional
-    public void createComment(String content, Integer postId, Integer parentCommentId, Integer userId) {
+    public void createComment(String content, Integer postId, Integer parentCommentId, Long userId) {
         PostComment comment = PostComment.create(content, userId, postId);
         if (parentCommentId != null) {
             PostComment parent = postCommentRepository.findById(parentCommentId)
@@ -63,7 +62,7 @@ public class PostCommentService {
     }
 
     @Transactional
-    public ReactionToggleResponse toggleLike(Integer userId, Integer commentId) {
+    public ReactionToggleResponse toggleLike(Long userId, Integer commentId) {
         PostComment comment = postCommentRepository.findById(commentId)
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, commentId, "댓글"));
 
@@ -99,7 +98,7 @@ public class PostCommentService {
 
 
     @Transactional
-    public ReactionToggleResponse toggleDislike(Integer userId, Integer commentId) {
+    public ReactionToggleResponse toggleDislike(Long userId, Integer commentId) {
         PostComment comment = postCommentRepository.findById(commentId)
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, "댓글이 존재하지 않습니다."));
 
@@ -157,7 +156,7 @@ public class PostCommentService {
     }
 
 
-    public InteractionStatusResponse getUserInteractionStatus(Integer commentId, Integer userId) {
+    public InteractionStatusResponse getUserInteractionStatus(Integer commentId, Long userId) {
         if (userId == null) {
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
         }
@@ -167,7 +166,7 @@ public class PostCommentService {
     }
 
     @Transactional(readOnly = true)
-    public PostDetailView buildPostDetailView(Integer postId, Integer userId, String sort) {
+    public PostDetailView buildPostDetailView(Integer postId, Long userId, String sort) {
         User currentUser = (userId != null) ? userService.getActiveUserById(userId) : null;
 
         // 1. 게시글 정보
@@ -185,21 +184,21 @@ public class PostCommentService {
         }
 
         // 4. 댓글 작성자 id 모두 조회
-        List<Integer> allUserIds = parentComments.stream()
+        List<Long> allUserIds = parentComments.stream()
                 .flatMap(c -> collectAllReplies(c).stream())
                 .map(PostComment::getUserId)
                 .distinct()
                 .toList();
 
         // 5. id -> UserDTO 매핑
-        Map<Integer, UserDTO> userDtoMap = userService.getUserDTOsByIds(allUserIds);
+        Map<Long, UserDTO> userDtoMap = userService.getUserDTOsByIds(allUserIds);
 
         // 6. 댓글 트리 → DTO 변환
         List<PostCommentDTO> commentDTOs = parentComments.stream()
                 .filter(c -> c.getParentComment() == null)
                 .map(c -> {
                     Integer commentId = c.getCommentId();
-                    Integer authorId = c.getUserId();
+                    Long authorId = c.getUserId();
                     PostCommentDTO dto = PostCommentDTO.from(c, userDtoMap);
 
                     InteractionStatusResponse res = commentInteractionMap.get(commentId);
@@ -238,7 +237,7 @@ public class PostCommentService {
         return all;
     }
 
-    public void fillInteractionMap(PostComment comment, Integer userId, Map<Integer, InteractionStatusResponse> map) {
+    public void fillInteractionMap(PostComment comment, Long userId, Map<Integer, InteractionStatusResponse> map) {
         map.put(comment.getCommentId(), getUserInteractionStatus(comment.getCommentId(), userId));
         for (PostComment reply : comment.getReplies()) {
             map.put(reply.getCommentId(), getUserInteractionStatus(reply.getCommentId(), userId));

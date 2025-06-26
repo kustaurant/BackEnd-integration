@@ -6,9 +6,9 @@ import com.kustaurant.kustaurant.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.domain.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.service.port.*;
-import com.kustaurant.kustaurant.user.controller.port.UserService;
-import com.kustaurant.kustaurant.user.domain.User;
-import com.kustaurant.kustaurant.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.user.user.controller.port.UserService;
+import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,7 +52,7 @@ class PostServiceTest {
     void 좋아요를_처음_누르면_좋아요가_생성된다() {
         // Given
         int postId = 1;
-        int userId = 10;
+        Long userId = 10L;
 
         Post post = Post.builder()
                 .id(postId)
@@ -84,7 +84,7 @@ class PostServiceTest {
     void 싫어요가_눌린_상태에서_좋아요를_누르면_싫어요는_삭제되고_좋아요가_생성된다() {
         // Given
         int postId = 1;
-        int userId = 20;
+        Long userId = 20L;
 
         Post post = Post.builder()
                 .id(postId)
@@ -133,7 +133,7 @@ class PostServiceTest {
         String title = "제목";
         String category = "일반";
         String body = "<img src='img1.jpg'>본문";
-        int userId = 1;
+        Long userId = 1L;
 
         when(imageExtractor.extract(body)).thenReturn(java.util.List.of("img1.jpg"));
 

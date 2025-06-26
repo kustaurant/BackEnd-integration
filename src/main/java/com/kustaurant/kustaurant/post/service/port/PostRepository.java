@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository {
-    List<PostEntity> findActivePostsByUserId(Integer userId);
+    List<PostEntity> findActivePostsByUserId(Long userId);
 
     Optional<PostEntity> findByStatusAndPostId(String status, Integer postId);
 
@@ -29,5 +29,5 @@ public interface PostRepository {
     void increaseVisitCount(Integer postId);
     void delete(Post post);
 
-    List<Post> findActiveByUserId(Integer userId);
+    List<Post> findActiveByUserId(Long userId);
 }

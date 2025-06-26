@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 public class PostDislike {
 
     private Integer id;
-    private Integer userId;
+    private Long userId;
     private Integer postId;
     private final LocalDateTime createdAt;
 
-    public PostDislike(Integer userId, Integer postId, LocalDateTime createdAt) {
+    public PostDislike(Long userId, Integer postId, LocalDateTime createdAt) {
         this.userId = userId;
         this.postId = postId;
         this.createdAt = createdAt;

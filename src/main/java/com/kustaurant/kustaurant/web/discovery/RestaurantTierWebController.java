@@ -4,9 +4,11 @@ package com.kustaurant.kustaurant.web.discovery;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kustaurant.kustaurant.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.application.service.query.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.application.service.query.RestaurantChartService;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.SituationList;
@@ -75,7 +77,7 @@ public class RestaurantTierWebController {
             @CuisineList List<String> cuisines,
             @SituationList List<Integer> situations,
             @LocationList List<String> locations,
-            Principal principal,
+            @AuthUser AuthUserInfo user,
             HttpServletRequest request
     ) {
         // page를 0부터 시작하도록 처리
@@ -84,11 +86,9 @@ public class RestaurantTierWebController {
         } else {
             page--;
         }
-        // User 처리
-        UserEntity user = customOAuth2UserService.getUserByPrincipal(principal);
-        Integer userId = user == null ? null : user.getUserId();
+
         // DB 조회
-        List<RestaurantTierDTO> tierRestaurants = restaurantChartService.findByConditions(cuisines, situations, locations, null, true, userId);
+        List<RestaurantTierDTO> tierRestaurants = restaurantChartService.findByConditions(cuisines, situations, locations, null, true, user.id());
 
         Pageable pageable = PageRequest.of(page, tierPageSize);
 

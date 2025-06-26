@@ -36,7 +36,7 @@ class JwtUtilTest {
     @DisplayName("AccessToken을 잘 발행한다")
     void generateAccessToken() {
         // given
-        int userId = 1;
+        Long userId = 1L;
         String role = "ROLE_USER";
 
         // when
@@ -54,7 +54,7 @@ class JwtUtilTest {
     @DisplayName("refreshToken발행시 tokenType은 RT")
     void generateRefreshToken_claims() {
         // given
-        int userId = 5;
+        Long userId = 5L;
 
         // when
         String token = jwtUtil.generateRefreshToken(userId, "ROLE_ADMIN");
@@ -89,7 +89,7 @@ class JwtUtilTest {
     @DisplayName("parse()는 ParsedToken 필드를 정확히 반환한다")
     void parse_returnsCorrectParsedToken() {
         // g
-        int userId = 42;
+        Long userId = 42L;
 
         // w
         String token = jwtUtil.generateAccessToken(userId, "ROLE_USER");

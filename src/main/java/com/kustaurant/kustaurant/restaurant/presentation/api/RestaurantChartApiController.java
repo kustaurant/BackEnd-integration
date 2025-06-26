@@ -1,15 +1,15 @@
 package com.kustaurant.kustaurant.restaurant.presentation.api;
 
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantApiService;
 import com.kustaurant.kustaurant.restaurant.application.service.query.RestaurantChartService;
-import com.kustaurant.kustaurant.global.OUserService;
 import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.restaurant.application.service.query.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.application.service.query.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantFavoriteService;
-import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -42,7 +42,6 @@ public class RestaurantChartApiController {
     private final RestaurantChartService restaurantChartService;
 
     private final RestaurantApiService restaurantApiService;
-    private final OUserService userService;
     private final RestaurantFavoriteService restaurantFavoriteService;
 
     @Operation(summary = "티어표 리스트 불러오기", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
@@ -74,12 +73,12 @@ public class RestaurantChartApiController {
             @LocationList List<String> locations,
             @RequestParam(defaultValue = "1") @Parameter(description = "페이지는 1부터 시작입니다.") Integer page,
             @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit,
-            @Parameter(hidden = true) @JwtToken Integer userId
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // page 0부터 시작하게 수정
         page--;
         // 조회
-        List<RestaurantTierDTO> restaurants = restaurantChartService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, userId);
+        List<RestaurantTierDTO> restaurants = restaurantChartService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, user.id());
 
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
@@ -113,12 +112,12 @@ public class RestaurantChartApiController {
             @LocationList List<String> locations,
             @RequestParam(defaultValue = "1") @Parameter(description = "페이지는 1부터 시작입니다.") Integer page,
             @RequestParam(defaultValue = "30") @Parameter(description = "한 페이지의 항목 개수입니다.") Integer limit,
-            @Parameter(hidden = true) @JwtToken Integer userId
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // page 0부터 시작하게 수정
         page--;
         // DB 조회
-        List<RestaurantTierDTO> restaurants = restaurantChartService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, userId);
+        List<RestaurantTierDTO> restaurants = restaurantChartService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, user.id());
 
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
@@ -166,10 +165,10 @@ public class RestaurantChartApiController {
             @SituationList List<Integer> situations,
             @Parameter(schema = @Schema(type = "string"), example = "L1,L2,L3 또는 ALL", description = "위치입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, L1:건입~중문, L2:중문~어대, L3:후문, L4:정문, L5:구의역")
             @LocationList List<String> locations,
-            @Parameter(hidden = true) @JwtToken Integer userId
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return new ResponseEntity<>(
-                restaurantChartService.getRestaurantTierMapDto(cuisines, situations, locations, userId),
+                restaurantChartService.getRestaurantTierMapDto(cuisines, situations, locations, user.id()),
                 HttpStatus.OK
         );
     }
@@ -215,10 +214,10 @@ public class RestaurantChartApiController {
             @SituationList List<Integer> situations,
             @Parameter(schema = @Schema(type = "string"), example = "L1,L2,L3 또는 ALL", description = "위치입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, L1:건입~중문, L2:중문~어대, L3:후문, L4:정문, L5:구의역")
             @LocationList List<String> locations,
-            @Parameter(hidden = true) @JwtToken Integer userId
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return new ResponseEntity<>(
-                restaurantChartService.getRestaurantTierMapDto(cuisines, situations, locations, userId),
+                restaurantChartService.getRestaurantTierMapDto(cuisines, situations, locations, user.id()),
                 HttpStatus.OK
         );
     }

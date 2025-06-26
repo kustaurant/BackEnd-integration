@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.post.domain;
 import com.kustaurant.kustaurant.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.user.domain.User;
+import com.kustaurant.kustaurant.user.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;

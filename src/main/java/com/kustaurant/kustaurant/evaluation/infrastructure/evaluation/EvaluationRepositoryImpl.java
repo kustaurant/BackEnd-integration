@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +19,7 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     private final EvaluationJpaRepository evaluationJpaRepository;
 
     @Override
-    public boolean existsByUserAndRestaurant(Integer userId, Integer restaurantId) {
+    public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
         if (userId == null || restaurantId == null) {
             return false;
         }
@@ -37,13 +37,13 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     }
 
 
-    public List<EvaluationDomain> findByUserId(Integer userId) {
+    public List<EvaluationDomain> findByUserId(Long userId) {
         return evaluationJpaRepository.findByUser_UserId(userId).stream().map(EvaluationDomain::from).toList();
     }
 
 
     @Override
-    public List<EvaluationDomain> findSortedEvaluationByUserIdDesc(Integer userId) {
+    public List<EvaluationDomain> findSortedEvaluationByUserIdDesc(Long userId) {
         return evaluationJpaRepository.findSortedEvaluationsByUserIdDesc(userId).stream()
                 .map(EvaluationDomain::from)
                 .toList();

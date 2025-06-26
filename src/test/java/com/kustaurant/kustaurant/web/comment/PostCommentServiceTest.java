@@ -10,8 +10,8 @@ import com.kustaurant.kustaurant.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.domain.Post;
 import com.kustaurant.kustaurant.post.domain.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.user.controller.port.UserService;
-import com.kustaurant.kustaurant.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.user.user.controller.port.UserService;
+import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.web.post.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class PostCommentServiceTest {
-
     private PostCommentRepository commentRepository;
     private PostCommentLikeJpaRepository likeRepository;
     private PostCommentDislikeJpaRepository dislikeRepository;
@@ -53,7 +52,7 @@ class PostCommentServiceTest {
     void 댓글을_조회할_수_있다() {
         // Given
         Integer commentId = 1;
-        PostComment mockComment = PostComment.create("content", 100, 1);
+        PostComment mockComment = PostComment.create("content", 100L, 1);
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(mockComment));
 
         // When
@@ -79,7 +78,7 @@ class PostCommentServiceTest {
     @Test
     void 댓글_좋아요_처음_누르면_좋아요가_생성된다() {
         // Given
-        Integer userId = 10;
+        Long userId = 10L;
         Integer commentId = 1;
         PostComment comment = PostComment.create("like test", userId, 2);
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
@@ -98,7 +97,7 @@ class PostCommentServiceTest {
     @Test
     void 댓글_싫어요에서_좋아요로_전환시_싫어요_감소_좋아요_증가한다() {
         // Given
-        Integer userId = 10;
+        Long userId = 10L;
         Integer commentId = 1;
         PostComment comment = PostComment.create("switch from dislike", userId, 2);
         comment.increaseDislikeCount(1);
@@ -119,8 +118,8 @@ class PostCommentServiceTest {
     void 댓글을_삭제하면_상태가_DELETED로_변경된다() {
         // Given
         Integer commentId = 1;
-        PostComment reply = PostComment.create("reply", 100, 1);
-        PostComment parentComment = PostComment.create("parent", 100, 1);
+        PostComment reply = PostComment.create("reply", 100L, 1);
+        PostComment parentComment = PostComment.create("parent", 100L, 1);
         parentComment.getReplies().add(reply);
         when(commentRepository.findByIdWithReplies(commentId)).thenReturn(Optional.of(parentComment));
 
@@ -137,8 +136,8 @@ class PostCommentServiceTest {
         // Given
         Integer postId = 1;
         Post post = Post.builder().id(postId).build();
-        PostComment comment1 = PostComment.create("1", 1, postId);
-        PostComment comment2 = PostComment.create("2", 1, postId);
+        PostComment comment1 = PostComment.create("1", 1L, postId);
+        PostComment comment2 = PostComment.create("2", 1L, postId);
         comment1.increaseLikeCount(5);
         comment2.increaseLikeCount(10);
         when(postService.getPost(postId)).thenReturn(post);
@@ -157,8 +156,8 @@ class PostCommentServiceTest {
         // Given
         Integer postId = 1;
         Post post = Post.builder().id(postId).build();
-        PostComment older = PostComment.create("older", 1, postId);
-        PostComment newer = PostComment.create("newer", 1, postId);
+        PostComment older = PostComment.create("older", 1L, postId);
+        PostComment newer = PostComment.create("newer", 1L, postId);
         older.setCreatedAt(LocalDateTime.now().minusMinutes(10));
         newer.setCreatedAt(LocalDateTime.now());
         when(postService.getPost(postId)).thenReturn(post);

@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.restaurant.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,14 +19,15 @@ public class RestaurantFavoriteEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer favoriteId;
-    @ManyToOne
-    @JoinColumn(name="user_id")
-    UserEntity user;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="restaurant_id")
     RestaurantEntity restaurant;
+
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -63,7 +64,7 @@ public class RestaurantFavoriteEntity {
     public RestaurantFavorite toDomain() {
         return RestaurantFavorite.builder()
                 .favoriteId(favoriteId)
-                .user(user.toModel())
+                .userId(userId)
                 .restaurant(restaurant.toDomain())
                 .status(status)
                 .createdAt(createdAt)
@@ -72,13 +73,9 @@ public class RestaurantFavoriteEntity {
     }
 
     public static RestaurantFavoriteEntity fromDomain(RestaurantFavorite domain) {
-        if (domain == null) {
-            return null;
-        }
-
         RestaurantFavoriteEntity entity = new RestaurantFavoriteEntity();
         entity.favoriteId = domain.getFavoriteId();
-        entity.user = UserEntity.from(domain.getUser());
+        entity.userId = domain.getUserId();
         entity.restaurant = RestaurantEntity.fromDomain(domain.getRestaurant());
         entity.status = domain.getStatus();
         entity.createdAt = domain.getCreatedAt();

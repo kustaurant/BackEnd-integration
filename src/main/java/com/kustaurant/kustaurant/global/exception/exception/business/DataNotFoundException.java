@@ -9,7 +9,7 @@ public class DataNotFoundException extends BusinessException {
         super(errorCode, detailMessage);
     }
 
-    public DataNotFoundException(ErrorCode errorCode, int id, String type) {
+    public DataNotFoundException(ErrorCode errorCode, Integer id, String type) {
         super(errorCode, "ID가 " + id + "인 " + type + "이(가) 존재하지 않습니다.");
     }
 }

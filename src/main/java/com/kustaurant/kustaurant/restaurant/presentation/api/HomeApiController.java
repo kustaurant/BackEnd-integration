@@ -1,10 +1,11 @@
 package com.kustaurant.kustaurant.restaurant.presentation.api;
 
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.application.service.query.RestaurantHomeService;
 import com.kustaurant.kustaurant.restaurant.application.service.query.RestaurantSearchService;
 import com.kustaurant.kustaurant.notice.service.HomeBannerApiService;
 import com.kustaurant.kustaurant.restaurant.application.service.query.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -35,10 +36,10 @@ public class HomeApiController {
             @ApiResponse(responseCode = "404", description = "restaurant not found", content = {@Content(mediaType = "application/json")})
     })
     @GetMapping("/api/v1/home")
-    public ResponseEntity<RestaurantListsResponse> home(@JwtToken @Parameter(hidden = true)Integer userId) {
+    public ResponseEntity<RestaurantListsResponse> home(@Parameter(hidden = true) @AuthUser AuthUserInfo user) {
         List<RestaurantTierDTO> topRestaurantsByRatingDTOs = restaurantHomeService.getTopRestaurants(); // 점수 높은 순으로 총 16개
         // 로그인 여부에 따라 랜덤 식당 또는 추천 식당을 반환하는 서비스 메서드를 호출합니다.
-        List<RestaurantTierDTO> restaurantsForMeDTOs = restaurantHomeService.getRecommendedOrRandomRestaurants(userId);
+        List<RestaurantTierDTO> restaurantsForMeDTOs = restaurantHomeService.getRecommendedOrRandomRestaurants(user.id());
         // 홈화면의 배너 이미지
         List<String> homePhotoUrls = homeBannerApiService.getHomeBannerImage();
         RestaurantListsResponse response = new RestaurantListsResponse(
@@ -70,13 +71,13 @@ public class HomeApiController {
     })
     public ResponseEntity<List<RestaurantTierDTO>> search(
             @RequestParam(value = "kw", defaultValue = "") String kw,
-            @Parameter(hidden = true) @JwtToken Integer userId
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         if (kw == null || kw.isEmpty()) {
             return ResponseEntity.ok(new ArrayList<>());
         }
         String[] kwList = kw.split(" ");
 
-        return ResponseEntity.ok(restaurantSearchService.search(kwList, userId));
+        return ResponseEntity.ok(restaurantSearchService.search(kwList, user.id()));
     }
 }

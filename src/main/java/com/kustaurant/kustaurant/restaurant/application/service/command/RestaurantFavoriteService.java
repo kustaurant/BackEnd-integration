@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.restaurant.application.service.command;
 import com.kustaurant.kustaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,12 +19,12 @@ public class RestaurantFavoriteService {
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
 
     // 유저의 식당 즐겨찾기 여부를 반환
-    public Boolean isUserFavorite(Integer userId, Integer restaurantId) {
+    public Boolean isUserFavorite(Long userId, Integer restaurantId) {
         return restaurantFavoriteRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 
     // 유저의 즐겨찾기 식당 리스트를 반환
-    public List<Restaurant> getFavoriteRestaurantDtoList(Integer userId) {
+    public List<Restaurant> getFavoriteRestaurantDtoList(Long userId) {
         List<RestaurantFavorite> favorites = restaurantFavoriteRepository.findByUser(userId);
 
         return favorites.stream()
@@ -38,7 +38,7 @@ public class RestaurantFavoriteService {
         RestaurantFavorite favorite;
         try {
             // 즐겨찾기 정보 조회
-            favorite = restaurantFavoriteRepository.findByUserIdAndRestaurantId(user.getUserId(), restaurant.getRestaurantId());
+            favorite = restaurantFavoriteRepository.findByUserIdAndRestaurantId(user.getId(), restaurant.getRestaurantId());
         } catch (DataNotFoundException e) {
             // 즐겨찾기가 안 되어 있는 경우
             addFavorite(user, restaurant);
@@ -49,10 +49,10 @@ public class RestaurantFavoriteService {
         return false;
     }
 
-    public void addFavorite(UserEntity user, Restaurant restaurant) {
+    public void addFavorite(Long userId, Restaurant restaurant) {
         restaurantFavoriteRepository.save(
                 RestaurantFavorite.builder()
-                .user(user.toModel())
+                .userId(userId)
                 .restaurant(restaurant)
                 .status("ACTIVE")
                 .createdAt(LocalDateTime.now())

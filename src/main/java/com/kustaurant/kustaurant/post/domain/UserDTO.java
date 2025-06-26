@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.post.domain;
 
-import com.kustaurant.kustaurant.user.domain.User;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;

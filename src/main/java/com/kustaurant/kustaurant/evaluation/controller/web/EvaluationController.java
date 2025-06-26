@@ -7,7 +7,7 @@
     import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
     import com.kustaurant.kustaurant.restaurant.presentation.enums.EnumSortComment;
     import com.kustaurant.kustaurant.restaurant.presentation.web.RestaurantWebService;
-    import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+    import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
     import com.kustaurant.kustaurant.evaluation.constants.EvaluationConstants;
     import com.kustaurant.kustaurant.evaluation.domain.EvaluationDTO;
     import com.kustaurant.kustaurant.evaluation.infrastructure.RestaurantComment;

@@ -3,7 +3,6 @@ package com.kustaurant.kustaurant.evaluation.service;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.evaluation.infrastructure.*;
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantApiService;
 import com.kustaurant.kustaurant.evaluation.service.port.EvaluationRepository;
@@ -13,7 +12,7 @@ import com.kustaurant.kustaurant.evaluation.infrastructure.situation.RestaurantS
 import com.kustaurant.kustaurant.evaluation.infrastructure.situation.SituationRepository;
 import com.kustaurant.kustaurant.restaurant.application.service.command.S3Service;
 import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantRepository;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.evaluation.domain.EvaluationDTO;
@@ -46,7 +45,7 @@ public class EvaluationService {
     private final EvaluationConstants evaluationConstants;
 
     // new code start
-    public Boolean isUserEvaluated(Integer userId, Integer restaurantId) {
+    public Boolean isUserEvaluated(Long userId, Integer restaurantId) {
         return evaluationRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 

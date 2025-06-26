@@ -2,9 +2,9 @@ package com.kustaurant.kustaurant.post.infrastructure;
 
 import com.kustaurant.kustaurant.post.domain.PostScrap;
 import com.kustaurant.kustaurant.post.service.port.PostScrapRepository;
-import com.kustaurant.kustaurant.user.controller.web.response.ScrappedPostView;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.user.infrastructure.UserJpaRepository;
+import com.kustaurant.kustaurant.user.mypage.controller.response.ScrappedPostView;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,12 +19,12 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
     private final PostJpaRepository postJpaRepository;
 
     @Override
-    public List<PostScrap> findByUserId(Integer userId) {
+    public List<PostScrap> findByUserId(Long userId) {
         return postScrapJpaRepository.findByUserIdOrderByCreatedAtDesc(userId).stream().map(PostScrap::from).toList();
     }
 
     @Override
-    public boolean existsByUserIdAndPostId(Integer userId, Integer postId) {
+    public boolean existsByUserIdAndPostId(Long userId, Integer postId) {
         return postScrapJpaRepository.existsByUser_UserIdAndPost_PostId(userId, postId);
     }
 
@@ -41,19 +41,17 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
     }
 
     @Override
-    public Optional<PostScrap> findByUserIdAndPostId(Integer userId, Integer postId) {
+    public Optional<PostScrap> findByUserIdAndPostId(Long userId, Integer postId) {
         return postScrapJpaRepository.findByUser_UserIdAndPost_PostId(userId, postId).map(PostScrapEntity::toDomain);
     }
 
     @Override
     public void save(PostScrap postScrap) {
-        UserEntity userEntity = userJpaRepository.findByUserId(postScrap.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
         PostEntity postEntity = postJpaRepository.findById(postScrap.getPostId())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
         PostScrapEntity postScrapEntity = PostScrapEntity.builder()
-                .user(userEntity)
+                .userId(postEntity.getUserId())
                 .post(postEntity)
                 .createdAt(postScrap.getCreatedAt())
                 .build();
@@ -62,7 +60,7 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
     }
 
     @Override
-    public List<ScrappedPostView> findScrapViewsByUserId(Integer userId) {
+    public List<ScrappedPostView> findScrapViewsByUserId(Long userId) {
         return postScrapJpaRepository.findWithPostByUserId(userId).stream()
                 .map(e -> {
                     PostEntity p = e.getPost();   // join-fetch 로 이미 로딩됨

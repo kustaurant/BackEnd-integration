@@ -11,8 +11,8 @@ import com.kustaurant.kustaurant.post.domain.Post;
 import com.kustaurant.kustaurant.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.infrastructure.*;
 import com.kustaurant.kustaurant.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.user.domain.User;
-import com.kustaurant.kustaurant.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.post.domain.PostUpdateDTO;
 import com.kustaurant.kustaurant.post.domain.UserDTO;
 import com.kustaurant.kustaurant.post.domain.PostDTO;
@@ -93,7 +93,7 @@ public class PostApiService {
     }
 
     @Transactional
-    public ReactionStatus toggleLike(Integer postId, Integer userId) {
+    public ReactionStatus toggleLike(Integer postId, Long userId) {
         return postService.toggleLike(postId, userId).getStatus();
     }
 
@@ -152,9 +152,9 @@ public class PostApiService {
     }
 
     // 게시글 삭제
-    public void deletePost(Integer postId, Integer userId) {
+    public void deletePost(Integer postId, Long userId) {
         PostEntity postEntity = getPost(postId);
-        if (!postEntity.getUser().getUserId().equals(userId)) {
+        if (!postEntity.getUserId().equals(userId)) {
             throw new AccessDeniedException("해당 게시글에 대한 권한이 없습니다.");
         }
         deleteComments(postEntity);

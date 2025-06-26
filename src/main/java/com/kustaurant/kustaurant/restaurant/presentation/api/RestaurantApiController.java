@@ -1,11 +1,12 @@
 package com.kustaurant.kustaurant.restaurant.presentation.api;
 
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantService;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.global.OUserService;
-import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtToken;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.common.OUserService;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.restaurant.application.service.command.dto.FavoriteResponseDTO;
 import com.kustaurant.kustaurant.restaurant.application.service.command.dto.RestaurantDetailDTO;
@@ -67,10 +68,10 @@ public class RestaurantApiController {
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetail(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId,
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
-            @Parameter(hidden = true) @JwtToken Integer userId
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return new ResponseEntity<>(
-                restaurantService.getActiveRestaurantDetailDto(restaurantId, userId, userAgent),
+                restaurantService.getActiveRestaurantDetailDto(restaurantId, user.id(), userAgent),
                 HttpStatus.OK
         );
     }
@@ -104,10 +105,10 @@ public class RestaurantApiController {
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetailWithAuth(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId,
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
-            @Parameter(hidden = true) @JwtToken Integer userId
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return new ResponseEntity<>(
-                restaurantService.getActiveRestaurantDetailDto(restaurantId, userId, userAgent),
+                restaurantService.getActiveRestaurantDetailDto(restaurantId, user.id(), userAgent),
                 HttpStatus.OK
         );
     }
@@ -124,10 +125,10 @@ public class RestaurantApiController {
     })
     public ResponseEntity<Boolean> restaurantFavoriteToggle(
             @PathVariable Integer restaurantId,
-            @Parameter(hidden = true) @JwtToken Integer userId
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 유저 가져오기
-        UserEntity UserEntity = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(user.id());
         // 식당 가져오기
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         // 즐겨찾기 로직
@@ -153,10 +154,10 @@ public class RestaurantApiController {
     })
     public ResponseEntity<FavoriteResponseDTO> restaurantFavoriteToggle2(
             @PathVariable Integer restaurantId,
-            @Parameter(hidden = true) @JwtToken Integer userId
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 유저 가져오기
-        UserEntity UserEntity = userService.findUserById(userId);
+        UserEntity UserEntity = userService.findUserById(user.id());
         // 식당 가져오기
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         // 즐겨찾기 로직

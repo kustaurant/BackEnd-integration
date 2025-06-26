@@ -12,11 +12,11 @@ import java.util.Set;
 @Getter
 public final class CustomOAuth2User implements OAuth2User, Serializable {
 
-    private final Integer userId;
+    private final Long userId;
     private final Set<? extends GrantedAuthority> authorities;
     private final Map<String, Object> attributes;
 
-    public CustomOAuth2User(Integer userId,
+    public CustomOAuth2User(Long userId,
                             Set<? extends GrantedAuthority> authorities,
                             Map<String, Object> attributes) {
         this.userId = userId;

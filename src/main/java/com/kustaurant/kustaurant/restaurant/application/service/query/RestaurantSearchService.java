@@ -15,7 +15,7 @@ public class RestaurantSearchService {
     private final RestaurantQueryRepository restaurantQueryRepository;
     private final RestaurantQueryAssembler restaurantQueryAssembler;
 
-    public List<RestaurantTierDTO> search(String[] kwList, @Nullable Integer userId) {
+    public List<RestaurantTierDTO> search(String[] kwList, @Nullable Long userId) {
         // 검색 결과 가져와서 DTO로 매핑
         List<RestaurantTierDTO> dtoList = restaurantQueryRepository.search(kwList)
                 .stream().map(RestaurantQueryMapper::toDto).toList();
