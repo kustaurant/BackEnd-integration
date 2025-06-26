@@ -15,7 +15,7 @@ public interface RestaurantFavoriteJpaRepository extends JpaRepository<Restauran
 
     @Query("""
         SELECT rf FROM RestaurantFavoriteEntity rf
-        WHERE rf.user.id = :userId
+        WHERE rf.user.userId = :userId
         ORDER BY rf.createdAt DESC""")
     List<RestaurantFavoriteEntity> findSortedFavoritesByUserIdDesc(@Param("userId") Integer userId);
 

@@ -131,7 +131,7 @@ public class EvaluationApiController {
         // 평가 추가하기 혹은 기존 평가 업데이트하기
         evaluationService.createOrUpdate(UserEntity, restaurant, evaluationDTO);
         // 평가 완료 후에 업데이트된 식당 데이터를 다시 반환
-        return new ResponseEntity<>(restaurantCommentService.getRestaurantCommentList(restaurantId, UserEntity, true, userAgent), HttpStatus.OK);
+        return new ResponseEntity<>(restaurantCommentService.getRestaurantCommentList(restaurantId, userId, true, userAgent), HttpStatus.OK);
     }
 
     // 리뷰 불러오기
@@ -171,7 +171,7 @@ public class EvaluationApiController {
         // 유져 가져오기
         UserEntity UserEntity = userService.findUserById(userId);
         // 이 식당의 댓글 리스트 가져오기
-        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurantId, UserEntity, sort.equals("popularity"), userAgent);
+        List<RestaurantCommentDTO> response = restaurantCommentService.getRestaurantCommentList(restaurantId, userId, sort.equals("popularity"), userAgent);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -216,7 +216,7 @@ public class EvaluationApiController {
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             // 댓글 좋아요 로직
-            evaluationService.likeEvaluation(UserEntity, evaluation);
+            evaluationService.likeEvaluation(userId, evaluation);
 
             return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(evaluation, UserEntity));
         } else { // 대댓글인 경우
@@ -225,9 +225,9 @@ public class EvaluationApiController {
             RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
             // 대댓글 좋아요 로직
             Map<String, String> responseMap = new HashMap<>();
-            restaurantCommentService.likeComment(UserEntity, restaurantComment, responseMap);
+            restaurantCommentService.likeComment(userId, restaurantComment, responseMap);
 
-            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, UserEntity));
+            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, UserEntity.getUserId()));
         }
     }
 
@@ -271,7 +271,7 @@ public class EvaluationApiController {
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             // 댓글 좋아요 로직
-            evaluationService.dislikeEvaluation(UserEntity, evaluation);
+            evaluationService.dislikeEvaluation(userId, evaluation);
 
             return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(evaluation, UserEntity));
         } else { // 대댓글인 경우
@@ -280,9 +280,9 @@ public class EvaluationApiController {
             RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
             // 대댓글 좋아요 로직
             Map<String, String> responseMap = new HashMap<>();
-            restaurantCommentService.dislikeComment(UserEntity, restaurantComment, responseMap);
+            restaurantCommentService.dislikeComment(userId, restaurantComment, responseMap);
 
-            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, UserEntity));
+            return ResponseEntity.ok(RestaurantCommentDTO.convertCommentWhenLikeDislike(restaurantComment, UserEntity.getUserId()));
         }
     }
 
@@ -332,7 +332,7 @@ public class EvaluationApiController {
         // 대댓글 달기
         RestaurantComment restaurantComment = restaurantCommentService.addSubComment(restaurant, UserEntity, commentBody, evaluation);
 
-        return new ResponseEntity<>(RestaurantCommentDTO.convertCommentWhenSubComment(restaurantComment, null, UserEntity, userAgent), HttpStatus.OK);
+        return new ResponseEntity<>(RestaurantCommentDTO.convertCommentWhenSubComment(restaurantComment, null, userId, userAgent), HttpStatus.OK);
     }
 
     private void checkRestaurantIdAndEvaluationId(RestaurantEntity restaurant, int restaurantId, int evaluationId) {

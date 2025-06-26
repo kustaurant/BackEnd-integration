@@ -4,6 +4,7 @@ package com.kustaurant.kustaurant.web.discovery;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kustaurant.kustaurant.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.JwtToken;
 import com.kustaurant.kustaurant.restaurant.application.service.query.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.application.service.query.RestaurantChartService;
 import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
@@ -11,7 +12,9 @@ import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.Cuisi
 import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.restaurant.presentation.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -75,7 +78,7 @@ public class RestaurantTierWebController {
             @CuisineList List<String> cuisines,
             @SituationList List<Integer> situations,
             @LocationList List<String> locations,
-            Principal principal,
+            @Parameter(hidden = true) @JwtToken Integer userId,
             HttpServletRequest request
     ) {
         // page를 0부터 시작하도록 처리
@@ -84,11 +87,9 @@ public class RestaurantTierWebController {
         } else {
             page--;
         }
-        // User 처리
-        UserEntity user = customOAuth2UserService.getUserByPrincipal(principal);
-        Integer userId = user == null ? null : user.getUserId();
         // DB 조회
-        List<RestaurantTierDTO> tierRestaurants = restaurantChartService.findByConditions(cuisines, situations, locations, null, true, userId);
+        List<RestaurantTierDTO> tierRestaurants = restaurantChartService.findByConditions(
+                cuisines, situations, locations, null, true, userId);
 
         Pageable pageable = PageRequest.of(page, tierPageSize);
 

@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.restaurant.application.service.query;
 
+import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantRepository;
 import com.kustaurant.kustaurant.restaurant.application.service.query.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
 import com.kustaurant.kustaurant.restaurant.application.service.query.port.RestaurantQueryRepository;
@@ -19,6 +20,7 @@ public class RestaurantHomeService {
     private final int RECOMMENDATION_SIZE = 15;
 
     private final RestaurantQueryRepository restaurantQueryRepository;
+    private final RestaurantRepository restaurantRepository;
     private final RestaurantFavoriteService restaurantFavoriteService;
 
     private Random rand = new Random();
@@ -59,10 +61,12 @@ public class RestaurantHomeService {
 
     public String getFavoriteCuisine(Integer userId) {
         // 1. 즐겨찾기한 식당을 가져옵니다.
-        List<Restaurant> favoriteRestaurants = restaurantFavoriteService.getFavoriteRestaurantDtoList(userId);
+        List<Integer> favoriteRestaurants = restaurantFavoriteService.getFavoriteRestaurantIdList(userId);
 
         // 2. 식당들의 카테고리를 수집하여 가장 많이 즐겨찾기한 카테고리를 찾습니다.
         Map<String, Long> cuisineFrequencyMap = favoriteRestaurants.stream()
+                .map(restaurantRepository::getById)
+                .filter(r -> Objects.equals(r.getStatus(), "ACTIVE"))
                 .collect(Collectors.groupingBy(Restaurant::getRestaurantCuisine, Collectors.counting()));
 
         // 3. 가장 많이 즐겨찾기된 카테고리 찾기

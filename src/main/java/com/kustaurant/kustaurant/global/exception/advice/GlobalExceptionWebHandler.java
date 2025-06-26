@@ -2,8 +2,11 @@ package com.kustaurant.kustaurant.global.exception.advice;
 
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,6 +25,16 @@ public class GlobalExceptionWebHandler {
         log.error("[DataNotFoundException] {} {}: {}", req.getMethod(), req.getRequestURI(), e.getMessage(), e);
         model.addAttribute("message", "존재하지 않습니다.");
         return "error/not_found";
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public void handleAccessDeniedException(
+            AccessDeniedException e,
+            HttpServletRequest req,
+            HttpServletResponse res
+    ) throws IOException {
+        log.error("[AccessDeniedException] {} {}: {}", req.getMethod(), req.getRequestURI(), e.getMessage(), e);
+        res.sendRedirect(req.getContextPath() + "/user/login");
     }
 
     @ExceptionHandler(Exception.class)

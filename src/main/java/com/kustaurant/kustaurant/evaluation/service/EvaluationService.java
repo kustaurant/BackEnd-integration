@@ -3,7 +3,6 @@ package com.kustaurant.kustaurant.evaluation.service;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.evaluation.infrastructure.*;
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantApiService;
 import com.kustaurant.kustaurant.evaluation.service.port.EvaluationRepository;
@@ -19,6 +18,7 @@ import com.kustaurant.kustaurant.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
 import com.kustaurant.kustaurant.global.etc.JsonData;
+import com.kustaurant.kustaurant.user.infrastructure.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,11 +38,11 @@ public class EvaluationService {
     private final RestaurantRepository restaurantRepository;
     private final RestaurantSituationRelationService restaurantSituationRelationService;
     private final EvaluationItemScoresService evaluationItemScoresService;
-    private final RestaurantApiService restaurantApiService;
     private final S3Service s3Service;
     private final RestaurantCommentLikeRepository restaurantCommentLikeRepository;
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final RestaurantCommentRepository restaurantCommentRepository;
+    private final UserJpaRepository userJpaRepository;
     private final EvaluationConstants evaluationConstants;
 
     // new code start
@@ -388,10 +388,11 @@ public class EvaluationService {
 
     // Evaluation 좋아요
     @Transactional
-    public void likeEvaluation(UserEntity user, EvaluationEntity evaluation) {
-        Optional<RestaurantCommentLike> likeOptional = restaurantCommentLikeRepository.findByUserAndEvaluation(user, evaluation);
-        Optional<RestaurantCommentDislike> dislikeOptional = restaurantCommentDislikeRepository.findByUserAndEvaluation(user, evaluation);
+    public void likeEvaluation(Integer userId, EvaluationEntity evaluation) {
+        Optional<RestaurantCommentLike> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getEvaluationId());
+        Optional<RestaurantCommentDislike> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getEvaluationId());
 
+        UserEntity userEntity = userJpaRepository.getReferenceById((long) userId);
         if (likeOptional.isPresent() && dislikeOptional.isPresent()) {
             throw new IllegalStateException(evaluation.getEvaluationId() + "id 평가 좋아요 상태 문제. 서버측에 알려주세요.. 감사합니다!");
         } else if (likeOptional.isPresent()) {
@@ -399,11 +400,11 @@ public class EvaluationService {
             evaluationLikeCountAdd(evaluation, -1);
         } else if (dislikeOptional.isPresent()) {
             restaurantCommentDislikeRepository.delete(dislikeOptional.get());
-            RestaurantCommentLike restaurantCommentLike = new RestaurantCommentLike(user, evaluation);
+            RestaurantCommentLike restaurantCommentLike = new RestaurantCommentLike(userEntity, evaluation);
             restaurantCommentLikeRepository.save(restaurantCommentLike);
             evaluationLikeCountAdd(evaluation, 2);
         } else {
-            RestaurantCommentLike restaurantCommentLike = new RestaurantCommentLike(user, evaluation);
+            RestaurantCommentLike restaurantCommentLike = new RestaurantCommentLike(userEntity, evaluation);
             restaurantCommentLikeRepository.save(restaurantCommentLike);
             evaluationLikeCountAdd(evaluation, 1);
         }
@@ -412,10 +413,11 @@ public class EvaluationService {
 
     // Evaluation 싫어요
     @Transactional
-    public void dislikeEvaluation(UserEntity user, EvaluationEntity evaluation) {
-        Optional<RestaurantCommentLike> likeOptional = restaurantCommentLikeRepository.findByUserAndEvaluation(user, evaluation);
-        Optional<RestaurantCommentDislike> dislikeOptional = restaurantCommentDislikeRepository.findByUserAndEvaluation(user, evaluation);
+    public void dislikeEvaluation(Integer userId, EvaluationEntity evaluation) {
+        Optional<RestaurantCommentLike> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getEvaluationId());
+        Optional<RestaurantCommentDislike> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getEvaluationId());
 
+        UserEntity userEntity = userJpaRepository.getReferenceById((long) userId);
         if (likeOptional.isPresent() && dislikeOptional.isPresent()) {
             throw new IllegalStateException(evaluation.getEvaluationId() + "id 평가 좋아요 상태 문제. 서버측에 알려주세요.. 감사합니다!");
         } else if (dislikeOptional.isPresent()) {
@@ -423,11 +425,11 @@ public class EvaluationService {
             evaluationLikeCountAdd(evaluation, 1);
         } else if (likeOptional.isPresent()) {
             restaurantCommentLikeRepository.delete(likeOptional.get());
-            RestaurantCommentDislike restaurantCommentDislike = new RestaurantCommentDislike(user, evaluation);
+            RestaurantCommentDislike restaurantCommentDislike = new RestaurantCommentDislike(userEntity, evaluation);
             restaurantCommentDislikeRepository.save(restaurantCommentDislike);
             evaluationLikeCountAdd(evaluation, -2);
         } else {
-            RestaurantCommentDislike restaurantCommentDislike = new RestaurantCommentDislike(user, evaluation);
+            RestaurantCommentDislike restaurantCommentDislike = new RestaurantCommentDislike(userEntity, evaluation);
             restaurantCommentDislikeRepository.save(restaurantCommentDislike);
             evaluationLikeCountAdd(evaluation, -1);
         }

@@ -15,7 +15,10 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @RequiredArgsConstructor
@@ -33,13 +36,15 @@ public class SecurityWebConfig {
                 .securityMatcher(request -> !request.getServletPath().matches("^/api/v\\d+/.*$"))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // 기본적으로 CSRF 보호 활성화
-
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Frame Options 비활성화
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/restaurant/**", "/evaluation/**", "/user/myPage", "/community/write","/api/post/**","/api/comment/**", "/admin/**").authenticated()
                         .anyRequest().permitAll()) // 모든 요청 허용
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/user/login")))
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/user/login")
                         .failureUrl("/user/login?error")

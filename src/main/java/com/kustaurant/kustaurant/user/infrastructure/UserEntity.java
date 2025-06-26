@@ -104,6 +104,7 @@ public class UserEntity {
 
     @Builder
     public UserEntity(
+            Integer userId,
             String providerId,
             String loginApi,
             String email,
@@ -113,6 +114,7 @@ public class UserEntity {
             UserStatus status,
             LocalDateTime createdAt
     ) {
+        this.userId = userId;
         this.providerId = providerId;
         this.loginApi = loginApi;
         this.email = email;
@@ -143,6 +145,7 @@ public class UserEntity {
 
     public static UserEntity from(User user) {
         return UserEntity.builder()
+                .userId(user.getId())
                 .providerId(user.getProviderId())
                 .loginApi(user.getLoginApi())
                 .email(user.getEmail())

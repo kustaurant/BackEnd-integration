@@ -126,12 +126,8 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        // 유저 가져오기
-        UserEntity UserEntity = userService.findUserById(userId);
-        // 식당 가져오기
-        Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         // 즐겨찾기 로직
-        boolean result = restaurantFavoriteService.toggleFavorite(UserEntity, restaurant);
+        boolean result = restaurantFavoriteService.toggleFavorite(userId, restaurantId);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         return ResponseEntity.ok(result);
     }
@@ -155,12 +151,10 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId,
             @Parameter(hidden = true) @JwtToken Integer userId
     ) {
-        // 유저 가져오기
-        UserEntity UserEntity = userService.findUserById(userId);
+        // 즐겨찾기 로직
+        boolean result = restaurantFavoriteService.toggleFavorite(userId, restaurantId);
         // 식당 가져오기
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
-        // 즐겨찾기 로직
-        boolean result = restaurantFavoriteService.toggleFavorite(UserEntity, restaurant);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         return ResponseEntity.ok(new FavoriteResponseDTO(result, restaurant.getFavoriteCount()));
     }
