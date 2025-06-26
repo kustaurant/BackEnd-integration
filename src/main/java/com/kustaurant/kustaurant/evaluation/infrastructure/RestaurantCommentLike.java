@@ -19,9 +19,8 @@ public class RestaurantCommentLike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer likeId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @ManyToOne
     @JoinColumn(name="comment_id")
@@ -31,16 +30,16 @@ public class RestaurantCommentLike {
     @JoinColumn(name="evaluation_id")
     private EvaluationEntity evaluation;
 
-    public RestaurantCommentLike(UserEntity UserEntity, RestaurantComment restaurantComment) {
+    public RestaurantCommentLike(Long userId, RestaurantComment restaurantComment) {
         this.restaurantComment = restaurantComment;
-        this.user = UserEntity;
+        this.userId = userId;
         this.evaluation = null;
         this.createdAt = LocalDateTime.now();
     }
 
-    public RestaurantCommentLike(UserEntity UserEntity, EvaluationEntity evaluation) {
+    public RestaurantCommentLike(Long userId, EvaluationEntity evaluation) {
         this.restaurantComment = null;
-        this.user = UserEntity;
+        this.userId = userId;
         this.evaluation = evaluation;
         this.createdAt = LocalDateTime.now();
     }

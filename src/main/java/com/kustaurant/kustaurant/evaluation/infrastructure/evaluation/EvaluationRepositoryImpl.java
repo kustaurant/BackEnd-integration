@@ -58,12 +58,12 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     }
 
     @Override
-    public Optional<EvaluationEntity> findByUserAndRestaurant(UserEntity user, RestaurantEntity restaurant) {
+    public Optional<EvaluationEntity> findByUserAndRestaurant(Long userId, RestaurantEntity restaurant) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(UserEntity user, RestaurantEntity restaurant, String status) {
+    public Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(Long userId, RestaurantEntity restaurant, String status) {
         return Optional.empty();
     }
 

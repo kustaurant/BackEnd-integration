@@ -20,7 +20,7 @@ public class RestaurantCommentReport {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity user;
+    private Long userId;
     @ManyToOne
     @JoinColumn(name = "evaluation_id")
     private EvaluationEntity evaluation;
@@ -31,15 +31,25 @@ public class RestaurantCommentReport {
     private LocalDateTime createdAt;
     private String status;
 
-    public RestaurantCommentReport(UserEntity UserEntity, RestaurantComment restaurantComment, LocalDateTime createdAt, String status) {
-        this.user = UserEntity;
+    public RestaurantCommentReport(
+            Long userId,
+            RestaurantComment restaurantComment,
+            LocalDateTime createdAt,
+            String status
+    ) {
+        this.userId = userId;
         this.evaluation = null;
         this.restaurantComment = restaurantComment;
         this.createdAt = createdAt;
         this.status = status;
     }
-    public RestaurantCommentReport(UserEntity UserEntity, EvaluationEntity evaluation, LocalDateTime createdAt, String status) {
-        this.user = UserEntity;
+    public RestaurantCommentReport(
+            Long userId,
+            EvaluationEntity evaluation,
+            LocalDateTime createdAt,
+            String status
+    ) {
+        this.userId = userId;
         this.evaluation = evaluation;
         this.restaurantComment = null;
         this.createdAt = createdAt;

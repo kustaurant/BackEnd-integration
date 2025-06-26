@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.global.auth.session;
 
+import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
@@ -68,19 +69,4 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 attrs.getAttributes()  // extra info
         );
     }
-
-    //리팩토링중 임시로 둘 코드
-    public UserEntity getUser(String providerId) {
-        return userRepository.findByProviderId(providerId)
-                .map(UserEntity::from)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다."));
-    }
-    //리팩토링중 임시로 둘 코드
-    public UserEntity getUserByPrincipal(Principal principal) {
-        Integer id = Integer.valueOf(principal.getName());
-        return userRepository.findById(id)
-                .map(UserEntity::from)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
-    }
-
 }

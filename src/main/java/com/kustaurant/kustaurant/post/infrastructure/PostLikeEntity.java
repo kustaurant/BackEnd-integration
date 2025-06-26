@@ -17,19 +17,8 @@ public class PostLikeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer postLikesId;
 
-    public PostLikeEntity(UserEntity user, PostEntity post, LocalDateTime createdAt) {
-        this.user = user;
-        this.post = post;
-        this.createdAt = createdAt;
-    }
-
-    public PostLikeEntity() {
-
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    UserEntity user;
+    @Column(name = "user_id", nullable = false)
+    Long userId;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
@@ -37,17 +26,30 @@ public class PostLikeEntity {
 
     LocalDateTime createdAt;
 
+    public PostLikeEntity() {}
+
+    public PostLikeEntity(Long userId, PostEntity post, LocalDateTime createdAt) {
+        this.userId = userId;
+        this.post = post;
+        this.createdAt = createdAt;
+    }
+
     public PostLike toDomain() {
-        return new PostLike(this.user.getId(), this.post.getPostId(), this.createdAt);
+        return new PostLike(
+                this.userId,
+                this.post.getPostId(),
+                this.createdAt
+        );
     }
 
     public static PostLikeEntity from(PostLike postLike) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(postLike.getUserId());
-
         PostEntity postEntity = new PostEntity();
         postEntity.setPostId(postLike.getPostId());
-        return new PostLikeEntity(userEntity, postEntity, postLike.getCreatedAt());
+        return new PostLikeEntity(
+                postLike.getUserId(),
+                postEntity,
+                postLike.getCreatedAt()
+        );
     }
 
 }

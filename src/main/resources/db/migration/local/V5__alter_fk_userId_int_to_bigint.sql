@@ -58,3 +58,17 @@ ALTER TABLE post_scraps_tbl
 ALTER TABLE post_scraps_tbl
     ADD CONSTRAINT fk_post_scraps_user_id
         FOREIGN KEY (user_id) REFERENCES users(user_id);
+
+-- 6. restaurant_comments_tbl: user_id 외래키 int -> bigint변경
+-- 기존 외래키 제약조건 제거
+ALTER TABLE restaurant_comments_tbl
+DROP FOREIGN KEY fk_restaurant_comments_TBL_users_TBL1;
+
+-- user_id 컬럼 타입 변경 (int → bigint)
+ALTER TABLE restaurant_comments_tbl
+    MODIFY COLUMN user_id BIGINT;
+
+-- 외래키 제약조건 다시 추가
+ALTER TABLE restaurant_comments_tbl
+    ADD CONSTRAINT fk_restaurant_comments_user_id
+        FOREIGN KEY (user_id) REFERENCES users(user_id);

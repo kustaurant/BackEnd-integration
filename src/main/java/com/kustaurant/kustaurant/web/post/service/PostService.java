@@ -81,7 +81,7 @@ public class PostService {
 
         return postEntityPage
                 .map(postEntity -> {
-                    User user = userService.getActiveUserById(postEntity.getAuthorId());
+                    User user = userService.getUserById(postEntity.getAuthorId());
                     PostDTO postDTO = PostDTO.from(postEntity, user);
                     postDTO.setUser(UserDTO.from(user));
                     return postDTO;
@@ -347,7 +347,7 @@ public class PostService {
     public List<PostDTO> getDTOs(Page<Post> paging) {
         List<PostDTO> postDTOList = new ArrayList<>();
         for (Post post : paging) {
-            User user = userService.getActiveUserById(post.getAuthorId());
+            User user = userService.getUserById(post.getAuthorId());
             PostDTO postDTO = PostDTO.from(post, user);
             postDTO.setUser(UserDTO.from(user));
             postDTOList.add(postDTO);

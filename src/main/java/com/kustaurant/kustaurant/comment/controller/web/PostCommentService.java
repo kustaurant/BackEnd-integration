@@ -167,11 +167,11 @@ public class PostCommentService {
 
     @Transactional(readOnly = true)
     public PostDetailView buildPostDetailView(Integer postId, Long userId, String sort) {
-        User currentUser = (userId != null) ? userService.getActiveUserById(userId) : null;
+        User currentUser = (userId != null) ? userService.getUserById(userId) : null;
 
         // 1. 게시글 정보
         Post post = postService.getPost(postId);
-        User postAuthor = userService.getActiveUserById(post.getAuthorId());
+        User postAuthor = userService.getUserById(post.getAuthorId());
         PostDTO postDTO = PostDTO.from(post, postAuthor);
 
         // 2. 부모 댓글+대댓글 트리 조회

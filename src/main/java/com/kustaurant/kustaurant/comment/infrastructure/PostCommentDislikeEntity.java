@@ -18,22 +18,27 @@ public class PostCommentDislikeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer commentDislikeId;
 
-    public PostCommentDislikeEntity(Integer commentDislikeId, UserEntity user, PostCommentEntity postComment, LocalDateTime createdAt) {
-        this.commentDislikeId = commentDislikeId;
-        this.user = user;
-        this.postComment = postComment;
-        this.createdAt = createdAt;
-    }
-    public PostCommentDislikeEntity() {
-
-    }
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    UserEntity user;
+    @Column(name = "user_id", nullable = false)
+    Long userId;
 
     @ManyToOne
     @JoinColumn(name="comment_id")
     PostCommentEntity postComment;
 
     LocalDateTime createdAt;
+
+    public PostCommentDislikeEntity() {}
+
+    public PostCommentDislikeEntity(
+            Integer commentDislikeId,
+            Long userId,
+            PostCommentEntity postComment,
+            LocalDateTime createdAt
+    ) {
+        this.commentDislikeId = commentDislikeId;
+        this.userId = userId;
+        this.postComment = postComment;
+        this.createdAt = createdAt;
+    }
+
 }

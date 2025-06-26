@@ -32,12 +32,10 @@ public class RestaurantWebService {
     private final RestaurantService restaurantService;
     private final RestaurantCommentService restaurantCommentService;
 
-    public RestaurantDetailWebDto getRestaurantWebDetails(UserEntity user, Integer restaurantId) {
-        Integer userId = user == null ? null : user.getUserId();
-        RestaurantDetailDTO restaurantDetailDto = restaurantService.getActiveRestaurantDetailDto(restaurantId, userId, "web");
+    public RestaurantDetailWebDto getRestaurantWebDetails(Long userId, Integer restaurantId) {
+        RestaurantDetailDTO restaurantDetailDto = restaurantService.getActiveRestaurantDetailDto(restaurantId, userId);
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
-        // TODO: 이거도 userId 사용하게 바꿔야됨.
-        List<RestaurantCommentDTO> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, user, true, "web");
+        List<RestaurantCommentDTO> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, userId, true);
 
         return new RestaurantDetailWebDto(
                 restaurantDetailDto,

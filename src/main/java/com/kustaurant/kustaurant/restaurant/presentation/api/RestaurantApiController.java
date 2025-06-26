@@ -67,11 +67,10 @@ public class RestaurantApiController {
     @GetMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetail(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId,
-            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return new ResponseEntity<>(
-                restaurantService.getActiveRestaurantDetailDto(restaurantId, user.id(), userAgent),
+                restaurantService.getActiveRestaurantDetailDto(restaurantId, user.id()),
                 HttpStatus.OK
         );
     }
@@ -104,11 +103,10 @@ public class RestaurantApiController {
     @GetMapping("/auth/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetailWithAuth(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId,
-            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return new ResponseEntity<>(
-                restaurantService.getActiveRestaurantDetailDto(restaurantId, user.id(), userAgent),
+                restaurantService.getActiveRestaurantDetailDto(restaurantId, user.id()),
                 HttpStatus.OK
         );
     }
@@ -127,12 +125,10 @@ public class RestaurantApiController {
             @PathVariable Integer restaurantId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        // 유저 가져오기
-        UserEntity UserEntity = userService.findUserById(user.id());
         // 식당 가져오기
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         // 즐겨찾기 로직
-        boolean result = restaurantFavoriteService.toggleFavorite(UserEntity, restaurant);
+        boolean result = restaurantFavoriteService.toggleFavorite(user.id(), restaurant);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         return ResponseEntity.ok(result);
     }
@@ -161,7 +157,7 @@ public class RestaurantApiController {
         // 식당 가져오기
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         // 즐겨찾기 로직
-        boolean result = restaurantFavoriteService.toggleFavorite(UserEntity, restaurant);
+        boolean result = restaurantFavoriteService.toggleFavorite(user.id(), restaurant);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         return ResponseEntity.ok(new FavoriteResponseDTO(result, restaurant.getFavoriteCount()));
     }

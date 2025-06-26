@@ -16,7 +16,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostCommentLikeRepositoryImpl implements PostCommentLikeRepository {
     private final PostCommentLikeJpaRepository postCommentLikeJpaRepository;
-    private final UserJpaRepository userJpaRepository;
     private final PostCommentJpaRepository postCommentJpaRepository;
     @Override
     public Optional<PostCommentLike> findByUserIdAndCommentId(Long userId, Integer commentId) {
@@ -25,18 +24,16 @@ public class PostCommentLikeRepositoryImpl implements PostCommentLikeRepository 
     }
 
     public void save(PostCommentLike like) {
-        UserEntity userEntity = userJpaRepository.findByUserId(like.getUserId())
-                .orElseThrow(UserNotFoundException::new);
         PostCommentEntity commentEntity = postCommentJpaRepository.findById(like.getCommentId())
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, like.getCommentId(), "댓글"));
 
-        PostCommentLikeEntity entity = toEntity(like, userEntity, commentEntity);
+        PostCommentLikeEntity entity = toEntity(like, like.getUserId(), commentEntity);
         postCommentLikeJpaRepository.save(entity);
     }
 
-    public PostCommentLikeEntity toEntity(PostCommentLike like, UserEntity userEntity, PostCommentEntity commentEntity) {
+    public PostCommentLikeEntity toEntity(PostCommentLike like, Long userId, PostCommentEntity commentEntity) {
         return PostCommentLikeEntity.builder()
-                .user(userEntity)
+                .userId(userId)
                 .postComment(commentEntity)
                 .createdAt(like.getCreatedAt())
                 .build();

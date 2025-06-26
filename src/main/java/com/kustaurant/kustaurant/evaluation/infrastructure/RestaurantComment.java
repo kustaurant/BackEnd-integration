@@ -23,9 +23,8 @@ public class RestaurantComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer commentId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @ManyToOne
     @JoinColumn(name="restaurant_id")
@@ -51,8 +50,8 @@ public class RestaurantComment {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public RestaurantComment(UserEntity UserEntity, RestaurantEntity restaurant, EvaluationEntity evaluation, String commentBody, String status, LocalDateTime createdAt) {
-        this.user = UserEntity;
+    public RestaurantComment(Long userId, RestaurantEntity restaurant, EvaluationEntity evaluation, String commentBody, String status, LocalDateTime createdAt) {
+        this.userId = userId;
         this.restaurant = restaurant;
         this.evaluation = evaluation;
         this.commentBody = commentBody;

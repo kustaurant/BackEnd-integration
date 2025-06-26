@@ -17,8 +17,8 @@ public interface EvaluationRepository {
     // TODO: need to delete everything below this
 
     EvaluationEntity save(EvaluationEntity evaluation);
-    Optional<EvaluationEntity> findByUserAndRestaurant(UserEntity UserEntity, RestaurantEntity restaurant);
-    Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(UserEntity UserEntity, RestaurantEntity restaurant, String status);
+    Optional<EvaluationEntity> findByUserAndRestaurant(Long userId, RestaurantEntity restaurant);
+    Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(Long userId, RestaurantEntity restaurant, String status);
 
     Integer countByRestaurant(RestaurantEntity restaurant);
 

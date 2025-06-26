@@ -9,6 +9,7 @@ import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
-    private final UserJpaRepository jpa;
+    private final UserJpaRepository jpaRepository;
 
     @Override
     public User getById(Long id) {
@@ -26,7 +27,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findByProviderId(String providerId) {
-        return jpa.findByProviderId(providerId).map(UserEntity::toModel);
+        return jpaRepository.findByProviderId(providerId).map(UserEntity::toModel);
     }
 
     @Override
@@ -42,17 +43,17 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findById(Long id) {
-        return jpa.findByUserId(id).map(UserEntity::toModel);
+        return jpaRepository.findByUserId(id).map(UserEntity::toModel);
     }
 
     @Override
     public User save(User user) {
-        return jpa.save(UserEntity.from(user)).toModel();
+        return jpaRepository.save(UserEntity.from(user)).toModel();
     }
 
     @Override
     public List<User> findUsersWithEvaluationCountDescending() {
-        return jpa.findUsersWithEvaluationCountDescending()
+        return jpaRepository.findUsersWithEvaluationCountDescending()
                 .stream()
                 .map(UserEntity::toModel)
                 .collect(Collectors.toList());
@@ -60,7 +61,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User> findUsersByEvaluationCountForQuarter(int year, int quarter) {
-        return jpa.findUsersByEvaluationCountForQuarter(year, quarter)
+        return jpaRepository.findUsersByEvaluationCountForQuarter(year, quarter)
                 .stream()
                 .map(UserEntity::toModel)
                 .collect(Collectors.toList());
@@ -68,17 +69,18 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public int countByLoginApi(String loginApi) {
-        return jpa.countByLoginApi(loginApi);
+        return jpaRepository.countByLoginApi(loginApi);
     }
 
 
     @Override
     public Map<Long, UserDTO> getUserDTOMapByIds(List<Long> ids) {
-        return jpa.findAllById(ids)
-                .stream()
+        return jpaRepository.findAllById(ids).stream()
                 .collect(Collectors.toMap(
                         UserEntity::getId,
-                        UserDTO::convertUserToUserDTO
+                        e->UserDTO.from(e.toModel()),
+                        (a,b)->a,
+                        LinkedHashMap::new
                 ));
     }
 

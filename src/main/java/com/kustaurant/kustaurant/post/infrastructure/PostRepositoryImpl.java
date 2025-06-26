@@ -61,12 +61,9 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public Post save(Post post) {
-        UserEntity userEntity = userJpaRepository.findByUserId(post.getAuthorId())
-                .orElseThrow(() -> new DataNotFoundException(USER_NOT_FOUND, post.getAuthorId(), "유저"));
-
         PostEntity postEntity;
         if (post.getId() == null) {
-            postEntity = PostEntity.from(post, userEntity);
+            postEntity = PostEntity.from(post);
             postEntity.setCreatedAt(LocalDateTime.now());
             postEntity.setUpdatedAt(LocalDateTime.now());
         } else {

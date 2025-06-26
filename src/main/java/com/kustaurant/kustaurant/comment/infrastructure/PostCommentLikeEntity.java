@@ -17,17 +17,9 @@ public class PostCommentLikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer commentLikeId;
-    public PostCommentLikeEntity(Integer commentLikeId, UserEntity user, PostCommentEntity postComment, LocalDateTime createdAt) {
-        this.commentLikeId = commentLikeId;
-        this.user = user;
-        this.postComment = postComment;
-        this.createdAt = createdAt;
-    }
-    public PostCommentLikeEntity() {
-    }
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    UserEntity user;
+
+    @Column(name = "user_id", nullable = false)
+    Long userId;
 
     @ManyToOne
     @JoinColumn(name="comment_id")
@@ -35,10 +27,25 @@ public class PostCommentLikeEntity {
 
     LocalDateTime createdAt;
 
+    public PostCommentLikeEntity() {
+    }
+
+    public PostCommentLikeEntity(
+            Integer commentLikeId,
+            Long userId,
+            PostCommentEntity postComment,
+            LocalDateTime createdAt
+    ) {
+        this.commentLikeId = commentLikeId;
+        this.userId = userId;
+        this.postComment = postComment;
+        this.createdAt = createdAt;
+    }
+
     public PostCommentLike toDomain(){
         return PostCommentLike.builder()
                 .commentLikeId(commentLikeId)
-                .userId(user.getId())
+                .userId(userId)
                 .commentId(postComment.getCommentId())
                 .createdAt(createdAt)
                 .build();

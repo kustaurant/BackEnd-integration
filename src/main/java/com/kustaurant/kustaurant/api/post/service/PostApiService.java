@@ -229,7 +229,7 @@ public class PostApiService {
         int prevCount = 100000; // 이전 유저의 평가 개수
         int countSame = 1; // 동일 순위를 세기 위한 변수
         for (User user : userList) {
-            int evaluationCount = user.getEvaluationCount();
+            int evaluationCount = user.getEvalCount();
             UserDTO userDTO = UserDTO.from(user); // 필요한 정보를 UserDTO에 담음
 
             if (evaluationCount < prevCount) {

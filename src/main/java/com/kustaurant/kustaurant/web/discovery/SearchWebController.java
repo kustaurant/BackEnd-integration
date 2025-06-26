@@ -1,6 +1,8 @@
 package com.kustaurant.kustaurant.web.discovery;
 
 import com.kustaurant.kustaurant.evaluation.service.EvaluationService;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.application.service.command.dto.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
@@ -28,10 +30,8 @@ public class SearchWebController {
     public String search(
             Model model,
             @RequestParam(value = "kw", defaultValue = "") String kw,
-            Principal principal
+            @AuthUser AuthUserInfo user
     ) {
-        UserEntity UserEntity = userService.getUserByPrincipal(principal);
-
         if (kw.isEmpty()) {
             model.addAttribute("kw", "입력된 검색어가 없습니다.");
             return "searchResult";
@@ -42,7 +42,7 @@ public class SearchWebController {
         String[] kwList = kw.split(" "); // 검색어 공백 단위로 끊음
         List<RestaurantEntity> restaurantList = restaurantWebService.searchRestaurants(kwList);
 
-        List<RestaurantTierDataClass> restaurantTierDataClassList = evaluationService.convertToTierDataClassList(restaurantList, UserEntity, false);
+        List<RestaurantTierDataClass> restaurantTierDataClassList = evaluationService.convertToTierDataClassList(restaurantList, user.id(), false);
 
         model.addAttribute("restaurantTierData", restaurantTierDataClassList);
 

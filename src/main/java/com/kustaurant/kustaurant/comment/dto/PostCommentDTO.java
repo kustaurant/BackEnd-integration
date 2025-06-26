@@ -52,16 +52,13 @@ public class PostCommentDTO {
     public static PostCommentDTO convertPostCommentToPostCommentDTO(
             PostCommentEntity comment
     ) {
-        String timeAgo = TimeAgoUtil.toKor(
-                comment.getUpdatedAt() != null ? comment.getUpdatedAt()
-                        : comment.getCreatedAt()
-        );
+        String timeAgo = TimeAgoUtil.toKor(comment.getUpdatedAt() != null ? comment.getUpdatedAt() : comment.getCreatedAt());
 
         return PostCommentDTO.builder()
                 .commentId(comment.getCommentId())
                 .commentBody(comment.getCommentBody())
                 .status(comment.getStatus().name())
-                .user(UserDTO.convertUserToUserDTO(comment.getUser()))
+                .user(UserDTO.convertUserToUserDTO(comment.getUserId()))
                 .likeCount(comment.getPostCommentLikesEntities().size())
                 .dislikeCount(comment.getPostCommentDislikesEntities().size())
                 .timeAgo(timeAgo)

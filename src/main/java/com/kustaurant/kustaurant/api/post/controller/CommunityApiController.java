@@ -97,10 +97,9 @@ public class CommunityApiController {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         postApiService.validatePostId(postId);
-        UserEntity writer = userService.findUserById(user.id());
         PostEntity postEntity = postApiService.getPost(postId);
         postService.increaseVisitCount(postId);
-        return ResponseEntity.ok(postApiCommentService.createPostDTOWithFlags(postEntity,writer));
+        return ResponseEntity.ok(postApiCommentService.createPostDTOWithFlags(postEntity,user.id()));
     }
 
     @GetMapping("/api/v1/community/ranking")
@@ -137,14 +136,13 @@ public class CommunityApiController {
 
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        UserEntity writer = userService.findUserById(user.id());
         PostCommentEntity postComment = postApiCommentService.createComment(content, postId, user.id());
         // 대댓글 일 경우 부모 댓글과 관계 매핑
         if (!parentCommentId.isEmpty()) {
             postApiCommentService.processParentComment(postComment, parentCommentId);
         }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(postApiCommentService.createPostCommentDTOWithFlags(postComment, writer));
+                .body(postApiCommentService.createPostCommentDTOWithFlags(postComment, user.id()));
     }
 
     // 댓글 or 대댓글 생성
@@ -165,14 +163,13 @@ public class CommunityApiController {
 
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        UserEntity writer = userService.findUserById(user.id());
         PostEntity postEntity = postApiService.getPost(Integer.valueOf(postId));
         PostCommentEntity postComment = postApiCommentService.createComment(content, postId, user.id());
         // 대댓글 일 경우 부모 댓글과 관계 매핑
         if (!parentCommentId.isEmpty()) {
             postApiCommentService.processParentComment(postComment, parentCommentId);
         }
-        List<PostCommentDTO> postCommentDTOs = postApiCommentService.getPostCommentDTOs(postEntity, writer);
+        List<PostCommentDTO> postCommentDTOs = postApiCommentService.getPostCommentDTOs(postEntity, user.id());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(postCommentDTOs);
     }
@@ -223,9 +220,8 @@ public class CommunityApiController {
             @PathVariable Integer postId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        UserEntity writer = userService.findUserById(user.id());
         PostEntity postEntity = postApiService.getPost(postId);
-        int status = postScrapApiService.scrapCreateOrDelete(postEntity, writer); // 1 또는 0 반환
+        int status = postScrapApiService.scrapCreateOrDelete(postEntity, user.id()); // 1 또는 0 반환
         ScrapToggleDTO scrapToggleDTO = new ScrapToggleDTO(postEntity.getPostScrapList().size(), status);
         return ResponseEntity.ok(scrapToggleDTO);
     }
@@ -283,7 +279,7 @@ public class CommunityApiController {
             ) {
         try {
             Post post = postService.create(postUpdateDTO.getTitle(), postUpdateDTO.getPostCategory(), postUpdateDTO.getContent(), user.id());
-            User writer = userServiceNew.getActiveUserById(user.id());
+            User writer = userServiceNew.getUserById(user.id());
             return ResponseEntity.ok(PostDTO.from(post,writer));
         } catch (Exception e) {
             throw new ServerException("게시글 생성 중 서버 오류가 발생했습니다.", e);

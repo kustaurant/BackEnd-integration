@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.user.user.domain;
 
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
-import com.kustaurant.kustaurant.user.mypage.infrastructure.UserStatsEntity;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
@@ -99,7 +98,7 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public int getEvaluationCount() {
+    public int getEvalCount() {
         return (stats != null) ? stats.getRatedRestCnt() : 0;
     }
 }

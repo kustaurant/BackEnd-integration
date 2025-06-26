@@ -26,13 +26,17 @@ public class PostCommentDislikeRepositoryImpl implements PostCommentDislikeRepos
         PostCommentEntity commentEntity = postCommentJpaRepository.findById(dislike.getCommentId())
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, dislike.getCommentId(), "댓글"));
 
-        PostCommentDislikeEntity entity = toEntity(dislike, userEntity, commentEntity);
+        PostCommentDislikeEntity entity = toEntity(dislike, userEntity.getId(), commentEntity);
         postCommentDislikeJpaRepository.save(entity);
     }
 
-    public PostCommentDislikeEntity toEntity(PostCommentDislike dislike, UserEntity userEntity, PostCommentEntity commentEntity) {
+    public PostCommentDislikeEntity toEntity(
+            PostCommentDislike dislike,
+            Long userId,
+            PostCommentEntity commentEntity
+    ) {
         return PostCommentDislikeEntity.builder()
-                .user(userEntity)
+                .userId(userId)
                 .postComment(commentEntity)
                 .createdAt(dislike.getCreatedAt())
                 .build();

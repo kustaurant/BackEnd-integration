@@ -25,14 +25,13 @@ public class RestaurantService {
         return restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
     }
 
-    public RestaurantDetailDTO getActiveRestaurantDetailDto(Integer restaurantId, Long userId, String userAgent) {
+    public RestaurantDetailDTO getActiveRestaurantDetailDto(Integer restaurantId, Long userId) {
         Restaurant restaurant = restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
         List<RestaurantMenu> menus = restaurantMenuService.findMenusByRestaurantId(restaurantId);
 
         boolean isEvaluated = evaluationService.isUserEvaluated(userId, restaurantId);
         boolean isFavorite = restaurantFavoriteService.isUserFavorite(userId, restaurantId);
-        boolean isIOS = RestaurantConstants.isIOS(userAgent);
 
-        return RestaurantDetailDTO.from(restaurant, menus, isEvaluated, isFavorite, isIOS);
+        return RestaurantDetailDTO.from(restaurant, menus, isEvaluated, isFavorite);
     }
 }

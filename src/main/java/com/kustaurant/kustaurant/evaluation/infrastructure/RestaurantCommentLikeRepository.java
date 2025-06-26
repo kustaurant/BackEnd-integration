@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface RestaurantCommentLikeRepository extends JpaRepository<RestaurantCommentLike, Integer> {
-    Optional<RestaurantCommentLike> findByUserAndRestaurantComment(UserEntity UserEntity, RestaurantComment restaurantComment);
+    Optional<RestaurantCommentLike> findByUserAndRestaurantComment(Long userId, RestaurantComment restaurantComment);
 
-    Optional<RestaurantCommentLike> findByUserAndEvaluation(UserEntity UserEntity, EvaluationEntity evaluation);
+    Optional<RestaurantCommentLike> findByUserAndEvaluation(Long userId, EvaluationEntity evaluation);
 }

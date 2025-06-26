@@ -17,19 +17,8 @@ public class PostDislikeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer postDislikesId;
 
-    public PostDislikeEntity(UserEntity user, PostEntity post, LocalDateTime createdAt) {
-        this.user = user;
-        this.post = post;
-        this.createdAt = createdAt;
-    }
-
-    public PostDislikeEntity() {
-
-    }
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    UserEntity user;
+    @Column(name = "user_id" , nullable = false)
+    Long userId;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
@@ -37,30 +26,36 @@ public class PostDislikeEntity {
 
     LocalDateTime createdAt;
 
+    public PostDislikeEntity() {
+    }
+    public PostDislikeEntity(Long userId, PostEntity post, LocalDateTime createdAt) {
+        this.userId = userId;
+        this.post = post;
+        this.createdAt = createdAt;
+    }
+
     public PostDislike toDomain() {
         return new PostDislike(
-                this.user.getId(),
+                this.userId,
                 this.post.getPostId(),
                 this.createdAt
         );
     }
 
     public static PostDislikeEntity from(PostDislike postDislike) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(postDislike.getUserId());
         PostEntity postEntity = new PostEntity();
         postEntity.setPostId(postDislike.getPostId());
 
         return new PostDislikeEntity(
-                userEntity,
+                postDislike.getUserId(),
                 postEntity,
                 postDislike.getCreatedAt()
         );
     }
 
-    public static PostDislikeEntity from(PostDislike postDislike, UserEntity user, PostEntity post) {
+    public static PostDislikeEntity from(PostDislike postDislike, Long userId, PostEntity post) {
         PostDislikeEntity postDislikeEntity = new PostDislikeEntity();
-        postDislikeEntity.setUser(user);
+        postDislikeEntity.setUserId(userId);
         postDislikeEntity.setPost(post);
         postDislikeEntity.setCreatedAt(postDislike.getCreatedAt());
         return postDislikeEntity;

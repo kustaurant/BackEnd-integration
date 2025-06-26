@@ -34,14 +34,14 @@ public class RestaurantFavoriteService {
 
     // 즐겨찾기 토글
     @Transactional
-    public boolean toggleFavorite(UserEntity user, Restaurant restaurant) {
+    public boolean toggleFavorite(Long userId, Restaurant restaurant) {
         RestaurantFavorite favorite;
         try {
             // 즐겨찾기 정보 조회
-            favorite = restaurantFavoriteRepository.findByUserIdAndRestaurantId(user.getId(), restaurant.getRestaurantId());
+            favorite = restaurantFavoriteRepository.findByUserIdAndRestaurantId(userId, restaurant.getRestaurantId());
         } catch (DataNotFoundException e) {
             // 즐겨찾기가 안 되어 있는 경우
-            addFavorite(user, restaurant);
+            addFavorite(userId, restaurant);
             return true;
         }
         // 즐겨찾기가 되어 있던 경우

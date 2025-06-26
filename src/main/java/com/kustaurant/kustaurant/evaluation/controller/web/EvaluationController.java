@@ -2,11 +2,15 @@
 
     import com.google.gson.Gson;
     import com.google.gson.reflect.TypeToken;
+    import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+    import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
     import com.kustaurant.kustaurant.restaurant.application.service.command.RestaurantCommentService;
     import com.kustaurant.kustaurant.restaurant.application.service.command.dto.RestaurantCommentDTO;
     import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantEntity;
     import com.kustaurant.kustaurant.restaurant.presentation.enums.EnumSortComment;
     import com.kustaurant.kustaurant.restaurant.presentation.web.RestaurantWebService;
+    import com.kustaurant.kustaurant.user.user.controller.port.UserService;
+    import com.kustaurant.kustaurant.user.user.domain.User;
     import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
     import com.kustaurant.kustaurant.evaluation.constants.EvaluationConstants;
     import com.kustaurant.kustaurant.evaluation.domain.EvaluationDTO;
@@ -39,25 +43,23 @@
     public class EvaluationController {
         private final RestaurantWebService restaurantWebService;
         private final EvaluationService evaluationService;
-        private final CustomOAuth2UserService customOAuth2UserService;
         private final EvaluationRepository evaluationRepository;
         private final RestaurantCommentService restaurantCommentService;
+        private final UserService userService;
 
         Gson gson = new Gson();
 
         private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
         // 평가 페이지 화면
-        @PreAuthorize("isAuthenticated() and hasRole('USER')")
         @GetMapping("/evaluation/{restaurantId}")
         public String evaluation(
                 Model model,
-                Principal principal,
+                @AuthUser AuthUserInfo user,
                 @PathVariable Integer restaurantId
         ) {
             RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
-            UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
-            EvaluationEntity evaluation = evaluationRepository.findByUserAndRestaurant(UserEntity, restaurant).orElse(null);
+            EvaluationEntity evaluation = evaluationRepository.findByUserAndRestaurant(user.id(), restaurant).orElse(null);
             Double mainScore = 0.0;
             model.addAttribute("restaurant", restaurant);
 
@@ -74,17 +76,15 @@
             return "evaluation";
         }
         // 평가 데이터 db 저장 (기존 평가 존재 시 업데이트 진행)
-        @PreAuthorize("isAuthenticated() and hasRole('USER')")
         @PostMapping("/api/evaluation/{restaurantId}")
         public ResponseEntity<?> evaluationDBcreate(
                 @PathVariable Integer restaurantId,
-                Principal principal,
+                @AuthUser AuthUserInfo user,
                 @RequestParam("starRating") Double starRating,
                 @RequestParam(value = "selectedSituations", required = false) String selectedSituationsJson,
                 @RequestParam(value = "evaluationComment", required = false) String evaluationComment,
                 @RequestPart(value = "newImage", required = false) MultipartFile newImage
         ) {
-            UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
             RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
             // JSON 문자열을 Java List로 변환
             List<Integer> evaluationSituations = new Gson().fromJson(selectedSituationsJson, new TypeToken<List<Integer>>(){}.getType());
@@ -97,18 +97,17 @@
             evaluationDTO.setNewImage(newImage);
 
             // 평가 데이터 저장 또는 업데이트
-            evaluationService.createOrUpdate(UserEntity, restaurant, evaluationDTO);
+            evaluationService.createOrUpdate(user.id(), restaurant, evaluationDTO);
 
             return ResponseEntity.ok("평가가 성공적으로 저장되었습니다.");
         }
 
         // 식당 댓글 작성
-        @PreAuthorize("isAuthenticated() and hasRole('USER')")
         @PostMapping("/api/restaurants/{restaurantId}/comments")
         public ResponseEntity<String> postRestaurantComment(
                 @PathVariable Integer restaurantId,
                 @RequestBody Map<String, Object> jsonBody,
-                Principal principal
+                @AuthUser AuthUserInfo user
         ) {
             String commentBody = jsonBody.get("commentBody").toString();
             if (commentBody.isEmpty()) {
@@ -116,7 +115,7 @@
             }
             String result = restaurantCommentService.addComment(
                     restaurantId,
-                    principal.getName(),
+                    user.id(),
                     commentBody);
             if (result.equals("ok")) {
                 return ResponseEntity.ok("Comment added successfully");
@@ -132,20 +131,19 @@
         public String getRestaurantCommentByRestaurantId(
                 @PathVariable Integer restaurantId,
                 @RequestParam(value = "sort", defaultValue = "POPULAR") String sort,
-                Principal principal,
+                @AuthUser AuthUserInfo user,
                 Model model
         ) {
             EnumSortComment sortComment = EnumSortComment.valueOf(sort);
 
-            if (principal == null) {
-                List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurantId, null, sortComment.equals(EnumSortComment.POPULAR), "ios");
+            if (user.id() == null) {
+                List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurantId, null, sortComment.equals(EnumSortComment.POPULAR));
                 model.addAttribute("restaurantComments", restaurantComments);
             } else {
-                UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
+                User writer = userService.getUserById(user.id());
+                model.addAttribute("user", writer);
 
-                model.addAttribute("user", UserEntity);
-
-                List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurantId, UserEntity, sortComment.equals(EnumSortComment.POPULAR), "ios");
+                List<RestaurantCommentDTO> restaurantComments = restaurantCommentService.getRestaurantCommentList(restaurantId, user.id(), sortComment.equals(EnumSortComment.POPULAR));
                 model.addAttribute("restaurantComments", restaurantComments);
             }
 
@@ -157,16 +155,15 @@
         public String getARenderedRestaurantCommentHtml(
                 Model model,
                 @PathVariable Integer evaluationId,
-                Principal principal
+                @AuthUser AuthUserInfo user
         ) {
             evaluationId -= EvaluationConstants.EVALUATION_ID_OFFSET;
 
-            if (principal != null) {
-                UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
+            if (user.id() != null) {
+                User writer = userService.getUserById(user.id());
+                model.addAttribute("user", writer);
 
-                model.addAttribute("user", UserEntity);
-
-                RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(evaluationId, UserEntity, "ios");
+                RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(evaluationId, user.id(), "ios");
                 model.addAttribute("restaurantComment", restaurantCommentDTO);
             } else {
                 RestaurantCommentDTO restaurantCommentDTO = restaurantCommentService.getRestaurantCommentDTO(evaluationId, null, "ios");
@@ -184,18 +181,17 @@
         @GetMapping("/api/restaurants/comments/{commentId}/like")
         public ResponseEntity<Map<String, String>> likeRestaurantComment(
                 @PathVariable Integer commentId,
-                Principal principal
+                @AuthUser AuthUserInfo user
         ) {
             Map<String, String> responseMap = new HashMap<>();
             try {
-                UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
                 if (isSubComment(commentId)) { // 대댓글인 경우
                     RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-                    restaurantCommentService.likeComment(UserEntity, restaurantComment, responseMap);
+                    restaurantCommentService.likeComment(user.id(), restaurantComment, responseMap);
                 } else { // 부모 댓글인 경우
                     int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
                     EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
-                    evaluationService.likeEvaluation(UserEntity, evaluation);
+                    evaluationService.likeEvaluation(user.id(), evaluation);
                 }
             } catch (DataNotFoundException e) {
                 logger.error("RestaurantCommentLikeError", e);
@@ -212,22 +208,20 @@
         }
 
         // 식당 댓글 싫어요
-        @PreAuthorize("isAuthenticated() and hasRole('USER')")
         @GetMapping("/api/restaurants/comments/{commentId}/dislike")
         public ResponseEntity<Map<String, String>> dislikeRestaurantComment(
                 @PathVariable Integer commentId,
-                Principal principal
+                @AuthUser AuthUserInfo user
         ) {
             Map<String, String> responseMap = new HashMap<>();
             try {
-                UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
                 if (isSubComment(commentId)) { // 대댓글인 경우
                     RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
-                    restaurantCommentService.dislikeComment(UserEntity, restaurantComment, responseMap);
+                    restaurantCommentService.dislikeComment(user.id(), restaurantComment, responseMap);
                 } else { // 부모 댓글인 경우
                     int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
                     EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
-                    evaluationService.dislikeEvaluation(UserEntity, evaluation);
+                    evaluationService.dislikeEvaluation(user.id(), evaluation);
                 }
             } catch (DataNotFoundException e) {
                 logger.error("RestaurantCommentDislikeError", e);
@@ -244,29 +238,28 @@
         }
 
         // 식당 댓글 삭제
-        @PreAuthorize("isAuthenticated() and hasRole('USER')")
         @DeleteMapping("/api/restaurants/comments/{commentId}")
         public ResponseEntity<String> deleteRestaurantComment(
                 @PathVariable Integer commentId,
-                Principal principal
+                @AuthUser AuthUserInfo user
         ) {
-            UserEntity UserEntity = customOAuth2UserService.getUser(principal.getName());
+
             if (isSubComment(commentId)) {
                 RestaurantComment restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
                 // 삭제 요청한 user가 댓글을 단 user가 아닌 경우
-                if (!restaurantComment.getUser().equals(UserEntity)) {
+                if (!restaurantComment.getUserId().equals(user.id())) {
                     return ResponseEntity.badRequest().build();
                 }
                 // 대댓글 지우기
-                restaurantCommentService.deleteComment(restaurantComment, UserEntity);
+                restaurantCommentService.deleteComment(restaurantComment, user.id());
             } else {
                 int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
                 EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
-                if (!evaluation.getUser().equals(UserEntity)) {
+                if (!evaluation.getUserId().equals(user.id())) {
                     return ResponseEntity.badRequest().build();
                 }
                 // 댓글 내용 지우기
-                evaluationService.deleteComment(evaluation, UserEntity);
+                evaluationService.deleteComment(evaluation, user.id());
             }
 
             return ResponseEntity.ok("success");

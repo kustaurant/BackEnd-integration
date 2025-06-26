@@ -71,7 +71,7 @@ class RestaurantFavoriteServiceTest {
                 .build();
 
         // When
-        boolean result = favoriteService.toggleFavorite(user, restaurant);
+        boolean result = favoriteService.toggleFavorite(user.getId(), restaurant);
 
         // Then
         assertThat(result).isTrue();
@@ -93,7 +93,7 @@ class RestaurantFavoriteServiceTest {
         favoriteService.addFavorite(user.getId(), restaurant);
 
         // When
-        boolean result = favoriteService.toggleFavorite(user, restaurant);
+        boolean result = favoriteService.toggleFavorite(user.getId(), restaurant);
 
         // Then
         assertThat(result).isFalse();

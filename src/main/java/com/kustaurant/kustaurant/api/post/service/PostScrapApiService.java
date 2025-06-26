@@ -19,12 +19,11 @@ import java.util.Optional;
 public class PostScrapApiService {
     private final PostScrapApiRepository postScrapApiRepository;
     private final PostRepository postRepository;
-    private final OUserRepository OUserRepository;
 
-    public int scrapCreateOrDelete(PostEntity postEntity, UserEntity UserEntity) {
+    public int scrapCreateOrDelete(PostEntity postEntity, Long userId) {
         List<PostScrapEntity> postScrapList = postEntity.getPostScrapList();
         List<PostScrapEntity> userScrapList = UserEntity.getScrapList();
-        Optional<PostScrapEntity> scrapOptional = postScrapApiRepository.findByUserAndPost(UserEntity, postEntity);
+        Optional<PostScrapEntity> scrapOptional = postScrapApiRepository.findByUserAndPost(userId, postEntity);
         int status;
 
         if (scrapOptional.isPresent()) {
@@ -35,7 +34,7 @@ public class PostScrapApiService {
             status = 0; // scrapDeleted
         } else {
             PostScrapEntity scrap = PostScrapEntity.builder()
-                    .userId(UserEntity)
+                    .userId(userId)
                     .post(postEntity)
                     .createdAt(LocalDateTime.now())
                     .build();
@@ -46,7 +45,6 @@ public class PostScrapApiService {
         }
 
         postRepository.save(postEntity);
-        OUserRepository.save(UserEntity);
         return status;
     }
 

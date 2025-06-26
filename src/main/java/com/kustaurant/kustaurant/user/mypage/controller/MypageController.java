@@ -27,7 +27,7 @@ public class MypageController {
 
         // 메뉴 탭 인덱스 정보
         model.addAttribute("menuIndex", menuIndex);
-        model.addAttribute("user", userService.getActiveUserById(user.id()));
+        model.addAttribute("user", userService.getUserById(user.id()));
         model.addAttribute("restaurantFavoriteList", data.getRestaurantFavoriteList());
         model.addAttribute("restaurantEvaluationList", data.getRestaurantEvaluationList());
         model.addAttribute("postList", data.getPostList());

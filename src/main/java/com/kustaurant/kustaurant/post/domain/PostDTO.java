@@ -77,7 +77,7 @@ public class PostDTO {
                 .likeCount(postEntity.getNetLikes())
                 .likeOnlyCount(postEntity.getPostLikesList().size())
                 .dislikeOnlyCount(postEntity.getPostDislikesList().size())
-                .user(UserDTO.convertUserToUserDTO(postEntity.getUser()))
+                .user(UserDTO.convertUserToUserDTO(postEntity.getUserId()))
                 .commentCount((int) postEntity.getPostCommentList().stream()
                         .filter(c -> c.getStatus().equals(ContentStatus.ACTIVE))
                         .count())
