@@ -6,13 +6,11 @@ import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 
-import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -55,7 +53,7 @@ public class RestaurantWebController {
     ) {
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
 
-        return ResponseEntity.ok(restaurantFavoriteService.toggleFavorite(user.id(), restaurant));
+        return ResponseEntity.ok(restaurantFavoriteService.toggleFavorite(user.id(), restaurantId));
     }
 
 }

@@ -408,8 +408,8 @@ public class EvaluationService {
     // Evaluation 좋아요
     @Transactional
     public void likeEvaluation(Long userId, EvaluationEntity evaluation) {
-        Optional<RestaurantCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluation(userId, evaluation);
-        Optional<RestaurantCommentDislikeEntity> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluation(userId, evaluation);
+        Optional<RestaurantCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
+        Optional<RestaurantCommentDislikeEntity> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
 
         if (likeOptional.isPresent() && dislikeOptional.isPresent()) {
             throw new IllegalStateException(evaluation.getId() + "id 평가 좋아요 상태 문제. 서버측에 알려주세요.. 감사합니다!");
@@ -432,8 +432,8 @@ public class EvaluationService {
     // Evaluation 싫어요
     @Transactional
     public void dislikeEvaluation(Long userId, EvaluationEntity evaluation) {
-        Optional<RestaurantCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluation(userId, evaluation);
-        Optional<RestaurantCommentDislikeEntity> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluation(userId, evaluation);
+        Optional<RestaurantCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
+        Optional<RestaurantCommentDislikeEntity> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
 
         if (likeOptional.isPresent() && dislikeOptional.isPresent()) {
             throw new IllegalStateException(evaluation.getId() + "id 평가 좋아요 상태 문제. 서버측에 알려주세요.. 감사합니다!");

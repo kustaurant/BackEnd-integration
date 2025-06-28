@@ -15,6 +15,8 @@ public interface RestaurantRepository {
 
     Restaurant save(Restaurant restaurant);
 
+    Restaurant getReference(Integer id);
+
     // TODO: need to delete everything below this
     List<RestaurantEntity> findAll();
     List<RestaurantEntity> findByStatus(String status);

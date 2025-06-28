@@ -4,11 +4,17 @@ import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.Restau
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
 public interface RestaurantCommentDislikeRepository extends JpaRepository<RestaurantCommentDislikeEntity, Integer> {
-    Optional<RestaurantCommentDislikeEntity> findByUserIdAndRestaurantComment(Long userId, RestaurantCommentEntity restaurantComment);
+    @Query("select d from RestaurantCommentDislikeEntity d "
+            + "where d.userId = :userId and d.restaurantComment.commentId = :commentId")
+    Optional<RestaurantCommentDislikeEntity> findByUserIdAndRestaurantCommentId(@Param("userId") Long userId, @Param("commentId") Integer commentId);
 
-    Optional<RestaurantCommentDislikeEntity> findByUserIdAndEvaluation(Long userId, EvaluationEntity evaluation);
+    @Query("select d from RestaurantCommentDislikeEntity d "
+            + "where d.userId = :userId and d.evaluation.id = :evaluationId")
+    Optional<RestaurantCommentDislikeEntity> findByUserIdAndEvaluationId(@Param("userId") Long userId, @Param("evaluationId") Integer evaluationId);
 }

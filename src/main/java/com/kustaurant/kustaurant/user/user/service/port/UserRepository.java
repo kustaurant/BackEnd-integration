@@ -24,5 +24,4 @@ public interface UserRepository {
     int countByLoginApi(String apple);
 
     Map<Long, UserDTO> getUserDTOMapByIds(List<Long> ids);
-
 }

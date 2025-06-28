@@ -23,24 +23,24 @@ public class RestaurantFavoriteService {
     }
 
     // 유저의 즐겨찾기 식당 리스트를 반환
-    public List<Restaurant> getFavoriteRestaurantDtoList(Long userId) {
+    public List<Integer> getFavoriteRestaurantIdList(Long userId) {
         List<RestaurantFavorite> favorites = restaurantFavoriteRepository.findByUser(userId);
 
         return favorites.stream()
-                .map(RestaurantFavorite::getRestaurant)
+                .map(RestaurantFavorite::getRestaurantId)
                 .toList();
     }
 
     // 즐겨찾기 토글
     @Transactional
-    public boolean toggleFavorite(Long userId, Restaurant restaurant) {
+    public boolean toggleFavorite(Long userId, Integer restaurantId) {
         RestaurantFavorite favorite;
         try {
             // 즐겨찾기 정보 조회
-            favorite = restaurantFavoriteRepository.findByUserIdAndRestaurantId(userId, restaurant.getRestaurantId());
+            favorite = restaurantFavoriteRepository.findByUserIdAndRestaurantId(userId, restaurantId);
         } catch (DataNotFoundException e) {
             // 즐겨찾기가 안 되어 있는 경우
-            addFavorite(userId, restaurant);
+            addFavorite(userId, restaurantId);
             return true;
         }
         // 즐겨찾기가 되어 있던 경우
@@ -48,14 +48,9 @@ public class RestaurantFavoriteService {
         return false;
     }
 
-    public void addFavorite(Long userId, Restaurant restaurant) {
+    public void addFavorite(Long userId, Integer restaurantId) {
         restaurantFavoriteRepository.save(
-                RestaurantFavorite.builder()
-                .userId(userId)
-                .restaurant(restaurant)
-                .status("ACTIVE")
-                .createdAt(LocalDateTime.now())
-                .build()
+                RestaurantFavorite.create(userId, restaurantId)
         );
     }
 

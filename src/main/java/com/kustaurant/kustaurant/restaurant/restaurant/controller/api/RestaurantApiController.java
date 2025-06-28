@@ -124,13 +124,12 @@ public class RestaurantApiController {
         // 식당 가져오기
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         // 즐겨찾기 로직
-        boolean result = restaurantFavoriteService.toggleFavorite(user.id(), restaurant);
+        boolean result = restaurantFavoriteService.toggleFavorite(user.id(), restaurantId);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         return ResponseEntity.ok(result);
     }
 
     // 즐겨찾기2
-    @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle2")
     @Operation(summary = "즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태와 수를 반환합니다.\n\n" +
             "[즐겨찾기 상태]\n\n" +
             "눌러서 즐겨찾기가 해제된 경우 -> false반환\n\n" +
@@ -144,6 +143,7 @@ public class RestaurantApiController {
             @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FavoriteResponseDTO.class))}),
             @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
     })
+    @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle2")
     public ResponseEntity<FavoriteResponseDTO> restaurantFavoriteToggle2(
             @PathVariable Integer restaurantId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
@@ -151,7 +151,7 @@ public class RestaurantApiController {
         // 식당 가져오기
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         // 즐겨찾기 로직
-        boolean result = restaurantFavoriteService.toggleFavorite(user.id(), restaurant);
+        boolean result = restaurantFavoriteService.toggleFavorite(user.id(), restaurantId);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         return ResponseEntity.ok(new FavoriteResponseDTO(result, restaurant.getFavoriteCount()));
     }

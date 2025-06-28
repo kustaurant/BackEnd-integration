@@ -78,6 +78,11 @@ public class RestaurantRepositoryImpl implements RestaurantQueryRepository, Rest
     }
 
     @Override
+    public Restaurant getReference(Integer id) {
+        return jpaRepository.getReferenceById(id).toDomain();
+    }
+
+    @Override
     public List<RestaurantEntity> findAll() {
         return List.of();
     }

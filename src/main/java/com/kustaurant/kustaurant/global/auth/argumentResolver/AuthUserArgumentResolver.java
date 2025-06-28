@@ -42,7 +42,9 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
             userId = oAuthUser.getUserId();
         } else if (auth.getPrincipal() instanceof Long uid) {                // 앱 JWT
             userId = uid;
-        } else {
+        } else if (auth.getPrincipal() instanceof String s && "anonymousUser".equals(s)) {
+            return new AuthUserInfo(null, UserRole.GUEST);
+        }else {
             throw new UnauthenticatedException("지원하지 않는 principal 타입: " + auth.getPrincipal().getClass().getName());
         }
 

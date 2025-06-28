@@ -150,19 +150,19 @@ public class EvaluationCommentService {
     }
 
     public boolean isUserLikedComment(Long userId, RestaurantCommentEntity restaurantComment) {
-        Optional<RestaurantCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantComment(userId, restaurantComment);
+        Optional<RestaurantCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
         return restaurantCommentlikeOptional.isPresent();
     }
 
     public boolean isUserHatedComment(Long userId, RestaurantCommentEntity restaurantComment) {
-        Optional<RestaurantCommentDislikeEntity> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndRestaurantComment(userId, restaurantComment);
+        Optional<RestaurantCommentDislikeEntity> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
         return restaurantCommentdislikeOptional.isPresent();
     }
 
     @Transactional
     public void likeComment(Long userId, RestaurantCommentEntity restaurantComment, Map<String, String> responseMap) {
-        Optional<RestaurantCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantComment(userId, restaurantComment);
-        Optional<RestaurantCommentDislikeEntity> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndRestaurantComment(userId, restaurantComment);
+        Optional<RestaurantCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
+        Optional<RestaurantCommentDislikeEntity> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
 
         if (restaurantCommentlikeOptional.isPresent() && restaurantCommentdislikeOptional.isPresent()) {
             throw new IllegalStateException(restaurantComment.getRestaurant().getRestaurantId() + "id 식당 좋아요 상태 문제. 서버측에 알려주세요.. 감사합니다!");
@@ -191,8 +191,8 @@ public class EvaluationCommentService {
 
     @Transactional
     public void dislikeComment(Long userId, RestaurantCommentEntity restaurantComment, Map<String, String> responseMap) {
-        Optional<RestaurantCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantComment(userId, restaurantComment);
-        Optional<RestaurantCommentDislikeEntity> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndRestaurantComment(userId, restaurantComment);
+        Optional<RestaurantCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
+        Optional<RestaurantCommentDislikeEntity> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
 
         if (restaurantCommentlikeOptional.isPresent() && restaurantCommentdislikeOptional.isPresent()) {
             throw new IllegalStateException(restaurantComment.getRestaurant().getRestaurantId() + "id 식당 싫어요 상태 문제. 서버측에 알려주세요.. 감사합니다!");

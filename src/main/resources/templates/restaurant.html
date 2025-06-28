@@ -21,6 +21,9 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <title th:text="${'쿠스토랑 - ' + restaurantDto.restaurantDetail.getRestaurantName()}"></title>
     <meta charset="UTF-8"/>
+    <!--  csrf token  -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
     <!-- 아이콘 라이브러리-->
     <script src="https://kit.fontawesome.com/0c60714712.js" crossorigin="anonymous"></script>
@@ -45,7 +48,7 @@
         const restaurantMenus = /*[[${menus}]]*/ [];
         const initialDisplayMenuCount = /*[[${initialDisplayMenuCount}]]*/ [];
     </script>
-    <script src="/js/restaurantScript.js" defer></script>
+    <script type="text/javascript" src="/js/restaurantScript.js" defer></script>
     <script type="text/javascript" src="https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js"
             charset="utf-8"></script>
     <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=gifrujmoep"></script>
@@ -134,29 +137,21 @@
         </div>
         <div id="menuUnfoldButton" class="unfold-button" th:if="${#lists.size(restaurantDto.restaurantDetail.restaurantMenuList) > 3}">펼치기</div>
     </div>
-    <div id="mapContainer" class="inner-container">
-        <div id="mapTopDiv" style="height:110px; width:100%; position: absolute; top: -110px; left: 0; visibility: hidden;"></div>
-        <div id="map"></div>
-        <div id="mapUnfoldButton" class="unfold-button">펼치기</div>
-    </div>
+<!--    <div id="mapContainer" class="inner-container">-->
+<!--        <div id="mapTopDiv" style="height:110px; width:100%; position: absolute; top: -110px; left: 0; visibility: hidden;"></div>-->
+<!--        <div id="map"></div>-->
+<!--        <div id="mapUnfoldButton" class="unfold-button">펼치기</div>-->
+<!--    </div>-->
 
     <a class="inner-container evaluation-button button" id="evaluationButton"
        th:href="@{/evaluation/{restuarantId}(restuarantId=${restaurantDto.restaurantDetail.restaurantId})}"
        th:text="${evaluationButton}"></a>
 
-    <!-- 댓글 쓰는 부분 : 기능 변경으로 삭제 -->
+    <!-- 댓글 정렬 -->
     <div class="comment-container">
-        <!--<div class="section-title">댓글</div>
-        <div class="input-container">
-            <div>
-                <textarea id="commentInput" placeholder="식당에 대한 댓글을 남겨주세요." spellcheck="false"></textarea>
-                <span id="commentAlert"></span>
-            </div>
-            <button class="button evaluation-button" onclick="sendComment()">등록</button>
-        </div>-->
         <div class="sort-toggle-buttons">
-            <button id="button1" class="active" onclick="toggleButton(1)">인기순</button>
-            <button id="button2" onclick="toggleButton(2)">최신순</button>
+            <button id="button1" class="active">인기순</button>
+            <button id="button2">최신순</button>
         </div>
     </div>
 
@@ -184,7 +179,7 @@
                             <span th:text="${restaurantComment.commentScore}"></span>
                         </div>
                         <div class="nick-date-div">
-                            <img class="icon" th:src="${restaurantComment.userEntity.getRankImg()}">
+                            <img class="icon" th:src="${restaurantComment.getCommentIconImgUrl()}">
                             <span class="nick-span" th:text="${restaurantComment.commentNickname}"></span>
                             <span class="date-span" th:text="${restaurantComment.commentTime}"></span>
                             <!-- Button trigger modal -->
@@ -217,7 +212,7 @@
                         </div>
                         <div class="body-div">
                             <div class="nick-date-div">
-                                <img th:src="${reply.user.getRankImg()}">
+                                <img th:src="${reply.getCommentIconImgUrl()}">
                                 <span class="nick-span" th:text="${reply.commentNickname}"></span>
                                 <span class="date-span" th:text="${reply.commentTime}"></span>
                                 <!-- Button trigger modal -->

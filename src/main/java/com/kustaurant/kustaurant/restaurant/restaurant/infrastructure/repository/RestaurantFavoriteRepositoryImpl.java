@@ -6,6 +6,8 @@ import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;
+import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import java.util.List;
 public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepository {
 
     private final RestaurantFavoriteJpaRepository jpaRepository;
+    private final RestaurantRepository restaurantRepository;
 
     @Override
     public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Integer restaurantId) {
@@ -47,13 +50,22 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     @Override
     @Transactional
     public RestaurantFavorite save(RestaurantFavorite restaurantFavorite) {
-        return jpaRepository.save(RestaurantFavoriteEntity.fromDomain(restaurantFavorite)).toDomain();
+        return jpaRepository.save(
+                RestaurantFavoriteEntity.fromDomain(
+                        restaurantFavorite,
+                        restaurantFavorite.getUserId(),
+                        restaurantRepository.getReference(restaurantFavorite.getRestaurantId())
+        )).toDomain();
     }
 
     @Override
     @Transactional
     public void delete(RestaurantFavorite restaurantFavorite) {
-        jpaRepository.delete(RestaurantFavoriteEntity.fromDomain(restaurantFavorite));
+        jpaRepository.delete(RestaurantFavoriteEntity.fromDomain(
+                restaurantFavorite,
+                restaurantFavorite.getUserId(),
+                restaurantRepository.getReference(restaurantFavorite.getRestaurantId())
+        ));
     }
 
     @Override
