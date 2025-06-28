@@ -19,8 +19,8 @@
         </div>
         <div class="nick-date-div">
             <img th:src="${restaurantComment.getCommentIconImgUrl()}">
-            <span class="nick-span" th:text="${restaurantComment.commentNickname}"></span>
-            <span class="date-span" th:text="${restaurantComment.commentTime}"></span>
+            <span class="nick-span" th:text="${restaurantComment.writerNickname}"></span>
+            <span class="date-span" th:text="${restaurantComment.timeAgo}"></span>
             <!-- Button trigger modal -->
             <button type="button" th:if="${restaurantComment.isCommentMine}" th:data-id="${restaurantComment.commentId}" class="delete-button btn btn-primary" onclick="deleteComment(this)" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 삭제
@@ -53,7 +53,7 @@
             <div class="nick-date-div">
                 <img th:src="${reply.getCommentIconImgUrl()}">
                 <span class="nick-span" th:text="${reply.commentNickname}"></span>
-                <span class="date-span" th:text="${reply.commentTime}"></span>
+                <span class="date-span" th:text="${reply.timeAgo}"></span>
                 <!-- Button trigger modal -->
                 <button type="button" th:if="${reply.isCommentMine}" th:data-id="${reply.commentId}" class="delete-button btn btn-primary" onclick="deleteComment(this)" data-bs-toggle="modal" data-bs-target="#exampleModal">
                     삭제

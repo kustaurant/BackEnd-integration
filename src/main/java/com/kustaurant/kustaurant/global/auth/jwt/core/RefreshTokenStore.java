@@ -13,16 +13,16 @@ public class RefreshTokenStore {
     private final StringRedisTemplate redisTemplate;
     private static final String KEY_FMT = "refresh:%d";
 
-    public void save(Integer userId, String refreshToken, Duration ttl) {
+    public void save(Long userId, String refreshToken, Duration ttl) {
         redisTemplate.opsForValue().
                 set(KEY_FMT.formatted(userId), refreshToken, ttl);
     }
 
-    public String get(Integer userId) {
+    public String get(Long userId) {
         return redisTemplate.opsForValue().get(KEY_FMT.formatted(userId));
     }
 
-    public void delete(Integer userId) {
+    public void delete(Long userId) {
         redisTemplate.delete(KEY_FMT.formatted(userId));
     }
 }

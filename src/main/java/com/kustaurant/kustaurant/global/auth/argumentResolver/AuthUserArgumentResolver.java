@@ -1,10 +1,9 @@
 package com.kustaurant.kustaurant.global.auth.argumentResolver;
 
 import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2User;
-import com.kustaurant.kustaurant.user.domain.enums.UserRole;
+import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.global.exception.exception.auth.UnauthenticatedException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,16 +37,15 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
         }
 
         /* ───────────── principal → userId 추출 ───────────── */
-        Integer userId;
+        Long userId;
         if (auth.getPrincipal() instanceof CustomOAuth2User oAuthUser) {        // 웹 세션
             userId = oAuthUser.getUserId();
-        } else if (auth.getPrincipal() instanceof Integer uid) {                // 앱 JWT
+        } else if (auth.getPrincipal() instanceof Long uid) {                // 앱 JWT
             userId = uid;
         } else if (auth.getPrincipal() instanceof String s && "anonymousUser".equals(s)) {
             return new AuthUserInfo(null, UserRole.GUEST);
         }else {
-            throw new UnauthenticatedException(
-                    "지원하지 않는 principal 타입: " + auth.getPrincipal().getClass().getName());
+            throw new UnauthenticatedException("지원하지 않는 principal 타입: " + auth.getPrincipal().getClass().getName());
         }
 
         /* ───────────── 권한(ROLE) 추출 및 매핑 ───────────── */

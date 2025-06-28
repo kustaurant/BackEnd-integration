@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.global.etc;
 
-import com.kustaurant.kustaurant.evaluation.service.EvaluationService;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

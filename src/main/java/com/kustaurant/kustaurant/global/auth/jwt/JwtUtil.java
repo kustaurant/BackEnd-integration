@@ -28,23 +28,23 @@ public class JwtUtil {
     }
 
     // JWT 액세스 토큰 생성
-    public String generateAccessToken(Integer userId, String role) {
+    public String generateAccessToken(Long userId, String role) {
         return generate(userId, role, jwtProperties.getAccessTtl());
     }
 
     // JWT 리프레시 토큰 생성
-    public String generateRefreshToken(Integer userId, String role) {
+    public String generateRefreshToken(Long userId, String role) {
         return generate(userId, role, jwtProperties.getRefreshTtl());
     }
 
     // 테스트용 10초짜리 토큰 생성
-    public String generateYOLOToken(Integer userId, String role) {
+    public String generateYOLOToken(Long userId, String role) {
         return generate(userId, role,Duration.ofSeconds(10));
     }
 
 
     // JWT 토큰 생성 로직
-    private String generate(Integer userId, String role, Duration ttl) {
+    private String generate(Long userId, String role, Duration ttl) {
         Instant now    = Instant.now();
         Instant expiry = now.plus(ttl);
 
@@ -61,14 +61,14 @@ public class JwtUtil {
     }
 
     // JWT 토큰에서 userId 추출
-    public Integer getUserIdFromToken(String token) {
+    public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
 
-        return Integer.parseInt(claims.getSubject());
+        return Long.parseLong(claims.getSubject());
     }
 
     public boolean isValid(String token) {
@@ -94,10 +94,10 @@ public class JwtUtil {
         }
     }
 
-    public record ParsedToken(Integer userId, String role, String tokenType) {}
+    public record ParsedToken(Long userId, String role, String tokenType) {}
     public ParsedToken parse(String token) {
         Claims c = parseAndValidate(token);
-        return new ParsedToken(Integer.valueOf(c.getSubject()),
+        return new ParsedToken(Long.valueOf(c.getSubject()),
                 (String) c.get("role"),
                 (String) c.get("tokenType"));
     }

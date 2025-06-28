@@ -1,12 +1,13 @@
 package com.kustaurant.kustaurant.user.service;
 
-import com.kustaurant.kustaurant.user.domain.User;
-import com.kustaurant.kustaurant.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.user.domain.vo.PhoneNumber;
+import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
+import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
-import com.kustaurant.kustaurant.user.domain.enums.UserRole;
+import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.mock.FakeUserRepository;
+import com.kustaurant.kustaurant.user.user.service.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ class UserServiceImplTest {
 
         //UserStatus가 ACTIVE 상태인 유저
         fakeUserRepository.save(User.builder()
-                .id(1)
+                .id(1L)
                 .providerId("aaaa")
                 .loginApi("NAVER")
                 .nickname(new Nickname("TESTUSER01"))
@@ -38,7 +39,7 @@ class UserServiceImplTest {
 
         //UserSTatus가 DELETED 상태인 유저
         fakeUserRepository.save(User.builder()
-                .id(2)
+                .id(2L)
                 .providerId("aaaa")
                 .loginApi("NAVER")
                 .nickname(new Nickname("TESTUSER02"))
@@ -51,21 +52,21 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getActiveUserById는_ACTIVE상태의_유저만_찾는다() {
+    void getUserById는_ACTIVE상태의_유저만_찾는다() {
         //g
         //w
-        User result=userServiceImpl.getActiveUserById(1);
+        User result=userServiceImpl.getUserById(1L);
         //t
         assertThat(result.getNickname().getValue()).isEqualTo("TESTUSER01");
     }
 
     @Test
-    void getActiveUserById는_DELETED상태의_유저는_찾아선_안된다() {
+    void getUserById는_DELETED상태의_유저는_찾아선_안된다() {
         //g
         //w
         //t
         assertThatThrownBy(()->{
-            userServiceImpl.getActiveUserById(2);
+            userServiceImpl.getUserById(2L);
         }).isInstanceOf(DataNotFoundException.class);
     }
 }

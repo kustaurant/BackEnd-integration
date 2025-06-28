@@ -1,17 +1,17 @@
 package com.kustaurant.kustaurant.global.auth.jwt.core;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.kustaurant.kustaurant.user.domain.User;
-import com.kustaurant.kustaurant.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.user.service.port.UserRepository;
+import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
+import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtProperties;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
 import com.kustaurant.kustaurant.global.auth.jwt.response.TokenResponse;
 import com.kustaurant.kustaurant.global.auth.jwt.apple.AppleApiService;
 import com.kustaurant.kustaurant.global.auth.jwt.apple.AppleLoginRequest;
 import com.kustaurant.kustaurant.global.auth.jwt.naver.NaverApiService;
-import com.kustaurant.kustaurant.user.domain.enums.UserRole;
+import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.global.auth.jwt.naver.NaverLoginRequest;
 import com.kustaurant.kustaurant.global.exception.exception.auth.RefreshTokenInvalidException;
 import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
@@ -96,14 +96,14 @@ public class UserApiLoginService {
 
     //4
     //로그아웃 처리
-    public void logoutUser(Integer userId) {
+    public void logoutUser(Long userId) {
         refreshStore.delete(userId);
     }
 
     //5
     //회원탈퇴 처리
     @Transactional
-    public void deleteUserById(Integer userId) {
+    public void deleteUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 

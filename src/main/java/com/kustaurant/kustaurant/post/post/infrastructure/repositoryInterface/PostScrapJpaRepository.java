@@ -1,0 +1,35 @@
+package com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface;
+
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostScrapEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface PostScrapJpaRepository extends JpaRepository<PostScrapEntity, Integer> {
+    @Query("""
+        SELECT ps FROM PostScrapEntity ps
+        WHERE ps.userId = :userId
+        ORDER BY ps.createdAt DESC""")
+    List<PostScrapEntity> findByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
+
+    boolean existsByUserIdAndPostId(Long userId, Integer postId);
+
+
+    void deleteByPostId(Integer postId);
+
+    Optional<PostScrapEntity> findByUserIdAndPostId(Long userId, Integer postId);
+
+//    @Query("""
+//        select ps
+//          from PostScrapEntity ps
+//          join fetch ps.post p
+//         where ps.userId = :userId
+//           and p.status     = 'ACTIVE'
+//         order by ps.createdAt desc
+//    """)
+//    List<PostScrapEntity> findWithPostByUserId(@Param("userId") Long userId);
+}

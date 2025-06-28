@@ -1,14 +1,8 @@
 package com.kustaurant.kustaurant.global.auth.session;
 
-import com.kustaurant.kustaurant.user.domain.enums.UserRole;
-import com.kustaurant.kustaurant.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.user.infrastructure.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
-import org.thymeleaf.util.StringUtils;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
@@ -44,8 +38,11 @@ public class OAuthAttributes {
         }
     }
 
-    private static OAuthAttributes ofNaver(String userNameAttributeName,
-                                           Map<String, Object> attributes) {
+    @SuppressWarnings("unchecked")
+    private static OAuthAttributes ofNaver(
+            String userNameAttributeName,
+            Map<String, Object> attributes
+    ) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
         return OAuthAttributes.builder()
@@ -67,15 +64,5 @@ public class OAuthAttributes {
                 .build();
     }
 
-    public UserEntity webToEntity() {
-        return UserEntity.builder()
-                .providerId(providerId)
-                .loginApi(loginApi)
-                .email(email)
-                .userNickname(new Nickname(StringUtils.substringBefore(email, "@")))
-                .status(UserStatus.ACTIVE)
-                .createdAt(LocalDateTime.now())
-                .role(UserRole.USER)
-                .build();
-    }
+
 }
