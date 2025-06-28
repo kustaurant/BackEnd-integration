@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.post.domain;
 
-import com.kustaurant.kustaurant.post.domain.Post;
-import com.kustaurant.kustaurant.post.enums.ContentStatus;
-import com.kustaurant.kustaurant.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.post.post.domain.Post;
+import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ class PostTest {
                 .body("Original Body")
                 .category("General")
                 .status(ContentStatus.ACTIVE)
-                .authorId(123)
+                .authorId(123L)
                 .likeCount(0)
                 .dislikeCount(0)
                 .netLikes(0)
@@ -156,7 +156,7 @@ class PostTest {
                 .body("Content")
                 .category("Talk")
                 .status(ContentStatus.ACTIVE)
-                .authorId(456)
+                .authorId(456L)
                 .likeCount(0)
                 .dislikeCount(0)
                 .netLikes(0)

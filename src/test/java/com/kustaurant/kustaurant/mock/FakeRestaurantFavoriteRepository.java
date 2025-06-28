@@ -2,10 +2,8 @@ package com.kustaurant.kustaurant.mock;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
-import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
-import com.kustaurant.kustaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
-import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 
 import java.util.ArrayList;
@@ -18,7 +16,7 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     @Override
     public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Integer restaurantId) {
         return store.stream()
-                .filter(fav -> fav.getUser().getId().equals(userId) &&
+                .filter(fav -> fav.getUserId().equals(userId) &&
                         fav.getRestaurant().getRestaurantId().equals(restaurantId))
                 .findFirst()
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_FAVORITE_NOT_FOUND, "Favorite not found - UserId:" + userId + ", RestaurantId:" + restaurantId));
@@ -28,7 +26,7 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     @Override
     public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
         return store.stream()
-                .anyMatch(fav -> fav.getUser().getId().equals(userId) &&
+                .anyMatch(fav -> fav.getUserId().equals(userId) &&
                         fav.getRestaurant().getRestaurantId().equals(restaurantId));
     }
 

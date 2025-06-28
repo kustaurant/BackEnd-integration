@@ -1,19 +1,16 @@
 package com.kustaurant.kustaurant.user.mypage.service;
 
-import com.kustaurant.kustaurant.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.global.exception.exception.business.NoProfileChangeException;
 import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
-import com.kustaurant.kustaurant.notice.domain.NoticeDTO;
-import com.kustaurant.kustaurant.notice.infrastructure.NoticeRepository;
-import com.kustaurant.kustaurant.evaluation.infrastructure.EvaluationEntity;
-import com.kustaurant.kustaurant.post.infrastructure.PostEntity;
-import com.kustaurant.kustaurant.post.infrastructure.PostScrapEntity;
+import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
+import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
-import com.kustaurant.kustaurant.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.*;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MypageMainResponse;
-import com.kustaurant.kustaurant.user.mypage.infrastructure.*;
+import com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo.*;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
@@ -37,7 +34,6 @@ public class MypageApiService {
     private final NoticeRepository noticeRepo;
 
     private final MyUserQueryRepository userQueryRepository;
-    private final MyUserStatsQueryRepository userStatsQueryRepository;
     private final MypageMainQueryRepository mypageMainQueryRepository;
     private final MyFavoriteRestaurantQueryRepository myFavoriteRestaurantQueryRepository;
     private final MyEvaluationQueryRepository myevaluationQueryRepository;
@@ -70,7 +66,6 @@ public class MypageApiService {
     //2
     // 마이페이지 프로필 정보(변경)화면에서 표시될 "닉네임, 메일주소, 핸드폰번호" 를 반환
     public ProfileResponse getProfile(Long userId){
-
         return userQueryRepository.findProfileByUserId(userId);
     }
 
@@ -178,37 +173,41 @@ public class MypageApiService {
 
 
     // 7. 유저가 스크랩한 커뮤니티 게시글 리스트들 반환
+    @Transactional(readOnly = true)
     public List<MyPostsResponse> getScrappedUserPosts(Long userId) {
-        List<PostScrapEntity> scraps = myPostScrapQueryRepository.findActiveScrapsByUserId(userId);
 
-        return scraps.stream()
-                .map(ps -> {
-                    PostEntity p = ps.getPost();
-
-                    String firstImg = p.getPostPhotoEntityList().isEmpty()
-                            ? null
-                            : p.getPostPhotoEntityList().get(0).getPhotoImgUrl();
-
-                    String shortBody = p.getPostBody().length() > 20
-                            ? p.getPostBody().substring(0, 20)
-                            : p.getPostBody();
-
-                    String timeAgo = TimeAgoUtil.toKor(
-                            p.getUpdatedAt() != null ? p.getUpdatedAt() : p.getCreatedAt()
-                    );
-
-                    return new MyPostsResponse(
-                            p.getPostId(),
-                            p.getPostCategory(),
-                            p.getPostTitle(),
-                            firstImg,
-                            shortBody,
-                            p.getNetLikes(),
-                            p.getPostCommentList().size(),
-                            timeAgo
-                    );
-                })
+        return myPostScrapQueryRepository.findScrappedPosts(userId)
+                .stream()
+                .map(this::toMyPostsResponse)
                 .toList();
+    }
+
+    private MyPostsResponse toMyPostsResponse(PostEntity p) {
+        String firstImg = p.getPostPhotoEntityList().isEmpty()
+                ? null
+                : p.getPostPhotoEntityList()
+                .get(0)
+                .getPhotoImgUrl();
+
+        String shortBody = p.getPostBody().length() > 20
+                ? p.getPostBody().substring(0, 20)
+                : p.getPostBody();
+
+        String timeAgo = TimeAgoUtil.toKor(
+                p.getUpdatedAt() != null ? p.getUpdatedAt()
+                        : p.getCreatedAt()
+        );
+
+        return new MyPostsResponse(
+                p.getPostId(),
+                p.getPostCategory(),
+                p.getPostTitle(),
+                firstImg,
+                shortBody,
+                p.getNetLikes(),
+                p.getPostCommentList().size(),
+                timeAgo
+        );
     }
 
 

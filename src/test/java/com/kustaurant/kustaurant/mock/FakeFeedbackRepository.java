@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.mock;
 
-import com.kustaurant.kustaurant.feedback.domain.Feedback;
-import com.kustaurant.kustaurant.feedback.service.port.FeedbackRepository;
+import com.kustaurant.kustaurant.admin.feedback.domain.Feedback;
+import com.kustaurant.kustaurant.admin.feedback.service.port.FeedbackRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;

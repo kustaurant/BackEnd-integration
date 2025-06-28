@@ -1,19 +1,22 @@
 package com.kustaurant.kustaurant.user.mypage.service;
 
-import com.kustaurant.kustaurant.comment.domain.PostComment;
-import com.kustaurant.kustaurant.comment.service.port.PostCommentRepository;
-import com.kustaurant.kustaurant.evaluation.domain.EvaluationDomain;
-import com.kustaurant.kustaurant.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.post.domain.Post;
-import com.kustaurant.kustaurant.post.domain.PostScrap;
-import com.kustaurant.kustaurant.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.post.service.port.PostScrapRepository;
-import com.kustaurant.kustaurant.restaurant.application.service.command.port.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.restaurant.domain.RestaurantFavorite;
+import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.post.comment.domain.PostComment;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDomain;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.post.post.domain.Post;
+import com.kustaurant.kustaurant.post.post.domain.PostScrap;
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
+import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
 import com.kustaurant.kustaurant.user.mypage.controller.response.MypageDataView;
 import com.kustaurant.kustaurant.user.mypage.controller.response.PostCommentView;
 import com.kustaurant.kustaurant.user.mypage.controller.response.ScrappedPostView;
+import com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo.MyPostScrapQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +33,8 @@ public class MypageServiceImpl implements MypageService {
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final PostScrapRepository postScrapRepository;
+
+    private final MyPostScrapQueryRepository myPostScrapQueryRepository;
 
     public List<RestaurantFavorite> getRestaurantFavorites(Long userId) {
         return restaurantFavoriteRepository.findSortedFavoritesByUserId(userId);
@@ -77,7 +82,23 @@ public class MypageServiceImpl implements MypageService {
     }
 
     private List<ScrappedPostView> getScrapViews(Long userId) {
-        return postScrapRepository.findScrapViewsByUserId(userId);
+        return myPostScrapQueryRepository.findScrappedPostsByUserId(userId)
+                .stream()
+                .map(this::toScrapView)
+                .toList();
+    }
+
+    private ScrappedPostView toScrapView(PostEntity p) {
+
+        return ScrappedPostView.builder()
+                .postId(p.getPostId())
+                .title(p.getPostTitle())
+                .category(p.getPostCategory())
+                .likeCount(p.getNetLikes())
+                .timeAgo(TimeAgoUtil.toKor(
+                        p.getUpdatedAt() != null ? p.getUpdatedAt()
+                                : p.getCreatedAt()))
+                .build();
     }
 
     @Override

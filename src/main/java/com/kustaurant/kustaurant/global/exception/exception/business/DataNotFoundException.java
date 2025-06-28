@@ -4,6 +4,9 @@ import com.kustaurant.kustaurant.global.exception.ErrorCode;
 
 // 사용자 정의 예외
 public class DataNotFoundException extends BusinessException {
+    public DataNotFoundException(ErrorCode errorCode) {
+        super(errorCode);
+    }
 
     public DataNotFoundException(ErrorCode errorCode, String detailMessage) {
         super(errorCode, detailMessage);

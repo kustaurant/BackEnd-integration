@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.feedback.domain;
 
-import com.kustaurant.kustaurant.feedback.controller.Request.FeedbackRequest;
+import com.kustaurant.kustaurant.admin.feedback.controller.Request.FeedbackRequest;
+import com.kustaurant.kustaurant.admin.feedback.domain.Feedback;
 import com.kustaurant.kustaurant.mock.TestClockHolder;
 import org.junit.jupiter.api.Test;
 

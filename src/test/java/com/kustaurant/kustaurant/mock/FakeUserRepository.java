@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.mock;
 
-import com.kustaurant.kustaurant.post.domain.UserDTO;
+import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;

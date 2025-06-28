@@ -17,6 +17,8 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Getter
 @Setter
 @Entity
@@ -55,7 +57,10 @@ public class UserEntity {
     @Column(nullable = false)
     private UserRole role;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            orphanRemoval = true)
+    @PrimaryKeyJoinColumn
     private UserStatsEntity stats;
 
     @Transient

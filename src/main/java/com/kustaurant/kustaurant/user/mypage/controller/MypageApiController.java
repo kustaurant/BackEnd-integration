@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.user.mypage.controller;
 
-import com.kustaurant.kustaurant.feedback.controller.Request.FeedbackRequest;
-import com.kustaurant.kustaurant.feedback.controller.port.FeedbackService;
-import com.kustaurant.kustaurant.notice.domain.NoticeDTO;
+import com.kustaurant.kustaurant.admin.feedback.controller.Request.FeedbackRequest;
+import com.kustaurant.kustaurant.admin.feedback.controller.port.FeedbackService;
+import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class MypageApiController {
-
     private final MypageApiService mypageApiService;
     private final FeedbackService feedbackService;
 
@@ -170,27 +168,7 @@ public class MypageApiController {
     }
 
 
-    //9
-    @Operation(
-            summary = "피드백 보내기 기능입니다",
-            description = "피드백을 보냅니다."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "피드백 감사합니다!"),
-            @ApiResponse(responseCode = "400", description = "내용이 없습니다."),
-    })
-    @PostMapping("/auth/mypage/feedback")
-    public ResponseEntity<String> sendFeedback(
-            @Parameter(hidden = true) @AuthUser AuthUserInfo user,
-            @Valid @RequestBody FeedbackRequest req
-    ){
-        feedbackService.create(user.id(),req);
-
-        return ResponseEntity.status(HttpStatus.OK).body("피드백 감사합니다!");
-    }
-
-
-    //10
+    //9 공지사항
     @Operation(
             summary = "\"공지사항 목록화면\" 로드에 필요한 정보 불러오기",
             description = "공지사항 리스트와 관련 링크들을 불러옵니다."

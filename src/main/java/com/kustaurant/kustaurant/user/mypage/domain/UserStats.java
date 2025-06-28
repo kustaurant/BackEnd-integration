@@ -22,7 +22,7 @@ public class UserStats {
 
     public static UserStats from(UserStatsEntity e) {
         return new UserStats(
-                e.getUser().getId(),
+                e.getId(),
                 e.getSavedRestCnt(),
                 e.getRatedRestCnt(),
                 e.getCommPostCnt(),
