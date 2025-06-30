@@ -31,17 +31,18 @@ public class RestaurantWebService {
     private final RestaurantService restaurantService;
     private final EvaluationCommentService restaurantCommentService;
 
-//    public RestaurantDetailWebDto getRestaurantWebDetails(Long userId, Integer restaurantId) {
-//        RestaurantDetailDTO restaurantDetailDto = restaurantService.getActiveRestaurantDetailDto(restaurantId, userId);
-//        Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
+    public RestaurantDetailWebDto getRestaurantWebDetails(Long userId, Integer restaurantId) {
+        RestaurantDetailDTO restaurantDetailDto = restaurantService.getActiveRestaurantDetailDto(restaurantId, userId);
+        Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
 //        List<EvalCommResponse> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, userId, true);
-//
-//        return new RestaurantDetailWebDto(
-//                restaurantDetailDto,
-//                restaurant,
-//                comments
-//        );
-//    }
+        List<EvalCommResponse> comments = List.of();
+
+        return new RestaurantDetailWebDto(
+                restaurantDetailDto,
+                restaurant,
+                comments
+        );
+    }
 
     // TODO: need to delete everything below this
     
