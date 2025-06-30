@@ -116,7 +116,7 @@ public class EvalCommApiController {
         // 평가 댓글인 경우 / 대댓글인 경우 판단
         if (!isSubComment(commentId)) { // 평가 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
-            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
+            checkRestaurantIdAndEvaluationId(restaurantId, commentId);
 
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             evaluationService.likeEvaluation(user.id(), evaluation);
@@ -169,7 +169,7 @@ public class EvalCommApiController {
         // 평가 댓글인 경우 / 대댓글인 경우 판단
         if (!isSubComment(commentId)) { // 평가 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
-            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
+            checkRestaurantIdAndEvaluationId(restaurantId, commentId);
 
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
@@ -228,7 +228,7 @@ public class EvalCommApiController {
         // 식당 가져오기
         RestaurantEntity restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
-        checkRestaurantIdAndEvaluationId(restaurant, restaurantId, evaluationId);
+        checkRestaurantIdAndEvaluationId(restaurantId, evaluationId);
         // Evaluation 가져오기
         EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
         // 대댓글 달기
@@ -238,8 +238,8 @@ public class EvalCommApiController {
         return ResponseEntity.ok().build();
     }
 
-    private void checkRestaurantIdAndEvaluationId(RestaurantEntity restaurant, int restaurantId, int evaluationId) {
-        if (restaurant.getEvaluationList().stream().noneMatch(evaluation -> evaluation.getId().equals(evaluationId))) {
+    private void checkRestaurantIdAndEvaluationId(int restaurantId, int evaluationId) {
+        if (!evaluationService.hasEvaluation(restaurantId, evaluationId)) {
             throw new ParamException(restaurantId + " 식당에는 " + evaluationId + " id를 가진 evaluation이 없습니다.");
         }
     }
@@ -277,7 +277,7 @@ public class EvalCommApiController {
             restaurantCommentService.deleteComment(comment, user.id());
         } else { // 평가 코멘트 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
-            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
+            checkRestaurantIdAndEvaluationId(restaurantId, commentId);
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             // 평가 및 평가의 대댓글 삭제
@@ -315,7 +315,7 @@ public class EvalCommApiController {
         } else { // 평가 코멘트 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
             // 이 평가가 해당 식당의 평가가 맞는지 확인
-            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
+            checkRestaurantIdAndEvaluationId(restaurantId, commentId);
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             // 신고 테이블에 저장

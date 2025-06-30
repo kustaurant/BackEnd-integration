@@ -16,13 +16,13 @@ import java.util.List;
 public class SituationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer situationId;
+    private Long situationId;
 
     private String situationName;
 
 
-    public SituationEntity(Integer id, String situationName) {
-        this.situationId=id;
+    public SituationEntity(Long id, String situationName) {
+        this.situationId = id;
         this.situationName = situationName;
     }
     public SituationEntity(){

@@ -26,7 +26,7 @@ public interface EvaluationCommentQueryRepository extends Repository<EvaluationE
         FROM   EvaluationEntity e
         JOIN   UserEntity         u  ON u.id = e.userId
         JOIN   u.stats            s
-        WHERE  e.restaurant.restaurantId = :rid
+        WHERE  e.restaurantId = :rid
           AND  e.status = 'ACTIVE'
     """)
     List<EvalCommentProjection> fetchEvalComments(@Param("rid") Integer restaurantId);

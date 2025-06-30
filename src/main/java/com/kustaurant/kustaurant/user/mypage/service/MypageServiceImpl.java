@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.user.mypage.service;
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDomain;
+import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
@@ -40,7 +40,7 @@ public class MypageServiceImpl implements MypageService {
         return restaurantFavoriteRepository.findSortedFavoritesByUserId(userId);
     }
 
-    public List<EvaluationDomain> getEvaluations(Long userId) {
+    public List<Evaluation> getEvaluations(Long userId) {
         return new ArrayList<>(evaluationRepository.findSortedEvaluationByUserIdDesc(userId));
     }
 

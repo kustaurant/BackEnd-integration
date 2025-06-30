@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.service.port;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDomain;
+import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 
@@ -11,8 +11,8 @@ public interface EvaluationRepository {
     boolean existsByUserAndRestaurant(Long userId, Integer restaurantId);
     List<EvaluationEntity> findByRestaurantIdAndStatus(Integer restaurantId, String status);
     Integer countAllByStatus(String status);
-    List<EvaluationDomain> findByUserId(Long userId);
-    List<EvaluationDomain> findSortedEvaluationByUserIdDesc(Long userId);
+    List<Evaluation> findByUserId(Long userId);
+    List<Evaluation> findSortedEvaluationByUserIdDesc(Long userId);
     // TODO: need to delete everything below this
 
     EvaluationEntity save(EvaluationEntity evaluation);

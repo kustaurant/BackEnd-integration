@@ -5,7 +5,9 @@ import com.google.gson.reflect.TypeToken;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.evaluation.comment.service.EvaluationCommentService;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
@@ -36,12 +38,11 @@ import java.util.Map;
 @Controller
 public class EvaluationWebController {
     private final RestaurantWebService restaurantWebService;
-    private final EvaluationService evaluationService;
     private final EvaluationRepository evaluationRepository;
     private final EvaluationCommentService restaurantCommentService;
-    private final UserService userService;
 
-    Gson gson = new Gson();
+    private final RestaurantService restaurantService;
+    private final EvaluationService evaluationService;
 
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
@@ -52,21 +53,13 @@ public class EvaluationWebController {
             @AuthUser AuthUserInfo user,
             @PathVariable Integer restaurantId
     ) {
-        RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
-        EvaluationEntity evaluation = evaluationRepository.findByUserAndRestaurant(user.id(), restaurant).orElse(null);
-        Double mainScore = 0.0;
+        // 식당 정보
+        Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         model.addAttribute("restaurant", restaurant);
+        // 이전 평가 정보
+        EvaluationDTO preEval = evaluationService.getPreEvaluation(user.id(), restaurantId);
+        model.addAttribute("preEval", preEval);
 
-        if (evaluation!=null) {
-            model.addAttribute("eval",evaluation);
-            model.addAttribute("mainScore", evaluation.getEvaluationScore());
-            if(evaluation.getSituationIdList()!=null){
-                model.addAttribute("situationJson",evaluation.getSituationIdList());
-            }
-        }
-        else{
-            return "evaluation";
-        }
         return "evaluation";
     }
     // 평가 데이터 db 저장 (기존 평가 존재 시 업데이트 진행)
@@ -81,7 +74,7 @@ public class EvaluationWebController {
     ) {
         RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
         // JSON 문자열을 Java List로 변환
-        List<Integer> evaluationSituations = new Gson().fromJson(selectedSituationsJson, new TypeToken<List<Integer>>(){}.getType());
+        List<Long> evaluationSituations = new Gson().fromJson(selectedSituationsJson, new TypeToken<List<Long>>(){}.getType());
 
         // 받은 파라미터로 평가 데이터를 생성
         EvaluationDTO evaluationDTO = new EvaluationDTO();
@@ -91,7 +84,7 @@ public class EvaluationWebController {
         evaluationDTO.setNewImage(newImage);
 
         // 평가 데이터 저장 또는 업데이트
-        evaluationService.createOrUpdate(user.id(), restaurant, evaluationDTO);
+//        evaluationService.createOrUpdate(user.id(), restaurant, evaluationDTO);
 
         return ResponseEntity.ok("평가가 성공적으로 저장되었습니다.");
     }

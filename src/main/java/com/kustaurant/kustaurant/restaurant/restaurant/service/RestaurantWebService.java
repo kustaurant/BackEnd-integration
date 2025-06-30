@@ -158,11 +158,12 @@ public class RestaurantWebService {
 
         // 평가 데이터가 evaluationCount개 이상 있는 식당을 필터링하고,
         // calculateAverageScore 메소드를 사용하여 평균 평가 점수를 기준으로 내림차순 정렬하여 상위 15개를 추출
-        return restaurants.stream()
-                .filter(r -> r.getEvaluationList().size() >= evaluationCount)
-                .sorted(Comparator.comparingDouble(RestaurantEntity::calculateAverageScore).reversed()) // 평균 점수에 따라 내림차순 정렬
-                .limit(15) // 상위 15개만 추출
-                .collect(Collectors.toList()); // 리스트로 수집
+//        return restaurants.stream()
+//                .filter(r -> r.getEvaluationList().size() >= evaluationCount)
+//                .sorted(Comparator.comparingDouble(RestaurantEntity::calculateAverageScore).reversed()) // 평균 점수에 따라 내림차순 정렬
+//                .limit(15) // 상위 15개만 추출
+//                .collect(Collectors.toList()); // 리스트로 수집
+        return List.of();
     }
 
 }

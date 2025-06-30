@@ -32,7 +32,7 @@ public class RestaurantSituationRelationService {
         }
     }
 
-    public void createOrDelete(RestaurantEntity restaurant, Integer situationId, Integer dataCount) {
+    public void createOrDelete(RestaurantEntity restaurant, Long situationId, Integer dataCount) {
         SituationEntity situationEntity = situationService.getSituation(situationId);
         if (situationEntity == null) {
             return;

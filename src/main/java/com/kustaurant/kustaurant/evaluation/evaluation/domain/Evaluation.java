@@ -11,8 +11,8 @@ import java.util.List;
 
 @Builder
 @Getter
-public class EvaluationDomain {
-    private Integer evaluationId;
+public class Evaluation {
+    private Long evaluationId;
     private Double evaluationScore;
     private String status;
     private LocalDateTime createdAt;
@@ -23,16 +23,16 @@ public class EvaluationDomain {
     private Integer commentLikeCount;
     // 참조키
     private Long userId;
-    private Restaurant restaurant;
+    private Integer restaurantId;
     // 추가
     private Integer likeCount;
     private Integer dislikeCount;
     private List<EvaluationSituation> evaluationSituationList;
 
-    public static EvaluationDomain from(EvaluationEntity entity) {
+    public static Evaluation from(EvaluationEntity entity) {
         if (entity == null) return null;
 
-        return EvaluationDomain.builder()
+        return Evaluation.builder()
                 .evaluationId(entity.getId())
                 .evaluationScore(entity.getEvaluationScore())
                 .status(entity.getStatus())
@@ -42,7 +42,7 @@ public class EvaluationDomain {
                 .commentImgUrl(entity.getCommentImgUrl())
                 .commentLikeCount(entity.getCommentLikeCount() != null ? entity.getCommentLikeCount() : 0)
                 .userId(entity.getUserId())
-                .restaurant(Restaurant.from(entity.getRestaurant()))
+                .restaurantId(entity.getRestaurantId())
                 .likeCount(entity.getRestaurantCommentLikeList() != null ? entity.getRestaurantCommentLikeList().size() : 0)
                 .dislikeCount(entity.getRestaurantCommentDislikeList() != null ? entity.getRestaurantCommentDislikeList().size() : 0)
                 .evaluationSituationList(

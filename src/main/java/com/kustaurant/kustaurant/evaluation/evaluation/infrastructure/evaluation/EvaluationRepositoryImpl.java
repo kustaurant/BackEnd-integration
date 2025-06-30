@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDomain;
+import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
@@ -22,12 +22,12 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
         if (userId == null || restaurantId == null) {
             return false;
         }
-        return jpaRepository.existsByUserIdAndRestaurant_RestaurantId(userId, restaurantId);
+        return jpaRepository.existsByUserIdAndRestaurantId(userId, restaurantId);
     }
 
     @Override
     public List<EvaluationEntity> findByRestaurantIdAndStatus(Integer restaurantId, String status) {
-        return evaluationJpaRepository.findByRestaurant_RestaurantIdAndStatus(restaurantId, status);
+        return evaluationJpaRepository.findByRestaurantIdAndStatus(restaurantId, status);
     }
 
     @Override
@@ -36,15 +36,15 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     }
 
 
-    public List<EvaluationDomain> findByUserId(Long userId) {
-        return evaluationJpaRepository.findByUserId(userId).stream().map(EvaluationDomain::from).toList();
+    public List<Evaluation> findByUserId(Long userId) {
+        return evaluationJpaRepository.findByUserId(userId).stream().map(Evaluation::from).toList();
     }
 
 
     @Override
-    public List<EvaluationDomain> findSortedEvaluationByUserIdDesc(Long userId) {
+    public List<Evaluation> findSortedEvaluationByUserIdDesc(Long userId) {
         return evaluationJpaRepository.findSortedEvaluationsByUserIdDesc(userId).stream()
-                .map(EvaluationDomain::from)
+                .map(Evaluation::from)
                 .toList();
     }
 

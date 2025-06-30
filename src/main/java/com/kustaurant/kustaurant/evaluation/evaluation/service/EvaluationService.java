@@ -22,19 +22,18 @@ import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
-import com.kustaurant.kustaurant.global.etc.JsonData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EvaluationService {
     private final EvaluationRepository evaluationRepository;
     private final SituationRepository situationRepository;
@@ -48,22 +47,21 @@ public class EvaluationService {
     private final RestaurantCommentRepository restaurantCommentRepository;
     private final EvaluationConstants evaluationConstants;
 
+    // new code start
     private final EvaluationQueryRepository evaluationQueryRepository;
 
-    // new code start
-    public Boolean isUserEvaluated(Long userId, Integer restaurantId) {
-        return evaluationRepository.existsByUserAndRestaurant(userId, restaurantId);
+    public boolean isUserEvaluated(Long userId, Integer restaurantId) {
+        return evaluationQueryRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 
-    public List<EvaluationEntity> findByRestaurantId(Integer restaurantId) {
-        return evaluationRepository.findByRestaurantIdAndStatus(restaurantId, "ACTIVE");
+    public boolean hasEvaluation(Integer restaurantId, Integer evaluationId) {
+        return evaluationQueryRepository.existsByRestaurantAndEvaluation(restaurantId, evaluationId);
     }
 
-    @Transactional(readOnly = true)
     public EvaluationDTO getPreEvaluation(Long userId, Integer restaurantId) {
         return evaluationQueryRepository.findActiveByUserAndRestaurant(userId, restaurantId)
-                .map(EvaluationDTO::convertEvaluation)
-                .orElse(EvaluationDTO.convertEvaluationWhenNoEvaluation());
+                .map(EvaluationDTO::toDto)
+                .orElse(EvaluationDTO.createIfNotPreEvaluated());
     }
     // new code end
 
@@ -73,134 +71,6 @@ public class EvaluationService {
             throw new DataNotFoundException(EVALUATION_NOT_FOUND, evaluationId, "평가");
         }
         return evaluationOptional.get();
-    }
-
-    public EvaluationEntity getByUserAndRestaurant(Long userId, RestaurantEntity restaurant) {
-        Optional<EvaluationEntity> evaluation = evaluationRepository.findByUserAndRestaurant(userId, restaurant);
-        return evaluation.orElse(null);
-    }
-
-    public void createOrUpdate(JsonData jsonData, Principal principal) {
-        /*Restaurant restaurant = restaurantService.getRestaurant(jsonData.getRestaurantId());
-        User user = customOAuth2UserService.getUser(principal.getName());
-
-        // user와 restaurant 정보로 db에 평가한 데이터가 있는지 확인
-        Optional<Evaluation> evaluationOptional = evaluationRepository.findByUserAndRestaurant(user, restaurant);
-        Evaluation evaluation;
-        // 있으면 업데이트 및 삭제
-        if (evaluationOptional.isPresent()) {
-            evaluation = evaluationOptional.get();
-            // updated at
-            evaluation.setUpdatedAt(LocalDateTime.now());
-            // restaurant tbl update
-            double preveMainScore = evaluation.getEvaluationScore();
-            restaurant.setRestaurantScoreSum(restaurant.getRestaurantScoreSum() - preveMainScore + jsonData.getStarRating());
-            // 메인 점수 업데이트
-            evaluation.setEvaluationScore(jsonData.getStarRating());
-            // 상황 점수 삭제
-            List<EvaluationItemScore> evaluationItemScoreList = evaluation.getEvaluationItemScoreList();
-            for (EvaluationItemScore itemScore : evaluationItemScoreList) {
-                double prevScore = itemScore.getScore();
-
-                Situation situation = itemScore.getSituation();
-                situation.getEvaluationItemScoreList().remove(itemScore);
-                situationRepository.save(situation);
-                evaluationItemScoreRepository.delete(itemScore);
-
-                // restaurant situation relation tbl update
-                List<RestaurantSituationRelation> restaurantSituationRelationList = restaurant.getRestaurantSituationRelationList();
-                for (RestaurantSituationRelation restaurantSituationRelation: restaurantSituationRelationList) {
-                    Situation relationSituation = restaurantSituationRelation.getSituation();
-                    if (relationSituation == situation) {
-                        restaurantSituationRelation.setDataCount(restaurantSituationRelation.getDataCount() - 1);
-                        restaurantSituationRelation.setScoreSum(restaurantSituationRelation.getScoreSum() - prevScore);
-                        break;
-                    }
-                }
-            }
-            evaluation.getEvaluationItemScoreList().clear();
-        }
-        // 없으면 새로 평가 데이터 생성
-        else {
-            evaluation = new Evaluation(restaurant, user, jsonData.getStarRating());
-            // restaurant tbl first update
-            restaurant.setRestaurantEvaluationCount(restaurant.getRestaurantEvaluationCount() + 1);
-            restaurant.setRestaurantScoreSum(restaurant.getRestaurantScoreSum() + jsonData.getStarRating());
-        }
-        restaurantRepository.save(restaurant);
-        evaluationRepository.save(evaluation);
-
-        // 새로운 EvaluationItemScore 생성 및 저장
-        List<EvaluationItemScore> evaluationItemScoreList = new ArrayList<>();
-        List situationScoreList = jsonData.getBarRatings();
-        for (int i = 0; i < situationScoreList.size(); i++) {
-            if (situationScoreList.get(i) == null) {
-                continue;
-            }
-
-            Situation situation = situationService.getSituation(i + 1); // 1인덱싱이라 +1
-
-            EvaluationItemScore evaluationItemScore = new EvaluationItemScore(evaluation, situation, (Double) situationScoreList.get(i));
-            evaluationItemScoreRepository.save(evaluationItemScore);
-
-            // EvaluationItemScore -> evaluationItemScore, situation 과 일대다 매핑
-            evaluationItemScoreList.add(evaluationItemScore);
-            situation.getEvaluationItemScoreList().add(evaluationItemScore);
-
-            // restaurant situation relation tbl insert
-            List<RestaurantSituationRelation> restaurantSituationRelationList = restaurant.getRestaurantSituationRelationList();
-            boolean isExist = false;
-            double newScore = (Double) situationScoreList.get(i);
-            for (RestaurantSituationRelation restaurantSituationRelation: restaurantSituationRelationList) {
-                Situation relationSituation = restaurantSituationRelation.getSituation();
-                if (relationSituation == situation) {
-                    restaurantSituationRelation.setDataCount(restaurantSituationRelation.getDataCount() + 1);
-                    restaurantSituationRelation.setScoreSum(restaurantSituationRelation.getScoreSum() + newScore);
-                    restaurantSituationRelationRepository.save(restaurantSituationRelation);
-                    isExist = true;
-                    break;
-                }
-            }
-            if (!isExist) {
-                RestaurantSituationRelation restaurantSituationRelation = new RestaurantSituationRelation();
-                restaurantSituationRelation.setRestaurant(restaurant);
-                restaurantSituationRelation.setSituation(situation);
-                restaurantSituationRelation.setDataCount(1);
-                restaurantSituationRelation.setScoreSum((Double) situationScoreList.get(i));
-                restaurantSituationRelationRepository.save(restaurantSituationRelation);
-            }
-        }
-
-        evaluation.setEvaluationItemScoreList(evaluationItemScoreList);
-        evaluationRepository.save(evaluation);
-
-        // 메인(cuisine) 티어 저장
-        if (restaurant.getRestaurantEvaluationCount() >= minNumberOfEvaluations) {
-            EnumTier tier = EnumTier.calculateTierOfRestaurant(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount());
-            restaurant.setMainTier(tier.getValue());
-        } else {
-            restaurant.setMainTier(-1);
-        }
-        restaurantRepository.save(restaurant);
-
-        // 상황(situation) 티어 저장
-        for (RestaurantSituationRelation restaurantSituationRelation : restaurant.getRestaurantSituationRelationList()) {
-            if (restaurantSituationRelation.getDataCount() >= minNumberOfEvaluations) {
-                Double AvgScore = restaurantSituationRelation.getScoreSum() / restaurantSituationRelation.getDataCount();
-                restaurantSituationRelation.setSituationTier(EnumTier.calculateSituationTierOfRestaurant(AvgScore).getValue());
-            } else {
-                restaurantSituationRelation.setSituationTier(-1);
-            }
-            restaurantSituationRelationRepository.save(restaurantSituationRelation);
-        }*/
-    }
-
-    public Double getEvaluationScoreByRestaurantComment(RestaurantCommentEntity restaurantComment) {
-        if (restaurantComment == null) {
-            return null;
-        }
-        EvaluationEntity evaluation = restaurantComment.getEvaluation();
-        return evaluation.getEvaluationScore();
     }
 
     public void createOrUpdate(Long userId, RestaurantEntity restaurant, EvaluationDTO evaluationDTO) {
@@ -240,7 +110,7 @@ public class EvaluationService {
         evaluationItemScoresService.deleteSituationsByEvaluation(evaluation);
         // 새로 추가
         if (evaluationDTO.getEvaluationSituations() != null && !evaluationDTO.getEvaluationSituations().isEmpty()) {
-            for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {
+            for (Long evaluationSituation : evaluationDTO.getEvaluationSituations()) {
                 // Evaluation Situation Item Table
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation -> {
                     evaluationSituationRepository.save(new EvaluationSituationEntity(evaluation, newSituation));
@@ -271,7 +141,7 @@ public class EvaluationService {
                 commentBody,
                 commentImgUrl,
                 userId,
-                restaurant
+                restaurant.getRestaurantId()
         );
         evaluationRepository.save(evaluation);
         // restaurants_tbl 테이블 점수 업데이트
@@ -281,7 +151,7 @@ public class EvaluationService {
         calculateTierOfOneRestaurant(restaurant);
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
         if (evaluationDTO.getEvaluationSituations() != null && !evaluationDTO.getEvaluationSituations().isEmpty()) {
-            for (Integer evaluationSituation : evaluationDTO.getEvaluationSituations()) {
+            for (Long evaluationSituation : evaluationDTO.getEvaluationSituations()) {
                 // Evaluation Situation Item Table
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
                         evaluationSituationRepository.save(new EvaluationSituationEntity(evaluation, newSituation)));
@@ -323,36 +193,36 @@ public class EvaluationService {
     }
 
     // 식당 별 점수, 평가 수, 상황 개수를 다시 카운트합니다.
-    @Transactional
-    public void calculateEvaluationDatas() {
-        List<RestaurantEntity> restaurantList = restaurantRepository.findByStatus("ACTIVE");
-
-        restaurantList.forEach(restaurant -> {
-            Map<Integer, Integer> situationCountMap = new HashMap<>(Map.of(
-                    1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0));
-            int evaluationCount = 0;
-            double scoreSum = 0;
-
-            for (EvaluationEntity evaluation : restaurant.getEvaluationList()) {
-                if (evaluation.getStatus().equals("ACTIVE")) {
-                    evaluationCount++;
-                    scoreSum += evaluation.getEvaluationScore();
-
-                    for (EvaluationSituationEntity item : evaluation.getEvaluationSituationEntityList()) {
-                        Integer situationId = item.getSituation().getSituationId();
-                        situationCountMap.put(situationId, situationCountMap.getOrDefault(situationId, 0) + 1);
-                    }
-                }
-            }
-
-            restaurant.setRestaurantEvaluationCount(evaluationCount);
-            restaurant.setRestaurantScoreSum(scoreSum);
-            restaurantRepository.save(restaurant);
-            log.info("식당id:{} 식당:{}, 평가개수:{}, 총합:{}", restaurant.getRestaurantId(), restaurant.getRestaurantName(), evaluationCount, scoreSum);
-
-            situationCountMap.forEach((key, value) -> restaurantSituationRelationService.createOrDelete(restaurant, key, value));
-        });
-    }
+//    @Transactional
+//    public void calculateEvaluationDatas() {
+//        List<RestaurantEntity> restaurantList = restaurantRepository.findByStatus("ACTIVE");
+//
+//        restaurantList.forEach(restaurant -> {
+//            Map<Integer, Integer> situationCountMap = new HashMap<>(Map.of(
+//                    1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0));
+//            int evaluationCount = 0;
+//            double scoreSum = 0;
+//
+//            for (EvaluationEntity evaluation : restaurant.getEvaluationList()) {
+//                if (evaluation.getStatus().equals("ACTIVE")) {
+//                    evaluationCount++;
+//                    scoreSum += evaluation.getEvaluationScore();
+//
+//                    for (EvaluationSituationEntity item : evaluation.getEvaluationSituationEntityList()) {
+//                        Integer situationId = item.getSituation().getSituationId();
+//                        situationCountMap.put(situationId, situationCountMap.getOrDefault(situationId, 0) + 1);
+//                    }
+//                }
+//            }
+//
+//            restaurant.setRestaurantEvaluationCount(evaluationCount);
+//            restaurant.setRestaurantScoreSum(scoreSum);
+//            restaurantRepository.save(restaurant);
+//            log.info("식당id:{} 식당:{}, 평가개수:{}, 총합:{}", restaurant.getRestaurantId(), restaurant.getRestaurantName(), evaluationCount, scoreSum);
+//
+//            situationCountMap.forEach((key, value) -> restaurantSituationRelationService.createOrDelete(restaurant, key, value));
+//        });
+//    }
 
 
     // 그냥 Restaurant 리스트를 RestaurantTierDataClass 리스트로 변경 ver1
@@ -408,8 +278,9 @@ public class EvaluationService {
     // Evaluation 좋아요
     @Transactional
     public void likeEvaluation(Long userId, EvaluationEntity evaluation) {
-        Optional<RestaurantCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
-        Optional<RestaurantCommentDislikeEntity> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
+        long evaluationId = evaluation.getId();
+        Optional<RestaurantCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, (int) evaluationId);
+        Optional<RestaurantCommentDislikeEntity> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluationId(userId, (int) evaluationId);
 
         if (likeOptional.isPresent() && dislikeOptional.isPresent()) {
             throw new IllegalStateException(evaluation.getId() + "id 평가 좋아요 상태 문제. 서버측에 알려주세요.. 감사합니다!");
@@ -432,8 +303,9 @@ public class EvaluationService {
     // Evaluation 싫어요
     @Transactional
     public void dislikeEvaluation(Long userId, EvaluationEntity evaluation) {
-        Optional<RestaurantCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
-        Optional<RestaurantCommentDislikeEntity> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
+        long evaluationId = evaluation.getId();
+        Optional<RestaurantCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, (int) evaluationId);
+        Optional<RestaurantCommentDislikeEntity> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluationId(userId, (int) evaluationId);
 
         if (likeOptional.isPresent() && dislikeOptional.isPresent()) {
             throw new IllegalStateException(evaluation.getId() + "id 평가 좋아요 상태 문제. 서버측에 알려주세요.. 감사합니다!");

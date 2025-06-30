@@ -17,7 +17,7 @@ import lombok.Setter;
 public class RestaurantSituationRelationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer relationId;
+    private Long relationId;
 
     private Integer dataCount;
 

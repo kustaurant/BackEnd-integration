@@ -52,15 +52,10 @@ public class RestaurantEntity {
     private LocalDateTime updatedAt;
 
 
-
     // 다른 테이블과의 관계 매핑
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
     List<RestaurantSituationRelationEntity> restaurantSituationRelationEntityList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "restaurant")
-    @JsonIgnore
-    private List<EvaluationEntity> evaluationList=new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
@@ -73,17 +68,6 @@ public class RestaurantEntity {
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
     private List<RestaurantMenuEntity> restaurantMenuList = new ArrayList<>();
-
-    public double calculateAverageScore() {
-        if (evaluationList.isEmpty()) {
-            return 0.0; // 평가가 없는 경우 0 반환
-        }
-
-        return evaluationList.stream()
-                .mapToDouble(EvaluationEntity::getEvaluationScore) // 평가 점수로 변환
-                .average() // 평균 계산
-                .orElse(0.0); // 평가가 없는 경우 0 반환
-    }
 
     public static RestaurantEntity fromDomain(Restaurant restaurant) {
         RestaurantEntity entity = new RestaurantEntity();

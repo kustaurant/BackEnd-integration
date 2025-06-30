@@ -7,9 +7,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface EvaluationJpaRepository extends JpaRepository<EvaluationEntity, Integer>{
-    boolean existsByUserIdAndRestaurant_RestaurantId(Long userId, Integer restaurantId);
-    List<EvaluationEntity> findByRestaurant_RestaurantIdAndStatus(Integer restaurantId, String status);
+public interface EvaluationJpaRepository extends JpaRepository<EvaluationEntity, Long> {
+    boolean existsByUserIdAndRestaurantId(Long userId, Integer restaurantId);
+    List<EvaluationEntity> findByRestaurantIdAndStatus(Integer restaurantId, String status);
 
     Integer countAllByStatus(String status);
 

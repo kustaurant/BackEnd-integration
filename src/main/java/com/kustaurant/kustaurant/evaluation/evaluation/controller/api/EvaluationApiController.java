@@ -58,7 +58,7 @@ public class EvaluationApiController {
         return ResponseEntity.ok(dto);
     }
 
-//    // 평가하기
+    // 평가하기
 //    @PostMapping(value = "/auth/restaurants/{restaurantId}/evaluation")
 //    @Operation(summary = "평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)\n\n" +
 //            "- 요청 형식 보충 설명\n\n" +

@@ -8,13 +8,13 @@ import java.util.Objects;
 @Getter
 @Setter
 public class EvaluationSituationId implements Serializable {
-    private Integer evaluation;
-    private Integer situation;
+    private Long evaluation;
+    private Long situation;
 
     public EvaluationSituationId() {
     }
 
-    public EvaluationSituationId(Integer evaluation, Integer situation) {
+    public EvaluationSituationId(Long evaluation, Long situation) {
         this.evaluation = evaluation;
         this.situation = situation;
     }

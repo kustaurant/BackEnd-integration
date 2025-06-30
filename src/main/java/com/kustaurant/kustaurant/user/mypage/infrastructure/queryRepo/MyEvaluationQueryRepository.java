@@ -11,7 +11,6 @@ public interface MyEvaluationQueryRepository extends Repository<EvaluationEntity
     @Query("""
         select distinct e
         from EvaluationEntity e
-        join fetch e.restaurant r
         left join fetch e.evaluationSituationEntityList es
         left join fetch es.situation s
         where e.userId = :userId

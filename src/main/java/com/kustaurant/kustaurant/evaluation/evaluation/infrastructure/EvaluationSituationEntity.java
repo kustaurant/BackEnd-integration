@@ -13,12 +13,12 @@ import lombok.Setter;
 public class EvaluationSituationEntity {
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="evaluation_id")
     private EvaluationEntity evaluation;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="situation_id")
     private SituationEntity situation;
 

@@ -125,10 +125,15 @@ public class MypageApiService {
                             .toList();
 
                     return new MyRatedRestaurantResponse(
-                            e.getRestaurant().getRestaurantName(),
-                            e.getRestaurant().getRestaurantId(),
-                            e.getRestaurant().getRestaurantImgUrl(),
-                            e.getRestaurant().getRestaurantCuisine(),
+                            // TODO: Evaluation 연관관계 삭제 -> 주석 처리
+//                            e.getRestaurant().getRestaurantName(),
+//                            e.getRestaurant().getRestaurantId(),
+//                            e.getRestaurant().getRestaurantImgUrl(),
+//                            e.getRestaurant().getRestaurantCuisine(),
+                            "식당 이름",
+                            1,
+                            "url",
+                            "Cuisine",
                             e.getEvaluationScore(),
                             e.getCommentBody(),
                             situations

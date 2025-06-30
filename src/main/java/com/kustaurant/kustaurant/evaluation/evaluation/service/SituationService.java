@@ -13,7 +13,7 @@ public class SituationService {
 
     private final SituationRepository situationRepository;
 
-    public SituationEntity getSituation(Integer id){
+    public SituationEntity getSituation(Long id){
         Optional<SituationEntity> situation = situationRepository.findById(id);
         return situation.orElse(null);
     }
