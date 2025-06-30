@@ -21,18 +21,15 @@ public class RestaurantSituationRelationEntity {
 
     private Integer dataCount;
 
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name="situation_id")
-    private SituationEntity situation;
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name="restaurant_id")
-    private RestaurantEntity restaurant;
+    @Column(name = "situation_id")
+    private Long situationId;
 
-    public RestaurantSituationRelationEntity(Integer dataCount, SituationEntity situation, RestaurantEntity restaurant) {
+    @Column(name = "restaurant_id")
+    private Integer restaurantId;
+
+    public RestaurantSituationRelationEntity(Integer dataCount, Long situationId, Integer restaurantId) {
         this.dataCount = dataCount;
-        this.situation = situation;
-        this.restaurant = restaurant;
+        this.situationId = situationId;
+        this.restaurantId = restaurantId;
     }
 }

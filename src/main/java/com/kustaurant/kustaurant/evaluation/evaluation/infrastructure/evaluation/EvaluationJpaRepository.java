@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,8 +22,6 @@ public interface EvaluationJpaRepository extends JpaRepository<EvaluationEntity,
         END DESC
     """)
     List<EvaluationEntity> findSortedEvaluationsByUserIdDesc(@Param("userId") Long userId);
-
-    List<EvaluationEntity> findByStatus(String status);
 
     List<EvaluationEntity> findByUserId(Long userId);
 }

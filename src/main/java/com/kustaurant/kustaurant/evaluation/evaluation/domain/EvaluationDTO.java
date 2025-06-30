@@ -4,12 +4,12 @@ import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConst
 import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.RestaurantConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Data
+@Getter
 @AllArgsConstructor
 @Schema(description = "evaluation data dto entity")
 public class EvaluationDTO {
@@ -30,12 +30,14 @@ public class EvaluationDTO {
 
     }
 
+    public void changeImgUrl(String url) {
+        this.evaluationImgUrl = url;
+    }
+
     public static EvaluationDTO toDto(Evaluation evaluation) {
         return new EvaluationDTO(
                 evaluation.getEvaluationScore(),
-                evaluation.getEvaluationSituationList().stream()
-                        .map(e -> e.getSituation().getSituationId())
-                        .toList(),
+                evaluation.getSituationIds(),
                 evaluation.getCommentImgUrl(),
                 evaluation.getCommentBody(),
                 EvaluationConstants.STAR_COMMENTS,

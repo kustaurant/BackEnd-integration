@@ -3,20 +3,19 @@ package com.kustaurant.kustaurant.evaluation.evaluation.service;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentDislikeEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentLikeEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentDislikeRepository;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentLikeRepository;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.*;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.query.EvaluationQueryRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.EvaluationSituationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.EvaluationSituationRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.restaurant.tier.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.SituationRepository;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.S3Service;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
@@ -35,19 +34,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class EvaluationService {
-    private final EvaluationRepository evaluationRepository;
-    private final SituationRepository situationRepository;
-    private final EvaluationSituationRepository evaluationSituationRepository;
-    private final RestaurantRepository restaurantRepository;
-    private final RestaurantSituationRelationService restaurantSituationRelationService;
-    private final EvaluationItemScoresService evaluationItemScoresService;
-    private final S3Service s3Service;
-    private final RestaurantCommentLikeRepository restaurantCommentLikeRepository;
-    private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
-    private final RestaurantCommentRepository restaurantCommentRepository;
-    private final EvaluationConstants evaluationConstants;
 
-    // new code start
     private final EvaluationQueryRepository evaluationQueryRepository;
 
     public boolean isUserEvaluated(Long userId, Integer restaurantId) {
@@ -63,7 +50,19 @@ public class EvaluationService {
                 .map(EvaluationDTO::toDto)
                 .orElse(EvaluationDTO.createIfNotPreEvaluated());
     }
-    // new code end
+
+    // -------------- previous code --------------- //
+
+    private final EvaluationRepository evaluationRepository;
+    private final SituationRepository situationRepository;
+    private final EvaluationSituationRepository evaluationSituationRepository;
+    private final RestaurantRepository restaurantRepository;
+    private final RestaurantSituationRelationService restaurantSituationRelationService;
+    private final SituationCommandService situationCommandService;
+    private final S3Service s3Service;
+    private final RestaurantCommentLikeRepository restaurantCommentLikeRepository;
+    private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
+    private final EvaluationConstants evaluationConstants;
 
     public EvaluationEntity getByEvaluationId(Integer evaluationId) {
         Optional<EvaluationEntity> evaluationOptional = evaluationRepository.findByEvaluationIdAndStatus(evaluationId, "ACTIVE");
@@ -71,16 +70,6 @@ public class EvaluationService {
             throw new DataNotFoundException(EVALUATION_NOT_FOUND, evaluationId, "평가");
         }
         return evaluationOptional.get();
-    }
-
-    public void createOrUpdate(Long userId, RestaurantEntity restaurant, EvaluationDTO evaluationDTO) {
-        // 이전 평가 가져오기
-        EvaluationEntity evaluation = evaluationRepository.findByUserAndRestaurantAndStatus(userId, restaurant, "ACTIVE").orElse(null);
-        if (evaluation == null) { // 이전 평가가 없을 경우
-            evaluationCreate(userId, restaurant, evaluationDTO);
-        } else { // 이전 평가가 있을 경우
-            evaluationUpdate(userId, restaurant, evaluation, evaluationDTO);
-        }
     }
 
     // 이전 평가가 있는 경우 - 평가 업데이트하기
@@ -104,20 +93,20 @@ public class EvaluationService {
         evaluationRepository.save(evaluation);
         // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
         // 이전 상황 데이터 삭제 & 이전에 선택한 상황에 대해 restaurant_situation_relations_tbl 테이블의 count 1씩 감소
-        for (EvaluationSituationEntity evaluationSituationEntity : evaluation.getEvaluationSituationEntityList()) {
-            restaurantSituationRelationService.updateOrCreate(restaurant, evaluationSituationEntity.getSituation(), -1);
-        }
-        evaluationItemScoresService.deleteSituationsByEvaluation(evaluation);
+//        for (EvaluationSituationEntity evaluationSituationEntity : evaluation.getEvaluationSituationEntityList()) {
+//            restaurantSituationRelationService.updateOrCreate(restaurant.getRestaurantId(), evaluationSituationEntity.getSituationId(), -1);
+//        }
+        situationCommandService.deleteSituationsByEvaluation(evaluation.getId());
         // 새로 추가
         if (evaluationDTO.getEvaluationSituations() != null && !evaluationDTO.getEvaluationSituations().isEmpty()) {
             for (Long evaluationSituation : evaluationDTO.getEvaluationSituations()) {
                 // Evaluation Situation Item Table
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation -> {
-                    evaluationSituationRepository.save(new EvaluationSituationEntity(evaluation, newSituation));
+                    evaluationSituationRepository.save(new EvaluationSituationEntity(evaluation.getId(), newSituation.getSituationId()));
                 });
                 // Restaurant Situation Relation Table
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
-                        restaurantSituationRelationService.updateOrCreate(restaurant, newSituation, 1));
+                        restaurantSituationRelationService.updateOrCreate(restaurant.getRestaurantId(), newSituation.getSituationId(), 1));
             }
         }
     }
@@ -154,10 +143,10 @@ public class EvaluationService {
             for (Long evaluationSituation : evaluationDTO.getEvaluationSituations()) {
                 // Evaluation Situation Item Table
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
-                        evaluationSituationRepository.save(new EvaluationSituationEntity(evaluation, newSituation)));
+                        evaluationSituationRepository.save(new EvaluationSituationEntity(evaluation.getId(), newSituation.getSituationId())));
                 // Restaurant Situation Relation Table
                 situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
-                        restaurantSituationRelationService.updateOrCreate(restaurant, newSituation, 1));
+                        restaurantSituationRelationService.updateOrCreate(restaurant.getRestaurantId(), newSituation.getSituationId(), 1));
             }
         }
     }
@@ -246,7 +235,7 @@ public class EvaluationService {
                 } else {
                     newDataClass.setRanking("-");
                 }
-                insertSituation(newDataClass, restaurant);
+//                insertSituation(newDataClass, restaurant);
                 resultList.add(newDataClass);
             } else { // 티어가 없는 경우 = 평가 데이터 부족 = 순위가 없음
                 newDataClass.setRanking("-");
@@ -267,13 +256,13 @@ public class EvaluationService {
         data.setIsFavorite(false);
     }
 
-    public void insertSituation(RestaurantTierDataClass data, RestaurantEntity restaurant) {
-        for (RestaurantSituationRelationEntity restaurantSituationRelationEntity : restaurant.getRestaurantSituationRelationEntityList()) {
-            if (RestaurantChartSpec.hasSituation(restaurantSituationRelationEntity)) {
-                data.addSituation(restaurantSituationRelationEntity);
-            }
-        }
-    }
+//    public void insertSituation(RestaurantTierDataClass data, RestaurantEntity restaurant) {
+//        for (RestaurantSituationRelationEntity restaurantSituationRelationEntity : restaurant.getRestaurantSituationRelationEntityList()) {
+//            if (RestaurantChartSpec.hasSituation(restaurantSituationRelationEntity)) {
+//                data.addSituation(restaurantSituationRelationEntity);
+//            }
+//        }
+//    }
 
     // Evaluation 좋아요
     @Transactional
@@ -352,14 +341,14 @@ public class EvaluationService {
         restaurantCommentDislikeRepository.deleteAll(evaluation.getRestaurantCommentDislikeList());
 
         // 대댓글 삭제
-        for (RestaurantCommentEntity restaurantComment : evaluation.getRestaurantCommentList()) {
-            restaurantComment.setStatus("DELETED");
-            restaurantComment.setCommentLikeCount(0);
-            restaurantCommentRepository.save(restaurantComment);
-
-            restaurantCommentLikeRepository.deleteAll(restaurantComment.getRestaurantCommentLikeList());
-            restaurantCommentDislikeRepository.deleteAll(restaurantComment.getRestaurantCommentDislikeList());
-        }
+//        for (RestaurantCommentEntity restaurantComment : evaluation.getRestaurantCommentList()) {
+//            restaurantComment.setStatus("DELETED");
+//            restaurantComment.setCommentLikeCount(0);
+//            restaurantCommentRepository.save(restaurantComment);
+//
+//            restaurantCommentLikeRepository.deleteAll(restaurantComment.getRestaurantCommentLikeList());
+//            restaurantCommentDislikeRepository.deleteAll(restaurantComment.getRestaurantCommentDislikeList());
+//        }
     }
 }
 

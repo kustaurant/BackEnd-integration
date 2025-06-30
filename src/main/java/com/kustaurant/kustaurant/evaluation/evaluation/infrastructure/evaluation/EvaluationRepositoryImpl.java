@@ -2,7 +2,6 @@ package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluatio
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -13,6 +12,8 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class EvaluationRepositoryImpl implements EvaluationRepository {
+
+    // TODO: 궁극적으로는 이 클래스를 없애는 것이 목표 -> Query와 Command로 이동
 
     private final EvaluationJpaRepository jpaRepository;
     private final EvaluationJpaRepository evaluationJpaRepository;
@@ -37,14 +38,14 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
 
 
     public List<Evaluation> findByUserId(Long userId) {
-        return evaluationJpaRepository.findByUserId(userId).stream().map(Evaluation::from).toList();
+        return evaluationJpaRepository.findByUserId(userId).stream().map(EvaluationEntity::toModel).toList();
     }
 
 
     @Override
     public List<Evaluation> findSortedEvaluationByUserIdDesc(Long userId) {
         return evaluationJpaRepository.findSortedEvaluationsByUserIdDesc(userId).stream()
-                .map(Evaluation::from)
+                .map(EvaluationEntity::toModel)
                 .toList();
     }
 

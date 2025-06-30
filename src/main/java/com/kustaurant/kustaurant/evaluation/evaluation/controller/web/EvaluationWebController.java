@@ -9,12 +9,11 @@ import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
-import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService;
 
@@ -78,10 +77,10 @@ public class EvaluationWebController {
 
         // 받은 파라미터로 평가 데이터를 생성
         EvaluationDTO evaluationDTO = new EvaluationDTO();
-        evaluationDTO.setEvaluationScore(starRating);
-        evaluationDTO.setEvaluationSituations(evaluationSituations);
-        evaluationDTO.setEvaluationComment(evaluationComment);
-        evaluationDTO.setNewImage(newImage);
+//        evaluationDTO.setEvaluationScore(starRating);
+//        evaluationDTO.setEvaluationSituations(evaluationSituations);
+//        evaluationDTO.setEvaluationComment(evaluationComment);
+//        evaluationDTO.setNewImage(newImage);
 
         // 평가 데이터 저장 또는 업데이트
 //        evaluationService.createOrUpdate(user.id(), restaurant, evaluationDTO);

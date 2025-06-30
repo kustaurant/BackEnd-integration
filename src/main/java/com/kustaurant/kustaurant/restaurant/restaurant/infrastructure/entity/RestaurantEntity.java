@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
@@ -53,10 +52,6 @@ public class RestaurantEntity {
 
 
     // 다른 테이블과의 관계 매핑
-    @OneToMany(mappedBy = "restaurant")
-    @JsonIgnore
-    List<RestaurantSituationRelationEntity> restaurantSituationRelationEntityList = new ArrayList<>();
-
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
     private List<RestaurantCommentEntity> restaurantCommentList = new ArrayList<>();
@@ -117,8 +112,8 @@ public class RestaurantEntity {
                 .restaurantEvaluationCount(restaurantEvaluationCount)
                 .restaurantScoreSum(restaurantScoreSum)
                 .mainTier(mainTier)
-                // TODO: 개선 필요해 보임
-                .situations(restaurantSituationRelationEntityList.stream().filter(RestaurantChartSpec::hasSituation).map(el -> el.getSituation().getSituationName()).collect(Collectors.toList()))
+                // TODO: 이거 복구해야됨 (2025-06-30)
+//                .situations(restaurantSituationRelationEntityList.stream().filter(RestaurantChartSpec::hasSituation).map(el -> el.getSituation().getSituationName()).collect(Collectors.toList()))
                 .favoriteCount(this.restaurantFavorite.size())
                 .build();
     }

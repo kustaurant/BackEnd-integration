@@ -6,5 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class EvaluationSituation {
+
+    private Long evaluationId;
     private Situation situation;
 }

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.query;
+package com.kustaurant.kustaurant.evaluation.evaluation.service.port;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import java.util.Optional;

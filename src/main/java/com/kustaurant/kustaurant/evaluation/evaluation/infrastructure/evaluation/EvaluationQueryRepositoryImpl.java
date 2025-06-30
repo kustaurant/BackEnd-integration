@@ -1,7 +1,7 @@
-package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.query;
+package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

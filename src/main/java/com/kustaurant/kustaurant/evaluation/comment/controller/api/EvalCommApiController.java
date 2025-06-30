@@ -5,9 +5,9 @@ import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalComm
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
 import com.kustaurant.kustaurant.evaluation.comment.service.EvaluationCommentService;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.RestaurantCommentReportEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.RestaurantCommentReportRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.report.RestaurantCommentReportEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.report.RestaurantCommentReportRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
@@ -17,20 +17,17 @@ import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.Res
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController

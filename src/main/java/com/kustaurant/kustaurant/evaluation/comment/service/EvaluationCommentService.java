@@ -8,7 +8,7 @@ import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.Restau
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentDislikeRepository;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentLikeRepository;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.*;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;

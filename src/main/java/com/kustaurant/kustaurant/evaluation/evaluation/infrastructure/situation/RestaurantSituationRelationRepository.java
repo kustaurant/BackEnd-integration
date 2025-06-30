@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.Optional;
 
 public interface RestaurantSituationRelationRepository extends JpaRepository<RestaurantSituationRelationEntity, Long>, JpaSpecificationExecutor<RestaurantSituationRelationEntity> {
-    Optional<RestaurantSituationRelationEntity> findByRestaurantAndSituation(RestaurantEntity restaurant, SituationEntity situationEntity);
+    Optional<RestaurantSituationRelationEntity> findByRestaurantIdAndSituationId(Integer restaurantId, Long situationId);
 }

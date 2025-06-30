@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.evaluation.comment.infrastructure.queryRepo;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.projection.EvalCommentProjection;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;

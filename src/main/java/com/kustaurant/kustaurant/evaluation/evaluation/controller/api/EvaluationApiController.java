@@ -30,7 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class EvaluationApiController {
-    private final RestaurantApiService restaurantApiService;
+
     private final EvaluationCommentService restaurantCommentService;
     private final EvaluationService evaluationService;
 
@@ -87,7 +87,7 @@ public class EvaluationApiController {
 //            @ApiResponse(responseCode = "500", description = "데이터베이스 상에 문제가 있을 경우 500을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
 //    })
 //    public ResponseEntity<List<EvalCommResponse>> evaluateRestaurant(
-//            @PathVariable Integer restaurantId,
+//            @PathVariable Long restaurantId,
 //            EvaluationDTO evaluationDTO,
 //            @Parameter(hidden = true) @AuthUser AuthUserInfo user
 //    ) {
@@ -95,10 +95,8 @@ public class EvaluationApiController {
 //        if (evaluationDTO.getEvaluationScore() == null || evaluationDTO.getEvaluationScore().equals(0d)) {
 //            throw new ParamException("평가 점수가 필요합니다.");
 //        }
-//        // 식당 가져오기
-//        RestaurantEntity restaurant = restaurantApiService.findRestaurantById(restaurantId);
 //        // 평가 추가하기 혹은 기존 평가 업데이트하기
-//        evaluationService.createOrUpdate(user.id(), restaurant, evaluationDTO);
+//        evaluationService.createOrUpdate(user.id(), restaurantId, evaluationDTO);
 //        // 평가 완료 후에 업데이트된 식당 데이터를 다시 반환
 //        return new ResponseEntity<>(restaurantCommentService.getRestaurantCommentList(restaurantId, user.id(), true), HttpStatus.OK);
 //    }
