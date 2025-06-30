@@ -65,7 +65,7 @@ public class EvaluationWebController {
 
     // 평가하기
     @PostMapping("/web/api/evaluation/{restaurantId}")
-    public ResponseEntity<?> evaluationDBcreate(
+    public ResponseEntity<String> evaluationDBcreate(
             @PathVariable Integer restaurantId,
             @AuthUser AuthUserInfo user,
             @RequestParam("starRating") Double starRating,

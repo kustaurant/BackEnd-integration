@@ -238,7 +238,7 @@ public class EvalCommApiController {
     }
 
     private void checkRestaurantIdAndEvaluationId(int restaurantId, int evaluationId) {
-        if (!evaluationQueryService.hasEvaluation(restaurantId, evaluationId)) {
+        if (!evaluationQueryService.hasEvaluation(restaurantId, (long) evaluationId)) {
             throw new ParamException(restaurantId + " 식당에는 " + evaluationId + " id를 가진 evaluation이 없습니다.");
         }
     }

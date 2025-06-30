@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EvaluationRepository {
-    boolean existsByUserAndRestaurant(Long userId, Integer restaurantId);
-    List<EvaluationEntity> findByRestaurantIdAndStatus(Integer restaurantId, String status);
     Integer countAllByStatus(String status);
     List<Evaluation> findByUserId(Long userId);
     List<Evaluation> findSortedEvaluationByUserIdDesc(Long userId);

@@ -7,7 +7,7 @@ public interface EvaluationQueryRepository {
 
     boolean existsByUserAndRestaurant(Long userId, Integer restaurantId);
 
-    boolean existsByRestaurantAndEvaluation(Integer restaurantId, Integer evaluationId);
+    boolean existsByRestaurantAndEvaluation(Integer restaurantId, Long evaluationId);
 
     Optional<Evaluation> findActiveByUserAndRestaurant(Long userId, Integer restaurantId);
 }

@@ -9,7 +9,7 @@ public interface EvaluationQueryJpaRepository extends Repository<EvaluationEntit
 
     boolean existsByUserIdAndRestaurantId(Long userId, Integer restaurantId);
 
-    boolean existsByRestaurantIdAndId(Integer restaurantId, Integer evaluationId);
+    boolean existsByRestaurantIdAndId(Integer restaurantId, Long evaluationId);
 
     Optional<EvaluationEntity> findByUserIdAndRestaurantIdAndStatus(Long userId, Integer restaurantId, String status);
 }

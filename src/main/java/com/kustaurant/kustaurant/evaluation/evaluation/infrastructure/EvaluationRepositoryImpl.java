@@ -21,19 +21,6 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     private final EvaluationJpaRepository evaluationJpaRepository;
 
     @Override
-    public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
-        if (userId == null || restaurantId == null) {
-            return false;
-        }
-        return jpaRepository.existsByUserIdAndRestaurantId(userId, restaurantId);
-    }
-
-    @Override
-    public List<EvaluationEntity> findByRestaurantIdAndStatus(Integer restaurantId, String status) {
-        return evaluationJpaRepository.findByRestaurantIdAndStatus(restaurantId, status);
-    }
-
-    @Override
     public Integer countAllByStatus(String status) {
         return jpaRepository.countAllByStatus(status);
     }

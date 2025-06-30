@@ -23,7 +23,7 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
     }
 
     @Override
-    public boolean existsByRestaurantAndEvaluation(Integer restaurantId, Integer evaluationId) {
+    public boolean existsByRestaurantAndEvaluation(Integer restaurantId, Long evaluationId) {
         if (restaurantId == null || evaluationId == null) {
             return false;
         }

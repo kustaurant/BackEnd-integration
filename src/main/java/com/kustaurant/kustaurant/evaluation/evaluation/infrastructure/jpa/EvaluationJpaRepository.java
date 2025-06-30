@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface EvaluationJpaRepository extends JpaRepository<EvaluationEntity, Long> {
-    boolean existsByUserIdAndRestaurantId(Long userId, Integer restaurantId);
-    List<EvaluationEntity> findByRestaurantIdAndStatus(Integer restaurantId, String status);
+
+    // TODO: 궁극적으로는 이 클래스를 없애는 것이 목표 -> Query와 Command로 이동
 
     Integer countAllByStatus(String status);
 

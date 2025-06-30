@@ -46,6 +46,7 @@ public class Evaluation {
 
     public void reEvaluate(EvaluationDTO dto) {
         this.evaluationScore = dto.getEvaluationScore();
+        this.updatedAt = LocalDateTime.now();
         this.commentBody = dto.getEvaluationComment();
         this.commentImgUrl = dto.getEvaluationImgUrl();
         this.situationIds = dto.getEvaluationSituations();

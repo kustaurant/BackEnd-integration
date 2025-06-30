@@ -15,7 +15,7 @@ public class EvaluationQueryService {
         return evaluationQueryRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 
-    public boolean hasEvaluation(Integer restaurantId, Integer evaluationId) {
+    public boolean hasEvaluation(Integer restaurantId, Long evaluationId) {
         return evaluationQueryRepository.existsByRestaurantAndEvaluation(restaurantId, evaluationId);
     }
 
