@@ -1,22 +1,21 @@
-package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation;
+package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentDislikeEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentLikeEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.EvaluationSituationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Entity
-@Setter
+@DynamicUpdate // 변경된 필드만 Update
 // 한 사용자가 한 식당을 중복 평가 할 수 없음
 @Table(name="evaluations_tbl")
 @NoArgsConstructor
@@ -28,13 +27,13 @@ public class EvaluationEntity {
     private Long id;
 
     private Double evaluationScore;
-    private String status = "ACTIVE";
+    private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     // 평가 내용 관련
     private String commentBody;
     private String commentImgUrl;
-    private Integer commentLikeCount = 0;
+    private Integer commentLikeCount;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
@@ -63,6 +62,34 @@ public class EvaluationEntity {
         this.restaurantId = restaurantId;
     }
 
+    public static EvaluationEntity create(Evaluation evaluation) {
+        EvaluationEntity entity = new EvaluationEntity();
+        entity.evaluationScore = evaluation.getEvaluationScore();
+        entity.status = evaluation.getStatus();
+        entity.createdAt = evaluation.getCreatedAt();
+        entity.commentBody = evaluation.getCommentBody();
+        entity.commentImgUrl = evaluation.getCommentImgUrl();
+        entity.commentLikeCount = evaluation.getCommentLikeCount();
+        entity.userId = evaluation.getUserId();
+        entity.restaurantId = evaluation.getRestaurantId();
+        return entity;
+    }
+
+    public void reEvaluate(Evaluation evaluation) {
+        this.evaluationScore = evaluation.getEvaluationScore();
+        this.updatedAt = evaluation.getUpdatedAt();
+        this.commentBody = evaluation.getCommentBody();
+        this.commentImgUrl = evaluation.getCommentImgUrl();
+        updateSituations(evaluation.getSituationIds());
+    }
+
+    public void updateSituations(List<Long> situationIds) {
+        this.evaluationSituations.clear();
+        situationIds.stream()
+                .map(s -> new EvaluationSituationEntity(this.id, s))
+                .forEach(evaluationSituations::add);
+    }
+
     public Evaluation toModel() {
         return Evaluation.builder()
                 .id(this.id)
@@ -81,21 +108,6 @@ public class EvaluationEntity {
                 .likeCount(this.restaurantCommentLikeList == null ? 0 : this.restaurantCommentLikeList.size())
                 .dislikeCount(this.restaurantCommentDislikeList == null ? 0 : this.restaurantCommentDislikeList.size())
                 .build();
-    }
-
-    public static EvaluationEntity from(Evaluation domain) {
-        EvaluationEntity entity = new EvaluationEntity();
-        entity.id = domain.getId();
-        entity.evaluationScore = domain.getEvaluationScore();
-        entity.status = domain.getStatus();
-        entity.createdAt = domain.getCreatedAt();
-        entity.updatedAt = domain.getUpdatedAt();
-        entity.commentBody = domain.getCommentBody();
-        entity.commentImgUrl = domain.getCommentImgUrl();
-        entity.commentLikeCount = domain.getCommentLikeCount();
-        entity.userId = domain.getUserId();
-        entity.restaurantId = domain.getRestaurantId();
-        return entity;
     }
 
     public String getStarImgUrl() {

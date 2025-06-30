@@ -6,27 +6,19 @@ import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.Restau
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentLikeEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentDislikeRepository;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentLikeRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation.EvaluationEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.EvaluationSituationEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.EvaluationSituationRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.restaurant.tier.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.SituationRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
-import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -35,31 +27,10 @@ import java.util.*;
 @Transactional(readOnly = true)
 public class EvaluationService {
 
-    private final EvaluationQueryRepository evaluationQueryRepository;
-
-    public boolean isUserEvaluated(Long userId, Integer restaurantId) {
-        return evaluationQueryRepository.existsByUserAndRestaurant(userId, restaurantId);
-    }
-
-    public boolean hasEvaluation(Integer restaurantId, Integer evaluationId) {
-        return evaluationQueryRepository.existsByRestaurantAndEvaluation(restaurantId, evaluationId);
-    }
-
-    public EvaluationDTO getPreEvaluation(Long userId, Integer restaurantId) {
-        return evaluationQueryRepository.findActiveByUserAndRestaurant(userId, restaurantId)
-                .map(EvaluationDTO::toDto)
-                .orElse(EvaluationDTO.createIfNotPreEvaluated());
-    }
-
-    // -------------- previous code --------------- //
+    // TODO: 궁극적으로는 이 클래스를 없애는 것이 목표 -> Query와 Command로 이동
 
     private final EvaluationRepository evaluationRepository;
-    private final SituationRepository situationRepository;
-    private final EvaluationSituationRepository evaluationSituationRepository;
     private final RestaurantRepository restaurantRepository;
-    private final RestaurantSituationRelationService restaurantSituationRelationService;
-    private final SituationCommandService situationCommandService;
-    private final S3Service s3Service;
     private final RestaurantCommentLikeRepository restaurantCommentLikeRepository;
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final EvaluationConstants evaluationConstants;
@@ -70,85 +41,6 @@ public class EvaluationService {
             throw new DataNotFoundException(EVALUATION_NOT_FOUND, evaluationId, "평가");
         }
         return evaluationOptional.get();
-    }
-
-    // 이전 평가가 있는 경우 - 평가 업데이트하기
-    @Transactional
-    public void evaluationUpdate(Long userId, RestaurantEntity restaurant, EvaluationEntity evaluation, EvaluationDTO evaluationDTO) {
-        // restaurants_tbl 테이블 점수 업데이트
-        restaurant.setRestaurantScoreSum(restaurant.getRestaurantScoreSum() - evaluation.getEvaluationScore() + evaluationDTO.getEvaluationScore());
-        restaurantRepository.save(restaurant);
-        calculateTierOfOneRestaurant(restaurant);
-        // 평가 업데이트
-        evaluation.setUpdatedAt(LocalDateTime.now());
-        evaluation.setEvaluationScore(evaluationDTO.getEvaluationScore());
-        String commentBody = evaluationDTO.getEvaluationComment();
-        if (commentBody == null || commentBody.isEmpty()) {
-            commentBody = null;
-        }
-        evaluation.setCommentBody(commentBody);
-        if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
-            evaluation.setCommentImgUrl(s3Service.uploadFile(evaluationDTO.getNewImage()));
-        }
-        evaluationRepository.save(evaluation);
-        // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
-        // 이전 상황 데이터 삭제 & 이전에 선택한 상황에 대해 restaurant_situation_relations_tbl 테이블의 count 1씩 감소
-//        for (EvaluationSituationEntity evaluationSituationEntity : evaluation.getEvaluationSituationEntityList()) {
-//            restaurantSituationRelationService.updateOrCreate(restaurant.getRestaurantId(), evaluationSituationEntity.getSituationId(), -1);
-//        }
-        situationCommandService.deleteSituationsByEvaluation(evaluation.getId());
-        // 새로 추가
-        if (evaluationDTO.getEvaluationSituations() != null && !evaluationDTO.getEvaluationSituations().isEmpty()) {
-            for (Long evaluationSituation : evaluationDTO.getEvaluationSituations()) {
-                // Evaluation Situation Item Table
-                situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation -> {
-                    evaluationSituationRepository.save(new EvaluationSituationEntity(evaluation.getId(), newSituation.getSituationId()));
-                });
-                // Restaurant Situation Relation Table
-                situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
-                        restaurantSituationRelationService.updateOrCreate(restaurant.getRestaurantId(), newSituation.getSituationId(), 1));
-            }
-        }
-    }
-
-    // 이전 평가가 없는 경우 - 평가 생성하기
-    @Transactional
-    public void evaluationCreate(Long userId, RestaurantEntity restaurant, EvaluationDTO evaluationDTO) {
-        // 평가 저장
-        String commentImgUrl = null;
-        if (evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty()) {
-            commentImgUrl = s3Service.uploadFile(evaluationDTO.getNewImage());
-        }
-        String commentBody = evaluationDTO.getEvaluationComment();
-        if (commentBody == null || commentBody.isEmpty()) {
-            commentBody = null;
-        }
-        EvaluationEntity evaluation = new EvaluationEntity(
-                evaluationDTO.getEvaluationScore(),
-                "ACTIVE",
-                LocalDateTime.now(),
-                commentBody,
-                commentImgUrl,
-                userId,
-                restaurant.getRestaurantId()
-        );
-        evaluationRepository.save(evaluation);
-        // restaurants_tbl 테이블 점수 업데이트
-        restaurant.setRestaurantScoreSum(restaurant.getRestaurantScoreSum() + evaluationDTO.getEvaluationScore());
-        restaurant.setRestaurantEvaluationCount(restaurant.getRestaurantEvaluationCount() + 1);
-        restaurantRepository.save(restaurant);
-        calculateTierOfOneRestaurant(restaurant);
-        // Evaluation Situation Item Table & Restaurant Situation Relation Table 반영
-        if (evaluationDTO.getEvaluationSituations() != null && !evaluationDTO.getEvaluationSituations().isEmpty()) {
-            for (Long evaluationSituation : evaluationDTO.getEvaluationSituations()) {
-                // Evaluation Situation Item Table
-                situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
-                        evaluationSituationRepository.save(new EvaluationSituationEntity(evaluation.getId(), newSituation.getSituationId())));
-                // Restaurant Situation Relation Table
-                situationRepository.findBySituationId(evaluationSituation).ifPresent(newSituation ->
-                        restaurantSituationRelationService.updateOrCreate(restaurant.getRestaurantId(), newSituation.getSituationId(), 1));
-            }
-        }
     }
 
     // 식당의 티어를 다시 계산함
@@ -315,7 +207,7 @@ public class EvaluationService {
     }
 
     private void evaluationLikeCountAdd(EvaluationEntity evaluation, int addNum) {
-        evaluation.setCommentLikeCount(evaluation.getCommentLikeCount() + addNum);
+//        evaluation.setCommentLikeCount(evaluation.getCommentLikeCount() + addNum);
         evaluationRepository.save(evaluation);
     }
 
@@ -331,9 +223,9 @@ public class EvaluationService {
         }
 
         // 평가 코멘트 및 사진 삭제
-        evaluation.setCommentBody(null);
-        evaluation.setCommentImgUrl(null);
-        evaluation.setCommentLikeCount(0);
+//        evaluation.setCommentBody(null);
+//        evaluation.setCommentImgUrl(null);
+//        evaluation.setCommentLikeCount(0);
         evaluationRepository.save(evaluation);
 
         // 좋아요, 싫어요 삭제

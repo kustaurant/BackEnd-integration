@@ -3,8 +3,6 @@ package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,11 +10,12 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Setter
 @Entity
+@DynamicUpdate
 @Table(name = "restaurants_tbl")
 public class RestaurantEntity {
     @Id
@@ -63,6 +62,14 @@ public class RestaurantEntity {
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
     private List<RestaurantMenuEntity> restaurantMenuList = new ArrayList<>();
+
+    public void updateStatistics(Restaurant restaurant) {
+        this.restaurantVisitCount = restaurant.getRestaurantVisitCount();
+        this.visitCount = restaurant.getVisitCount();
+        this.restaurantEvaluationCount = restaurant.getRestaurantEvaluationCount();
+        this.restaurantScoreSum = restaurant.getRestaurantScoreSum();
+        this.mainTier = restaurant.getMainTier();
+    }
 
     public static RestaurantEntity fromDomain(Restaurant restaurant) {
         RestaurantEntity entity = new RestaurantEntity();

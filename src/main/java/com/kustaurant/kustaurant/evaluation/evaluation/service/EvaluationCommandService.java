@@ -4,7 +4,6 @@ import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationCommandRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.service.port.dto.EvaluationSaveCondition;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,42 +15,71 @@ public class EvaluationCommandService {
     private final EvaluationCommandRepository evaluationCommandRepository;
     private final EvaluationQueryRepository evaluationQueryRepository;
 
+    private final EvaluationRestaurantService restaurantEvaluationService;
+
     private final S3Service s3Service;
-    private final SituationCommandService situationCommandService;
 
     @Transactional
-    public void evaluate(Long userId, Integer restaurantId, EvaluationDTO evaluationDTO) {
-        boolean evaluatedBefore = evaluationQueryRepository.existsByUserAndRestaurant(userId, restaurantId);
-        if (evaluatedBefore) {
-            evaluationUpdate(userId, restaurantId, evaluationDTO);
+    public void evaluate(Long userId, Integer restaurantId, EvaluationDTO dto) {
+        setImgUrlIfNewImageAdded(dto);
+        if (hasUserEvaluatedRestaurant(userId, restaurantId)) {
+            reEvaluate(userId, restaurantId, dto);
         } else {
-            evaluationCreate(userId, restaurantId, evaluationDTO);
+            createEvaluation(userId, restaurantId, dto);
         }
     }
 
     /**
      * 평가 새로 생성
      */
-    private void evaluationCreate(Long userId, Integer restaurantId, EvaluationDTO evaluationDTO) {
+    private void createEvaluation(Long userId, Integer restaurantId, EvaluationDTO dto) {
         // 평가 생성
+        Evaluation created = Evaluation.create(userId, restaurantId, dto);
+
+        // 저장
+        evaluationCommandRepository.create(created);
+
+        // 식당 평가 관련 데이터 갱신
+        restaurantEvaluationService.afterEvaluationCreated(restaurantId, dto.getEvaluationSituations(), dto.getEvaluationScore());
+    }
+
+    /**
+     * 재평가
+     */
+    private void reEvaluate(Long userId, Integer restaurantId, EvaluationDTO dto) {
+        evaluationQueryRepository
+                .findActiveByUserAndRestaurant(userId, restaurantId)
+                .ifPresent(evaluation -> {
+                    double oldScore = evaluation.getEvaluationScore();
+
+                    // 재평가
+                    evaluation.reEvaluate(dto);
+
+                    // 업데이트
+                    evaluationCommandRepository.reEvaluate(evaluation);
+
+                    // 식당 평가 관련 데이터 갱신
+                    restaurantEvaluationService.afterReEvaluated(
+                            restaurantId,
+                            dto.getEvaluationSituations(),
+                            oldScore,
+                            dto.getEvaluationScore()
+                    );
+                });
+    }
+
+    private void setImgUrlIfNewImageAdded(EvaluationDTO evaluationDTO) {
         if (hasNewImage(evaluationDTO)) {
             String imgUrl = s3Service.uploadFile(evaluationDTO.getNewImage());
             evaluationDTO.changeImgUrl(imgUrl);
         }
-        Evaluation evaluation = evaluationCommandRepository.addEvaluation(
-                EvaluationSaveCondition.from(userId, restaurantId, evaluationDTO));
-        // 상황 생성
-        situationCommandService.addSituations(restaurantId, evaluation.getId(), evaluationDTO.getEvaluationSituations());
-    }
-
-    /**
-     * 기존 평가 수정
-     */
-    private void evaluationUpdate(Long userId, Integer restaurantId, EvaluationDTO evaluationDTO) {
-
     }
 
     private boolean hasNewImage(EvaluationDTO evaluationDTO) {
         return evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty();
+    }
+
+    private boolean hasUserEvaluatedRestaurant(Long userId, Integer restaurantId) {
+        return evaluationQueryRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 }

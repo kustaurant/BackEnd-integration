@@ -15,6 +15,8 @@ public interface RestaurantRepository {
 
     Restaurant save(Restaurant restaurant);
 
+    void updateStatistics(Restaurant restaurant);
+
     Restaurant getReference(Integer id);
 
     // TODO: need to delete everything below this

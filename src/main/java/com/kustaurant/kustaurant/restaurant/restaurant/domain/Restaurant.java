@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.domain;
 
+import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.Builder;
 import lombok.Getter;
@@ -68,4 +69,18 @@ public class Restaurant {
                 .build();
     }
 
+    public void afterEvaluationCreated(Double score) {
+        this.restaurantScoreSum += score;
+        this.restaurantEvaluationCount++;
+        this.mainTier = calculateTier();
+    }
+
+    public void afterReEvaluated(Double preScore, Double postScore) {
+        this.restaurantScoreSum += (postScore - preScore);
+        this.mainTier = calculateTier();
+    }
+
+    private Integer calculateTier() {
+        return EvaluationConstants.calculateRestaurantTier(restaurantScoreSum / restaurantEvaluationCount);
+    }
 }

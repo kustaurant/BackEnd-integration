@@ -1,6 +1,5 @@
-package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation;
+package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationSituation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

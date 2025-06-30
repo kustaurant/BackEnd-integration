@@ -1,13 +1,9 @@
-package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation;
+package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -20,9 +16,4 @@ public class SituationEntity {
     private Long situationId;
 
     private String situationName;
-
-    public SituationEntity(Long id, String situationName) {
-        this.situationId = id;
-        this.situationName = situationName;
-    }
 }

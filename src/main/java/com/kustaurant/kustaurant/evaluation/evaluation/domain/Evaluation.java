@@ -26,4 +26,28 @@ public class Evaluation {
     // 추가
     private Integer likeCount;
     private Integer dislikeCount;
+
+    public static Evaluation create(Long userId, Integer restaurantId,
+            EvaluationDTO dto) {
+        return Evaluation.builder()
+                .evaluationScore(dto.getEvaluationScore())
+                .status("ACTIVE")
+                .createdAt(LocalDateTime.now())
+                .commentBody(dto.getEvaluationComment())
+                .commentImgUrl(dto.getEvaluationImgUrl())
+                .commentLikeCount(0)
+                .situationIds(dto.getEvaluationSituations())
+                .userId(userId)
+                .restaurantId(restaurantId)
+                .likeCount(0)
+                .dislikeCount(0)
+                .build();
+    }
+
+    public void reEvaluate(EvaluationDTO dto) {
+        this.evaluationScore = dto.getEvaluationScore();
+        this.commentBody = dto.getEvaluationComment();
+        this.commentImgUrl = dto.getEvaluationImgUrl();
+        this.situationIds = dto.getEvaluationSituations();
+    }
 }

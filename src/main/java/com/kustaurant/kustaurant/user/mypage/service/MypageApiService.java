@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.global.exception.exception.business.NoProfileCh
 import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
 import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;

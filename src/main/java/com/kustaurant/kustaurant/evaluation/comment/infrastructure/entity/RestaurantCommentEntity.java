@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation.EvaluationEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.report.RestaurantCommentReportEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.report.RestaurantCommentReportEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import jakarta.persistence.*;
 import lombok.Getter;

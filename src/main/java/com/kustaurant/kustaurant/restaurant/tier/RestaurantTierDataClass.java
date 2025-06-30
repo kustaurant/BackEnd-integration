@@ -4,7 +4,7 @@ package com.kustaurant.kustaurant.restaurant.tier;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.RestaurantSituationRelationEntity;
 import lombok.Getter;
 import lombok.Setter;
 

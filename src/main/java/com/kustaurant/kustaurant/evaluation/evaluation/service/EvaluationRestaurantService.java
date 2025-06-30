@@ -1,0 +1,58 @@
+package com.kustaurant.kustaurant.evaluation.evaluation.service;
+
+import com.kustaurant.kustaurant.evaluation.evaluation.domain.RestaurantSituationRelation;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.port.RestaurantSituationRelationRepository;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+/**
+ * 평가 관련 식당 데이터를 다루는 서비스입니다.
+ */
+@Service
+@RequiredArgsConstructor
+public class EvaluationRestaurantService {
+
+    private final RestaurantSituationRelationRepository relationRepository;
+
+    private final RestaurantService restaurantService;
+
+    public void afterEvaluationCreated(Integer restaurantId, List<Long> situationIds, Double score) {
+        // 식당 상황 수 테이블 업데이트
+        for (Long situationId : situationIds) {
+            updateOrCreateRelation(restaurantId, situationId, 1);
+        }
+        // 식당 정보 업데이트
+        restaurantService.afterEvaluationCreated(restaurantId, score);
+    }
+
+    public void afterReEvaluated(Integer restaurantId, List<Long> situationIds, Double preScore, Double postScore) {
+        // 식당 상황 수 테이블 업데이트
+        for (Long situationId : situationIds) {
+            updateOrCreateRelation(restaurantId, situationId, 1);
+        }
+        // 식당 정보 업데이트
+        restaurantService.afterReEvaluated(restaurantId, preScore, postScore);
+    }
+
+    // 기존에 데이터가 있으면 업데이트하고, 없으면 새로 생성합니다.
+    private void updateOrCreateRelation(Integer restaurantId, Long situationId, Integer addDataCount) {
+        relationRepository.findByRestaurantIdAndSituationId(restaurantId, situationId)
+                .ifPresentOrElse(
+                        r -> updateRelation(r, addDataCount), // 기존에 있는 경우 업데이트
+                        () -> saveRelationWhenAddingPositive(restaurantId, situationId, addDataCount) // 없는 경우 추가
+                );
+    }
+
+    private void updateRelation(RestaurantSituationRelation relation, Integer addDateCount) {
+        relation.addDataCount(addDateCount);
+        relationRepository.updateDataCount(relation);
+    }
+
+    private void saveRelationWhenAddingPositive(Integer restaurantId, Long situationId, Integer addDateCount) {
+        if (addDateCount > 0) {
+            relationRepository.create(RestaurantSituationRelation.create(situationId, restaurantId, addDateCount));
+        }
+    }
+}

@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.service.port;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 
 import java.util.List;

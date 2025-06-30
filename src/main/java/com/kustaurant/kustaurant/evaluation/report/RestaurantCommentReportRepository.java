@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.report;
+package com.kustaurant.kustaurant.evaluation.report;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

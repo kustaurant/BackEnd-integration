@@ -1,11 +1,10 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.service.port;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
-import com.kustaurant.kustaurant.evaluation.evaluation.service.port.dto.EvaluationSaveCondition;
 
 public interface EvaluationCommandRepository {
 
-    Evaluation addEvaluation(EvaluationSaveCondition condition);
+    Long create(Evaluation evaluation);
 
-    Evaluation updateEvaluation(EvaluationSaveCondition condition);
+    void reEvaluate(Evaluation evaluation);
 }

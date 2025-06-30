@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        fetch(`/api/evaluation/${restaurantId}`, {
+        fetch(`/web/api/evaluation/${restaurantId}`, {
             method: "POST",
             headers: {
                 [csrfHeader]: csrfToken  // CSRF 토큰을 헤더에 포함

@@ -1,6 +1,8 @@
-package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation;
+package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa.EvaluationJpaRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.RequiredArgsConstructor;

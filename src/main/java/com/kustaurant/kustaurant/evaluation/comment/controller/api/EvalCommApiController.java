@@ -5,9 +5,10 @@ import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalComm
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
 import com.kustaurant.kustaurant.evaluation.comment.service.EvaluationCommentService;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation.EvaluationEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.report.RestaurantCommentReportEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.report.RestaurantCommentReportRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationQueryService;
+import com.kustaurant.kustaurant.evaluation.report.RestaurantCommentReportEntity;
+import com.kustaurant.kustaurant.evaluation.report.RestaurantCommentReportRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
@@ -37,6 +38,7 @@ public class EvalCommApiController {
     private final RestaurantApiService restaurantApiService;
     private final EvaluationCommentService restaurantCommentService;
     private final EvaluationService evaluationService;
+    private final EvaluationQueryService evaluationQueryService;
     private final RestaurantCommentReportRepository restaurantCommentReportRepository;
 
 
@@ -236,7 +238,7 @@ public class EvalCommApiController {
     }
 
     private void checkRestaurantIdAndEvaluationId(int restaurantId, int evaluationId) {
-        if (!evaluationService.hasEvaluation(restaurantId, evaluationId)) {
+        if (!evaluationQueryService.hasEvaluation(restaurantId, evaluationId)) {
             throw new ParamException(restaurantId + " 식당에는 " + evaluationId + " id를 가진 evaluation이 없습니다.");
         }
     }

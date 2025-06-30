@@ -5,11 +5,13 @@ import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.Restaur
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "evaluation data dto entity")
 public class EvaluationDTO {
@@ -26,8 +28,12 @@ public class EvaluationDTO {
     @Schema(description = "새로운 이미지", example = "평가하기나 다시평가하기를 할 때 새로 등록한 이미지가 있을 경우에만 사용하는 필드입니다.")
     private MultipartFile newImage;
 
-    public EvaluationDTO() {
-
+    public EvaluationDTO(Double evaluationScore, List<Long> evaluationSituations,
+            String evaluationComment, MultipartFile newImage) {
+        this.evaluationScore = evaluationScore;
+        this.evaluationSituations = evaluationSituations;
+        this.evaluationComment = evaluationComment;
+        this.newImage = newImage;
     }
 
     public void changeImgUrl(String url) {
