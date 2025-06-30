@@ -49,7 +49,7 @@ public class PostCommentService {
         PostComment comment = PostComment.create(content, userId, postId);
         if (parentCommentId != null) {
             PostComment parent = postCommentRepository.findById(parentCommentId)
-                    .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, "부모 댓글을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, "부모 댓글을 찾을 수 없습니다."));
             comment.setParent(parent);
         }
         postCommentRepository.save(comment);
@@ -62,14 +62,14 @@ public class PostCommentService {
         if (postComment.isPresent()) {
             return postComment.get();
         } else {
-            throw new DataNotFoundException(COMMENT_NOT_FOUNT, commentId, "댓글");
+            throw new DataNotFoundException(COMMENT_NOT_FOUND, commentId, "댓글");
         }
     }
 
     @Transactional
     public ReactionToggleResponse toggleLike(Long userId, Integer commentId) {
         PostComment comment = postCommentRepository.findById(commentId)
-                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, commentId, "댓글"));
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, commentId, "댓글"));
 
         boolean isLikedBefore = postCommentLikeRepository.existsByUserIdAndCommentId(userId, commentId);
         boolean isDislikedBefore = postCommentDislikeRepository.existsByUserIdAndCommentId(userId, commentId);
@@ -105,7 +105,7 @@ public class PostCommentService {
     @Transactional
     public ReactionToggleResponse toggleDislike(Long userId, Integer commentId) {
         PostComment comment = postCommentRepository.findById(commentId)
-                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, "댓글이 존재하지 않습니다."));
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, "댓글이 존재하지 않습니다."));
 
         boolean isLikedBefore = postCommentLikeRepository.existsByUserIdAndCommentId(userId, commentId);
         boolean isDislikedBefore = postCommentDislikeRepository.existsByUserIdAndCommentId(userId, commentId);
@@ -252,7 +252,7 @@ public class PostCommentService {
     @Transactional
     public int deleteComment(Integer commentId) {
         PostComment comment = postCommentRepository.findByIdWithReplies(commentId)
-                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, commentId, "댓글"));
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, commentId, "댓글"));
 
         comment.delete();  // 도메인 내에서 댓글 + 대댓글 상태 변경
 

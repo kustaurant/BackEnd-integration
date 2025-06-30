@@ -112,7 +112,7 @@ public class PostDTO {
                         .filter(c -> c.getStatus() == ContentStatus.ACTIVE)
                         .count())
                 .postVisitCount(post.getVisitCount())
-                .scrapCount(post.getScraps().size())
+                .scrapCount(post.getScraps() == null ? 0 : post.getScraps().size())
                 .build();
         if (author != null) {
             postDTO.setUser(UserDTO.from(author));

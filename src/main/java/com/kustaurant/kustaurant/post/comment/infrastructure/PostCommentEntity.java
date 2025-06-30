@@ -72,7 +72,6 @@ public class PostCommentEntity {
         entity.setLikeCount(comment.getNetLikes());
         entity.setCreatedAt(comment.getCreatedAt());
         entity.setUpdatedAt(comment.getUpdatedAt());
-
         // postId 처리
         if (comment.getPostId() != null) {
             PostEntity postEntity = new PostEntity();
