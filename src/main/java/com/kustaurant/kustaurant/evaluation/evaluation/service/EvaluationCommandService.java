@@ -18,7 +18,6 @@ public class EvaluationCommandService {
     private final EvaluationQueryRepository evaluationQueryRepository;
 
     private final EvaluationRestaurantService restaurantEvaluationService;
-
     private final S3Service s3Service;
 
     @Transactional
