@@ -113,15 +113,11 @@ public class EvaluationEntity {
     }
 
     public String getStarImgUrl() {
-        try {
-            String[] scoreSplit = evaluationScore.toString().split("\\.");
-            if (scoreSplit.length > 1) {
-                return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/star/star" + scoreSplit[0] + scoreSplit[1] + ".svg";
-            } else {
-                return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/star/star" + scoreSplit[0] + "0.svg";
-            }
-        } catch (Exception e) {
-            return null;
+        String[] scoreSplit = evaluationScore.toString().split("\\.");
+        if (scoreSplit.length > 1) {
+            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/star/star" + scoreSplit[0] + scoreSplit[1] + ".svg";
+        } else {
+            return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/star/star" + scoreSplit[0] + "0.svg";
         }
     }
 }

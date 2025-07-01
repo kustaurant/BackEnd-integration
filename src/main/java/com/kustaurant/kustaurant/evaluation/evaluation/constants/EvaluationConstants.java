@@ -16,6 +16,8 @@ public class EvaluationConstants {
 
     public static final int EVALUATION_ID_OFFSET = 10000000;
 
+    private static final double TIER_ELIGIBILITY_PERCENTAGE = 0.004;
+
 
     public int calculateRestaurantTier(int evalCount, double avgScore) {
         if (!isEligibleForTier(evalCount)) {
@@ -40,7 +42,7 @@ public class EvaluationConstants {
     }
 
     private int getMinimumEvaluationCountForTier() {
-        return (int) (evaluationQueryRepository.countByStatus("ACTIVE") * 0.004);
+        return (int) (evaluationQueryRepository.countByStatus("ACTIVE") * TIER_ELIGIBILITY_PERCENTAGE);
     }
 
     public static final List<RestaurantConstants.StarComment> STAR_COMMENTS = List.of(
