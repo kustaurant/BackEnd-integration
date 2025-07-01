@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.post.post.service.api;
 
 
-import static com.kustaurant.kustaurant.global.exception.ErrorCode.POST_NOT_FOUNT;
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.POST_NOT_FOUND;
 
 import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentEntity;
 import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentApiRepository;
@@ -11,7 +11,6 @@ import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostPhotoEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostScrapEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface.PostPhotoJpaRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
@@ -27,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,7 +90,7 @@ public class PostApiService {
         if (post.isPresent()) {
             return post.get();
         } else {
-            throw new DataNotFoundException(POST_NOT_FOUNT, id, "게시글");
+            throw new DataNotFoundException(POST_NOT_FOUND, id, "게시글");
         }
     }
 
@@ -210,7 +208,7 @@ public class PostApiService {
             // 분기별 순위 리스트 계산
             return calculateRankForQuarter(userList, currentYear, currentQuarter);
         } else {
-            throw new DataNotFoundException(POST_NOT_FOUNT, "sort값이 잘못 입력되었습니다.");
+            throw new DataNotFoundException(POST_NOT_FOUND, "sort값이 잘못 입력되었습니다.");
         }
     }
 

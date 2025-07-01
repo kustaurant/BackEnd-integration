@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.evaluation.comment.infrastructure.queryRepo;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.projection.EvalCommentProjection;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
@@ -26,7 +26,7 @@ public interface EvaluationCommentQueryRepository extends Repository<EvaluationE
         FROM   EvaluationEntity e
         JOIN   UserEntity         u  ON u.id = e.userId
         JOIN   u.stats            s
-        WHERE  e.restaurant.restaurantId = :rid
+        WHERE  e.restaurantId = :rid
           AND  e.status = 'ACTIVE'
     """)
     List<EvalCommentProjection> fetchEvalComments(@Param("rid") Integer restaurantId);

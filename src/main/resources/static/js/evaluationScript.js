@@ -6,9 +6,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var starImageWidth = starImage.clientWidth; // 별점 이미지의 전체 너비
 
     // 초기 별점 설정
-    var initialRating = parseFloat(document.getElementById("situationJson").getAttribute("data-mainScore")) || 0;
-    var initialRatingIndex = initialRating > 0 ? initialRating * 2 - 1 : 0; // 기존 평가가 있다면 별점 인덱스 설정, 아니면 0으로 설정
-    var initialComment = document.getElementById("situationJson").getAttribute("data-comment") || "";
+    var initialRating = parseFloat(document.getElementById("preEval").getAttribute("data-mainScore")) || 0;
+    var initialRatingIndex = initialRating > 0 ? initialRating * 2 : 0; // 기존 평가가 있다면 별점 인덱스 설정, 아니면 0으로 설정
+    var initialComment = document.getElementById("preEval").getAttribute("data-comment") || "";
 
     var evaluationData = {
         starRating: initialRating, // 초기값 설정
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        fetch(`/api/evaluation/${restaurantId}`, {
+        fetch(`/web/api/evaluation/${restaurantId}`, {
             method: "POST",
             headers: {
                 [csrfHeader]: csrfToken  // CSRF 토큰을 헤더에 포함

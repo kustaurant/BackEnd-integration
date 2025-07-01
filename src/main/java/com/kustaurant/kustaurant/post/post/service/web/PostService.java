@@ -112,7 +112,7 @@ public class PostService {
         if (post.isPresent()) {
             return post.get();
         } else {
-            throw new DataNotFoundException(POST_NOT_FOUNT, id, "게시글");
+            throw new DataNotFoundException(POST_NOT_FOUND, id, "게시글");
         }
     }
 
@@ -298,7 +298,7 @@ public class PostService {
     @Transactional
     public void deletePost(Integer postId) {
         Post post = postRepository.findByIdWithComments(postId)
-                .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUNT, postId, "게시글"));
+                .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND, postId, "게시글"));
 
         // 게시물 상태 변경
         post.delete();

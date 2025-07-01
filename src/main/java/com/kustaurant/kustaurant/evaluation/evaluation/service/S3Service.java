@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.service;
+package com.kustaurant.kustaurant.evaluation.evaluation.service;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;

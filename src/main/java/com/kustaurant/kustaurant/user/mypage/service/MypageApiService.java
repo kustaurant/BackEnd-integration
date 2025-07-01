@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.global.exception.exception.business.NoProfileCh
 import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
 import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
@@ -119,16 +119,22 @@ public class MypageApiService {
 
         return list.stream()
                 .map(e -> {
-                    List<String> situations = e.getEvaluationSituationEntityList()
-                            .stream()
-                            .map(es -> es.getSituation().getSituationName())
-                            .toList();
+                    // TODO: Evaluation 연관관계 삭제 -> 주석 처리
+//                    List<String> situations = e.getEvaluationSituationEntityList()
+//                            .stream()
+//                            .map(es -> es.getSituation().getSituationName())
+//                            .toList();
+                    List<String> situations = List.of();
 
                     return new MyRatedRestaurantResponse(
-                            e.getRestaurant().getRestaurantName(),
-                            e.getRestaurant().getRestaurantId(),
-                            e.getRestaurant().getRestaurantImgUrl(),
-                            e.getRestaurant().getRestaurantCuisine(),
+//                            e.getRestaurant().getRestaurantName(),
+//                            e.getRestaurant().getRestaurantId(),
+//                            e.getRestaurant().getRestaurantImgUrl(),
+//                            e.getRestaurant().getRestaurantCuisine(),
+                            "식당 이름",
+                            1,
+                            "url",
+                            "Cuisine",
                             e.getEvaluationScore(),
                             e.getCommentBody(),
                             situations

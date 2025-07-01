@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -24,26 +25,26 @@ public class RestaurantWebController {
     @Value("${restaurant.initialDisplayMenuCount}")
     private int initialDisplayMenuCount;
 
-//    @GetMapping("/restaurants/{restaurantId}")
-//    public String restaurant(
-//            Model model,
-//            @PathVariable Integer restaurantId,
-//            @AuthUser AuthUserInfo user
-//    ) {
-//        model.addAttribute("initialDisplayMenuCount", initialDisplayMenuCount);
-//        // 식당 정보
-//        RestaurantDetailWebDto restaurantDetailWebDto = restaurantWebService.getRestaurantWebDetails(user.id(), restaurantId);
-//        model.addAttribute("restaurantDto", restaurantDetailWebDto);
-//        String evaluationButton =
-//                (user != null && restaurantDetailWebDto.getRestaurantDetail().getIsEvaluated()) ? "다시 평가하기" : " 평가하기";
-//        model.addAttribute("evaluationButton", evaluationButton);
-//        // 메뉴 정보
-//        model.addAttribute("menus", restaurantDetailWebDto.getRestaurantDetail().getRestaurantMenuList());
-//        // 식당 댓글
-//        model.addAttribute("restaurantComments", restaurantDetailWebDto.getComments());
-//
-//        return "restaurant";
-//    }
+    @GetMapping("/restaurants/{restaurantId}")
+    public String restaurant(
+            Model model,
+            @PathVariable Integer restaurantId,
+            @AuthUser AuthUserInfo user
+    ) {
+        model.addAttribute("initialDisplayMenuCount", initialDisplayMenuCount);
+        // 식당 정보
+        RestaurantDetailWebDto restaurantDetailWebDto = restaurantWebService.getRestaurantWebDetails(user.id(), restaurantId);
+        model.addAttribute("restaurantDto", restaurantDetailWebDto);
+        String evaluationButton =
+                (user != null && restaurantDetailWebDto.getRestaurantDetail().getIsEvaluated()) ? "다시 평가하기" : " 평가하기";
+        model.addAttribute("evaluationButton", evaluationButton);
+        // 메뉴 정보
+        model.addAttribute("menus", restaurantDetailWebDto.getRestaurantDetail().getRestaurantMenuList());
+        // 식당 댓글
+        model.addAttribute("restaurantComments", restaurantDetailWebDto.getComments());
+
+        return "restaurant";
+    }
 
     // 식당 즐겨찾기
     @PostMapping("/web/api/restaurants/{restaurantId}/favorite/toggle")
