@@ -16,7 +16,7 @@ public class EvaluationCommandRepositoryImpl implements EvaluationCommandReposit
     @Override
     public Long create(Evaluation evaluation) {
         // 저장
-        EvaluationEntity saved = jpaRepository.save(EvaluationEntity.create(evaluation));
+        EvaluationEntity saved = jpaRepository.save(EvaluationEntity.from(evaluation));
         // 상황 추가
         saved.updateSituations(evaluation.getSituationIds());
 

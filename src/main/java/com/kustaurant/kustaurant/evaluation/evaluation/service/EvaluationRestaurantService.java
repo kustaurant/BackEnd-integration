@@ -2,10 +2,11 @@ package com.kustaurant.kustaurant.evaluation.evaluation.service;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.RestaurantSituationRelation;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.RestaurantSituationRelationRepository;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantRatingService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 평가 관련 식당 데이터를 다루는 서비스입니다.
@@ -16,24 +17,26 @@ public class EvaluationRestaurantService {
 
     private final RestaurantSituationRelationRepository relationRepository;
 
-    private final RestaurantService restaurantService;
+    private final RestaurantRatingService restaurantRatingService;
 
+    @Transactional
     public void afterEvaluationCreated(Integer restaurantId, List<Long> situationIds, Double score) {
         // 식당 상황 수 테이블 업데이트
         for (Long situationId : situationIds) {
             updateOrCreateRelation(restaurantId, situationId, 1);
         }
         // 식당 정보 업데이트
-        restaurantService.afterEvaluationCreated(restaurantId, score);
+        restaurantRatingService.afterEvaluationCreated(restaurantId, score);
     }
 
+    @Transactional
     public void afterReEvaluated(Integer restaurantId, List<Long> situationIds, Double preScore, Double postScore) {
         // 식당 상황 수 테이블 업데이트
         for (Long situationId : situationIds) {
             updateOrCreateRelation(restaurantId, situationId, 1);
         }
         // 식당 정보 업데이트
-        restaurantService.afterReEvaluated(restaurantId, preScore, postScore);
+        restaurantRatingService.afterReEvaluated(restaurantId, preScore, postScore);
     }
 
     // 기존에 데이터가 있으면 업데이트하고, 없으면 새로 생성합니다.

@@ -5,6 +5,7 @@ import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.Restau
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentLikeEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,7 +19,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate // 변경된 필드만 Update
 // 한 사용자가 한 식당을 중복 평가 할 수 없음
 @Table(name="evaluations_tbl")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class EvaluationEntity {
 
     @Id
@@ -62,11 +63,12 @@ public class EvaluationEntity {
         this.restaurantId = restaurantId;
     }
 
-    public static EvaluationEntity create(Evaluation evaluation) {
+    public static EvaluationEntity from(Evaluation evaluation) {
         EvaluationEntity entity = new EvaluationEntity();
         entity.evaluationScore = evaluation.getEvaluationScore();
         entity.status = evaluation.getStatus();
         entity.createdAt = evaluation.getCreatedAt();
+        entity.updatedAt = evaluation.getUpdatedAt();
         entity.commentBody = evaluation.getCommentBody();
         entity.commentImgUrl = evaluation.getCommentImgUrl();
         entity.commentLikeCount = evaluation.getCommentLikeCount();

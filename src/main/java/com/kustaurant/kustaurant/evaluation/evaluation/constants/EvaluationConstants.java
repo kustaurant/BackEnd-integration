@@ -17,28 +17,30 @@ public class EvaluationConstants {
 
     public static final int EVALUATION_ID_OFFSET = 10000000;
 
-    public boolean isHasTier(RestaurantEntity restaurant) {
-        return restaurant.getRestaurantEvaluationCount() >= getMinimumEvaluationCountForTier();
-    }
 
-    public int getMinimumEvaluationCountForTier() {
-        return (int) (evaluationRepository.findByStatus("ACTIVE").size() * 0.004);
-    }
-
-    public static int calculateRestaurantTier(double averageScore) {
-        if (averageScore >= 4.3) {
-            return 1;
-        } else if (averageScore > 3.9) {
-            return 2;
-        } else if (averageScore > 3.3) {
-            return 3;
-        } else if (averageScore > 2.5) {
-            return 4;
-        } else if (averageScore >= 1.0) {
-            return 5;
-        } else {
+    public int calculateRestaurantTier(int evalCount, double avgScore) {
+        if (!isEligibleForTier(evalCount)) {
             return -1;
         }
+        if (avgScore >= 4.3) {
+            return 1;
+        } else if (avgScore > 3.9) {
+            return 2;
+        } else if (avgScore > 3.3) {
+            return 3;
+        } else if (avgScore > 2.5) {
+            return 4;
+        } else{
+            return 5;
+        }
+    }
+
+    private boolean isEligibleForTier(int evalCount) {
+        return evalCount >= getMinimumEvaluationCountForTier();
+    }
+
+    private int getMinimumEvaluationCountForTier() {
+        return (int) (evaluationRepository.findByStatus("ACTIVE").size() * 0.004);
     }
 
     public static final List<RestaurantConstants.StarComment> STAR_COMMENTS = List.of(

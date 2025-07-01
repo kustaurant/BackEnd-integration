@@ -35,22 +35,4 @@ public class RestaurantService {
 
         return RestaurantDetailDTO.from(restaurant, menus, isEvaluated, isFavorite);
     }
-
-    @Transactional
-    public void afterEvaluationCreated(Integer restaurantId, Double score) {
-        Restaurant restaurant = restaurantRepository.getById(restaurantId);
-
-        restaurant.afterEvaluationCreated(score);
-
-        restaurantRepository.updateStatistics(restaurant);
-    }
-
-    @Transactional
-    public void afterReEvaluated(Integer restaurantId, Double preScore, Double postScore) {
-        Restaurant restaurant = restaurantRepository.getById(restaurantId);
-
-        restaurant.afterReEvaluated(preScore, postScore);
-
-        restaurantRepository.updateStatistics(restaurant);
-    }
 }

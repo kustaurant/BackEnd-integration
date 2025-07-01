@@ -46,12 +46,12 @@ public class EvaluationService {
     // 식당의 티어를 다시 계산함
     @Transactional
     public void calculateTierOfOneRestaurant(RestaurantEntity restaurant) {
-        if (evaluationConstants.isHasTier(restaurant)) {
-            restaurant.setMainTier(
-                    EvaluationConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
-            );
-            restaurantRepository.save(restaurant);
-        }
+//        if (evaluationConstants.isEligibleForTier(restaurant)) {
+////            restaurant.setMainTier(
+////                    EvaluationConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
+////            );
+//            restaurantRepository.save(restaurant);
+//        }
     }
 
     // 모든 평가 기록에 대해서 티어를 다시 계산함.
@@ -61,13 +61,13 @@ public class EvaluationService {
         // 가게 메인 티어 계산
         List<RestaurantEntity> restaurantList = restaurantRepository.findAll();
         for (RestaurantEntity restaurant: restaurantList) {
-            if (evaluationConstants.isHasTier(restaurant)) {
-                restaurant.setMainTier(
-                        EvaluationConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
-                );
-            } else {
-                restaurant.setMainTier(-1);
-            }
+//            if (evaluationConstants.isEligibleForTier(restaurant)) {
+////                restaurant.setMainTier(
+////                        EvaluationConstants.calculateRestaurantTier(restaurant.getRestaurantScoreSum() / restaurant.getRestaurantEvaluationCount())
+////                );
+//            } else {
+//                restaurant.setMainTier(-1);
+//            }
             restaurantRepository.save(restaurant);
         }
         log.info("전체 식당에 대해 메인 티어 계산 완료");
