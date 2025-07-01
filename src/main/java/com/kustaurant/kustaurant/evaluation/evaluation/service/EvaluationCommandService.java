@@ -55,7 +55,7 @@ public class EvaluationCommandService {
     private void reEvaluate(Long userId, Integer restaurantId, EvaluationDTO dto) {
         evaluationQueryRepository
                 .findActiveByUserAndRestaurant(userId, restaurantId)
-                .ifPresent(evaluation -> {
+                .ifPresent(evaluation -> { // 항상 존재함.
                     double oldScore = evaluation.getEvaluationScore();
                     List<Long> oldSituations = new ArrayList<>(evaluation.getSituationIds());
 

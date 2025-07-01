@@ -34,7 +34,7 @@ public class EvaluationRestaurantService {
             Double preScore, Double postScore
     ) {
         // 식당 상황 수 테이블 업데이트
-        decreaseSituationRelationCountsForRemoved(restaurantId, preSituations, postSituations);
+        syncSituationRelationCountsForRemoved(restaurantId, preSituations, postSituations);
         // 식당 정보 업데이트
         restaurantRatingService.afterReEvaluated(restaurantId, preScore, postScore);
     }
@@ -45,15 +45,15 @@ public class EvaluationRestaurantService {
         }
     }
 
-    private void decreaseSituationRelationCountsForRemoved(Integer restaurantId,
+    private void syncSituationRelationCountsForRemoved(Integer restaurantId,
             List<Long> preSituations, List<Long> postSituations) {
-        for (Long preSituation : preSituations) {
+        for (Long preSituation : preSituations) { // 삭제된 situation 감소시키기
             if (postSituations.contains(preSituation)) {
                 continue;
             }
             updateOrCreateRelation(restaurantId, preSituation, -1);
         }
-        for (Long postSituation : postSituations) {
+        for (Long postSituation : postSituations) { // 추가된 situation 증가시키기
             if (preSituations.contains(postSituation)) {
                 continue;
             }
