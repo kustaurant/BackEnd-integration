@@ -69,7 +69,7 @@ public class PostRepositoryImpl implements PostRepository {
             postEntity.setUpdatedAt(LocalDateTime.now());
         } else {
             postEntity = postJpaRepository.findById(post.getId())
-                    .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUNT, post.getId(), "게시물"));
+                    .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND, post.getId(), "게시물"));
 
             // 엔티티 상태 동기화
             postEntity.setPostTitle(post.getTitle());
@@ -87,7 +87,7 @@ public class PostRepositoryImpl implements PostRepository {
                     PostCommentEntity entity = postEntity.getPostCommentList().stream()
                             .filter(e -> e.getCommentId().equals(comment.getCommentId()))
                             .findFirst()
-                            .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, comment.getCommentId(), "댓글"));
+                            .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, comment.getCommentId(), "댓글"));
 
                     // 댓글 상태 동기화 (예: soft delete, netLikes 등)
                     entity.setStatus(comment.getStatus());
@@ -99,7 +99,7 @@ public class PostRepositoryImpl implements PostRepository {
                             PostCommentEntity replyEntity = entity.getRepliesList().stream()
                                     .filter(r -> r.getCommentId().equals(reply.getCommentId()))
                                     .findFirst()
-                                    .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, "대댓글이 존재하지 않습니다."));
+                                    .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, "대댓글이 존재하지 않습니다."));
 
                             replyEntity.setStatus(reply.getStatus());
                             replyEntity.setLikeCount(reply.getNetLikes());
@@ -129,7 +129,7 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public void increaseVisitCount(Integer postId) {
         PostEntity post = postJpaRepository.findById(postId)
-                .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUNT, postId, "게시글"));
+                .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND, postId, "게시글"));
         post.setPostVisitCount(post.getPostVisitCount() + 1);
     }
 

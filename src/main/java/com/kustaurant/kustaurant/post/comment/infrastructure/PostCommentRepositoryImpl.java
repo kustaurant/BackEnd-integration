@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.post.comment.infrastructure;
 
-import static com.kustaurant.kustaurant.global.exception.ErrorCode.COMMENT_NOT_FOUNT;
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.COMMENT_NOT_FOUND;
 
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
@@ -66,7 +66,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
 
         // 기존 댓글 수정
         PostCommentEntity entity = postCommentJpaRepository.findById(comment.getCommentId())
-                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, comment.getCommentId(), "댓글"));
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, comment.getCommentId(), "댓글"));
 
         entity.setStatus(comment.getStatus());
         entity.setLikeCount(comment.getNetLikes());
@@ -76,7 +76,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
             PostCommentEntity replyEntity = entity.getRepliesList().stream()
                     .filter(r -> r.getCommentId().equals(reply.getCommentId()))
                     .findFirst()
-                    .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, "대댓글이 존재하지 않습니다."));
+                    .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, "대댓글이 존재하지 않습니다."));
             replyEntity.setStatus(reply.getStatus());
             replyEntity.setLikeCount(reply.getNetLikes());
         }

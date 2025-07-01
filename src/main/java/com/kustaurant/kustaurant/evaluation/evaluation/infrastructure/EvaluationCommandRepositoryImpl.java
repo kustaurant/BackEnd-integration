@@ -1,9 +1,13 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa.EvaluationCommandJpaRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationCommandRepository;
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +29,9 @@ public class EvaluationCommandRepositoryImpl implements EvaluationCommandReposit
 
     @Override
     public void reEvaluate(Evaluation evaluation) {
-        jpaRepository.findById(evaluation.getId())
-                .ifPresent(e -> e.reEvaluate(evaluation)); // 반드시 존재함.
+        EvaluationEntity entity = jpaRepository.findById(evaluation.getId())
+                .orElseThrow(() ->
+                        new DataNotFoundException(EVALUATION_NOT_FOUND, evaluation.getId(), "평가"));
+        entity.reEvaluate(evaluation);
     }
 }

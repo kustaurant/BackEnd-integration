@@ -22,7 +22,7 @@ public class PostCommentLikeRepositoryImpl implements PostCommentLikeRepository 
 
     public void save(PostCommentLike like) {
         PostCommentEntity commentEntity = postCommentJpaRepository.findById(like.getCommentId())
-                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUNT, like.getCommentId(), "댓글"));
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, like.getCommentId(), "댓글"));
 
         PostCommentLikeEntity entity = toEntity(like, like.getUserId(), commentEntity);
         postCommentLikeJpaRepository.save(entity);

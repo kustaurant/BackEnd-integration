@@ -34,6 +34,8 @@ public class RestaurantWebService {
     public RestaurantDetailWebDto getRestaurantWebDetails(Long userId, Integer restaurantId) {
         RestaurantDetailDTO restaurantDetailDto = restaurantService.getActiveRestaurantDetailDto(restaurantId, userId);
         Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
+
+        // TODO: 추후 수정
 //        List<EvalCommResponse> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, userId, true);
         List<EvalCommResponse> comments = List.of();
 

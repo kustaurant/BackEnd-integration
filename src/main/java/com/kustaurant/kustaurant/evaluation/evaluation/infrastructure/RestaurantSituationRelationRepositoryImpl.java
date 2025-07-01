@@ -34,7 +34,7 @@ public class RestaurantSituationRelationRepositoryImpl implements
     public void updateDataCount(RestaurantSituationRelation relation) {
         RestaurantSituationRelationEntity entity = jpaRepository.findById(relation.getRelationId())
                 .orElseThrow(() -> new DataNotFoundException(
-                        RESTAURANT_SITUATION_RELATION_NOT_FOUNT,
+                        RESTAURANT_SITUATION_RELATION_NOT_FOUND,
                         relation.getRelationId(),
                         "식당 상황 관계"
                 ));

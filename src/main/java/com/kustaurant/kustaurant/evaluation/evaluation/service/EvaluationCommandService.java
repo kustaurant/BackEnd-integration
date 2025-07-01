@@ -22,11 +22,12 @@ public class EvaluationCommandService {
 
     @Transactional
     public void evaluate(Long userId, Integer restaurantId, EvaluationDTO dto) {
-        setImgUrlIfNewImageAdded(dto);
+        EvaluationDTO updated = applyImgUrlIfNewImageAdded(dto);
+
         if (hasUserEvaluatedRestaurant(userId, restaurantId)) {
-            reEvaluate(userId, restaurantId, dto);
+            reEvaluate(userId, restaurantId, updated);
         } else {
-            createEvaluation(userId, restaurantId, dto);
+            createEvaluation(userId, restaurantId, updated);
         }
     }
 
@@ -75,11 +76,12 @@ public class EvaluationCommandService {
                 });
     }
 
-    private void setImgUrlIfNewImageAdded(EvaluationDTO evaluationDTO) {
+    private EvaluationDTO applyImgUrlIfNewImageAdded(EvaluationDTO evaluationDTO) {
         if (hasNewImage(evaluationDTO)) {
             String imgUrl = s3Service.uploadFile(evaluationDTO.getNewImage());
-            evaluationDTO.changeImgUrl(imgUrl);
+            return evaluationDTO.withEvaluationImgUrl(imgUrl);
         }
+        return evaluationDTO;
     }
 
     private boolean hasNewImage(EvaluationDTO evaluationDTO) {

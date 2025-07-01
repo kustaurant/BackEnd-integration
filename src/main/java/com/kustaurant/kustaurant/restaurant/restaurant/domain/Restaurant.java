@@ -82,6 +82,9 @@ public class Restaurant {
     }
 
     public double getAvgScore() {
+        if (restaurantEvaluationCount == 0) {
+            return 0.0;
+        }
         return restaurantScoreSum / restaurantEvaluationCount;
     }
 }

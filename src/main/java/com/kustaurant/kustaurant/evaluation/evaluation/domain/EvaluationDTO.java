@@ -36,8 +36,21 @@ public class EvaluationDTO {
         this.newImage = newImage;
     }
 
-    public void changeImgUrl(String url) {
-        this.evaluationImgUrl = url;
+    public EvaluationDTO withEvaluationImgUrl(String imgUrl) {
+        return new EvaluationDTO(
+                this.evaluationScore,
+                List.copyOf(this.evaluationSituations),
+                imgUrl,
+                this.evaluationComment,
+                List.copyOf(this.starComments),
+                this.newImage
+        );
+    }
+
+    public static EvaluationDTO createIfNotPreEvaluated() {
+        return new EvaluationDTO(
+                null, null, null, null, EvaluationConstants.STAR_COMMENTS, null
+        );
     }
 
     public static EvaluationDTO toDto(Evaluation evaluation) {
@@ -48,12 +61,6 @@ public class EvaluationDTO {
                 evaluation.getCommentBody(),
                 EvaluationConstants.STAR_COMMENTS,
                 null
-        );
-    }
-
-    public static EvaluationDTO createIfNotPreEvaluated() {
-        return new EvaluationDTO(
-                null, null, null, null, EvaluationConstants.STAR_COMMENTS, null
         );
     }
 }

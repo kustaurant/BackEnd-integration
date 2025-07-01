@@ -18,7 +18,6 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
     // TODO: 궁극적으로는 이 클래스를 없애는 것이 목표 -> Query와 Command로 이동
 
     private final EvaluationJpaRepository jpaRepository;
-    private final EvaluationJpaRepository evaluationJpaRepository;
 
     @Override
     public Integer countAllByStatus(String status) {
@@ -27,13 +26,13 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
 
 
     public List<Evaluation> findByUserId(Long userId) {
-        return evaluationJpaRepository.findByUserId(userId).stream().map(EvaluationEntity::toModel).toList();
+        return jpaRepository.findByUserId(userId).stream().map(EvaluationEntity::toModel).toList();
     }
 
 
     @Override
     public List<Evaluation> findSortedEvaluationByUserIdDesc(Long userId) {
-        return evaluationJpaRepository.findSortedEvaluationsByUserIdDesc(userId).stream()
+        return jpaRepository.findSortedEvaluationsByUserIdDesc(userId).stream()
                 .map(EvaluationEntity::toModel)
                 .toList();
     }

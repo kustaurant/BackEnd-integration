@@ -70,14 +70,14 @@ public class EvaluationRestaurantService {
                 );
     }
 
-    private void updateRelation(RestaurantSituationRelation relation, Integer addDateCount) {
-        relation.addDataCount(addDateCount);
+    private void updateRelation(RestaurantSituationRelation relation, Integer addDataCount) {
+        relation.addDataCount(addDataCount);
         relationRepository.updateDataCount(relation);
     }
 
-    private void saveRelationWhenAddingPositive(Integer restaurantId, Long situationId, Integer addDateCount) {
-        if (addDateCount > 0) {
-            relationRepository.create(RestaurantSituationRelation.create(situationId, restaurantId, addDateCount));
+    private void saveRelationWhenAddingPositive(Integer restaurantId, Long situationId, Integer addDataCount) {
+        if (addDataCount > 0) {
+            relationRepository.create(RestaurantSituationRelation.create(situationId, restaurantId, addDataCount));
         }
     }
 }
