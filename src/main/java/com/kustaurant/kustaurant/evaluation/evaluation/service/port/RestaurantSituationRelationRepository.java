@@ -9,5 +9,5 @@ public interface RestaurantSituationRelationRepository {
 
     Long create(RestaurantSituationRelation restaurantSituationRelation);
 
-    void updateDataCount(RestaurantSituationRelation relation);
+    void changeDataCount(RestaurantSituationRelation relation);
 }

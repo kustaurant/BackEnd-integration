@@ -31,7 +31,7 @@ public class RestaurantSituationRelationRepositoryImpl implements
     }
 
     @Override
-    public void updateDataCount(RestaurantSituationRelation relation) {
+    public void changeDataCount(RestaurantSituationRelation relation) {
         RestaurantSituationRelationEntity entity = jpaRepository.findById(relation.getRelationId())
                 .orElseThrow(() -> new DataNotFoundException(
                         RESTAURANT_SITUATION_RELATION_NOT_FOUND,
@@ -39,6 +39,6 @@ public class RestaurantSituationRelationRepositoryImpl implements
                         "식당 상황 관계"
                 ));
 
-        entity.updateDataCount(relation.getDataCount());
+        entity.changeDataCount(relation.getDataCount());
     }
 }

@@ -67,6 +67,7 @@ public class EvaluationEntity {
 
     public static EvaluationEntity from(Evaluation evaluation) {
         EvaluationEntity entity = new EvaluationEntity();
+        entity.id = evaluation.getId();
         entity.evaluationScore = evaluation.getEvaluationScore();
         entity.status = evaluation.getStatus();
         entity.createdAt = evaluation.getCreatedAt();
@@ -76,6 +77,7 @@ public class EvaluationEntity {
         entity.commentLikeCount = evaluation.getCommentLikeCount();
         entity.userId = evaluation.getUserId();
         entity.restaurantId = evaluation.getRestaurantId();
+        entity.situationIds = new ArrayList<>(evaluation.getSituationIds());
         return entity;
     }
 

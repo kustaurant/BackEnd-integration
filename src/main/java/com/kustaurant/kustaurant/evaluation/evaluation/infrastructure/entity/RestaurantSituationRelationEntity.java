@@ -32,7 +32,7 @@ public class RestaurantSituationRelationEntity {
         return entity;
     }
 
-    public void updateDataCount(Integer dataCount) {
+    public void changeDataCount(Integer dataCount) {
         this.dataCount = dataCount;
     }
 

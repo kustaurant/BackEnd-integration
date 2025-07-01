@@ -72,7 +72,7 @@ public class EvaluationRestaurantService {
 
     private void updateRelation(RestaurantSituationRelation relation, Integer addDataCount) {
         relation.addDataCount(addDataCount);
-        relationRepository.updateDataCount(relation);
+        relationRepository.changeDataCount(relation);
     }
 
     private void saveRelationWhenAddingPositive(Integer restaurantId, Long situationId, Integer addDataCount) {
