@@ -10,4 +10,6 @@ public interface EvaluationQueryRepository {
     boolean existsByRestaurantAndEvaluation(Integer restaurantId, Long evaluationId);
 
     Optional<Evaluation> findActiveByUserAndRestaurant(Long userId, Integer restaurantId);
+
+    int countByStatus(String status);
 }

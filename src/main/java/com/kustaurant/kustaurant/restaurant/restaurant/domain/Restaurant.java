@@ -68,15 +68,17 @@ public class Restaurant {
                 .build();
     }
 
-    public void afterEvaluationCreated(Double score, Integer tier) {
+    public void afterEvaluationCreated(Double score) {
         this.restaurantScoreSum += score;
         this.restaurantEvaluationCount++;
-        this.mainTier = tier;
     }
 
-    public void afterReEvaluated(Double preScore, Double postScore, Integer tier) {
+    public void afterReEvaluated(Double preScore, Double postScore) {
         this.restaurantScoreSum += (postScore - preScore);
-        this.mainTier = tier;
+    }
+
+    public void changeTier(int mainTier) {
+        this.mainTier = mainTier;
     }
 
     public double getAvgScore() {

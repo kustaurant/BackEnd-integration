@@ -19,9 +19,11 @@ public class RestaurantRatingService {
     public void afterEvaluationCreated(Integer restaurantId, Double score) {
         Restaurant restaurant = restaurantRepository.getById(restaurantId);
 
+        restaurant.afterEvaluationCreated(score);
+
         int tier = calculateTier(restaurant.getRestaurantEvaluationCount(), restaurant.getAvgScore());
 
-        restaurant.afterEvaluationCreated(score, tier);
+        restaurant.changeTier(tier);
 
         restaurantRepository.updateStatistics(restaurant);
     }
@@ -30,9 +32,11 @@ public class RestaurantRatingService {
     public void afterReEvaluated(Integer restaurantId, Double preScore, Double postScore) {
         Restaurant restaurant = restaurantRepository.getById(restaurantId);
 
+        restaurant.afterReEvaluated(preScore, postScore);
+
         int tier = calculateTier(restaurant.getRestaurantEvaluationCount(), restaurant.getAvgScore());
 
-        restaurant.afterReEvaluated(preScore, postScore, tier);
+        restaurant.changeTier(tier);
 
         restaurantRepository.updateStatistics(restaurant);
     }

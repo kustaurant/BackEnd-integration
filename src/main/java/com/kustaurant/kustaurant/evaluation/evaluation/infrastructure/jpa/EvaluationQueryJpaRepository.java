@@ -12,4 +12,6 @@ public interface EvaluationQueryJpaRepository extends Repository<EvaluationEntit
     boolean existsByRestaurantIdAndId(Integer restaurantId, Long evaluationId);
 
     Optional<EvaluationEntity> findByUserIdAndRestaurantIdAndStatus(Long userId, Integer restaurantId, String status);
+
+    Integer countByStatus(String status);
 }

@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentDislikeEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentLikeEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
@@ -41,11 +40,14 @@ public class EvaluationEntity {
     @Column(name = "restaurant_id", nullable = false)
     private Integer restaurantId;
 
-    // 상황 일대다 단방향 매핑
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "evaluation_id")
-    private List<EvaluationSituationEntity> evaluationSituations = new ArrayList<>();
+    // Evaluation 에서 EvaluationSituation 관리
+    @ElementCollection
+    @CollectionTable(
+            name = "evaluation_situations_tbl",
+            joinColumns = @JoinColumn(name = "evaluation_id")
+    )
+    @Column(name = "situation_id")
+    private List<Long> situationIds = new ArrayList<>();
 
     // 일단 둠
     @OneToMany(mappedBy = "evaluation")
@@ -85,11 +87,9 @@ public class EvaluationEntity {
         updateSituations(evaluation.getSituationIds());
     }
 
-    public void updateSituations(List<Long> situationIds) {
-        this.evaluationSituations.clear();
-        situationIds.stream()
-                .map(s -> new EvaluationSituationEntity(this.id, s))
-                .forEach(evaluationSituations::add);
+    public void updateSituations(List<Long> newSituationIds) {
+        this.situationIds.clear();
+        this.situationIds.addAll(newSituationIds);
     }
 
     public Evaluation toModel() {
@@ -102,9 +102,7 @@ public class EvaluationEntity {
                 .commentBody(this.commentBody)
                 .commentImgUrl(this.commentImgUrl)
                 .commentLikeCount(this.commentLikeCount == null ? 0 : this.commentLikeCount)
-                .situationIds(this.evaluationSituations.stream()
-                        .map(EvaluationSituationEntity::getSituationId)
-                        .toList())
+                .situationIds(this.situationIds)
                 .userId(this.userId)
                 .restaurantId(this.restaurantId)
                 .likeCount(this.restaurantCommentLikeList == null ? 0 : this.restaurantCommentLikeList.size())

@@ -4,6 +4,8 @@ import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationCommandRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +42,11 @@ public class EvaluationCommandService {
         evaluationCommandRepository.create(created);
 
         // 식당 평가 관련 데이터 갱신
-        restaurantEvaluationService.afterEvaluationCreated(restaurantId, dto.getEvaluationSituations(), dto.getEvaluationScore());
+        restaurantEvaluationService.afterEvaluationCreated(
+                restaurantId,
+                dto.getEvaluationSituations(),
+                dto.getEvaluationScore()
+        );
     }
 
     /**
@@ -51,6 +57,7 @@ public class EvaluationCommandService {
                 .findActiveByUserAndRestaurant(userId, restaurantId)
                 .ifPresent(evaluation -> {
                     double oldScore = evaluation.getEvaluationScore();
+                    List<Long> oldSituations = new ArrayList<>(evaluation.getSituationIds());
 
                     // 재평가
                     evaluation.reEvaluate(dto);
@@ -61,6 +68,7 @@ public class EvaluationCommandService {
                     // 식당 평가 관련 데이터 갱신
                     restaurantEvaluationService.afterReEvaluated(
                             restaurantId,
+                            oldSituations,
                             dto.getEvaluationSituations(),
                             oldScore,
                             dto.getEvaluationScore()

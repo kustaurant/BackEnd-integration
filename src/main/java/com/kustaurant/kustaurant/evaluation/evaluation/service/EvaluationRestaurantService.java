@@ -22,21 +22,43 @@ public class EvaluationRestaurantService {
     @Transactional
     public void afterEvaluationCreated(Integer restaurantId, List<Long> situationIds, Double score) {
         // 식당 상황 수 테이블 업데이트
-        for (Long situationId : situationIds) {
-            updateOrCreateRelation(restaurantId, situationId, 1);
-        }
+        increaseSituationRelationCounts(restaurantId, situationIds);
         // 식당 정보 업데이트
         restaurantRatingService.afterEvaluationCreated(restaurantId, score);
     }
 
     @Transactional
-    public void afterReEvaluated(Integer restaurantId, List<Long> situationIds, Double preScore, Double postScore) {
+    public void afterReEvaluated(
+            Integer restaurantId,
+            List<Long> preSituations, List<Long> postSituations,
+            Double preScore, Double postScore
+    ) {
         // 식당 상황 수 테이블 업데이트
+        decreaseSituationRelationCountsForRemoved(restaurantId, preSituations, postSituations);
+        // 식당 정보 업데이트
+        restaurantRatingService.afterReEvaluated(restaurantId, preScore, postScore);
+    }
+
+    private void increaseSituationRelationCounts(Integer restaurantId, List<Long> situationIds) {
         for (Long situationId : situationIds) {
             updateOrCreateRelation(restaurantId, situationId, 1);
         }
-        // 식당 정보 업데이트
-        restaurantRatingService.afterReEvaluated(restaurantId, preScore, postScore);
+    }
+
+    private void decreaseSituationRelationCountsForRemoved(Integer restaurantId,
+            List<Long> preSituations, List<Long> postSituations) {
+        for (Long preSituation : preSituations) {
+            if (postSituations.contains(preSituation)) {
+                continue;
+            }
+            updateOrCreateRelation(restaurantId, preSituation, -1);
+        }
+        for (Long postSituation : postSituations) {
+            if (preSituations.contains(postSituation)) {
+                continue;
+            }
+            updateOrCreateRelation(restaurantId, postSituation, 1);
+        }
     }
 
     // 기존에 데이터가 있으면 업데이트하고, 없으면 새로 생성합니다.

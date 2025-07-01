@@ -35,4 +35,9 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
         return jpaRepository.findByUserIdAndRestaurantIdAndStatus(userId, restaurantId, "ACTIVE")
                 .map(EvaluationEntity::toModel);
     }
+
+    @Override
+    public int countByStatus(String status) {
+        return jpaRepository.countByStatus(status);
+    }
 }

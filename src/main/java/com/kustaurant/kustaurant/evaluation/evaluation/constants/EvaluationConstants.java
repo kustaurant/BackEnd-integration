@@ -1,8 +1,7 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.constants;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,7 +12,7 @@ import java.util.List;
 @Slf4j
 @Component
 public class EvaluationConstants {
-    private final EvaluationRepository evaluationRepository;
+    private final EvaluationQueryRepository evaluationQueryRepository;
 
     public static final int EVALUATION_ID_OFFSET = 10000000;
 
@@ -36,11 +35,12 @@ public class EvaluationConstants {
     }
 
     private boolean isEligibleForTier(int evalCount) {
-        return evalCount >= getMinimumEvaluationCountForTier();
+        int aa = getMinimumEvaluationCountForTier();
+        return evalCount >= aa;
     }
 
     private int getMinimumEvaluationCountForTier() {
-        return (int) (evaluationRepository.findByStatus("ACTIVE").size() * 0.004);
+        return (int) (evaluationQueryRepository.countByStatus("ACTIVE") * 0.004);
     }
 
     public static final List<RestaurantConstants.StarComment> STAR_COMMENTS = List.of(
