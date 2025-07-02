@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.service.query;
 
+import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationQueryService;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.List;
 public class RestaurantQueryAssembler {
 
     private final RestaurantFavoriteService restaurantFavoriteService;
-    private final EvaluationService evaluationService;
+    private final EvaluationQueryService evaluationQueryService;
 
     // Dto 객체에 데이터 채우기
     public void enrichDtoList(Long userId, List<RestaurantTierDTO> dtoList, @Nullable Integer ranking) {
@@ -37,6 +37,6 @@ public class RestaurantQueryAssembler {
     }
     // 평가여부 설정하기 (userId가 null이면 false로 설정됨)
     private void setEvaluated(RestaurantTierDTO dto, Long userId) {
-        dto.setIsEvaluated(evaluationService.isUserEvaluated(userId, dto.getRestaurantId()));
+        dto.setIsEvaluated(evaluationQueryService.isUserEvaluated(userId, dto.getRestaurantId()));
     }
 }

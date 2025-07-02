@@ -78,6 +78,15 @@ public class RestaurantRepositoryImpl implements RestaurantQueryRepository, Rest
     }
 
     @Override
+    public void updateStatistics(Restaurant restaurant) {
+        RestaurantEntity entity = jpaRepository.findById(restaurant.getRestaurantId())
+                .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND,
+                        restaurant.getRestaurantId(), "식당"));
+
+        entity.updateStatistics(restaurant);
+    }
+
+    @Override
     public Restaurant getReference(Integer id) {
         return jpaRepository.getReferenceById(id).toDomain();
     }

@@ -1,15 +1,15 @@
-package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.evaluation;
+package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface EvaluationJpaRepository extends JpaRepository<EvaluationEntity, Integer>{
-    boolean existsByUserIdAndRestaurant_RestaurantId(Long userId, Integer restaurantId);
-    List<EvaluationEntity> findByRestaurant_RestaurantIdAndStatus(Integer restaurantId, String status);
+public interface EvaluationJpaRepository extends JpaRepository<EvaluationEntity, Long> {
+
+    // TODO: 궁극적으로는 이 클래스를 없애는 것이 목표 -> Query와 Command로 이동
 
     Integer countAllByStatus(String status);
 
@@ -23,8 +23,6 @@ public interface EvaluationJpaRepository extends JpaRepository<EvaluationEntity,
         END DESC
     """)
     List<EvaluationEntity> findSortedEvaluationsByUserIdDesc(@Param("userId") Long userId);
-
-    List<EvaluationEntity> findByStatus(String status);
 
     List<EvaluationEntity> findByUserId(Long userId);
 }

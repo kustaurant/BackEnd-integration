@@ -2,24 +2,24 @@ package com.kustaurant.kustaurant.evaluation.evaluation.controller.web;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationCommandService;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationQueryService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.evaluation.comment.service.EvaluationCommentService;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
-import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService;
 
-import com.kustaurant.kustaurant.home.MainController;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,18 +32,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
+@Slf4j
 @Controller
+@RequiredArgsConstructor
 public class EvaluationWebController {
     private final RestaurantWebService restaurantWebService;
-    private final EvaluationService evaluationService;
     private final EvaluationRepository evaluationRepository;
     private final EvaluationCommentService restaurantCommentService;
-    private final UserService userService;
 
-    Gson gson = new Gson();
+    private final RestaurantService restaurantService;
+    private final EvaluationService evaluationService;
 
-    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
+    private final EvaluationQueryService evaluationQueryService;
+    private final EvaluationCommandService evaluationCommandService;
 
     // 평가 페이지 화면
     @GetMapping("/evaluation/{restaurantId}")
@@ -52,26 +53,19 @@ public class EvaluationWebController {
             @AuthUser AuthUserInfo user,
             @PathVariable Integer restaurantId
     ) {
-        RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
-        EvaluationEntity evaluation = evaluationRepository.findByUserAndRestaurant(user.id(), restaurant).orElse(null);
-        Double mainScore = 0.0;
+        // 식당 정보
+        Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         model.addAttribute("restaurant", restaurant);
+        // 이전 평가 정보
+        EvaluationDTO preEval = evaluationQueryService.getPreEvaluation(user.id(), restaurantId);
+        model.addAttribute("preEval", preEval);
 
-        if (evaluation!=null) {
-            model.addAttribute("eval",evaluation);
-            model.addAttribute("mainScore", evaluation.getEvaluationScore());
-            if(evaluation.getSituationIdList()!=null){
-                model.addAttribute("situationJson",evaluation.getSituationIdList());
-            }
-        }
-        else{
-            return "evaluation";
-        }
         return "evaluation";
     }
-    // 평가 데이터 db 저장 (기존 평가 존재 시 업데이트 진행)
-    @PostMapping("/api/evaluation/{restaurantId}")
-    public ResponseEntity<?> evaluationDBcreate(
+
+    // 평가하기
+    @PostMapping("/web/api/evaluation/{restaurantId}")
+    public ResponseEntity<String> evaluationDBcreate(
             @PathVariable Integer restaurantId,
             @AuthUser AuthUserInfo user,
             @RequestParam("starRating") Double starRating,
@@ -79,19 +73,19 @@ public class EvaluationWebController {
             @RequestParam(value = "evaluationComment", required = false) String evaluationComment,
             @RequestPart(value = "newImage", required = false) MultipartFile newImage
     ) {
-        RestaurantEntity restaurant = restaurantWebService.getRestaurant(restaurantId);
         // JSON 문자열을 Java List로 변환
-        List<Integer> evaluationSituations = new Gson().fromJson(selectedSituationsJson, new TypeToken<List<Integer>>(){}.getType());
+        List<Long> situations = new Gson().fromJson(selectedSituationsJson, new TypeToken<List<Long>>(){}.getType());
 
         // 받은 파라미터로 평가 데이터를 생성
-        EvaluationDTO evaluationDTO = new EvaluationDTO();
-        evaluationDTO.setEvaluationScore(starRating);
-        evaluationDTO.setEvaluationSituations(evaluationSituations);
-        evaluationDTO.setEvaluationComment(evaluationComment);
-        evaluationDTO.setNewImage(newImage);
+        EvaluationDTO evaluationDTO = new EvaluationDTO(
+                starRating,
+                situations,
+                evaluationComment,
+                newImage
+        );
 
         // 평가 데이터 저장 또는 업데이트
-        evaluationService.createOrUpdate(user.id(), restaurant, evaluationDTO);
+        evaluationCommandService.evaluate(user.id(), restaurantId, evaluationDTO);
 
         return ResponseEntity.ok("평가가 성공적으로 저장되었습니다.");
     }
@@ -188,12 +182,12 @@ public class EvaluationWebController {
                 evaluationService.likeEvaluation(user.id(), evaluation);
             }
         } catch (DataNotFoundException e) {
-            logger.error("RestaurantCommentLikeError", e);
+            log.error("RestaurantCommentLikeError", e);
             responseMap.put("status", "error");
             responseMap.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap);
         } catch (IllegalStateException e) {
-            logger.error("RestaurantCommentLikeError", e);
+            log.error("RestaurantCommentLikeError", e);
             responseMap.put("status", "error");
             responseMap.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);
@@ -218,12 +212,12 @@ public class EvaluationWebController {
                 evaluationService.dislikeEvaluation(user.id(), evaluation);
             }
         } catch (DataNotFoundException e) {
-            logger.error("RestaurantCommentDislikeError", e);
+            log.error("RestaurantCommentDislikeError", e);
             responseMap.put("status", "error");
             responseMap.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseMap);
         } catch (IllegalStateException e) {
-            logger.error("RestaurantCommentDislikeError", e);
+            log.error("RestaurantCommentDislikeError", e);
             responseMap.put("status", "error");
             responseMap.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseMap);

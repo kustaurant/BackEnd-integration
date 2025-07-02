@@ -5,9 +5,10 @@ import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalComm
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
 import com.kustaurant.kustaurant.evaluation.comment.service.EvaluationCommentService;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.RestaurantCommentReportEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.RestaurantCommentReportRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationQueryService;
+import com.kustaurant.kustaurant.evaluation.report.RestaurantCommentReportEntity;
+import com.kustaurant.kustaurant.evaluation.report.RestaurantCommentReportRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
@@ -17,20 +18,17 @@ import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.Res
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -40,6 +38,7 @@ public class EvalCommApiController {
     private final RestaurantApiService restaurantApiService;
     private final EvaluationCommentService restaurantCommentService;
     private final EvaluationService evaluationService;
+    private final EvaluationQueryService evaluationQueryService;
     private final RestaurantCommentReportRepository restaurantCommentReportRepository;
 
 
@@ -116,7 +115,7 @@ public class EvalCommApiController {
         // 평가 댓글인 경우 / 대댓글인 경우 판단
         if (!isSubComment(commentId)) { // 평가 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
-            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
+            checkRestaurantIdAndEvaluationId(restaurantId, commentId);
 
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             evaluationService.likeEvaluation(user.id(), evaluation);
@@ -169,7 +168,7 @@ public class EvalCommApiController {
         // 평가 댓글인 경우 / 대댓글인 경우 판단
         if (!isSubComment(commentId)) { // 평가 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
-            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
+            checkRestaurantIdAndEvaluationId(restaurantId, commentId);
 
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
@@ -228,7 +227,7 @@ public class EvalCommApiController {
         // 식당 가져오기
         RestaurantEntity restaurant = restaurantApiService.findRestaurantById(restaurantId);
         // 식당에 해당하는 commentId를 갖는 comment가 없는 경우 예외 처리
-        checkRestaurantIdAndEvaluationId(restaurant, restaurantId, evaluationId);
+        checkRestaurantIdAndEvaluationId(restaurantId, evaluationId);
         // Evaluation 가져오기
         EvaluationEntity evaluation = evaluationService.getByEvaluationId(evaluationId);
         // 대댓글 달기
@@ -238,8 +237,8 @@ public class EvalCommApiController {
         return ResponseEntity.ok().build();
     }
 
-    private void checkRestaurantIdAndEvaluationId(RestaurantEntity restaurant, int restaurantId, int evaluationId) {
-        if (restaurant.getEvaluationList().stream().noneMatch(evaluation -> evaluation.getId().equals(evaluationId))) {
+    private void checkRestaurantIdAndEvaluationId(int restaurantId, int evaluationId) {
+        if (!evaluationQueryService.hasEvaluation(restaurantId, (long) evaluationId)) {
             throw new ParamException(restaurantId + " 식당에는 " + evaluationId + " id를 가진 evaluation이 없습니다.");
         }
     }
@@ -277,7 +276,7 @@ public class EvalCommApiController {
             restaurantCommentService.deleteComment(comment, user.id());
         } else { // 평가 코멘트 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
-            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
+            checkRestaurantIdAndEvaluationId(restaurantId, commentId);
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             // 평가 및 평가의 대댓글 삭제
@@ -315,7 +314,7 @@ public class EvalCommApiController {
         } else { // 평가 코멘트 댓글인 경우
             commentId -= EvaluationConstants.EVALUATION_ID_OFFSET;
             // 이 평가가 해당 식당의 평가가 맞는지 확인
-            checkRestaurantIdAndEvaluationId(restaurant, restaurantId, commentId);
+            checkRestaurantIdAndEvaluationId(restaurantId, commentId);
             // 평가 가져오기
             EvaluationEntity evaluation = evaluationService.getByEvaluationId(commentId);
             // 신고 테이블에 저장
