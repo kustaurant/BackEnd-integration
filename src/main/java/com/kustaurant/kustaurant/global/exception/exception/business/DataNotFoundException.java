@@ -15,4 +15,8 @@ public class DataNotFoundException extends BusinessException {
     public DataNotFoundException(ErrorCode errorCode, Integer id, String type) {
         super(errorCode, "ID가 " + id + "인 " + type + "이(가) 존재하지 않습니다.");
     }
+
+    public DataNotFoundException(ErrorCode errorCode, Long id, String type) {
+        super(errorCode, "ID가 " + id + "인 " + type + "이(가) 존재하지 않습니다.");
+    }
 }

@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class Situation {
-    private Integer situationId;
+    private Long situationId;
     private String situationName;
 }

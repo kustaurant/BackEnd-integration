@@ -10,16 +10,13 @@ import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentApiRepos
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
-import com.kustaurant.kustaurant.post.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -42,7 +39,7 @@ public class PostApiCommentService {
         if (postComment.isPresent()) {
             return postComment.get();
         } else {
-            throw new DataNotFoundException(COMMENT_NOT_FOUNT, commentId, "댓글");
+            throw new DataNotFoundException(COMMENT_NOT_FOUND, commentId, "댓글");
         }
     }
 

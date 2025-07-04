@@ -1,11 +1,8 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,11 +10,12 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Setter
 @Entity
+@DynamicUpdate
 @Table(name = "restaurants_tbl")
 public class RestaurantEntity {
     @Id
@@ -52,16 +50,7 @@ public class RestaurantEntity {
     private LocalDateTime updatedAt;
 
 
-
     // 다른 테이블과의 관계 매핑
-    @OneToMany(mappedBy = "restaurant")
-    @JsonIgnore
-    List<RestaurantSituationRelationEntity> restaurantSituationRelationEntityList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "restaurant")
-    @JsonIgnore
-    private List<EvaluationEntity> evaluationList=new ArrayList<>();
-
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
     private List<EvalCommentEntity> restaurantCommentList = new ArrayList<>();
@@ -74,15 +63,12 @@ public class RestaurantEntity {
     @JsonIgnore
     private List<RestaurantMenuEntity> restaurantMenuList = new ArrayList<>();
 
-    public double calculateAverageScore() {
-        if (evaluationList.isEmpty()) {
-            return 0.0; // 평가가 없는 경우 0 반환
-        }
-
-        return evaluationList.stream()
-                .mapToDouble(EvaluationEntity::getEvaluationScore) // 평가 점수로 변환
-                .average() // 평균 계산
-                .orElse(0.0); // 평가가 없는 경우 0 반환
+    public void updateStatistics(Restaurant restaurant) {
+        this.restaurantVisitCount = restaurant.getRestaurantVisitCount();
+        this.visitCount = restaurant.getVisitCount();
+        this.restaurantEvaluationCount = restaurant.getRestaurantEvaluationCount();
+        this.restaurantScoreSum = restaurant.getRestaurantScoreSum();
+        this.mainTier = restaurant.getMainTier();
     }
 
     public static RestaurantEntity fromDomain(Restaurant restaurant) {
@@ -133,8 +119,8 @@ public class RestaurantEntity {
                 .restaurantEvaluationCount(restaurantEvaluationCount)
                 .restaurantScoreSum(restaurantScoreSum)
                 .mainTier(mainTier)
-                // TODO: 개선 필요해 보임
-                .situations(restaurantSituationRelationEntityList.stream().filter(RestaurantChartSpec::hasSituation).map(el -> el.getSituation().getSituationName()).collect(Collectors.toList()))
+                // TODO: 이거 복구해야됨 (2025-06-30)
+//                .situations(restaurantSituationRelationEntityList.stream().filter(RestaurantChartSpec::hasSituation).map(el -> el.getSituation().getSituationName()).collect(Collectors.toList()))
                 .favoriteCount(this.restaurantFavorite.size())
                 .build();
     }

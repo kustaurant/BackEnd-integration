@@ -22,7 +22,7 @@ public class PostScrapApiService {
     @Transactional
     public boolean toggleScrap(Integer postId, Long userId) {
         postRepository.findById(postId).orElseThrow(
-                ()-> new DataNotFoundException(ErrorCode.POST_NOT_FOUNT)
+                ()-> new DataNotFoundException(ErrorCode.POST_NOT_FOUND)
         );
 
         Optional<PostScrap> existing = postScrapRepository.findByUserIdAndPostId(userId, postId);

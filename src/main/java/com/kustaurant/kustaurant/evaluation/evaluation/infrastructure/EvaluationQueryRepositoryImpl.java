@@ -1,0 +1,43 @@
+package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure;
+
+import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa.EvaluationQueryJpaRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+@Repository
+@RequiredArgsConstructor
+public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository {
+
+    private final EvaluationQueryJpaRepository jpaRepository;
+
+    @Override
+    public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
+        if (userId == null || restaurantId == null) {
+            return false;
+        }
+        return jpaRepository.existsByUserIdAndRestaurantId(userId, restaurantId);
+    }
+
+    @Override
+    public boolean existsByRestaurantAndEvaluation(Integer restaurantId, Long evaluationId) {
+        if (restaurantId == null || evaluationId == null) {
+            return false;
+        }
+        return jpaRepository.existsByRestaurantIdAndId(restaurantId, evaluationId);
+    }
+
+    @Override
+    public Optional<Evaluation> findActiveByUserAndRestaurant(Long userId, Integer restaurantId) {
+        return jpaRepository.findByUserIdAndRestaurantIdAndStatus(userId, restaurantId, "ACTIVE")
+                .map(EvaluationEntity::toModel);
+    }
+
+    @Override
+    public int countByStatus(String status) {
+        return jpaRepository.countByStatus(status);
+    }
+}

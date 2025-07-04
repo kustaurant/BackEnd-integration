@@ -1,6 +1,9 @@
 package com.kustaurant.kustaurant.evaluation.comment.controller.response;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
+import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -74,7 +77,7 @@ public record EvalCommentResponse(
     }
 
     public static EvalCommentResponse convertCommentWhenSubComment(
-            RestaurantCommentEntity comment,
+            EvalCommentEntity comment,
             Double evaluationScore,
             Long userId
     ) {
@@ -88,8 +91,7 @@ public record EvalCommentResponse(
                 null,
                 comment.getCommentBody(),
                 isUserLikeDisLikeStatus(comment, userId),
-                comment.getRestaurantCommentLikeList().size(),
-                comment.getRestaurantCommentDislikeList().size(),
+                comment.getEvalCommentLikeList().size(),
                 isCommentMine(userId, comment),
                 null,
                 comment.getUpdatedAt() == null ? comment.getCreatedAt() : comment.getUpdatedAt(),

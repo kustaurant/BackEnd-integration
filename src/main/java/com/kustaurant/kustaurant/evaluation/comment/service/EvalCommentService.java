@@ -2,13 +2,11 @@ package com.kustaurant.kustaurant.evaluation.comment.service;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentDislikeEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentLikeEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentDislikeRepository;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.EvalCommentLikeRepository;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.EvalCommentRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.*;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;
@@ -28,7 +26,6 @@ import java.util.*;
 public class EvalCommentService {
     private final EvalCommentRepository restaurantCommentRepository;
     private final EvalCommentLikeRepository restaurantCommentLikeRepository;
-    private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final RestaurantRepository restaurantRepository;
     private final EvaluationService evaluationService;
 

@@ -85,40 +85,40 @@
     <hr>
     <div id="keywordList">
         <button id="situation1" class="keywordBtn"
-                th:classappend="${situationJson != null and situationJson.contains(1) ? 'selected' : 'unselected'}">
+                th:classappend="${preEval.getEvaluationSituations() != null and preEval.getEvaluationSituations().contains(1L) ? 'selected' : 'unselected'}">
             <img src="/img/tier/혼밥.png">
             <span>혼밥</span>
         </button>
         <button id="situation2" class="keywordBtn"
-                th:classappend="${situationJson != null and situationJson.contains(2) ? 'selected' : 'unselected'}">
+                th:classappend="${preEval.getEvaluationSituations() != null and preEval.getEvaluationSituations().contains(2L) ? 'selected' : 'unselected'}">
             <img src="/img/tier/2~4인.png">
             <span>2~4인</span>
         </button>
-        <button id="situation3" class="keywordBtn" th:classappend="${situationJson != null and situationJson.contains(3) ? 'selected' : 'unselected'}">
+        <button id="situation3" class="keywordBtn" th:classappend="${preEval.getEvaluationSituations() != null and preEval.getEvaluationSituations().contains(3L) ? 'selected' : 'unselected'}">
             <img src="/img/tier/5인%20이상.png">
             <span>5인 이상</span>
         </button>
-        <button id="situation4" class="keywordBtn" th:classappend="${situationJson != null and situationJson.contains(4) ? 'selected' : 'unselected'}">
+        <button id="situation4" class="keywordBtn" th:classappend="${preEval.getEvaluationSituations() != null and preEval.getEvaluationSituations().contains(4L) ? 'selected' : 'unselected'}">
             <img src="/img/tier/단체%20회식.png">
             <span>단체 회식</span>
         </button>
-        <button id="situation5" class="keywordBtn" th:classappend="${situationJson != null and situationJson.contains(5) ? 'selected' : 'unselected'}">
+        <button id="situation5" class="keywordBtn" th:classappend="${preEval.getEvaluationSituations() != null and preEval.getEvaluationSituations().contains(5L) ? 'selected' : 'unselected'}">
             <img src="/img/tier/배달.png">
             <span>배달</span>
         </button>
-        <button id="situation6" class="keywordBtn" th:classappend="${situationJson != null and situationJson.contains(6) ? 'selected' : 'unselected'}">
+        <button id="situation6" class="keywordBtn" th:classappend="${preEval.getEvaluationSituations() != null and preEval.getEvaluationSituations().contains(6L) ? 'selected' : 'unselected'}">
             <img src="/img/tier/야식.png">
             <span>야식</span>
         </button>
-        <button id="situation7" class="keywordBtn" th:classappend="${situationJson != null and situationJson.contains(7) ? 'selected' : 'unselected'}">
+        <button id="situation7" class="keywordBtn" th:classappend="${preEval.getEvaluationSituations() != null and preEval.getEvaluationSituations().contains(7L) ? 'selected' : 'unselected'}">
             <img src="/img/tier/친구%20초대.png">
             <span>친구 초대</span>
         </button>
-        <button id="situation8" class="keywordBtn" th:classappend="${situationJson != null and situationJson.contains(8) ? 'selected' : 'unselected'}">
+        <button id="situation8" class="keywordBtn" th:classappend="${preEval.getEvaluationSituations() != null and preEval.getEvaluationSituations().contains(8L) ? 'selected' : 'unselected'}">
             <img src="/img/tier/데이트.png">
             <span>데이트</span>
         </button>
-        <button id="situation9" class="keywordBtn" th:classappend="${situationJson != null and situationJson.contains(9) ? 'selected' : 'unselected'}">
+        <button id="situation9" class="keywordBtn" th:classappend="${preEval.getEvaluationSituations() != null and preEval.getEvaluationSituations().contains(9L) ? 'selected' : 'unselected'}">
             <img src="/img/tier/소개팅.png">
             <span>소개팅</span>
         </button>
@@ -127,7 +127,7 @@
 
     <!-- 코멘트 입력 창 추가 -->
     <div id="commentSection" class="contents">
-        <textarea id="evaluationComment" rows="4" placeholder="(선택) 여기에 상세한 리뷰를 남겨주세요" th:text="${eval != null ? eval.commentBody : ''}"></textarea>
+        <textarea id="evaluationComment" rows="4" placeholder="(선택) 여기에 상세한 리뷰를 남겨주세요" th:text="${preEval.getEvaluationComment() != null ? preEval.getEvaluationComment() : ''}"></textarea>
     </div>
 
 <!--    <div id="forth" class="contents">-->
@@ -151,7 +151,11 @@
 </div>
 <footer th:replace="~{footer::footerFragment}"></footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-<div id="situationJson" th:data-comment="${eval!=null and eval.commentBody!=null ? eval.commentBody: ''}" th:data-situationJson="${situationJson}" th:data-mainScore="${mainScore}" style="display: none"></div>
+<div id="preEval"
+     th:data-comment="${preEval != null and preEval.getEvaluationComment() != null ? preEval.getEvaluationComment() : ''}"
+     th:data-situationJson="${preEval.getEvaluationSituations()}"
+     th:data-mainScore="${preEval.getEvaluationScore()}"
+     style="display: none"></div>
 
 <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
 <script type="text/javascript">
