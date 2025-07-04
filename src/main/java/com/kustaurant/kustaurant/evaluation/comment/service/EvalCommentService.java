@@ -3,11 +3,11 @@ package com.kustaurant.kustaurant.evaluation.comment.service;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentDislikeEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentLikeEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentLikeEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentDislikeRepository;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentLikeRepository;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentRepository;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.EvalCommentLikeRepository;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.EvalCommentRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
@@ -25,15 +25,15 @@ import java.util.*;
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class EvaluationCommentService {
-    private final RestaurantCommentRepository restaurantCommentRepository;
-    private final RestaurantCommentLikeRepository restaurantCommentLikeRepository;
+public class EvalCommentService {
+    private final EvalCommentRepository restaurantCommentRepository;
+    private final EvalCommentLikeRepository restaurantCommentLikeRepository;
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
     private final RestaurantRepository restaurantRepository;
     private final EvaluationService evaluationService;
 
-    public RestaurantCommentEntity findCommentByCommentId(Integer commentId) {
-        Optional<RestaurantCommentEntity> commentOptional = restaurantCommentRepository.findByCommentIdAndStatus(commentId, "ACTIVE");
+    public EvalCommentEntity findCommentByCommentId(Integer commentId) {
+        Optional<EvalCommentEntity> commentOptional = restaurantCommentRepository.findByCommentIdAndStatus(commentId, "ACTIVE");
         if (commentOptional.isEmpty()) {
             throw new DataNotFoundException(RESTAURANT_COMMENT_NOT_FOUND, commentId, "식당 대댓글");
         }
@@ -42,7 +42,7 @@ public class EvaluationCommentService {
 
     // 평가 대댓글 삭제
     @Transactional
-    public void deleteComment(RestaurantCommentEntity comment, Long userId) {
+    public void deleteComment(EvalCommentEntity comment, Long userId) {
         if (comment == null || userId == null) {
             return;
         }
@@ -114,7 +114,7 @@ public class EvaluationCommentService {
 //    }
 
     public String addComment(Integer restaurantId, Long userId, String commentBody) {
-        RestaurantCommentEntity restaurantComment = new RestaurantCommentEntity();
+        EvalCommentEntity restaurantComment = new EvalCommentEntity();
 
         RestaurantEntity restaurant = restaurantRepository.findByRestaurantId(restaurantId);
 
@@ -133,8 +133,8 @@ public class EvaluationCommentService {
         }
     }
 
-    public RestaurantCommentEntity addSubComment(RestaurantEntity restaurant, Long userId, String commentBody, EvaluationEntity evaluation) {
-        RestaurantCommentEntity restaurantComment = new RestaurantCommentEntity();
+    public EvalCommentEntity addSubComment(RestaurantEntity restaurant, Long userId, String commentBody, EvaluationEntity evaluation) {
+        EvalCommentEntity restaurantComment = new EvalCommentEntity();
 
         restaurantComment.setUserId(userId);
         restaurantComment.setRestaurant(restaurant);
@@ -149,19 +149,19 @@ public class EvaluationCommentService {
         return restaurantComment;
     }
 
-    public boolean isUserLikedComment(Long userId, RestaurantCommentEntity restaurantComment) {
-        Optional<RestaurantCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
+    public boolean isUserLikedComment(Long userId, EvalCommentEntity restaurantComment) {
+        Optional<EvalCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
         return restaurantCommentlikeOptional.isPresent();
     }
 
-    public boolean isUserHatedComment(Long userId, RestaurantCommentEntity restaurantComment) {
+    public boolean isUserHatedComment(Long userId, EvalCommentEntity restaurantComment) {
         Optional<RestaurantCommentDislikeEntity> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
         return restaurantCommentdislikeOptional.isPresent();
     }
 
     @Transactional
-    public void likeComment(Long userId, RestaurantCommentEntity restaurantComment, Map<String, String> responseMap) {
-        Optional<RestaurantCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
+    public void likeComment(Long userId, EvalCommentEntity restaurantComment, Map<String, String> responseMap) {
+        Optional<EvalCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
         Optional<RestaurantCommentDislikeEntity> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
 
         if (restaurantCommentlikeOptional.isPresent() && restaurantCommentdislikeOptional.isPresent()) {
@@ -172,26 +172,26 @@ public class EvaluationCommentService {
             responseMap.put("status", "unliked");
         } else if (restaurantCommentdislikeOptional.isPresent()) { // 싫어요를 눌렀었던 경우
             restaurantCommentDislikeRepository.delete(restaurantCommentdislikeOptional.get());
-            RestaurantCommentLikeEntity restaurantCommentlike = new RestaurantCommentLikeEntity(userId, restaurantComment);
+            EvalCommentLikeEntity restaurantCommentlike = new EvalCommentLikeEntity(userId, restaurantComment);
             restaurantCommentLikeRepository.save(restaurantCommentlike);
             commentLikeCountAdd(restaurantComment, 2);
             responseMap.put("status", "switched");
         } else { // 새로 좋아요를 누르는 경우
-            RestaurantCommentLikeEntity restaurantCommentlike = new RestaurantCommentLikeEntity(userId, restaurantComment);
+            EvalCommentLikeEntity restaurantCommentlike = new EvalCommentLikeEntity(userId, restaurantComment);
             restaurantCommentLikeRepository.save(restaurantCommentlike);
             commentLikeCountAdd(restaurantComment, 1);
             responseMap.put("status", "liked");
         }
     }
 
-    private void commentLikeCountAdd(RestaurantCommentEntity restaurantComment, int addNum) {
+    private void commentLikeCountAdd(EvalCommentEntity restaurantComment, int addNum) {
         restaurantComment.setCommentLikeCount(restaurantComment.getCommentLikeCount() + addNum);
         restaurantCommentRepository.save(restaurantComment);
     }
 
     @Transactional
-    public void dislikeComment(Long userId, RestaurantCommentEntity restaurantComment, Map<String, String> responseMap) {
-        Optional<RestaurantCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
+    public void dislikeComment(Long userId, EvalCommentEntity restaurantComment, Map<String, String> responseMap) {
+        Optional<EvalCommentLikeEntity> restaurantCommentlikeOptional = restaurantCommentLikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
         Optional<RestaurantCommentDislikeEntity> restaurantCommentdislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndRestaurantCommentId(userId, restaurantComment.getCommentId());
 
         if (restaurantCommentlikeOptional.isPresent() && restaurantCommentdislikeOptional.isPresent()) {

@@ -2,18 +2,18 @@ package com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 @Entity
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "restaurant_comment_likes_tbl")
-public class RestaurantCommentLikeEntity {
+public class EvalCommentLikeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,20 +24,15 @@ public class RestaurantCommentLikeEntity {
 
     @ManyToOne
     @JoinColumn(name="comment_id")
-    private RestaurantCommentEntity restaurantComment;
+    private Long evalCommentId;
 
-    @ManyToOne
-    @JoinColumn(name="evaluation_id")
-    private EvaluationEntity evaluation;
-
-    public RestaurantCommentLikeEntity(Long userId, RestaurantCommentEntity restaurantComment) {
-        this.restaurantComment = restaurantComment;
+    public EvalCommentLikeEntity(Long userId, Long evalCommentId) {
+        this.evalCommentId = evalCommentId;
         this.userId = userId;
-        this.evaluation = null;
         this.createdAt = LocalDateTime.now();
     }
 
-    public RestaurantCommentLikeEntity(Long userId, EvaluationEntity evaluation) {
+    public EvalCommentLikeEntity(Long userId, EvaluationEntity evaluation) {
         this.restaurantComment = null;
         this.userId = userId;
         this.evaluation = evaluation;

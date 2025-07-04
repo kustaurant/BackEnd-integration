@@ -3,11 +3,11 @@ package com.kustaurant.kustaurant.evaluation.evaluation.service;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentDislikeEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentLikeEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentLikeEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentDislikeRepository;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentLikeRepository;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.RestaurantCommentRepository;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.EvalCommentLikeRepository;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.EvalCommentRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.*;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.query.EvaluationQueryRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
@@ -43,9 +43,9 @@ public class EvaluationService {
     private final RestaurantSituationRelationService restaurantSituationRelationService;
     private final EvaluationItemScoresService evaluationItemScoresService;
     private final S3Service s3Service;
-    private final RestaurantCommentLikeRepository restaurantCommentLikeRepository;
+    private final EvalCommentLikeRepository restaurantCommentLikeRepository;
     private final RestaurantCommentDislikeRepository restaurantCommentDislikeRepository;
-    private final RestaurantCommentRepository restaurantCommentRepository;
+    private final EvalCommentRepository restaurantCommentRepository;
     private final EvaluationConstants evaluationConstants;
 
     private final EvaluationQueryRepository evaluationQueryRepository;
@@ -195,7 +195,7 @@ public class EvaluationService {
         }*/
     }
 
-    public Double getEvaluationScoreByRestaurantComment(RestaurantCommentEntity restaurantComment) {
+    public Double getEvaluationScoreByRestaurantComment(EvalCommentEntity restaurantComment) {
         if (restaurantComment == null) {
             return null;
         }
@@ -408,7 +408,7 @@ public class EvaluationService {
     // Evaluation 좋아요
     @Transactional
     public void likeEvaluation(Long userId, EvaluationEntity evaluation) {
-        Optional<RestaurantCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
+        Optional<EvalCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
         Optional<RestaurantCommentDislikeEntity> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
 
         if (likeOptional.isPresent() && dislikeOptional.isPresent()) {
@@ -418,11 +418,11 @@ public class EvaluationService {
             evaluationLikeCountAdd(evaluation, -1);
         } else if (dislikeOptional.isPresent()) {
             restaurantCommentDislikeRepository.delete(dislikeOptional.get());
-            RestaurantCommentLikeEntity restaurantCommentLike = new RestaurantCommentLikeEntity(userId, evaluation);
+            EvalCommentLikeEntity restaurantCommentLike = new EvalCommentLikeEntity(userId, evaluation);
             restaurantCommentLikeRepository.save(restaurantCommentLike);
             evaluationLikeCountAdd(evaluation, 2);
         } else {
-            RestaurantCommentLikeEntity restaurantCommentLike = new RestaurantCommentLikeEntity(userId, evaluation);
+            EvalCommentLikeEntity restaurantCommentLike = new EvalCommentLikeEntity(userId, evaluation);
             restaurantCommentLikeRepository.save(restaurantCommentLike);
             evaluationLikeCountAdd(evaluation, 1);
         }
@@ -432,7 +432,7 @@ public class EvaluationService {
     // Evaluation 싫어요
     @Transactional
     public void dislikeEvaluation(Long userId, EvaluationEntity evaluation) {
-        Optional<RestaurantCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
+        Optional<EvalCommentLikeEntity> likeOptional = restaurantCommentLikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
         Optional<RestaurantCommentDislikeEntity> dislikeOptional = restaurantCommentDislikeRepository.findByUserIdAndEvaluationId(userId, evaluation.getId());
 
         if (likeOptional.isPresent() && dislikeOptional.isPresent()) {
@@ -480,7 +480,7 @@ public class EvaluationService {
         restaurantCommentDislikeRepository.deleteAll(evaluation.getRestaurantCommentDislikeList());
 
         // 대댓글 삭제
-        for (RestaurantCommentEntity restaurantComment : evaluation.getRestaurantCommentList()) {
+        for (EvalCommentEntity restaurantComment : evaluation.getRestaurantCommentList()) {
             restaurantComment.setStatus("DELETED");
             restaurantComment.setCommentLikeCount(0);
             restaurantCommentRepository.save(restaurantComment);

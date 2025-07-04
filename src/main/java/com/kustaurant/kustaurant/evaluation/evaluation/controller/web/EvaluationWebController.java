@@ -4,13 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.evaluation.comment.service.EvaluationCommentService;
+import com.kustaurant.kustaurant.evaluation.comment.service.EvalCommentService;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
@@ -38,7 +38,7 @@ public class EvaluationWebController {
     private final RestaurantWebService restaurantWebService;
     private final EvaluationService evaluationService;
     private final EvaluationRepository evaluationRepository;
-    private final EvaluationCommentService restaurantCommentService;
+    private final EvalCommentService restaurantCommentService;
     private final UserService userService;
 
     Gson gson = new Gson();
@@ -180,7 +180,7 @@ public class EvaluationWebController {
         Map<String, String> responseMap = new HashMap<>();
         try {
             if (isSubComment(commentId)) { // 대댓글인 경우
-                RestaurantCommentEntity restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
+                EvalCommentEntity restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
                 restaurantCommentService.likeComment(user.id(), restaurantComment, responseMap);
             } else { // 부모 댓글인 경우
                 int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
@@ -210,7 +210,7 @@ public class EvaluationWebController {
         Map<String, String> responseMap = new HashMap<>();
         try {
             if (isSubComment(commentId)) { // 대댓글인 경우
-                RestaurantCommentEntity restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
+                EvalCommentEntity restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
                 restaurantCommentService.dislikeComment(user.id(), restaurantComment, responseMap);
             } else { // 부모 댓글인 경우
                 int evaluationId = commentId - EvaluationConstants.EVALUATION_ID_OFFSET;
@@ -239,7 +239,7 @@ public class EvaluationWebController {
     ) {
 
         if (isSubComment(commentId)) {
-            RestaurantCommentEntity restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
+            EvalCommentEntity restaurantComment = restaurantCommentService.findCommentByCommentId(commentId);
             // 삭제 요청한 user가 댓글을 단 user가 아닌 경우
             if (!restaurantComment.getUserId().equals(user.id())) {
                 return ResponseEntity.badRequest().build();

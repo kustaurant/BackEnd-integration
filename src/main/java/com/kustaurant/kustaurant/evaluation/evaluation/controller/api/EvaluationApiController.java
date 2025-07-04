@@ -5,25 +5,18 @@ import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationService
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantApiService;
-import com.kustaurant.kustaurant.evaluation.comment.service.EvaluationCommentService;
-import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommResponse;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
+import com.kustaurant.kustaurant.evaluation.comment.service.EvalCommentService;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
-import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -31,7 +24,7 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class EvaluationApiController {
     private final RestaurantApiService restaurantApiService;
-    private final EvaluationCommentService restaurantCommentService;
+    private final EvalCommentService restaurantCommentService;
     private final EvaluationService evaluationService;
 
     // 이전 평가 데이터 가져오기

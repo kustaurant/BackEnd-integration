@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface EvaluationCommentQueryRepository extends Repository<EvaluationEntity, Integer> {
+public interface EvalCommentQueryRepository extends Repository<EvaluationEntity, Integer> {
 
     @Query("""
         SELECT  e.id                              AS commentId,

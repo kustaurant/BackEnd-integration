@@ -2,8 +2,8 @@ package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentDislikeEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentLikeEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentLikeEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDomain;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationSituation;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Situation;
@@ -35,7 +35,7 @@ public class EvaluationEntity {
     private String commentImgUrl;
     private Integer commentLikeCount = 0;
     @OneToMany(mappedBy = "evaluation")
-    private List<RestaurantCommentLikeEntity> restaurantCommentLikeList = new ArrayList<>();
+    private List<EvalCommentLikeEntity> restaurantCommentLikeList = new ArrayList<>();
     @OneToMany(mappedBy = "evaluation")
     private List<RestaurantCommentDislikeEntity> restaurantCommentDislikeList = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public class EvaluationEntity {
     private List<RestaurantCommentReportEntity> restaurantCommentReportList = new ArrayList<>();
     @JsonIgnore
     @OneToMany(mappedBy = "evaluation")
-    private List<RestaurantCommentEntity> restaurantCommentList = new ArrayList<>();
+    private List<EvalCommentEntity> restaurantCommentList = new ArrayList<>();
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="restaurant_id")

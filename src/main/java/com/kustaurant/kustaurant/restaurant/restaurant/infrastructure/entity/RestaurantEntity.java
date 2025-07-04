@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.EvaluationEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.situation.RestaurantSituationRelationEntity;
@@ -64,7 +64,7 @@ public class RestaurantEntity {
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
-    private List<RestaurantCommentEntity> restaurantCommentList = new ArrayList<>();
+    private List<EvalCommentEntity> restaurantCommentList = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore

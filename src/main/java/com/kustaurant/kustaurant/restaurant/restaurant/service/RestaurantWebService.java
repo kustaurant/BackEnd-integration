@@ -1,11 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.service;
 
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
-import com.kustaurant.kustaurant.evaluation.comment.service.EvaluationCommentService;
-import com.kustaurant.kustaurant.restaurant.restaurant.controller.web.RestaurantDetailWebDto;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommResponse;
-import com.kustaurant.kustaurant.restaurant.restaurant.controller.response.RestaurantDetailDTO;
+import com.kustaurant.kustaurant.evaluation.comment.service.EvalCommentService;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantMenuEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantMenuRepository;
@@ -29,7 +25,7 @@ import java.util.stream.Collectors;
 public class RestaurantWebService {
     
     private final RestaurantService restaurantService;
-    private final EvaluationCommentService restaurantCommentService;
+    private final EvalCommentService restaurantCommentService;
 
 //    public RestaurantDetailWebDto getRestaurantWebDetails(Long userId, Integer restaurantId) {
 //        RestaurantDetailDTO restaurantDetailDto = restaurantService.getActiveRestaurantDetailDto(restaurantId, userId);
