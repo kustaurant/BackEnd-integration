@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.post.comment.infrastructure;
 
+import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +17,7 @@ public interface PostCommentJpaRepository extends JpaRepository<PostCommentEntit
     
     List<PostCommentEntity> findByPostId(Integer postId);
     
-    List<PostCommentEntity> findByPostIdAndStatus(Integer postId, String status);
+    List<PostCommentEntity> findByPostIdAndStatus(Integer postId, ContentStatus status);
     
     List<PostCommentEntity> findByParentCommentId(Integer parentCommentId);
 }

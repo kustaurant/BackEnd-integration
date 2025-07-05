@@ -28,7 +28,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     @Override
     public List<PostComment> findParentComments(Integer postId) {
         // ID 기반으로 부모 댓글 조회
-        List<PostCommentEntity> parentComments = postCommentJpaRepository.findByPostIdAndStatus(postId, "ACTIVE")
+        List<PostCommentEntity> parentComments = postCommentJpaRepository.findByPostIdAndStatus(postId, ContentStatus.ACTIVE)
                 .stream()
                 .filter(comment -> comment.getParentCommentId() == null)
                 .collect(Collectors.toList());
