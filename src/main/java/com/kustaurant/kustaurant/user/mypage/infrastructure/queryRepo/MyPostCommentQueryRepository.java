@@ -11,10 +11,8 @@ public interface MyPostCommentQueryRepository extends Repository<PostCommentEnti
     @Query("""
         select pc
         from PostCommentEntity pc
-        join fetch pc.post p
         where pc.userId = :userId
-          and pc.status  = 'ACTIVE'
-          and p.status   = 'ACTIVE'
+          and pc.status = 'ACTIVE'
         order by pc.createdAt desc
     """)
     List<PostCommentEntity> findActiveCommentsByUserId(@Param("userId") Long userId);

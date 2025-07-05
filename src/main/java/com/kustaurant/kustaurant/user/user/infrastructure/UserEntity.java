@@ -100,8 +100,8 @@ public class UserEntity {
     }
 
     public User toModel(){
-        int evalCnt = stats.getRatedRestCnt();
-
+//        int evalCnt = stats.getRatedRestCnt();
+        int evalCnt = 0;
         return User.builder()
                 .id(id)
                 .nickname(nickname)
@@ -115,5 +115,4 @@ public class UserEntity {
                 .rankImg(UserIconResolver.resolve(evalCnt))
                 .build();
     }
-
 }

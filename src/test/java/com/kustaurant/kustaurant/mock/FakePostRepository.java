@@ -85,9 +85,10 @@ public class FakePostRepository implements PostRepository {
     }
 
     @Override
-    public Optional<PostEntity> findByStatusAndPostId(String status, Integer postId) {
-        return Optional.empty();
+    public Post findByStatusAndPostId(ContentStatus status, Integer postId) {
+        return null;
     }
+
 
     @Override
     public PostEntity save(PostEntity postEntity) {

@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.post.comment.dto;
 
-import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentEntity;
+import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,8 +20,8 @@ public class CommentLikeDislikeDTO {
         this.commentLikeStatus = commentLikeStatus;
     }
 
-    public static CommentLikeDislikeDTO toCommentLikeDislikeDTO(PostCommentEntity postComment, int commentLikeStatus) {
-        return new CommentLikeDislikeDTO(postComment.getPostCommentLikesEntities().size(), postComment.getPostCommentDislikesEntities().size(), commentLikeStatus);
+    public static CommentLikeDislikeDTO toCommentLikeDislikeDTO(PostComment postComment, int commentLikeStatus) {
+        return new CommentLikeDislikeDTO(postComment.getLikeCount(), postComment.getDislikeCount(), commentLikeStatus);
     }
 
 }

@@ -14,33 +14,31 @@ import java.util.Optional;
 public class PostDislikeRepositoryImpl implements PostDislikeRepository {
     private final PostDislikeJpaRepository postDislikeJpaRepository;
 
-
     @Override
     public Optional<PostDislike> findByUserIdAndPostId(Long userId, Integer postId) {
-
-        return postDislikeJpaRepository.findByUserIdAndPost_PostId(userId, postId)
+        return postDislikeJpaRepository.findByUserIdAndPostId(userId, postId)
                 .map(PostDislikeEntity::toDomain);
     }
 
     @Override
-    public boolean existsByUserIdAndPostId(Long userId, Integer postId) {
-        return postDislikeJpaRepository.existsByUserIdAndPost_PostId(userId, postId);
+    public Boolean existsByUserIdAndPostId(Long userId, Integer postId) {
+        return postDislikeJpaRepository.existsByUserIdAndPostId(userId, postId);
     }
 
     @Override
-    public PostDislike save(PostDislike postDislike) {
-        return postDislikeJpaRepository.save(PostDislikeEntity.from(postDislike)).toDomain();
+    public void save(PostDislike postDislike) {
+        postDislikeJpaRepository.save(PostDislikeEntity.from(postDislike)).toDomain();
     }
 
     @Override
     public void deleteByUserIdAndPostId(Long userId, Integer postId) {
-        postDislikeJpaRepository.findByUserIdAndPost_PostId(userId, postId)
+        postDislikeJpaRepository.findByUserIdAndPostId(userId, postId)
                 .ifPresent(postDislikeJpaRepository::delete);
     }
 
     @Override
     public int countByPostId(Integer postId) {
-        return postDislikeJpaRepository.countByPost_PostId(postId);
+        return postDislikeJpaRepository.countByPostId(postId);
     }
 
 }

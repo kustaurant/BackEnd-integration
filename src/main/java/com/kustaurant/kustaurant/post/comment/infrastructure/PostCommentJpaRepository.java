@@ -13,4 +13,10 @@ public interface PostCommentJpaRepository extends JpaRepository<PostCommentEntit
         WHERE pc.userId = :userId AND pc.status = 'ACTIVE'
         ORDER BY pc.createdAt DESC""")
     List<PostCommentEntity> findActiveByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
+    
+    List<PostCommentEntity> findByPostId(Integer postId);
+    
+    List<PostCommentEntity> findByPostIdAndStatus(Integer postId, String status);
+    
+    List<PostCommentEntity> findByParentCommentId(Integer parentCommentId);
 }

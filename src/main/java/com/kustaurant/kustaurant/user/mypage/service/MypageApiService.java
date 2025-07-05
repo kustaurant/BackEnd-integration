@@ -5,7 +5,12 @@ import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoun
 import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
+import com.kustaurant.kustaurant.post.post.domain.Post;
+import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
+import com.kustaurant.kustaurant.post.comment.domain.PostComment;
+import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
+import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.*;
@@ -32,6 +37,9 @@ public class MypageApiService {
     private final UserRepository userRepository;
     private final UserProfileValidator validator;
     private final NoticeRepository noticeRepo;
+    private final PostRepository postRepository;
+    private final PostCommentRepository postCommentRepository;
+    private final PostPhotoRepository postPhotoRepository;
 
     private final MyUserQueryRepository userQueryRepository;
     private final MypageMainQueryRepository mypageMainQueryRepository;
@@ -148,29 +156,35 @@ public class MypageApiService {
     // 6. 유저가 작성한 커뮤니티 게시글 리스트들 반환
     @Transactional(readOnly = true)
     public List<MyPostsResponse> getUserPosts(Long userId) {
-        List<PostEntity> posts = myPostQueryRepository.findActivePostsByUserId(userId);
+        List<Post> posts = postRepository.findActiveByUserId(userId);
 
         return posts.stream()
                 .map(p -> {
-                    String firstImg = p.getPostPhotoEntityList().isEmpty()
-                            ? null
-                            : p.getPostPhotoEntityList().get(0).getPhotoImgUrl();
+                    // ID 기반으로 사진 정보 조회
+                    String firstImg = null;
+                    List<PostPhoto> photos = postPhotoRepository.findByPostId(p.getId());
+                    if (photos != null && !photos.isEmpty()) {
+                        firstImg = photos.get(0).getPhotoImgUrl();
+                    }
 
-                    String shortBody = p.getPostBody().length() > 20
-                            ? p.getPostBody().substring(0, 20)
-                            : p.getPostBody();
+                    String shortBody = p.getBody().length() > 20
+                            ? p.getBody().substring(0, 20)
+                            : p.getBody();
 
                     LocalDateTime time = p.getUpdatedAt() != null ? p.getUpdatedAt() : p.getCreatedAt();
                     String timeAgo = TimeAgoUtil.toKor(time);
 
+                    // ID 기반으로 댓글 수 조회
+                    int commentCount = postCommentRepository.findByPostId(p.getId()).size();
+
                     return new MyPostsResponse(
-                            p.getPostId(),
-                            p.getPostCategory(),
-                            p.getPostTitle(),
+                            p.getId(),
+                            p.getCategory(),
+                            p.getTitle(),
                             firstImg,
                             shortBody,
                             p.getNetLikes(),
-                            p.getPostCommentList().size(),
+                            commentCount,
                             timeAgo
                     );
                 })
@@ -184,34 +198,38 @@ public class MypageApiService {
 
         return myPostScrapQueryRepository.findScrappedPosts(userId)
                 .stream()
-                .map(this::toMyPostsResponse)
+                .map(postEntity -> toMyPostsResponse(postEntity.toDomain()))
                 .toList();
     }
 
-    private MyPostsResponse toMyPostsResponse(PostEntity p) {
-        String firstImg = p.getPostPhotoEntityList().isEmpty()
-                ? null
-                : p.getPostPhotoEntityList()
-                .get(0)
-                .getPhotoImgUrl();
+    private MyPostsResponse toMyPostsResponse(Post p) {
+        // ID 기반으로 사진 정보 조회
+        String firstImg = null;
+        List<PostPhoto> photos = postPhotoRepository.findByPostId(p.getId());
+        if (photos != null && !photos.isEmpty()) {
+            firstImg = photos.get(0).getPhotoImgUrl();
+        }
 
-        String shortBody = p.getPostBody().length() > 20
-                ? p.getPostBody().substring(0, 20)
-                : p.getPostBody();
+        String shortBody = p.getBody().length() > 20
+                ? p.getBody().substring(0, 20)
+                : p.getBody();
 
         String timeAgo = TimeAgoUtil.toKor(
                 p.getUpdatedAt() != null ? p.getUpdatedAt()
                         : p.getCreatedAt()
         );
 
+        // ID 기반으로 댓글 수 조회
+        int commentCount = postCommentRepository.findByPostId(p.getId()).size();
+
         return new MyPostsResponse(
-                p.getPostId(),
-                p.getPostCategory(),
-                p.getPostTitle(),
+                p.getId(),
+                p.getCategory(),
+                p.getTitle(),
                 firstImg,
                 shortBody,
                 p.getNetLikes(),
-                p.getPostCommentList().size(),
+                commentCount,
                 timeAgo
         );
     }
@@ -232,10 +250,14 @@ public class MypageApiService {
                             c.getUpdatedAt() != null ? c.getUpdatedAt() : c.getCreatedAt()
                     );
 
+                    // ID 기반으로 게시글 정보 조회
+                    Post post = postRepository.findById(c.getPostId())
+                            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
                     return new MyPostCommentResponse(
-                            c.getPost().getPostId(),
-                            c.getPost().getPostCategory(),
-                            c.getPost().getPostTitle(),
+                            post.getId(),
+                            post.getCategory(),
+                            post.getTitle(),
                             shortBody,
                             c.getLikeCount(),
                             timeAgo
@@ -255,6 +277,4 @@ public class MypageApiService {
                 ))
                 .collect(Collectors.toList());
     }
-
-
 }

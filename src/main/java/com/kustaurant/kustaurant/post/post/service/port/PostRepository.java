@@ -5,7 +5,6 @@ import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,14 +12,13 @@ import java.util.Optional;
 public interface PostRepository {
     List<PostEntity> findActivePostsByUserId(Long userId);
 
-    Optional<PostEntity> findByStatusAndPostId(String status, Integer postId);
+    Post findByStatusAndPostId(ContentStatus status, Integer postId);
 
     PostEntity save(PostEntity postEntity);
     Post save(Post post);
     Optional<Post> findById(Integer id);
     Optional<Post> findByIdWithComments(Integer id);
     Page<Post> findAll(Pageable pageable);
-    Page<Post> findAll(Specification<PostEntity> spec, Pageable pageable);
 
     List<Post> findAllById(List<Integer> ids);
 
@@ -30,4 +28,10 @@ public interface PostRepository {
     void delete(Post post);
 
     List<Post> findActiveByUserId(Long userId);
+    
+    // 서비스 계층에서 직접 파라미터를 받는 메서드들
+    Page<Post> findByStatusAndCategory(ContentStatus status, String category, Pageable pageable);
+    Page<Post> findByStatusAndPopularCount(ContentStatus status, int minLikeCount, Pageable pageable);
+    Page<Post> findByStatusAndCategoryAndPopularCount(ContentStatus status, String category, int minLikeCount, Pageable pageable);
+    Page<Post> findByStatusAndSearchKeyword(ContentStatus status, String keyword, String category, int minLikeCount, Pageable pageable);
 }

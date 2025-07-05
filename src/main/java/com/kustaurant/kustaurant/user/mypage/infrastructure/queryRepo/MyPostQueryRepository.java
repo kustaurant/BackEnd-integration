@@ -9,10 +9,8 @@ import java.util.List;
 
 public interface MyPostQueryRepository extends Repository<PostEntity, Long> {
     @Query("""
-        select distinct p
+        select p
         from PostEntity p
-        left join fetch p.postPhotoEntityList ph
-        left join fetch p.postCommentList    pc
         where p.userId = :userId
           and p.status = 'ACTIVE'
         order by p.createdAt desc
