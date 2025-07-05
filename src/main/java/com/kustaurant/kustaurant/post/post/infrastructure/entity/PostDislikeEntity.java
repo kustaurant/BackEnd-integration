@@ -19,43 +19,40 @@ public class PostDislikeEntity {
     @Column(name = "user_id" , nullable = false)
     Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    PostEntity post;
+    @Column(name = "post_id", nullable = false)
+    Integer postId;
 
     LocalDateTime createdAt;
 
     public PostDislikeEntity() {
     }
-    public PostDislikeEntity(Long userId, PostEntity post, LocalDateTime createdAt) {
+    public PostDislikeEntity(Long userId, Integer postId, LocalDateTime createdAt) {
         this.userId = userId;
-        this.post = post;
+        this.postId = postId;
         this.createdAt = createdAt;
     }
 
     public PostDislike toDomain() {
-        return new PostDislike(
-                this.userId,
-                this.post.getPostId(),
-                this.createdAt
-        );
+        return PostDislike.builder()
+                .id(postDislikesId)
+                .userId(this.userId)
+                .postId(this.postId)
+                .createdAt(this.createdAt)
+                .build();
     }
 
     public static PostDislikeEntity from(PostDislike postDislike) {
-        PostEntity postEntity = new PostEntity();
-        postEntity.setPostId(postDislike.getPostId());
-
         return new PostDislikeEntity(
                 postDislike.getUserId(),
-                postEntity,
+                postDislike.getPostId(),
                 postDislike.getCreatedAt()
         );
     }
 
-    public static PostDislikeEntity from(PostDislike postDislike, Long userId, PostEntity post) {
+    public static PostDislikeEntity from(PostDislike postDislike, Long userId, Integer postId) {
         PostDislikeEntity postDislikeEntity = new PostDislikeEntity();
         postDislikeEntity.setUserId(userId);
-        postDislikeEntity.setPost(post);
+        postDislikeEntity.setPostId(postId);
         postDislikeEntity.setCreatedAt(postDislike.getCreatedAt());
         return postDislikeEntity;
     }

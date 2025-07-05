@@ -44,10 +44,7 @@ public class FakePostRepository implements PostRepository {
         }
     }
 
-    @Override
-    public Page<Post> findAll(Specification<PostEntity> spec, Pageable pageable) {
-        return null;
-    }
+
 
     @Override
     public List<Post> findAllById(List<Integer> ids) {
@@ -75,6 +72,26 @@ public class FakePostRepository implements PostRepository {
     }
 
     @Override
+    public Page<Post> findByStatusAndCategory(ContentStatus status, String category, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<Post> findByStatusAndPopularCount(ContentStatus status, int minLikeCount, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<Post> findByStatusAndCategoryAndPopularCount(ContentStatus status, String category, int minLikeCount, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<Post> findByStatusAndSearchKeyword(ContentStatus status, String keyword, String category, int minLikeCount, Pageable pageable) {
+        return null;
+    }
+
+    @Override
     public Page<Post> findAll(Pageable pageable) {
         return null;
     }
@@ -85,9 +102,10 @@ public class FakePostRepository implements PostRepository {
     }
 
     @Override
-    public Optional<PostEntity> findByStatusAndPostId(String status, Integer postId) {
-        return Optional.empty();
+    public Post findByStatusAndPostId(ContentStatus status, Integer postId) {
+        return null;
     }
+
 
     @Override
     public PostEntity save(PostEntity postEntity) {

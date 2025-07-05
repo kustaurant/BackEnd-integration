@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.post.comment.infrastructure;
+package com.kustaurant.kustaurant.post.comment.domain;
 
 import lombok.Builder;
 import lombok.Getter;

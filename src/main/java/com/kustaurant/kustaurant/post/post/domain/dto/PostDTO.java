@@ -107,12 +107,10 @@ public class PostDTO {
                 .likeOnlyCount(post.getLikeCount())
                 .dislikeOnlyCount(post.getDislikeCount())
                 .timeAgo(post.calculateTimeAgo())
-                .postPhotoImgUrl(!post.getPhotos().isEmpty() ? post.getPhotos().get(0).getPhotoImgUrl() : null)
-                .commentCount((int) post.getComments().stream()
-                        .filter(c -> c.getStatus() == ContentStatus.ACTIVE)
-                        .count())
+                .postPhotoImgUrl(null) // ID 기반으로 별도 조회 필요
+                .commentCount(0) // ID 기반으로 별도 조회 필요
                 .postVisitCount(post.getVisitCount())
-                .scrapCount(post.getScraps() == null ? 0 : post.getScraps().size())
+                .scrapCount(0) // ID 기반으로 별도 조회 필요
                 .build();
         if (author != null) {
             postDTO.setUser(UserDTO.from(author));

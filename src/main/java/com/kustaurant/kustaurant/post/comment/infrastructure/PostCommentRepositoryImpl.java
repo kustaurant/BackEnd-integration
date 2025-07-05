@@ -2,17 +2,12 @@ package com.kustaurant.kustaurant.post.comment.infrastructure;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.COMMENT_NOT_FOUND;
 
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
-import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
-import com.kustaurant.kustaurant.user.user.infrastructure.UserJpaRepository;
-import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,7 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PostCommentRepositoryImpl implements PostCommentRepository {
     private final PostCommentJpaRepository postCommentJpaRepository;
-    private final UserJpaRepository userJpaRepository;
+
     @Override
     public List<PostComment> findActiveByUserId(Long userId) {
         return postCommentJpaRepository.findActiveByUserIdOrderByCreatedAtDesc(userId).stream().map(PostCommentEntity::toDomain).toList();
@@ -32,26 +27,22 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
 
     @Override
     public List<PostComment> findParentComments(Integer postId) {
-        Specification<PostCommentEntity> spec = (root, query, cb) -> {
-            Predicate postIdPredicate = cb.equal(root.get("post").get("postId"), postId);
-            Predicate parentNull = cb.isNull(root.get("parentComment"));
-            Predicate statusActive = cb.equal(root.get("status"), ContentStatus.ACTIVE);
-            return cb.and(postIdPredicate, parentNull, statusActive);
-        };
-        List<PostCommentEntity> parentComments = postCommentJpaRepository.findAll(spec);
+        // ID 기반으로 부모 댓글 조회
+        List<PostCommentEntity> parentComments = postCommentJpaRepository.findByPostIdAndStatus(postId, ContentStatus.ACTIVE)
+                .stream()
+                .filter(comment -> comment.getParentCommentId() == null)
+                .collect(Collectors.toList());
 
         return parentComments.stream()
                 .map(PostCommentEntity::toDomain)
                 .collect(Collectors.toList());
     }
 
-
-
-
     @Override
     public Optional<PostComment> findById(Integer comment_id) {
         return postCommentJpaRepository.findById(comment_id).map(PostCommentEntity::toDomain);
     }
+
     @Override
     public Optional<PostComment> findByIdWithReplies(Integer commentId) {
         return postCommentJpaRepository.findById(commentId)
@@ -61,32 +52,47 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     @Override
     public PostComment save(PostComment comment) {
         // 신규 댓글 (id가 null)
-        if (comment.getCommentId() == null) {
+        if (comment.getId() == null) {
             PostCommentEntity entity = PostCommentEntity.from(comment);
             postCommentJpaRepository.save(entity);
             return entity.toDomain();
         }
 
         // 기존 댓글 수정
-        PostCommentEntity entity = postCommentJpaRepository.findById(comment.getCommentId())
-                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, comment.getCommentId(), "댓글"));
+        PostCommentEntity entity = postCommentJpaRepository.findById(comment.getId())
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, comment.getId(), "댓글"));
 
         entity.setStatus(comment.getStatus());
         entity.setLikeCount(comment.getNetLikes());
-
-        // 대댓글 등 추가 수정 로직
-        for (PostComment reply : comment.getReplies()) {
-            PostCommentEntity replyEntity = entity.getRepliesList().stream()
-                    .filter(r -> r.getCommentId().equals(reply.getCommentId()))
-                    .findFirst()
-                    .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, "대댓글이 존재하지 않습니다."));
-            replyEntity.setStatus(reply.getStatus());
-            replyEntity.setLikeCount(reply.getNetLikes());
-        }
 
         postCommentJpaRepository.save(entity);
         return entity.toDomain();
     }
 
+    @Override
+    public void deleteByPostId(Integer postId) {
+        // Soft delete 방식으로 변경
+        List<PostCommentEntity> comments = postCommentJpaRepository.findByPostId(postId);
+        for (PostCommentEntity comment : comments) {
+            comment.setStatus(ContentStatus.DELETED);
+        }
+        postCommentJpaRepository.saveAll(comments);
+    }
 
+    @Override
+    public List<PostComment> findByPostId(Integer postId) {
+        return postCommentJpaRepository.findByPostId(postId).stream()
+                .map(PostCommentEntity::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostComment> findByParentCommentId(Integer parentCommentId) {
+        return List.of();
+    }
+
+    @Override
+    public List<PostComment> saveAll(List<PostComment> comments) {
+        return List.of();
+    }
 }

@@ -3,6 +3,8 @@ package com.kustaurant.kustaurant.post.comment.controller.web;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
+import com.kustaurant.kustaurant.post.comment.domain.PostCommentDislike;
+import com.kustaurant.kustaurant.post.comment.domain.PostCommentLike;
 import com.kustaurant.kustaurant.post.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.post.comment.infrastructure.*;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentDislikeRepository;
@@ -50,7 +52,7 @@ public class PostCommentService {
         if (parentCommentId != null) {
             PostComment parent = postCommentRepository.findById(parentCommentId)
                     .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, "부모 댓글을 찾을 수 없습니다."));
-            comment.setParent(parent);
+            comment.setParentCommentId(parentCommentId);
         }
         postCommentRepository.save(comment);
     }
@@ -165,8 +167,8 @@ public class PostCommentService {
         if (userId == null) {
             return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
         }
-        boolean isLiked = postCommentLikeJpaRepository.existsByUserIdAndPostComment_CommentId(userId, commentId);
-        boolean isDisliked = postCommentDislikeJpaRepository.existsByUserIdAndPostComment_CommentId(userId, commentId);
+        boolean isLiked = postCommentLikeJpaRepository.existsByUserIdAndCommentId(userId, commentId);
+        boolean isDisliked = postCommentDislikeJpaRepository.existsByUserIdAndCommentId(userId, commentId);
         return new InteractionStatusResponse(isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED, isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
     }
 
@@ -200,9 +202,9 @@ public class PostCommentService {
 
         // 6. 댓글 트리 → DTO 변환
         List<PostCommentDTO> commentDTOs = parentComments.stream()
-                .filter(c -> c.getParentComment() == null)
+                .filter(c -> c.getParentCommentId() == null)
                 .map(c -> {
-                    Integer commentId = c.getCommentId();
+                    Integer commentId = c.getId();
                     Long authorId = c.getUserId();
                     PostCommentDTO dto = PostCommentDTO.from(c, userDtoMap);
 
@@ -238,15 +240,17 @@ public class PostCommentService {
     private List<PostComment> collectAllReplies(PostComment comment) {
         List<PostComment> all = new ArrayList<>();
         all.add(comment);
-        all.addAll(comment.getReplies());
+        // ID 기반으로 대댓글 조회 필요
+        // all.addAll(comment.getReplies());
         return all;
     }
 
     public void fillInteractionMap(PostComment comment, Long userId, Map<Integer, InteractionStatusResponse> map) {
-        map.put(comment.getCommentId(), getUserInteractionStatus(comment.getCommentId(), userId));
-        for (PostComment reply : comment.getReplies()) {
-            map.put(reply.getCommentId(), getUserInteractionStatus(reply.getCommentId(), userId));
-        }
+        map.put(comment.getId(), getUserInteractionStatus(comment.getId(), userId));
+        // ID 기반으로 대댓글 조회 필요
+        // for (PostComment reply : comment.getReplies()) {
+        //     map.put(reply.getId(), getUserInteractionStatus(reply.getId(), userId));
+        // }
     }
 
     @Transactional
@@ -258,6 +262,8 @@ public class PostCommentService {
 
         postCommentRepository.save(comment); // 변경 반영
 
-        return 1 + comment.getReplies().size(); // 삭제된 댓글 수 리턴
+        // ID 기반으로 대댓글 수 조회
+        List<PostComment> replies = postCommentRepository.findByParentCommentId(commentId);
+        return 1 + replies.size(); // 삭제된 댓글 수 리턴
     }
 }

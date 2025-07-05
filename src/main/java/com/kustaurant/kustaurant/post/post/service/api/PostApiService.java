@@ -3,16 +3,15 @@ package com.kustaurant.kustaurant.post.post.service.api;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.POST_NOT_FOUND;
 
-import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentEntity;
-import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentApiRepository;
+import com.kustaurant.kustaurant.post.comment.domain.PostComment;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.post.post.domain.Post;
+import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostPhotoEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface.PostPhotoJpaRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
@@ -38,8 +37,8 @@ import java.util.*;
 public class PostApiService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final PostCommentApiRepository postCommentApiRepository;
-    private final PostPhotoJpaRepository postPhotoJpaRepository;
+    private final PostCommentRepository postCommentRepository;
+    private final PostPhotoRepository postPhotoRepository;
     private final EvaluationRepository evaluationRepository;
     private final PostScrapRepository postScrapRepository;
     // 인기순 제한 기준 숫자
@@ -59,9 +58,8 @@ public class PostApiService {
                 posts = this.postRepository.findByStatus(ContentStatus.ACTIVE, pageable);
             } else if (sort.equals("popular")) {
                 sorts.add(Sort.Order.desc("createdAt"));
-                Specification<PostEntity> spec = getSpecByPopularOver5();
                 Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-                posts = this.postRepository.findAll(spec, pageable);
+                posts = this.postRepository.findByStatusAndPopularCount(ContentStatus.ACTIVE, POPULARCOUNT, pageable);
             } else {
                 throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
             }
@@ -69,9 +67,11 @@ public class PostApiService {
             List<Sort.Order> sorts = new ArrayList<>();
             sorts.add(Sort.Order.desc("createdAt"));
             Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-            Specification<PostEntity> spec = getSpecByCategoryAndPopularCount(koreanCategory, sort);
-            //spec의 인기순으로 먼저 정렬, 그다음 pageable의 최신순으로 두번째 정렬 기준 설정
-            posts = this.postRepository.findAll(spec, pageable);
+            if (sort.equals("popular")) {
+                posts = this.postRepository.findByStatusAndCategoryAndPopularCount(ContentStatus.ACTIVE, koreanCategory, POPULARCOUNT, pageable);
+            } else {
+                posts = this.postRepository.findByStatusAndCategory(ContentStatus.ACTIVE, koreanCategory, pageable);
+            }
         }
 
         Page<PostDTO> result = posts.map(post -> {
@@ -85,65 +85,13 @@ public class PostApiService {
         return result;  // Post 엔티티를 PostDTO로 변환
     }
 
-    public PostEntity getPost(Integer id) {
-        Optional<PostEntity> post = this.postRepository.findByStatusAndPostId("ACTIVE", id);
-        if (post.isPresent()) {
-            return post.get();
-        } else {
-            throw new DataNotFoundException(POST_NOT_FOUND, id, "게시글");
-        }
+    public Post getPost(Integer id) {
+        return this.postRepository.findByStatusAndPostId(ContentStatus.ACTIVE, id);
     }
 
     @Transactional
     public ReactionStatus toggleLike(Integer postId, Long userId) {
         return postService.toggleLike(postId, userId).getStatus();
-    }
-
-
-    private Specification<PostEntity> getSpecByCategoryAndPopularCount(String postCategory, String sort) {
-        return new Specification<>() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public Predicate toPredicate(Root<PostEntity> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                query.distinct(true);  // 중복을 제거
-                Predicate likeCountPredicate;
-
-                Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
-                Predicate categoryPredicate = cb.equal(p.get("postCategory"), postCategory);
-                // 조건 추가
-                if (sort.equals("popular")) {
-                    likeCountPredicate = cb.greaterThanOrEqualTo(p.get("likeCount"), POPULARCOUNT);
-                    return cb.and(statusPredicate, likeCountPredicate, categoryPredicate);
-                } else {
-
-                    return cb.and(statusPredicate, categoryPredicate);
-                }
-
-
-            }
-
-
-        };
-    }
-
-    private Specification<PostEntity> getSpecByPopularOver5() {
-        return new Specification<>() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public Predicate toPredicate(Root<PostEntity> p, CriteriaQuery<?> query, CriteriaBuilder cb) {
-                query.distinct(true);  // 중복을 제거
-                Predicate statusPredicate = cb.equal(p.get("status"), "ACTIVE");
-                Predicate likeCountPredicate = cb.greaterThanOrEqualTo(p.get("likeCount"), POPULARCOUNT);
-                return cb.and(statusPredicate, likeCountPredicate     // 글 작성자
-                );
-
-
-            }
-
-
-        };
     }
 
     // post Id 유효성 검사
@@ -153,40 +101,22 @@ public class PostApiService {
         }
     }
 
-//    // 게시글 삭제
-//    public void deletePost(Integer postId, Long userId) {
-//        PostEntity postEntity = getPost(postId);
-//        if (!postEntity.getUserId().equals(userId)) {
-//            throw new AccessDeniedException("해당 게시글에 대한 권한이 없습니다.");
-//        }
-//        deleteComments(postEntity);
-//        deleteScraps(postEntity);
-//        deletePhotos(postEntity);
-//        postEntity.setStatus(ContentStatus.DELETED);
-//        postRepository.save(postEntity);
-//    }
-
-    private void deleteComments(PostEntity postEntity) {
-        List<PostCommentEntity> comments = postEntity.getPostCommentList();
-        for (PostCommentEntity comment : comments) {
-            comment.setStatus(ContentStatus.DELETED);
-            for (PostCommentEntity reply : comment.getRepliesList()) {
-                reply.setStatus(ContentStatus.DELETED);
-            }
-            postCommentApiRepository.save(comment);
-        }
+    private void deleteComments(Post post) {
+        Integer postId = post.getId();
+        List<PostComment> comments = postCommentRepository.findByPostId(postId);
+        comments.forEach(comment -> comment.setStatus(ContentStatus.DELETED));
+        postCommentRepository.saveAll(comments);
     }
 
-//    private void deleteScraps(PostEntity postEntity) {
-//        List<PostScrapEntity> scraps = postEntity.getPostScrapList();
-//        postScrapRepository.deleteAll(scraps);
-//    }
+    private void deletePhotos(Post post) {
 
-    private void deletePhotos(PostEntity postEntity) {
-        List<PostPhotoEntity> photos = postEntity.getPostPhotoEntityList();
-        if (photos != null) {
-            postPhotoJpaRepository.deleteAll(photos);
-            postEntity.setPostPhotoEntityList(null); // 기존 사진과의 연결 해제
+        Integer postId = post.getId();
+        List<PostPhoto> photos = postPhotoRepository.findByPostId(postId);
+        if (photos != null && !photos.isEmpty()) {
+            for (PostPhoto photo : photos) {
+                photo.setStatus(ContentStatus.DELETED);
+            }
+            postPhotoRepository.saveAll(photos);
         }
     }
 
@@ -298,10 +228,31 @@ public class PostApiService {
             return 4;
         }
     }
+    // TODO: Post에 Setter 제거 하고 value type 으로 postContent 를 새로 만들어서 update하기
+    public void updatePost(PostUpdateDTO postUpdateDTO, Post post) {
+        if (postUpdateDTO.getTitle() != null) post.setTitle(postUpdateDTO.getTitle());
+        if (postUpdateDTO.getPostCategory() != null) post.setCategory(postUpdateDTO.getPostCategory());
+        if (postUpdateDTO.getContent() != null) post.setBody(postUpdateDTO.getContent());
+    }
 
-    public void updatePost(PostUpdateDTO postUpdateDTO, PostEntity postEntity) {
-        if (postUpdateDTO.getTitle() != null) postEntity.setPostTitle(postUpdateDTO.getTitle());
-        if (postUpdateDTO.getPostCategory() != null) postEntity.setPostCategory(postUpdateDTO.getPostCategory());
-        if (postUpdateDTO.getContent() != null) postEntity.setPostBody(postUpdateDTO.getContent());
+    // 게시글 삭제
+    @Transactional
+    public void deletePost(Integer postId, Long userId) {
+        Post post = getPost(postId);
+
+        // 권한 확인
+        if (!post.getAuthorId().equals(userId)) {
+            throw new RuntimeException("게시글을 삭제할 권한이 없습니다.");
+        }
+
+        // 게시글 상태를 DELETED로 변경
+        post.setStatus(ContentStatus.DELETED);
+        postRepository.save(post);
+
+        // 관련 댓글 삭제
+        deleteComments(post);
+
+        // 관련 사진 삭제
+        deletePhotos(post);
     }
 }

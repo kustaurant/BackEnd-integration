@@ -17,13 +17,13 @@ public class PostLikeRepositoryImpl implements PostLikeRepository {
     @Override
     public Optional<PostLike> findByUserIdAndPostId(Long userId, Integer postId) {
         return postLikeJpaRepository
-                .findByUserIdAndPost_PostId(userId,postId)
+                .findByUserIdAndPostId(userId, postId)
                 .map(PostLikeEntity::toDomain);
     }
 
     @Override
     public Boolean existsByUserIdAndPostId(Long userId, Integer postId) {
-        return postLikeJpaRepository.existsByUserIdAndPost_PostId(userId,postId);
+        return postLikeJpaRepository.existsByUserIdAndPostId(userId, postId);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class PostLikeRepositoryImpl implements PostLikeRepository {
 
     @Override
     public void deleteByUserIdAndPostId(Long userId, Integer postId) {
-        postLikeJpaRepository.findByUserIdAndPost_PostId(userId,postId)
+        postLikeJpaRepository.findByUserIdAndPostId(userId, postId)
                 .ifPresent(entity -> {
                     postLikeJpaRepository.delete(entity);
                     postLikeJpaRepository.flush(); // 즉시 DB 반영
@@ -43,8 +43,7 @@ public class PostLikeRepositoryImpl implements PostLikeRepository {
 
     @Override
     public int countByPostId(Integer postId) {
-        return postLikeJpaRepository.countByPost_PostId(postId);
+        return postLikeJpaRepository.countByPostId(postId);
     }
-
 
 }

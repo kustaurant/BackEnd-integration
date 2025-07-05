@@ -10,11 +10,9 @@ import java.util.List;
 
 public interface MyPostScrapQueryRepository extends Repository<PostScrapEntity, Long> {
     @Query("""
-        select distinct p
+        select p
         from PostEntity p
              join PostScrapEntity ps on ps.postId = p.postId
-        left join fetch p.postPhotoEntityList ph
-        left join fetch p.postCommentList pc
         where ps.userId = :userId
           and p.status = 'ACTIVE'
         order by p.createdAt desc

@@ -1,15 +1,16 @@
 package com.kustaurant.kustaurant.post.post.domain;
 
-import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@Setter
 @Builder
 public class Post {
     private Integer id;
@@ -25,11 +26,10 @@ public class Post {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-
-    private List<PostComment> comments;
-    private List<PostPhoto> photos;
-    private List<PostScrap> scraps;
-
+    // ID 기반 참조로 변경
+    private List<Integer> commentIds;
+    private List<Integer> photoIds;
+    private List<Integer> scrapIds;
 
     public void delete() {
         this.status = ContentStatus.DELETED;
@@ -39,18 +39,7 @@ public class Post {
         this.title = title;
         this.body = body;
         this.category = category;
-
-        this.photos = new java.util.ArrayList<>();
-        for (String url : imageUrls) {
-            this.photos.add(PostPhoto.builder()
-                    .postId(this.id)
-                    .photoImgUrl(url)
-                    .status(ContentStatus.ACTIVE)
-                    .build());
-        }
     }
-
-
 
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();
@@ -121,6 +110,18 @@ public class Post {
 
     private void updateNetLikes() {
         this.netLikes = this.likeCount - this.dislikeCount;
+    }
+
+    public void updateCommentIds(List<Integer> commentIds) {
+        this.commentIds = commentIds;
+    }
+
+    public void updatePhotoIds(List<Integer> photoIds) {
+        this.photoIds = photoIds;
+    }
+
+    public void updateScrapIds(List<Integer> scrapIds) {
+        this.scrapIds = scrapIds;
     }
 }
 

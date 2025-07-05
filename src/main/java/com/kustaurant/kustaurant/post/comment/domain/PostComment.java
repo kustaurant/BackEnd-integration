@@ -15,8 +15,9 @@ import java.util.List;
 @Getter
 public class PostComment {
 
-    private final Integer commentId;
+    private Integer id;
     private final String commentBody;
+    @Setter
     private ContentStatus status;
     private Integer netLikes;
     @Setter
@@ -25,12 +26,15 @@ public class PostComment {
     private LocalDateTime updatedAt;
 
     private final Long userId;
-    private final Integer postId;
+    @Setter
+    private Integer postId;
 
     private Integer likeCount;
     private Integer dislikeCount;
-    private PostComment parentComment;
-    private List<PostComment> replies;
+    
+    // ID 기반 참조로 변경
+    private Integer parentCommentId;
+    private List<Integer> replyIds;
 
     public static PostComment create(String commentBody, Long userId, Integer postId) {
         return PostComment.builder()
@@ -43,20 +47,17 @@ public class PostComment {
                 .updatedAt(LocalDateTime.now())
                 .userId(userId)
                 .postId(postId)
-                .replies(new ArrayList<>())
+                .replyIds(new ArrayList<>())
                 .build();
     }
 
-    public void setParent(PostComment parent) {
-        this.parentComment = parent;
-        parent.replies.add(this);
+    public void setParentCommentId(Integer parentCommentId) {
+        this.parentCommentId = parentCommentId;
     }
 
     public void delete() {
         this.status = ContentStatus.DELETED;
-        for (PostComment reply : replies) {
-            reply.status = ContentStatus.DELETED;
-        }
+        // 대댓글들은 별도 서비스에서 처리
     }
 
     public String calculateTimeAgo() {

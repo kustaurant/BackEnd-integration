@@ -19,9 +19,8 @@ public class PostPhotoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer photoId;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    private PostEntity post;
+    @Column(name = "post_id", nullable = false)
+    private Integer postId;
 
     private String photoImgUrl;
 
@@ -36,15 +35,15 @@ public class PostPhotoEntity {
     public PostPhoto toDomain() {
         return new PostPhoto(
                 this.photoId,
-                this.post.getPostId(),
+                this.postId,
                 this.photoImgUrl,
                 this.status
         );
     }
 
-    public static PostPhotoEntity from(PostPhoto postPhoto, PostEntity postEntity) {
+    public static PostPhotoEntity from(PostPhoto postPhoto) {
         return PostPhotoEntity.builder()
-                .post(postEntity)
+                .postId(postPhoto.getPostId())
                 .photoImgUrl(postPhoto.getPhotoImgUrl())
                 .status(postPhoto.getStatus())
                 .build();

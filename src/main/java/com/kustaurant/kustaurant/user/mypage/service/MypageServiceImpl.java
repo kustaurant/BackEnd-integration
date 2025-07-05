@@ -71,7 +71,7 @@ public class MypageServiceImpl implements MypageService {
 
         return postComments.stream()
                 .map(comment -> new PostCommentView(
-                        comment.getCommentId(),
+                        comment.getId(),
                         comment.getCommentBody(),
                         comment.getNetLikes(),
                         comment.calculateTimeAgo(),

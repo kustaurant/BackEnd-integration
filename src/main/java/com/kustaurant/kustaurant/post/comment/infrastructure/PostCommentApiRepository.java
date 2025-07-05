@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface PostCommentApiRepository extends JpaRepository<PostCommentEntity,Integer> {
     List<PostCommentEntity> findAll(Specification<PostCommentEntity> spec);
+    
+    List<PostCommentEntity> findByParentCommentId(Integer parentCommentId);
 }

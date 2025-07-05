@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.post.comment.infrastructure;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
+import com.kustaurant.kustaurant.post.comment.domain.PostCommentDislike;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentDislikeRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
 import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
@@ -21,54 +22,44 @@ public class PostCommentDislikeRepositoryImpl implements PostCommentDislikeRepos
     private final PostCommentJpaRepository postCommentJpaRepository;
     @Override
     public void save(PostCommentDislike dislike) {
-        UserEntity userEntity = userJpaRepository.findById(dislike.getUserId())
-                .orElseThrow(UserNotFoundException::new);
-        PostCommentEntity commentEntity = postCommentJpaRepository.findById(dislike.getCommentId())
-                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, dislike.getCommentId(), "댓글"));
-
-        PostCommentDislikeEntity entity = toEntity(dislike, userEntity.getId(), commentEntity);
-        postCommentDislikeJpaRepository.save(entity);
-    }
-
-    public PostCommentDislikeEntity toEntity(
-            PostCommentDislike dislike,
-            Long userId,
-            PostCommentEntity commentEntity
-    ) {
-        return PostCommentDislikeEntity.builder()
-                .userId(userId)
-                .postComment(commentEntity)
+        PostCommentDislikeEntity entity = PostCommentDislikeEntity.builder()
+                .userId(dislike.getUserId())
+                .commentId(dislike.getCommentId())
                 .createdAt(dislike.getCreatedAt())
                 .build();
+        postCommentDislikeJpaRepository.save(entity);
     }
 
     @Override
     public void deleteById(Integer id) {
-
+        postCommentDislikeJpaRepository.deleteById(id);
     }
 
     @Override
     public List<PostCommentDislike> findByCommentId(Integer commentId) {
-        return List.of();
+        return postCommentDislikeJpaRepository.findByCommentId(commentId).stream()
+                .map(PostCommentDislikeEntity::toDomain)
+                .toList();
     }
 
     @Override
     public Optional<PostCommentDislike> findByUserIdAndCommentId(Long userId, Integer commentId) {
-        return Optional.empty();
+        return postCommentDislikeJpaRepository.findByUserIdAndCommentId(userId, commentId)
+                .map(PostCommentDislikeEntity::toDomain);
     }
 
     @Override
     public boolean existsByUserIdAndCommentId(Long userId, Integer commentId) {
-        return postCommentDislikeJpaRepository.existsByUserIdAndPostComment_CommentId(userId, commentId);
+        return postCommentDislikeJpaRepository.existsByUserIdAndCommentId(userId, commentId);
     }
 
     @Override
     public void deleteByUserIdAndCommentId(Long userId, Integer commentId) {
-        postCommentDislikeJpaRepository.deleteByUserIdAndPostComment_CommentId(userId, commentId);
+        postCommentDislikeJpaRepository.deleteByUserIdAndCommentId(userId, commentId);
     }
 
     @Override
     public int countByCommentId(Integer commentId) {
-        return postCommentDislikeJpaRepository.countByPostComment_CommentId(commentId);
+        return postCommentDislikeJpaRepository.countByCommentId(commentId);
     }
 }
