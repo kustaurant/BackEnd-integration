@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.post.post.service.api;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.POST_NOT_FOUND;
 
+import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
@@ -85,8 +86,7 @@ public class PostApiService {
     }
 
     public Post getPost(Integer id) {
-        Post post = this.postRepository.findByStatusAndPostId(ContentStatus.ACTIVE, id);
-        return post;
+        return this.postRepository.findByStatusAndPostId(ContentStatus.ACTIVE, id);
     }
 
     @Transactional
@@ -102,9 +102,10 @@ public class PostApiService {
     }
 
     private void deleteComments(Post post) {
-        // ID 기반으로 댓글 삭제 처리
         Integer postId = post.getId();
-        postCommentRepository.deleteByPostId(postId);
+        List<PostComment> comments = postCommentRepository.findByPostId(postId);
+        comments.forEach(comment -> comment.setStatus(ContentStatus.DELETED));
+        postCommentRepository.saveAll(comments);
     }
 
     private void deletePhotos(Post post) {
@@ -227,7 +228,7 @@ public class PostApiService {
             return 4;
         }
     }
-
+    // TODO: Post에 Setter 제거 하고 value type 으로 postContent 를 새로 만들어서 update하기
     public void updatePost(PostUpdateDTO postUpdateDTO, Post post) {
         if (postUpdateDTO.getTitle() != null) post.setTitle(postUpdateDTO.getTitle());
         if (postUpdateDTO.getPostCategory() != null) post.setCategory(postUpdateDTO.getPostCategory());
@@ -238,7 +239,7 @@ public class PostApiService {
     @Transactional
     public void deletePost(Integer postId, Long userId) {
         Post post = getPost(postId);
-        
+
         // 권한 확인
         if (!post.getAuthorId().equals(userId)) {
             throw new RuntimeException("게시글을 삭제할 권한이 없습니다.");
@@ -247,10 +248,10 @@ public class PostApiService {
         // 게시글 상태를 DELETED로 변경
         post.setStatus(ContentStatus.DELETED);
         postRepository.save(post);
-        
+
         // 관련 댓글 삭제
         deleteComments(post);
-        
+
         // 관련 사진 삭제
         deletePhotos(post);
     }

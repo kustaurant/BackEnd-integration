@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Builder
 @Setter
+@Builder
 public class Post {
     private Integer id;
     private String title;
@@ -110,6 +110,18 @@ public class Post {
 
     private void updateNetLikes() {
         this.netLikes = this.likeCount - this.dislikeCount;
+    }
+
+    public void updateCommentIds(List<Integer> commentIds) {
+        this.commentIds = commentIds;
+    }
+
+    public void updatePhotoIds(List<Integer> photoIds) {
+        this.photoIds = photoIds;
+    }
+
+    public void updateScrapIds(List<Integer> scrapIds) {
+        this.scrapIds = scrapIds;
     }
 }
 

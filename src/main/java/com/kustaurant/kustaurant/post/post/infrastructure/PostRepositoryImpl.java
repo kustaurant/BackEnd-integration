@@ -37,19 +37,19 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public Page<Post> findAll(Pageable pageable) {
-        return postJpaRepository.findAll(pageable).map(this::toModelWithCounts);
+        return postJpaRepository.findAll(pageable).map(this::toDomainWithCounts);
     }
 
     @Override
     public List<Post> findAllById(List<Integer> ids) {
         return postJpaRepository.findAllById(ids).stream()
-                .map(this::toModelWithCounts)
+                .map(this::toDomainWithCounts)
                 .collect(Collectors.toList());
     }
     
     @Override
     public Page<Post> findByStatus(ContentStatus status, Pageable pageable) {
-        return postJpaRepository.findByStatus(status,pageable).map(this::toModelWithCounts);
+        return postJpaRepository.findByStatus(status,pageable).map(this::toDomainWithCounts);
     }
     
     @Override
@@ -94,12 +94,12 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public Optional<Post> findById(Integer postId) {
-        return postJpaRepository.findById(postId).map(this::toModelWithCounts);
+        return postJpaRepository.findById(postId).map(this::toDomainWithCounts);
     }
 
     @Override
     public Optional<Post> findByIdWithComments(Integer postId) {
-        return postJpaRepository.findById(postId).map(this::toModelWithCounts);
+        return postJpaRepository.findById(postId).map(this::toDomainWithCounts);
     }
 
     @Override
@@ -121,7 +121,7 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public List<Post> findActiveByUserId(Long userId) {
         return postJpaRepository.findActivePostsByUserId(userId).stream()
-                .map(this::toModelWithCounts)
+                .map(this::toDomainWithCounts)
                 .toList();
     }
 
@@ -132,7 +132,7 @@ public class PostRepositoryImpl implements PostRepository {
             Predicate categoryPredicate = cb.equal(root.get("postCategory"), category);
             return cb.and(statusPredicate, categoryPredicate);
         };
-        return postJpaRepository.findAll(spec, pageable).map(this::toModelWithCounts);
+        return postJpaRepository.findAll(spec, pageable).map(this::toDomainWithCounts);
     }
 
     @Override
@@ -142,7 +142,7 @@ public class PostRepositoryImpl implements PostRepository {
             Predicate likeCountPredicate = cb.greaterThanOrEqualTo(root.get("likeCount"), minLikeCount);
             return cb.and(statusPredicate, likeCountPredicate);
         };
-        return postJpaRepository.findAll(spec, pageable).map(this::toModelWithCounts);
+        return postJpaRepository.findAll(spec, pageable).map(this::toDomainWithCounts);
     }
 
     @Override
@@ -153,7 +153,7 @@ public class PostRepositoryImpl implements PostRepository {
             Predicate likeCountPredicate = cb.greaterThanOrEqualTo(root.get("likeCount"), minLikeCount);
             return cb.and(statusPredicate, categoryPredicate, likeCountPredicate);
         };
-        return postJpaRepository.findAll(spec, pageable).map(this::toModelWithCounts);
+        return postJpaRepository.findAll(spec, pageable).map(this::toDomainWithCounts);
     }
 
     @Override
@@ -175,7 +175,7 @@ public class PostRepositoryImpl implements PostRepository {
                 searchPredicate = cb.and(categoryPredicate, cb.or(
                     cb.like(root.get("postTitle"), "%" + keyword + "%"),
                     cb.like(root.get("postBody"), "%" + keyword + "%"),
-                    cb.like(u1.get("userNickname"), "%" + keyword + "%")
+                    cb.like(u1.get("nickname").get("value"), "%" + keyword + "%")
                 ));
             } else {
                 searchPredicate = cb.or(
@@ -187,10 +187,11 @@ public class PostRepositoryImpl implements PostRepository {
             
             return cb.and(statusPredicate, likeCountPredicate, searchPredicate);
         };
-        return postJpaRepository.findAll(spec, pageable).map(this::toModelWithCounts);
+        return postJpaRepository.findAll(spec, pageable).map(this::toDomainWithCounts);
     }
 
-    private Post toModelWithCounts(PostEntity postEntity) {
+    // TODO: n+1 문제 추후 처리 예정
+    private Post toDomainWithCounts(PostEntity postEntity) {
         int likeCount = postLikeJpaRepository.countByPostId(postEntity.getPostId());
         int dislikeCount = postDislikeJpaRepository.countByPostId(postEntity.getPostId());
         return postEntity.toDomainWithCounts(likeCount, dislikeCount);

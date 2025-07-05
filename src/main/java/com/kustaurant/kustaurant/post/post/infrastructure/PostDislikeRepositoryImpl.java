@@ -27,7 +27,7 @@ public class PostDislikeRepositoryImpl implements PostDislikeRepository {
 
     @Override
     public void save(PostDislike postDislike) {
-        postDislikeJpaRepository.save(PostDislikeEntity.from(postDislike)).toDomain();
+        postDislikeJpaRepository.save(PostDislikeEntity.from(postDislike));
     }
 
     @Override

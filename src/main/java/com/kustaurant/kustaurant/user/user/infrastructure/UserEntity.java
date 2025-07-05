@@ -100,9 +100,8 @@ public class UserEntity {
     }
 
     public User toModel(){
-//        int evalCnt = stats.getRatedRestCnt();
-        // TODO: stats 데이터 삽입시 추후 위 주석 활성화 해서 정상화, 현재는 0으로 하드코딩
-        int evalCnt = 0;
+        // TODO: stats 엔티티가 정상적으로 매핑되면 하드코딩 제거
+        int evalCnt = (stats != null) ? stats.getRatedRestCnt() : 0;
 
         return User.builder()
                 .id(id)
