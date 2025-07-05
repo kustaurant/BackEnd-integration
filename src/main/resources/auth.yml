@@ -19,6 +19,7 @@ spring.security.oauth2.client:
 apple:
   APPLE_CLIENT_ID: ${APPLE_CLIENT_ID}
   APPLE_PUBLIC_KEYS_URL: ${APPLE_PUBLIC_KEYS_URL}
+
 # jwt
 jwt:
   secret: ${JWT_SECRET}
