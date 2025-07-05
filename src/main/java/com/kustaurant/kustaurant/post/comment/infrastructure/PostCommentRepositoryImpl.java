@@ -2,10 +2,13 @@ package com.kustaurant.kustaurant.post.comment.infrastructure;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.COMMENT_NOT_FOUND;
 
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.UserJpaRepository;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +24,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PostCommentRepositoryImpl implements PostCommentRepository {
     private final PostCommentJpaRepository postCommentJpaRepository;
-
+    private final UserJpaRepository userJpaRepository;
     @Override
     public List<PostComment> findActiveByUserId(Long userId) {
         return postCommentJpaRepository.findActiveByUserIdOrderByCreatedAtDesc(userId).stream().map(PostCommentEntity::toDomain).toList();

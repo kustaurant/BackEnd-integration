@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "post_dislikes_tbl_new")
+@Table(name = "post_dislikes_tbl")
 public class PostDislikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

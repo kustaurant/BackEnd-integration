@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Builder
-@Table(name="post_comments_dislikes_tbl_new")
+@Table(name="post_comment_dislikes_tbl")
 public class PostCommentDislikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

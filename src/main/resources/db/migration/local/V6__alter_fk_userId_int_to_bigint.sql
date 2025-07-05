@@ -37,10 +37,16 @@ CALL drop_fk_if_exists('restaurant_comment_likes_tbl'   ,'fk_likes_TBL_users_TBL
 CALL drop_fk_if_exists('restaurant_comment_reports_tbl' ,'restaurant_comment_reports_tbl_ibfk_1');
 CALL drop_fk_if_exists('restaurant_comments_tbl'        ,'fk_restaurant_comments_TBL_users_TBL1');
 CALL drop_fk_if_exists('restaurant_favorite_tbl'        ,'fk_restaurant_favorite_TBL_users_TBL1');
-CALL drop_fk_if_exists('post_comments_dislikes_tbl_new' ,'post_comments_dislikes_tbl_new_ibfk_1');
-CALL drop_fk_if_exists('post_comments_likes_tbl_new'    ,'post_comments_likes_tbl_new_ibfk_1');
-CALL drop_fk_if_exists('post_dislikes_tbl_new'          ,'post_dislikes_tbl_new_ibfk_1');
-CALL drop_fk_if_exists('post_likes_tbl_new'             ,'post_likes_tbl_new_ibfk_1');
+CALL drop_fk_if_exists('post_comment_dislikes_tbl' ,'post_comment_dislikes_tbl_ibfk_1');
+CALL drop_fk_if_exists('post_comment_likes_tbl'    ,'post_comment_likes_tbl_ibfk_1');
+CALL drop_fk_if_exists('post_dislikes_tbl'          ,'post_dislikes_tbl_ibfk_1');
+CALL drop_fk_if_exists('post_likes_tbl'             ,'post_likes_tbl_ibfk_1');
+
+/* 추가: OLD 테이블 FK 삭제 */
+CALL drop_fk_if_exists('post_comment_dislikes_tbl_old'  ,'post_comment_dislikes_tbl_old_ibfk_2');
+CALL drop_fk_if_exists('post_comment_likes_tbl_old'     ,'post_comment_likes_tbl_old_ibfk_2');
+CALL drop_fk_if_exists('post_dislikes_tbl_old'          ,'post_dislikes_tbl_old_ibfk_2');
+CALL drop_fk_if_exists('post_likes_tbl_old'             ,'post_likes_tbl_old_ibfk_2');
 
 /* ─── 2. 부모(users_tbl) 컬럼 타입 확장 ─── */
 ALTER TABLE users_tbl
@@ -57,11 +63,16 @@ ALTER TABLE restaurant_comment_likes_tbl    MODIFY COLUMN user_id BIGINT UNSIGNE
 ALTER TABLE restaurant_comment_reports_tbl  MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
 ALTER TABLE restaurant_comments_tbl         MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
 ALTER TABLE restaurant_favorite_tbl         MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE post_comments_dislikes_tbl_new  MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE post_comments_likes_tbl_new     MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE post_dislikes_tbl_new           MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
-ALTER TABLE post_likes_tbl_new              MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE post_comment_dislikes_tbl  MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE post_comment_likes_tbl     MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE post_dislikes_tbl           MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE post_likes_tbl              MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
 
+/* 추가: OLD 테이블 컬럼 타입 확장 */
+ALTER TABLE post_comment_dislikes_tbl_old    MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE post_comment_likes_tbl_old       MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE post_dislikes_tbl_old            MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE post_likes_tbl_old               MODIFY COLUMN user_id BIGINT UNSIGNED NOT NULL;
 /* ─── 4. FK 재생성 ─── */
 ALTER TABLE evaluations_tbl
     ADD CONSTRAINT fk_evaluations_user FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
@@ -95,17 +106,30 @@ ALTER TABLE restaurant_comments_tbl
 ALTER TABLE restaurant_favorite_tbl
     ADD CONSTRAINT fk_rest_favorite_user FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
 
-ALTER TABLE post_comments_dislikes_tbl_new
-    ADD CONSTRAINT fk_post_cmt_dislikes_new_user FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
+ALTER TABLE post_comment_dislikes_tbl
+    ADD CONSTRAINT fk_post_cmt_dislikes_user FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
 
-ALTER TABLE post_comments_likes_tbl_new
-    ADD CONSTRAINT fk_post_cmt_likes_new_user    FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
+ALTER TABLE post_comment_likes_tbl
+    ADD CONSTRAINT fk_post_cmt_likes_user    FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
 
-ALTER TABLE post_dislikes_tbl_new
-    ADD CONSTRAINT fk_post_dislikes_new_user     FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
+ALTER TABLE post_dislikes_tbl
+    ADD CONSTRAINT fk_post_dislikes_user     FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
 
-ALTER TABLE post_likes_tbl_new
-    ADD CONSTRAINT fk_post_likes_new_user        FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
+ALTER TABLE post_likes_tbl
+    ADD CONSTRAINT fk_post_likes_user        FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
+
+/* 추가: OLD 테이블 FK 재생성 */
+ALTER TABLE post_comment_dislikes_tbl_old
+    ADD CONSTRAINT fk_post_cmt_dislikes_user_old FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
+
+ALTER TABLE post_comment_likes_tbl_old
+    ADD CONSTRAINT fk_post_cmt_likes_user_old FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
+
+ALTER TABLE post_dislikes_tbl_old
+    ADD CONSTRAINT fk_post_dislikes_user_old FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
+
+ALTER TABLE post_likes_tbl_old
+    ADD CONSTRAINT fk_post_likes_user_old FOREIGN KEY (user_id) REFERENCES users_tbl(user_id);
 
 /* ─── 5. feedbacks_tbl 정리 ─── */
 ALTER TABLE feedbacks_tbl
