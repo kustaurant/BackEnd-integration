@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Builder
-@Table(name="post_comments_likes_tbl_new")
+@Table(name="post_comment_likes_tbl")
 public class PostCommentLikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

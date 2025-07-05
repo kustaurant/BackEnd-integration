@@ -100,7 +100,7 @@
                         </span>
                         <span class="third-detail user-name">
                         <img th:src="${view.post.user.rankImg}">
-                        <span th:text="${view.post.user.userNickname} ">
+                        <span th:text="${view.post.user.nickname} ">
                         </span>
                         </span>
 
@@ -120,7 +120,7 @@
                 </div>
             </div>
             <!-- 글 수정 버튼 -->
-            <a th:if="${view.post.user != null and view.currentUser != null and view.post.user.userNickname == view.currentUser.userNickname}"
+            <a th:if="${view.post.user != null and view.currentUser != null and view.post.user.nickname == view.currentUser.nickname}"
                th:href="'/community/post/update?postId=' + ${view.post.postId}"
                type="button" class="post-update"
                th:data-id="${view.post.postId}">
@@ -128,7 +128,7 @@
             </a>
 
             <!-- 글 삭제 버튼 -->
-            <button th:if="${view.post.user != null and view.currentUser != null and view.post.user.userNickname == view.currentUser.userNickname}"
+            <button th:if="${view.post.user != null and view.currentUser != null and view.post.user.nickname == view.currentUser.nickname}"
                     type="button" class="post-delete"
                     data-bs-toggle="modal" data-bs-target="#postModal"
                     th:data-id="${view.post.postId}"
@@ -215,7 +215,7 @@
                                 <div class="comment-name">
                                     <img th:src="${comment.user.rankImg}">
 
-                                    <span class="user-name" th:text="${comment.user.userNickname}"></span>
+                                    <span class="user-name" th:text="${comment.user.nickname}"></span>
                                     <span th:text="${comment.timeAgo}"></span>
                                 </div>
                                 <div class="comment-body">
@@ -224,7 +224,7 @@
                                     </div>
                                 </div>
                                 <ul style="padding-left: 0;">
-                                    <li th:if="${comment.user != null and view.currentUser != null and comment.user.userNickname == view.currentUser.userNickname}">
+                                    <li th:if="${comment.user != null and view.currentUser != null and comment.user.nickname == view.currentUser.nickname}">
                                         <!-- 댓글 삭제 버튼 -->
                                         <button class="comment-button comment-delete" data-bs-toggle="modal"
                                                 data-bs-target="#commentModal" th:data-id="${comment.commentId}"

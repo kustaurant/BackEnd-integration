@@ -42,7 +42,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     public Optional<PostComment> findById(Integer comment_id) {
         return postCommentJpaRepository.findById(comment_id).map(PostCommentEntity::toDomain);
     }
-    
+
     @Override
     public Optional<PostComment> findByIdWithReplies(Integer commentId) {
         return postCommentJpaRepository.findById(commentId)
