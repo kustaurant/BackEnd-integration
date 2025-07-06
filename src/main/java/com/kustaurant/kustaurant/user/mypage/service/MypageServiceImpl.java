@@ -73,7 +73,7 @@ public class MypageServiceImpl implements MypageService {
                 .map(comment -> new PostCommentView(
                         comment.getId(),
                         comment.getCommentBody(),
-                        comment.getNetLikes(),
+                        0, // netLikes 필드 제거됨
                         comment.calculateTimeAgo(),
                         postIdToTitle.getOrDefault(comment.getPostId(), "알 수 없음"),
                         comment.getPostId()

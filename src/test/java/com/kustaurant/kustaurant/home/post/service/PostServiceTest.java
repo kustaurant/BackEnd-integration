@@ -44,9 +44,10 @@ class PostServiceTest {
         imageExtractor = mock(ImageExtractor.class);
         userService = mock(UserService.class);
 
+        PostQueryDAO postQueryDAO = mock(PostQueryDAO.class);
         postService = new PostService(postRepository, userRepository,
                 postScrapRepository, postLikeRepository, postDislikeRepository,
-                postPhotoRepository, imageExtractor, userService);
+                postPhotoRepository, imageExtractor, postQueryDAO, userService);
     }
 
     @Test
@@ -57,9 +58,6 @@ class PostServiceTest {
 
         Post post = Post.builder()
                 .id(postId)
-                .likeCount(0)
-                .dislikeCount(0)
-                .netLikes(0)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .authorId(userId)
@@ -89,9 +87,6 @@ class PostServiceTest {
 
         Post post = Post.builder()
                 .id(postId)
-                .likeCount(0)
-                .dislikeCount(1)
-                .netLikes(-1)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .authorId(userId)

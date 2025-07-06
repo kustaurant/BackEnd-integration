@@ -10,6 +10,7 @@ import com.kustaurant.kustaurant.post.post.domain.response.InteractionStatusResp
 import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.post.enums.*;
 import com.kustaurant.kustaurant.post.post.service.port.*;
+import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
@@ -39,6 +40,7 @@ public class PostService {
     private final PostDislikeRepository postDislikeRepository;
     private final PostPhotoRepository postPhotoRepository;
     private final ImageExtractor imageExtractor;
+    private final PostQueryDAO postQueryDAO;
 
 
     // 인기순 제한 기준 숫자
@@ -77,6 +79,8 @@ public class PostService {
             postEntityPage = this.postRepository.findByStatusAndSearchKeyword(ContentStatus.ACTIVE, kw, postCategory, -1000, pageable);
         }
 
+        // PostQueryDAO를 활용한 효율적인 데이터 조회
+        // 우선 기존 로직 유지 (향후 개선 예정)
         return postEntityPage
                 .map(postEntity -> {
                     User user = userService.getUserById(postEntity.getAuthorId());
@@ -157,6 +161,7 @@ public class PostService {
             status = ReactionStatus.LIKE_CREATED;
         }
 
+        // 리액션 뒤 최신 지표 조회
         int likeCount = postLikeRepository.countByPostId(postId);
         int dislikeCount = postDislikeRepository.countByPostId(postId);
 
@@ -183,6 +188,7 @@ public class PostService {
             status = ReactionStatus.DISLIKE_CREATED;
         }
 
+        // 리액션 뒤 최신 지표 조회
         int likeCount = postLikeRepository.countByPostId(postId);
         int dislikeCount = postDislikeRepository.countByPostId(postId);
 
@@ -227,7 +233,7 @@ public class PostService {
 
     @Transactional
     public Post create(String title, String category, String body, Long userId) {
-        Post post = Post.builder().title(title).category(category).body(body).status(ContentStatus.ACTIVE).netLikes(0).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).authorId(userId).build();
+        Post post = Post.builder().title(title).category(category).body(body).status(ContentStatus.ACTIVE).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).authorId(userId).build();
         Post savedPost = postRepository.save(post);
 
         List<String> imageUrls = imageExtractor.extract(body);
@@ -272,4 +278,47 @@ public class PostService {
         }
         return postDTOList;
     }
+    
+    /**
+     * PostQueryDAO를 활용한 최적화된 게시글 상세 조회
+     * 모든 관련 데이터를 단일 쿼리로 조회하여 N+1 문제 해결
+     */
+    public Optional<PostDTO> getPostWithAllData(Integer postId, Long currentUserId) {
+        Optional<PostDTOProjection> projection = postQueryDAO.findPostWithAllData(postId, currentUserId);
+        return projection.map(PostDTO::from);
+    }
+    
+    /**
+     * PostQueryDAO를 활용한 최적화된 게시글 목록 조회
+     * 모든 관련 데이터를 단일 쿼리로 조회하여 N+1 문제 해결
+     */
+    public Page<PostDTO> getPostsWithAllData(Pageable pageable, Long currentUserId) {
+        Page<PostDTOProjection> projections = postQueryDAO.findPostsWithAllData(pageable, currentUserId);
+        return projections.map(PostDTO::from);
+    }
+    
+    /**
+     * 카테고리별 게시글 목록 조회 (최적화된 버전)
+     */
+    public Page<PostDTO> getPostsByCategoryWithAllData(String category, Pageable pageable, Long currentUserId) {
+        Page<PostDTOProjection> projections = postQueryDAO.findPostsByCategoryWithAllData(category, pageable, currentUserId);
+        return projections.map(PostDTO::from);
+    }
+    
+    /**
+     * 특정 사용자의 게시글 목록 조회 (최적화된 버전)
+     */
+    public List<PostDTO> getPostsByAuthorWithAllData(Long authorId, Long currentUserId) {
+        List<PostDTOProjection> projections = postQueryDAO.findPostsByAuthorWithAllData(authorId, currentUserId);
+        return projections.stream().map(PostDTO::from).collect(Collectors.toList());
+    }
+    
+    /**
+     * 스크랩한 게시글 목록 조회 (최적화된 버전)
+     */
+    public List<PostDTO> getScrappedPostsWithAllData(Long userId, Long currentUserId) {
+        List<PostDTOProjection> projections = postQueryDAO.findScrappedPostsByUserWithAllData(userId, currentUserId);
+        return projections.stream().map(PostDTO::from).collect(Collectors.toList());
+    }
+
 }

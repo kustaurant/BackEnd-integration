@@ -75,7 +75,6 @@ public class PostCommentService {
 
         boolean isLikedBefore = postCommentLikeRepository.existsByUserIdAndCommentId(userId, commentId);
         boolean isDislikedBefore = postCommentDislikeRepository.existsByUserIdAndCommentId(userId, commentId);
-        log.info("toggleLike - userId: {}, commentId: {}, isLikedBefore: {}, isDislikedBefore: {}", userId, commentId, isLikedBefore, isDislikedBefore);
         ReactionStatus status;
         if (isLikedBefore) {
             postCommentLikeRepository.deleteByUserIdAndCommentId(userId, commentId);
@@ -145,7 +144,8 @@ public class PostCommentService {
         List<PostComment> postCommentList = postCommentRepository.findParentComments(postId);
         List<PostComment> mutableList = new ArrayList<>(postCommentList);
         if (sort.equals("popular")) {
-            mutableList.sort(Comparator.comparingInt(PostComment::getNetLikes).reversed());
+            // 인기순은 일단 생성일시 기준으로 정렬 (향후 별도 카운트 로직 구현 예정)
+            mutableList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
         } else {
             mutableList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
         }

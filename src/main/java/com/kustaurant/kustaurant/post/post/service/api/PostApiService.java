@@ -20,6 +20,8 @@ import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
 import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.post.service.web.PostService;
+import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
+import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
@@ -46,6 +48,7 @@ public class PostApiService {
     // 페이지 숫자
     public static final int PAGESIZE = 10;
     private final PostService postService;
+    private final PostQueryDAO postQueryDAO;
 
     // 메인 화면 로딩하기
     public Page<PostDTO> getPosts(int page, String sort, String koreanCategory, String postBodyType) {
@@ -74,8 +77,8 @@ public class PostApiService {
             }
         }
 
+        // 기존 방식 (N+1 문제 존재)
         Page<PostDTO> result = posts.map(post -> {
-            // TODO: PostDTO에 UserDTO 추가
             PostDTO dto = PostDTO.from(post);
             if (postBodyType.equals("text")) {
                 dto.setPostBody(Jsoup.parse(dto.getPostBody()).text()); // HTML 제거 후 일반 텍스트 변환
@@ -254,5 +257,64 @@ public class PostApiService {
 
         // 관련 사진 삭제
         deletePhotos(post);
+    }
+    
+    /**
+     * PostQueryDAO를 활용한 최적화된 게시글 목록 조회 (API용)
+     * 모든 관련 데이터를 단일 쿼리로 조회하여 N+1 문제 해결
+     */
+    public Page<PostDTO> getPostsOptimized(int page, String sort, String koreanCategory, String postBodyType, Long currentUserId) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
+        
+        Page<PostDTO> result;
+        
+        if (koreanCategory.equals("전체")) {
+            result = postService.getPostsWithAllData(pageable, currentUserId);
+        } else {
+            result = postService.getPostsByCategoryWithAllData(koreanCategory, pageable, currentUserId);
+        }
+        
+        // 인기순 필터링은 서비스 레이어에서 처리 (향후 쿼리 최적화 가능)
+        if (sort.equals("popular")) {
+            result = result.map(dto -> {
+                if (dto.getLikeCount() < POPULARCOUNT) {
+                    return null; // 필터링될 항목
+                }
+                return dto;
+            });
+        }
+        
+        // 텍스트 변환 처리
+        if (postBodyType.equals("text")) {
+            result = result.map(dto -> {
+                dto.setPostBody(Jsoup.parse(dto.getPostBody()).text()); // HTML 제거 후 일반 텍스트 변환
+                return dto;
+            });
+        }
+        
+        return result;
+    }
+    
+    /**
+     * PostQueryDAO를 활용한 최적화된 게시글 상세 조회 (API용)
+     */
+    public Optional<PostDTO> getPostOptimized(Integer postId, Long currentUserId) {
+        return postService.getPostWithAllData(postId, currentUserId);
+    }
+    
+    /**
+     * 특정 사용자의 게시글 목록 조회 (최적화된 버전)
+     */
+    public List<PostDTO> getPostsByAuthorOptimized(Long authorId, Long currentUserId) {
+        return postService.getPostsByAuthorWithAllData(authorId, currentUserId);
+    }
+    
+    /**
+     * 스크랩한 게시글 목록 조회 (최적화된 버전)
+     */
+    public List<PostDTO> getScrappedPostsOptimized(Long userId, Long currentUserId) {
+        return postService.getScrappedPostsWithAllData(userId, currentUserId);
     }
 }
