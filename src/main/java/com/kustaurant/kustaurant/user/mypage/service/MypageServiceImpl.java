@@ -7,7 +7,8 @@ import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
-import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
+import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
+import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
@@ -16,7 +17,6 @@ import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
 import com.kustaurant.kustaurant.user.mypage.controller.response.MypageDataView;
 import com.kustaurant.kustaurant.user.mypage.controller.response.PostCommentView;
 import com.kustaurant.kustaurant.user.mypage.controller.response.ScrappedPostView;
-import com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo.MyPostScrapQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +34,7 @@ public class MypageServiceImpl implements MypageService {
     private final PostCommentRepository postCommentRepository;
     private final PostScrapRepository postScrapRepository;
 
-    private final MyPostScrapQueryRepository myPostScrapQueryRepository;
-
+    private final PostQueryDAO postQueryDAO;
     public List<RestaurantFavorite> getRestaurantFavorites(Long userId) {
         return restaurantFavoriteRepository.findSortedFavoritesByUserId(userId);
     }
@@ -82,22 +81,21 @@ public class MypageServiceImpl implements MypageService {
     }
 
     private List<ScrappedPostView> getScrapViews(Long userId) {
-        return myPostScrapQueryRepository.findScrappedPostsByUserId(userId)
+        return postQueryDAO.findMyScrappedPosts(userId)
                 .stream()
                 .map(this::toScrapView)
                 .toList();
     }
 
-    private ScrappedPostView toScrapView(PostEntity p) {
-
+    private ScrappedPostView toScrapView(PostDTOProjection p) {
         return ScrappedPostView.builder()
-                .postId(p.getPostId())
-                .title(p.getPostTitle())
-                .category(p.getPostCategory())
+                .postId(p.postId())
+                .title(p.postTitle())
+                .category(p.postCategory())
                 .likeCount(p.getNetLikes())
                 .timeAgo(TimeAgoUtil.toKor(
-                        p.getUpdatedAt() != null ? p.getUpdatedAt()
-                                : p.getCreatedAt()))
+                        p.updatedAt() != null ? p.updatedAt()
+                                : p.createdAt()))
                 .build();
     }
 

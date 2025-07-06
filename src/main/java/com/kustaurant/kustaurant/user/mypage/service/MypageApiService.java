@@ -41,17 +41,10 @@ public class MypageApiService {
     private final UserRepository userRepository;
     private final UserProfileValidator validator;
     private final NoticeRepository noticeRepo;
-    private final PostRepository postRepository;
-    private final PostCommentRepository postCommentRepository;
-    private final PostPhotoRepository postPhotoRepository;
-
     private final MyUserQueryRepository userQueryRepository;
     private final MypageMainQueryRepository mypageMainQueryRepository;
     private final MyFavoriteRestaurantQueryRepository myFavoriteRestaurantQueryRepository;
     private final MyEvaluationQueryRepository myevaluationQueryRepository;
-    private final MyPostQueryRepository myPostQueryRepository;
-    private final MyPostScrapQueryRepository myPostScrapQueryRepository;
-    private final MyPostCommentQueryRepository myPostCommentQueryRepository;
     private final PostQueryDAO postQueryDAO;
     private final PostCommentQueryDAO postCommentQueryDAO;
 
@@ -158,8 +151,7 @@ public class MypageApiService {
     }
 
 
-
-    // 6. 마이페이지 - 내가 작성한 게시글 목록 조회 (PostDTOProjection -> MyPostsResponse)
+    // 6. 마이페이지 - 내가 작성한 게시글 목록 조회
     @Transactional(readOnly = true)
     public List<MyPostsResponse> getUserPosts(Long userId) {
         return postQueryDAO.findMyWrittenPosts(userId)
