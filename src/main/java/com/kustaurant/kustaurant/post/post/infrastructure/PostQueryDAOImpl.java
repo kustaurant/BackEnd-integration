@@ -15,8 +15,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,7 +29,6 @@ import java.util.Optional;
 public class PostQueryDAOImpl implements PostQueryDAO {
 
     private final JPAQueryFactory queryFactory;
-    private final EntityManager entityManager;
     
     private static final QPostEntity post = QPostEntity.postEntity;
     private static final QPostLikeEntity postLike = QPostLikeEntity.postLikeEntity;
@@ -42,6 +39,7 @@ public class PostQueryDAOImpl implements PostQueryDAO {
     private static final QUserEntity user = QUserEntity.userEntity;
     private static final QUserStatsEntity userStats = QUserStatsEntity.userStatsEntity;
 
+    // 단일 게시글 조회
     @Override
     public Optional<PostDTOProjection> findPostWithAllData(Integer postId, Long currentUserId) {
         PostDTOProjection result = queryFactory
@@ -86,8 +84,97 @@ public class PostQueryDAOImpl implements PostQueryDAO {
                 Expressions.asBoolean(false)
         );
     }
-    
-    private ConstructorExpression<PostDTOProjection> createMyPageProjection() {
+
+
+    // 게시글 페이지로 조회
+    @Override
+    public Page<PostDTOProjection> findPostsWithAllData(Pageable pageable, Long currentUserId) {
+        QPostLikeEntity userLike = new QPostLikeEntity("userLike");
+        QPostScrapEntity userScrap = new QPostScrapEntity("userScrap");
+        
+        // 데이터 조회
+        List<PostDTOProjection> results = queryFactory
+                .select(createPostProjectionWithUserStatus(currentUserId))
+                .from(post)
+                .leftJoin(user).on(post.userId.eq(user.id))
+                .leftJoin(userStats).on(user.id.eq(userStats.id))
+                .leftJoin(postLike).on(post.postId.eq(postLike.postId))
+                .leftJoin(postDislike).on(post.postId.eq(postDislike.postId))
+                .leftJoin(postComment).on(post.postId.eq(postComment.postId))
+                .leftJoin(postScrap).on(post.postId.eq(postScrap.postId))
+                .leftJoin(postPhoto).on(post.postId.eq(postPhoto.postId).and(postPhoto.status.eq(ContentStatus.ACTIVE)))
+                .leftJoin(userLike).on(post.postId.eq(userLike.postId).and(
+                        currentUserId != null ? userLike.userId.eq(currentUserId) : userLike.userId.isNull()))
+                .leftJoin(userScrap).on(post.postId.eq(userScrap.postId).and(
+                        currentUserId != null ? userScrap.userId.eq(currentUserId) : userScrap.userId.isNull()))
+                .where(post.status.eq(ContentStatus.ACTIVE))
+                .groupBy(post.postId, post.postTitle, post.postBody, post.postCategory, post.status, 
+                        post.createdAt, post.updatedAt, post.postVisitCount, post.userId, 
+                        user.nickname.value, userStats.ratedRestCnt)
+                .orderBy(post.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+        
+        // 총 개수 조회
+        Long totalCount = queryFactory
+                .select(post.countDistinct())
+                .from(post)
+                .where(post.status.eq(ContentStatus.ACTIVE))
+                .fetchOne();
+        
+        long count = totalCount != null ? totalCount : 0L;
+        
+        return new PageImpl<>(results, pageable, count);
+    }
+
+    @Override
+    public Page<PostDTOProjection> findPostsByCategoryWithAllData(String category, Pageable pageable, Long currentUserId) {
+        QPostLikeEntity userLike = new QPostLikeEntity("userLike");
+        QPostScrapEntity userScrap = new QPostScrapEntity("userScrap");
+        
+        // 데이터 조회
+        List<PostDTOProjection> results = queryFactory
+                .select(createPostProjectionWithUserStatus(currentUserId))
+                .from(post)
+                .leftJoin(user).on(post.userId.eq(user.id))
+                .leftJoin(userStats).on(user.id.eq(userStats.id))
+                .leftJoin(postLike).on(post.postId.eq(postLike.postId))
+                .leftJoin(postDislike).on(post.postId.eq(postDislike.postId))
+                .leftJoin(postComment).on(post.postId.eq(postComment.postId))
+                .leftJoin(postScrap).on(post.postId.eq(postScrap.postId))
+                .leftJoin(postPhoto).on(post.postId.eq(postPhoto.postId).and(postPhoto.status.eq(ContentStatus.ACTIVE)))
+                .leftJoin(userLike).on(post.postId.eq(userLike.postId).and(
+                        currentUserId != null ? userLike.userId.eq(currentUserId) : userLike.userId.isNull()))
+                .leftJoin(userScrap).on(post.postId.eq(userScrap.postId).and(
+                        currentUserId != null ? userScrap.userId.eq(currentUserId) : userScrap.userId.isNull()))
+                .where(post.status.eq(ContentStatus.ACTIVE)
+                        .and(post.postCategory.eq(category)))
+                .groupBy(post.postId, post.postTitle, post.postBody, post.postCategory, post.status, 
+                        post.createdAt, post.updatedAt, post.postVisitCount, post.userId, 
+                        user.nickname.value, userStats.ratedRestCnt)
+                .orderBy(post.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+        
+        // 총 개수 조회
+        Long totalCount = queryFactory
+                .select(post.countDistinct())
+                .from(post)
+                .where(post.status.eq(ContentStatus.ACTIVE)
+                        .and(post.postCategory.eq(category)))
+                .fetchOne();
+        
+        long count = totalCount != null ? totalCount : 0L;
+        
+        return new PageImpl<>(results, pageable, count);
+    }
+
+    private ConstructorExpression<PostDTOProjection> createPostProjectionWithUserStatus(Long currentUserId) {
+        QPostLikeEntity userLike = new QPostLikeEntity("userLike");
+        QPostScrapEntity userScrap = new QPostScrapEntity("userScrap");
+
         return Projections.constructor(PostDTOProjection.class,
                 post.postId,
                 post.postTitle,
@@ -105,96 +192,24 @@ public class PostQueryDAOImpl implements PostQueryDAO {
                 postComment.commentId.countDistinct().coalesce(0L),
                 postScrap.scrapId.countDistinct().coalesce(0L),
                 postPhoto.photoImgUrl.min().coalesce(""),
-                Expressions.asBoolean(false), // isLiked - 마이페이지에서는 불필요
-                Expressions.asBoolean(false)  // isScraped - 마이페이지에서는 불필요
+                currentUserId != null ?
+                        Expressions.cases()
+                                .when(userLike.userId.max().isNotNull())
+                                .then(true)
+                                .otherwise(false) :
+                        Expressions.asBoolean(false),
+                currentUserId != null ?
+                        Expressions.cases()
+                                .when(userScrap.userId.max().isNotNull())
+                                .then(true)
+                                .otherwise(false) :
+                        Expressions.asBoolean(false)
         );
     }
 
-    @Override
-    public Page<PostDTOProjection> findPostsWithAllData(Pageable pageable, Long currentUserId) {
-        String jpql = buildBaseQuery() + " WHERE p.status = 'ACTIVE' ORDER BY p.createdAt DESC";
-        
-        TypedQuery<PostDTOProjection> query = entityManager.createQuery(jpql, PostDTOProjection.class);
-        if (currentUserId != null) {
-            query.setParameter("currentUserId", currentUserId);
-        }
-        
-        // 페이징 적용
-        query.setFirstResult((int) pageable.getOffset());
-        query.setMaxResults(pageable.getPageSize());
-        
-        List<PostDTOProjection> results = query.getResultList();
-        
-        // 총 개수 조회
-        long totalCount = getTotalCount("WHERE p.status = 'ACTIVE'");
-        
-        return new PageImpl<>(results, pageable, totalCount);
-    }
-
-    @Override
-    public Page<PostDTOProjection> findPostsByCategoryWithAllData(String category, Pageable pageable, Long currentUserId) {
-        String jpql = buildBaseQuery() + " WHERE p.status = 'ACTIVE' AND p.postCategory = :category ORDER BY p.createdAt DESC";
-        
-        TypedQuery<PostDTOProjection> query = entityManager.createQuery(jpql, PostDTOProjection.class);
-        query.setParameter("category", category);
-        if (currentUserId != null) {
-            query.setParameter("currentUserId", currentUserId);
-        }
-        
-        // 페이징 적용
-        query.setFirstResult((int) pageable.getOffset());
-        query.setMaxResults(pageable.getPageSize());
-        
-        List<PostDTOProjection> results = query.getResultList();
-        
-        // 총 개수 조회
-        String countCondition = "WHERE p.status = 'ACTIVE' AND p.postCategory = '" + category + "'";
-        long totalCount = getTotalCount(countCondition);
-        
-        return new PageImpl<>(results, pageable, totalCount);
-    }
 
 
-    private String buildBaseQuery() {
-        return "SELECT NEW com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection(" +
-                "p.postId, " +
-                "p.postTitle, " +
-                "p.postBody, " +
-                "p.postCategory, " +
-                "CAST(p.status AS string), " +
-                "p.createdAt, " +
-                "p.updatedAt, " +
-                "p.postVisitCount, " +
-                "p.userId, " +
-                "u.nickname.value, " +
-                "COALESCE(us.ratedRestCnt, 0), " +
-                "COALESCE(COUNT(DISTINCT pl.postLikesId), 0L), " +
-                "COALESCE(COUNT(DISTINCT pd.postDislikesId), 0L), " +
-                "COALESCE(COUNT(DISTINCT CASE WHEN pc.status = 'ACTIVE' THEN pc.postCommentId END), 0L), " +
-                "COALESCE(COUNT(DISTINCT ps.postScrapId), 0L), " +
-                "COALESCE(MIN(pp.photoImgUrl), ''), " +
-                "CASE WHEN :currentUserId IS NULL THEN false ELSE COALESCE(MAX(CASE WHEN upl.userId = :currentUserId THEN true ELSE false END), false) END, " +
-                "CASE WHEN :currentUserId IS NULL THEN false ELSE COALESCE(MAX(CASE WHEN ups.userId = :currentUserId THEN true ELSE false END), false) END" +
-                ") " +
-                "FROM PostEntity p " +
-                "LEFT JOIN UserEntity u ON p.userId = u.id " +
-                "LEFT JOIN u.stats us " +
-                "LEFT JOIN PostLikeEntity pl ON p.postId = pl.postId " +
-                "LEFT JOIN PostDislikeEntity pd ON p.postId = pd.postId " +
-                "LEFT JOIN PostCommentEntity pc ON p.postId = pc.postId " +
-                "LEFT JOIN PostScrapEntity ps ON p.postId = ps.postId " +
-                "LEFT JOIN PostPhotoEntity pp ON p.postId = pp.postId AND pp.status = 'ACTIVE' " +
-                "LEFT JOIN PostLikeEntity upl ON p.postId = upl.postId " +
-                "LEFT JOIN PostScrapEntity ups ON p.postId = ups.postId " +
-                "GROUP BY p.postId, p.postTitle, p.postBody, p.postCategory, p.status, p.createdAt, p.updatedAt, p.postVisitCount, p.userId, u.nickname.value, us.ratedRestCnt ";
-    }
-
-    private long getTotalCount(String whereClause) {
-        String countJpql = "SELECT COUNT(DISTINCT p.postId) FROM PostEntity p " + whereClause;
-        TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class);
-        return countQuery.getSingleResult();
-    }
-
+    // 마이페이지 내가 작성한 글 조회
     @Override
     public List<PostDTOProjection> findMyWrittenPosts(Long currentUserId) {
         return queryFactory
@@ -216,7 +231,7 @@ public class PostQueryDAOImpl implements PostQueryDAO {
                 .fetch();
     }
 
-
+    // 마이페이지 내가 스크랩한 글 조회
     @Override
     public List<PostDTOProjection> findMyScrappedPosts(Long currentUserId) {
         QPostScrapEntity userScrap = new QPostScrapEntity("userScrap");
@@ -242,6 +257,30 @@ public class PostQueryDAOImpl implements PostQueryDAO {
                         user.nickname.value, userStats.ratedRestCnt)
                 .orderBy(post.createdAt.desc())
                 .fetch();
+    }
+
+    // 마이페이지 전용 게시글 조회 쿼리
+    private ConstructorExpression<PostDTOProjection> createMyPageProjection() {
+        return Projections.constructor(PostDTOProjection.class,
+                post.postId,
+                post.postTitle,
+                post.postBody,
+                post.postCategory,
+                post.status.stringValue(),
+                post.createdAt,
+                post.updatedAt,
+                post.postVisitCount,
+                post.userId,
+                user.nickname.value,
+                userStats.ratedRestCnt.coalesce(0),
+                postLike.postLikesId.countDistinct().coalesce(0L),
+                postDislike.postDislikesId.countDistinct().coalesce(0L),
+                postComment.commentId.countDistinct().coalesce(0L),
+                postScrap.scrapId.countDistinct().coalesce(0L),
+                postPhoto.photoImgUrl.min().coalesce(""),
+                Expressions.asBoolean(false), // isLiked - 마이페이지에서는 불필요
+                Expressions.asBoolean(false)  // isScraped - 마이페이지에서는 불필요
+        );
     }
 
 }
