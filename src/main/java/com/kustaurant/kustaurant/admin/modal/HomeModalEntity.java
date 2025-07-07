@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin.modal.infrastructure;
+package com.kustaurant.kustaurant.admin.modal;
 
 import jakarta.persistence.*;
 import lombok.Getter;

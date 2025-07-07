@@ -1,7 +1,5 @@
-package com.kustaurant.kustaurant.admin.modal.service;
+package com.kustaurant.kustaurant.admin.modal;
 
-import com.kustaurant.kustaurant.admin.modal.infrastructure.HomeModalEntity;
-import com.kustaurant.kustaurant.admin.modal.infrastructure.HomeModalRepository;
 import com.kustaurant.kustaurant.common.service.port.ClockHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -55,8 +55,8 @@ public class PostCommentDTO {
 //        String timeAgo = TimeAgoUtil.toKor(comment.getUpdatedAt() != null ? comment.getUpdatedAt() : comment.getCreatedAt());
 //
 //        return PostCommentDTO.builder()
-//                .commentId(comment.getCommentId())
-//                .commentBody(comment.getCommentBody())
+//                .evalId(comment.getCommentId())
+//                .evalBody(comment.getCommentBody())
 //                .status(comment.getStatus().name())
 //                .user(UserDTO.convertUserToUserDTO(comment.getUserId()))
 //                .likeCount(comment.getPostCommentLikesEntities().size())

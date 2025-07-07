@@ -83,4 +83,9 @@ public class FakeUserRepository implements UserRepository {
     public Map<Long, UserDTO> getUserDTOMapByIds(List<Long> ids) {
         return Map.of();
     }
+
+    @Override
+    public List<User> findByIdIn(List<Long> ids) {
+        return List.of();
+    }
 }

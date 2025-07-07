@@ -17,17 +17,16 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Integer restaurantId) {
         return store.stream()
                 .filter(fav -> fav.getUserId().equals(userId) &&
-                        fav.getRestaurant().getRestaurantId().equals(restaurantId))
+                        fav.getRestaurantId().equals(restaurantId))
                 .findFirst()
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_FAVORITE_NOT_FOUND, "Favorite not found - UserId:" + userId + ", RestaurantId:" + restaurantId));
-
     }
 
     @Override
     public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
         return store.stream()
                 .anyMatch(fav -> fav.getUserId().equals(userId) &&
-                        fav.getRestaurant().getRestaurantId().equals(restaurantId));
+                        fav.getRestaurantId().equals(restaurantId));
     }
 
     @Override

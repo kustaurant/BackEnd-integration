@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.common.enums;
 
-public enum reaction {
+public enum ReactionType {
     LIKE, DISLIKE;
 
     public boolean isLike() {

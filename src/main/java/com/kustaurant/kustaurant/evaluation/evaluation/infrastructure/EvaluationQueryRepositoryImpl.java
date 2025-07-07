@@ -4,7 +4,10 @@ import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa.EvaluationQueryJpaRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
+
+import java.util.List;
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -39,5 +42,21 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
     @Override
     public int countByStatus(String status) {
         return jpaRepository.countByStatus(status);
+    }
+
+    @Override
+    public List<Evaluation> findByRestaurantIdOrderByCreatedAtDesc(Integer restaurantId) {
+        return jpaRepository.findByRestaurantIdOrderByCreatedAtDesc(restaurantId)
+                .stream()
+                .map(EvaluationEntity::toModel)
+                .toList();
+    }
+
+    @Override
+    public List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Integer restaurantId) {
+        return jpaRepository.findByRestaurantIdOrderByLikeCountDesc(restaurantId)
+                .stream()
+                .map(EvaluationEntity::toModel)
+                .toList();
     }
 }

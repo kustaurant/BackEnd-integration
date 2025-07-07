@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.evaluation.report;
+package com.kustaurant.kustaurant.admin.report;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name="restaurant_comment_reports_tbl")
+@Table(name="report")
 @NoArgsConstructor
-public class RestaurantCommentReportEntity {
+public class ReportEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer reportId;
@@ -31,7 +31,7 @@ public class RestaurantCommentReportEntity {
     private LocalDateTime createdAt;
     private String status;
 
-    public RestaurantCommentReportEntity(
+    public ReportEntity(
             Long userId,
             EvalCommentEntity restaurantComment,
             LocalDateTime createdAt,
@@ -43,7 +43,7 @@ public class RestaurantCommentReportEntity {
         this.createdAt = createdAt;
         this.status = status;
     }
-    public RestaurantCommentReportEntity(
+    public ReportEntity(
             Long userId,
             EvaluationEntity evaluation,
             LocalDateTime createdAt,

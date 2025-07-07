@@ -246,7 +246,7 @@ public class PostService {
                 return cb.and(statusPredicate, likeCountPredicate, cb.or(cb.like(p.get("postTitle"), "%" + kw + "%"), // 제목
                         cb.like(p.get("postBody"), "%" + kw + "%"),      // 내용
                         cb.like(u1.get("nickname").get("value"), "%" + kw + "%")    // 글 작성자
-//                        ,cb.like(c.get("commentBody"), "%" + kw + "%"),      // 댓글 내용
+//                        ,cb.like(c.get("evalBody"), "%" + kw + "%"),      // 댓글 내용
 //                        cb.like(u2.get("userNickname"), "%" + kw + "%") // 댓글 작성자
                 ));
             }

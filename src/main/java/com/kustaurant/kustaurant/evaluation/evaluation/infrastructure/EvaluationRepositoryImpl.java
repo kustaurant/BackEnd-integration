@@ -37,36 +37,10 @@ public class EvaluationRepositoryImpl implements EvaluationRepository {
                 .toList();
     }
 
-
-    // TODO: need to delete everything below this.
-
     @Override
-    public EvaluationEntity save(EvaluationEntity evaluation) {
-        return null;
-    }
-
-    @Override
-    public Optional<EvaluationEntity> findByUserAndRestaurant(Long userId, RestaurantEntity restaurant) {
+    public Optional<Evaluation> findById(Long id) {
         return Optional.empty();
     }
 
-    @Override
-    public Optional<EvaluationEntity> findByUserAndRestaurantAndStatus(Long userId, RestaurantEntity restaurant, String status) {
-        return Optional.empty();
-    }
 
-    @Override
-    public Integer countByRestaurant(RestaurantEntity restaurant) {
-        return 0;
-    }
-
-    @Override
-    public Optional<EvaluationEntity> findByEvaluationIdAndStatus(Integer evaluationId, String status) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<EvaluationEntity> findByStatus(String status) {
-        return List.of();
-    }
 }

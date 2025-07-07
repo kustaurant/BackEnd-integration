@@ -2,7 +2,6 @@ package com.kustaurant.kustaurant.restaurant.restaurant.service;
 
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentResponse;
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
-import com.kustaurant.kustaurant.evaluation.comment.service.EvalCommentService;
 import com.kustaurant.kustaurant.restaurant.restaurant.controller.response.RestaurantDetailDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.controller.web.RestaurantDetailWebDto;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
@@ -22,14 +21,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class RestaurantWebService {
     
     private final RestaurantService restaurantService;
-    private final EvalCommentService restaurantCommentService;
 
     public RestaurantDetailWebDto getRestaurantWebDetails(Long userId, Integer restaurantId) {
         RestaurantDetailDTO restaurantDetailDto = restaurantService.getActiveRestaurantDetailDto(restaurantId, userId);

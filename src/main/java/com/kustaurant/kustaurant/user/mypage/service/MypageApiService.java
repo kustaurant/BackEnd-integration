@@ -136,7 +136,7 @@ public class MypageApiService {
                             "url",
                             "Cuisine",
                             e.getEvaluationScore(),
-                            e.getCommentBody(),
+                            e.getBody(),
                             situations
                     );
                 })

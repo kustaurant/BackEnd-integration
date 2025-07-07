@@ -84,4 +84,9 @@ public class UserRepositoryImpl implements UserRepository {
                 ));
     }
 
+    @Override
+    public List<User> findByIdIn(List<Long> ids) {
+        return jpaRepository.findByIdIn(ids).stream().map(UserEntity::toModel).collect(Collectors.toList());
+    }
+
 }

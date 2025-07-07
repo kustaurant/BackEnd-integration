@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.home;
 
-import com.kustaurant.kustaurant.admin.modal.service.HomeModalService;
+import com.kustaurant.kustaurant.admin.modal.HomeModalService;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.kustaurant.admin.modal.infrastructure.HomeModalEntity;
+import com.kustaurant.kustaurant.admin.modal.HomeModalEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
