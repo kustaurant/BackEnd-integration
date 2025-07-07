@@ -16,7 +16,6 @@ public record PostCommentDTOProjection(
         Integer postId,
         Long userId,
         String userNickname,
-        String userRankImg,
         Integer userEvaluationCount,
         Long likeCount,
         Long dislikeCount,
