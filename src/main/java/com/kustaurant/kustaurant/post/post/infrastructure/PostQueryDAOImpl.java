@@ -2,8 +2,20 @@ package com.kustaurant.kustaurant.post.post.infrastructure;
 
 import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
 import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostEntity;
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostLikeEntity;
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostDislikeEntity;
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostPhotoEntity;
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostScrapEntity;
+import com.kustaurant.kustaurant.post.comment.infrastructure.QPostCommentEntity;
+import com.kustaurant.kustaurant.user.user.infrastructure.QUserEntity;
+import com.kustaurant.kustaurant.user.mypage.infrastructure.QUserStatsEntity;
+import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.ConstructorExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,21 +30,84 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostQueryDAOImpl implements PostQueryDAO {
 
-    @PersistenceContext
+    private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
+    
+    private static final QPostEntity post = QPostEntity.postEntity;
+    private static final QPostLikeEntity postLike = QPostLikeEntity.postLikeEntity;
+    private static final QPostDislikeEntity postDislike = QPostDislikeEntity.postDislikeEntity;
+    private static final QPostPhotoEntity postPhoto = QPostPhotoEntity.postPhotoEntity;
+    private static final QPostScrapEntity postScrap = QPostScrapEntity.postScrapEntity;
+    private static final QPostCommentEntity postComment = QPostCommentEntity.postCommentEntity;
+    private static final QUserEntity user = QUserEntity.userEntity;
+    private static final QUserStatsEntity userStats = QUserStatsEntity.userStatsEntity;
 
     @Override
     public Optional<PostDTOProjection> findPostWithAllData(Integer postId, Long currentUserId) {
-        String jpql = buildBaseQuery() + " WHERE p.postId = :postId AND p.status = 'ACTIVE'";
+        PostDTOProjection result = queryFactory
+                .select(createPostProjection(currentUserId))
+                .from(post)
+                .leftJoin(user).on(post.userId.eq(user.id))
+                .leftJoin(userStats).on(user.id.eq(userStats.id))
+                .leftJoin(postLike).on(post.postId.eq(postLike.postId))
+                .leftJoin(postDislike).on(post.postId.eq(postDislike.postId))
+                .leftJoin(postComment).on(post.postId.eq(postComment.postId))
+                .leftJoin(postScrap).on(post.postId.eq(postScrap.postId))
+                .leftJoin(postPhoto).on(post.postId.eq(postPhoto.postId).and(postPhoto.status.eq(ContentStatus.ACTIVE)))
+                .where(post.postId.eq(postId)
+                        .and(post.status.eq(ContentStatus.ACTIVE)))
+                .groupBy(post.postId, post.postTitle, post.postBody, post.postCategory, post.status, 
+                        post.createdAt, post.updatedAt, post.postVisitCount, post.userId, 
+                        user.nickname.value, userStats.ratedRestCnt)
+                .fetchOne();
         
-        TypedQuery<PostDTOProjection> query = entityManager.createQuery(jpql, PostDTOProjection.class);
-        query.setParameter("postId", postId);
-        if (currentUserId != null) {
-            query.setParameter("currentUserId", currentUserId);
-        }
-        
-        List<PostDTOProjection> results = query.getResultList();
-        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+        return Optional.ofNullable(result);
+    }
+    
+    private ConstructorExpression<PostDTOProjection> createPostProjection(Long currentUserId) {
+        return Projections.constructor(PostDTOProjection.class,
+                post.postId,
+                post.postTitle,
+                post.postBody,
+                post.postCategory,
+                post.status.stringValue(),
+                post.createdAt,
+                post.updatedAt,
+                post.postVisitCount,
+                post.userId,
+                user.nickname.value,
+                userStats.ratedRestCnt.coalesce(0),
+                postLike.postLikesId.countDistinct().coalesce(0L),
+                postDislike.postDislikesId.countDistinct().coalesce(0L),
+                postComment.commentId.countDistinct().coalesce(0L),
+                postScrap.scrapId.countDistinct().coalesce(0L),
+                postPhoto.photoImgUrl.min().coalesce(""),
+                Expressions.asBoolean(false),
+                Expressions.asBoolean(false)
+        );
+    }
+    
+    private ConstructorExpression<PostDTOProjection> createMyPageProjection() {
+        return Projections.constructor(PostDTOProjection.class,
+                post.postId,
+                post.postTitle,
+                post.postBody,
+                post.postCategory,
+                post.status.stringValue(),
+                post.createdAt,
+                post.updatedAt,
+                post.postVisitCount,
+                post.userId,
+                user.nickname.value,
+                userStats.ratedRestCnt.coalesce(0),
+                postLike.postLikesId.countDistinct().coalesce(0L),
+                postDislike.postDislikesId.countDistinct().coalesce(0L),
+                postComment.commentId.countDistinct().coalesce(0L),
+                postScrap.scrapId.countDistinct().coalesce(0L),
+                postPhoto.photoImgUrl.min().coalesce(""),
+                Expressions.asBoolean(false), // isLiked - 마이페이지에서는 불필요
+                Expressions.asBoolean(false)  // isScraped - 마이페이지에서는 불필요
+        );
     }
 
     @Override
@@ -79,33 +154,6 @@ public class PostQueryDAOImpl implements PostQueryDAO {
         return new PageImpl<>(results, pageable, totalCount);
     }
 
-    @Override
-    public List<PostDTOProjection> findPostsByAuthorWithAllData(Long authorId, Long currentUserId) {
-        String jpql = buildBaseQuery() + " WHERE p.status = 'ACTIVE' AND p.userId = :authorId ORDER BY p.createdAt DESC";
-        
-        TypedQuery<PostDTOProjection> query = entityManager.createQuery(jpql, PostDTOProjection.class);
-        query.setParameter("authorId", authorId);
-        if (currentUserId != null) {
-            query.setParameter("currentUserId", currentUserId);
-        }
-        
-        return query.getResultList();
-    }
-
-    @Override
-    public List<PostDTOProjection> findScrappedPostsByUserWithAllData(Long userId, Long currentUserId) {
-        String jpql = buildBaseQuery() + 
-                " WHERE p.status = 'ACTIVE' AND EXISTS (SELECT 1 FROM PostScrapEntity ps WHERE ps.postId = p.postId AND ps.userId = :userId) " +
-                " ORDER BY p.createdAt DESC";
-        
-        TypedQuery<PostDTOProjection> query = entityManager.createQuery(jpql, PostDTOProjection.class);
-        query.setParameter("userId", userId);
-        if (currentUserId != null) {
-            query.setParameter("currentUserId", currentUserId);
-        }
-        
-        return query.getResultList();
-    }
 
     private String buildBaseQuery() {
         return "SELECT NEW com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection(" +
@@ -119,8 +167,7 @@ public class PostQueryDAOImpl implements PostQueryDAO {
                 "p.postVisitCount, " +
                 "p.userId, " +
                 "u.nickname.value, " +
-                "COALESCE(u.rankImg, ''), " +
-                "COALESCE(us.evaluationCount, 0), " +
+                "COALESCE(us.ratedRestCnt, 0), " +
                 "COALESCE(COUNT(DISTINCT pl.postLikesId), 0L), " +
                 "COALESCE(COUNT(DISTINCT pd.postDislikesId), 0L), " +
                 "COALESCE(COUNT(DISTINCT CASE WHEN pc.status = 'ACTIVE' THEN pc.postCommentId END), 0L), " +
@@ -139,7 +186,7 @@ public class PostQueryDAOImpl implements PostQueryDAO {
                 "LEFT JOIN PostPhotoEntity pp ON p.postId = pp.postId AND pp.status = 'ACTIVE' " +
                 "LEFT JOIN PostLikeEntity upl ON p.postId = upl.postId " +
                 "LEFT JOIN PostScrapEntity ups ON p.postId = ups.postId " +
-                "GROUP BY p.postId, p.postTitle, p.postBody, p.postCategory, p.status, p.createdAt, p.updatedAt, p.postVisitCount, p.userId, u.nickname.value, u.rankImg, us.evaluationCount ";
+                "GROUP BY p.postId, p.postTitle, p.postBody, p.postCategory, p.status, p.createdAt, p.updatedAt, p.postVisitCount, p.userId, u.nickname.value, us.ratedRestCnt ";
     }
 
     private long getTotalCount(String whereClause) {
@@ -150,75 +197,51 @@ public class PostQueryDAOImpl implements PostQueryDAO {
 
     @Override
     public List<PostDTOProjection> findMyWrittenPosts(Long currentUserId) {
-        String jpql = buildMyPageQuery() + " WHERE p.status = 'ACTIVE' AND p.userId = :currentUserId ORDER BY p.createdAt DESC";
-        
-        TypedQuery<PostDTOProjection> query = entityManager.createQuery(jpql, PostDTOProjection.class);
-        query.setParameter("currentUserId", currentUserId);
-        
-        return query.getResultList();
+        return queryFactory
+                .select(createMyPageProjection())
+                .from(post)
+                .leftJoin(user).on(post.userId.eq(user.id))
+                .leftJoin(userStats).on(user.id.eq(userStats.id))
+                .leftJoin(postLike).on(post.postId.eq(postLike.postId))
+                .leftJoin(postDislike).on(post.postId.eq(postDislike.postId))
+                .leftJoin(postComment).on(post.postId.eq(postComment.postId))
+                .leftJoin(postScrap).on(post.postId.eq(postScrap.postId))
+                .leftJoin(postPhoto).on(post.postId.eq(postPhoto.postId).and(postPhoto.status.eq(ContentStatus.ACTIVE)))
+                .where(post.status.eq(ContentStatus.ACTIVE)
+                        .and(post.userId.eq(currentUserId)))
+                .groupBy(post.postId, post.postTitle, post.postBody, post.postCategory, post.status, 
+                        post.createdAt, post.updatedAt, post.postVisitCount, post.userId, 
+                        user.nickname.value, userStats.ratedRestCnt)
+                .orderBy(post.createdAt.desc())
+                .fetch();
     }
 
-    @Override
-    public List<PostDTOProjection> findMyCommentedPosts(Long currentUserId) {
-        String jpql = buildMyPageQuery() + 
-                " WHERE p.status = 'ACTIVE' AND EXISTS (" +
-                "   SELECT 1 FROM PostCommentEntity pc " +
-                "   WHERE pc.postId = p.postId AND pc.userId = :currentUserId AND pc.status = 'ACTIVE'" +
-                " ) ORDER BY p.createdAt DESC";
-        
-        TypedQuery<PostDTOProjection> query = entityManager.createQuery(jpql, PostDTOProjection.class);
-        query.setParameter("currentUserId", currentUserId);
-        
-        return query.getResultList();
-    }
 
     @Override
     public List<PostDTOProjection> findMyScrappedPosts(Long currentUserId) {
-        String jpql = buildMyPageQuery() + 
-                " WHERE p.status = 'ACTIVE' AND EXISTS (" +
-                "   SELECT 1 FROM PostScrapEntity ps " +
-                "   WHERE ps.postId = p.postId AND ps.userId = :currentUserId" +
-                " ) ORDER BY p.createdAt DESC";
+        QPostScrapEntity userScrap = new QPostScrapEntity("userScrap");
         
-        TypedQuery<PostDTOProjection> query = entityManager.createQuery(jpql, PostDTOProjection.class);
-        query.setParameter("currentUserId", currentUserId);
-        
-        return query.getResultList();
+        return queryFactory
+                .select(createMyPageProjection())
+                .from(post)
+                .leftJoin(user).on(post.userId.eq(user.id))
+                .leftJoin(userStats).on(user.id.eq(userStats.id))
+                .leftJoin(postLike).on(post.postId.eq(postLike.postId))
+                .leftJoin(postDislike).on(post.postId.eq(postDislike.postId))
+                .leftJoin(postComment).on(post.postId.eq(postComment.postId))
+                .leftJoin(postScrap).on(post.postId.eq(postScrap.postId))
+                .leftJoin(postPhoto).on(post.postId.eq(postPhoto.postId).and(postPhoto.status.eq(ContentStatus.ACTIVE)))
+                .where(post.status.eq(ContentStatus.ACTIVE)
+                        .and(queryFactory.selectOne()
+                                .from(userScrap)
+                                .where(userScrap.postId.eq(post.postId)
+                                        .and(userScrap.userId.eq(currentUserId)))
+                                .exists()))
+                .groupBy(post.postId, post.postTitle, post.postBody, post.postCategory, post.status, 
+                        post.createdAt, post.updatedAt, post.postVisitCount, post.userId, 
+                        user.nickname.value, userStats.ratedRestCnt)
+                .orderBy(post.createdAt.desc())
+                .fetch();
     }
 
-    /**
-     * 마이페이지용 간소화된 쿼리 (상호작용 정보 제외)
-     */
-    private String buildMyPageQuery() {
-        return "SELECT NEW com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection(" +
-                "p.postId, " +
-                "p.postTitle, " +
-                "p.postBody, " +
-                "p.postCategory, " +
-                "CAST(p.status AS string), " +
-                "p.createdAt, " +
-                "p.updatedAt, " +
-                "p.postVisitCount, " +
-                "p.userId, " +
-                "u.nickname.value, " +
-                "COALESCE(u.rankImg, ''), " +
-                "COALESCE(us.evaluationCount, 0), " +
-                "COALESCE(COUNT(DISTINCT pl.postLikesId), 0L), " +
-                "COALESCE(COUNT(DISTINCT pd.postDislikesId), 0L), " +
-                "COALESCE(COUNT(DISTINCT CASE WHEN pc.status = 'ACTIVE' THEN pc.postCommentId END), 0L), " +
-                "COALESCE(COUNT(DISTINCT ps.postScrapId), 0L), " +
-                "COALESCE(MIN(pp.photoImgUrl), ''), " +
-                "false, " + // isLiked - 마이페이지에서는 불필요
-                "false" +   // isScraped - 마이페이지에서는 불필요  
-                ") " +
-                "FROM PostEntity p " +
-                "LEFT JOIN UserEntity u ON p.userId = u.id " +
-                "LEFT JOIN u.stats us " +
-                "LEFT JOIN PostLikeEntity pl ON p.postId = pl.postId " +
-                "LEFT JOIN PostDislikeEntity pd ON p.postId = pd.postId " +
-                "LEFT JOIN PostCommentEntity pc ON p.postId = pc.postId " +
-                "LEFT JOIN PostScrapEntity ps ON p.postId = ps.postId " +
-                "LEFT JOIN PostPhotoEntity pp ON p.postId = pp.postId AND pp.status = 'ACTIVE' " +
-                "GROUP BY p.postId, p.postTitle, p.postBody, p.postCategory, p.status, p.createdAt, p.updatedAt, p.postVisitCount, p.userId, u.nickname.value, u.rankImg, us.evaluationCount ";
-    }
 }

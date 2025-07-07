@@ -305,20 +305,5 @@ public class PostService {
         return projections.map(PostDTO::from);
     }
     
-    /**
-     * 특정 사용자의 게시글 목록 조회 (최적화된 버전)
-     */
-    public List<PostDTO> getPostsByAuthorWithAllData(Long authorId, Long currentUserId) {
-        List<PostDTOProjection> projections = postQueryDAO.findPostsByAuthorWithAllData(authorId, currentUserId);
-        return projections.stream().map(PostDTO::from).collect(Collectors.toList());
-    }
-    
-    /**
-     * 스크랩한 게시글 목록 조회 (최적화된 버전)
-     */
-    public List<PostDTO> getScrappedPostsWithAllData(Long userId, Long currentUserId) {
-        List<PostDTOProjection> projections = postQueryDAO.findScrappedPostsByUserWithAllData(userId, currentUserId);
-        return projections.stream().map(PostDTO::from).collect(Collectors.toList());
-    }
 
 }

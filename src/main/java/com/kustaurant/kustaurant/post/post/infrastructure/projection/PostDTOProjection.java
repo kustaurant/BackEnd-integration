@@ -13,7 +13,6 @@ public record PostDTOProjection(
         Integer visitCount,
         Long authorId,
         String authorNickname,
-        String authorRankImg,
         Integer authorEvaluationCount,
         Long likeCount,
         Long dislikeCount,

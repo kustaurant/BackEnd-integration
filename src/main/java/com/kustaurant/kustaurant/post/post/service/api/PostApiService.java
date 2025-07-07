@@ -231,7 +231,6 @@ public class PostApiService {
             return 4;
         }
     }
-    // TODO: Post에 Setter 제거 하고 value type 으로 postContent 를 새로 만들어서 update하기
     public void updatePost(PostUpdateDTO postUpdateDTO, Post post) {
         if (postUpdateDTO.getTitle() != null) post.setTitle(postUpdateDTO.getTitle());
         if (postUpdateDTO.getPostCategory() != null) post.setCategory(postUpdateDTO.getPostCategory());
@@ -258,7 +257,7 @@ public class PostApiService {
         // 관련 사진 삭제
         deletePhotos(post);
     }
-    
+
     /**
      * PostQueryDAO를 활용한 최적화된 게시글 목록 조회 (API용)
      * 모든 관련 데이터를 단일 쿼리로 조회하여 N+1 문제 해결
@@ -267,15 +266,15 @@ public class PostApiService {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("createdAt"));
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        
+
         Page<PostDTO> result;
-        
+
         if (koreanCategory.equals("전체")) {
             result = postService.getPostsWithAllData(pageable, currentUserId);
         } else {
             result = postService.getPostsByCategoryWithAllData(koreanCategory, pageable, currentUserId);
         }
-        
+
         // 인기순 필터링은 서비스 레이어에서 처리 (향후 쿼리 최적화 가능)
         if (sort.equals("popular")) {
             result = result.map(dto -> {
@@ -285,7 +284,7 @@ public class PostApiService {
                 return dto;
             });
         }
-        
+
         // 텍스트 변환 처리
         if (postBodyType.equals("text")) {
             result = result.map(dto -> {
@@ -293,28 +292,7 @@ public class PostApiService {
                 return dto;
             });
         }
-        
+
         return result;
-    }
-    
-    /**
-     * PostQueryDAO를 활용한 최적화된 게시글 상세 조회 (API용)
-     */
-    public Optional<PostDTO> getPostOptimized(Integer postId, Long currentUserId) {
-        return postService.getPostWithAllData(postId, currentUserId);
-    }
-    
-    /**
-     * 특정 사용자의 게시글 목록 조회 (최적화된 버전)
-     */
-    public List<PostDTO> getPostsByAuthorOptimized(Long authorId, Long currentUserId) {
-        return postService.getPostsByAuthorWithAllData(authorId, currentUserId);
-    }
-    
-    /**
-     * 스크랩한 게시글 목록 조회 (최적화된 버전)
-     */
-    public List<PostDTO> getScrappedPostsOptimized(Long userId, Long currentUserId) {
-        return postService.getScrappedPostsWithAllData(userId, currentUserId);
     }
 }

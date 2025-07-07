@@ -35,34 +35,11 @@ public interface PostQueryDAO {
     Page<PostDTOProjection> findPostsByCategoryWithAllData(String category, Pageable pageable, Long currentUserId);
     
     /**
-     * 특정 사용자의 게시글 목록을 모든 관련 데이터와 함께 조회
-     * @param authorId 작성자 ID
-     * @param currentUserId 현재 사용자 ID (좋아요/스크랩 여부 확인용, null 가능)
-     * @return List<PostDTOProjection>
-     */
-    List<PostDTOProjection> findPostsByAuthorWithAllData(Long authorId, Long currentUserId);
-    
-    /**
-     * 특정 사용자가 스크랩한 게시글 목록을 모든 관련 데이터와 함께 조회
-     * @param userId 사용자 ID
-     * @param currentUserId 현재 사용자 ID (좋아요/스크랩 여부 확인용, null 가능)
-     * @return List<PostDTOProjection>
-     */
-    List<PostDTOProjection> findScrappedPostsByUserWithAllData(Long userId, Long currentUserId);
-    
-    /**
      * 마이페이지용: 내가 작성한 게시글 목록 조회 (상호작용 정보 제외)
      * @param currentUserId 현재 사용자 ID
      * @return List<PostDTOProjection>
      */
     List<PostDTOProjection> findMyWrittenPosts(Long currentUserId);
-    
-    /**
-     * 마이페이지용: 내가 댓글단 게시글 목록 조회 (상호작용 정보 제외)
-     * @param currentUserId 현재 사용자 ID
-     * @return List<PostDTOProjection>
-     */
-    List<PostDTOProjection> findMyCommentedPosts(Long currentUserId);
     
     /**
      * 마이페이지용: 내가 스크랩한 게시글 목록 조회 (상호작용 정보 제외)

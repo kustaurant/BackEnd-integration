@@ -6,6 +6,7 @@ import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
 import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -144,7 +145,7 @@ public class PostDTO {
     private static UserDTO createUserDTO(PostDTOProjection projection) {
         UserDTO userDTO = new UserDTO();
         userDTO.setNickname(projection.authorNickname());
-        userDTO.setRankImg(projection.authorRankImg());
+        userDTO.setRankImg(UserIconResolver.resolve(projection.authorEvaluationCount()));
         userDTO.setEvaluationCount(projection.authorEvaluationCount());
         return userDTO;
     }
