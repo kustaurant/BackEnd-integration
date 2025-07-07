@@ -61,27 +61,10 @@ public class PostEntity {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .visitCount(postVisitCount)
-                .netLikes(netLikes)
                 .authorId(userId)
                 .build();
     }
 
-    public Post toDomainWithCounts(int likeCount, int dislikeCount) {
-        return Post.builder()
-                .id(postId)
-                .title(postTitle)
-                .body(postBody)
-                .category(postCategory)
-                .status(status)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
-                .visitCount(postVisitCount)
-                .netLikes(netLikes)
-                .likeCount(likeCount)
-                .dislikeCount(dislikeCount)
-                .authorId(userId)
-                .build();
-    }
 
 
     public static PostEntity from(Post post) {

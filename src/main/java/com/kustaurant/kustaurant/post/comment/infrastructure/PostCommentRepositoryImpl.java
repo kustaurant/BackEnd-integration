@@ -63,7 +63,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, comment.getId(), "댓글"));
 
         entity.setStatus(comment.getStatus());
-        entity.setLikeCount(comment.getNetLikes());
+        // likeCount 필드 제거됨
 
         postCommentJpaRepository.save(entity);
         return entity.toDomain();

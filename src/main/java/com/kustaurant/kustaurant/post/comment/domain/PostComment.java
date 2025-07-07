@@ -19,7 +19,6 @@ public class PostComment {
     private final String commentBody;
     @Setter
     private ContentStatus status;
-    private Integer netLikes;
     @Setter
     private LocalDateTime createdAt;
     @Setter
@@ -29,10 +28,7 @@ public class PostComment {
     @Setter
     private Integer postId;
 
-    private Integer likeCount;
-    private Integer dislikeCount;
     
-    // ID 기반 참조로 변경
     private Integer parentCommentId;
     private List<Integer> replyIds;
 
@@ -40,9 +36,6 @@ public class PostComment {
         return PostComment.builder()
                 .commentBody(commentBody)
                 .status(ContentStatus.ACTIVE)
-                .netLikes(0)
-                .likeCount(0)
-                .dislikeCount(0)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .userId(userId)
@@ -85,57 +78,25 @@ public class PostComment {
 
     public ReactionStatus toggleLike(boolean isLikedBefore, boolean isDislikedBefore) {
         if (isLikedBefore) {
-            decreaseLikeCount(1);
             return ReactionStatus.LIKE_DELETED;
         }
 
         if (isDislikedBefore) {
-            decreaseDislikeCount(1);
-            increaseLikeCount(1);
             return ReactionStatus.DISLIKE_TO_LIKE;
         }
 
-        increaseLikeCount(1);
         return ReactionStatus.LIKE_CREATED;
     }
 
     public ReactionStatus toggleDislike(boolean isLikedBefore, boolean isDislikedBefore) {
         if (isLikedBefore) {
-            decreaseLikeCount(1);
-            increaseDislikeCount(1);
             return ReactionStatus.LIKE_TO_DISLIKE;
         }
 
         if (isDislikedBefore) {
-            decreaseDislikeCount(1);
             return ReactionStatus.DISLIKE_DELETED;
         }
 
-        increaseDislikeCount(1);
         return ReactionStatus.DISLIKE_CREATED;
-    }
-
-    public void increaseLikeCount(int amount) {
-        this.likeCount += amount;
-        updateNetLikes();
-    }
-
-    public void decreaseLikeCount(int amount) {
-        this.likeCount -= amount;
-        updateNetLikes();
-    }
-
-    public void increaseDislikeCount(int amount) {
-        this.dislikeCount += amount;
-        updateNetLikes();
-    }
-
-    public void decreaseDislikeCount(int amount) {
-        this.dislikeCount -= amount;
-        updateNetLikes();
-    }
-
-    private void updateNetLikes() {
-        this.netLikes = this.likeCount - this.dislikeCount;
     }
 }

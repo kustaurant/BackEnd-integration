@@ -19,14 +19,10 @@ public class Post {
     private String category;
     private ContentStatus status;
     private Long authorId;
-    private Integer netLikes;
-    private Integer likeCount;
-    private Integer dislikeCount;
     private Integer visitCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // ID 기반 참조로 변경
     private List<Integer> commentIds;
     private List<Integer> photoIds;
     private List<Integer> scrapIds;
@@ -58,58 +54,26 @@ public class Post {
 
     public ReactionStatus toggleLike(boolean isLikedBefore, boolean isDislikedBefore) {
         if (isLikedBefore) {
-            decreaseLikeCount(1);
             return ReactionStatus.LIKE_DELETED;
         }
 
         if (isDislikedBefore) {
-            decreaseDislikeCount(1);
-            increaseLikeCount(1);
             return ReactionStatus.DISLIKE_TO_LIKE;
         }
 
-        increaseLikeCount(1);
         return ReactionStatus.LIKE_CREATED;
     }
 
     public ReactionStatus toggleDislike(boolean isLikedBefore, boolean isDislikedBefore) {
         if (isLikedBefore) {
-            decreaseLikeCount(1);
-            increaseDislikeCount(1);
             return ReactionStatus.LIKE_TO_DISLIKE;
         }
 
         if (isDislikedBefore) {
-            decreaseDislikeCount(1);
             return ReactionStatus.DISLIKE_DELETED;
         }
 
-        increaseDislikeCount(1);
         return ReactionStatus.DISLIKE_CREATED;
-    }
-
-    public void increaseLikeCount(int amount) {
-        this.likeCount += amount;
-        updateNetLikes();
-    }
-
-    public void decreaseLikeCount(int amount) {
-        this.likeCount -= amount;
-        updateNetLikes();
-    }
-
-    public void increaseDislikeCount(int amount) {
-        this.dislikeCount += amount;
-        updateNetLikes();
-    }
-
-    public void decreaseDislikeCount(int amount) {
-        this.dislikeCount -= amount;
-        updateNetLikes();
-    }
-
-    private void updateNetLikes() {
-        this.netLikes = this.likeCount - this.dislikeCount;
     }
 
     public void updateCommentIds(List<Integer> commentIds) {

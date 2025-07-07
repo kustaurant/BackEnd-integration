@@ -27,7 +27,6 @@ public class PostCommentEntity {
 
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
-    Integer likeCount=0; // 이 likeCount는 좋아요 수에서 싫어요 수를 뺀 순 좋아요 수를 의미
 
     @Column(name = "post_id", nullable = false)
     Integer postId;
@@ -57,7 +56,6 @@ public class PostCommentEntity {
         entity.setCommentId(comment.getId());
         entity.setCommentBody(comment.getCommentBody());
         entity.setStatus(comment.getStatus());
-        entity.setLikeCount(comment.getNetLikes());
         entity.setCreatedAt(comment.getCreatedAt());
         entity.setUpdatedAt(comment.getUpdatedAt());
         entity.setPostId(comment.getPostId());
@@ -73,7 +71,6 @@ public class PostCommentEntity {
                 .commentBody(this.commentBody)
                 .postId(this.postId)
                 .userId(this.userId)
-                .netLikes(this.likeCount)
                 .status(this.status)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)

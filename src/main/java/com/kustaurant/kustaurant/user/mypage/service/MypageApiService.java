@@ -11,6 +11,10 @@ import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
+import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
+import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryDAO;
+import java.util.stream.Collectors;
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.*;
@@ -37,17 +41,12 @@ public class MypageApiService {
     private final UserRepository userRepository;
     private final UserProfileValidator validator;
     private final NoticeRepository noticeRepo;
-    private final PostRepository postRepository;
-    private final PostCommentRepository postCommentRepository;
-    private final PostPhotoRepository postPhotoRepository;
-
     private final MyUserQueryRepository userQueryRepository;
     private final MypageMainQueryRepository mypageMainQueryRepository;
     private final MyFavoriteRestaurantQueryRepository myFavoriteRestaurantQueryRepository;
     private final MyEvaluationQueryRepository myevaluationQueryRepository;
-    private final MyPostQueryRepository myPostQueryRepository;
-    private final MyPostScrapQueryRepository myPostScrapQueryRepository;
-    private final MyPostCommentQueryRepository myPostCommentQueryRepository;
+    private final PostQueryDAO postQueryDAO;
+    private final PostCommentQueryDAO postCommentQueryDAO;
 
     public User findUserById(Long userId) {
         if (userId == null) {
@@ -152,118 +151,32 @@ public class MypageApiService {
     }
 
 
-
-    // 6. 유저가 작성한 커뮤니티 게시글 리스트들 반환
+    // 6. 마이페이지 - 내가 작성한 게시글 목록 조회
     @Transactional(readOnly = true)
     public List<MyPostsResponse> getUserPosts(Long userId) {
-        List<Post> posts = postRepository.findActiveByUserId(userId);
-
-        return posts.stream()
-                .map(p -> {
-                    // ID 기반으로 사진 정보 조회
-                    String firstImg = null;
-                    List<PostPhoto> photos = postPhotoRepository.findByPostId(p.getId());
-                    if (photos != null && !photos.isEmpty()) {
-                        firstImg = photos.get(0).getPhotoImgUrl();
-                    }
-
-                    String shortBody = p.getBody().length() > 20
-                            ? p.getBody().substring(0, 20)
-                            : p.getBody();
-
-                    LocalDateTime time = p.getUpdatedAt() != null ? p.getUpdatedAt() : p.getCreatedAt();
-                    String timeAgo = TimeAgoUtil.toKor(time);
-
-                    // ID 기반으로 댓글 수 조회
-                    int commentCount = postCommentRepository.findByPostId(p.getId()).size();
-
-                    return new MyPostsResponse(
-                            p.getId(),
-                            p.getCategory(),
-                            p.getTitle(),
-                            firstImg,
-                            shortBody,
-                            p.getNetLikes(),
-                            commentCount,
-                            timeAgo
-                    );
-                })
-                .toList();
+        return postQueryDAO.findMyWrittenPosts(userId)
+                .stream()
+                .map(MyPostsResponse::from)
+                .collect(Collectors.toList());
     }
 
-
-    // 7. 유저가 스크랩한 커뮤니티 게시글 리스트들 반환
+    // 7. 내가 스크랩한 게시글 목록 조회
     @Transactional(readOnly = true)
     public List<MyPostsResponse> getScrappedUserPosts(Long userId) {
-
-        return myPostScrapQueryRepository.findScrappedPosts(userId)
+        return postQueryDAO.findMyScrappedPosts(userId)
                 .stream()
-                .map(postEntity -> toMyPostsResponse(postEntity.toDomain()))
-                .toList();
-    }
-
-    private MyPostsResponse toMyPostsResponse(Post p) {
-        // ID 기반으로 사진 정보 조회
-        String firstImg = null;
-        List<PostPhoto> photos = postPhotoRepository.findByPostId(p.getId());
-        if (photos != null && !photos.isEmpty()) {
-            firstImg = photos.get(0).getPhotoImgUrl();
-        }
-
-        String shortBody = p.getBody().length() > 20
-                ? p.getBody().substring(0, 20)
-                : p.getBody();
-
-        String timeAgo = TimeAgoUtil.toKor(
-                p.getUpdatedAt() != null ? p.getUpdatedAt()
-                        : p.getCreatedAt()
-        );
-
-        // ID 기반으로 댓글 수 조회
-        int commentCount = postCommentRepository.findByPostId(p.getId()).size();
-
-        return new MyPostsResponse(
-                p.getId(),
-                p.getCategory(),
-                p.getTitle(),
-                firstImg,
-                shortBody,
-                p.getNetLikes(),
-                commentCount,
-                timeAgo
-        );
+                .map(MyPostsResponse::from)
+                .collect(Collectors.toList());
     }
 
 
-    // 8. 유저가 댓글단 커뮤니티 게시글 리스트들 반환
+    // 8. 마이페이지 - 내가 작성한 댓글 목록 조회
     @Transactional(readOnly = true)
     public List<MyPostCommentResponse> getCommentedUserPosts(Long userId) {
-
-        return myPostCommentQueryRepository.findActiveCommentsByUserId(userId)
+        return postCommentQueryDAO.findMyCommentedPostsWithDetails(userId)
                 .stream()
-                .map(c -> {
-                    String shortBody = c.getCommentBody().length() > 20
-                            ? c.getCommentBody().substring(0, 20)
-                            : c.getCommentBody();
-
-                    String timeAgo = TimeAgoUtil.toKor(
-                            c.getUpdatedAt() != null ? c.getUpdatedAt() : c.getCreatedAt()
-                    );
-
-                    // ID 기반으로 게시글 정보 조회
-                    Post post = postRepository.findById(c.getPostId())
-                            .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-
-                    return new MyPostCommentResponse(
-                            post.getId(),
-                            post.getCategory(),
-                            post.getTitle(),
-                            shortBody,
-                            c.getLikeCount(),
-                            timeAgo
-                    );
-                })
-                .toList();
+                .map(MyPostCommentResponse::from)
+                .collect(Collectors.toList());
     }
 
 

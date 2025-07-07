@@ -41,3 +41,8 @@ out/
 
 ### env ###
 .env
+
+### Cluade ###
+.CLAUDE.md.swp
+CLAUDE.md
+plan.md

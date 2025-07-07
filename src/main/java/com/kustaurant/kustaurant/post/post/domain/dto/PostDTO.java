@@ -4,7 +4,9 @@ import com.kustaurant.kustaurant.post.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
+import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
 import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -66,29 +68,7 @@ public class PostDTO {
     @Schema(description = "작성자 여부", example = "true")
     Boolean isPostMine = false;
 
-//    public static PostDTO convertPostToPostDTO(PostEntity postEntity) {
-//        return PostDTO.builder()
-//                .postId(postEntity.getPostId())
-//                .postTitle(postEntity.getPostTitle())
-//                .postBody(postEntity.getPostBody())
-//                .status(postEntity.getStatus().name())
-//                .postCategory(postEntity.getPostCategory())
-//                .createdAt(postEntity.getCreatedAt())
-//                .updatedAt(postEntity.getUpdatedAt())
-//                .likeCount(postEntity.getNetLikes())
-//                .likeOnlyCount(postEntity.getPostLikesList().size())
-//                .dislikeOnlyCount(postEntity.getPostDislikesList().size())
-//                .user(UserDTO.convertUserToUserDTO(postEntity.getUserId()))
-//                .commentCount((int) postEntity.getPostCommentList().stream()
-//                        .filter(c -> c.getStatus().equals(ContentStatus.ACTIVE))
-//                        .count())
-//                .timeAgo(postEntity.toModel().calculateTimeAgo())
-//                .postPhotoImgUrl(!postEntity.getPostPhotoEntityList().isEmpty() ?
-//                        postEntity.getPostPhotoEntityList().get(0).getPhotoImgUrl() : null)
-//                .postVisitCount(postEntity.getPostVisitCount())
-//                .scrapCount(postEntity.getPostScrapList().size())
-//                .build();
-//    }
+    // 레거시 메서드 제거
 
     public static PostDTO from(Post post) {
         return from(post, null);
@@ -103,9 +83,9 @@ public class PostDTO {
                 .status(post.getStatus().name())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
-                .likeCount(post.getNetLikes())
-                .likeOnlyCount(post.getLikeCount())
-                .dislikeOnlyCount(post.getDislikeCount())
+                .likeCount(0) // 계산 필요시 별도 DAO로 조회
+                .likeOnlyCount(0) // 계산 필요시 별도 DAO로 조회
+                .dislikeOnlyCount(0) // 계산 필요시 별도 DAO로 조회
                 .timeAgo(post.calculateTimeAgo())
                 .postPhotoImgUrl(null) // ID 기반으로 별도 조회 필요
                 .commentCount(0) // ID 기반으로 별도 조회 필요
@@ -116,5 +96,57 @@ public class PostDTO {
             postDTO.setUser(UserDTO.from(author));
         }
         return postDTO;
+    }
+    
+    // PostDTOProjection을 활용한 최적화된 팩토리 메서드
+    public static PostDTO from(PostDTOProjection projection) {
+        return PostDTO.builder()
+                .postId(projection.postId())
+                .postTitle(projection.postTitle())
+                .postBody(projection.postBody())
+                .postCategory(projection.postCategory())
+                .status(projection.status())
+                .createdAt(projection.createdAt())
+                .updatedAt(projection.updatedAt())
+                .likeCount(projection.getNetLikes())
+                .likeOnlyCount(projection.getLikeOnlyCount())
+                .dislikeOnlyCount(projection.getDislikeOnlyCount())
+                .user(createUserDTO(projection))
+                .timeAgo(calculateTimeAgo(projection.createdAt()))
+                .postPhotoImgUrl(projection.firstPhotoUrl())
+                .commentCount(projection.getCommentCount())
+                .postVisitCount(projection.visitCount())
+                .scrapCount(projection.getScrapCount())
+                .isScraped(projection.isScraped())
+                .isliked(projection.isLiked())
+                .isPostMine(false) // 별도 로직으로 설정
+                .build();
+    }
+    
+    // 시간 경과 계산 헬퍼 메서드
+    private static String calculateTimeAgo(LocalDateTime createdAt) {
+        if (createdAt == null) return "";
+        
+        LocalDateTime now = LocalDateTime.now();
+        long diffInMinutes = java.time.Duration.between(createdAt, now).toMinutes();
+
+        if (diffInMinutes < 1) {
+            return "방금 전";
+        } else if (diffInMinutes < 60) {
+            return diffInMinutes + "분 전";
+        } else if (diffInMinutes < 1440) { // 24시간
+            return (diffInMinutes / 60) + "시간 전";
+        } else {
+            return (diffInMinutes / 1440) + "일 전";
+        }
+    }
+    
+    // UserDTO 생성 헬퍼 메서드
+    private static UserDTO createUserDTO(PostDTOProjection projection) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setNickname(projection.authorNickname());
+        userDTO.setRankImg(UserIconResolver.resolve(projection.authorEvaluationCount()));
+        userDTO.setEvaluationCount(projection.authorEvaluationCount());
+        return userDTO;
     }
 }

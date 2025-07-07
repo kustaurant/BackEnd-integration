@@ -169,8 +169,8 @@ public class PostApiCommentService {
                 .commentId(postComment.getId())
                 .commentBody(postComment.getCommentBody())
                 .status(postComment.getStatus().name())
-                .likeCount(postComment.getLikeCount())
-                .dislikeCount(postComment.getDislikeCount())
+                .likeCount(0) // 리액션 지표는 별도 서비스에서 계산
+                .dislikeCount(0) // 리액션 지표는 별도 서비스에서 계산
                 .createdAt(postComment.getCreatedAt())
                 .updatedAt(postComment.getUpdatedAt())
                 .timeAgo(postComment.calculateTimeAgo())

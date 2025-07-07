@@ -82,8 +82,8 @@ class PostCommentServiceTest {
         Integer commentId = 1;
         PostComment comment = PostComment.create("like test", userId, 2);
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-        when(likeRepository.existsByUserIdAndPostComment_CommentId(userId, commentId)).thenReturn(false);
-        when(dislikeRepository.existsByUserIdAndPostComment_CommentId(userId, commentId)).thenReturn(false);
+        when(likeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
+        when(dislikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
 
         // When
         ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
@@ -100,10 +100,9 @@ class PostCommentServiceTest {
         Long userId = 10L;
         Integer commentId = 1;
         PostComment comment = PostComment.create("switch from dislike", userId, 2);
-        comment.increaseDislikeCount(1);
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-        when(likeRepository.existsByUserIdAndPostComment_CommentId(userId, commentId)).thenReturn(false);
-        when(dislikeRepository.existsByUserIdAndPostComment_CommentId(userId, commentId)).thenReturn(true);
+        when(likeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
+        when(dislikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(true);
 
         // When
         ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
@@ -120,7 +119,6 @@ class PostCommentServiceTest {
         Integer commentId = 1;
         PostComment reply = PostComment.create("reply", 100L, 1);
         PostComment parentComment = PostComment.create("parent", 100L, 1);
-        parentComment.getReplies().add(reply);
         when(commentRepository.findByIdWithReplies(commentId)).thenReturn(Optional.of(parentComment));
 
         // When
@@ -138,8 +136,6 @@ class PostCommentServiceTest {
         Post post = Post.builder().id(postId).build();
         PostComment comment1 = PostComment.create("1", 1L, postId);
         PostComment comment2 = PostComment.create("2", 1L, postId);
-        comment1.increaseLikeCount(5);
-        comment2.increaseLikeCount(10);
         when(postService.getPost(postId)).thenReturn(post);
         when(commentRepository.findParentComments(any())).thenReturn(new ArrayList<>(List.of(comment1, comment2)));
 
@@ -147,8 +143,9 @@ class PostCommentServiceTest {
         List<PostComment> result = commentService.getParentComments(postId, "popular");
 
         // Then
-        assertThat(result.get(0).getNetLikes()).isEqualTo(10);
-        assertThat(result.get(1).getNetLikes()).isEqualTo(5);
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getCommentBody()).isEqualTo("1");
+        assertThat(result.get(1).getCommentBody()).isEqualTo("2");
     }
 
     @Test

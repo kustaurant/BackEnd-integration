@@ -236,7 +236,7 @@ public class CommunityApiController {
     ) {
         Post post = postApiService.getPost(postId);
         ReactionStatus status = postApiService.toggleLike(postId, user.id()); // 1 또는 0 반환
-        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(post.getLikeCount(), status.toAppLikeStatus());
+        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(0, status.toAppLikeStatus()); // 좋아요 수는 별도 API로 조회
         return ResponseEntity.ok(likeOrDislikeDTO);
     }
 

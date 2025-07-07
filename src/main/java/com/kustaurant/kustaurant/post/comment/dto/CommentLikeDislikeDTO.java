@@ -21,7 +21,7 @@ public class CommentLikeDislikeDTO {
     }
 
     public static CommentLikeDislikeDTO toCommentLikeDislikeDTO(PostComment postComment, int commentLikeStatus) {
-        return new CommentLikeDislikeDTO(postComment.getLikeCount(), postComment.getDislikeCount(), commentLikeStatus);
+        return new CommentLikeDislikeDTO(0, 0, commentLikeStatus); // 리액션 지표는 별도 서비스에서 계산
     }
 
 }

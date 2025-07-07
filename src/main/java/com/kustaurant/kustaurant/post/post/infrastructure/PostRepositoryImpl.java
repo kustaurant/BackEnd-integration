@@ -84,7 +84,7 @@ public class PostRepositoryImpl implements PostRepository {
             postEntity.setPostCategory(post.getCategory());
             postEntity.setStatus(post.getStatus());
             postEntity.setUpdatedAt(LocalDateTime.now());
-            postEntity.setNetLikes(post.getNetLikes());
+            // netLikes 필드 제거됨
             postEntity.setPostVisitCount(post.getVisitCount());
         }
 
@@ -192,8 +192,7 @@ public class PostRepositoryImpl implements PostRepository {
 
     // TODO: n+1 문제 추후 처리 예정
     private Post toDomainWithCounts(PostEntity postEntity) {
-        int likeCount = postLikeJpaRepository.countByPostId(postEntity.getPostId());
-        int dislikeCount = postDislikeJpaRepository.countByPostId(postEntity.getPostId());
-        return postEntity.toDomainWithCounts(likeCount, dislikeCount);
+        // DDD 리팩토링으로 count 필드 제거, 기본 도메인 객체 반환
+        return postEntity.toDomain();
     }
 }
