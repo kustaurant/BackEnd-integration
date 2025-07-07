@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.post.comment.service.port;
 
-import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentDislike;
+import com.kustaurant.kustaurant.post.comment.domain.PostCommentDislike;
 
 import java.util.List;
 import java.util.Optional;

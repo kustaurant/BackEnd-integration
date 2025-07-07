@@ -26,15 +26,12 @@ class PostCommentTest {
         assertThat(comment.getUserId()).isEqualTo(userId);
         assertThat(comment.getPostId()).isEqualTo(postId);
         assertThat(comment.getStatus()).isEqualTo(ContentStatus.ACTIVE);
-        assertThat(comment.getLikeCount()).isEqualTo(0);
-        assertThat(comment.getDislikeCount()).isEqualTo(0);
-        assertThat(comment.getNetLikes()).isEqualTo(0);
-        assertThat(comment.getReplies()).isEmpty();
+        assertThat(comment.getReplyIds()).isEmpty();
         assertThat(comment.getCreatedAt()).isNotNull();
     }
 
     @Test
-    void 댓글_좋아요_처음_누르면_좋아요가_증가한다() {
+    void 댓글_좋아요_처음_누르면_LIKE_CREATED_상태가_반환된다() {
         // Given
         PostComment comment = PostComment.create("Like test", 1L, 1);
 
@@ -43,55 +40,78 @@ class PostCommentTest {
 
         // Then
         assertThat(result).isEqualTo(ReactionStatus.LIKE_CREATED);
-        assertThat(comment.getLikeCount()).isEqualTo(1);
-        assertThat(comment.getDislikeCount()).isEqualTo(0);
-        assertThat(comment.getNetLikes()).isEqualTo(1);
     }
 
     @Test
-    void 댓글_좋아요_취소하면_좋아요가_감소한다() {
+    void 댓글_좋아요_취소하면_LIKE_DELETED_상태가_반환된다() {
         // Given
         PostComment comment = PostComment.create("Like cancel", 1L, 1);
-        comment.increaseLikeCount(1);
 
         // When
         ReactionStatus result = comment.toggleLike(true, false);
 
         // Then
         assertThat(result).isEqualTo(ReactionStatus.LIKE_DELETED);
-        assertThat(comment.getLikeCount()).isEqualTo(0);
-        assertThat(comment.getNetLikes()).isEqualTo(0);
     }
 
     @Test
-    void 댓글_싫어요에서_좋아요로_전환하면_싫어요가_감소하고_좋아요가_증가한다() {
+    void 댓글_싫어요에서_좋아요로_전환하면_DISLIKE_TO_LIKE_상태가_반환된다() {
         // Given
         PostComment comment = PostComment.create("Switch", 1L, 1);
-        comment.increaseDislikeCount(1);
 
         // When
         ReactionStatus result = comment.toggleLike(false, true);
 
         // Then
         assertThat(result).isEqualTo(ReactionStatus.DISLIKE_TO_LIKE);
-        assertThat(comment.getLikeCount()).isEqualTo(1);
-        assertThat(comment.getDislikeCount()).isEqualTo(0);
-        assertThat(comment.getNetLikes()).isEqualTo(1);
+    }
+
+    @Test
+    void 댓글_싫어요_처음_누르면_DISLIKE_CREATED_상태가_반환된다() {
+        // Given
+        PostComment comment = PostComment.create("Dislike test", 1L, 1);
+
+        // When
+        ReactionStatus result = comment.toggleDislike(false, false);
+
+        // Then
+        assertThat(result).isEqualTo(ReactionStatus.DISLIKE_CREATED);
+    }
+
+    @Test
+    void 댓글_싫어요_취소하면_DISLIKE_DELETED_상태가_반환된다() {
+        // Given
+        PostComment comment = PostComment.create("Dislike cancel", 1L, 1);
+
+        // When
+        ReactionStatus result = comment.toggleDislike(false, true);
+
+        // Then
+        assertThat(result).isEqualTo(ReactionStatus.DISLIKE_DELETED);
+    }
+
+    @Test
+    void 댓글_좋아요에서_싫어요로_전환하면_LIKE_TO_DISLIKE_상태가_반환된다() {
+        // Given
+        PostComment comment = PostComment.create("Switch to dislike", 1L, 1);
+
+        // When
+        ReactionStatus result = comment.toggleDislike(true, false);
+
+        // Then
+        assertThat(result).isEqualTo(ReactionStatus.LIKE_TO_DISLIKE);
     }
 
     @Test
     void 댓글을_삭제하면_상태가_DELETED로_변경된다() {
         // Given
-        PostComment parentComment = PostComment.create("Parent comment", 1L, 1);
-        PostComment reply = PostComment.create("Reply", 1L, 1);
-        parentComment.getReplies().add(reply);
+        PostComment comment = PostComment.create("Comment to delete", 1L, 1);
 
         // When
-        parentComment.delete();
+        comment.delete();
 
         // Then
-        assertThat(parentComment.getStatus()).isEqualTo(ContentStatus.DELETED);
-        assertThat(parentComment.getReplies().get(0).getStatus()).isEqualTo(ContentStatus.DELETED);
+        assertThat(comment.getStatus()).isEqualTo(ContentStatus.DELETED);
     }
 
     @Test
@@ -118,5 +138,41 @@ class PostCommentTest {
 
         // Then
         assertThat(timeAgo).isEqualTo("30초 전");
+    }
+
+    @Test
+    void 부모_댓글_ID를_설정할_수_있다() {
+        // Given
+        PostComment comment = PostComment.create("Reply comment", 1L, 1);
+
+        // When
+        comment.setParentCommentId(5);
+
+        // Then
+        assertThat(comment.getParentCommentId()).isEqualTo(5);
+    }
+
+    @Test
+    void 댓글_빌더가_정상적으로_작동한다() {
+        // Given & When
+        LocalDateTime now = LocalDateTime.now();
+        PostComment comment = PostComment.builder()
+                .id(100)
+                .commentBody("Test comment body")
+                .status(ContentStatus.ACTIVE)
+                .createdAt(now)
+                .updatedAt(now)
+                .userId(999L)
+                .postId(555)
+                .build();
+
+        // Then
+        assertThat(comment.getId()).isEqualTo(100);
+        assertThat(comment.getCommentBody()).isEqualTo("Test comment body");
+        assertThat(comment.getStatus()).isEqualTo(ContentStatus.ACTIVE);
+        assertThat(comment.getUserId()).isEqualTo(999L);
+        assertThat(comment.getPostId()).isEqualTo(555);
+        assertThat(comment.getCreatedAt()).isEqualTo(now);
+        assertThat(comment.getUpdatedAt()).isEqualTo(now);
     }
 }

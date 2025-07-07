@@ -1,15 +1,16 @@
 package com.kustaurant.kustaurant.post.post.domain;
 
-import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@Setter
 @Builder
 public class Post {
     private Integer id;
@@ -18,18 +19,13 @@ public class Post {
     private String category;
     private ContentStatus status;
     private Long authorId;
-    private Integer netLikes;
-    private Integer likeCount;
-    private Integer dislikeCount;
     private Integer visitCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-
-    private List<PostComment> comments;
-    private List<PostPhoto> photos;
-    private List<PostScrap> scraps;
-
+    private List<Integer> commentIds;
+    private List<Integer> photoIds;
+    private List<Integer> scrapIds;
 
     public void delete() {
         this.status = ContentStatus.DELETED;
@@ -39,18 +35,7 @@ public class Post {
         this.title = title;
         this.body = body;
         this.category = category;
-
-        this.photos = new java.util.ArrayList<>();
-        for (String url : imageUrls) {
-            this.photos.add(PostPhoto.builder()
-                    .postId(this.id)
-                    .photoImgUrl(url)
-                    .status(ContentStatus.ACTIVE)
-                    .build());
-        }
     }
-
-
 
     public String calculateTimeAgo() {
         LocalDateTime now = LocalDateTime.now();
@@ -69,58 +54,38 @@ public class Post {
 
     public ReactionStatus toggleLike(boolean isLikedBefore, boolean isDislikedBefore) {
         if (isLikedBefore) {
-            decreaseLikeCount(1);
             return ReactionStatus.LIKE_DELETED;
         }
 
         if (isDislikedBefore) {
-            decreaseDislikeCount(1);
-            increaseLikeCount(1);
             return ReactionStatus.DISLIKE_TO_LIKE;
         }
 
-        increaseLikeCount(1);
         return ReactionStatus.LIKE_CREATED;
     }
 
     public ReactionStatus toggleDislike(boolean isLikedBefore, boolean isDislikedBefore) {
         if (isLikedBefore) {
-            decreaseLikeCount(1);
-            increaseDislikeCount(1);
             return ReactionStatus.LIKE_TO_DISLIKE;
         }
 
         if (isDislikedBefore) {
-            decreaseDislikeCount(1);
             return ReactionStatus.DISLIKE_DELETED;
         }
 
-        increaseDislikeCount(1);
         return ReactionStatus.DISLIKE_CREATED;
     }
 
-    public void increaseLikeCount(int amount) {
-        this.likeCount += amount;
-        updateNetLikes();
+    public void updateCommentIds(List<Integer> commentIds) {
+        this.commentIds = commentIds;
     }
 
-    public void decreaseLikeCount(int amount) {
-        this.likeCount -= amount;
-        updateNetLikes();
+    public void updatePhotoIds(List<Integer> photoIds) {
+        this.photoIds = photoIds;
     }
 
-    public void increaseDislikeCount(int amount) {
-        this.dislikeCount += amount;
-        updateNetLikes();
-    }
-
-    public void decreaseDislikeCount(int amount) {
-        this.dislikeCount -= amount;
-        updateNetLikes();
-    }
-
-    private void updateNetLikes() {
-        this.netLikes = this.likeCount - this.dislikeCount;
+    public void updateScrapIds(List<Integer> scrapIds) {
+        this.scrapIds = scrapIds;
     }
 }
 

@@ -34,7 +34,7 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-001", "게시글을 찾을 수 없습니다."),
 
     /* ──── COMMENT ──── */
-    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT-001", "댓글을 찾을 수 없습니다."),
+    COMMENT_NOT_FOUND (HttpStatus.NOT_FOUND, "COMMENT-001", "댓글을 찾을 수 없습니다."),
 
     /* ──── AUTH ──── */
     UNAUTHORIZED (HttpStatus.UNAUTHORIZED, "AUTH-401-UNAUTHORIZED", "인증이 필요합니다."),

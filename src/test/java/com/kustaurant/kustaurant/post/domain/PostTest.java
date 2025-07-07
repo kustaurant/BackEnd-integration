@@ -24,15 +24,9 @@ class PostTest {
                 .category("General")
                 .status(ContentStatus.ACTIVE)
                 .authorId(123L)
-                .likeCount(0)
-                .dislikeCount(0)
-                .netLikes(0)
                 .visitCount(0)
                 .createdAt(LocalDateTime.now().minusMinutes(30))
                 .updatedAt(LocalDateTime.now())
-                .photos(new java.util.ArrayList<>())
-                .scraps(new java.util.ArrayList<>())
-                .comments(new java.util.ArrayList<>())
                 .build();
     }
 
@@ -43,37 +37,24 @@ class PostTest {
 
         // Then
         assertThat(result).isEqualTo(ReactionStatus.LIKE_CREATED);
-        assertThat(post.getLikeCount()).isEqualTo(1);
-        assertThat(post.getNetLikes()).isEqualTo(1);
     }
 
     @Test
     void 좋아요를_이미_누른_상태에서_한번_더_누르면_취소된다() {
-        // Given
-        post.increaseLikeCount(1);
-
         // When
         ReactionStatus result = post.toggleLike(true, false);
 
         // Then
         assertThat(result).isEqualTo(ReactionStatus.LIKE_DELETED);
-        assertThat(post.getLikeCount()).isEqualTo(0);
-        assertThat(post.getNetLikes()).isEqualTo(0);
     }
 
     @Test
-    void 싫어요에서_좋아요로_변경하면_싫어요는_감소하고_좋아요는_증가한다() {
-        // Given
-        post.increaseDislikeCount(1);
-
+    void 싫어요에서_좋아요로_변경하면_DISLIKE_TO_LIKE_상태가_반환된다() {
         // When
         ReactionStatus result = post.toggleLike(false, true);
 
         // Then
         assertThat(result).isEqualTo(ReactionStatus.DISLIKE_TO_LIKE);
-        assertThat(post.getLikeCount()).isEqualTo(1);
-        assertThat(post.getDislikeCount()).isEqualTo(0);
-        assertThat(post.getNetLikes()).isEqualTo(1);
     }
 
     @Test
@@ -83,41 +64,28 @@ class PostTest {
 
         // Then
         assertThat(result).isEqualTo(ReactionStatus.DISLIKE_CREATED);
-        assertThat(post.getDislikeCount()).isEqualTo(1);
-        assertThat(post.getNetLikes()).isEqualTo(-1);
     }
 
     @Test
     void 싫어요를_이미_누른_상태에서_한번_더_누르면_취소된다() {
-        // Given
-        post.increaseDislikeCount(1);
-
         // When
         ReactionStatus result = post.toggleDislike(false, true);
 
         // Then
         assertThat(result).isEqualTo(ReactionStatus.DISLIKE_DELETED);
-        assertThat(post.getDislikeCount()).isEqualTo(0);
-        assertThat(post.getNetLikes()).isEqualTo(0);
     }
 
     @Test
-    void 좋아요에서_싫어요로_변경하면_좋아요는_감소하고_싫어요는_증가한다() {
-        // Given
-        post.increaseLikeCount(1);
-
+    void 좋아요에서_싫어요로_변경하면_LIKE_TO_DISLIKE_상태가_반환된다() {
         // When
         ReactionStatus result = post.toggleDislike(true, false);
 
         // Then
         assertThat(result).isEqualTo(ReactionStatus.LIKE_TO_DISLIKE);
-        assertThat(post.getLikeCount()).isEqualTo(0);
-        assertThat(post.getDislikeCount()).isEqualTo(1);
-        assertThat(post.getNetLikes()).isEqualTo(-1);
     }
 
     @Test
-    void 게시글을_수정하면_제목_본문_카테고리_이미지가_변경된다() {
+    void 게시글을_수정하면_제목_본문_카테고리가_변경된다() {
         // When
         post.update("New Title", "New Body", "Food", Arrays.asList("url1", "url2"));
 
@@ -125,8 +93,6 @@ class PostTest {
         assertThat(post.getTitle()).isEqualTo("New Title");
         assertThat(post.getBody()).isEqualTo("New Body");
         assertThat(post.getCategory()).isEqualTo("Food");
-        assertThat(post.getPhotos()).hasSize(2);
-        assertThat(post.getPhotos().get(0).getPhotoImgUrl()).isEqualTo("url1");
     }
 
     @Test
@@ -157,15 +123,9 @@ class PostTest {
                 .category("Talk")
                 .status(ContentStatus.ACTIVE)
                 .authorId(456L)
-                .likeCount(0)
-                .dislikeCount(0)
-                .netLikes(0)
                 .visitCount(0)
                 .createdAt(LocalDateTime.now().minusDays(2))
                 .updatedAt(LocalDateTime.now())
-                .photos(new java.util.ArrayList<>())
-                .scraps(new java.util.ArrayList<>())
-                .comments(new java.util.ArrayList<>())
                 .build();
 
         // When
@@ -173,5 +133,30 @@ class PostTest {
 
         // Then
         assertThat(result).isEqualTo("2일 전");
+    }
+    
+    @Test
+    void 포스트_빌더가_정상적으로_작동한다() {
+        // Given & When
+        Post testPost = Post.builder()
+                .id(100)
+                .title("Test Title")
+                .body("Test Body")
+                .category("Test Category")
+                .status(ContentStatus.ACTIVE)
+                .authorId(999L)
+                .visitCount(5)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        // Then
+        assertThat(testPost.getId()).isEqualTo(100);
+        assertThat(testPost.getTitle()).isEqualTo("Test Title");
+        assertThat(testPost.getBody()).isEqualTo("Test Body");
+        assertThat(testPost.getCategory()).isEqualTo("Test Category");
+        assertThat(testPost.getStatus()).isEqualTo(ContentStatus.ACTIVE);
+        assertThat(testPost.getAuthorId()).isEqualTo(999L);
+        assertThat(testPost.getVisitCount()).isEqualTo(5);
     }
 }

@@ -1,9 +1,7 @@
 package com.kustaurant.kustaurant.post.post.infrastructure;
 
 import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
-import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostPhotoEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface.PostJpaRepository;
 import com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface.PostPhotoJpaRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,22 +15,28 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostPhotoRepositoryImpl implements PostPhotoRepository {
     private final PostPhotoJpaRepository postPhotoJpaRepository;
-    private final PostJpaRepository postJpaRepository;
+    
     @Override
     public void save(PostPhoto postPhoto) {
-        PostEntity postEntity = postJpaRepository.findById(postPhoto.getPostId())
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-        PostPhotoEntity entity = PostPhotoEntity.from(postPhoto, postEntity);
+        PostPhotoEntity entity = PostPhotoEntity.from(postPhoto);
         postPhotoJpaRepository.save(entity);
-    }
-
-
-    @Override
-    public void deleteByPost_PostId(Integer postId) {
-        postPhotoJpaRepository.deleteByPost_PostId(postId);
     }
 
     @Override
     public void saveAll(List<PostPhoto> photos) {
+        List<PostPhotoEntity> entities = photos.stream()
+                .map(PostPhotoEntity::from)
+                .toList();
+        postPhotoJpaRepository.saveAll(entities);
+    }
+
+    @Override
+    public List<PostPhoto> findByPostId(Integer postId) {
+        return List.of();
+    }
+
+    @Override
+    public void deleteByPostId(Integer postId) {
+
     }
 }

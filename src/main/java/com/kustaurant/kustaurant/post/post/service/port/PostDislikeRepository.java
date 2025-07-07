@@ -6,8 +6,11 @@ import java.util.Optional;
 
 public interface PostDislikeRepository {
     Optional<PostDislike> findByUserIdAndPostId(Long userId, Integer postId);
-    boolean existsByUserIdAndPostId(Long userId, Integer postId);
-    PostDislike save(PostDislike postDislike);
+
+    Boolean existsByUserIdAndPostId(Long userId, Integer postId);
+
+    void save(PostDislike postDislike);
+
     void deleteByUserIdAndPostId(Long userId, Integer postId);
 
     int countByPostId(Integer postId);

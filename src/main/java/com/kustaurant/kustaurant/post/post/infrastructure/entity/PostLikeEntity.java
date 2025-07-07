@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "post_likes_tbl_new")
+@Table(name = "post_likes_tbl")
 public class PostLikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,34 +19,32 @@ public class PostLikeEntity {
     @Column(name = "user_id", nullable = false)
     Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    PostEntity post;
+    @Column(name = "post_id", nullable = false)
+    Integer postId;
 
     LocalDateTime createdAt;
 
     public PostLikeEntity() {}
 
-    public PostLikeEntity(Long userId, PostEntity post, LocalDateTime createdAt) {
+    public PostLikeEntity(Long userId, Integer postId, LocalDateTime createdAt) {
         this.userId = userId;
-        this.post = post;
+        this.postId = postId;
         this.createdAt = createdAt;
     }
 
     public PostLike toDomain() {
-        return new PostLike(
-                this.userId,
-                this.post.getPostId(),
-                this.createdAt
-        );
+        return PostLike.builder()
+                .id(postLikesId)
+                .userId(this.userId)
+                .postId(this.postId)
+                .createdAt(this.createdAt)
+                .build();
     }
 
     public static PostLikeEntity from(PostLike postLike) {
-        PostEntity postEntity = new PostEntity();
-        postEntity.setPostId(postLike.getPostId());
         return new PostLikeEntity(
                 postLike.getUserId(),
-                postEntity,
+                postLike.getPostId(),
                 postLike.getCreatedAt()
         );
     }

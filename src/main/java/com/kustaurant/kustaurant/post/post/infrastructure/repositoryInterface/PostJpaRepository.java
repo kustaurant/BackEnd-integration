@@ -22,7 +22,7 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Integer> {
     @Query("SELECT p FROM PostEntity p WHERE p.userId = :userId AND p.status = 'ACTIVE'")
     List<PostEntity> findActivePostsByUserId(@Param("userId") Long userId);
 
-    Optional<PostEntity> findByStatusAndPostId(String status, Integer postId);
+    Optional<PostEntity> findByStatusAndPostId(ContentStatus status, Integer postId);
 
     @Query("""
         SELECT p FROM PostEntity p

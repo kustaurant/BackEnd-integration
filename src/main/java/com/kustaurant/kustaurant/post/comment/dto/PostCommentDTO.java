@@ -1,10 +1,8 @@
 package com.kustaurant.kustaurant.post.comment.dto;
 
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
-import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentEntity;
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.user.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,10 +10,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -41,10 +37,13 @@ public class PostCommentDTO {
     @Schema(description = "시간 경과", example = "8일 전")
     private String timeAgo;
     @Schema(description = "싫어요 여부", example = "true")
+    @Builder.Default
     private Boolean isDisliked = false;
     @Schema(description = "좋아요 여부", example = "false")
+    @Builder.Default
     private Boolean isLiked = false;
     @Schema(description = "나의 댓글인지의 여부", example = "false")
+    @Builder.Default
     private Boolean isCommentMine = false;
     @Schema(description = "작성 유저")
     UserDTO user;
@@ -77,23 +76,31 @@ public class PostCommentDTO {
 
     public static PostCommentDTO from(PostComment comment, Map<Long, UserDTO> userDtoMap) {
         return PostCommentDTO.builder()
-                .commentId(comment.getCommentId())
+                .commentId(comment.getId())
                 .commentBody(comment.getCommentBody())
                 .status(comment.getStatus().name())
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
                 .user(userDtoMap.get(comment.getUserId()))
-                .likeCount(comment.getLikeCount())
-                .dislikeCount(comment.getDislikeCount())
+                .likeCount(0) // 리액션 지표는 별도 서비스에서 계산
+                .dislikeCount(0) // 리액션 지표는 별도 서비스에서 계산
                 .timeAgo(comment.calculateTimeAgo())
-                .repliesList(
-                        Optional.ofNullable(comment.getReplies())
-                                .orElse(List.of())
-                                .stream()
-                                .filter(reply -> reply.getStatus() == ContentStatus.ACTIVE)
-                                .map(reply -> PostCommentDTO.from(reply, userDtoMap))
-                                .toList()
-                )
+                .repliesList(List.of()) // ID 기반으로 별도 조회 필요
+                .build();
+    }
+
+    public static PostCommentDTO from(PostComment comment, User user) {
+        return PostCommentDTO.builder()
+                .commentId(comment.getId())
+                .commentBody(comment.getCommentBody())
+                .status(comment.getStatus().name())
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
+                .user(UserDTO.from(user))
+                .likeCount(0) // 리액션 지표는 별도 서비스에서 계산
+                .dislikeCount(0) // 리액션 지표는 별도 서비스에서 계산
+                .timeAgo(comment.calculateTimeAgo())
+                .repliesList(List.of()) // ID 기반으로 별도 조회 필요
                 .build();
     }
 }

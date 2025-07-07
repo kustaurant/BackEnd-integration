@@ -15,48 +15,42 @@ import java.util.List;
 @Getter
 public class PostComment {
 
-    private final Integer commentId;
+    private Integer id;
     private final String commentBody;
+    @Setter
     private ContentStatus status;
-    private Integer netLikes;
     @Setter
     private LocalDateTime createdAt;
     @Setter
     private LocalDateTime updatedAt;
 
     private final Long userId;
-    private final Integer postId;
+    @Setter
+    private Integer postId;
 
-    private Integer likeCount;
-    private Integer dislikeCount;
-    private PostComment parentComment;
-    private List<PostComment> replies;
+    
+    private Integer parentCommentId;
+    private List<Integer> replyIds;
 
     public static PostComment create(String commentBody, Long userId, Integer postId) {
         return PostComment.builder()
                 .commentBody(commentBody)
                 .status(ContentStatus.ACTIVE)
-                .netLikes(0)
-                .likeCount(0)
-                .dislikeCount(0)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .userId(userId)
                 .postId(postId)
-                .replies(new ArrayList<>())
+                .replyIds(new ArrayList<>())
                 .build();
     }
 
-    public void setParent(PostComment parent) {
-        this.parentComment = parent;
-        parent.replies.add(this);
+    public void setParentCommentId(Integer parentCommentId) {
+        this.parentCommentId = parentCommentId;
     }
 
     public void delete() {
         this.status = ContentStatus.DELETED;
-        for (PostComment reply : replies) {
-            reply.status = ContentStatus.DELETED;
-        }
+        // 대댓글들은 별도 서비스에서 처리
     }
 
     public String calculateTimeAgo() {
@@ -84,57 +78,25 @@ public class PostComment {
 
     public ReactionStatus toggleLike(boolean isLikedBefore, boolean isDislikedBefore) {
         if (isLikedBefore) {
-            decreaseLikeCount(1);
             return ReactionStatus.LIKE_DELETED;
         }
 
         if (isDislikedBefore) {
-            decreaseDislikeCount(1);
-            increaseLikeCount(1);
             return ReactionStatus.DISLIKE_TO_LIKE;
         }
 
-        increaseLikeCount(1);
         return ReactionStatus.LIKE_CREATED;
     }
 
     public ReactionStatus toggleDislike(boolean isLikedBefore, boolean isDislikedBefore) {
         if (isLikedBefore) {
-            decreaseLikeCount(1);
-            increaseDislikeCount(1);
             return ReactionStatus.LIKE_TO_DISLIKE;
         }
 
         if (isDislikedBefore) {
-            decreaseDislikeCount(1);
             return ReactionStatus.DISLIKE_DELETED;
         }
 
-        increaseDislikeCount(1);
         return ReactionStatus.DISLIKE_CREATED;
-    }
-
-    public void increaseLikeCount(int amount) {
-        this.likeCount += amount;
-        updateNetLikes();
-    }
-
-    public void decreaseLikeCount(int amount) {
-        this.likeCount -= amount;
-        updateNetLikes();
-    }
-
-    public void increaseDislikeCount(int amount) {
-        this.dislikeCount += amount;
-        updateNetLikes();
-    }
-
-    public void decreaseDislikeCount(int amount) {
-        this.dislikeCount -= amount;
-        updateNetLikes();
-    }
-
-    private void updateNetLikes() {
-        this.netLikes = this.likeCount - this.dislikeCount;
     }
 }

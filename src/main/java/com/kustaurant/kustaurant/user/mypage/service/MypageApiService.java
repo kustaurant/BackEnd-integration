@@ -5,7 +5,16 @@ import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoun
 import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
+import com.kustaurant.kustaurant.post.post.domain.Post;
+import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
+import com.kustaurant.kustaurant.post.comment.domain.PostComment;
+import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
+import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
+import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
+import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryDAO;
+import java.util.stream.Collectors;
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.*;
@@ -32,14 +41,12 @@ public class MypageApiService {
     private final UserRepository userRepository;
     private final UserProfileValidator validator;
     private final NoticeRepository noticeRepo;
-
     private final MyUserQueryRepository userQueryRepository;
     private final MypageMainQueryRepository mypageMainQueryRepository;
     private final MyFavoriteRestaurantQueryRepository myFavoriteRestaurantQueryRepository;
     private final MyEvaluationQueryRepository myevaluationQueryRepository;
-    private final MyPostQueryRepository myPostQueryRepository;
-    private final MyPostScrapQueryRepository myPostScrapQueryRepository;
-    private final MyPostCommentQueryRepository myPostCommentQueryRepository;
+    private final PostQueryDAO postQueryDAO;
+    private final PostCommentQueryDAO postCommentQueryDAO;
 
     public User findUserById(Long userId) {
         if (userId == null) {
@@ -144,104 +151,32 @@ public class MypageApiService {
     }
 
 
-
-    // 6. 유저가 작성한 커뮤니티 게시글 리스트들 반환
+    // 6. 마이페이지 - 내가 작성한 게시글 목록 조회
     @Transactional(readOnly = true)
     public List<MyPostsResponse> getUserPosts(Long userId) {
-        List<PostEntity> posts = myPostQueryRepository.findActivePostsByUserId(userId);
-
-        return posts.stream()
-                .map(p -> {
-                    String firstImg = p.getPostPhotoEntityList().isEmpty()
-                            ? null
-                            : p.getPostPhotoEntityList().get(0).getPhotoImgUrl();
-
-                    String shortBody = p.getPostBody().length() > 20
-                            ? p.getPostBody().substring(0, 20)
-                            : p.getPostBody();
-
-                    LocalDateTime time = p.getUpdatedAt() != null ? p.getUpdatedAt() : p.getCreatedAt();
-                    String timeAgo = TimeAgoUtil.toKor(time);
-
-                    return new MyPostsResponse(
-                            p.getPostId(),
-                            p.getPostCategory(),
-                            p.getPostTitle(),
-                            firstImg,
-                            shortBody,
-                            p.getNetLikes(),
-                            p.getPostCommentList().size(),
-                            timeAgo
-                    );
-                })
-                .toList();
+        return postQueryDAO.findMyWrittenPosts(userId)
+                .stream()
+                .map(MyPostsResponse::from)
+                .collect(Collectors.toList());
     }
 
-
-    // 7. 유저가 스크랩한 커뮤니티 게시글 리스트들 반환
+    // 7. 내가 스크랩한 게시글 목록 조회
     @Transactional(readOnly = true)
     public List<MyPostsResponse> getScrappedUserPosts(Long userId) {
-
-        return myPostScrapQueryRepository.findScrappedPosts(userId)
+        return postQueryDAO.findMyScrappedPosts(userId)
                 .stream()
-                .map(this::toMyPostsResponse)
-                .toList();
-    }
-
-    private MyPostsResponse toMyPostsResponse(PostEntity p) {
-        String firstImg = p.getPostPhotoEntityList().isEmpty()
-                ? null
-                : p.getPostPhotoEntityList()
-                .get(0)
-                .getPhotoImgUrl();
-
-        String shortBody = p.getPostBody().length() > 20
-                ? p.getPostBody().substring(0, 20)
-                : p.getPostBody();
-
-        String timeAgo = TimeAgoUtil.toKor(
-                p.getUpdatedAt() != null ? p.getUpdatedAt()
-                        : p.getCreatedAt()
-        );
-
-        return new MyPostsResponse(
-                p.getPostId(),
-                p.getPostCategory(),
-                p.getPostTitle(),
-                firstImg,
-                shortBody,
-                p.getNetLikes(),
-                p.getPostCommentList().size(),
-                timeAgo
-        );
+                .map(MyPostsResponse::from)
+                .collect(Collectors.toList());
     }
 
 
-    // 8. 유저가 댓글단 커뮤니티 게시글 리스트들 반환
+    // 8. 마이페이지 - 내가 작성한 댓글 목록 조회
     @Transactional(readOnly = true)
     public List<MyPostCommentResponse> getCommentedUserPosts(Long userId) {
-
-        return myPostCommentQueryRepository.findActiveCommentsByUserId(userId)
+        return postCommentQueryDAO.findMyCommentedPostsWithDetails(userId)
                 .stream()
-                .map(c -> {
-                    String shortBody = c.getCommentBody().length() > 20
-                            ? c.getCommentBody().substring(0, 20)
-                            : c.getCommentBody();
-
-                    String timeAgo = TimeAgoUtil.toKor(
-                            c.getUpdatedAt() != null ? c.getUpdatedAt() : c.getCreatedAt()
-                    );
-
-                    return new MyPostCommentResponse(
-                            c.getPost().getPostId(),
-                            c.getPost().getPostCategory(),
-                            c.getPost().getPostTitle(),
-                            shortBody,
-                            c.getLikeCount(),
-                            timeAgo
-                    );
-                })
-                .toList();
+                .map(MyPostCommentResponse::from)
+                .collect(Collectors.toList());
     }
 
 
@@ -255,6 +190,4 @@ public class MypageApiService {
                 ))
                 .collect(Collectors.toList());
     }
-
-
 }
