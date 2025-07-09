@@ -43,11 +43,11 @@ public class EvalCommentApiController {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         EvalComment evalComment = evalCommCommandService.create(evalCommentId, restaurantId, user.id(), req);
-        User cuurrentUser = userService.getUserById(user.id());
+        User currentUser = userService.getUserById(user.id());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(EvalCommentResponse.from(evalComment,cuurrentUser,null,user.id()));
+                .body(EvalCommentResponse.from(evalComment,currentUser,null,user.id()));
     }
 
 

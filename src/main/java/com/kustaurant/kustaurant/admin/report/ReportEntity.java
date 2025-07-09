@@ -7,11 +7,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @Entity
 @Table(name="report")
 @NoArgsConstructor
@@ -38,7 +38,7 @@ public class ReportEntity {
     @Column(nullable = false, length = 20)
     private ReportStatus status = ReportStatus.PENDING;
 
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
 }

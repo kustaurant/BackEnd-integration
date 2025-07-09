@@ -32,7 +32,7 @@ public class EvalUserReactionService {
         if (evaluationLike.isEmpty()) {
             evaluationLikeRepository.save(new EvalUserReactionEntity(userId, evaluationId, reaction));
             if(reaction.isLike()) evaluation.adjustLikeCount(+1);
-            else evaluation.adjustDislikeCount(-1);
+            else evaluation.adjustDislikeCount(+1);
 
             resultReaction = reaction;
         } else {

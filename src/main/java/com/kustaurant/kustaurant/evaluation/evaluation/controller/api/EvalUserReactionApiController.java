@@ -34,7 +34,7 @@ public class EvalUserReactionApiController {
             @ApiResponse(responseCode = "500", description = "없는 경우겠지만 만에 하나 DB 일관성에 문제가 생겼을 경우 500을 반환하게 했습니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))})
     })
     @PostMapping("/api/v1/auth/restaurants/evaluations/{evaluationId}/{reaction}")
-    public ResponseEntity<EvalReactionResponse> likeRestaurantComment(
+    public ResponseEntity<EvalReactionResponse> toggleEvaluationReaction(
             @PathVariable Long evaluationId,
             @PathVariable String reaction,
             @AuthUser AuthUserInfo user

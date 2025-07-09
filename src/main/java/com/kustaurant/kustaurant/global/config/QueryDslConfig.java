@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.config;
+package com.kustaurant.kustaurant.global.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

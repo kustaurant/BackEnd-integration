@@ -21,7 +21,7 @@ public class EvalUserReactionWebController {
 
     // 1. 평가 좋아요/싫어요 토글
     @PostMapping("/web/api/restaurants/evaluations/{evaluationId}/{reaction}")
-    public ResponseEntity<Map<String, String>> likeRestaurantComment(
+    public ResponseEntity<Map<String,String>> toggleEvaluationReaction(
             @AuthUser AuthUserInfo user,
             @PathVariable Long evaluationId,
             @PathVariable String reaction,
@@ -30,11 +30,13 @@ public class EvalUserReactionWebController {
         ReactionType reactionType = ReactionType.valueOf(reaction);
         EvalReactionResponse response = evalUserReactionService.toggleReaction(user.id(), evaluationId, reactionType);
 
-        model.addAttribute("evaluationId", response.evaluationId());
-        model.addAttribute("reaction", response.reaction());
-        model.addAttribute("reaction", response.likeCount());
-        model.addAttribute("reaction", response.dislikeCount());
+        Map<String, String> responseData = Map.of(
+        "evaluationId", response.evaluationId().toString(),
+        "reaction", response.reaction().toString(),
+        "likeCount", String.valueOf(response.likeCount()),
+        "dislikeCount", String.valueOf(response.dislikeCount())
+         );
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(responseData);
     }
 }

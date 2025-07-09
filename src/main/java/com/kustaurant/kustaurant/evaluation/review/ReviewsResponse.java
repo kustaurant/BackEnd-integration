@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 public record ReviewsResponse(
-        @Schema(description = "코멘트 id", example = "3")
+        @Schema(description = "평가 id", example = "3")
         Long evalId,
         @Schema(description = "평가 별점", example = "4.5")
         Double evalScore,
@@ -30,8 +30,8 @@ public record ReviewsResponse(
         Integer evalLikeCount,
         @Schema(description = "비추천 개수", example = "3")
         Integer evalDislikeCount,
-        @Schema(description = "사용자가 단 댓글인지 여부", example = "true")
-        Boolean isCommentMine,
+        @Schema(description = "사용자가 단 평가인지 여부", example = "true")
+        Boolean isEvaluationMine,
         @Schema(description = "대댓글 리스트")
         List<EvalCommentResponse> evalCommentList,
         @JsonIgnore

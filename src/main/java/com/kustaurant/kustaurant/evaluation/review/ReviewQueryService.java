@@ -91,7 +91,7 @@ public class ReviewQueryService {
                             .stream()
                             .map(c -> EvalCommentResponse.from(
                                     c,
-                                    writer,                      // 댓글 작성자도 동일
+                                    userMap.get(c.getUserId()),  // 댓글 실제 작성자
                                     myCommReact.get(c.getId()),  // 내 댓글 리액션
                                     currentUserId == null ? -1L : currentUserId
                             ))

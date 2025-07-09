@@ -48,13 +48,15 @@ public class EvaluationEntity {
     @Column(name = "situation_id")
     private List<Long> situationIds = new ArrayList<>();
 
-    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String body, String imgUrl, Long userId, Integer restaurantId) {
+    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String body, String imgUrl, Integer likeCount, Integer dislikeCount, Long userId, Integer restaurantId) {
         this.evaluationScore = evaluationScore;
+        this.userId = userId;
         this.status = status;
         this.createdAt = createdAt;
         this.body = body;
         this.imgUrl = imgUrl;
-        this.userId = userId;
+        this.likeCount = likeCount;
+        this.dislikeCount = dislikeCount;
         this.restaurantId = restaurantId;
     }
 

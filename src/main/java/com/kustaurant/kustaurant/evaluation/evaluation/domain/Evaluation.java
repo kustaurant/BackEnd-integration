@@ -55,6 +55,6 @@ public class Evaluation {
         this.likeCount += num;
     }
     public void adjustDislikeCount(int num) {
-        this.likeCount += num;
+        this.dislikeCount += num;
     }
 }

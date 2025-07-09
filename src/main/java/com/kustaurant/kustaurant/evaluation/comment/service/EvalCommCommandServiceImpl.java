@@ -18,8 +18,8 @@ public class EvalCommCommandServiceImpl implements EvalCommCommandService {
     private final EvalCommentRepository evalCommentRepository;
     private final EvalCommUserReactionRepository evalCommUserReactionRepository;
 
-    public EvalComment create(Long evalCommentId, Integer restaurantId,  Long userId, EvalCommentRequest req) {
-        EvalComment evalComment = EvalComment.create(userId, restaurantId, evalCommentId, req);
+    public EvalComment create(Long evaluationId, Integer restaurantId, Long userId, EvalCommentRequest req) {
+        EvalComment evalComment = EvalComment.create(userId, restaurantId, evaluationId, req);
         return evalCommentRepository.save(evalComment);
     }
 

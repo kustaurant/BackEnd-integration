@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,12 +19,13 @@ public class EvalCommUserReactionWebController {
 
 
     // 1. 식당평가 댓글 좋아요
-    @GetMapping("/web/api/restaurants/comments/{evalCommentId}/{reaction}")
-    public ResponseEntity<Void> likeRestaurantComment(
+    @PostMapping("/web/api/restaurants/comments/{evalCommentId}/{reaction}")
+    public ResponseEntity<Void> toggleReaction(
             @PathVariable Long evalCommentId,
             @PathVariable String reaction,
             @AuthUser AuthUserInfo user
     ) {
+        // TODO: 수정 필요
         ReactionType reactionType = ReactionType.valueOf(reaction);
         EvalCommentReactionResponse response = evalCommUserReactionService.toggleReaction(user.id(), evalCommentId, reactionType);
 

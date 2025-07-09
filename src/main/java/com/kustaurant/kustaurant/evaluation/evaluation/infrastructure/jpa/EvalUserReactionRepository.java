@@ -12,11 +12,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public interface EvalUserReactionRepository extends JpaRepository<EvalUserReactionEntity, Long> {
-    @Query("select l from EvaluationEntity l "
+    @Query("select l from EvalUserReactionEntity l "
             + "where l.id = :evaluationId and l.userId = :userId")
     Optional<EvalUserReactionEntity> findByEvaluationIdAndUserId(
-            @Param("userId") Long userId,
-            @Param("evaluationId") Long evaluationId
+            @Param("evaluationId") Long evaluationId,
+            @Param("userId") Long userId
     );
 
     @Query("""

@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -17,10 +19,13 @@ public class EvalCommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(nullable = false)
     private Long userId;
+    @Column(nullable = false)
     private Integer restaurantId;
+    @Column(nullable = false)
     private Long evaluationId;
+    @Column(nullable = false)
     private String body;
 
     private Integer likeCount;
@@ -29,8 +34,9 @@ public class EvalCommentEntity {
     @Enumerated(EnumType.STRING)           // ← enum 으로 매핑
     @Column(nullable = false, length = 8)
     private Status status;
-
+    @CreationTimestamp
     private LocalDateTime createdAt;
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
     public static EvalCommentEntity from(EvalComment evalComment) {
