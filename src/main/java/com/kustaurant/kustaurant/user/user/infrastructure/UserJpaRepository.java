@@ -54,4 +54,6 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
 
     @Query("select count(u) from UserEntity u where u.loginApi = :loginApi")
     int countByLoginApi(@Param("loginApi") String loginApi);
+
+    List<UserEntity> findByIdIn(List<Long> ids);
 }

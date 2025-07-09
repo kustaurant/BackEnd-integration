@@ -1,7 +1,5 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity;
 
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentDislikeEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentLikeEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,9 +29,10 @@ public class EvaluationEntity {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     // 평가 내용 관련
-    private String commentBody;
-    private String commentImgUrl;
-    private Integer commentLikeCount;
+    private String body;
+    private String imgUrl;
+    private Integer likeCount;
+    private Integer dislikeCount;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
@@ -49,19 +48,15 @@ public class EvaluationEntity {
     @Column(name = "situation_id")
     private List<Long> situationIds = new ArrayList<>();
 
-    // 일단 둠
-    @OneToMany(mappedBy = "evaluation")
-    private List<RestaurantCommentLikeEntity> restaurantCommentLikeList = new ArrayList<>();
-    @OneToMany(mappedBy = "evaluation")
-    private List<RestaurantCommentDislikeEntity> restaurantCommentDislikeList = new ArrayList<>();
-
-    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String commentBody, String commentImgUrl, Long userId, Integer restaurantId) {
+    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String body, String imgUrl, Integer likeCount, Integer dislikeCount, Long userId, Integer restaurantId) {
         this.evaluationScore = evaluationScore;
+        this.userId = userId;
         this.status = status;
         this.createdAt = createdAt;
-        this.commentBody = commentBody;
-        this.commentImgUrl = commentImgUrl;
-        this.userId = userId;
+        this.body = body;
+        this.imgUrl = imgUrl;
+        this.likeCount = likeCount;
+        this.dislikeCount = dislikeCount;
         this.restaurantId = restaurantId;
     }
 
@@ -72,9 +67,9 @@ public class EvaluationEntity {
         entity.status = evaluation.getStatus();
         entity.createdAt = evaluation.getCreatedAt();
         entity.updatedAt = evaluation.getUpdatedAt();
-        entity.commentBody = evaluation.getCommentBody();
-        entity.commentImgUrl = evaluation.getCommentImgUrl();
-        entity.commentLikeCount = evaluation.getCommentLikeCount();
+        entity.body = evaluation.getCommentBody();
+        entity.imgUrl = evaluation.getCommentImgUrl();
+        entity.likeCount = evaluation.getCommentLikeCount();
         entity.userId = evaluation.getUserId();
         entity.restaurantId = evaluation.getRestaurantId();
         entity.situationIds = new ArrayList<>(evaluation.getSituationIds());
@@ -84,8 +79,8 @@ public class EvaluationEntity {
     public void reEvaluate(Evaluation evaluation) {
         this.evaluationScore = evaluation.getEvaluationScore();
         this.updatedAt = evaluation.getUpdatedAt();
-        this.commentBody = evaluation.getCommentBody();
-        this.commentImgUrl = evaluation.getCommentImgUrl();
+        this.body = evaluation.getCommentBody();
+        this.imgUrl = evaluation.getCommentImgUrl();
         updateSituations(evaluation.getSituationIds());
     }
 
@@ -101,14 +96,14 @@ public class EvaluationEntity {
                 .status(this.status)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
-                .commentBody(this.commentBody)
-                .commentImgUrl(this.commentImgUrl)
-                .commentLikeCount(this.commentLikeCount == null ? 0 : this.commentLikeCount)
+                .commentBody(this.body)
+                .commentImgUrl(this.imgUrl)
+                .commentLikeCount(this.likeCount == null ? 0 : this.likeCount)
                 .situationIds(this.situationIds)
                 .userId(this.userId)
                 .restaurantId(this.restaurantId)
-                .likeCount(this.restaurantCommentLikeList == null ? 0 : this.restaurantCommentLikeList.size())
-                .dislikeCount(this.restaurantCommentDislikeList == null ? 0 : this.restaurantCommentDislikeList.size())
+                .likeCount(this.likeCount)
+                .dislikeCount(this.dislikeCount)
                 .build();
     }
 

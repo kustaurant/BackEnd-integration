@@ -75,6 +75,7 @@ public class PostCommentService {
 
         boolean isLikedBefore = postCommentLikeRepository.existsByUserIdAndCommentId(userId, commentId);
         boolean isDislikedBefore = postCommentDislikeRepository.existsByUserIdAndCommentId(userId, commentId);
+        log.info("toggleLike - userId: {}, evalId: {}, isLikedBefore: {}, isDislikedBefore: {}", userId, commentId, isLikedBefore, isDislikedBefore);
         ReactionStatus status;
         if (isLikedBefore) {
             postCommentLikeRepository.deleteByUserIdAndCommentId(userId, commentId);

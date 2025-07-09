@@ -71,7 +71,7 @@ public class PostService {
         List<Sort.Order> sorts = new ArrayList<>();
         sorts.add(Sort.Order.desc("createdAt"));
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        
+
         Page<Post> postEntityPage;
         if (sort.equals("popular")) {
             postEntityPage = this.postRepository.findByStatusAndSearchKeyword(ContentStatus.ACTIVE, kw, postCategory, POPULARCOUNT, pageable);
@@ -96,7 +96,7 @@ public class PostService {
         // 인기순 최신순 모두 최신순으로
         sorts.add(Sort.Order.desc("createdAt"));
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-        
+
         if (sort.equals("popular")) {
             return this.postRepository.findByStatusAndCategoryAndPopularCount(ContentStatus.ACTIVE, postCategory, POPULARCOUNT, pageable);
         } else {
@@ -217,7 +217,7 @@ public class PostService {
 
         // 게시물 상태 변경
         post.delete();
-        
+
         // 댓글 삭제 (ID 기반으로 처리)
         // 댓글들은 별도 서비스에서 처리하므로 여기서는 게시글만 삭제
 
@@ -278,7 +278,7 @@ public class PostService {
         }
         return postDTOList;
     }
-    
+
     /**
      * PostQueryDAO를 활용한 최적화된 게시글 상세 조회
      * 모든 관련 데이터를 단일 쿼리로 조회하여 N+1 문제 해결
@@ -287,7 +287,7 @@ public class PostService {
         Optional<PostDTOProjection> projection = postQueryDAO.findPostWithAllData(postId, currentUserId);
         return projection.map(PostDTO::from);
     }
-    
+
     /**
      * PostQueryDAO를 활용한 최적화된 게시글 목록 조회
      * 모든 관련 데이터를 단일 쿼리로 조회하여 N+1 문제 해결
@@ -296,7 +296,7 @@ public class PostService {
         Page<PostDTOProjection> projections = postQueryDAO.findPostsWithAllData(pageable, currentUserId);
         return projections.map(PostDTO::from);
     }
-    
+
     /**
      * 카테고리별 게시글 목록 조회 (최적화된 버전)
      */
@@ -304,6 +304,6 @@ public class PostService {
         Page<PostDTOProjection> projections = postQueryDAO.findPostsByCategoryWithAllData(category, pageable, currentUserId);
         return projections.map(PostDTO::from);
     }
-    
+
 
 }

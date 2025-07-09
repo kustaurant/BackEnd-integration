@@ -12,6 +12,11 @@ public abstract class JwtAuthException extends AuthenticationException {
         this.errorCode = ec;
     }
 
+    protected JwtAuthException(ErrorCode ec, String message) {
+        super(message);
+        this.errorCode = ec;
+    }
+
     protected JwtAuthException(ErrorCode ec, Throwable cause) {
         super(ec.getMessage(), cause);
         this.errorCode = ec;
