@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.post.post.controller;
 
-import com.kustaurant.kustaurant.post.comment.controller.web.PostCommentService;
+import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.post.post.domain.Post;
@@ -9,7 +9,8 @@ import com.kustaurant.kustaurant.post.post.domain.PostDetailView;
 import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.post.post.service.web.PostScrapService;
-import com.kustaurant.kustaurant.post.post.service.web.PostService;
+import com.kustaurant.kustaurant.post.post.service.web.PostQueryService;
+import com.kustaurant.kustaurant.post.post.service.web.PostCommandService;
 import com.kustaurant.kustaurant.post.post.service.StorageService;
 import groovy.util.logging.Slf4j;
 import jakarta.transaction.Transactional;
@@ -31,7 +32,8 @@ import java.util.*;
 @Controller
 @RequiredArgsConstructor
 public class CommunityController {
-    private final PostService postService;
+    private final PostQueryService postQueryService;
+    private final PostCommandService postCommandService;
     private final PostCommentService postCommentService;
     private final PostScrapService postScrapService;
     private final StorageService storageService;
@@ -47,9 +49,9 @@ public class CommunityController {
     ) {
         Page<PostDTO> paging;
         if (postCategory.equals("전체")) {
-            paging = postService.getList(page, sort);
+            paging = postQueryService.getList(page, sort);
         } else {
-            paging = postService.getListByPostCategory(postCategory, page, sort);
+            paging = postQueryService.getListByPostCategory(postCategory, page, sort);
         }
 
         model.addAttribute("currentPage", "community");
@@ -77,7 +79,7 @@ public class CommunityController {
     @DeleteMapping("/api/post/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Integer postId) {
         log.info("Deleting post with ID: {}", postId);
-        postService.deletePost(postId);
+        postCommandService.deletePost(postId);
         return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
     }
 
@@ -110,7 +112,7 @@ public class CommunityController {
     @GetMapping("/api/post/like")
     public ResponseEntity<ReactionToggleResponse> togglePostLike(@RequestParam("postId") Integer postId, Principal principal) {
         Long userId = Long.valueOf(principal.getName());
-        ReactionToggleResponse reactionToggleResponse = postService.toggleLike(postId, userId);
+        ReactionToggleResponse reactionToggleResponse = postCommandService.toggleLike(postId, userId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
 
@@ -119,7 +121,7 @@ public class CommunityController {
     @GetMapping("/api/post/dislike")
     public ResponseEntity<ReactionToggleResponse> togglePostDislike(@RequestParam("postId") Integer postId, Principal principal) {
         Long userId = Long.valueOf(principal.getName());
-        ReactionToggleResponse reactionToggleResponse = postService.toggleDislike(postId, userId);
+        ReactionToggleResponse reactionToggleResponse = postCommandService.toggleDislike(postId, userId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
 
@@ -136,8 +138,8 @@ public class CommunityController {
     @GetMapping("/community/search")
     public String search(Model model, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "kw", defaultValue = "") String kw, @RequestParam(defaultValue = "recent") String sort, @RequestParam(defaultValue = "전체") String postCategory) {
 
-        Page<PostDTO> paging = postService.getList(page, sort, kw, postCategory);
-        List<String> timeAgoList = postService.getTimeAgoList(paging);
+        Page<PostDTO> paging = postQueryService.getList(page, sort, kw, postCategory);
+        List<String> timeAgoList = postQueryService.getTimeAgoList(paging);
         model.addAttribute("timeAgoList", timeAgoList);
         model.addAttribute("paging", paging);
         model.addAttribute("postSearchKw", kw);
@@ -185,7 +187,7 @@ public class CommunityController {
             @RequestParam("content") String content,
             @AuthUser AuthUserInfo user
     ) {
-        postService.create(title, category, content, user.id());
+        postCommandService.create(title, category, content, user.id());
         return ResponseEntity.ok("글이 성공적으로 저장되었습니다.");
     }
 
@@ -196,7 +198,7 @@ public class CommunityController {
             Model model,
             @AuthUser AuthUserInfo user
     ) {
-        Post post = postService.getPost(postId);
+        Post post = postQueryService.getPost(postId);
         model.addAttribute("post", PostDTO.from(post));
         return "community_update";
     }
@@ -210,7 +212,7 @@ public class CommunityController {
             @RequestParam String content,
             @AuthUser AuthUserInfo user
     ) {
-        postService.update(postId, title, postCategory, content);
+        postCommandService.update(postId, title, postCategory, content);
         return ResponseEntity.ok("글이 성공적으로 수정되었습니다.");
     }
 

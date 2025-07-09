@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.post.comment.controller.web;
+package com.kustaurant.kustaurant.post.comment.service;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
@@ -23,7 +23,7 @@ import com.kustaurant.kustaurant.post.post.enums.ScrapStatus;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
-import com.kustaurant.kustaurant.post.post.service.web.PostService;
+import com.kustaurant.kustaurant.post.post.service.web.PostQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -39,7 +39,7 @@ import java.util.*;
 @Slf4j
 public class PostCommentService {
     private final PostCommentRepository postCommentRepository;
-    private final PostService postService;
+    private final PostQueryService postQueryService;
     private final PostCommentLikeJpaRepository postCommentLikeJpaRepository;
     private final PostCommentDislikeJpaRepository postCommentDislikeJpaRepository;
     private final UserService userService;
@@ -177,7 +177,7 @@ public class PostCommentService {
         User currentUser = (userId != null) ? userService.getUserById(userId) : null;
 
         // 1. 게시글 정보
-        Post post = postService.getPost(postId);
+        Post post = postQueryService.getPost(postId);
         User postAuthor = userService.getUserById(post.getAuthorId());
         PostDTO postDTO = PostDTO.from(post, postAuthor);
 
@@ -223,7 +223,7 @@ public class PostCommentService {
         // 7. 최종 뷰 조합
         PostDetailView.PostDetailViewBuilder builder = PostDetailView.builder()
                 .post(postDTO)
-                .postInteractionStatus(postService.getUserInteractionStatus(postId, userId))
+                .postInteractionStatus(postQueryService.getUserInteractionStatus(postId, userId))
                 .commentInteractionMap(commentInteractionMap)
                 .sort(sort);
 

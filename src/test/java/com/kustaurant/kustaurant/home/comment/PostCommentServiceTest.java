@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.home.comment;
 
-import com.kustaurant.kustaurant.post.comment.controller.web.PostCommentService;
+import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentDislikeJpaRepository;
 import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentLikeJpaRepository;
@@ -13,7 +13,7 @@ import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
-import com.kustaurant.kustaurant.post.post.service.web.PostService;
+import com.kustaurant.kustaurant.post.post.service.web.PostQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,7 @@ class PostCommentServiceTest {
     private PostCommentRepository commentRepository;
     private PostCommentLikeJpaRepository likeRepository;
     private PostCommentDislikeJpaRepository dislikeRepository;
-    private PostService postService;
+    private PostQueryService postQueryService;
     private UserRepository userRepository;
     private PostCommentService commentService;
     private UserService userService;
@@ -40,12 +40,12 @@ class PostCommentServiceTest {
         commentRepository = mock(PostCommentRepository.class);
         likeRepository = mock(PostCommentLikeJpaRepository.class);
         dislikeRepository = mock(PostCommentDislikeJpaRepository.class);
-        postService = mock(PostService.class);
+        postQueryService = mock(PostQueryService.class);
         userRepository = mock(UserRepository.class);
         postCommentDislikeRepository = mock(PostCommentDislikeRepository.class);
         postCommentLikeRepository = mock(PostCommentLikeRepository.class);
 
-        commentService = new PostCommentService(commentRepository, postService, likeRepository, dislikeRepository,userService, postCommentLikeRepository, postCommentDislikeRepository);
+        commentService = new PostCommentService(commentRepository, postQueryService, likeRepository, dislikeRepository,userService, postCommentLikeRepository, postCommentDislikeRepository);
     }
 
     @Test
@@ -136,7 +136,7 @@ class PostCommentServiceTest {
         Post post = Post.builder().id(postId).build();
         PostComment comment1 = PostComment.create("1", 1L, postId);
         PostComment comment2 = PostComment.create("2", 1L, postId);
-        when(postService.getPost(postId)).thenReturn(post);
+        when(postQueryService.getPost(postId)).thenReturn(post);
         when(commentRepository.findParentComments(any())).thenReturn(new ArrayList<>(List.of(comment1, comment2)));
 
         // When
@@ -157,7 +157,7 @@ class PostCommentServiceTest {
         PostComment newer = PostComment.create("newer", 1L, postId);
         older.setCreatedAt(LocalDateTime.now().minusMinutes(10));
         newer.setCreatedAt(LocalDateTime.now());
-        when(postService.getPost(postId)).thenReturn(post);
+        when(postQueryService.getPost(postId)).thenReturn(post);
         when(commentRepository.findParentComments(any())).thenReturn(new ArrayList<>(List.of(older, newer)));
 
         // When
