@@ -45,7 +45,7 @@ public class CommunityController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(defaultValue = "recent") String sort
     ) {
-        Page<Post> paging;
+        Page<PostDTO> paging;
         if (postCategory.equals("전체")) {
             paging = postService.getList(page, sort);
         } else {
@@ -56,10 +56,7 @@ public class CommunityController {
         model.addAttribute("postCategory", postCategory);
         model.addAttribute("sort", sort);
         model.addAttribute("paging", paging);
-
-        List<PostDTO> postDTOList = postService.getDTOs(paging);
-
-        model.addAttribute("postList", postDTOList);
+        model.addAttribute("postList", paging.getContent());
         return "community";
     }
 
@@ -147,7 +144,6 @@ public class CommunityController {
         model.addAttribute("sort", sort);
         model.addAttribute("postCategory", postCategory);
         model.addAttribute("postList", paging.getContent());
-
         return "community";
     }
 

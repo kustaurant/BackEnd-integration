@@ -2,10 +2,10 @@ package com.kustaurant.kustaurant.post.post.service.web;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
+import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.post.domain.*;
 import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
-import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
 import com.kustaurant.kustaurant.post.post.domain.response.InteractionStatusResponse;
 import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.post.enums.*;
@@ -50,19 +50,20 @@ public class PostService {
     private final UserService userService;
 
     // 메인 화면 로딩하기
-    public Page<Post> getList(int page, String sort) {
+    public Page<PostDTO> getList(int page, String sort) {
         List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
+        
         // 최신순 정렬
         if (sort.isEmpty() || sort.equals("recent")) {
-            sorts.add(Sort.Order.desc("createdAt"));
-            Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-            return this.postRepository.findByStatus(ContentStatus.ACTIVE, pageable);
+            return postQueryDAO.findPostsWithAllData(pageable, null)
+                    .map(PostDTO::from);
         }
         // 인기순 정렬하기
         else {
-            sorts.add(Sort.Order.desc("createdAt"));
-            Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-            return this.postRepository.findByStatusAndPopularCount(ContentStatus.ACTIVE, POPULARCOUNT, pageable);
+            return postQueryDAO.findPopularPostsWithAllData(pageable, null, POPULARCOUNT)
+                    .map(PostDTO::from);
         }
     }
 
@@ -72,35 +73,29 @@ public class PostService {
         sorts.add(Sort.Order.desc("createdAt"));
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
         
-        Page<Post> postEntityPage;
+        // 인기순 정렬
         if (sort.equals("popular")) {
-            postEntityPage = this.postRepository.findByStatusAndSearchKeyword(ContentStatus.ACTIVE, kw, postCategory, POPULARCOUNT, pageable);
+            return postQueryDAO.findPopularPostsBySearchKeywordWithAllData(kw, postCategory, pageable, null, POPULARCOUNT)
+                    .map(PostDTO::from);
         } else {
-            postEntityPage = this.postRepository.findByStatusAndSearchKeyword(ContentStatus.ACTIVE, kw, postCategory, -1000, pageable);
+            // 최신순 정렬
+            return postQueryDAO.findPostsBySearchKeywordWithAllData(kw, postCategory, pageable, null)
+                    .map(PostDTO::from);
         }
-
-        // PostQueryDAO를 활용한 효율적인 데이터 조회
-        // 우선 기존 로직 유지 (향후 개선 예정)
-        return postEntityPage
-                .map(postEntity -> {
-                    User user = userService.getUserById(postEntity.getAuthorId());
-                    PostDTO postDTO = PostDTO.from(postEntity, user);
-                    postDTO.setUser(UserDTO.from(user));
-                    return postDTO;
-                });
     }
 
     //  드롭다운에서 카테고리가 설정된 상태에서 게시물 반환하기
-    public Page<Post> getListByPostCategory(String postCategory, int page, String sort) {
+    public Page<PostDTO> getListByPostCategory(String postCategory, int page, String sort) {
         List<Sort.Order> sorts = new ArrayList<>();
-        // 인기순 최신순 모두 최신순으로
         sorts.add(Sort.Order.desc("createdAt"));
         Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
         
         if (sort.equals("popular")) {
-            return this.postRepository.findByStatusAndCategoryAndPopularCount(ContentStatus.ACTIVE, postCategory, POPULARCOUNT, pageable);
+            return postQueryDAO.findPopularPostsByCategoryWithAllData(postCategory, pageable, null, POPULARCOUNT)
+                    .map(PostDTO::from);
         } else {
-            return this.postRepository.findByStatusAndCategory(ContentStatus.ACTIVE, postCategory, pageable);
+            return postQueryDAO.findPostsByCategoryWithAllData(postCategory, pageable, null)
+                    .map(PostDTO::from);
         }
     }
     @Transactional
@@ -115,26 +110,11 @@ public class PostService {
 
     // 게시물 리스트에 대한 시간 경과 리스트로 반환하는 함수.
     public List<String> getTimeAgoList(Page<PostDTO> postList) {
-        LocalDateTime now = LocalDateTime.now();
         return postList.stream().map(post -> {
             LocalDateTime createdAt = post.getCreatedAt();
-            return timeAgo(now, createdAt);
+            return TimeAgoUtil.toKor(createdAt);
         }).collect(Collectors.toList());
 
-    }
-
-    // 작성글이나 댓글이 만들어진지 얼마나 됐는지 계산하는 함수
-    public String timeAgo(LocalDateTime now, LocalDateTime past) {
-        long minutes = Duration.between(past, now).toMinutes();
-        if (minutes < 60) {
-            return minutes + "분 전";
-        }
-        long hours = minutes / 60;
-        if (hours < 24) {
-            return hours + "시간 전";
-        }
-        long days = hours / 24;
-        return days + "일 전";
     }
 
     // 조회수 증가
@@ -268,16 +248,6 @@ public class PostService {
         postRepository.save(post);
     }
 
-    public List<PostDTO> getDTOs(Page<Post> paging) {
-        List<PostDTO> postDTOList = new ArrayList<>();
-        for (Post post : paging) {
-            User user = userService.getUserById(post.getAuthorId());
-            PostDTO postDTO = PostDTO.from(post, user);
-            postDTO.setUser(UserDTO.from(user));
-            postDTOList.add(postDTO);
-        }
-        return postDTOList;
-    }
     
     /**
      * PostQueryDAO를 활용한 최적화된 게시글 상세 조회
@@ -304,6 +274,4 @@ public class PostService {
         Page<PostDTOProjection> projections = postQueryDAO.findPostsByCategoryWithAllData(category, pageable, currentUserId);
         return projections.map(PostDTO::from);
     }
-    
-
 }

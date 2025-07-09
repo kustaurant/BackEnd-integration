@@ -52,40 +52,41 @@ public class PostApiService {
 
     // 메인 화면 로딩하기
     public Page<PostDTO> getPosts(int page, String sort, String koreanCategory, String postBodyType) {
-        Page<Post> posts;
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
+        
+        Page<PostDTO> result;
+        
         if (koreanCategory.equals("전체")) {
-            List<Sort.Order> sorts = new ArrayList<>();
             if (sort.isEmpty() || sort.equals("recent")) {
-                sorts.add(Sort.Order.desc("createdAt"));
-                Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-                posts = this.postRepository.findByStatus(ContentStatus.ACTIVE, pageable);
+                result = postQueryDAO.findPostsWithAllData(pageable, null)
+                        .map(PostDTO::from);
             } else if (sort.equals("popular")) {
-                sorts.add(Sort.Order.desc("createdAt"));
-                Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-                posts = this.postRepository.findByStatusAndPopularCount(ContentStatus.ACTIVE, POPULARCOUNT, pageable);
+                result = postQueryDAO.findPopularPostsWithAllData(pageable, null, POPULARCOUNT)
+                        .map(PostDTO::from);
             } else {
                 throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
             }
         } else {
-            List<Sort.Order> sorts = new ArrayList<>();
-            sorts.add(Sort.Order.desc("createdAt"));
-            Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
             if (sort.equals("popular")) {
-                posts = this.postRepository.findByStatusAndCategoryAndPopularCount(ContentStatus.ACTIVE, koreanCategory, POPULARCOUNT, pageable);
+                result = postQueryDAO.findPopularPostsByCategoryWithAllData(koreanCategory, pageable, null, POPULARCOUNT)
+                        .map(PostDTO::from);
             } else {
-                posts = this.postRepository.findByStatusAndCategory(ContentStatus.ACTIVE, koreanCategory, pageable);
+                result = postQueryDAO.findPostsByCategoryWithAllData(koreanCategory, pageable, null)
+                        .map(PostDTO::from);
             }
         }
 
-        // 기존 방식 (N+1 문제 존재)
-        Page<PostDTO> result = posts.map(post -> {
-            PostDTO dto = PostDTO.from(post);
-            if (postBodyType.equals("text")) {
+        // 텍스트 변환 처리
+        if (postBodyType.equals("text")) {
+            result = result.map(dto -> {
                 dto.setPostBody(Jsoup.parse(dto.getPostBody()).text()); // HTML 제거 후 일반 텍스트 변환
-            }
-            return dto;
-        });
-        return result;  // Post 엔티티를 PostDTO로 변환
+                return dto;
+            });
+        }
+        
+        return result;
     }
 
     public Post getPost(Integer id) {
