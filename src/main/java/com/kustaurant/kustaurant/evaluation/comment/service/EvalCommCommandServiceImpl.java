@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.evaluation.comment.service;
 
+import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommCommandService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalCommentRequest;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
@@ -13,14 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class EvalCommCommandService {
-    EvalCommentRepository evalCommentRepository;
-    EvalCommUserReactionRepository evalCommUserReactionRepository;
+public class EvalCommCommandServiceImpl implements EvalCommCommandService {
+    private final EvalCommentRepository evalCommentRepository;
+    private final EvalCommUserReactionRepository evalCommUserReactionRepository;
 
     public EvalComment create(Long evalCommentId, Integer restaurantId,  Long userId, EvalCommentRequest req) {
-        return EvalComment.create(userId, restaurantId, evalCommentId, req);
-//        EvalComment evalComment = EvalComment.create(userId, restaurantId, evalCommentId, req);
-//        return evalCommentRepository.save(evalComment);
+        EvalComment evalComment = EvalComment.create(userId, restaurantId, evalCommentId, req);
+        return evalCommentRepository.save(evalComment);
     }
 
     public void delete(Long evalCommentId, Integer restaurantId, Long userId) {

@@ -17,8 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,7 +55,12 @@ public class ReviewQueryService {
                 .collect(Collectors.groupingBy(EvalComment::getEvaluationId));
 
         /* 5) 작성자 프로필 batch 로딩 */
-        Map<Long, User> userMap = userRepo.findByIdIn(writerIds).stream()
+        Set<Long> allUserIds = new HashSet<>(writerIds);
+        commentMap.values().stream()
+                .flatMap(List::stream)
+                .forEach(c -> allUserIds.add(c.getUserId()));
+
+        Map<Long, User> userMap = userRepo.findByIdIn(new ArrayList<>(allUserIds)).stream()
                 .collect(Collectors.toMap(User::getId, u -> u));
 
         /* 6) “내가 평가에 누른 리액션” 한 방 조회 */

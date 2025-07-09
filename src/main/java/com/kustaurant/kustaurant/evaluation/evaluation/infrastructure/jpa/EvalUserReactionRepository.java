@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 public interface EvalUserReactionRepository extends JpaRepository<EvalUserReactionEntity, Long> {
     @Query("select l from EvaluationEntity l "
             + "where l.id = :evaluationId and l.userId = :userId")
-    Optional<EvalUserReactionEntity> findByevaluationIdAndUserId(
+    Optional<EvalUserReactionEntity> findByEvaluationIdAndUserId(
             @Param("userId") Long userId,
-            @Param("evalId") Long evaluationId
+            @Param("evaluationId") Long evaluationId
     );
 
     @Query("""

@@ -1,9 +1,9 @@
 package com.kustaurant.kustaurant.evaluation.comment.controller.api;
 
+import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommCommandService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalCommentRequest;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentResponse;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
-import com.kustaurant.kustaurant.evaluation.comment.service.EvalCommCommandService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;

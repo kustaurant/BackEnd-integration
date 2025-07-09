@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public class User {
-    private Long id;
+    private final Long id;
     private Nickname nickname;
     private PhoneNumber phoneNumber;
     private String email;
@@ -24,7 +24,6 @@ public class User {
     private final String rankImg;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
     private UserStats stats;
 
     @Builder
@@ -38,6 +37,7 @@ public class User {
             String loginApi,
             UserStatus status,
             String rankImg,
+            UserStats stats,
             LocalDateTime createdAt,
             LocalDateTime updatedAt
     ) {
@@ -50,6 +50,7 @@ public class User {
         this.loginApi = loginApi;
         this.status = status;
         this.rankImg = rankImg;
+        this.stats = stats;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

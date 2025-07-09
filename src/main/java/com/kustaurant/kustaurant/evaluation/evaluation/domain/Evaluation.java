@@ -6,7 +6,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Builder
+@Builder(toBuilder = true)
 @Getter
 public class Evaluation {
 

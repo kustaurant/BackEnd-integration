@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 public interface EvalCommUserReactionRepository extends JpaRepository<EvalCommUserReactionEntity, Long> {
 
     @Query("select l from EvalCommUserReactionEntity l "
-            + "where l.userId = :userId and l.evalCommentId = :commentId")
+            + "where l.userId = :userId and l.evalCommentId = :evalCommentId")
     Optional<EvalCommUserReactionEntity> findByUserIdAndEvalCommentId(
             @Param("userId") Long userId,
-            @Param("evalId") Long commentId
+            @Param("evalCommentId") Long evalCommentId
     );
 
     void deleteAllByEvalCommentId(Long evalCommentId);

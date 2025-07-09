@@ -5,6 +5,6 @@ import com.kustaurant.kustaurant.common.enums.ReactionType;
 public record EvalCommentReactionResponse(
         Long evalCommentId,
         ReactionType reaction,
-        Integer commentLikeCount,
-        Integer commentDislikeCount
+        Integer likeCount,
+        Integer dislikeCount
 ){}

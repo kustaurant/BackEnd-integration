@@ -1,9 +1,9 @@
 package com.kustaurant.kustaurant.evaluation.comment.service;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
+import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommUserReactionService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentReactionResponse;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommUserReactionEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
 import com.kustaurant.kustaurant.evaluation.comment.service.port.EvalCommentRepository;
@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class EvalCommUserReactionService {
+public class EvalCommUserReactionServiceImpl implements EvalCommUserReactionService {
     private final EvalCommUserReactionRepository evalCommentLikeRepository;
     private final EvalCommentRepository evalCommentRepository;
 

@@ -1,7 +1,8 @@
 package com.kustaurant.kustaurant.admin.report;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
+import com.kustaurant.kustaurant.admin.report.enums.ReportReason;
+import com.kustaurant.kustaurant.admin.report.enums.ReportStatus;
+import com.kustaurant.kustaurant.admin.report.enums.TargetType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,42 +18,27 @@ import java.time.LocalDateTime;
 public class ReportEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer reportId;
-    @Column(name = "user_id", nullable = false)
+    private Long id;
+
+    @Column(nullable = false)
     private Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "evaluation_id")
-    private EvaluationEntity evaluation;
-    @ManyToOne
-    @JoinColumn(name = "comment_id")
-    private EvalCommentEntity restaurantComment;
+    @Column(nullable = false)
+    private Long targetId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private TargetType targetType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ReportReason reason;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ReportStatus status = ReportStatus.PENDING;
+
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    private String status;
 
-    public ReportEntity(
-            Long userId,
-            EvalCommentEntity restaurantComment,
-            LocalDateTime createdAt,
-            String status
-    ) {
-        this.userId = userId;
-        this.evaluation = null;
-        this.restaurantComment = restaurantComment;
-        this.createdAt = createdAt;
-        this.status = status;
-    }
-    public ReportEntity(
-            Long userId,
-            EvaluationEntity evaluation,
-            LocalDateTime createdAt,
-            String status
-    ) {
-        this.userId = userId;
-        this.evaluation = evaluation;
-        this.restaurantComment = null;
-        this.createdAt = createdAt;
-        this.status = status;
-    }
 }

@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.evaluation.comment.controller.api;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
+import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommUserReactionService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentReactionResponse;
-import com.kustaurant.kustaurant.evaluation.comment.service.EvalCommUserReactionService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;

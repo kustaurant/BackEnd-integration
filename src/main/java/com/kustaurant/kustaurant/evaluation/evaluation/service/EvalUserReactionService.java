@@ -25,7 +25,7 @@ public class EvalUserReactionService {
     public EvalReactionResponse toggleReaction(Long userId, Long evaluationId, ReactionType reaction) {
         Evaluation evaluation = evaluationRepository.findById(evaluationId)
                 .orElseThrow(()-> new DataNotFoundException(ErrorCode.EVALUATION_NOT_FOUND));
-        Optional<EvalUserReactionEntity> evaluationLike = evaluationLikeRepository.findByevaluationIdAndUserId(userId, evaluationId);
+        Optional<EvalUserReactionEntity> evaluationLike = evaluationLikeRepository.findByEvaluationIdAndUserId(userId, evaluationId);
 
         ReactionType resultReaction;
 

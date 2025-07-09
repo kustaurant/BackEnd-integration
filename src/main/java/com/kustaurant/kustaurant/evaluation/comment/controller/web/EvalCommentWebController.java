@@ -2,27 +2,20 @@ package com.kustaurant.kustaurant.evaluation.comment.controller.web;
 
 import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalCommentRequest;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
-import com.kustaurant.kustaurant.evaluation.comment.service.EvalCommCommandService;
-import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
+import com.kustaurant.kustaurant.evaluation.comment.service.EvalCommCommandServiceImpl;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.enums.EnumSortComment;
-import com.kustaurant.kustaurant.user.user.domain.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-
 @Controller
 @RequiredArgsConstructor
 public class EvalCommentWebController {
-    private final EvalCommCommandService evalCommCommandService;
+    private final EvalCommCommandServiceImpl evalCommCommandService;
 
     // 1. 식당평가 댓글 작성
     @PostMapping("/web/api/restaurants/{restaurantId}/comments/{evalCommentId}")

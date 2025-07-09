@@ -48,12 +48,7 @@ public class RestaurantEntity {
 
     @JsonIgnore
     private LocalDateTime updatedAt;
-
-
     // 다른 테이블과의 관계 매핑
-    @OneToMany(mappedBy = "restaurant")
-    @JsonIgnore
-    private List<EvalCommentEntity> restaurantCommentList = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore
