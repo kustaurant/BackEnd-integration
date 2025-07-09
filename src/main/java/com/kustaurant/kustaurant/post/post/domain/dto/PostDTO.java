@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.post.post.domain.dto;
 
+import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
@@ -86,7 +87,7 @@ public class PostDTO {
                 .likeCount(0) // 계산 필요시 별도 DAO로 조회
                 .likeOnlyCount(0) // 계산 필요시 별도 DAO로 조회
                 .dislikeOnlyCount(0) // 계산 필요시 별도 DAO로 조회
-                .timeAgo(post.calculateTimeAgo())
+                .timeAgo(TimeAgoUtil.toKor(post.getCreatedAt()))
                 .postPhotoImgUrl(null) // ID 기반으로 별도 조회 필요
                 .commentCount(0) // ID 기반으로 별도 조회 필요
                 .postVisitCount(post.getVisitCount())
@@ -112,7 +113,7 @@ public class PostDTO {
                 .likeOnlyCount(projection.getLikeOnlyCount())
                 .dislikeOnlyCount(projection.getDislikeOnlyCount())
                 .user(createUserDTO(projection))
-                .timeAgo(calculateTimeAgo(projection.createdAt()))
+                .timeAgo(TimeAgoUtil.toKor(projection.createdAt()))
                 .postPhotoImgUrl(projection.firstPhotoUrl())
                 .commentCount(projection.getCommentCount())
                 .postVisitCount(projection.visitCount())
@@ -123,24 +124,7 @@ public class PostDTO {
                 .build();
     }
     
-    // 시간 경과 계산 헬퍼 메서드
-    private static String calculateTimeAgo(LocalDateTime createdAt) {
-        if (createdAt == null) return "";
-        
-        LocalDateTime now = LocalDateTime.now();
-        long diffInMinutes = java.time.Duration.between(createdAt, now).toMinutes();
 
-        if (diffInMinutes < 1) {
-            return "방금 전";
-        } else if (diffInMinutes < 60) {
-            return diffInMinutes + "분 전";
-        } else if (diffInMinutes < 1440) { // 24시간
-            return (diffInMinutes / 60) + "시간 전";
-        } else {
-            return (diffInMinutes / 1440) + "일 전";
-        }
-    }
-    
     // UserDTO 생성 헬퍼 메서드
     private static UserDTO createUserDTO(PostDTOProjection projection) {
         UserDTO userDTO = new UserDTO();
