@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.home.comment;
+package com.kustaurant.kustaurant.post;
 
 import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
@@ -7,9 +7,10 @@ import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentLikeJpaR
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentDislikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
-import com.kustaurant.kustaurant.post.post.domain.Post;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryDAO;
 import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
@@ -17,9 +18,6 @@ import com.kustaurant.kustaurant.post.post.service.web.PostQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -27,6 +25,8 @@ import static org.mockito.Mockito.*;
 
 class PostCommentServiceTest {
     private PostCommentRepository commentRepository;
+    private PostCommentQueryDAO postCommentQueryDAO;
+    private PostQueryDAO postQueryDAO;
     private PostCommentLikeJpaRepository likeRepository;
     private PostCommentDislikeJpaRepository dislikeRepository;
     private PostQueryService postQueryService;
@@ -35,17 +35,21 @@ class PostCommentServiceTest {
     private UserService userService;
     private PostCommentLikeRepository postCommentLikeRepository;
     private PostCommentDislikeRepository postCommentDislikeRepository;
+    
     @BeforeEach
     void setUp() {
         commentRepository = mock(PostCommentRepository.class);
+        postCommentQueryDAO = mock(PostCommentQueryDAO.class);
+        postQueryDAO = mock(PostQueryDAO.class);
         likeRepository = mock(PostCommentLikeJpaRepository.class);
         dislikeRepository = mock(PostCommentDislikeJpaRepository.class);
         postQueryService = mock(PostQueryService.class);
         userRepository = mock(UserRepository.class);
+        userService = mock(UserService.class);
         postCommentDislikeRepository = mock(PostCommentDislikeRepository.class);
         postCommentLikeRepository = mock(PostCommentLikeRepository.class);
 
-        commentService = new PostCommentService(commentRepository, postQueryService, likeRepository, dislikeRepository,userService, postCommentLikeRepository, postCommentDislikeRepository);
+        commentService = new PostCommentService(commentRepository, postCommentQueryDAO, postQueryDAO, postQueryService, likeRepository, dislikeRepository, userService, postCommentLikeRepository, postCommentDislikeRepository);
     }
 
     @Test
@@ -129,41 +133,7 @@ class PostCommentServiceTest {
         verify(commentRepository).save(parentComment);
     }
 
-    @Test
-    void 댓글목록을_조회할_때_인기순이면_좋아요순으로_정렬된다() {
-        // Given
-        Integer postId = 1;
-        Post post = Post.builder().id(postId).build();
-        PostComment comment1 = PostComment.create("1", 1L, postId);
-        PostComment comment2 = PostComment.create("2", 1L, postId);
-        when(postQueryService.getPost(postId)).thenReturn(post);
-        when(commentRepository.findParentComments(any())).thenReturn(new ArrayList<>(List.of(comment1, comment2)));
-
-        // When
-        List<PostComment> result = commentService.getParentComments(postId, "popular");
-
-        // Then
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).getCommentBody()).isEqualTo("1");
-        assertThat(result.get(1).getCommentBody()).isEqualTo("2");
-    }
-
-    @Test
-    void 댓글목록을_조회할_때_최신순이면_작성시간순으로_정렬된다() {
-        // Given
-        Integer postId = 1;
-        Post post = Post.builder().id(postId).build();
-        PostComment older = PostComment.create("older", 1L, postId);
-        PostComment newer = PostComment.create("newer", 1L, postId);
-        older.setCreatedAt(LocalDateTime.now().minusMinutes(10));
-        newer.setCreatedAt(LocalDateTime.now());
-        when(postQueryService.getPost(postId)).thenReturn(post);
-        when(commentRepository.findParentComments(any())).thenReturn(new ArrayList<>(List.of(older, newer)));
-
-        // When
-        List<PostComment> result = commentService.getParentComments(postId, "recent");
-
-        // Then
-        assertThat(result.get(0).getCreatedAt()).isAfter(result.get(1).getCreatedAt());
-    }
+    // 댓글 목록 조회 테스트는 제거된 getParentComments 메서드 대신
+    // buildPostDetailView 메서드나 PostCommentQueryDAO를 직접 테스트하는 것이 좋습니다.
+    // 실제 통합 테스트에서 전체 플로우를 검증하는 것을 권장합니다.
 }

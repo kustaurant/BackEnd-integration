@@ -7,10 +7,11 @@ import com.kustaurant.kustaurant.post.comment.domain.PostCommentDislike;
 import com.kustaurant.kustaurant.post.comment.domain.PostCommentLike;
 import com.kustaurant.kustaurant.post.comment.dto.PostCommentDTO;
 import com.kustaurant.kustaurant.post.comment.infrastructure.*;
+import com.kustaurant.kustaurant.post.comment.infrastructure.projection.PostCommentDetailProjection;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentDislikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
-import com.kustaurant.kustaurant.post.post.domain.Post;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryDAO;
 import com.kustaurant.kustaurant.post.post.domain.PostDetailView;
 import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
 import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
@@ -20,13 +21,14 @@ import com.kustaurant.kustaurant.post.post.enums.DislikeStatus;
 import com.kustaurant.kustaurant.post.post.enums.LikeStatus;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.post.enums.ScrapStatus;
+import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
+import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.post.post.service.web.PostQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,8 @@ import java.util.*;
 @Slf4j
 public class PostCommentService {
     private final PostCommentRepository postCommentRepository;
+    private final PostCommentQueryDAO postCommentQueryDAO;
+    private final PostQueryDAO postQueryDAO;
     private final PostQueryService postQueryService;
     private final PostCommentLikeJpaRepository postCommentLikeJpaRepository;
     private final PostCommentDislikeJpaRepository postCommentDislikeJpaRepository;
@@ -140,27 +144,6 @@ public class PostCommentService {
 
 
 
-    public List<PostComment> getParentComments(Integer postId, String sort) {
-        List<PostComment> postCommentList = postCommentRepository.findParentComments(postId);
-        List<PostComment> mutableList = new ArrayList<>(postCommentList);
-        if (sort.equals("popular")) {
-            // 인기순은 일단 생성일시 기준으로 정렬 (향후 별도 카운트 로직 구현 예정)
-            mutableList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
-        } else {
-            mutableList.sort(Comparator.comparing(PostComment::getCreatedAt).reversed());
-        }
-        return mutableList;
-    }
-
-
-
-    private Specification<PostCommentEntity> parentAndPostSpec(Integer postId, Specification<PostCommentEntity> baseSpec) {
-        return (root, query, cb) -> cb.and(
-                cb.equal(root.get("post").get("postId"), postId),
-                cb.isNull(root.get("parentComment")),
-                baseSpec == null ? cb.conjunction() : baseSpec.toPredicate(root, query, cb)
-        );
-    }
 
 
     public InteractionStatusResponse getUserInteractionStatus(Integer commentId, Long userId) {
@@ -174,83 +157,84 @@ public class PostCommentService {
 
     @Transactional(readOnly = true)
     public PostDetailView buildPostDetailView(Integer postId, Long userId, String sort) {
-        User currentUser = (userId != null) ? userService.getUserById(userId) : null;
-
-        // 1. 게시글 정보
-        Post post = postQueryService.getPost(postId);
-        User postAuthor = userService.getUserById(post.getAuthorId());
-        PostDTO postDTO = PostDTO.from(post, postAuthor);
-
-        // 2. 부모 댓글+대댓글 트리 조회
-        List<PostComment> parentComments = getParentComments(postId, sort);
-
-        // 3. 댓글 상호작용 맵 생성
-        Map<Integer, InteractionStatusResponse> commentInteractionMap = new HashMap<>();
-        for (PostComment comment : parentComments) {
-            fillInteractionMap(comment, userId, commentInteractionMap);
-        }
-
-        // 4. 댓글 작성자 id 모두 조회
-        List<Long> allUserIds = parentComments.stream()
-                .flatMap(c -> collectAllReplies(c).stream())
-                .map(PostComment::getUserId)
-                .distinct()
-                .toList();
-
-        // 5. id -> UserDTO 매핑
-        Map<Long, UserDTO> userDtoMap = userService.getUserDTOsByIds(allUserIds);
-
-        // 6. 댓글 트리 → DTO 변환
-        List<PostCommentDTO> commentDTOs = parentComments.stream()
-                .filter(c -> c.getParentCommentId() == null)
-                .map(c -> {
-                    Integer commentId = c.getId();
-                    Long authorId = c.getUserId();
-                    PostCommentDTO dto = PostCommentDTO.from(c, userDtoMap);
-
-                    InteractionStatusResponse res = commentInteractionMap.get(commentId);
-                    if (res != null) {
-                        dto.setIsLiked(res.getLiked().isLiked());
-                        dto.setIsDisliked(res.getDisliked().isDisliked());
-                    }
-
-                    dto.setIsCommentMine(currentUser != null && authorId.equals(currentUser.getId()));
-                    return dto;
-                }).toList();
-
+        // 1. 게시글 정보 조회 (최적화된 단일 쿼리)
+        PostDTOProjection postData = postQueryDAO.findPostWithAllData(postId, userId)
+                .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND, postId, "게시글"));
+        
+        // 2. 댓글 트리 조회 (최적화된 단일 쿼리)
+        List<PostCommentDetailProjection> commentData = 
+                postCommentQueryDAO.findCommentTreeByPostId(postId, userId, sort);
+        
+        // 3. 댓글 계층 구조 구성 및 DTO 변환
+        List<PostCommentDTO> commentDTOs = buildCommentTree(commentData);
+        
+        // 4. PostDTO 생성 및 댓글 리스트 설정
+        PostDTO postDTO = PostDTO.from(postData);
         postDTO.setPostCommentList(commentDTOs);
-
-        // 7. 최종 뷰 조합
-        PostDetailView.PostDetailViewBuilder builder = PostDetailView.builder()
-                .post(postDTO)
-                .postInteractionStatus(postQueryService.getUserInteractionStatus(postId, userId))
-                .commentInteractionMap(commentInteractionMap)
-                .sort(sort);
-
-        // currentUser 추가
-        if (currentUser != null) {
-            builder.currentUser(UserDTO.from(currentUser));
-        } else {
-            builder.currentUser(null);
+        postDTO.setIsPostMine(userId != null && userId.equals(postData.authorId()));
+        
+        // 5. 현재 사용자 정보 조회 (필요한 경우에만)
+        UserDTO currentUserDTO = null;
+        if (userId != null) {
+            User currentUser = userService.getUserById(userId);
+            currentUserDTO = UserDTO.from(currentUser);
         }
-
-        return builder.build();
+        
+        // 6. 최종 뷰 조합
+        return PostDetailView.builder()
+                .post(postDTO)
+                .currentUser(currentUserDTO)
+                .sort(sort)
+                .postInteractionStatus(postQueryService.getUserInteractionStatus(postId, userId))
+                .commentInteractionMap(null) // 더 이상 사용하지 않음 - PostCommentDTO에 직접 포함됨
+                .build();
     }
 
-    private List<PostComment> collectAllReplies(PostComment comment) {
-        List<PostComment> all = new ArrayList<>();
-        all.add(comment);
-        // ID 기반으로 대댓글 조회 필요
-        // all.addAll(comment.getReplies());
-        return all;
-    }
-
-    public void fillInteractionMap(PostComment comment, Long userId, Map<Integer, InteractionStatusResponse> map) {
-        map.put(comment.getId(), getUserInteractionStatus(comment.getId(), userId));
-        // ID 기반으로 대댓글 조회 필요
-        // for (PostComment reply : comment.getReplies()) {
-        //     map.put(reply.getId(), getUserInteractionStatus(reply.getId(), userId));
-        // }
+    /**
+     * 댓글 데이터를 계층 구조로 구성
+     * 부모 댓글과 대댓글을 트리 형태로 조직화
+     */
+    private List<PostCommentDTO> buildCommentTree(List<PostCommentDetailProjection> commentData) {
+        // 1. 모든 댓글을 DTO로 변환
+        List<PostCommentDTO> allComments = commentData.stream()
+                .map(PostCommentDTO::from)
+                .toList();
+        
+        // 2. 부모 댓글과 대댓글을 분리
+        Map<Integer, PostCommentDTO> commentMap = new HashMap<>();
+        List<PostCommentDTO> parentComments = new ArrayList<>();
+        List<PostCommentDTO> replyComments = new ArrayList<>();
+        
+        for (PostCommentDTO comment : allComments) {
+            commentMap.put(comment.getCommentId(), comment);
+            if (comment.getCommentId() != null && commentData.stream()
+                    .anyMatch(p -> p.commentId().equals(comment.getCommentId()) && p.parentCommentId() == null)) {
+                parentComments.add(comment);
+            } else {
+                replyComments.add(comment);
+            }
+        }
+        
+        // 3. 대댓글을 부모 댓글에 연결
+        for (PostCommentDTO reply : replyComments) {
+            Integer parentId = commentData.stream()
+                    .filter(p -> p.commentId().equals(reply.getCommentId()))
+                    .map(PostCommentDetailProjection::parentCommentId)
+                    .findFirst()
+                    .orElse(null);
+            
+            if (parentId != null && commentMap.containsKey(parentId)) {
+                PostCommentDTO parent = commentMap.get(parentId);
+                if (parent.getRepliesList() == null) {
+                    parent.setRepliesList(new ArrayList<>());
+                } else if (!(parent.getRepliesList() instanceof ArrayList)) {
+                    parent.setRepliesList(new ArrayList<>(parent.getRepliesList()));
+                }
+                parent.getRepliesList().add(reply);
+            }
+        }
+        
+        return parentComments;
     }
 
     @Transactional

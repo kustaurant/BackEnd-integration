@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.comment.domain;
+package com.kustaurant.kustaurant.post;
 
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;

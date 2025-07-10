@@ -202,13 +202,13 @@
                         <div class="comment-div">
                             <div class="comment-left">
                                 <button class="comment-up" type="button" th:data-id="${comment.commentId}">
-                                    <img th:if="${view.commentInteractionMap[comment.commentId]?.liked?.isLiked()}" src="/img/community/up-green.png">
-                                    <img th:unless="${view.commentInteractionMap[comment.commentId]?.liked?.isLiked()}" src="/img/community/up.png">
+                                    <img th:if="${comment.isLiked}" src="/img/community/up-green.png">
+                                    <img th:unless="${comment.isLiked}" src="/img/community/up.png">
                                 </button>
                                 <span class="totalLikeCount" th:text="${comment.likeCount}"></span>
                                 <button class="comment-down" type="button" th:data-id="${comment.commentId}">
-                                    <img th:if="${view.commentInteractionMap[comment.commentId]?.disliked?.isDisliked()}" src="/img/community/down-red.png">
-                                    <img th:unless="${view.commentInteractionMap[comment.commentId]?.disliked?.isDisliked()}" src="/img/community/down.png">
+                                    <img th:if="${comment.isDisliked}" src="/img/community/down-red.png">
+                                    <img th:unless="${comment.isDisliked}" src="/img/community/down.png">
                                 </button>
                             </div>
                             <div class="comment-content">
@@ -224,7 +224,7 @@
                                     </div>
                                 </div>
                                 <ul style="padding-left: 0;">
-                                    <li th:if="${comment.user != null and view.currentUser != null and comment.user.nickname == view.currentUser.nickname}">
+                                    <li th:if="${comment.isCommentMine}">
                                         <!-- 댓글 삭제 버튼 -->
                                         <button class="comment-button comment-delete" data-bs-toggle="modal"
                                                 data-bs-target="#commentModal" th:data-id="${comment.commentId}"
@@ -253,19 +253,19 @@
                                         </div>
                                         <div class="comment-left">
                                             <button class="comment-up" type="button" th:data-id="${reply.commentId}">
-                                                <img th:if="${view.commentInteractionMap[reply.commentId]?.liked?.isLiked()}" src="/img/community/up-green.png">
-                                                <img th:unless="${view.commentInteractionMap[reply.commentId]?.liked?.isLiked()}" src="/img/community/up.png">
+                                                <img th:if="${reply.isLiked}" src="/img/community/up-green.png">
+                                                <img th:unless="${reply.isLiked}" src="/img/community/up.png">
                                             </button>
                                             <span class="totalLikeCount" th:text="${reply.likeCount}"></span>
                                             <button class="comment-down" type="button" th:data-id="${reply.commentId}">
-                                                <img th:if="${view.commentInteractionMap[reply.commentId]?.disliked?.isDisliked()}" src="/img/community/down-red.png">
-                                                <img th:unless="${view.commentInteractionMap[reply.commentId]?.disliked?.isDisliked()}" src="/img/community/down.png">
+                                                <img th:if="${reply.isDisliked}" src="/img/community/down-red.png">
+                                                <img th:unless="${reply.isDisliked}" src="/img/community/down.png">
                                             </button>
                                         </div>
                                         <div class="comment-content">
                                             <div class="comment-name">
                                                 <img th:src="${reply.user.rankImg}">
-                                                <span class="user-name" th:text="${reply.user.userNickname}"></span>
+                                                <span class="user-name" th:text="${reply.user.nickname}"></span>
                                                 <span th:text="${reply.timeAgo}"></span>
                                             </div>
                                             <div class="comment-body">
@@ -274,7 +274,7 @@
                                                 </div>
                                             </div>
                                             <ul style="padding-left: 0;">
-                                                <li th:if="${reply.user == view.currentUser}">
+                                                <li th:if="${reply.isCommentMine}">
                                                     <!-- 대댓글 삭제 버튼 -->
                                                     <button class="comment-button comment-delete" data-bs-toggle="modal"
                                                             data-bs-target="#commentModal"
