@@ -28,6 +28,6 @@ public class EvalCommCommandServiceImpl implements EvalCommCommandService {
                 .orElseThrow(() -> new DataNotFoundException(ErrorCode.COMMENT_NOT_FOUND));
         evalComment.softDelete(userId);
         evalCommUserReactionRepository.deleteAllByEvalCommentId(evalCommentId);
-//        evalCommentRepository.save(evalComment);
+        evalCommentRepository.save(evalComment);
     }
 }

@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.evaluation.comment.controller.web;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
+import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommUserReactionService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentReactionResponse;
 import com.kustaurant.kustaurant.evaluation.comment.service.EvalCommUserReactionServiceImpl;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 @RequiredArgsConstructor
 public class EvalCommUserReactionWebController {
-    private final EvalCommUserReactionServiceImpl evalCommUserReactionService;
+    private final EvalCommUserReactionService evalCommUserReactionService;
 
 
     // 1. 식당평가 댓글 좋아요

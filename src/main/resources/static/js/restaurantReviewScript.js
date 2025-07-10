@@ -1,3 +1,8 @@
+// csrf 토큰 읽어오기
+// CSRF 토큰 가져오기
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
 const btn1 = document.getElementById('button1');
 const btn2 = document.getElementById('button2');
 let activeButton = btn1;
@@ -76,15 +81,6 @@ function renderComments(reviews) {
             <img src="${rev.writerIconImgUrl}" />
             <span class="nick-span">${rev.writerNickname}</span>
             <span class="date-span">${rev.timeAgo}</span>
-            ${rev.isEvaluationMine
-        ? `<button type="button" data-id="${rev.evalId}"
-                         class="delete-button btn btn-primary"
-                         onclick="deleteComment(this)"
-                         data-bs-toggle="modal"
-                         data-bs-target="#exampleModal">
-                   삭제
-                 </button>`
-        : ''}
           </div>
           ${rev.evalBody || rev.evalImgUrl ?
             `<div class="real-comment-container">

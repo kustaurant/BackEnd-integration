@@ -1,24 +1,24 @@
 // 창이 로드될 때와 창 크기가 바뀔 때 적용할 함수 넣어주기
-// var map;
-// var marker;
-// window.onload = function() {
-//     mainImgResize();
-//     // html 에서 식당 정보 가져오기
-//     var restaurantInfo = document.getElementById('restaurantInfo');
-//     var name = restaurantInfo.getAttribute('data-name');
-//     var latitude = parseFloat(restaurantInfo.getAttribute('data-latitude'));
-//     var longitude = parseFloat(restaurantInfo.getAttribute('data-longitude'));
-//     // 네이버 지도
-//     map = new naver.maps.Map('map', {
-//         center: new naver.maps.LatLng(latitude, longitude),//위도, 경도
-//         zoom: 16,
-//         minZoom: 10,
-//     });
-//     marker = new naver.maps.Marker({
-//         position: new naver.maps.LatLng(latitude, longitude),//위도, 경도
-//         map: map
-//     });
-// };
+var map;
+var marker;
+window.onload = function() {
+    mainImgResize();
+    // html 에서 식당 정보 가져오기
+    var restaurantInfo = document.getElementById('restaurantInfo');
+    var name = restaurantInfo.getAttribute('data-name');
+    var latitude = parseFloat(restaurantInfo.getAttribute('data-latitude'));
+    var longitude = parseFloat(restaurantInfo.getAttribute('data-longitude'));
+    // 네이버 지도
+    map = new naver.maps.Map('map', {
+        center: new naver.maps.LatLng(latitude, longitude),//위도, 경도
+        zoom: 16,
+        minZoom: 10,
+    });
+    marker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(latitude, longitude),//위도, 경도
+        map: map
+    });
+};
 window.onresize = function() {
     mainImgResize();
 }
@@ -83,7 +83,6 @@ function toggleFavoriteHTML(favoriteImg) {
 
 // 메뉴
 function fillMenuInfo(data, num) { //num은 처음 표시할 메뉴 개수임. -1일 경우 모든 메뉴 표시
-    console.log(data);
   const menuInfoContainer = document.getElementById('menuInfoContainer');
   menuInfoContainer.innerHTML = '';
   const menuUl = document.createElement('ul');
@@ -209,78 +208,3 @@ if (unfoldButton) {
 //         commentTextArea.value = commentTextArea.value.substring(0, maxLength);
 //     }
 // });
-
-// csrf 토큰 읽어오기
-// CSRF 토큰 가져오기
-const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-// 댓글 달기 요청
-function sendComment() {
-    const apiUrl = window.location.origin + "/web/api" + window.location.pathname + "/comments";
-    const currentUrl = window.location.href;
-    const commentInput = document.getElementById('commentInput');
-    const commentBody = commentInput.value.trim();
-    const commentToggleButton2 = document.getElementById('button2');
-
-    const commentAlert = document.getElementById('commentAlert');
-
-    fetch(apiUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            [csrfHeader]: csrfToken
-        },
-        body: JSON.stringify({
-            commentBody: commentBody,
-        }),
-    })
-        .then(response => {
-            if (response.redirected) {
-                window.location.href = response.url;
-            } else {
-                // 리다이렉션이 없는 경우에 대한 처리
-                if (response.ok) {
-                    commentInput.value = '';
-                    commentAlert.innerText = '';
-                    commentToggleButton2.click();
-                } else if (response.status === 400) {
-                    // 메시지가 빈 경우
-                    commentInput.value = '';
-                    return response.text().then(errorMessage => {
-                        alert(errorMessage);
-                    })
-                } else {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-            }
-        })
-        .catch(error => {
-            console.error("Error adding comment:", error);
-        });
-}
-
-//댓글 삭제
-function deleteComment(deleteButton) {
-    const commentId = deleteButton.getAttribute('data-id');
-    var modal = document.getElementById("exampleModal");
-    var deleteAgreeButton = document.getElementById('deleteAgreeButton');
-
-    deleteAgreeButton.onclick = function() {
-        const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}`;
-        fetch(apiUrl, {
-            method: "DELETE",
-            [csrfHeader]: csrfToken
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`${response.status}: ${response.message}`);
-                } else {
-                    deleteButton.closest('li').remove();
-                }
-            })
-            .catch(error => {
-                console.error("Error adding comment:", error);
-            });
-    }
-}

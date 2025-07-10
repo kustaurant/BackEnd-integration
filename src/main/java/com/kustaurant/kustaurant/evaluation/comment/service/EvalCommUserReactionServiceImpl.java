@@ -24,18 +24,18 @@ public class EvalCommUserReactionServiceImpl implements EvalCommUserReactionServ
     private final EvalCommentRepository evalCommentRepository;
 
     @Transactional
-    public EvalCommentReactionResponse toggleReaction(Long userId, Long commentId, ReactionType target) {
+    public EvalCommentReactionResponse toggleReaction(Long userId, Long evalCommentId, ReactionType target) {
 
-        EvalComment evalComment = evalCommentRepository.findById(commentId)
+        EvalComment evalComment = evalCommentRepository.findById(evalCommentId)
                 .orElseThrow(() -> new DataNotFoundException(ErrorCode.COMMENT_NOT_FOUND));
 
-        Optional<EvalCommUserReactionEntity> evalCommentLike = evalCommentLikeRepository.findByUserIdAndEvalCommentId(userId, commentId);
+        Optional<EvalCommUserReactionEntity> evalCommentLike = evalCommentLikeRepository.findByUserIdAndEvalCommentId(userId, evalCommentId);
 
         ReactionType resultReaction;
 
         if (evalCommentLike.isEmpty()) {
             // 좋아요 또는 싫어요를 처음 누르는 경우
-            evalCommentLikeRepository.save(new EvalCommUserReactionEntity(commentId, userId, target));
+            evalCommentLikeRepository.save(new EvalCommUserReactionEntity(evalCommentId, userId, target));
 
             if(target==ReactionType.LIKE) evalComment.adjustLikeCount(+1);
             else evalComment.adjustDislikeCount(+1);
