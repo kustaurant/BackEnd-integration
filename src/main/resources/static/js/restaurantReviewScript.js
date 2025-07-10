@@ -222,8 +222,32 @@ function removeActiveForm() {
   if (existing) existing.remove();
 }
 
+async function checkLoginStatus() {
+  try {
+    const statusRes = await fetch('/web/api/auth/status', {
+      method: 'GET',
+      credentials: 'include',
+      redirect: 'manual'
+    });
+    // 리다이렉트 응답이 왔을 땐 로그인 화면으로
+    if (statusRes.redirected) {
+      window.location.href = statusRes.headers.get('Location') || '/user/login';
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('로그인 체크 실패:', e);
+    window.location.href = '/user/login';
+    return false;
+  }
+}
+
 // 1) “댓글 달기” 클릭 시: 인라인 폼 토글
-function addEvalComment(btn) {
+async function addEvalComment(btn) {
+  // 1) 로그인 상태 체크
+  const loggedIn = await checkLoginStatus();
+  if (!loggedIn) return;
+  // 2) 로그인 상태 체크 후 로직 수행
   // 이미 열려 있으면 닫고 종료
   const sameContainer = btn.closest('li').querySelector('.eval-comment-form');
   if (sameContainer) {

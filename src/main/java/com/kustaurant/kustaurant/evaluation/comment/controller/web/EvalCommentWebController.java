@@ -30,8 +30,7 @@ public class EvalCommentWebController {
     public ResponseEntity<EvalCommentResponse> postRestaurantComment(
             @PathVariable Integer restaurantId,
             @PathVariable Long evalCommentId,
-            // @PreAuthorize 보다 Body validation 체크가 먼저 진행 되어서 @Valid 제거 -> 서비스에서 검증
-            @RequestBody EvalCommentRequest req,
+            @Valid @RequestBody EvalCommentRequest req,
             @AuthUser AuthUserInfo user
     ) {
         EvalComment evalComment = evalCommCommandService.create(evalCommentId, restaurantId, user.id(), req);

@@ -1,10 +1,14 @@
 package com.kustaurant.kustaurant.home;
 
 import com.kustaurant.kustaurant.admin.modal.HomeModalService;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.admin.modal.HomeModalEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -73,6 +77,12 @@ public class MainController {
     @GetMapping("/marketing")
     public String marketing() {
         return "marketing";
+    }
+
+    @GetMapping("/web/api/auth/status")
+    @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
+    public ResponseEntity<Void> checkLoginStatus() {
+        return ResponseEntity.ok().build();
     }
 
 }
