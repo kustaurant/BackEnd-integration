@@ -18,4 +18,6 @@ public interface PostScrapRepository {
     Optional<PostScrap> findByUserIdAndPostId(Long userId,Integer postId);
 
     void save(PostScrap postScrap);
+    
+    int countByPostId(Integer postId);
 }

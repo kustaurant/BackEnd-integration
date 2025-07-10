@@ -89,7 +89,7 @@ public class PostCommentDTO {
                 .createdAt(projection.createdAt())
                 .updatedAt(projection.updatedAt())
                 .user(createUserDTO(projection))
-                .likeCount(projection.getNetLikes())
+                .likeCount(projection.getLikeOnlyCount())
                 .dislikeCount(projection.getDislikeOnlyCount())
                 .timeAgo(TimeAgoUtil.toKor(projection.createdAt()))
                 .isLiked(projection.isLiked())

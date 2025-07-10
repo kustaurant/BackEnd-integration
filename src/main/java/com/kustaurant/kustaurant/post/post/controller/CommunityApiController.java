@@ -8,6 +8,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.dto.*;
+import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
@@ -209,20 +210,18 @@ public class CommunityApiController {
     }
 
     // 게시글 스크랩
-    @PostMapping("/api/v1/auth/community/{postId}/scrap")
-    @Operation(summary = "게시글 스크랩 추가/제거")
+    @PostMapping("/api/v1/auth/community/{postId}/scraps")
+    @Operation(summary = "게시글 스크랩", description = "게시글 ID를 입력받아 스크랩을 생성하거나 해제합니다. \n\nstatus와 현재 게시글의 스크랩 수를 반환합니다. \n\n처음 스크랩을 누르면 스크랩이 처리되고 status 값으로 1이 반환되며, 이미 스크랩된 상태였으면 해제되면서 status 값으로 0이 반환됩니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "게시글 스크랩 추가"),
-            @ApiResponse(responseCode = "204", description = "게시글 스크랩 제거"),
-            @ApiResponse(responseCode = "404", description = "게시글이 도중 지워짐")
+            @ApiResponse(responseCode = "200", description = "게시글 스크랩 처리가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ScrapToggleDTO.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<Void> createScrap(
+    public ResponseEntity<ScrapToggleDTO> createScrap(
             @PathVariable Integer postId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        boolean isCreated = postScrapApiService.toggleScrap(postId, user.id());
-
-        return isCreated ? ResponseEntity.status(HttpStatus.CREATED).build() : ResponseEntity.noContent().build();
+        ScrapToggleDTO scrapToggleDTO = postScrapApiService.toggleScrapWithCount(postId, user.id());
+        return ResponseEntity.ok(scrapToggleDTO);
     }
 
     // 게시글 좋아요 생성
@@ -236,9 +235,8 @@ public class CommunityApiController {
             @PathVariable Integer postId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        Post post = postQueryApiService.getPost(postId);
-        ReactionStatus status = postCommandApiService.toggleLike(postId, user.id()); // 1 또는 0 반환
-        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(0, status.toAppLikeStatus()); // 좋아요 수는 별도 API로 조회
+        ReactionToggleResponse response = postCommandApiService.toggleLike(postId, user.id());
+        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(response.getLikeCount(), response.getStatus().toAppLikeStatus());
         return ResponseEntity.ok(likeOrDislikeDTO);
     }
 

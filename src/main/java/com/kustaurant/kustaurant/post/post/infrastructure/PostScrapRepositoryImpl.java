@@ -46,4 +46,9 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
     public void save(PostScrap postScrap) {
         postScrapJpaRepository.save(PostScrapEntity.from(postScrap));
     }
+
+    @Override
+    public int countByPostId(Integer postId) {
+        return postScrapJpaRepository.countByPostId(postId);
+    }
 }

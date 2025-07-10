@@ -5,6 +5,7 @@ import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.post.domain.dto.PostUpdateDTO;
+import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
@@ -25,8 +26,8 @@ public class PostCommandApiService {
     private final PostCommandService postCommandService;
 
     @Transactional
-    public ReactionStatus toggleLike(Integer postId, Long userId) {
-        return postCommandService.toggleLike(postId, userId).getStatus();
+    public ReactionToggleResponse toggleLike(Integer postId, Long userId) {
+        return postCommandService.toggleLike(postId, userId);
     }
 
     private void deleteComments(Post post) {

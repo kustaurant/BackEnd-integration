@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.post.post.service.api;
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
+import com.kustaurant.kustaurant.post.post.domain.dto.ScrapToggleDTO;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,40 @@ public class PostScrapApiService {
         } catch (DataIntegrityViolationException e) {
             return true;
         }
+    }
+
+    @Transactional
+    public ScrapToggleDTO toggleScrapWithCount(Integer postId, Long userId) {
+        postRepository.findById(postId).orElseThrow(
+                ()-> new DataNotFoundException(ErrorCode.POST_NOT_FOUND)
+        );
+
+        Optional<PostScrap> existing = postScrapRepository.findByUserIdAndPostId(userId, postId);
+        boolean isCreated;
+
+        if (existing.isPresent()) {
+            postScrapRepository.delete(existing.get());
+            isCreated = false;
+        } else {
+            try {
+                postScrapRepository.save(
+                        PostScrap.builder()
+                                .postId(postId)
+                                .userId(userId)
+                                .createdAt(LocalDateTime.now())
+                                .build()
+                );
+                isCreated = true;
+            } catch (DataIntegrityViolationException e) {
+                isCreated = true;
+            }
+        }
+
+        // 스크랩 개수 조회
+        int scrapCount = postScrapRepository.countByPostId(postId);
+        int status = isCreated ? 1 : 0;
+
+        return new ScrapToggleDTO(scrapCount, status);
     }
 
 }

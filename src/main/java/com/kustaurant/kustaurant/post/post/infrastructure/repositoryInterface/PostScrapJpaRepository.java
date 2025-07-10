@@ -22,6 +22,8 @@ public interface PostScrapJpaRepository extends JpaRepository<PostScrapEntity, I
     void deleteByPostId(Integer postId);
 
     Optional<PostScrapEntity> findByUserIdAndPostId(Long userId, Integer postId);
+    
+    int countByPostId(Integer postId);
 
 //    @Query("""
 //        select ps
