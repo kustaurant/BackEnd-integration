@@ -50,7 +50,6 @@ public class EvalCommentApiController {
                 .body(EvalCommentResponse.from(evalComment,currentUser,null,user.id()));
     }
 
-
     // 2. 평가 댓글 삭제하기
     @Operation(summary = "리뷰 댓글 및 대댓글 삭제하기", description = "리뷰 댓글 및 대댓글 삭제하기")
     @ApiResponses(value = {
