@@ -81,6 +81,13 @@ function renderComments(reviews) {
             <img src="${rev.writerIconImgUrl}" />
             <span class="nick-span">${rev.writerNickname}</span>
             <span class="date-span">${rev.timeAgo}</span>
+            <button type="button" data-id="${rev.evalId}"
+                         class="delete-button btn btn-primary"
+                         onclick="addEvalComment(this)"
+                         data-bs-toggle="modal"
+                         data-bs-target="#exampleModal">
+                   댓글 달기
+                 </button>
           </div>
           ${rev.evalBody || rev.evalImgUrl ?
             `<div class="real-comment-container">
