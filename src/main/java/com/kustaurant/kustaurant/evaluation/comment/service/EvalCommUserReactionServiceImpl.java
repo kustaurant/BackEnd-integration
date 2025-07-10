@@ -10,11 +10,13 @@ import com.kustaurant.kustaurant.evaluation.comment.service.port.EvalCommentRepo
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EvalCommUserReactionServiceImpl implements EvalCommUserReactionService {
@@ -22,18 +24,18 @@ public class EvalCommUserReactionServiceImpl implements EvalCommUserReactionServ
     private final EvalCommentRepository evalCommentRepository;
 
     @Transactional
-    public EvalCommentReactionResponse toggleReaction(Long userId, Long commentId, ReactionType target) {
+    public EvalCommentReactionResponse toggleReaction(Long userId, Long evalCommentId, ReactionType target) {
 
-        EvalComment evalComment = evalCommentRepository.findById(commentId)
+        EvalComment evalComment = evalCommentRepository.findById(evalCommentId)
                 .orElseThrow(() -> new DataNotFoundException(ErrorCode.COMMENT_NOT_FOUND));
 
-        Optional<EvalCommUserReactionEntity> evalCommentLike = evalCommentLikeRepository.findByUserIdAndEvalCommentId(userId, commentId);
+        Optional<EvalCommUserReactionEntity> evalCommentLike = evalCommentLikeRepository.findByUserIdAndEvalCommentId(userId, evalCommentId);
 
         ReactionType resultReaction;
 
         if (evalCommentLike.isEmpty()) {
             // 좋아요 또는 싫어요를 처음 누르는 경우
-            evalCommentLikeRepository.save(new EvalCommUserReactionEntity(userId, commentId, target));
+            evalCommentLikeRepository.save(new EvalCommUserReactionEntity(evalCommentId, userId, target));
 
             if(target==ReactionType.LIKE) evalComment.adjustLikeCount(+1);
             else evalComment.adjustDislikeCount(+1);
@@ -65,6 +67,9 @@ public class EvalCommUserReactionServiceImpl implements EvalCommUserReactionServ
                 resultReaction = target;
             }
         }
+
+        // 좋아요, 싫어요 업데이트
+        evalCommentRepository.save(evalComment);
 
         return new EvalCommentReactionResponse(
                 evalComment.getId(),

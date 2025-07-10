@@ -34,4 +34,12 @@ public class EvaluationCommandRepositoryImpl implements EvaluationCommandReposit
                         new DataNotFoundException(EVALUATION_NOT_FOUND, evaluation.getId(), "평가"));
         entity.reEvaluate(evaluation);
     }
+
+    @Override
+    public void react(Evaluation evaluation) {
+        EvaluationEntity entity = jpaRepository.findById(evaluation.getId())
+                .orElseThrow(() ->
+                        new DataNotFoundException(EVALUATION_NOT_FOUND, evaluation.getId(), "평가"));
+        entity.react(evaluation.getLikeCount(), evaluation.getDislikeCount());
+    }
 }

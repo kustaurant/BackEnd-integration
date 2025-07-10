@@ -7,4 +7,6 @@ public interface EvaluationCommandRepository {
     Long create(Evaluation evaluation);
 
     void reEvaluate(Evaluation evaluation);
+
+    void react(Evaluation evaluation);
 }

@@ -5,9 +5,8 @@ import com.kustaurant.kustaurant.evaluation.evaluation.controller.response.EvalR
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvalUserReactionEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa.EvalUserReactionRepository;
-import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationCommandRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,15 +16,16 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class EvalUserReactionService {
-    private final EvaluationRepository evaluationRepository;
+
+    private final EvaluationQueryRepository evaluationQueryRepository;
+    private final EvaluationCommandRepository evaluationCommandRepository;
     private final EvalUserReactionRepository evaluationLikeRepository;
 
     // 평가 좋아요/싫어요 토글
     @Transactional
     public EvalReactionResponse toggleReaction(Long userId, Long evaluationId, ReactionType reaction) {
-        Evaluation evaluation = evaluationRepository.findById(evaluationId)
-                .orElseThrow(()-> new DataNotFoundException(ErrorCode.EVALUATION_NOT_FOUND));
-        Optional<EvalUserReactionEntity> evaluationLike = evaluationLikeRepository.findByEvaluationIdAndUserId(userId, evaluationId);
+        Evaluation evaluation = evaluationQueryRepository.findActiveById(evaluationId);
+        Optional<EvalUserReactionEntity> evaluationLike = evaluationLikeRepository.findByEvaluationIdAndUserId(evaluationId, userId);
 
         ReactionType resultReaction;
 
@@ -38,15 +38,17 @@ public class EvalUserReactionService {
         } else {
             EvalUserReactionEntity row = evaluationLike.get();
 
-            if(row.getReaction().equals(reaction)) {
+            if (row.getReaction() == reaction) {
                 evaluationLikeRepository.delete(row);
-                if(reaction==ReactionType.LIKE) evaluation.adjustLikeCount(-1);
-                else evaluation.adjustDislikeCount(-1);
+                if (reaction==ReactionType.LIKE)
+                    evaluation.adjustLikeCount(-1);
+                else
+                    evaluation.adjustDislikeCount(-1);
 
                 resultReaction = null;
             } else {
                 // 반대 버튼 -> 전환
-                row.setReaction(reaction);
+                row.updateReaction(reaction);
 
                 if(reaction==ReactionType.LIKE){
                     evaluation.adjustLikeCount(+1);
@@ -59,6 +61,9 @@ public class EvalUserReactionService {
                 resultReaction = reaction;
             }
         }
+
+        // 좋아요, 싫어요 업데이트
+        evaluationCommandRepository.react(evaluation);
 
         return new EvalReactionResponse(
                 evaluation.getId(),

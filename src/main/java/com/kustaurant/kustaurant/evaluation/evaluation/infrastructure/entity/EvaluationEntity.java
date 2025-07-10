@@ -89,6 +89,15 @@ public class EvaluationEntity {
         this.situationIds.addAll(newSituationIds);
     }
 
+    public void react(Integer likeCount, Integer dislikeCount) {
+        if (likeCount != null && likeCount >= 0) {
+            this.likeCount = likeCount;
+        }
+        if (dislikeCount != null && dislikeCount >= 0) {
+            this.dislikeCount = dislikeCount;
+        }
+    }
+
     public Evaluation toModel() {
         return Evaluation.builder()
                 .id(this.id)

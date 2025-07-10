@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class FakeEvaluationQueryRepository implements EvaluationQueryRepository {
+
+    @Override
+    public Evaluation findActiveById(Long id) {
+        return null;
+    }
+
     @Override
     public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
         return false;

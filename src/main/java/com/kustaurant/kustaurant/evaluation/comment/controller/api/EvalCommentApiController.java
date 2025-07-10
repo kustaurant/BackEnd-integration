@@ -32,7 +32,7 @@ public class EvalCommentApiController {
     @Operation(summary = "평가에 댓글 달기", description = "작성한 평가 댓글을 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "댓글 생성 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EvalCommentResponse.class))}),
-            @ApiResponse(responseCode = "400", description = "댓글은10자 이상 1000자 이하여야함. 해당 식당에 해당 comment Id를 가진 comment가 없음", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "댓글은 1000자 이하여야함. 해당 식당에 해당 comment Id를 가진 comment가 없음", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))}),
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없음.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))})
     })
     @PostMapping("/api/v1/auth/restaurants/{restaurantId}/comments/{evalCommentId}")
@@ -49,7 +49,6 @@ public class EvalCommentApiController {
                 .status(HttpStatus.CREATED)
                 .body(EvalCommentResponse.from(evalComment,currentUser,null,user.id()));
     }
-
 
     // 2. 평가 댓글 삭제하기
     @Operation(summary = "리뷰 댓글 및 대댓글 삭제하기", description = "리뷰 댓글 및 대댓글 삭제하기")

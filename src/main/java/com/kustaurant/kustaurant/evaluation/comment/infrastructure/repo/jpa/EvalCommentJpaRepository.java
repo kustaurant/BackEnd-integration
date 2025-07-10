@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa;
 
+import com.kustaurant.kustaurant.common.enums.Status;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,5 +11,5 @@ public interface EvalCommentJpaRepository extends JpaRepository<EvalCommentEntit
 
     Optional<EvalCommentEntity> findByIdAndRestaurantId(Long id, Integer restaurantId);
 
-    List<EvalCommentEntity> findAllByEvaluationIdIn(List<Long> evalIds);
+    List<EvalCommentEntity> findAllByEvaluationIdInAndStatus(List<Long> evalIds, Status status);
 }

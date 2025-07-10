@@ -45,7 +45,9 @@ public class SecurityWebConfig {
                         .requestMatchers("/restaurant/**", "/evaluation/**", "/user/myPage", "/community/write","/api/post/**","/api/comment/**", "/admin/**").authenticated()
                         .anyRequest().permitAll()) // 모든 요청 허용
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/user/login")))
+                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/user/login"))
+                        .accessDeniedHandler((req, res, ex2) ->
+                                res.sendRedirect(req.getContextPath() + "/user/login")))
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/user/login")
                         .failureUrl("/user/login?error")
