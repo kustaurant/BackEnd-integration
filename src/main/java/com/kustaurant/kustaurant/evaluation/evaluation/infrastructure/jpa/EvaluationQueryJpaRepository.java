@@ -19,7 +19,7 @@ public interface EvaluationQueryJpaRepository extends Repository<EvaluationEntit
     Optional<EvaluationEntity> findByUserIdAndRestaurantIdAndStatus(Long userId, Integer restaurantId, String status);
 
     Integer countByStatus(String status);
-    List<EvaluationEntity> findByRestaurantIdOrderByCreatedAtDesc(Integer restaurantId);
-    List<EvaluationEntity> findByRestaurantIdOrderByLikeCountDesc(Integer restaurantId);
+    List<EvaluationEntity> findByRestaurantIdAndStatusOrderByCreatedAtDesc(Integer restaurantId, String status);
+    List<EvaluationEntity> findByRestaurantIdAndStatusOrderByLikeCountDesc(Integer restaurantId, String status);
 
 }

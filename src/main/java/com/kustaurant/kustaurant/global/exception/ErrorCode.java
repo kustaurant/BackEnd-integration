@@ -30,6 +30,10 @@ public enum ErrorCode {
     EVALUATION_NOT_FOUND (HttpStatus.NOT_FOUND, "EVALUATION-001", "평가를 찾을 수 없습니다."),
     RESTAURANT_SITUATION_RELATION_NOT_FOUND(HttpStatus.NOT_FOUND, "RELATION-001", "레스토랑 상황을 찾을 수 없습니다"),
 
+    /* ──── EVAL COMMENT ──── */
+    EVAL_COMMENT_BLANK_REQ (HttpStatus.BAD_REQUEST, "EVAL-COMMENT-001", "댓글은 공백일 수 없습니다."),
+    EVAL_COMMENT_INVALID_LENGTH_REQ (HttpStatus.BAD_REQUEST, "EVAL-COMMENT-002", "댓글은 1000자 이하여야 합니다."),
+
     /* ──── POST ──── */
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-001", "게시글을 찾을 수 없습니다."),
 

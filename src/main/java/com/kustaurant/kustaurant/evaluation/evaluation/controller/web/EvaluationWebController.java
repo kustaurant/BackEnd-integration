@@ -13,6 +13,7 @@ import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,7 @@ public class EvaluationWebController {
     private final EvaluationCommandService evaluationCommandService;
 
     // 1. 평가 페이지 화면
+    @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
     @GetMapping("/evaluation/{restaurantId}")
     public String evaluation(
             Model model,
@@ -48,6 +50,7 @@ public class EvaluationWebController {
 
 
     // 2. 평가하기
+    @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
     @PostMapping("/web/api/evaluation/{restaurantId}")
     public ResponseEntity<String> evaluationDBcreate(
             @PathVariable Integer restaurantId,

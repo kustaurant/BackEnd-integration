@@ -1,15 +1,20 @@
 package com.kustaurant.kustaurant.evaluation.comment.service;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
 import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommCommandService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalCommentRequest;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
 import com.kustaurant.kustaurant.evaluation.comment.service.port.EvalCommentRepository;
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
+import com.kustaurant.kustaurant.global.exception.exception.business.BusinessException;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.business.InvalidRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +24,25 @@ public class EvalCommCommandServiceImpl implements EvalCommCommandService {
     private final EvalCommUserReactionRepository evalCommUserReactionRepository;
 
     public EvalComment create(Long evaluationId, Integer restaurantId, Long userId, EvalCommentRequest req) {
+        validateCommentReq(req);
+
         EvalComment evalComment = EvalComment.create(userId, restaurantId, evaluationId, req);
         return evalCommentRepository.save(evalComment);
     }
 
+    private void validateCommentReq(EvalCommentRequest req) {
+        if (req == null || req.body() == null || req.body().isBlank()) {
+            throw new InvalidRequestException(EVAL_COMMENT_BLANK_REQ);
+        }
+        int length = req.body().trim().length();
+        if (length > 1000) {
+            throw new InvalidRequestException(EVAL_COMMENT_INVALID_LENGTH_REQ);
+        }
+    }
+
     public void delete(Long evalCommentId, Integer restaurantId, Long userId) {
         EvalComment evalComment = evalCommentRepository.findByIdAndRestaurantId(evalCommentId, restaurantId)
-                .orElseThrow(() -> new DataNotFoundException(ErrorCode.COMMENT_NOT_FOUND));
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND));
         evalComment.softDelete(userId);
         evalCommUserReactionRepository.deleteAllByEvalCommentId(evalCommentId);
         evalCommentRepository.save(evalComment);

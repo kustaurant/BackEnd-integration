@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo;
 
+import com.kustaurant.kustaurant.common.enums.Status;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommentJpaRepository;
@@ -33,7 +34,7 @@ public class EvalCommentRepositoryImpl implements EvalCommentRepository {
 
     @Override
     public List<EvalComment> findAllByEvaluationIdIn(List<Long> evalIds) {
-        return jpaRepository.findAllByEvaluationIdIn(evalIds).stream().map(EvalCommentEntity::toModel).collect(Collectors.toList());
+        return jpaRepository.findAllByEvaluationIdInAndStatus(evalIds, Status.ACTIVE).stream().map(EvalCommentEntity::toModel).collect(Collectors.toList());
     }
 
 }

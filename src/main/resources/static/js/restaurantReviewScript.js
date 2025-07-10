@@ -83,9 +83,7 @@ function renderComments(reviews) {
             <span class="date-span">${rev.timeAgo}</span>
             <button type="button" data-id="${rev.evalId}"
                          class="delete-button btn btn-primary"
-                         onclick="addEvalComment(this)"
-                         data-bs-toggle="modal"
-                         data-bs-target="#exampleModal">
+                         onclick="addEvalComment(this)">
                    댓글 달기
                  </button>
           </div>
@@ -131,14 +129,13 @@ function renderComments(reviews) {
                 <span class="nick-span">${reply.writerNickname}</span>
                 <span class="date-span">${reply.timeAgo}</span>
                 ${reply.isCommentMine
-        ? `<button type="button" data-id="${reply.commentId}"
-                             class="delete-button btn btn-primary"
-                             onclick="deleteComment(this)"
-                             data-bs-toggle="modal"
-                             data-bs-target="#exampleModal">
+                  ? `<button type="button" data-id="${reply.commentId}"
+                       class="delete-button btn btn-primary"
+                       data-bs-toggle="modal"
+                       data-bs-target="#exampleModal">
                        삭제
                      </button>`
-        : ''}
+                  : ''}
               </div>
               <div class="real-comment-container">
                 <span>${reply.commentBody}</span>
@@ -217,3 +214,147 @@ async function handleReaction(btn, reaction) {
     console.error('Reaction error:', e);
   }
 }
+
+// 평가 댓글 달기
+// 현재 열려 있는 폼을 닫기
+function removeActiveForm() {
+  const existing = document.querySelector('.eval-comment-form');
+  if (existing) existing.remove();
+}
+
+// 1) “댓글 달기” 클릭 시: 인라인 폼 토글
+function addEvalComment(btn) {
+  // 이미 열려 있으면 닫고 종료
+  const sameContainer = btn.closest('li').querySelector('.eval-comment-form');
+  if (sameContainer) {
+    sameContainer.remove();
+    return;
+  }
+  // 다른 폼이 열려 있으면 닫기
+  removeActiveForm();
+
+  const li = btn.closest('li');
+  const restaurantId  = window.location.pathname.split('/')[2];
+  const evalCommentId  = btn.dataset.id;
+
+  // 폼 HTML
+  const form = document.createElement('div');
+  form.className = 'eval-comment-form';
+  form.innerHTML = `
+    <textarea class="eval-comment-textarea" rows="3"
+      placeholder="댓글을 입력하세요 (1000자 이하)"></textarea>
+    <div class="eval-comment-actions" style="margin-top:8px;">
+      <button class="eval-comment-submit">등록</button>
+      <button class="eval-comment-cancel">취소</button>
+    </div>
+  `;
+
+  // 버튼에 context 저장
+  form.dataset.restaurantId = restaurantId;
+  form.dataset.evalCommentId = evalCommentId;
+
+  // 이벤트 연결
+  form.querySelector('.eval-comment-submit')
+  .addEventListener('click', () => submitInlineComment(form));
+  form.querySelector('.eval-comment-cancel')
+  .addEventListener('click', () => form.remove());
+
+  // li 끝에 삽입
+  li.appendChild(form);
+
+  const textarea = form.querySelector('.eval-comment-textarea');
+  textarea.focus();
+}
+
+// 2) 폼 내 “등록” 클릭 시
+async function submitInlineComment(form) {
+  const body = form.querySelector('.eval-comment-textarea').value.trim();
+
+  const { restaurantId, evalCommentId } = form.dataset;
+  const url = `/web/api/restaurants/${restaurantId}/comments/${evalCommentId}`;
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        [csrfHeader]: csrfToken
+      },
+      body: JSON.stringify({ body })
+    });
+    if (res.redirected) {
+      // 로그인 화면으로 넘어간 상황
+      window.location.href = res.url;  // 직접 페이지 이동
+      return;
+    }
+    if (res.status === 400) {
+      const errors = await res.json();
+      const msg = errors.message;
+      alert(msg);
+      return;
+    }
+    if (res.status === 401 || res.status === 403) {
+      window.location.href = '/user/login';
+      return;
+    }
+    if (!res.ok) throw new Error(res.status);
+    // 성공 시 목록 새로고침
+    removeActiveForm();
+    const sort = document.querySelector('#button1').classList.contains('active')
+        ? 'POPULARITY' : 'LATEST';
+    loadComments(sort);
+
+  } catch (e) {
+    console.error(e);
+    alert('댓글 등록 중 오류가 발생했습니다.');
+  }
+}
+
+// ----------- 평가 댓글 삭제 ---------------
+// 모달에 평가 댓글 id 넘기기
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.delete-button');
+  if (!btn) return;
+
+  const modal = document.getElementById('exampleModal');
+  modal.dataset.evalCommentId = btn.dataset.id;
+});
+// 모달에서 삭제 버튼 클릭 시 삭제
+document.getElementById('deleteAgreeButton')
+.addEventListener('click', async () => {
+  const modal = document.getElementById('exampleModal');
+  const evalCommentId = modal.dataset.evalCommentId;
+  const restaurantId  = window.location.pathname.split('/')[2];
+  const url = `/web/api/restaurants/${restaurantId}/comments/${evalCommentId}`;
+
+  try {
+    const res = await fetch(url, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        [csrfHeader]: csrfToken
+      }
+    });
+
+    if (res.status === 204) {
+      // 삭제 성공: 목록 리프레시
+      const sort = document.querySelector('#button1').classList.contains('active')
+          ? 'POPULARITY' : 'LATEST';
+      loadComments(sort);
+    } else if (res.redirected) {
+      // 로그인 화면으로 넘어간 상황
+      window.location.href = res.url;  // 직접 페이지 이동
+      return;
+    } else if (res.status === 401 || res.status === 403) {
+      // 권한 문제 시 로그인으로
+      window.location.href = '/user/login';
+    } else {
+      console.error('삭제 실패', res.status);
+      alert('댓글 삭제 중 오류가 발생했습니다.');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('댓글 삭제 중 오류가 발생했습니다.');
+  }
+});

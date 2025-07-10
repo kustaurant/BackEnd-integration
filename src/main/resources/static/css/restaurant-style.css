@@ -528,6 +528,7 @@ div.basic-info > div.texts > span {
     margin-right: 3px;
 }
 .nick-span {
+    font-size: 14px;
     font-weight: 550;
     margin-right: 10px;
 }
@@ -540,6 +541,7 @@ div.basic-info > div.texts > span {
     color: #777;
     border: none;
     padding: 5px;
+    margin-right: 5px;
     font-size: 13px;
 }
 .delete-button:hover {
@@ -564,7 +566,7 @@ div.basic-info > div.texts > span {
     margin-bottom: 5px;
 }
 .real-comment-container span {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 20px;
     text-align: left;
     white-space: pre-wrap;
@@ -573,8 +575,9 @@ div.basic-info > div.texts > span {
 /* 대댓글 좌측 화살표 이미지 */
 #subCommentList > li {
     display: flex;
-    background-color: #fdfdfd;
+    background-color: #fbfbfb;
     padding: 3px 0 3px 6px;
+    margin: 3px 0;
 }
 #subCommentList .reply-img-container {
     width: 14px;
@@ -593,8 +596,8 @@ div.basic-info > div.texts > span {
     width: 100%;
 }
 #subCommentList .real-comment-container span {
-    font-size: 12px;
-    line-height: 18px;
+    font-size: 13px;
+    line-height: 20px;
     text-align: left;
     white-space: pre-wrap;
     width: 100%;
@@ -602,4 +605,59 @@ div.basic-info > div.texts > span {
 /* 텍스트 커서 깜빡임 없애기 */
 body{
     caret-color: transparent;
+}
+
+/*-------평가 댓글 달기--------*/
+.eval-comment-form {
+    margin: 12px 0;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.eval-comment-textarea {
+    width: 100%;
+    height: 80px;
+    border-radius: 5px;
+    padding: 6px 10px;
+    caret-color: #000;
+    color: #111;
+}
+.eval-comment-textarea:focus {
+    border-color: #18881c;
+    box-shadow: 0 0 0 2px rgb(12, 94, 15);
+}
+.eval-comment-textarea:focus::placeholder {
+    color: transparent;
+}
+
+.eval-comment-actions {
+    margin: 3px 0 3px 6px !important;
+    height: 74px;
+    width: 70px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;               /* 버튼 사이 4px 여백 */
+}
+
+.eval-comment-actions button {
+    width: 100%;
+    flex: 1;
+    font-size: 14px;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.eval-comment-form .eval-comment-submit {
+    background-color: #1d8058;
+}
+.eval-comment-form .eval-comment-submit:hover {
+    background-color: #0e5a3b;
+}
+.eval-comment-form .eval-comment-cancel {
+    background-color: #868f97;
+}
+.eval-comment-form .eval-comment-cancel:hover {
+    background-color: #575d63;
 }
