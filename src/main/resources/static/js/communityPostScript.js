@@ -28,7 +28,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // 게시글 좋아요
     document.getElementById("likeButton").addEventListener('click', function () {
         var postId = this.dataset.postId;
-        fetch("/api/post/like?postId=" + postId, { method: 'GET' })
+        fetch("/api/posts/" + postId + "/like", { 
+            method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        })
             .then(response => {
                 if (response.redirected) {
                     window.location.href = "/user/login";
@@ -57,7 +62,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("dislikeButton").addEventListener('click', function (event) {
         event.preventDefault();
         var postId = this.dataset.postId;
-        fetch("/api/post/dislike?postId=" + postId, { method: 'GET' })
+        fetch("/api/posts/" + postId + "/dislike", { 
+            method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        })
             .then(response => {
                 if (response.redirected) {
                     window.location.href = "/user/login";
@@ -84,7 +94,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("scrap").addEventListener('click', function (event) {
         event.preventDefault();
         var postId = this.dataset.postId;
-        fetch("/api/post/scrap?postId=" + postId, { method: 'GET' })
+        fetch("/api/posts/" + postId + "/scrap", { 
+            method: 'POST',
+            headers: {
+                [csrfHeader]: csrfToken
+            }
+        })
             .then(response => {
                 if (response.redirected) {
                     window.location.href = "/user/login";
@@ -105,7 +120,12 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', function (event) {
             event.preventDefault();
             const commentId = this.getAttribute('data-id');
-            fetch(`/api/comment/like/${commentId}`, { method: 'GET' })
+            fetch(`/api/comments/${commentId}/like`, { 
+                method: 'POST',
+                headers: {
+                    [csrfHeader]: csrfToken
+                }
+            })
                 .then(response => {
                     if (response.redirected) {
                         window.location.href = "/user/login";
@@ -131,7 +151,12 @@ document.addEventListener('DOMContentLoaded', function () {
         button.addEventListener('click', function (event) {
             event.preventDefault();
             const commentId = this.getAttribute('data-id');
-            fetch(`/api/comment/dislike/${commentId}`, { method: 'GET' })
+            fetch(`/api/comments/${commentId}/dislike`, { 
+                method: 'POST',
+                headers: {
+                    [csrfHeader]: csrfToken
+                }
+            })
                 .then(response => {
                     if (response.redirected) {
                         window.location.href = "/user/login";
@@ -213,13 +238,12 @@ document.addEventListener('DOMContentLoaded', function () {
         var postId = window.location.pathname.split('/').pop();
         var formData = new FormData(this);
         formData.set('content', content); // trim 처리된 내용으로 업데이트
-        formData.append('postId', postId);
 
         // CSRF 토큰 가져오기
         var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        fetch(this.action, {
+        fetch("/api/posts/" + postId + "/comments", {
             method: 'POST',
             headers: {
                 [csrfHeader]: csrfToken // CSRF 토큰을 헤더에 포함
@@ -252,7 +276,6 @@ document.addEventListener('DOMContentLoaded', function () {
         var postId = window.location.pathname.split('/').pop();
         var form = document.querySelector(".comment-ul .comment-form")
         var formData = new FormData(form);
-        formData.append('postId', postId);
 
         // 폼에서 data-comment-id 속성 값을 가져와서 formData에 추가
         var parentCommentId = document.querySelector('.comment-ul .comment-write').getAttribute('data-comment-id');
@@ -264,7 +287,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-        fetch(form.action, {
+        fetch("/api/posts/" + postId + "/comments", {
             method: 'POST',
             headers: {
                 [csrfHeader]: csrfToken // CSRF 토큰을 헤더에 포함
@@ -312,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 게시글 삭제 함수
     function deletePost(postId) {
-        fetch(`/api/post/${postId}`, {
+        fetch(`/api/posts/${postId}`, {
             method: 'DELETE',
             headers: {
                 [csrfHeader]: csrfToken
@@ -328,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 댓글 삭제 함수
     function deleteComment(commentId) {
-        fetch(`/api/comment/${commentId}`, {
+        fetch(`/api/comments/${commentId}`, {
             method: 'DELETE',
             headers: {
                 [csrfHeader]: csrfToken

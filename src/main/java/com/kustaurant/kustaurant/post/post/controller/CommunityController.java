@@ -76,7 +76,7 @@ public class CommunityController {
     }
 
     // 게시글 삭제
-    @DeleteMapping("/api/post/{postId}")
+    @DeleteMapping("/api/posts/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Integer postId) {
         log.info("Deleting post with ID: {}", postId);
         postCommandService.deletePost(postId);
@@ -84,7 +84,7 @@ public class CommunityController {
     }
 
     // 댓글 삭제
-    @DeleteMapping("/api/comment/{commentId}")
+    @DeleteMapping("/api/comments/{commentId}")
     @Transactional
     public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable Integer commentId) {
         int deletedCount = postCommentService.deleteComment(commentId);
@@ -96,10 +96,10 @@ public class CommunityController {
     }
 
     // 댓글 or 대댓글 생성
-    @PostMapping("/api/comment/create")
+    @PostMapping("/api/posts/{postId}/comments")
     public ResponseEntity<String> createComment(
+            @PathVariable Integer postId,
             @RequestParam(name = "content", defaultValue = "") String content,
-            @RequestParam(name = "postId") Integer postId,
             @RequestParam(name = "parentCommentId", required = false) Integer parentCommentId,
             @AuthUser AuthUserInfo user
     ) {
@@ -109,8 +109,8 @@ public class CommunityController {
 
     // 게시글 좋아요 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @GetMapping("/api/post/like")
-    public ResponseEntity<ReactionToggleResponse> togglePostLike(@RequestParam("postId") Integer postId, Principal principal) {
+    @PostMapping("/api/posts/{postId}/like")
+    public ResponseEntity<ReactionToggleResponse> togglePostLike(@PathVariable Integer postId, Principal principal) {
         Long userId = Long.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postCommandService.toggleLike(postId, userId);
         return ResponseEntity.ok(reactionToggleResponse);
@@ -118,8 +118,8 @@ public class CommunityController {
 
     // 게시글 싫어요 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @GetMapping("/api/post/dislike")
-    public ResponseEntity<ReactionToggleResponse> togglePostDislike(@RequestParam("postId") Integer postId, Principal principal) {
+    @PostMapping("/api/posts/{postId}/dislike")
+    public ResponseEntity<ReactionToggleResponse> togglePostDislike(@PathVariable Integer postId, Principal principal) {
         Long userId = Long.valueOf(principal.getName());
         ReactionToggleResponse reactionToggleResponse = postCommandService.toggleDislike(postId, userId);
         return ResponseEntity.ok(reactionToggleResponse);
@@ -127,8 +127,8 @@ public class CommunityController {
 
     // 게시글 스크랩
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @GetMapping("/api/post/scrap")
-    public ResponseEntity<Map<String, Object>> toggleScrap(@RequestParam("postId") Integer postId, Principal principal) {
+    @PostMapping("/api/posts/{postId}/scrap")
+    public ResponseEntity<Map<String, Object>> toggleScrap(@PathVariable Integer postId, Principal principal) {
         Long userId = Long.valueOf(principal.getName());
         Map<String, Object> response = postScrapService.toggleScrap(userId,postId);
         return ResponseEntity.ok(response);
@@ -151,7 +151,7 @@ public class CommunityController {
 
     // 게시글 댓글 좋아요
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @GetMapping("/api/comment/like/{commentId}")
+    @PostMapping("/api/comments/{commentId}/like")
     public ResponseEntity<ReactionToggleResponse> toggleCommentLike(
             @PathVariable Integer commentId,
             @AuthUser AuthUserInfo user
@@ -162,7 +162,7 @@ public class CommunityController {
 
     // 게시글 댓글 싫어요
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @GetMapping("/api/comment/dislike/{commentId}")
+    @PostMapping("/api/comments/{commentId}/dislike")
     public ResponseEntity<ReactionToggleResponse> toggleCommentDislike(
             @PathVariable Integer commentId,
             @AuthUser AuthUserInfo user
@@ -180,7 +180,7 @@ public class CommunityController {
     }
 
     // 게시글 생성
-    @PostMapping("/api/community/post/create")
+    @PostMapping("/api/posts")
     public ResponseEntity<String> createPost(
             @RequestParam("title") String title,
             @RequestParam("postCategory") String category,
@@ -204,9 +204,9 @@ public class CommunityController {
     }
 
     // 게시글 수정
-    @PostMapping("/api/community/post/update")
+    @PutMapping("/api/posts/{postId}")
     public ResponseEntity<String> updatePost(
-            @RequestParam Integer postId,
+            @PathVariable Integer postId,
             @RequestParam String title,
             @RequestParam String postCategory,
             @RequestParam String content,
@@ -217,7 +217,7 @@ public class CommunityController {
     }
 
     // 이미지 업로드 (미리보기)
-    @PostMapping("/api/upload/image")
+    @PostMapping("/api/images")
     public ResponseEntity<?> imageUpload(
             @RequestParam("image") MultipartFile imageFile,
             @AuthUser AuthUserInfo user

@@ -87,8 +87,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-        fetch('/api/community/post/update', {
-            method: 'POST',
+        fetch('/api/posts/' + postId, {
+            method: 'PUT',
             headers: {
                 [csrfHeader]: csrfToken
             },
@@ -122,10 +122,15 @@ document.addEventListener('DOMContentLoaded', function () {
         input.onchange = function () {
             var files = this.files;
             var formData = new FormData();
+            var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
             formData.append('image', files[0]); // 첫 번째 선택된 파일만 처리
 
-            fetch('/api/upload/image', {
+            fetch('/api/images', {
                 method: 'POST',
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
                 body: formData
             })
                 .then(response => response.json())
