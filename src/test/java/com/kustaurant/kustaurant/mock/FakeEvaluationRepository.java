@@ -28,6 +28,16 @@ public class FakeEvaluationRepository implements EvaluationQueryRepository, Eval
     }
 
     @Override
+    public void react(Evaluation evaluation) {
+
+    }
+
+    @Override
+    public Evaluation findActiveById(Long id) {
+        return null;
+    }
+
+    @Override
     public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
         return false;
     }

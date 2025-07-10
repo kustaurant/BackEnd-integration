@@ -467,9 +467,9 @@ div.basic-info > div.texts > span {
 
 /* 댓글 리스트 */
 #commentList > li {
-    background-color: #F9F9F9;
-    margin-top: 2px;
-    padding: 6px 12px;
+    background-color: #f8f8f8;
+    margin-top: 3px;
+    padding: 8px 12px;
 }
 #commentList > li > div {
     display: flex;
@@ -554,7 +554,7 @@ div.basic-info > div.texts > span {
     justify-content: flex-start;
     margin-top: 5px;
     padding-right: 10px;
-    padding-bottom: 12px;
+    padding-bottom: 6px;
     white-space: pre;
     width: 100%;
 }
@@ -573,7 +573,7 @@ div.basic-info > div.texts > span {
 /* 대댓글 좌측 화살표 이미지 */
 #subCommentList > li {
     display: flex;
-    background-color: #F9F9F9;
+    background-color: #fdfdfd;
     padding: 3px 0 3px 6px;
 }
 #subCommentList .reply-img-container {

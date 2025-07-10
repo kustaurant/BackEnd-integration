@@ -27,7 +27,7 @@ public class EvalUserReactionEntity {
         this.reaction = reaction;
     }
 
-    public void setReaction(ReactionType reaction) {
+    public void updateReaction(ReactionType reaction) {
         this.reaction = reaction;
     }
 }

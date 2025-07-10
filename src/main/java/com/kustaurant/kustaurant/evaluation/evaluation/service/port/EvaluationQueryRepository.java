@@ -7,6 +7,8 @@ import java.util.Optional;
 
 public interface EvaluationQueryRepository {
 
+    Evaluation findActiveById(Long id);
+
     boolean existsByUserAndRestaurant(Long userId, Integer restaurantId);
 
     boolean existsByRestaurantAndEvaluation(Integer restaurantId, Long evaluationId);

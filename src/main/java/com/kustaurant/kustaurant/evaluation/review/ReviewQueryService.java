@@ -80,6 +80,8 @@ public class ReviewQueryService {
                     : evalCommReactionRepo.toMap(currentUserId, commentIds);
         }
 
+
+
         /* 8) DTO 매핑 */
         return evals.stream()
                 .map(ev -> {

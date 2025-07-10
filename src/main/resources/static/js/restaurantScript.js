@@ -1,24 +1,24 @@
 // 창이 로드될 때와 창 크기가 바뀔 때 적용할 함수 넣어주기
-var map;
-var marker;
-window.onload = function() {
-    mainImgResize();
-    // html 에서 식당 정보 가져오기
-    var restaurantInfo = document.getElementById('restaurantInfo');
-    var name = restaurantInfo.getAttribute('data-name');
-    var latitude = parseFloat(restaurantInfo.getAttribute('data-latitude'));
-    var longitude = parseFloat(restaurantInfo.getAttribute('data-longitude'));
-    // 네이버 지도
-    map = new naver.maps.Map('map', {
-        center: new naver.maps.LatLng(latitude, longitude),//위도, 경도
-        zoom: 16,
-        minZoom: 10,
-    });
-    marker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(latitude, longitude),//위도, 경도
-        map: map
-    });
-};
+// var map;
+// var marker;
+// window.onload = function() {
+//     mainImgResize();
+//     // html 에서 식당 정보 가져오기
+//     var restaurantInfo = document.getElementById('restaurantInfo');
+//     var name = restaurantInfo.getAttribute('data-name');
+//     var latitude = parseFloat(restaurantInfo.getAttribute('data-latitude'));
+//     var longitude = parseFloat(restaurantInfo.getAttribute('data-longitude'));
+//     // 네이버 지도
+//     map = new naver.maps.Map('map', {
+//         center: new naver.maps.LatLng(latitude, longitude),//위도, 경도
+//         zoom: 16,
+//         minZoom: 10,
+//     });
+//     marker = new naver.maps.Marker({
+//         position: new naver.maps.LatLng(latitude, longitude),//위도, 경도
+//         map: map
+//     });
+// };
 window.onresize = function() {
     mainImgResize();
 }
@@ -215,45 +215,6 @@ if (unfoldButton) {
 const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-// 댓글 인기순, 최신순 토글 초기화
-const btn1 = document.getElementById('button1');
-const btn2 = document.getElementById('button2');
-let activeButton = btn1;
-btn1.addEventListener('click', () => toggleButton(1));
-btn2.addEventListener('click', () => toggleButton(2));
-// 댓글 인기순, 최신순 토글 함수
-function toggleButton(buttonNumber) {
-    const commentsUl = document.getElementById('commentList');
-    const currentButton = document.getElementById(`button${buttonNumber}`);
-    const queryParameter = buttonNumber === 1 ? 'POPULAR' : 'LATEST';
-    const apiUrl = "/web/api" + window.location.pathname + "/comments?sort=" + queryParameter;
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then(html => {
-            commentsUl.innerHTML = html;
-        })
-        .catch(error => {
-            // 오류 처리
-            console.error('Error fetching data:', error);
-        });
-
-    if (activeButton === currentButton) {
-    // active 버튼 다시 클릭
-    } else {
-    // active가 아닌 버튼 클릭
-    if (activeButton) {
-      activeButton.classList.remove('active');
-    }
-    currentButton.classList.add('active');
-    activeButton = currentButton;
-    }
-}
-
 // 댓글 달기 요청
 function sendComment() {
     const apiUrl = window.location.origin + "/web/api" + window.location.pathname + "/comments";
@@ -299,74 +260,6 @@ function sendComment() {
         });
 }
 
-// 댓글 좋아요 요청
-function commentLike(button) {
-    const commentId = button.getAttribute("data-id");
-    const parentCommentId = button.getAttribute("data-parent-id");
-    const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}/like`;
-
-    fetch(apiUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            [csrfHeader]: csrfToken
-        },
-    })
-        .then(response => {
-            let data = response.json();
-            if (response.redirected) {
-                window.location.href = response.url;
-            } else if (!response.ok) {
-                throw new Error(`${data.status}: ${data.message}`);
-            } else {
-                changeCommentHtml(parentCommentId, button.closest('#commentList > li'));
-            }
-        })
-        .catch(error => {
-            console.error("Error adding comment:", error);
-        });
-}
-// 댓글 싫어요 요청
-function commentDislike(button) {
-    const commentId = button.getAttribute("data-id");
-    const parentCommentId = button.getAttribute("data-parent-id");
-    const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}/dislike`;
-
-    fetch(apiUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            [csrfHeader]: csrfToken
-        },
-    })
-        .then(response => {
-            let data = response.json();
-            if (response.redirected) {
-                window.location.href = response.url;
-            } else if (!response.ok) {
-                throw new Error(`${data.status}: ${data.message}`);
-            } else {
-                changeCommentHtml(parentCommentId, button.closest('#commentList > li'));
-            }
-        })
-        .catch(error => {
-            console.error("Error adding comment:", error);
-        });
-}
-// 댓글 하나 html 교체
-function changeCommentHtml(commentId, commentLi) {
-    const apiUrl = window.location.origin + `/web/api/restaurants/comments/${commentId}`;
-    fetch(apiUrl, {
-        method: "GET",
-    })
-        .then(response => response.text())
-        .then(html => {
-            commentLi.innerHTML = html;
-        })
-        .catch(error => {
-            console.error("Error adding comment:", error);
-        });
-}
 //댓글 삭제
 function deleteComment(deleteButton) {
     const commentId = deleteButton.getAttribute('data-id');
