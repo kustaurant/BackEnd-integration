@@ -42,6 +42,12 @@ async function loadComments(sort) {
   renderComments(reviews);
 }
 
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 function renderComments(reviews) {
   const commentsUl = document.getElementById('commentList');
   commentsUl.innerHTML = '';
@@ -79,7 +85,7 @@ function renderComments(reviews) {
           </div>
           <div class="nick-date-div">
             <img src="${rev.writerIconImgUrl}" />
-            <span class="nick-span">${rev.writerNickname}</span>
+            <span class="nick-span">${escapeHtml(rev.writerNickname)}</span>
             <span class="date-span">${rev.timeAgo}</span>
             <button type="button" data-id="${rev.evalId}"
                          class="delete-button btn btn-primary"
@@ -92,7 +98,7 @@ function renderComments(reviews) {
               ${rev.evalImgUrl
             ? `<img src="${rev.evalImgUrl}"/>`
             : ''}
-              <span>${rev.evalBody}</span>
+              <span>${escapeHtml(rev.evalBody)}</span>
             </div>`
           : ''}
         </div>
@@ -126,7 +132,7 @@ function renderComments(reviews) {
             <div class="body-div">
               <div class="nick-date-div">
                 <img src="${reply.writerIconImgUrl || ''}">
-                <span class="nick-span">${reply.writerNickname}</span>
+                <span class="nick-span">${escapeHtml(reply.writerNickname)}</span>
                 <span class="date-span">${reply.timeAgo}</span>
                 ${reply.isCommentMine
                   ? `<button type="button" data-id="${reply.commentId}"
@@ -138,7 +144,7 @@ function renderComments(reviews) {
                   : ''}
               </div>
               <div class="real-comment-container">
-                <span>${reply.commentBody}</span>
+                <span>${escapeHtml(reply.commentBody)}</span>
               </div>
             </div>
           </li>
@@ -293,6 +299,15 @@ async function addEvalComment(btn) {
 // 2) 폼 내 “등록” 클릭 시
 async function submitInlineComment(form) {
   const body = form.querySelector('.eval-comment-textarea').value.trim();
+
+  if (!body) {
+    alert('댓글 내용을 입력해주세요.');
+    return;
+  }
+  if (body.length > 1000) {
+    alert('댓글은 1000자 이하로 입력해주세요.');
+    return;
+  }
 
   const { restaurantId, evalCommentId } = form.dataset;
   const url = `/web/api/restaurants/${restaurantId}/comments/${evalCommentId}`;
