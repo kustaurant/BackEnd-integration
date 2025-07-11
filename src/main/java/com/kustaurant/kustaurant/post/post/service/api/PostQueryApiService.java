@@ -1,125 +1,90 @@
 package com.kustaurant.kustaurant.post.post.service.api;
 
-
-import static com.kustaurant.kustaurant.global.exception.ErrorCode.POST_NOT_FOUND;
-
-import com.kustaurant.kustaurant.post.comment.domain.PostComment;
-import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
-import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
+import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
+import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
-import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
-import com.kustaurant.kustaurant.post.post.domain.dto.PostUpdateDTO;
-import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
-import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
-import com.kustaurant.kustaurant.post.post.service.web.PostService;
-import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
-import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
-import jakarta.persistence.criteria.*;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
-import org.springframework.data.domain.*;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.POST_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-public class PostApiService {
+public class PostQueryApiService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final PostCommentRepository postCommentRepository;
-    private final PostPhotoRepository postPhotoRepository;
     private final EvaluationRepository evaluationRepository;
-    private final PostScrapRepository postScrapRepository;
+    private final PostQueryDAO postQueryDAO;
+
     // 인기순 제한 기준 숫자
     public static final int POPULARCOUNT = 3;
     // 페이지 숫자
     public static final int PAGESIZE = 10;
-    private final PostService postService;
-    private final PostQueryDAO postQueryDAO;
 
     // 메인 화면 로딩하기
     public Page<PostDTO> getPosts(int page, String sort, String koreanCategory, String postBodyType) {
-        Page<Post> posts;
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
+        
+        Page<PostDTO> result;
+        
         if (koreanCategory.equals("전체")) {
-            List<Sort.Order> sorts = new ArrayList<>();
             if (sort.isEmpty() || sort.equals("recent")) {
-                sorts.add(Sort.Order.desc("createdAt"));
-                Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-                posts = this.postRepository.findByStatus(ContentStatus.ACTIVE, pageable);
+                result = postQueryDAO.findPostsWithAllData(pageable, null)
+                        .map(PostDTO::from);
             } else if (sort.equals("popular")) {
-                sorts.add(Sort.Order.desc("createdAt"));
-                Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
-                posts = this.postRepository.findByStatusAndPopularCount(ContentStatus.ACTIVE, POPULARCOUNT, pageable);
+                result = postQueryDAO.findPopularPostsWithAllData(pageable, null, POPULARCOUNT)
+                        .map(PostDTO::from);
             } else {
                 throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
             }
         } else {
-            List<Sort.Order> sorts = new ArrayList<>();
-            sorts.add(Sort.Order.desc("createdAt"));
-            Pageable pageable = PageRequest.of(page, PAGESIZE, Sort.by(sorts));
             if (sort.equals("popular")) {
-                posts = this.postRepository.findByStatusAndCategoryAndPopularCount(ContentStatus.ACTIVE, koreanCategory, POPULARCOUNT, pageable);
+                result = postQueryDAO.findPopularPostsByCategoryWithAllData(koreanCategory, pageable, null, POPULARCOUNT)
+                        .map(PostDTO::from);
             } else {
-                posts = this.postRepository.findByStatusAndCategory(ContentStatus.ACTIVE, koreanCategory, pageable);
+                result = postQueryDAO.findPostsByCategoryWithAllData(koreanCategory, pageable, null)
+                        .map(PostDTO::from);
             }
         }
 
-        // 기존 방식 (N+1 문제 존재)
-        Page<PostDTO> result = posts.map(post -> {
-            PostDTO dto = PostDTO.from(post);
-            if (postBodyType.equals("text")) {
+        // 텍스트 변환 처리
+        if (postBodyType.equals("text")) {
+            result = result.map(dto -> {
                 dto.setPostBody(Jsoup.parse(dto.getPostBody()).text()); // HTML 제거 후 일반 텍스트 변환
-            }
-            return dto;
-        });
-        return result;  // Post 엔티티를 PostDTO로 변환
+                return dto;
+            });
+        }
+        
+        return result;
     }
 
     public Post getPost(Integer id) {
         return this.postRepository.findByStatusAndPostId(ContentStatus.ACTIVE, id);
     }
 
-    @Transactional
-    public ReactionStatus toggleLike(Integer postId, Long userId) {
-        return postService.toggleLike(postId, userId).getStatus();
-    }
-
     // post Id 유효성 검사
     public void validatePostId(Integer postId) {
         if (postId <= 0) {
             throw new IllegalArgumentException("잘못된 게시글 ID입니다.");
-        }
-    }
-
-    private void deleteComments(Post post) {
-        Integer postId = post.getId();
-        List<PostComment> comments = postCommentRepository.findByPostId(postId);
-        comments.forEach(comment -> comment.setStatus(ContentStatus.DELETED));
-        postCommentRepository.saveAll(comments);
-    }
-
-    private void deletePhotos(Post post) {
-
-        Integer postId = post.getId();
-        List<PostPhoto> photos = postPhotoRepository.findByPostId(postId);
-        if (photos != null && !photos.isEmpty()) {
-            for (PostPhoto photo : photos) {
-                photo.setStatus(ContentStatus.DELETED);
-            }
-            postPhotoRepository.saveAll(photos);
         }
     }
 
@@ -196,7 +161,6 @@ public class PostApiService {
                     .count());
             ;
 
-
             UserDTO userDTO = UserDTO.from(user); // 필요한 정보를 UserDTO에 담음
             userDTO.setEvaluationCount(evaluationCount); // 분기 내 평가 수를 설정
 
@@ -231,32 +195,6 @@ public class PostApiService {
             return 4;
         }
     }
-    public void updatePost(PostUpdateDTO postUpdateDTO, Post post) {
-        if (postUpdateDTO.getTitle() != null) post.setTitle(postUpdateDTO.getTitle());
-        if (postUpdateDTO.getPostCategory() != null) post.setCategory(postUpdateDTO.getPostCategory());
-        if (postUpdateDTO.getContent() != null) post.setBody(postUpdateDTO.getContent());
-    }
-
-    // 게시글 삭제
-    @Transactional
-    public void deletePost(Integer postId, Long userId) {
-        Post post = getPost(postId);
-
-        // 권한 확인
-        if (!post.getAuthorId().equals(userId)) {
-            throw new RuntimeException("게시글을 삭제할 권한이 없습니다.");
-        }
-
-        // 게시글 상태를 DELETED로 변경
-        post.setStatus(ContentStatus.DELETED);
-        postRepository.save(post);
-
-        // 관련 댓글 삭제
-        deleteComments(post);
-
-        // 관련 사진 삭제
-        deletePhotos(post);
-    }
 
     /**
      * PostQueryDAO를 활용한 최적화된 게시글 목록 조회 (API용)
@@ -270,19 +208,23 @@ public class PostApiService {
         Page<PostDTO> result;
 
         if (koreanCategory.equals("전체")) {
-            result = postService.getPostsWithAllData(pageable, currentUserId);
+            if (sort.isEmpty() || sort.equals("recent")) {
+                result = postQueryDAO.findPostsWithAllData(pageable, currentUserId)
+                        .map(PostDTO::from);
+            } else if (sort.equals("popular")) {
+                result = postQueryDAO.findPopularPostsWithAllData(pageable, currentUserId, POPULARCOUNT)
+                        .map(PostDTO::from);
+            } else {
+                throw new IllegalArgumentException("sort 파라미터 값이 올바르지 않습니다.");
+            }
         } else {
-            result = postService.getPostsByCategoryWithAllData(koreanCategory, pageable, currentUserId);
-        }
-
-        // 인기순 필터링은 서비스 레이어에서 처리 (향후 쿼리 최적화 가능)
-        if (sort.equals("popular")) {
-            result = result.map(dto -> {
-                if (dto.getLikeCount() < POPULARCOUNT) {
-                    return null; // 필터링될 항목
-                }
-                return dto;
-            });
+            if (sort.equals("popular")) {
+                result = postQueryDAO.findPopularPostsByCategoryWithAllData(koreanCategory, pageable, currentUserId, POPULARCOUNT)
+                        .map(PostDTO::from);
+            } else {
+                result = postQueryDAO.findPostsByCategoryWithAllData(koreanCategory, pageable, currentUserId)
+                        .map(PostDTO::from);
+            }
         }
 
         // 텍스트 변환 처리

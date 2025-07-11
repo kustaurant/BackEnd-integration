@@ -1,8 +1,11 @@
 package com.kustaurant.kustaurant.post.comment.dto;
 
+import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
+import com.kustaurant.kustaurant.post.comment.infrastructure.projection.PostCommentDetailProjection;
 import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
 import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,32 +51,6 @@ public class PostCommentDTO {
     @Schema(description = "작성 유저")
     UserDTO user;
 
-//    public static PostCommentDTO convertPostCommentToPostCommentDTO(
-//            PostCommentEntity comment
-//    ) {
-//        String timeAgo = TimeAgoUtil.toKor(comment.getUpdatedAt() != null ? comment.getUpdatedAt() : comment.getCreatedAt());
-//
-//        return PostCommentDTO.builder()
-//                .evalId(comment.getCommentId())
-//                .evalBody(comment.getCommentBody())
-//                .status(comment.getStatus().name())
-//                .user(UserDTO.convertUserToUserDTO(comment.getUserId()))
-//                .likeCount(comment.getPostCommentLikesEntities().size())
-//                .dislikeCount(comment.getPostCommentDislikesEntities().size())
-//                .timeAgo(timeAgo)
-//                .createdAt(comment.getCreatedAt())
-//                .updatedAt(comment.getUpdatedAt())
-//                .repliesList(
-//                        comment.getRepliesList().stream()
-//                                .filter(reply -> reply.getStatus().equals(ContentStatus.ACTIVE))
-//                                .sorted(Comparator.comparing(PostCommentEntity::getCreatedAt).reversed())
-//                                .map(PostCommentDTO::convertPostCommentToPostCommentDTO)
-//                                .toList()
-//                )
-//                .build();
-//    }
-
-
     public static PostCommentDTO from(PostComment comment, Map<Long, UserDTO> userDtoMap) {
         return PostCommentDTO.builder()
                 .commentId(comment.getId())
@@ -102,5 +79,31 @@ public class PostCommentDTO {
                 .timeAgo(comment.calculateTimeAgo())
                 .repliesList(List.of()) // ID 기반으로 별도 조회 필요
                 .build();
+    }
+
+    public static PostCommentDTO from(PostCommentDetailProjection projection) {
+        return PostCommentDTO.builder()
+                .commentId(projection.commentId())
+                .commentBody(projection.commentBody())
+                .status(projection.status())
+                .createdAt(projection.createdAt())
+                .updatedAt(projection.updatedAt())
+                .user(createUserDTO(projection))
+                .likeCount(projection.getLikeOnlyCount())
+                .dislikeCount(projection.getDislikeOnlyCount())
+                .timeAgo(TimeAgoUtil.toKor(projection.createdAt()))
+                .isLiked(projection.isLiked())
+                .isDisliked(projection.isDisliked())
+                .isCommentMine(projection.isMine())
+                .repliesList(List.of()) // 대댓글은 별도로 처리
+                .build();
+    }
+
+    private static UserDTO createUserDTO(PostCommentDetailProjection projection) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setNickname(projection.userNickname());
+        userDTO.setRankImg(UserIconResolver.resolve(projection.userEvaluationCount()));
+        userDTO.setEvaluationCount(projection.userEvaluationCount());
+        return userDTO;
     }
 }

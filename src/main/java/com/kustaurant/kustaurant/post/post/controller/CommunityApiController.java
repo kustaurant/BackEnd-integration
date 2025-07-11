@@ -8,6 +8,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.dto.*;
+import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
@@ -15,11 +16,12 @@ import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.ServerException;
 import com.kustaurant.kustaurant.post.post.enums.PostCategory;
-import com.kustaurant.kustaurant.post.comment.controller.api.PostApiCommentService;
+import com.kustaurant.kustaurant.post.comment.service.PostCommentApiService;
 import com.kustaurant.kustaurant.post.post.service.api.PostScrapApiService;
-import com.kustaurant.kustaurant.post.post.service.api.PostApiService;
+import com.kustaurant.kustaurant.post.post.service.api.PostQueryApiService;
+import com.kustaurant.kustaurant.post.post.service.api.PostCommandApiService;
 import com.kustaurant.kustaurant.post.post.service.api.StorageApiService;
-import com.kustaurant.kustaurant.post.post.service.web.PostService;
+import com.kustaurant.kustaurant.post.post.service.web.PostCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -42,13 +44,14 @@ import java.util.*;
 @RestController
 @RequiredArgsConstructor
 public class CommunityApiController {
-    private final PostApiService postApiService;
-    private final PostApiCommentService postApiCommentService;
+    private final PostQueryApiService postQueryApiService;
+    private final PostCommandApiService postCommandApiService;
+    private final PostCommentApiService postCommentApiService;
     private final PostScrapApiService postScrapApiService;
     private final StorageApiService storageApiService;
     private final PostRepository postRepository;
     private final UserService userService;
-    private final PostService postService;
+    private final PostCommandService postCommandService;
 
     // 커뮤니티 메인 화면
     @GetMapping("/api/v1/community/posts")
@@ -75,7 +78,7 @@ public class CommunityApiController {
         // Enum으로 변환하고 한글 이름 추출
         PostCategory categoryEnum = PostCategory.fromStringToEnum(postCategory);
         String koreanCategory = categoryEnum.getKoreanName();
-        Page<PostDTO> paging = postApiService.getPosts(page,sort,koreanCategory,postBodyType);
+        Page<PostDTO> paging = postQueryApiService.getPosts(page,sort,koreanCategory,postBodyType);
 
         return ResponseEntity.ok(paging.getContent());
     }
@@ -93,10 +96,10 @@ public class CommunityApiController {
             @PathVariable @Parameter(description = "게시글 id", example = "69") Integer postId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        postApiService.validatePostId(postId);
-        Post post = postApiService.getPost(postId);
-        postService.increaseVisitCount(postId);
-        return ResponseEntity.ok(postApiCommentService.createPostDTOWithFlags(post,user.id()));
+        postQueryApiService.validatePostId(postId);
+        Post post = postQueryApiService.getPost(postId);
+        postCommandService.increaseVisitCount(postId);
+        return ResponseEntity.ok(postCommentApiService.createPostDTOWithFlags(post,user.id()));
     }
 
     @GetMapping("/api/v1/community/ranking")
@@ -107,7 +110,7 @@ public class CommunityApiController {
             @RequestParam @Parameter(description = "랭킹 산정 기준입니다. 분기순:quarterly, 최신순:cumulative", example = "cumulative") String sort
     ) {
 
-        List<UserDTO> userList =  postApiService.getUserListforRanking(sort);
+        List<UserDTO> userList = postQueryApiService.getUserListforRanking(sort);
         return userList;
     }
 
@@ -133,13 +136,13 @@ public class CommunityApiController {
 
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        PostComment postComment = postApiCommentService.createComment(content, postId, user.id());
+        PostComment postComment = postCommentApiService.createComment(content, postId, user.id());
         // 대댓글 일 경우 부모 댓글과 관계 매핑
         if (!parentCommentId.isEmpty()) {
-            postApiCommentService.processParentComment(postComment, parentCommentId);
+            postCommentApiService.processParentComment(postComment, parentCommentId);
         }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(postApiCommentService.createPostCommentDTOWithFlags(postComment, user.id()));
+                .body(postCommentApiService.createPostCommentDTOWithFlags(postComment, user.id()));
     }
 
     // 댓글 or 대댓글 생성
@@ -160,13 +163,13 @@ public class CommunityApiController {
 
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        Post post = postApiService.getPost(Integer.valueOf(postId));
-        PostComment postComment = postApiCommentService.createComment(content, postId, user.id());
+        Post post = postQueryApiService.getPost(Integer.valueOf(postId));
+        PostComment postComment = postCommentApiService.createComment(content, postId, user.id());
         // 대댓글 일 경우 부모 댓글과 관계 매핑
         if (!parentCommentId.isEmpty()) {
-            postApiCommentService.processParentComment(postComment, parentCommentId);
+            postCommentApiService.processParentComment(postComment, parentCommentId);
         }
-        List<PostCommentDTO> postCommentDTOs = postApiCommentService.getPostCommentDTOs(post, user.id());
+        List<PostCommentDTO> postCommentDTOs = postCommentApiService.getPostCommentDTOs(post, user.id());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(postCommentDTOs);
     }
@@ -185,7 +188,7 @@ public class CommunityApiController {
             @PathVariable Integer postId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        postApiService.deletePost(postId, user.id());
+        postCommandApiService.deletePost(postId, user.id());
         return ResponseEntity.noContent().build();
     }
 
@@ -202,25 +205,23 @@ public class CommunityApiController {
             @PathVariable @Parameter(description = "삭제할 댓글의 ID입니다.", example = "123") Integer commentId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        postApiCommentService.deleteComment(commentId, user.id());
+        postCommentApiService.deleteComment(commentId, user.id());
         return ResponseEntity.noContent().build();
     }
 
     // 게시글 스크랩
-    @PostMapping("/api/v1/auth/community/{postId}/scrap")
-    @Operation(summary = "게시글 스크랩 추가/제거")
+    @PostMapping("/api/v1/auth/community/{postId}/scraps")
+    @Operation(summary = "게시글 스크랩", description = "게시글 ID를 입력받아 스크랩을 생성하거나 해제합니다. \n\nstatus와 현재 게시글의 스크랩 수를 반환합니다. \n\n처음 스크랩을 누르면 스크랩이 처리되고 status 값으로 1이 반환되며, 이미 스크랩된 상태였으면 해제되면서 status 값으로 0이 반환됩니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "게시글 스크랩 추가"),
-            @ApiResponse(responseCode = "204", description = "게시글 스크랩 제거"),
-            @ApiResponse(responseCode = "404", description = "게시글이 도중 지워짐")
+            @ApiResponse(responseCode = "200", description = "게시글 스크랩 처리가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ScrapToggleDTO.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID의 게시글이 존재하지 않습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<Void> createScrap(
+    public ResponseEntity<ScrapToggleDTO> createScrap(
             @PathVariable Integer postId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        boolean isCreated = postScrapApiService.toggleScrap(postId, user.id());
-
-        return isCreated ? ResponseEntity.status(HttpStatus.CREATED).build() : ResponseEntity.noContent().build();
+        ScrapToggleDTO scrapToggleDTO = postScrapApiService.toggleScrapWithCount(postId, user.id());
+        return ResponseEntity.ok(scrapToggleDTO);
     }
 
     // 게시글 좋아요 생성
@@ -234,9 +235,8 @@ public class CommunityApiController {
             @PathVariable Integer postId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        Post post = postApiService.getPost(postId);
-        ReactionStatus status = postApiService.toggleLike(postId, user.id()); // 1 또는 0 반환
-        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(0, status.toAppLikeStatus()); // 좋아요 수는 별도 API로 조회
+        ReactionToggleResponse response = postCommandApiService.toggleLike(postId, user.id());
+        LikeOrDislikeDTO likeOrDislikeDTO = new LikeOrDislikeDTO(response.getLikeCount(), response.getStatus().toAppLikeStatus());
         return ResponseEntity.ok(likeOrDislikeDTO);
     }
 
@@ -253,8 +253,8 @@ public class CommunityApiController {
             @PathVariable @Parameter(description = "좋아요는 likes, 싫어요는 dislikes로 값을 설정합니다.", example = "likes") String action,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        PostComment postComment = postApiCommentService.getPostCommentByCommentId(commentId);
-        int commentLikeStatus = postApiCommentService.toggleCommentLikeOrDislike(action,user.id(),commentId).getStatus().toAppLikeStatus();
+        PostComment postComment = postCommentApiService.getPostCommentByCommentId(commentId);
+        int commentLikeStatus = postCommentApiService.toggleCommentLikeOrDislike(action,user.id(),commentId).getStatus().toAppLikeStatus();
         CommentLikeDislikeDTO responseDTO = CommentLikeDislikeDTO.toCommentLikeDislikeDTO(postComment,commentLikeStatus);
         return ResponseEntity.ok(responseDTO);
     }
@@ -275,7 +275,7 @@ public class CommunityApiController {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         try {
-            Post post = postService.create(postUpdateDTO.getTitle(), postUpdateDTO.getPostCategory(), postUpdateDTO.getContent(), user.id());
+            Post post = postCommandService.create(postUpdateDTO.getTitle(), postUpdateDTO.getPostCategory(), postUpdateDTO.getContent(), user.id());
             User writer = userService.getUserById(user.id());
             return ResponseEntity.ok(PostDTO.from(post,writer));
         } catch (Exception e) {
@@ -318,8 +318,8 @@ public class CommunityApiController {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         try {
-            Post post = postApiService.getPost(Integer.valueOf(postId));
-            postApiService.updatePost(postUpdateDTO, post);
+            Post post = postQueryApiService.getPost(Integer.valueOf(postId));
+            postCommandApiService.updatePost(postUpdateDTO, post);
             postRepository.save(post);
             return ResponseEntity.ok().build();
         } catch (Exception e) {

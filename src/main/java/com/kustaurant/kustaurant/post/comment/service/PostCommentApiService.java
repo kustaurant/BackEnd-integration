@@ -1,12 +1,10 @@
-package com.kustaurant.kustaurant.post.comment.controller.api;
+package com.kustaurant.kustaurant.post.comment.service;
 
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
-import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
-import com.kustaurant.kustaurant.post.post.service.api.PostApiService;
-import com.kustaurant.kustaurant.post.comment.controller.web.PostCommentService;
+import com.kustaurant.kustaurant.post.post.service.api.PostQueryApiService;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentLikeRepository;
@@ -24,20 +22,19 @@ import com.kustaurant.kustaurant.user.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 
 @Service
 @RequiredArgsConstructor
-public class PostApiCommentService {
+public class PostCommentApiService {
     private final PostCommentRepository postCommentRepository;
     private final PostCommentLikeRepository postCommentLikeRepository;
     private final PostCommentDislikeRepository postCommentDislikeRepository;
     private final PostLikeRepository postLikeRepository;
     private final PostDislikeRepository postDislikeRepository;
     private final PostRepository postRepository;
-    private final PostApiService postApiService;
+    private final PostQueryApiService postQueryApiService;
     private final PostCommentService postCommentService;
     private final UserService userService;
 
@@ -123,8 +120,13 @@ public class PostApiCommentService {
 
     // 댓글 생성
     public PostComment createComment(String content, String postId, Long userId) {
-        Post post = postApiService.getPost(Integer.valueOf(postId));
-        PostComment postComment = PostComment.create(content, userId, post.getId());
+        // 댓글 내용 검증
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("댓글 내용을 입력해주세요.");
+        }
+        
+        Post post = postQueryApiService.getPost(Integer.valueOf(postId));
+        PostComment postComment = PostComment.create(content.trim(), userId, post.getId());
         return postCommentRepository.save(postComment);
     }
 

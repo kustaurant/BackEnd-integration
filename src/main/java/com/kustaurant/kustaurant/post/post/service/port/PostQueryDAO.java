@@ -47,4 +47,44 @@ public interface PostQueryDAO {
      * @return List<PostDTOProjection>
      */
     List<PostDTOProjection> findMyScrappedPosts(Long currentUserId);
+    
+    /**
+     * 인기 게시글 목록을 모든 관련 데이터와 함께 페이징 조회
+     * @param pageable 페이징 정보
+     * @param currentUserId 현재 사용자 ID (좋아요/스크랩 여부 확인용, null 가능)
+     * @param minLikeCount 최소 좋아요 수
+     * @return Page<PostDTOProjection>
+     */
+    Page<PostDTOProjection> findPopularPostsWithAllData(Pageable pageable, Long currentUserId, int minLikeCount);
+    
+    /**
+     * 특정 카테고리의 인기 게시글 목록을 모든 관련 데이터와 함께 페이징 조회
+     * @param category 카테고리
+     * @param pageable 페이징 정보
+     * @param currentUserId 현재 사용자 ID (좋아요/스크랩 여부 확인용, null 가능)
+     * @param minLikeCount 최소 좋아요 수
+     * @return Page<PostDTOProjection>
+     */
+    Page<PostDTOProjection> findPopularPostsByCategoryWithAllData(String category, Pageable pageable, Long currentUserId, int minLikeCount);
+    
+    /**
+     * 검색 키워드로 게시글 목록을 모든 관련 데이터와 함께 페이징 조회
+     * @param keyword 검색 키워드 (제목, 내용 검색)
+     * @param category 카테고리 (null 가능)
+     * @param pageable 페이징 정보
+     * @param currentUserId 현재 사용자 ID (좋아요/스크랩 여부 확인용, null 가능)
+     * @return Page<PostDTOProjection>
+     */
+    Page<PostDTOProjection> findPostsBySearchKeywordWithAllData(String keyword, String category, Pageable pageable, Long currentUserId);
+    
+    /**
+     * 검색 키워드로 인기 게시글 목록을 모든 관련 데이터와 함께 페이징 조회
+     * @param keyword 검색 키워드 (제목, 내용 검색)
+     * @param category 카테고리 (null 가능)
+     * @param pageable 페이징 정보
+     * @param currentUserId 현재 사용자 ID (좋아요/스크랩 여부 확인용, null 가능)
+     * @param minLikeCount 최소 좋아요 수
+     * @return Page<PostDTOProjection>
+     */
+    Page<PostDTOProjection> findPopularPostsBySearchKeywordWithAllData(String keyword, String category, Pageable pageable, Long currentUserId, int minLikeCount);
 }

@@ -107,6 +107,7 @@ public class PostRepositoryImpl implements PostRepository {
         PostEntity post = postJpaRepository.findById(postId)
                 .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND, postId, "게시글"));
         post.setPostVisitCount(post.getPostVisitCount() + 1);
+        postJpaRepository.save(post);
     }
 
     @Override

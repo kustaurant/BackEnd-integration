@@ -25,3 +25,4 @@ logging:
   level:
     com.kustaurant: trace
     org.flywaydb.core: info
+

@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.post.post.controller;
 
-import com.kustaurant.kustaurant.post.comment.controller.web.PostCommentService;
+import com.kustaurant.kustaurant.global.exception.exception.auth.UnauthenticatedException;
+import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.post.post.domain.Post;
@@ -9,7 +10,8 @@ import com.kustaurant.kustaurant.post.post.domain.PostDetailView;
 import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.post.post.service.web.PostScrapService;
-import com.kustaurant.kustaurant.post.post.service.web.PostService;
+import com.kustaurant.kustaurant.post.post.service.web.PostQueryService;
+import com.kustaurant.kustaurant.post.post.service.web.PostCommandService;
 import com.kustaurant.kustaurant.post.post.service.StorageService;
 import groovy.util.logging.Slf4j;
 import jakarta.transaction.Transactional;
@@ -31,7 +33,8 @@ import java.util.*;
 @Controller
 @RequiredArgsConstructor
 public class CommunityController {
-    private final PostService postService;
+    private final PostQueryService postQueryService;
+    private final PostCommandService postCommandService;
     private final PostCommentService postCommentService;
     private final PostScrapService postScrapService;
     private final StorageService storageService;
@@ -45,21 +48,18 @@ public class CommunityController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(defaultValue = "recent") String sort
     ) {
-        Page<Post> paging;
+        Page<PostDTO> paging;
         if (postCategory.equals("전체")) {
-            paging = postService.getList(page, sort);
+            paging = postQueryService.getList(page, sort);
         } else {
-            paging = postService.getListByPostCategory(postCategory, page, sort);
+            paging = postQueryService.getListByPostCategory(postCategory, page, sort);
         }
 
         model.addAttribute("currentPage", "community");
         model.addAttribute("postCategory", postCategory);
         model.addAttribute("sort", sort);
         model.addAttribute("paging", paging);
-
-        List<PostDTO> postDTOList = postService.getDTOs(paging);
-
-        model.addAttribute("postList", postDTOList);
+        model.addAttribute("postList", paging.getContent());
         return "community";
     }
 
@@ -77,17 +77,30 @@ public class CommunityController {
     }
 
     // 게시글 삭제
-    @DeleteMapping("/api/post/{postId}")
-    public ResponseEntity<String> deletePost(@PathVariable Integer postId) {
-        log.info("Deleting post with ID: {}", postId);
-        postService.deletePost(postId);
+    @DeleteMapping("/api/posts/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Integer postId, @AuthUser AuthUserInfo user) {
+        log.info("Deleting post with ID: {} by user: {}", postId, user.id());
+
+        // 게시글 조회 및 작성자 권한 확인
+        Post post = postQueryService.getPost(postId);
+        if (!post.getAuthorId().equals(user.id())) {
+            throw new UnauthenticatedException("게시글을 삭제할 권한이 없습니다.");
+        }
+
+        postCommandService.deletePost(postId);
         return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
     }
 
     // 댓글 삭제
-    @DeleteMapping("/api/comment/{commentId}")
+    @DeleteMapping("/api/comments/{commentId}")
     @Transactional
-    public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable Integer commentId) {
+    public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable Integer commentId, @AuthUser AuthUserInfo user) {
+        // 댓글 조회 및 작성자 권한 확인
+        com.kustaurant.kustaurant.post.comment.domain.PostComment comment = postCommentService.getPostCommentByCommentId(commentId);
+        if (!comment.getUserId().equals(user.id())) {
+            throw new UnauthenticatedException("댓글을 삭제할 권한이 없습니다.");
+        }
+
         int deletedCount = postCommentService.deleteComment(commentId);
         return ResponseEntity.ok(Map.of(
                 "success", true,
@@ -97,10 +110,10 @@ public class CommunityController {
     }
 
     // 댓글 or 대댓글 생성
-    @PostMapping("/api/comment/create")
+    @PostMapping("/api/posts/{postId}/comments")
     public ResponseEntity<String> createComment(
+            @PathVariable Integer postId,
             @RequestParam(name = "content", defaultValue = "") String content,
-            @RequestParam(name = "postId") Integer postId,
             @RequestParam(name = "parentCommentId", required = false) Integer parentCommentId,
             @AuthUser AuthUserInfo user
     ) {
@@ -110,28 +123,28 @@ public class CommunityController {
 
     // 게시글 좋아요 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @GetMapping("/api/post/like")
-    public ResponseEntity<ReactionToggleResponse> togglePostLike(@RequestParam("postId") Integer postId, Principal principal) {
+    @PostMapping("/api/posts/{postId}/like")
+    public ResponseEntity<ReactionToggleResponse> togglePostLike(@PathVariable Integer postId, Principal principal) {
         Long userId = Long.valueOf(principal.getName());
-        ReactionToggleResponse reactionToggleResponse = postService.toggleLike(postId, userId);
+        ReactionToggleResponse reactionToggleResponse = postCommandService.toggleLike(postId, userId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
 
     // 게시글 싫어요 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @GetMapping("/api/post/dislike")
-    public ResponseEntity<ReactionToggleResponse> togglePostDislike(@RequestParam("postId") Integer postId, Principal principal) {
+    @PostMapping("/api/posts/{postId}/dislike")
+    public ResponseEntity<ReactionToggleResponse> togglePostDislike(@PathVariable Integer postId, Principal principal) {
         Long userId = Long.valueOf(principal.getName());
-        ReactionToggleResponse reactionToggleResponse = postService.toggleDislike(postId, userId);
+        ReactionToggleResponse reactionToggleResponse = postCommandService.toggleDislike(postId, userId);
         return ResponseEntity.ok(reactionToggleResponse);
     }
 
     // 게시글 스크랩
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @GetMapping("/api/post/scrap")
-    public ResponseEntity<Map<String, Object>> toggleScrap(@RequestParam("postId") Integer postId, Principal principal) {
+    @PostMapping("/api/posts/{postId}/scrap")
+    public ResponseEntity<Map<String, Object>> toggleScrap(@PathVariable Integer postId, Principal principal) {
         Long userId = Long.valueOf(principal.getName());
-        Map<String, Object> response = postScrapService.toggleScrap(userId,postId);
+        Map<String, Object> response = postScrapService.toggleScrap(userId, postId);
         return ResponseEntity.ok(response);
     }
 
@@ -139,21 +152,20 @@ public class CommunityController {
     @GetMapping("/community/search")
     public String search(Model model, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "kw", defaultValue = "") String kw, @RequestParam(defaultValue = "recent") String sort, @RequestParam(defaultValue = "전체") String postCategory) {
 
-        Page<PostDTO> paging = postService.getList(page, sort, kw, postCategory);
-        List<String> timeAgoList = postService.getTimeAgoList(paging);
+        Page<PostDTO> paging = postQueryService.getList(page, sort, kw, postCategory);
+        List<String> timeAgoList = postQueryService.getTimeAgoList(paging);
         model.addAttribute("timeAgoList", timeAgoList);
         model.addAttribute("paging", paging);
         model.addAttribute("postSearchKw", kw);
         model.addAttribute("sort", sort);
         model.addAttribute("postCategory", postCategory);
         model.addAttribute("postList", paging.getContent());
-
         return "community";
     }
 
     // 게시글 댓글 좋아요
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @GetMapping("/api/comment/like/{commentId}")
+    @PostMapping("/api/comments/{commentId}/like")
     public ResponseEntity<ReactionToggleResponse> toggleCommentLike(
             @PathVariable Integer commentId,
             @AuthUser AuthUserInfo user
@@ -164,7 +176,7 @@ public class CommunityController {
 
     // 게시글 댓글 싫어요
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
-    @GetMapping("/api/comment/dislike/{commentId}")
+    @PostMapping("/api/comments/{commentId}/dislike")
     public ResponseEntity<ReactionToggleResponse> toggleCommentDislike(
             @PathVariable Integer commentId,
             @AuthUser AuthUserInfo user
@@ -182,14 +194,14 @@ public class CommunityController {
     }
 
     // 게시글 생성
-    @PostMapping("/api/community/post/create")
+    @PostMapping("/api/posts")
     public ResponseEntity<String> createPost(
             @RequestParam("title") String title,
             @RequestParam("postCategory") String category,
             @RequestParam("content") String content,
             @AuthUser AuthUserInfo user
     ) {
-        postService.create(title, category, content, user.id());
+        postCommandService.create(title, category, content, user.id());
         return ResponseEntity.ok("글이 성공적으로 저장되었습니다.");
     }
 
@@ -200,30 +212,34 @@ public class CommunityController {
             Model model,
             @AuthUser AuthUserInfo user
     ) {
-        Post post = postService.getPost(postId);
+        Post post = postQueryService.getPost(postId);
         model.addAttribute("post", PostDTO.from(post));
         return "community_update";
     }
 
     // 게시글 수정
-    @PostMapping("/api/community/post/update")
+    @PutMapping("/api/posts/{postId}")
     public ResponseEntity<String> updatePost(
-            @RequestParam Integer postId,
+            @PathVariable Integer postId,
             @RequestParam String title,
             @RequestParam String postCategory,
             @RequestParam String content,
             @AuthUser AuthUserInfo user
     ) {
-        postService.update(postId, title, postCategory, content);
+        Post post = postQueryService.getPost(postId);
+        if (!post.getAuthorId().equals(user.id())) {
+            throw new UnauthenticatedException("게시글을 수정할 권한이 없습니다.");
+        }
+        postCommandService.update(postId, title, postCategory, content);
         return ResponseEntity.ok("글이 성공적으로 수정되었습니다.");
     }
 
     // 이미지 업로드 (미리보기)
-    @PostMapping("/api/upload/image")
+    @PostMapping("/api/images")
     public ResponseEntity<?> imageUpload(
             @RequestParam("image") MultipartFile imageFile,
             @AuthUser AuthUserInfo user
-    ){
+    ) {
         if (imageFile.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("rs_st", -1, "rs_msg", "파일이 없습니다."));
         }

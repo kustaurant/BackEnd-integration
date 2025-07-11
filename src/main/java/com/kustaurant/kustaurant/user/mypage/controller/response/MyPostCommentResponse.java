@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.user.mypage.controller.response;
 
+import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.comment.infrastructure.projection.PostCommentDTOProjection;
 
 import java.time.LocalDateTime;
@@ -23,8 +24,7 @@ public record MyPostCommentResponse(
                 projection.postTitle(),
                 extractShortCommentBody(projection.commentBody()),
                 projection.getNetLikes(),
-                calculateTimeAgo(projection.updatedAt() != null ? projection.updatedAt() : projection.createdAt())
-        );
+                TimeAgoUtil.toKor(projection.createdAt()));
     }
     
     /**
@@ -40,25 +40,5 @@ public record MyPostCommentResponse(
         }
         
         return commentBody;
-    }
-    
-    /**
-     * 시간 경과 계산 (한국어)
-     */
-    private static String calculateTimeAgo(LocalDateTime dateTime) {
-        if (dateTime == null) return "";
-        
-        LocalDateTime now = LocalDateTime.now();
-        long diffInMinutes = java.time.Duration.between(dateTime, now).toMinutes();
-
-        if (diffInMinutes < 1) {
-            return "방금 전";
-        } else if (diffInMinutes < 60) {
-            return diffInMinutes + "분 전";
-        } else if (diffInMinutes < 1440) { // 24시간
-            return (diffInMinutes / 60) + "시간 전";
-        } else {
-            return (diffInMinutes / 1440) + "일 전";
-        }
     }
 }
