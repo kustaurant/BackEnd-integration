@@ -120,8 +120,13 @@ public class PostCommentApiService {
 
     // 댓글 생성
     public PostComment createComment(String content, String postId, Long userId) {
+        // 댓글 내용 검증
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("댓글 내용을 입력해주세요.");
+        }
+        
         Post post = postQueryApiService.getPost(Integer.valueOf(postId));
-        PostComment postComment = PostComment.create(content, userId, post.getId());
+        PostComment postComment = PostComment.create(content.trim(), userId, post.getId());
         return postCommentRepository.save(postComment);
     }
 

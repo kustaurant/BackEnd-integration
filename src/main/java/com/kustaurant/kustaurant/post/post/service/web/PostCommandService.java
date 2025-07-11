@@ -116,7 +116,7 @@ public class PostCommandService {
 
     @Transactional
     public Post create(String title, String category, String body, Long userId) {
-        Post post = Post.builder().title(title).category(category).body(body).status(ContentStatus.ACTIVE).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).authorId(userId).build();
+        Post post = Post.builder().title(title).category(category).body(body).status(ContentStatus.ACTIVE).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).authorId(userId).visitCount(0).build();
         Post savedPost = postRepository.save(post);
 
         List<String> imageUrls = imageExtractor.extract(body);
@@ -137,6 +137,7 @@ public class PostCommandService {
 
         List<String> imageUrls = imageExtractor.extract(body);
         post.update(title, body, category, imageUrls);
+        post.setUpdatedAt(LocalDateTime.now());
 
         postPhotoRepository.deleteByPostId(postId);
         // ID 기반으로 사진 저장

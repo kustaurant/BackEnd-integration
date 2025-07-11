@@ -77,8 +77,15 @@ public class CommunityController {
 
     // 게시글 삭제
     @DeleteMapping("/api/posts/{postId}")
-    public ResponseEntity<String> deletePost(@PathVariable Integer postId) {
-        log.info("Deleting post with ID: {}", postId);
+    public ResponseEntity<String> deletePost(@PathVariable Integer postId, @AuthUser AuthUserInfo user) {
+        log.info("Deleting post with ID: {} by user: {}", postId, user.id());
+        
+        // 게시글 조회 및 작성자 권한 확인
+        Post post = postQueryService.getPost(postId);
+        if (!post.getAuthorId().equals(user.id())) {
+            throw new RuntimeException("게시글을 삭제할 권한이 없습니다.");
+        }
+        
         postCommandService.deletePost(postId);
         return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
     }
@@ -86,7 +93,13 @@ public class CommunityController {
     // 댓글 삭제
     @DeleteMapping("/api/comments/{commentId}")
     @Transactional
-    public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable Integer commentId) {
+    public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable Integer commentId, @AuthUser AuthUserInfo user) {
+        // 댓글 조회 및 작성자 권한 확인
+        com.kustaurant.kustaurant.post.comment.domain.PostComment comment = postCommentService.getPostCommentByCommentId(commentId);
+        if (!comment.getUserId().equals(user.id())) {
+            throw new RuntimeException("댓글을 삭제할 권한이 없습니다.");
+        }
+        
         int deletedCount = postCommentService.deleteComment(commentId);
         return ResponseEntity.ok(Map.of(
                 "success", true,

@@ -43,7 +43,7 @@ public class PostScrapApiService {
             );
             return true;
         } catch (DataIntegrityViolationException e) {
-            return true;
+            return false;
         }
     }
 
@@ -70,7 +70,7 @@ public class PostScrapApiService {
                 );
                 isCreated = true;
             } catch (DataIntegrityViolationException e) {
-                isCreated = true;
+                isCreated = false;
             }
         }
 

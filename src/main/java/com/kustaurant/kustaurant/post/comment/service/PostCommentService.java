@@ -239,15 +239,22 @@ public class PostCommentService {
 
     @Transactional
     public int deleteComment(Integer commentId) {
-        PostComment comment = postCommentRepository.findByIdWithReplies(commentId)
+        PostComment comment = postCommentRepository.findById(commentId)
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, commentId, "댓글"));
 
-        comment.delete();  // 도메인 내에서 댓글 + 대댓글 상태 변경
+        comment.delete();  // 도메인 내에서 댓글 상태 변경
 
-        postCommentRepository.save(comment); // 변경 반영
-
-        // ID 기반으로 대댓글 수 조회
+        // ID 기반으로 대댓글 조회 및 삭제
         List<PostComment> replies = postCommentRepository.findByParentCommentId(commentId);
+        for (PostComment reply : replies) {
+            reply.delete();
+        }
+        
+        postCommentRepository.save(comment); // 변경 반영
+        if (!replies.isEmpty()) {
+            postCommentRepository.saveAll(replies); // 대댓글 변경 반영
+        }
+
         return 1 + replies.size(); // 삭제된 댓글 수 리턴
     }
 }
