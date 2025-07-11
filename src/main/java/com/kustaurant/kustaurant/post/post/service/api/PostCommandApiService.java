@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.post.post.service.api;
 
+import com.kustaurant.kustaurant.global.exception.exception.auth.UnauthenticatedException;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.post.domain.Post;
@@ -47,11 +48,12 @@ public class PostCommandApiService {
             postPhotoRepository.saveAll(photos);
         }
     }
-
+    @Transactional
     public void updatePost(PostUpdateDTO postUpdateDTO, Post post) {
         if (postUpdateDTO.getTitle() != null) post.setTitle(postUpdateDTO.getTitle());
         if (postUpdateDTO.getPostCategory() != null) post.setCategory(postUpdateDTO.getPostCategory());
         if (postUpdateDTO.getContent() != null) post.setBody(postUpdateDTO.getContent());
+        postRepository.save(post);
     }
 
     // 게시글 삭제
@@ -61,7 +63,7 @@ public class PostCommandApiService {
 
         // 권한 확인
         if (!post.getAuthorId().equals(userId)) {
-            throw new RuntimeException("게시글을 삭제할 권한이 없습니다.");
+            throw new UnauthenticatedException("게시글을 삭제할 권한이 없습니다.");
         }
 
         // 게시글 상태를 DELETED로 변경

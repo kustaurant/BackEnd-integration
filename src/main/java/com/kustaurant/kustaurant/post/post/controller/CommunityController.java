@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.post.post.controller;
 
+import com.kustaurant.kustaurant.global.exception.exception.auth.UnauthenticatedException;
 import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
@@ -79,13 +80,13 @@ public class CommunityController {
     @DeleteMapping("/api/posts/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Integer postId, @AuthUser AuthUserInfo user) {
         log.info("Deleting post with ID: {} by user: {}", postId, user.id());
-        
+
         // 게시글 조회 및 작성자 권한 확인
         Post post = postQueryService.getPost(postId);
         if (!post.getAuthorId().equals(user.id())) {
-            throw new RuntimeException("게시글을 삭제할 권한이 없습니다.");
+            throw new UnauthenticatedException("게시글을 삭제할 권한이 없습니다.");
         }
-        
+
         postCommandService.deletePost(postId);
         return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
     }
@@ -97,9 +98,9 @@ public class CommunityController {
         // 댓글 조회 및 작성자 권한 확인
         com.kustaurant.kustaurant.post.comment.domain.PostComment comment = postCommentService.getPostCommentByCommentId(commentId);
         if (!comment.getUserId().equals(user.id())) {
-            throw new RuntimeException("댓글을 삭제할 권한이 없습니다.");
+            throw new UnauthenticatedException("댓글을 삭제할 권한이 없습니다.");
         }
-        
+
         int deletedCount = postCommentService.deleteComment(commentId);
         return ResponseEntity.ok(Map.of(
                 "success", true,
@@ -143,7 +144,7 @@ public class CommunityController {
     @PostMapping("/api/posts/{postId}/scrap")
     public ResponseEntity<Map<String, Object>> toggleScrap(@PathVariable Integer postId, Principal principal) {
         Long userId = Long.valueOf(principal.getName());
-        Map<String, Object> response = postScrapService.toggleScrap(userId,postId);
+        Map<String, Object> response = postScrapService.toggleScrap(userId, postId);
         return ResponseEntity.ok(response);
     }
 
@@ -225,6 +226,10 @@ public class CommunityController {
             @RequestParam String content,
             @AuthUser AuthUserInfo user
     ) {
+        Post post = postQueryService.getPost(postId);
+        if (!post.getAuthorId().equals(user.id())) {
+            throw new UnauthenticatedException("게시글을 수정할 권한이 없습니다.");
+        }
         postCommandService.update(postId, title, postCategory, content);
         return ResponseEntity.ok("글이 성공적으로 수정되었습니다.");
     }
@@ -234,7 +239,7 @@ public class CommunityController {
     public ResponseEntity<?> imageUpload(
             @RequestParam("image") MultipartFile imageFile,
             @AuthUser AuthUserInfo user
-    ){
+    ) {
         if (imageFile.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("rs_st", -1, "rs_msg", "파일이 없습니다."));
         }
