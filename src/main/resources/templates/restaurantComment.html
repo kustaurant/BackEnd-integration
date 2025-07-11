@@ -1,7 +1,11 @@
 <div>
     <!-- 댓글 좋아요/싫어요 영역 -->
     <div class="like-div">
-        <button class="comment-up" type="button" onclick="commentLike(this)" th:data-id="${restaurantComment.commentId}" th:data-parent-id="${restaurantComment.commentId}">
+        <button type="button"
+                class="comment-up"
+                onclick="commentLike(this)"
+                th:data-id="${restaurantComment.commentId}"
+                th:data-parent-id="${restaurantComment.commentId}">
             <img th:if="${restaurantComment.commentLikeStatus eq 1}" src="/img/community/up-green.png">
             <img th:unless="${restaurantComment.commentLikeStatus eq 1}" src="/img/community/up.png">
         </button>

@@ -80,7 +80,7 @@ public class PostCommentDTO {
                 .repliesList(List.of()) // ID 기반으로 별도 조회 필요
                 .build();
     }
-    
+
     public static PostCommentDTO from(PostCommentDetailProjection projection) {
         return PostCommentDTO.builder()
                 .commentId(projection.commentId())
@@ -98,7 +98,7 @@ public class PostCommentDTO {
                 .repliesList(List.of()) // 대댓글은 별도로 처리
                 .build();
     }
-    
+
     private static UserDTO createUserDTO(PostCommentDetailProjection projection) {
         UserDTO userDTO = new UserDTO();
         userDTO.setNickname(projection.userNickname());

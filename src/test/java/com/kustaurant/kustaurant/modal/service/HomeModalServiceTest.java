@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.modal.service;
 
-import com.kustaurant.kustaurant.admin.modal.infrastructure.HomeModalEntity;
-import com.kustaurant.kustaurant.admin.modal.infrastructure.HomeModalRepository;
-import com.kustaurant.kustaurant.admin.modal.service.HomeModalService;
+import com.kustaurant.kustaurant.admin.modal.HomeModalEntity;
+import com.kustaurant.kustaurant.admin.modal.HomeModalRepository;
+import com.kustaurant.kustaurant.admin.modal.HomeModalService;
 import com.kustaurant.kustaurant.common.service.port.ClockHolder;
 import com.kustaurant.kustaurant.mock.TestClockHolder;
 import org.junit.jupiter.api.BeforeEach;

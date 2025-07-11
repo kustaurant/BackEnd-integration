@@ -1,11 +1,10 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.service;
 
+import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentResponse;
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
-import com.kustaurant.kustaurant.evaluation.comment.service.EvaluationCommentService;
+import com.kustaurant.kustaurant.restaurant.restaurant.controller.response.RestaurantDetailDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.controller.web.RestaurantDetailWebDto;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommResponse;
-import com.kustaurant.kustaurant.restaurant.restaurant.controller.response.RestaurantDetailDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantMenuEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantMenuRepository;
@@ -22,14 +21,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class RestaurantWebService {
     
     private final RestaurantService restaurantService;
-    private final EvaluationCommentService restaurantCommentService;
 
     public RestaurantDetailWebDto getRestaurantWebDetails(Long userId, Integer restaurantId) {
         RestaurantDetailDTO restaurantDetailDto = restaurantService.getActiveRestaurantDetailDto(restaurantId, userId);
@@ -37,7 +34,7 @@ public class RestaurantWebService {
 
         // TODO: 추후 수정
 //        List<EvalCommResponse> comments = restaurantCommentService.getRestaurantCommentList(restaurantId, userId, true);
-        List<EvalCommResponse> comments = List.of();
+        List<EvalCommentResponse> comments = List.of();
 
         return new RestaurantDetailWebDto(
                 restaurantDetailDto,

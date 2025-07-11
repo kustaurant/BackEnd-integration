@@ -10,7 +10,7 @@ public class UnauthenticatedException extends JwtAuthException {
 
   /** 디버깅용 상세 사유 전달 */
   public UnauthenticatedException(String reason) {
-    super(ErrorCode.UNAUTHORIZED, new IllegalStateException(reason));
+    super(ErrorCode.UNAUTHORIZED, reason);
   }
 
   public UnauthenticatedException(Throwable cause) {

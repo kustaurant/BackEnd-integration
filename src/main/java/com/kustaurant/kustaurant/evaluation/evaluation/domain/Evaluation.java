@@ -6,7 +6,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Builder
+@Builder(toBuilder = true)
 @Getter
 public class Evaluation {
 
@@ -27,8 +27,7 @@ public class Evaluation {
     private Integer likeCount;
     private Integer dislikeCount;
 
-    public static Evaluation create(Long userId, Integer restaurantId,
-            EvaluationDTO dto) {
+    public static Evaluation create(Long userId, Integer restaurantId, EvaluationDTO dto) {
         return Evaluation.builder()
                 .evaluationScore(dto.getEvaluationScore())
                 .status("ACTIVE")
@@ -50,5 +49,12 @@ public class Evaluation {
         this.commentBody = dto.getEvaluationComment();
         this.commentImgUrl = dto.getEvaluationImgUrl();
         this.situationIds = dto.getEvaluationSituations();
+    }
+
+    public void adjustLikeCount(int num) {
+        this.likeCount += num;
+    }
+    public void adjustDislikeCount(int num) {
+        this.dislikeCount += num;
     }
 }

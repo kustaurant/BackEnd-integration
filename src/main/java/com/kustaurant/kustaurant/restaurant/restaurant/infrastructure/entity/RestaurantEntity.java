@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.RestaurantCommentEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommentEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -48,12 +48,7 @@ public class RestaurantEntity {
 
     @JsonIgnore
     private LocalDateTime updatedAt;
-
-
     // 다른 테이블과의 관계 매핑
-    @OneToMany(mappedBy = "restaurant")
-    @JsonIgnore
-    private List<RestaurantCommentEntity> restaurantCommentList = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant")
     @JsonIgnore

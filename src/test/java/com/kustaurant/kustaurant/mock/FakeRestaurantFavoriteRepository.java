@@ -20,7 +20,6 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
                         fav.getRestaurantId().equals(restaurantId))
                 .findFirst()
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_FAVORITE_NOT_FOUND, "Favorite not found - UserId:" + userId + ", RestaurantId:" + restaurantId));
-
     }
 
     @Override

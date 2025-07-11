@@ -1,10 +1,17 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure;
 
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa.EvaluationQueryJpaRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
+
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
+import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import java.util.List;
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +20,13 @@ import org.springframework.stereotype.Repository;
 public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository {
 
     private final EvaluationQueryJpaRepository jpaRepository;
+
+    @Override
+    public Evaluation findActiveById(Long id) {
+        return jpaRepository.findByIdAndStatus(id, "ACTIVE")
+                .map(EvaluationEntity::toModel)
+                .orElseThrow(() -> new DataNotFoundException(EVALUATION_NOT_FOUND, id, "평가"));
+    }
 
     @Override
     public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
@@ -39,5 +53,21 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
     @Override
     public int countByStatus(String status) {
         return jpaRepository.countByStatus(status);
+    }
+
+    @Override
+    public List<Evaluation> findByRestaurantIdOrderByCreatedAtDesc(Integer restaurantId) {
+        return jpaRepository.findByRestaurantIdAndStatusOrderByCreatedAtDesc(restaurantId, "ACTIVE")
+                .stream()
+                .map(EvaluationEntity::toModel)
+                .toList();
+    }
+
+    @Override
+    public List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Integer restaurantId) {
+        return jpaRepository.findByRestaurantIdAndStatusOrderByLikeCountDesc(restaurantId, "ACTIVE")
+                .stream()
+                .map(EvaluationEntity::toModel)
+                .toList();
     }
 }
