@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.user.mypage.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.comment.infrastructure.projection.PostCommentDTOProjection;
 
@@ -11,34 +13,11 @@ public record MyPostCommentResponse(
         String postTitle,
         String postcommentBody,
         Integer commentlikeCount,
-        String timeAgo
+        @JsonIgnore LocalDateTime createdAt
 ) {
-    
-    /**
-     * PostCommentDTOProjection을 MyPostCommentResponse로 변환
-     */
-    public static MyPostCommentResponse from(PostCommentDTOProjection projection) {
-        return new MyPostCommentResponse(
-                projection.postId(),
-                projection.postCategory(),
-                projection.postTitle(),
-                extractShortCommentBody(projection.commentBody()),
-                projection.getNetLikes(),
-                TimeAgoUtil.toKor(projection.createdAt()));
+    @JsonProperty
+    public String timeAgo() {
+        return TimeAgoUtil.toKor(createdAt);
     }
-    
-    /**
-     * 댓글 본문을 20자로 제한하여 요약
-     */
-    private static String extractShortCommentBody(String commentBody) {
-        if (commentBody == null || commentBody.isEmpty()) {
-            return "";
-        }
-        
-        if (commentBody.length() > 20) {
-            return commentBody.substring(0, 20) + "...";
-        }
-        
-        return commentBody;
-    }
+
 }

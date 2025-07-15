@@ -39,7 +39,6 @@ public class EvaluationEntity {
     @Column(name = "restaurant_id", nullable = false)
     private Integer restaurantId;
 
-    // Evaluation 에서 EvaluationSituation 관리
     @ElementCollection
     @CollectionTable(
             name = "evaluation_situations_tbl",

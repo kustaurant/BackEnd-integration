@@ -33,8 +33,8 @@ public class MypageServiceImpl implements MypageService {
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final PostScrapRepository postScrapRepository;
-
     private final PostQueryDAO postQueryDAO;
+
     public List<RestaurantFavorite> getRestaurantFavorites(Long userId) {
         return restaurantFavoriteRepository.findSortedFavoritesByUserId(userId);
     }

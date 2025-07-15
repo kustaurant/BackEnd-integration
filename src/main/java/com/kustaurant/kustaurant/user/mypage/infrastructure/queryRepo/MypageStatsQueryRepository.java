@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
-public interface MyUserStatsQueryRepository extends Repository<UserStatsEntity, Long> {
+public interface MypageStatsQueryRepository extends Repository<UserStatsEntity, Long> {
     @Query("""
         select new com.kustaurant.kustaurant.user.mypage.controller.response.UserActivityStatsResponse(
             s.savedRestCnt,

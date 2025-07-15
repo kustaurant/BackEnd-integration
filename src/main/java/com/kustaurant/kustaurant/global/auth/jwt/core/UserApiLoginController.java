@@ -21,7 +21,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserApiLoginController {
 
@@ -37,7 +36,7 @@ public class UserApiLoginController {
             @ApiResponse(responseCode = "200", description = "로그인 성공",
                     content = @Content(schema = @Schema(implementation = TokenResponse.class)))
     })
-    @PostMapping("/login/naver")
+    @PostMapping("/api/v2/login/naver")
     public ResponseEntity<TokenResponse> loginWithNaver(
             @Valid @RequestBody NaverLoginRequest req
     ) {
@@ -54,7 +53,7 @@ public class UserApiLoginController {
             @ApiResponse(responseCode = "200", description = "로그인 성공",
                     content = @Content(schema = @Schema(implementation = TokenResponse.class)))
     })
-    @PostMapping("/login/apple")
+    @PostMapping("/api/v2/login/apple")
     public ResponseEntity<TokenResponse> loginWithApple(
             @Valid @RequestBody AppleLoginRequest req
     ) {
@@ -73,7 +72,7 @@ public class UserApiLoginController {
             @ApiResponse(responseCode = "401", description = "리프레시 토큰 만료 또는 유효하지 않음"),
             @ApiResponse(responseCode = "400", description = "요청 헤더 누락 또는 잘못된 형식")
     })
-    @PostMapping("/token/refresh")
+    @PostMapping("/api/v2/token/refresh")
     public ResponseEntity<AccessTokenResponse> refreshAccessToken(
             @RequestHeader("Authorization") String refreshToken
     ) {
@@ -90,7 +89,7 @@ public class UserApiLoginController {
             @ApiResponse(responseCode = "204", description = "토큰이 유효합니다"),
             @ApiResponse(responseCode = "401", description = "토큰이 유효하지 않습니다"),
     })
-    @GetMapping("/token/verify")
+    @GetMapping("/api/v2/token/verify")
     public ResponseEntity<?> verifyToken(
             @RequestHeader("Authorization") String accessToken
     ) {
@@ -109,7 +108,7 @@ public class UserApiLoginController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "로그아웃 성공")
     })
-    @PostMapping("/auth/logout")
+    @PostMapping("/api/v2/auth/logout")
     public ResponseEntity<?> logout(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
             ) {
@@ -125,7 +124,7 @@ public class UserApiLoginController {
             @ApiResponse(responseCode = "401", description = "인증 정보 없음"),
             @ApiResponse(responseCode = "404", description = "사용자 없음")
     })
-    @DeleteMapping("/auth/user")
+    @DeleteMapping("/api/v2/auth/user")
     public ResponseEntity<Void> deleteAccount(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {

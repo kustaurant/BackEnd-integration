@@ -1,8 +1,6 @@
 package com.kustaurant.kustaurant.home;
 
 import com.kustaurant.kustaurant.admin.modal.HomeModalService;
-import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
-import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.admin.modal.HomeModalEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
@@ -17,7 +15,7 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Controller
-public class MainController {
+public class HomeWebController {
     private final RestaurantWebService restaurantWebService;
     private final HomeModalService homeModalService;
 

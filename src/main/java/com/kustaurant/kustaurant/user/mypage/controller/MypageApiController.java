@@ -1,7 +1,5 @@
 package com.kustaurant.kustaurant.user.mypage.controller;
 
-import com.kustaurant.kustaurant.admin.feedback.controller.Request.FeedbackRequest;
-import com.kustaurant.kustaurant.admin.feedback.controller.port.FeedbackService;
 import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
@@ -17,16 +15,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
 public class MypageApiController {
     private final MypageApiService mypageApiService;
-    private final FeedbackService feedbackService;
 
     //1-1
     @Operation(
@@ -35,40 +32,37 @@ public class MypageApiController {
                     "로그인하지 않은 회원도 접속 가능하기 때문에 엔드포인트에 /auth가 포함되지 않습니다. " +
                     "로그인하지 않은 회원인 경우 기본적인 빈 객체가 반환됩니다."
     )
-    @GetMapping("/mypage")
+    @GetMapping("/api/v2/mypage")
     public ResponseEntity<MypageMainResponse> getMypageView(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
         MypageMainResponse response;
-
         if (user == null) {
-            // 로그인하지 않은 사용자일 경우, 빈 객체 반환
             response = new MypageMainResponse(null,null,0,0);
-        } else {
-            // 로그인한 사용자의 마이페이지 정보 로드
+        } else{
             response = mypageApiService.getMypageInfo(user.id());
         }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
 
-    //2
+    //2 마이페이지 프로필 변경 화면 조회
     @Operation(
-            summary = "마이페이지 프로필 정보(변경)화면 로드에 정보 불러오기",
-            description = "마이페이지 프로필 정보(변경)화면 로드에 정보를 불러옵니다"
+            summary = "\"마이페이지 프로필 변경 화면 조회\"",
+            description = "마이페이지 프로필 변경화면 로드에 정보를 불러옵니다"
     )
-    @GetMapping("/auth/mypage/profile")
+    @GetMapping("/api/v2/mypage/profile")
     public ResponseEntity<ProfileResponse> getMypageProfile(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
-        ProfileResponse profileResponse = mypageApiService.getProfile(user.id());
+        ProfileResponse response = mypageApiService.getProfile(user.id());
 
-        return new ResponseEntity<>(profileResponse, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
 
-    //3
+    //3 마이페이지 프로필 변경
     @Operation(
             summary = "마이페이지 프로필 변경하기",
             description = "유저의 닉네임,전화번호를 변경합니다. (프로필 사진 미구현)"
@@ -82,68 +76,68 @@ public class MypageApiController {
                     "닉네임은 10자 이하여야 합니다. or" +
                     "전화번호는 숫자로 11자로만 입력되어야 합니다.")
     })
-    @PatchMapping("/auth/mypage/profile")
-    public ResponseEntity<?> updateMypageProfile(
+    @PatchMapping("/api/v2/auth/mypage/profile")
+    public ResponseEntity<ProfileResponse> updateMypageProfile(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user,
             @Valid @RequestBody ProfileUpdateRequest req
     ){
-        ProfileResponse res = mypageApiService.updateUserProfile(user.id(), req);
+        ProfileResponse response = mypageApiService.updateUserProfile(user.id(), req);
 
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
 
-    //4
+    //4 음식점 평가 목록 조회
     @Operation(
-            summary = "\"내가 평가한 맛집 화면\" 로드에 필요한 정보 불러오기",
-            description = "유저가 평가해논 맛집 정보들을 불러옵니다."
+            summary = "\"내가 평가한 음식점 조회\"",
+            description = "유저가 평가한 음식점 리스트를 불러옵니다."
     )
-    @GetMapping("/auth/mypage/evaluate-restaurant-list")
+    @GetMapping("/api/v2/auth/mypage/restaurants/evaluated")
     public ResponseEntity<List<MyRatedRestaurantResponse>> getEvaluateRestaurantList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
-        List<MyRatedRestaurantResponse> list = mypageApiService.getUserEvaluateRestaurantList(user.id());
+        List<MyRatedRestaurantResponse> responseList = mypageApiService.getUserEvaluateRestaurantList(user.id());
 
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(responseList);
     }
 
 
-    //5 커뮤니티
+    //5 음식점 즐겨찾기 조회
     @Operation(
-            summary = "\"내가 작성한 커뮤니티글 화면\" 로드에 필요한 정보 불러오기",
-            description = "유저가 작성한 커뮤니티 글 리스트 정보들을 불러옵니다."
-    )
-    @GetMapping("/auth/mypage/community-list")
-    public ResponseEntity<List<MyPostsResponse>> getWrittenUserPostsList(
-            @Parameter(hidden = true) @AuthUser AuthUserInfo user
-    ){
-        List<MyPostsResponse> list = mypageApiService.getUserPosts(user.id());
-
-        return ResponseEntity.ok(list);
-    }
-
-
-    //6
-    @Operation(
-            summary = "\"내가 저장한 맛집 화면\" 로드에 필요한 정보 불러오기",
+            summary = "\"내가 저장한 음식점 조회\"",
             description = "유저가 즐겨찾기해논 맛집 정보들을 불러옵니다."
     )
-    @GetMapping("/auth/mypage/favorite-restaurant-list")
+    @GetMapping("/api/v2/auth/mypage/restaurants/favorite")
     public ResponseEntity<List<MyRestaurantResponse>> getFavoriteRestaurantList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
-        List<MyRestaurantResponse> list = mypageApiService.getUserFavoriteRestaurantList(user.id());
+        List<MyRestaurantResponse> responseList = mypageApiService.getUserFavoriteRestaurantList(user.id());
 
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(responseList);
     }
 
 
-    //7 커뮤니티
+    //6 커뮤니티 작성 글 조회
     @Operation(
-            summary = "\"내가 저장한 커뮤니티 게시글 화면\" 로드에 필요한 정보 불러오기",
+            summary = "\"내가 작성한 커뮤니티 글 조회\"",
+            description = "유저가 작성한 커뮤니티 글 리스트 정보들을 불러옵니다."
+    )
+    @GetMapping("/api/v2/auth/mypage/community/posts")
+    public ResponseEntity<List<MyPostsResponse>> getWrittenUserPostsList(
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
+    ){
+        List<MyPostsResponse> responseList = mypageApiService.getUserPosts(user.id());
+
+        return ResponseEntity.ok(responseList);
+    }
+
+
+    //7 커뮤니티 스크랩한 게시글 조회
+    @Operation(
+            summary = "\"내가 저장한 커뮤니티 게시글 조회\"",
             description = "유저가 저장해놓은 커뮤니티 게시글 리스트 정보들을 불러옵니다."
     )
-    @GetMapping("/auth/mypage/community-scrap-list")
+    @GetMapping("/api/v2/auth/mypage/community/scraps")
     public ResponseEntity<List<MyPostsResponse>> getCommunityScrapList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
@@ -153,12 +147,12 @@ public class MypageApiController {
     }
 
 
-    //8 커뮤니티
+    //8 커뮤니티 작성 댓글 조회
     @Operation(
-            summary = "\"내가 작성한 커뮤니티 댓글 화면\" 로드에 필요한 정보 불러오기",
+            summary = "\"내가 작성한 커뮤니티 댓글 조회\"",
             description = "유저가 작성한 커뮤니티의 댓글 리스트들을 불러옵니다."
     )
-    @GetMapping("/auth/mypage/community-comment-list")
+    @GetMapping("/api/v2/auth/mypage/community/comments")
     public ResponseEntity<List<MyPostCommentResponse>> getCommunityCommentList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
@@ -170,10 +164,10 @@ public class MypageApiController {
 
     //9 공지사항
     @Operation(
-            summary = "\"공지사항 목록화면\" 로드에 필요한 정보 불러오기",
-            description = "공지사항 리스트와 관련 링크들을 불러옵니다."
+            summary = "\"공지사항 목록 조회\"",
+            description = "공지사항 리스트와 관련 링크들을 불러옵니다. (조회는 웹뷰 방식)"
     )
-    @GetMapping("/mypage/noticelist")
+    @GetMapping("/api/v2/mypage/notices")
     public ResponseEntity<List<NoticeDTO>> getNotices() {
         List<NoticeDTO> noticeDTOs = mypageApiService.getAllNotices();
 

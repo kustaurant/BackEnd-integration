@@ -9,22 +9,19 @@ import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "users_tbl")
-@NoArgsConstructor
-@SQLRestriction("status = 'ACTIVE'")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "status = 'ACTIVE'")
 public class UserEntity {
 
     @Id
