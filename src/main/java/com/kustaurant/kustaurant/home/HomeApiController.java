@@ -5,7 +5,6 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.controller.response.RestaurantListsResponse;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.query.RestaurantHomeService;
 import com.kustaurant.kustaurant.restaurant.search.service.RestaurantSearchService;
-import com.kustaurant.kustaurant.admin.notice.service.HomeBannerApiService;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

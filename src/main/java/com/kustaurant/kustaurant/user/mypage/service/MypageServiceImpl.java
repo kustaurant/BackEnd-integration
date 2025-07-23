@@ -14,9 +14,9 @@ import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
-import com.kustaurant.kustaurant.user.mypage.controller.response.MypageDataView;
-import com.kustaurant.kustaurant.user.mypage.controller.response.PostCommentView;
-import com.kustaurant.kustaurant.user.mypage.controller.response.ScrappedPostView;
+import com.kustaurant.kustaurant.user.mypage.controller.response.web.MypageDataView;
+import com.kustaurant.kustaurant.user.mypage.controller.response.web.PostCommentView;
+import com.kustaurant.kustaurant.user.mypage.controller.response.web.ScrappedPostView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+/**
+ * 웹 부분은 마이페이지가 모든 정보를 한번에 넘겨주도록 되어있음
+ */
 
 @Service
 @RequiredArgsConstructor

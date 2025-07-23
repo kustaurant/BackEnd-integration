@@ -3,15 +3,12 @@ package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QSituationEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
-import com.kustaurant.kustaurant.user.mypage.controller.response.MyRatedRestaurantResponse;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRatedRestaurantResponse;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

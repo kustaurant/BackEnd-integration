@@ -68,7 +68,8 @@ public class EvaluationEntity {
         entity.updatedAt = evaluation.getUpdatedAt();
         entity.body = evaluation.getCommentBody();
         entity.imgUrl = evaluation.getCommentImgUrl();
-        entity.likeCount = evaluation.getCommentLikeCount();
+        entity.likeCount = evaluation.getLikeCount();
+        entity.dislikeCount = evaluation.getDislikeCount();
         entity.userId = evaluation.getUserId();
         entity.restaurantId = evaluation.getRestaurantId();
         entity.situationIds = new ArrayList<>(evaluation.getSituationIds());
@@ -106,7 +107,6 @@ public class EvaluationEntity {
                 .updatedAt(this.updatedAt)
                 .commentBody(this.body)
                 .commentImgUrl(this.imgUrl)
-                .commentLikeCount(this.likeCount == null ? 0 : this.likeCount)
                 .situationIds(this.situationIds)
                 .userId(this.userId)
                 .restaurantId(this.restaurantId)

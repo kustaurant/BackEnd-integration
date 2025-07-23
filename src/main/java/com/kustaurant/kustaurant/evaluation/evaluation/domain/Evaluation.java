@@ -18,7 +18,6 @@ public class Evaluation {
     // 평가 내용 관련
     private String commentBody;
     private String commentImgUrl;
-    private Integer commentLikeCount;
     private List<Long> situationIds;
     // 참조키
     private Long userId;
@@ -34,7 +33,6 @@ public class Evaluation {
                 .createdAt(LocalDateTime.now())
                 .commentBody(dto.getEvaluationComment())
                 .commentImgUrl(dto.getEvaluationImgUrl())
-                .commentLikeCount(0)
                 .situationIds(dto.getEvaluationSituations())
                 .userId(userId)
                 .restaurantId(restaurantId)

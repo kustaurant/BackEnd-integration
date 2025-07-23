@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantFavoriteEntity;
-import com.kustaurant.kustaurant.user.mypage.controller.response.MyRestaurantResponse;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class MyRestaurantQueryRepository {
                         favorite.userId.eq(userId),
                         favorite.status.eq("ACTIVE")
                 )
-                .orderBy(restaurant.restaurantName.asc())
+                .orderBy(favorite.createdAt.desc())
                 .fetch();
     }
 }

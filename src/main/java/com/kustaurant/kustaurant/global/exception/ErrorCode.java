@@ -16,9 +16,9 @@ public enum ErrorCode {
     /* ──── USER ──── */
     USER_NOT_FOUND        (HttpStatus.NOT_FOUND,            "USER-001",   "유저를 찾을 수 없습니다."),
     NICKNAME_COOLDOWN       (HttpStatus.BAD_REQUEST,    "USER-002", "닉네임 변경은 30일에 한 번만 가능합니다."),
-    NICKNAME_DUPLICATED     (HttpStatus.CONFLICT,       "USER-003", "이미 사용 중인 닉네임입니다."),
-    PHONE_DUPLICATED        (HttpStatus.CONFLICT,       "USER-004", "이미 사용 중인 전화번호입니다."),
-    NO_PROFILE_CHANGE     (HttpStatus.BAD_REQUEST,    "USER-005", "변경된 값이 없습니다."),
+    NICKNAME_DUPLICATED     (HttpStatus.CONFLICT,       "USER-003", "이미 사용 중인 닉네임 입니다."),
+    PHONE_DUPLICATED        (HttpStatus.CONFLICT,       "USER-004", "이미 사용 중인 전화번호 입니다."),
+    NO_PROFILE_CHANGE     (HttpStatus.BAD_REQUEST,    "USER-005", "요청에 변경된 값이 없습니다."),
 
 
     /* ──── RESTAURANT ──── */

@@ -3,19 +3,17 @@ package com.kustaurant.kustaurant.user.mypage.controller;
 import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import com.kustaurant.kustaurant.user.mypage.controller.port.MypageApiService;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
-import com.kustaurant.kustaurant.user.mypage.controller.response.*;
-import com.kustaurant.kustaurant.user.mypage.controller.response.api.MypageMainResponse;
-import com.kustaurant.kustaurant.user.mypage.service.MypageApiService;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.*;
+import com.kustaurant.kustaurant.user.mypage.service.MypageApiServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,16 +63,16 @@ public class MypageApiController {
     //3 마이페이지 프로필 변경
     @Operation(
             summary = "마이페이지 프로필 변경하기",
-            description = "유저의 닉네임,전화번호를 변경합니다. (프로필 사진 미구현)"
+            description = "유저의 닉네임,전화번호를 변경합니다. (프로필 사진 미구현)" +
+                    "닉네임 또는 전화번호 중 하나만 변경요청 가능하므로 "
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "변경된 사항이 없습니다 or" +
-                    " 닉네임을 변경한 지 30일이 지나지 않아 변경할 수 없습니다 or" +
-                    "해당 닉네임이 이미 존재합니다. or" +
-                    "이전과 동일한 닉네임입니다. or" +
-                    "닉네임은 2자 이상이어야 합니다. or" +
-                    "닉네임은 10자 이하여야 합니다. or" +
-                    "전화번호는 숫자로 11자로만 입력되어야 합니다.")
+            @ApiResponse(responseCode = "400", description = "요청에 변경된 값이 없습니다 or" +
+                    "닉네임 변경은 30일에 한 번만 가능합니다. or" +
+                    "이미 사용 중인 닉네임 입니다. or" +
+                    "닉네임은 2자 이상 10지 이하여야 합니다. or" +
+                    "이미 사용 중인 전화번호 입니다. or" +
+                    "전화번호는 숫자로만 11자리여야 합니다.('-'제외)")
     })
     @PatchMapping("/api/v2/auth/mypage/profile")
     public ResponseEntity<ProfileResponse> updateMypageProfile(

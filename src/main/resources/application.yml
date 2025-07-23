@@ -1,4 +1,3 @@
-
 spring:
   profiles:
     active: local
@@ -17,21 +16,18 @@ spring:
 
   jpa:
     hibernate.ddl-auto: validate
+  cloud:
+    aws:
+      region:
+        static: "ap-northeast-2"
+      credentials:
+        access-key: "${AWS_ACCESS_KEY}"
+        secret-key: "${AWS_SECRET_KEY}"
+      s3:
+        bucket: kustaurant
 
 # logging level
 logging.level.com.kustaurant: trace
-
-# aws s3
-cloud.aws:
-  s3:
-    bucket: "kustaurant"
-  stack:
-    auto: false
-  region:
-    static: "ap-northeast-2"
-  credentials:
-    access-key: "${AWS_ACCESS_KEY}"
-    secret-key: "${AWS_SECRET_KEY}"
 
 # custom setting
 restaurant:
