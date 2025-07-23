@@ -6,6 +6,7 @@ import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.List;
 
 public class RestaurantQueryMapper {
 
@@ -18,17 +19,17 @@ public class RestaurantQueryMapper {
                 restaurant.getRestaurantId(),
                 null,
                 restaurant.getRestaurantName(),
-                restaurant.getRestaurantCuisine(),
-                restaurant.getRestaurantPosition() == null ? "건대 주변" : restaurant.getRestaurantPosition(),
+                restaurant.getRestaurantCuisine().getValue(),
+                restaurant.getGeoPosition() == null ? "건대 주변" : restaurant.getGeoPosition().position().getValue(),
                 restaurant.getRestaurantImgUrl() == null || restaurant.getRestaurantImgUrl().equals("no_img") ? RestaurantConstants.REPLACE_IMG_URL : restaurant.getRestaurantImgUrl(),
-                restaurant.getMainTier(),
+                restaurant.getMainTier().getValue(),
                 false,
                 false,
-                restaurant.getRestaurantLongitude(),
-                restaurant.getRestaurantLatitude(),
+                restaurant.getGeoPosition().coordinates().longitude() + "",
+                restaurant.getGeoPosition().coordinates().latitude() + "",
                 restaurant.getPartnershipInfo(),
                 score,
-                restaurant.getSituations(),
+                List.of(),
                 restaurant.getRestaurantType()
         );
     }

@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.restaurant.restaurant.service.query;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationQueryService;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
+import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,7 @@ public class RestaurantQueryAssembler {
     }
     // 즐찾여부 설정하기 (userId가 null이면 false로 설정됨)
     private void setFavorite(RestaurantTierDTO dto, Long userId) {
-        dto.setIsFavorite(restaurantFavoriteService.isUserFavorite(userId, dto.getRestaurantId()));
+//        dto.setIsFavorite(restaurantFavoriteService.isUserFavorite(userId, dto.getRestaurantId()));
     }
     // 평가여부 설정하기 (userId가 null이면 false로 설정됨)
     private void setEvaluated(RestaurantTierDTO dto, Long userId) {

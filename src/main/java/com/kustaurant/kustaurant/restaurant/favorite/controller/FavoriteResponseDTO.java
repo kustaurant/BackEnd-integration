@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.controller.response;
+package com.kustaurant.kustaurant.restaurant.favorite.controller;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -11,5 +11,5 @@ public class FavoriteResponseDTO {
     @Schema(description = "즐겨찾기 여부, (true->즐겨찾기 해제됨, false->즐겨찾기 해제됨.)", example = "true")
     private Boolean isFavorite;
     @Schema(description = "해당 식당의 즐겨찾기 수", example = "23")
-    private Integer count;
+    private Long count;
 }

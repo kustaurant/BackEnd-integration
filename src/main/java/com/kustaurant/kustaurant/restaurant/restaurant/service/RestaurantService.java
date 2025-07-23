@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.service;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationQueryService;
+import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantMenu;
 import com.kustaurant.kustaurant.restaurant.restaurant.controller.response.RestaurantDetailDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
@@ -31,7 +32,8 @@ public class RestaurantService {
         List<RestaurantMenu> menus = restaurantMenuService.findMenusByRestaurantId(restaurantId);
 
         boolean isEvaluated = evaluationQueryService.isUserEvaluated(userId, restaurantId);
-        boolean isFavorite = restaurantFavoriteService.isUserFavorite(userId, restaurantId);
+//        boolean isFavorite = restaurantFavoriteService.isUserFavorite(userId, restaurantId);
+        boolean isFavorite = false;
 
         return RestaurantDetailDTO.from(restaurant, menus, isEvaluated, isFavorite);
     }

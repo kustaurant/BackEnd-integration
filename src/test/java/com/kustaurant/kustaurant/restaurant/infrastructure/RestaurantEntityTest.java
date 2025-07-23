@@ -23,8 +23,8 @@ class RestaurantEntityTest {
         entity.setRestaurantUrl("https://example.com");
         entity.setRestaurantImgUrl("https://example.com/image.jpg");
         entity.setRestaurantCuisine("고기구이");
-        entity.setRestaurantLatitude("37.5665");
-        entity.setRestaurantLongitude("126.9780");
+        entity.setLatitude("37.5665");
+        entity.setLongitude("126.9780");
         entity.setPartnershipInfo("파트너십 정보");
         entity.setStatus("TEST");
         entity.setCreatedAt(LocalDateTime.parse("2024-03-19T15:30:00"));
@@ -36,7 +36,7 @@ class RestaurantEntityTest {
         entity.setMainTier(3);
 
         // when
-        Restaurant domain = entity.toDomain();
+        Restaurant domain = entity.toModel();
 
         // then
         assertEquals(entity.getRestaurantId(), domain.getRestaurantId());
@@ -48,8 +48,8 @@ class RestaurantEntityTest {
         assertEquals(entity.getRestaurantUrl(), domain.getRestaurantUrl());
         assertEquals(entity.getRestaurantImgUrl(), domain.getRestaurantImgUrl());
         assertEquals(entity.getRestaurantCuisine(), domain.getRestaurantCuisine());
-        assertEquals(entity.getRestaurantLatitude(), domain.getRestaurantLatitude());
-        assertEquals(entity.getRestaurantLongitude(), domain.getRestaurantLongitude());
+        assertEquals(entity.getLatitude(), domain.getRestaurantLatitude());
+        assertEquals(entity.getLongitude(), domain.getRestaurantLongitude());
         assertEquals(entity.getPartnershipInfo(), domain.getPartnershipInfo());
         assertEquals(entity.getStatus(), domain.getStatus());
         assertEquals(entity.getCreatedAt(), domain.getCreatedAt());
@@ -88,7 +88,7 @@ class RestaurantEntityTest {
                 .build();
 
         // when
-        RestaurantEntity entity = RestaurantEntity.fromDomain(domain);
+        RestaurantEntity entity = RestaurantEntity.from(domain);
 
         // then
         assertEquals(domain.getRestaurantId(), entity.getRestaurantId());
@@ -100,8 +100,8 @@ class RestaurantEntityTest {
         assertEquals(domain.getRestaurantUrl(), entity.getRestaurantUrl());
         assertEquals(domain.getRestaurantImgUrl(), entity.getRestaurantImgUrl());
         assertEquals(domain.getRestaurantCuisine(), entity.getRestaurantCuisine());
-        assertEquals(domain.getRestaurantLatitude(), entity.getRestaurantLatitude());
-        assertEquals(domain.getRestaurantLongitude(), entity.getRestaurantLongitude());
+        assertEquals(domain.getRestaurantLatitude(), entity.getLatitude());
+        assertEquals(domain.getRestaurantLongitude(), entity.getLongitude());
         assertEquals(domain.getPartnershipInfo(), entity.getPartnershipInfo());
         assertEquals(domain.getStatus(), entity.getStatus());
         assertEquals(domain.getCreatedAt(), entity.getCreatedAt());

@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.tier.argument_resolver;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.enums.CuisineEnum;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Cuisine;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -54,7 +54,7 @@ public class CuisineListArgumentResolver implements HandlerMethodArgumentResolve
 
             // 문자열을 List<String>으로 변환
             List<String> cuisineList = Arrays.stream(cuisines.split(","))
-                    .map(c -> CuisineEnum.valueOf(c.trim()).getValue())
+                    .map(c -> Cuisine.valueOf(c.trim()).getValue())
                     .collect(Collectors.toList());
 
             if (cuisineList.contains("제휴업체")) {

@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.tier.argument_resolver;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.enums.LocationEnum;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -40,7 +40,7 @@ public class LocationListArgumentResolver implements HandlerMethodArgumentResolv
 
             // 문자열을 List<String>으로 변환
             return Arrays.stream(locations.split(","))
-                    .map(c -> LocationEnum.valueOf(c.trim()).getValue())
+                    .map(c -> Position.valueOf(c.trim()).getValue())
                     .collect(Collectors.toList());
 
         } catch (IllegalArgumentException e) {

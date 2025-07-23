@@ -4,13 +4,11 @@ import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRe
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.RestaurantQueryRepository;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
+import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +45,8 @@ public class RestaurantHomeService {
         }
 
         // 로그인 시: 즐겨찾기 기반 추천 식당 반환
-        String favoriteCuisine = getFavoriteCuisine(userId);
+//        String favoriteCuisine = getFavoriteCuisine(userId);
+        String favoriteCuisine = null;
         if (favoriteCuisine == null) {
             // 즐찾이 없는 경우
             return dtoList.subList(0, Math.min(dtoList.size(), RECOMMENDATION_SIZE));
@@ -59,17 +58,17 @@ public class RestaurantHomeService {
                 .subList(0, Math.min(dtoList.size(), RECOMMENDATION_SIZE));
     }
 
-    public String getFavoriteCuisine(Long userId) {
-        // 1. 즐겨찾기한 식당을 가져옵니다.
-        List<Integer> favoriteRestaurants = restaurantFavoriteService.getFavoriteRestaurantIdList(userId);
-
-        // 2. 식당들의 카테고리를 수집하여 가장 많이 즐겨찾기한 카테고리를 찾습니다.
-        Map<String, Long> cuisineFrequencyMap = favoriteRestaurants.stream()
-                .map(restaurantRepository::getById)
-                .filter(r -> Objects.equals(r.getStatus(), "ACTIVE"))
-                .collect(Collectors.groupingBy(Restaurant::getRestaurantCuisine, Collectors.counting()));
-
-        // 3. 가장 많이 즐겨찾기된 카테고리 찾기
-        return Collections.max(cuisineFrequencyMap.entrySet(), Map.Entry.comparingByValue()).getKey();
-    }
+//    public String getFavoriteCuisine(Long userId) {
+//        // 1. 즐겨찾기한 식당을 가져옵니다.
+//        List<Integer> favoriteRestaurants = restaurantFavoriteService.getFavoriteRestaurantIdList(userId);
+//
+//        // 2. 식당들의 카테고리를 수집하여 가장 많이 즐겨찾기한 카테고리를 찾습니다.
+//        Map<String, Long> cuisineFrequencyMap = favoriteRestaurants.stream()
+//                .map(restaurantRepository::getById)
+//                .filter(r -> Objects.equals(r.getStatus(), "ACTIVE"))
+//                .collect(Collectors.groupingBy(Restaurant::getRestaurantCuisine, Collectors.counting()));
+//
+//        // 3. 가장 많이 즐겨찾기된 카테고리 찾기
+//        return Collections.max(cuisineFrequencyMap.entrySet(), Map.Entry.comparingByValue()).getKey();
+//    }
 }

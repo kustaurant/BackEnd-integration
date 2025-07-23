@@ -1,15 +1,15 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.controller.api;
+package com.kustaurant.kustaurant.restaurant.tier.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantApiService;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.query.RestaurantChartService;
+import com.kustaurant.kustaurant.restaurant.tier.RestaurantChartService;
 import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierMapDTO;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
+import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

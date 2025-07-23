@@ -1,15 +1,10 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.service;
+package com.kustaurant.kustaurant.restaurant.favorite.service;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -17,18 +12,9 @@ public class RestaurantFavoriteService {
     // repository
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
 
-    // 유저의 식당 즐겨찾기 여부를 반환
-    public Boolean isUserFavorite(Long userId, Integer restaurantId) {
-        return restaurantFavoriteRepository.existsByUserAndRestaurant(userId, restaurantId);
-    }
-
-    // 유저의 즐겨찾기 식당 리스트를 반환
-    public List<Integer> getFavoriteRestaurantIdList(Long userId) {
-        List<RestaurantFavorite> favorites = restaurantFavoriteRepository.findByUser(userId);
-
-        return favorites.stream()
-                .map(RestaurantFavorite::getRestaurantId)
-                .toList();
+    @Transactional(readOnly = true)
+    public long countByRestaurantId(Integer restaurantId) {
+        return restaurantFavoriteRepository.countByRestaurantId(restaurantId);
     }
 
     // 즐겨찾기 토글

@@ -37,8 +37,8 @@ public class AdminService {
         restaurant.setRestaurantUrl(info.getUrl());
         restaurant.setRestaurantImgUrl(info.getImgUrl());
         restaurant.setRestaurantPosition(info.getPosition());
-        restaurant.setRestaurantLatitude(info.getLatitude().toString());
-        restaurant.setRestaurantLongitude(info.getLongitude().toString());
+        restaurant.setLatitude(info.getLatitude());
+        restaurant.setLongitude(info.getLongitude());
         if (info.getPartnershipInfo() == null || info.getPartnershipInfo().isBlank()) {
             restaurant.setPartnershipInfo(null);
         } else {
@@ -68,8 +68,8 @@ public class AdminService {
                 restaurant.getRestaurantImgUrl(),
                 restaurant.getRestaurantPosition(),
                 restaurant.getPartnershipInfo(),
-                parseDoubleOrNull(restaurant.getRestaurantLatitude()),
-                parseDoubleOrNull(restaurant.getRestaurantLongitude())));
+                parseDoubleOrNull(restaurant.getLatitude().toString()),
+                parseDoubleOrNull(restaurant.getLongitude().toString())));
     }
 
     // String을 Double 형으로 바꿀 수 있으면 바꾸고, 못 바꾸면 null 반환

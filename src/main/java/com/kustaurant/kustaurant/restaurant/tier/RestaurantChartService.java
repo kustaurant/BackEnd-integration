@@ -1,10 +1,12 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.service.query;
+package com.kustaurant.kustaurant.restaurant.tier;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.RestaurantQueryRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.MapConstants;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.query.RestaurantQueryAssembler;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.query.RestaurantQueryMapper;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierMapDTO;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.enums.LocationEnum;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import lombok.RequiredArgsConstructor;
@@ -101,8 +103,8 @@ public class RestaurantChartService {
         if (locations != null && !locations.contains(("ALL"))) {
             try {
                 for (int i = 0; i < MapConstants.LIST_OF_COORD_LIST.size(); i++) {
-                    LocationEnum locationEnum = LocationEnum.valueOf("L" + (i + 1));
-                    if (locations.contains(locationEnum.getValue())) {
+                    Position position = Position.valueOf("L" + (i + 1));
+                    if (locations.contains(position.getValue())) {
                         response.getSolidPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
                     } else {
                         response.getDashedPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));

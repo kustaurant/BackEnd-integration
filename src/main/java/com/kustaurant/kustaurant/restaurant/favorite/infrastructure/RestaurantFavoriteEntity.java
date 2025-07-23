@@ -1,14 +1,11 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity;
+package com.kustaurant.kustaurant.restaurant.favorite.infrastructure;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
+import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Entity
 @Setter
@@ -18,40 +15,39 @@ public class RestaurantFavoriteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer favoriteId;
+    @Column(name = "favorite_id")
+    private Integer id;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name="restaurant_id")
-    RestaurantEntity restaurant;
+    @Column(name = "restaurant_id", nullable = false)
+    private Integer restaurantId;
 
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public RestaurantFavorite toDomain() {
+    public RestaurantFavorite toModel() {
         return RestaurantFavorite.builder()
-                .favoriteId(favoriteId)
+                .id(id)
                 .userId(userId)
-                .restaurantId(restaurant.getRestaurantId())
+                .restaurantId(restaurantId)
                 .status(status)
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();
     }
 
-    public static RestaurantFavoriteEntity fromDomain(RestaurantFavorite domain, Long userId, Restaurant restaurant) {
+    public static RestaurantFavoriteEntity from(RestaurantFavorite domain) {
         if (domain == null) {
             return null;
         }
 
         RestaurantFavoriteEntity entity = new RestaurantFavoriteEntity();
-        entity.favoriteId = domain.getFavoriteId();
+        entity.id = domain.getId();
         entity.userId = domain.getUserId();
-        entity.restaurant = RestaurantEntity.fromDomain(restaurant);
+        entity.restaurantId = domain.getRestaurantId();
         entity.status = domain.getStatus();
         entity.createdAt = domain.getCreatedAt();
         entity.updatedAt = domain.getUpdatedAt();

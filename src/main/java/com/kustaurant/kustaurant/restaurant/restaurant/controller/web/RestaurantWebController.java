@@ -2,14 +2,10 @@ package com.kustaurant.kustaurant.restaurant.restaurant.controller.web;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class RestaurantWebController {
 
-    private final RestaurantService restaurantService;
     private final RestaurantWebService restaurantWebService;
-    private final RestaurantFavoriteService restaurantFavoriteService;
 
     @Value("${restaurant.initialDisplayMenuCount}")
     private int initialDisplayMenuCount;
@@ -46,15 +40,5 @@ public class RestaurantWebController {
         return "restaurant";
     }
 
-    // 식당 즐겨찾기
-    @PostMapping("/web/api/restaurants/{restaurantId}/favorite/toggle")
-    public ResponseEntity<Boolean> toggleFavorite(
-            @PathVariable Integer restaurantId,
-            @AuthUser AuthUserInfo user
-    ) {
-        Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
-
-        return ResponseEntity.ok(restaurantFavoriteService.toggleFavorite(user.id(), restaurantId));
-    }
 
 }

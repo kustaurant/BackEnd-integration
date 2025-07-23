@@ -27,54 +27,54 @@ public class RestaurantRepositoryImpl implements RestaurantQueryRepository, Rest
     @Override
     public List<Restaurant> findAll(Specification<RestaurantEntity> spec) {
         return jpaRepository.findAll(spec)
-                .stream().map(RestaurantEntity::toDomain).toList();
+                .stream().map(RestaurantEntity::toModel).toList();
     }
 
     @Override
     public List<Restaurant> findAll(Specification<RestaurantEntity> spec, Pageable pageable) {
         return jpaRepository.findAll(spec, pageable).toList()
-                .stream().map(RestaurantEntity::toDomain).toList();
+                .stream().map(RestaurantEntity::toModel).toList();
     }
 
     @Override
     public List<Restaurant> search(String[] kwList) {
         Specification<RestaurantEntity> spec = RestaurantSearchSpec.createSearchSpecification(kwList);
         return jpaRepository.findAll(spec)
-                .stream().map(RestaurantEntity::toDomain).toList();
+                .stream().map(RestaurantEntity::toModel).toList();
     }
 
     //--------------------------------------------
     // RestaurantRepository
     @Override
     public Restaurant getById(Integer id) {
-        return jpaRepository.findById(id).map(RestaurantEntity::toDomain)
+        return jpaRepository.findById(id).map(RestaurantEntity::toModel)
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND, id, "식당"));
     }
 
     @Override
     public Restaurant getByIdAndStatus(Integer id, String status) {
-        return jpaRepository.findByRestaurantIdAndStatus(id, status).map(RestaurantEntity::toDomain)
+        return jpaRepository.findByRestaurantIdAndStatus(id, status).map(RestaurantEntity::toModel)
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND, "요청한 restaurant가 존재하지 않습니다. 요청 정보 - id: " + id + ", status: " + status));
     }
 
     @Override
     public List<Restaurant> findByCuisineAndStatus(String cuisine, String status) {
-        return jpaRepository.findByRestaurantCuisineAndStatus(cuisine, status).stream().map(RestaurantEntity::toDomain).toList();
+        return jpaRepository.findByRestaurantCuisineAndStatus(cuisine, status).stream().map(RestaurantEntity::toModel).toList();
     }
 
     @Override
     public List<Restaurant> findByPositionAndStatus(String position, String status) {
-        return jpaRepository.findByRestaurantPositionAndStatus(position, status).stream().map(RestaurantEntity::toDomain).toList();
+        return jpaRepository.findByRestaurantPositionAndStatus(position, status).stream().map(RestaurantEntity::toModel).toList();
     }
 
     @Override
     public List<Restaurant> findByCuisineAndPositionAndStatus(String cuisine, String position, String status) {
-        return jpaRepository.findByRestaurantCuisineAndRestaurantPositionAndStatus(cuisine, position, status).stream().map(RestaurantEntity::toDomain).toList();
+        return jpaRepository.findByRestaurantCuisineAndRestaurantPositionAndStatus(cuisine, position, status).stream().map(RestaurantEntity::toModel).toList();
     }
 
     @Override
     public Restaurant save(Restaurant restaurant) {
-        return jpaRepository.save(RestaurantEntity.fromDomain(restaurant)).toDomain();
+        return jpaRepository.save(RestaurantEntity.from(restaurant)).toModel();
     }
 
     @Override
@@ -88,7 +88,7 @@ public class RestaurantRepositoryImpl implements RestaurantQueryRepository, Rest
 
     @Override
     public Restaurant getReference(Integer id) {
-        return jpaRepository.getReferenceById(id).toDomain();
+        return jpaRepository.getReferenceById(id).toModel();
     }
 
     @Override

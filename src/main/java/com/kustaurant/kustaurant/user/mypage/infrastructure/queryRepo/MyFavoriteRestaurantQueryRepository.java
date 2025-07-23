@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
+import com.kustaurant.kustaurant.restaurant.favorite.infrastructure.RestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.user.mypage.controller.response.MyRestaurantResponse;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
@@ -20,7 +20,7 @@ public interface MyFavoriteRestaurantQueryRepository extends Repository<Restaura
             r.restaurantPosition
         )
         from RestaurantFavoriteEntity f
-        join f.restaurant r
+        join RestaurantEntity r on f.restaurantId = r.restaurantId
         where f.userId = :userId
           and f.status = 'ACTIVE'
     """)

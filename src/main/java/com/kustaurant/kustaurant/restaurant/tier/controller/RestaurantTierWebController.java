@@ -1,5 +1,5 @@
 
-package com.kustaurant.kustaurant.restaurant.restaurant.controller.web;
+package com.kustaurant.kustaurant.restaurant.tier.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,12 +7,11 @@ import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRe
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.query.RestaurantChartService;
+import com.kustaurant.kustaurant.restaurant.tier.RestaurantChartService;
 import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.SituationList;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
