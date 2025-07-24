@@ -1,13 +1,12 @@
 package com.kustaurant.kustaurant.restaurant.tier;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.RestaurantQueryRepository;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.MapConstants;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.query.RestaurantQueryAssembler;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.query.RestaurantQueryMapper;
+import com.kustaurant.kustaurant.restaurant.restaurant.constants.MapConstants;
+import com.kustaurant.kustaurant.restaurant.tier.query.RestaurantQueryAssembler;
+import com.kustaurant.kustaurant.restaurant.tier.query.RestaurantQueryMapper;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
+import com.kustaurant.kustaurant.restaurant.tier.spec.RestaurantChartSpec;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +23,7 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class RestaurantChartService {
 
-    private final RestaurantQueryRepository restaurantQueryRepository;
+    private final RestaurantChartRepository restaurantChartRepository;
     private final RestaurantQueryAssembler restaurantQueryAssembler;
 
     // Cuisine, Situation, Location 조건에 맞는 식당 리스트를 반환
@@ -34,7 +33,7 @@ public class RestaurantChartService {
             Integer tierInfo, boolean isOrderByScore, @Nullable Long userId
     ) {
         // 조건에 맞는 식당 데이터 가져오기
-        List<RestaurantTierDTO> dtoList = restaurantQueryRepository.findAll(
+        List<RestaurantTierDTO> dtoList = restaurantChartRepository.findAll(
                 RestaurantChartSpec.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore))
                 .stream().map(RestaurantQueryMapper::toDto).toList();
         // 각 식당의 즐찾여부, 평가여부, 랭킹 정보 채우기
@@ -51,7 +50,7 @@ public class RestaurantChartService {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         // 조건에 맞는 식당 데이터 가져오기
-        List<RestaurantTierDTO> dtoList = restaurantQueryRepository.findAll(
+        List<RestaurantTierDTO> dtoList = restaurantChartRepository.findAll(
                 RestaurantChartSpec.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore), pageable)
                 .stream().map(RestaurantQueryMapper::toDto).toList();;
         // 각 식당의 즐찾여부, 평가여부, 랭킹 정보 채우기

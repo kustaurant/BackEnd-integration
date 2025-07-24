@@ -11,7 +11,7 @@ import static com.querydsl.core.group.GroupBy.set;
 import static java.util.Objects.isNull;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.QRestaurantMenu;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.QRestaurantDetail;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetail;
 import com.querydsl.core.types.dsl.BooleanExpression;

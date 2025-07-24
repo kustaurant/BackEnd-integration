@@ -1,10 +1,8 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.service.query;
+package com.kustaurant.kustaurant.restaurant.tier.query;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.RestaurantQueryRepository;
-import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
+import com.kustaurant.kustaurant.restaurant.tier.spec.RestaurantChartSpec;
+import com.kustaurant.kustaurant.restaurant.tier.RestaurantChartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +15,13 @@ public class RestaurantHomeService {
     private final int TOP_RESTAURANT_SIZE = 16;
     private final int RECOMMENDATION_SIZE = 15;
 
-    private final RestaurantQueryRepository restaurantQueryRepository;
-    private final RestaurantRepository restaurantRepository;
-    private final RestaurantFavoriteService restaurantFavoriteService;
+    private final RestaurantChartRepository restaurantChartRepository;
 
     private Random rand = new Random();
 
     public List<RestaurantTierDTO> getTopRestaurants() {
 
-        List<RestaurantTierDTO> dtoList = restaurantQueryRepository.findAll(
+        List<RestaurantTierDTO> dtoList = restaurantChartRepository.findAll(
                         RestaurantChartSpec.withCuisinesAndLocationsAndSituations(null, null, null, "ACTIVE", null, true))
                 .stream().map(RestaurantQueryMapper::toDto).toList();
 
@@ -34,7 +30,7 @@ public class RestaurantHomeService {
 
 
     public List<RestaurantTierDTO> getRecommendedOrRandomRestaurants(Long userId) {
-        List<RestaurantTierDTO> dtoList = new ArrayList<>(restaurantQueryRepository.findAll(
+        List<RestaurantTierDTO> dtoList = new ArrayList<>(restaurantChartRepository.findAll(
                         RestaurantChartSpec.withCuisinesAndLocationsAndSituations(null, null, null, "ACTIVE", null, true))
                 .stream().map(RestaurantQueryMapper::toDto).toList());
         Collections.shuffle(dtoList, rand);
@@ -52,7 +48,7 @@ public class RestaurantHomeService {
             return dtoList.subList(0, Math.min(dtoList.size(), RECOMMENDATION_SIZE));
         }
         // 즐찾이 있는 경우
-        return restaurantQueryRepository.findAll(
+        return restaurantChartRepository.findAll(
                         RestaurantChartSpec.withCuisinesAndLocationsAndSituations(List.of(favoriteCuisine), null, null, "ACTIVE", null, true))
                 .stream().map(RestaurantQueryMapper::toDto).toList()
                 .subList(0, Math.min(dtoList.size(), RECOMMENDATION_SIZE));

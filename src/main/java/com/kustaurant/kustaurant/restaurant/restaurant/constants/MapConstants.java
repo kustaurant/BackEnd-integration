@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.service.constants;
+package com.kustaurant.kustaurant.restaurant.restaurant.constants;
 
 import java.util.List;
 

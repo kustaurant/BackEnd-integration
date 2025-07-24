@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.service.query;
+package com.kustaurant.kustaurant.restaurant.tier.query;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationQueryService;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;

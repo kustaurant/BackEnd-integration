@@ -1,12 +1,6 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.service;
 
-import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
-
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.RestaurantSituationRelationEntity;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
 import com.kustaurant.kustaurant.restaurant.tier.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;

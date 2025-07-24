@@ -3,10 +3,10 @@ package com.kustaurant.kustaurant.restaurant.draw.service;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.query.RestaurantQueryMapper;
+import com.kustaurant.kustaurant.restaurant.tier.query.RestaurantQueryMapper;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec.RestaurantChartSpec;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.RestaurantQueryRepository;
+import com.kustaurant.kustaurant.restaurant.tier.spec.RestaurantChartSpec;
+import com.kustaurant.kustaurant.restaurant.tier.RestaurantChartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 public class RestaurantDrawService {
 
     private final int TARGET_SIZE = 30;
-    private final RestaurantQueryRepository restaurantQueryRepository;
+    private final RestaurantChartRepository restaurantChartRepository;
 
     Random rand = new Random();
 
     public List<RestaurantTierDTO> draw(List<String> cuisines, List<String> locations) {
-        List<RestaurantTierDTO> dtoList = restaurantQueryRepository.findAll(
+        List<RestaurantTierDTO> dtoList = restaurantChartRepository.findAll(
                 RestaurantChartSpec.withCuisinesAndLocationsAndSituations(cuisines, locations, null, "ACTIVE", null, false))
                 .stream().map(RestaurantQueryMapper::toDto)
                 .collect(Collectors.toList());;

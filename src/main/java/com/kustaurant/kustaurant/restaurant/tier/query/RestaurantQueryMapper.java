@@ -1,7 +1,7 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.service.query;
+package com.kustaurant.kustaurant.restaurant.tier.query;
 
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 
 import java.math.RoundingMode;

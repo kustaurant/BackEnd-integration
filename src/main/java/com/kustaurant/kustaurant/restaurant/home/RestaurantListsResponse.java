@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.controller.response;
+package com.kustaurant.kustaurant.restaurant.home;
 
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
 import io.swagger.v3.oas.annotations.media.Schema;

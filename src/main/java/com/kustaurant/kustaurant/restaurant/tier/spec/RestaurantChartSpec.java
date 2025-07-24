@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.spec;
+package com.kustaurant.kustaurant.restaurant.tier.spec;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.RestaurantSituationRelationEntity;

@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.restaurant.restaurant.service.port;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantMenu;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.text.DecimalFormat;

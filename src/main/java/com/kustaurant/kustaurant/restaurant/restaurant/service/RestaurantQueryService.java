@@ -24,5 +24,4 @@ public class RestaurantQueryService {
     public RestaurantDetail getRestaurantDetail(Integer restaurantId, Long userId) {
         return restaurantDetailRepository.getRestaurantDetail(restaurantId, userId);
     }
-
 }
