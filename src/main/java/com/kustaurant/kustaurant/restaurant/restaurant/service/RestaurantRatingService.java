@@ -17,7 +17,7 @@ public class RestaurantRatingService {
 
     @Transactional
     public void afterEvaluationCreated(Integer restaurantId, Double score) {
-        Restaurant restaurant = restaurantRepository.getById(restaurantId);
+        Restaurant restaurant = restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
 
         restaurant.afterEvaluationCreated(score);
 
@@ -30,7 +30,7 @@ public class RestaurantRatingService {
 
     @Transactional
     public void afterReEvaluated(Integer restaurantId, Double preScore, Double postScore) {
-        Restaurant restaurant = restaurantRepository.getById(restaurantId);
+        Restaurant restaurant = restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
 
         restaurant.afterReEvaluated(preScore, postScore);
 

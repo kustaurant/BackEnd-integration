@@ -3,7 +3,6 @@ package com.kustaurant.kustaurant.restaurant.restaurant.controller;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.controller.response.RestaurantDetailDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantQueryService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetail;
 import lombok.RequiredArgsConstructor;

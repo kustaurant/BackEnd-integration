@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.restaurant.restaurant.controller;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantQueryService;
-import com.kustaurant.kustaurant.restaurant.restaurant.controller.response.RestaurantDetailDTO;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetail;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -52,16 +52,16 @@ public class RestaurantApiController {
             "   - favoriteCount: not null\n\n" +
             "   - restaurantMenuList: **null이거나 빈 배열**이 넘어갈 수 있습니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "식당 존재함. 응답 정상 반환.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))}),
+            @ApiResponse(responseCode = "200", description = "식당 존재함. 응답 정상 반환.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetail.class))}),
             @ApiResponse(responseCode = "404", description = "해당 id를 가진 식당이 없음. 또는 폐업함.", content = {@Content(mediaType = "application/json")})
     })
     @GetMapping("/restaurants/{restaurantId}")
-    public ResponseEntity<RestaurantDetailDTO> getRestaurantDetail(
+    public ResponseEntity<RestaurantDetail> getRestaurantDetail(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return new ResponseEntity<>(
-                restaurantQueryService.getActiveRestaurantDetailDto(restaurantId, user.id()),
+                restaurantQueryService.getRestaurantDetail(restaurantId, user.id()),
                 HttpStatus.OK
         );
     }
@@ -88,16 +88,16 @@ public class RestaurantApiController {
             "   - favoriteCount: not null\n\n" +
             "   - restaurantMenuList: **null이거나 빈 배열**이 넘어갈 수 있습니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "식당 존재함. 응답 정상 반환.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetailDTO.class))}),
+            @ApiResponse(responseCode = "200", description = "식당 존재함. 응답 정상 반환.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetail.class))}),
             @ApiResponse(responseCode = "404", description = "해당 id를 가진 식당이 없음. 또는 폐업함.", content = {@Content(mediaType = "application/json")})
     })
     @GetMapping("/auth/restaurants/{restaurantId}")
-    public ResponseEntity<RestaurantDetailDTO> getRestaurantDetailWithAuth(
+    public ResponseEntity<RestaurantDetail> getRestaurantDetailWithAuth(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Integer restaurantId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return new ResponseEntity<>(
-                restaurantQueryService.getActiveRestaurantDetailDto(restaurantId, user.id()),
+                restaurantQueryService.getRestaurantDetail(restaurantId, user.id()),
                 HttpStatus.OK
         );
     }
