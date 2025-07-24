@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantQueryService;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetail;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;

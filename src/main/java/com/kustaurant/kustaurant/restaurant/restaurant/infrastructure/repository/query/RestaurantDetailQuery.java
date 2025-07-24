@@ -12,8 +12,8 @@ import static java.util.Objects.isNull;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.QRestaurantMenu;
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.port.QRestaurantDetail;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetail;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.QRestaurantDetail;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;

@@ -2,8 +2,8 @@ package com.kustaurant.kustaurant.restaurant.draw.controller;
 
 import com.kustaurant.kustaurant.restaurant.draw.service.RestaurantDrawService;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.CuisineList;
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.LocationList;
+import com.kustaurant.kustaurant.restaurant.tier.controller.argument_resolver.CuisineList;
+import com.kustaurant.kustaurant.restaurant.tier.controller.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

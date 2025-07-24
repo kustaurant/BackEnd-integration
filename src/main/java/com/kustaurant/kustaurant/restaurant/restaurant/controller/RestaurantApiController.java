@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.restaurant.restaurant.controller;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantQueryService;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetail;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.home;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.home.RestaurantListsResponse;
-import com.kustaurant.kustaurant.restaurant.tier.query.RestaurantHomeService;
+import com.kustaurant.kustaurant.restaurant.home.RestaurantHomeService;
 import com.kustaurant.kustaurant.restaurant.search.service.RestaurantSearchService;
 import com.kustaurant.kustaurant.admin.notice.service.HomeBannerApiService;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;

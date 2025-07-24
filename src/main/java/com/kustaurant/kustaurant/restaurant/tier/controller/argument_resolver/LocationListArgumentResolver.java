@@ -1,6 +1,7 @@
-package com.kustaurant.kustaurant.restaurant.tier.argument_resolver;
+package com.kustaurant.kustaurant.restaurant.tier.controller.argument_resolver;
 
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -12,11 +13,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SituationListArgumentResolver implements HandlerMethodArgumentResolver {
+public class LocationListArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(SituationList.class) != null && parameter.getParameterType().equals(List.class);
+        return parameter.getParameterAnnotation(LocationList.class) != null && parameter.getParameterType().equals(List.class);
     }
 
     @Override
@@ -26,26 +27,26 @@ public class SituationListArgumentResolver implements HandlerMethodArgumentResol
                                   WebDataBinderFactory binderFactory) throws Exception {
         boolean isApiRequest = isApiRequest(webRequest);
 
-        String situations = webRequest.getParameter("situations");
-        if (situations == null || situations.isEmpty()) {
+        String locations = webRequest.getParameter("locations");
+        if (locations == null || locations.isEmpty()) {
             return null;
         }
 
         try {
             // 파라미터가 "ALL"이면 null 반환
-            if (situations.contains("ALL")) {
+            if (locations.contains("ALL")) {
                 return null;
             }
 
             // 문자열을 List<String>으로 변환
-            return Arrays.stream(situations.split(","))
-                    .map(c -> Integer.parseInt(c.trim()))
+            return Arrays.stream(locations.split(","))
+                    .map(c -> Position.valueOf(c.trim()).getValue())
                     .collect(Collectors.toList());
 
         } catch (IllegalArgumentException e) {
             if (isApiRequest) {
                 // API 요청의 경우 예외를 던집니다.
-                throw new ParamException("situations 파라미터 입력이 올바르지 않습니다.");
+                throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
             } else {
                 // 웹 요청의 경우 클라이언트에 리다이렉트를 지시합니다.
                 HttpServletResponse response = webRequest.getNativeResponse(HttpServletResponse.class);

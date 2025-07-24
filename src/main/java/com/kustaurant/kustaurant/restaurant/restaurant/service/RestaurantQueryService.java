@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.service;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetail;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetailRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;
 import lombok.RequiredArgsConstructor;

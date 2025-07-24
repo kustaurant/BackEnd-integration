@@ -3,10 +3,8 @@ package com.kustaurant.kustaurant.restaurant.draw.service;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
-import com.kustaurant.kustaurant.restaurant.tier.query.RestaurantQueryMapper;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.restaurant.tier.spec.RestaurantChartSpec;
-import com.kustaurant.kustaurant.restaurant.tier.RestaurantChartRepository;
+import com.kustaurant.kustaurant.restaurant.tier.service.port.RestaurantChartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +21,11 @@ public class RestaurantDrawService {
     Random rand = new Random();
 
     public List<RestaurantTierDTO> draw(List<String> cuisines, List<String> locations) {
-        List<RestaurantTierDTO> dtoList = restaurantChartRepository.findAll(
-                RestaurantChartSpec.withCuisinesAndLocationsAndSituations(cuisines, locations, null, "ACTIVE", null, false))
-                .stream().map(RestaurantQueryMapper::toDto)
-                .collect(Collectors.toList());;
+//        List<RestaurantTierDTO> dtoList = restaurantChartRepository.findAll(
+//                RestaurantChartSpec.withCuisinesAndLocationsAndSituations(cuisines, locations, null, "ACTIVE", null, false))
+//                .stream().map(RestaurantQueryMapper::toDto)
+//                .collect(Collectors.toList());
+        List<RestaurantTierDTO> dtoList = new ArrayList<>();
 
         // 조건에 맞는 식당이 없을 경우 404 에러 반환
         if (dtoList.isEmpty()) {

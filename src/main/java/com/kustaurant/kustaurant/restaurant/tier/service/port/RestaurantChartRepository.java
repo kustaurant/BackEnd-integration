@@ -1,16 +1,15 @@
-package com.kustaurant.kustaurant.restaurant.tier;
+package com.kustaurant.kustaurant.restaurant.tier.service.port;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
+import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
 public interface RestaurantChartRepository {
-    // 티어표
-    List<Restaurant> findAll(Specification<RestaurantEntity> spec);
-    List<Restaurant> findAll(Specification<RestaurantEntity> spec, Pageable pageable);
-    // 검색
-    List<Restaurant> search(String[] kwList);
+
+    Page<RestaurantTierDTO> findByCondition(ChartCondition condition, Pageable pageable, Long userId);
 }

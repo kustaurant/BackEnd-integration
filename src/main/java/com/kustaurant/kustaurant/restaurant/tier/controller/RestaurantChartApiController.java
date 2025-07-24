@@ -2,13 +2,13 @@ package com.kustaurant.kustaurant.restaurant.tier.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.restaurant.tier.RestaurantChartService;
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.CuisineList;
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.LocationList;
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.SituationList;
+import com.kustaurant.kustaurant.restaurant.tier.service.RestaurantChartService;
+import com.kustaurant.kustaurant.restaurant.tier.controller.argument_resolver.CuisineList;
+import com.kustaurant.kustaurant.restaurant.tier.controller.argument_resolver.LocationList;
+import com.kustaurant.kustaurant.restaurant.tier.controller.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierMapDTO;
-import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
+import com.kustaurant.kustaurant.restaurant.tier.service.port.ChartCondition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -18,6 +18,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,7 +67,7 @@ public class RestaurantChartApiController {
             @Parameter(schema = @Schema(type = "string"), example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
             @CuisineList List<String> cuisines,
             @Parameter(schema = @Schema(type = "string"), example = "1,2 또는 ALL", description = "상황입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, 1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
-            @SituationList List<Integer> situations,
+            @SituationList List<Long> situations,
             @Parameter(schema = @Schema(type = "string"), example = "L1,L2,L3 또는 ALL", description = "위치입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, L1:건입~중문, L2:중문~어대, L3:후문, L4:정문, L5:구의역")
             @LocationList List<String> locations,
             @RequestParam(defaultValue = "1") @Parameter(description = "페이지는 1부터 시작입니다.") Integer page,
@@ -74,9 +77,11 @@ public class RestaurantChartApiController {
         // page 0부터 시작하게 수정
         page--;
         // 조회
-        List<RestaurantTierDTO> restaurants = restaurantChartService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, user.id());
+        ChartCondition condition = new ChartCondition(cuisines, situations, locations);
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<RestaurantTierDTO> restaurants = restaurantChartService.findByConditions(condition, pageable, user.id());
 
-        return new ResponseEntity<>(restaurants, HttpStatus.OK);
+        return new ResponseEntity<>(restaurants.getContent(), HttpStatus.OK);
     }
 
     @Operation(summary = "티어표 리스트 불러오기 (Auth 버전)", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
@@ -103,7 +108,7 @@ public class RestaurantChartApiController {
             @Parameter(schema = @Schema(type = "string"), example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
             @CuisineList List<String> cuisines,
             @Parameter(schema = @Schema(type = "string"), example = "1,2 또는 ALL", description = "상황입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, 1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
-            @SituationList List<Integer> situations,
+            @SituationList List<Long> situations,
             @Parameter(schema = @Schema(type = "string"), example = "L1,L2,L3 또는 ALL", description = "위치입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, L1:건입~중문, L2:중문~어대, L3:후문, L4:정문, L5:구의역")
             @LocationList List<String> locations,
             @RequestParam(defaultValue = "1") @Parameter(description = "페이지는 1부터 시작입니다.") Integer page,
@@ -113,9 +118,11 @@ public class RestaurantChartApiController {
         // page 0부터 시작하게 수정
         page--;
         // DB 조회
-        List<RestaurantTierDTO> restaurants = restaurantChartService.findByConditionsWithPage(cuisines, situations, locations, null, true, page, limit, user.id());
+        ChartCondition condition = new ChartCondition(cuisines, situations, locations);
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<RestaurantTierDTO> restaurants = restaurantChartService.findByConditions(condition, pageable, user.id());
 
-        return new ResponseEntity<>(restaurants, HttpStatus.OK);
+        return new ResponseEntity<>(restaurants.getContent(), HttpStatus.OK);
     }
 
 
@@ -158,13 +165,14 @@ public class RestaurantChartApiController {
             @Parameter(schema = @Schema(type = "string"), example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
             @CuisineList List<String> cuisines,
             @Parameter(schema = @Schema(type = "string"), example = "1,2 또는 ALL", description = "상황입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, 1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
-            @SituationList List<Integer> situations,
+            @SituationList List<Long> situations,
             @Parameter(schema = @Schema(type = "string"), example = "L1,L2,L3 또는 ALL", description = "위치입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, L1:건입~중문, L2:중문~어대, L3:후문, L4:정문, L5:구의역")
             @LocationList List<String> locations,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
+        ChartCondition condition = new ChartCondition(cuisines, situations, locations);
         return new ResponseEntity<>(
-                restaurantChartService.getRestaurantTierMapDto(cuisines, situations, locations, user.id()),
+                restaurantChartService.getRestaurantTierMapDto(condition, user.id()),
                 HttpStatus.OK
         );
     }
@@ -207,13 +215,14 @@ public class RestaurantChartApiController {
             @Parameter(schema = @Schema(type = "string"), example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
             @CuisineList List<String> cuisines,
             @Parameter(schema = @Schema(type = "string"), example = "1,2 또는 ALL", description = "상황입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, 1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
-            @SituationList List<Integer> situations,
+            @SituationList List<Long> situations,
             @Parameter(schema = @Schema(type = "string"), example = "L1,L2,L3 또는 ALL", description = "위치입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, L1:건입~중문, L2:중문~어대, L3:후문, L4:정문, L5:구의역")
             @LocationList List<String> locations,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
+        ChartCondition condition = new ChartCondition(cuisines, situations, locations);
         return new ResponseEntity<>(
-                restaurantChartService.getRestaurantTierMapDto(cuisines, situations, locations, user.id()),
+                restaurantChartService.getRestaurantTierMapDto(condition, user.id()),
                 HttpStatus.OK
         );
     }

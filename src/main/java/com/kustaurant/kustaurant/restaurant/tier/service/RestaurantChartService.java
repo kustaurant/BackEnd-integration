@@ -1,16 +1,15 @@
-package com.kustaurant.kustaurant.restaurant.tier;
+package com.kustaurant.kustaurant.restaurant.tier.service;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.MapConstants;
-import com.kustaurant.kustaurant.restaurant.tier.query.RestaurantQueryAssembler;
-import com.kustaurant.kustaurant.restaurant.tier.query.RestaurantQueryMapper;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
-import com.kustaurant.kustaurant.restaurant.tier.spec.RestaurantChartSpec;
+import com.kustaurant.kustaurant.restaurant.tier.service.port.ChartCondition;
+import com.kustaurant.kustaurant.restaurant.tier.service.port.RestaurantChartRepository;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -24,48 +23,28 @@ import java.util.stream.IntStream;
 public class RestaurantChartService {
 
     private final RestaurantChartRepository restaurantChartRepository;
-    private final RestaurantQueryAssembler restaurantQueryAssembler;
+    private final ChartRankingAssembler chartRankingAssembler;
 
-    // Cuisine, Situation, Location 조건에 맞는 식당 리스트를 반환
-    // tierInfo 설명: 1 -> 티어가 있는 것만, -1 -> 티어가 없는 것만, 그외 -> 둘 다
-    public List<RestaurantTierDTO> findByConditions(
-            List<String> cuisines, List<Integer> situations, List<String> locations,
-            Integer tierInfo, boolean isOrderByScore, @Nullable Long userId
+    // 조건에 맞는 식당 리스트를 반환
+    public Page<RestaurantTierDTO> findByConditions(
+            ChartCondition condition, Pageable pageable, @Nullable Long userId
     ) {
         // 조건에 맞는 식당 데이터 가져오기
-        List<RestaurantTierDTO> dtoList = restaurantChartRepository.findAll(
-                RestaurantChartSpec.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore))
-                .stream().map(RestaurantQueryMapper::toDto).toList();
-        // 각 식당의 즐찾여부, 평가여부, 랭킹 정보 채우기
-        restaurantQueryAssembler.enrichDtoList(userId, dtoList, 1);
-
-        return dtoList;
-    }
-
-    // 위 함수의 페이징 버전
-    // tierInfo 설명: 1 -> 티어가 있는 것만, -1 -> 티어가 없는 것만, 그외 -> 둘 다
-    public List<RestaurantTierDTO> findByConditionsWithPage(
-            List<String> cuisines, List<Integer> situations, List<String> locations,
-            Integer tierInfo, boolean isOrderByScore, int page, int size, @Nullable Long userId
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-        // 조건에 맞는 식당 데이터 가져오기
-        List<RestaurantTierDTO> dtoList = restaurantChartRepository.findAll(
-                RestaurantChartSpec.withCuisinesAndLocationsAndSituations(cuisines, locations, situations, "ACTIVE", tierInfo, isOrderByScore), pageable)
-                .stream().map(RestaurantQueryMapper::toDto).toList();;
-        // 각 식당의 즐찾여부, 평가여부, 랭킹 정보 채우기
-        restaurantQueryAssembler.enrichDtoList(userId, dtoList, page * size + 1);
-
-        return dtoList;
+        Page<RestaurantTierDTO> result = restaurantChartRepository.findByCondition(condition,
+                pageable, userId);
+        // 순위 정보 채우기
+        int startRanking = pageable.getPageSize() * pageable.getPageNumber() + 1;
+        chartRankingAssembler.enrichDtoList(result.getContent(), startRanking);
+        return result;
     }
 
     // 지도 식당 데이터 반환
     public RestaurantTierMapDTO getRestaurantTierMapDto(
-            List<String> cuisines, List<Integer> situations, List<String> locations, @Nullable Long userId
+            ChartCondition condition, @Nullable Long userId
     ) {
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
-        List<RestaurantTierDTO> tieredRestaurantTierDTOs = findByConditions(cuisines, situations, locations, 1, false, userId);
-        List<RestaurantTierDTO> nonTieredRestaurantTierDTOs = findByConditions(cuisines, situations, locations, -1, false, userId);
+        List<RestaurantTierDTO> tieredRestaurantTierDTOs = findByConditions(condition, null, userId).toList();
+        List<RestaurantTierDTO> nonTieredRestaurantTierDTOs = findByConditions(condition, null, userId).toList();
 
         // 2. 응답 생성하기
         RestaurantTierMapDTO response = new RestaurantTierMapDTO();
@@ -99,11 +78,11 @@ public class RestaurantChartService {
         response.insertZoomAndRestaurants(18, nonTier18);
         response.insertZoomAndRestaurants(19, nonTier19);
         // 2.4 폴리곤 좌표 리스트의 리스트
-        if (locations != null && !locations.contains(("ALL"))) {
+        if (condition.positions() != null && !condition.positions().contains(("ALL"))) {
             try {
                 for (int i = 0; i < MapConstants.LIST_OF_COORD_LIST.size(); i++) {
                     Position position = Position.valueOf("L" + (i + 1));
-                    if (locations.contains(position.getValue())) {
+                    if (condition.positions().contains(position.getValue())) {
                         response.getSolidPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
                     } else {
                         response.getDashedPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));

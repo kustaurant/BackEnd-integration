@@ -1,11 +1,11 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.service.port;
+package com.kustaurant.kustaurant.restaurant.restaurant.service.dto;
+
+import static com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantMenu;
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -95,10 +95,10 @@ public class RestaurantDetail {
     ) {
             this (
                     restaurantId,
-                    restaurantImgUrl,
+                    restaurantImgUrlPostProcessing(restaurantImgUrl),
                     mainTier,
                     restaurantCuisine,
-                    RestaurantConstants.getCuisineImgUrl(restaurantCuisine),
+                    getCuisineImgUrl(restaurantCuisine),
                     positionPostprocessing(restaurantPosition),
                     restaurantName,
                     addressPostprocessing(restaurantAddress),
@@ -119,24 +119,5 @@ public class RestaurantDetail {
                     latitude,
                     longitude
             );
-    }
-
-    private static double avgScorePostprocessing(double scoreSum, long evaluationCount) {
-            DecimalFormat df = new DecimalFormat("#.0");
-            return evaluationCount == 0 ? null : Double.parseDouble(df.format(scoreSum / evaluationCount));
-    }
-
-    private static String positionPostprocessing(String restaurantPosition) {
-            return restaurantPosition == null ? "건대 주변" : restaurantPosition;
-    }
-
-    private static String addressPostprocessing(String restaurantAddress) {
-            if (restaurantAddress == null
-                    || restaurantAddress.isBlank()
-                    || restaurantAddress.equals("no_address")
-            ) {
-                    restaurantAddress = "주소가 없습니다.";
-            }
-            return restaurantAddress;
     }
 }

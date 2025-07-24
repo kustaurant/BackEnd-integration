@@ -7,10 +7,11 @@ import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRe
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.restaurant.tier.RestaurantChartService;
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.CuisineList;
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.LocationList;
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.SituationList;
+import com.kustaurant.kustaurant.restaurant.tier.service.RestaurantChartService;
+import com.kustaurant.kustaurant.restaurant.tier.controller.argument_resolver.CuisineList;
+import com.kustaurant.kustaurant.restaurant.tier.controller.argument_resolver.LocationList;
+import com.kustaurant.kustaurant.restaurant.tier.controller.argument_resolver.SituationList;
+import com.kustaurant.kustaurant.restaurant.tier.service.port.ChartCondition;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,11 +31,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Controller
 @Slf4j
-public class RestaurantTierWebController {
+public class RestaurantChartWebController {
     private final EvaluationRepository evaluationRepository;
     private final RestaurantChartService restaurantChartService;
 
-    public static final Integer tierPageSize = 40;
+    public static final Integer TIER_PAGE_SIZE = 40;
     // 티어표 지도 중앙 좌표
     // 인덱스 0번.전체 | 1번.건입~중문 | 2번.중문~어대 | 3번.후문 | 4번.정문 | 5번.구의역
     private float[] latitudeArray = {37.542318f, 37.541518f, 37.545520f, 37.545750f, 37.538512f, 37.537962f};
@@ -71,7 +72,7 @@ public class RestaurantTierWebController {
             Model model,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @CuisineList List<String> cuisines,
-            @SituationList List<Integer> situations,
+            @SituationList List<Long> situations,
             @LocationList List<String> locations,
             @AuthUser AuthUserInfo user,
             HttpServletRequest request
@@ -82,11 +83,11 @@ public class RestaurantTierWebController {
         } else {
             page--;
         }
+        Pageable pageable = PageRequest.of(page, TIER_PAGE_SIZE);
 
         // DB 조회
-        List<RestaurantTierDTO> tierRestaurants = restaurantChartService.findByConditions(cuisines, situations, locations, null, true, user.id());
-
-        Pageable pageable = PageRequest.of(page, tierPageSize);
+        ChartCondition condition = new ChartCondition(cuisines, situations, locations);
+        Page<RestaurantTierDTO> data = restaurantChartService.findByConditions(condition, pageable, user.id());
 
         model.addAttribute("isJH", cuisines != null && cuisines.contains("JH"));
 
@@ -95,7 +96,7 @@ public class RestaurantTierWebController {
         model.addAttribute("locations", locations);
         model.addAttribute("currentPage","tier");
         model.addAttribute("evaluationsCount", evaluationRepository.countAllByStatus("ACTIVE"));
-        model.addAttribute("paging", convertToPage(tierRestaurants, pageable));
+        model.addAttribute("paging", data);
         model.addAttribute("queryString", getQueryStringWithoutPage(request));
 
         return "tier";
@@ -109,21 +110,6 @@ public class RestaurantTierWebController {
                     return Arrays.stream(entry.getValue()).map(value -> key + "=" + value);
                 })
                 .collect(Collectors.joining("&"));
-    }
-
-    public Page<RestaurantTierDTO> convertToPage(List<RestaurantTierDTO> dataList, Pageable pageable) {
-        int totalSize = dataList.size();
-        int totalPages = (int) Math.ceil((double) totalSize / pageable.getPageSize());
-
-        // 현재 페이지가 총 페이지 수보다 큰 경우 마지막 페이지로 이동
-        if (pageable.getPageNumber() >= totalPages && totalPages > 0) {
-            pageable = PageRequest.of(totalPages - 1, pageable.getPageSize());
-        }
-
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), totalSize);
-
-        return new PageImpl<>(dataList.subList(start, end), pageable, totalSize);
     }
 
     // 티어표 화면 이전

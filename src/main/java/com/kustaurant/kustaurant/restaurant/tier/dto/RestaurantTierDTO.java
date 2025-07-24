@@ -1,17 +1,18 @@
 package com.kustaurant.kustaurant.restaurant.tier.dto;
 
+import static com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants.*;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
+import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import java.util.Set;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @Schema(description = "restaurant tier entity")
-@Builder
 public class RestaurantTierDTO {
     @Schema(description = "식당 id", example = "1")
     private Integer restaurantId;
@@ -31,10 +32,10 @@ public class RestaurantTierDTO {
     private Boolean isEvaluated;
     @Schema(description = "식당 즐겨찾기 여부", example = "false")
     private Boolean isFavorite;
-    @Schema(description = "식당 x좌표", example = "127.888")
-    private String x;
-    @Schema(description = "식당 y좌표", example = "37.333")
-    private String  y;
+    @Schema(description = "식당 경도", example = "127.888")
+    private Double longitude;
+    @Schema(description = "식당 위도", example = "37.333")
+    private Double latitude;
     @Schema(description = "식당 제휴 정보", example = "건대생 공짜!!!")
     private String partnershipInfo;
     @Schema(description = "식당 점수", example = "4.5")
@@ -45,15 +46,40 @@ public class RestaurantTierDTO {
     @JsonIgnore
     private String restaurantType;
 
+    @QueryProjection
+    public RestaurantTierDTO(Integer restaurantId, String restaurantName,
+            String restaurantCuisine, String restaurantPosition, String restaurantImgUrl,
+            Integer mainTier, Boolean isEvaluated, Boolean isFavorite, Double longitude, Double latitude,
+            String partnershipInfo, Double scoreSum, Integer evaluationCount, Set<String> situations,
+            String restaurantType) {
+        this.restaurantId = restaurantId;
+        this.restaurantName = restaurantName;
+        this.restaurantCuisine = restaurantCuisine;
+        this.restaurantPosition = positionPostprocessing(restaurantPosition);
+        this.restaurantImgUrl = restaurantImgUrl;
+        this.mainTier = mainTier;
+        this.isEvaluated = isEvaluated;
+        this.isFavorite = isFavorite;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.partnershipInfo = partnershipInfo;
+        this.restaurantScore = avgScorePostprocessing(scoreSum, evaluationCount);
+        this.situations = situations.stream().toList();
+        this.restaurantType = restaurantType;
+    }
+
     public String getTierImgUrl() {
-        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/" + mainTier + "tier.png";
+        return RestaurantConstants.getTierImgUrl(mainTier);
     }
 
     public String getCuisineImgUrl() {
-        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/cuisine-icon/" + restaurantCuisine.replaceAll("/", "") + ".svg";
+        return RestaurantConstants.getCuisineImgUrl(restaurantCuisine);
     }
 
-    public boolean existTier() {
-        return mainTier != null && mainTier > 0;
+    public Integer calcRanking() {
+        if (mainTier != null && mainTier > 0) {
+            return restaurantRanking;
+        }
+        return null;
     }
 }

@@ -7,7 +7,7 @@ import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.Res
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.kustaurant.restaurant.search.infrastructure.spec.RestaurantSearchSpec;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
-import com.kustaurant.kustaurant.restaurant.tier.RestaurantChartRepository;
+import com.kustaurant.kustaurant.restaurant.tier.service.port.RestaurantChartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -17,32 +17,9 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class RestaurantRepositoryImpl implements RestaurantChartRepository, RestaurantRepository {
+public class RestaurantRepositoryImpl implements RestaurantRepository {
 
     private final RestaurantJpaRepository jpaRepository;
-
-    // RestaurantChartRepository
-    @Override
-    public List<Restaurant> findAll(Specification<RestaurantEntity> spec) {
-        return jpaRepository.findAll(spec)
-                .stream().map(RestaurantEntity::toModel).toList();
-    }
-
-    @Override
-    public List<Restaurant> findAll(Specification<RestaurantEntity> spec, Pageable pageable) {
-        return jpaRepository.findAll(spec, pageable).toList()
-                .stream().map(RestaurantEntity::toModel).toList();
-    }
-
-    @Override
-    public List<Restaurant> search(String[] kwList) {
-        Specification<RestaurantEntity> spec = RestaurantSearchSpec.createSearchSpecification(kwList);
-        return jpaRepository.findAll(spec)
-                .stream().map(RestaurantEntity::toModel).toList();
-    }
-
-    //--------------------------------------------
-    // RestaurantRepository
 
     @Override
     public Restaurant getByIdAndStatus(Integer id, String status) {

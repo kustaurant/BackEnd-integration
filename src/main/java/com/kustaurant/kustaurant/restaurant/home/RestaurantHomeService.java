@@ -1,8 +1,7 @@
-package com.kustaurant.kustaurant.restaurant.tier.query;
+package com.kustaurant.kustaurant.restaurant.home;
 
 import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
-import com.kustaurant.kustaurant.restaurant.tier.spec.RestaurantChartSpec;
-import com.kustaurant.kustaurant.restaurant.tier.RestaurantChartRepository;
+import com.kustaurant.kustaurant.restaurant.tier.service.port.RestaurantChartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,19 +20,22 @@ public class RestaurantHomeService {
 
     public List<RestaurantTierDTO> getTopRestaurants() {
 
-        List<RestaurantTierDTO> dtoList = restaurantChartRepository.findAll(
-                        RestaurantChartSpec.withCuisinesAndLocationsAndSituations(null, null, null, "ACTIVE", null, true))
-                .stream().map(RestaurantQueryMapper::toDto).toList();
+//        List<RestaurantTierDTO> dtoList = restaurantChartRepository
+//                .findAll(
+//                        RestaurantChartSpec.withCuisinesAndLocationsAndSituations(null, null, null, "ACTIVE", null, true))
+//                .stream().map(RestaurantQueryMapper::toDto).toList();
+        List<RestaurantTierDTO> dtoList = new ArrayList<>();
 
         return dtoList.subList(0, Math.min(dtoList.size(), TOP_RESTAURANT_SIZE));
     }
 
 
     public List<RestaurantTierDTO> getRecommendedOrRandomRestaurants(Long userId) {
-        List<RestaurantTierDTO> dtoList = new ArrayList<>(restaurantChartRepository.findAll(
-                        RestaurantChartSpec.withCuisinesAndLocationsAndSituations(null, null, null, "ACTIVE", null, true))
-                .stream().map(RestaurantQueryMapper::toDto).toList());
-        Collections.shuffle(dtoList, rand);
+//        List<RestaurantTierDTO> dtoList = new ArrayList<>(restaurantChartRepository.findAll(
+//                        RestaurantChartSpec.withCuisinesAndLocationsAndSituations(null, null, null, "ACTIVE", null, true))
+//                .stream().map(RestaurantQueryMapper::toDto).toList());
+//        Collections.shuffle(dtoList, rand);
+        List<RestaurantTierDTO> dtoList = new ArrayList<>();
 
         // 미로그인 시: 랜덤으로 15개의 식당 반환
         if (userId == null) {
@@ -48,10 +50,11 @@ public class RestaurantHomeService {
             return dtoList.subList(0, Math.min(dtoList.size(), RECOMMENDATION_SIZE));
         }
         // 즐찾이 있는 경우
-        return restaurantChartRepository.findAll(
-                        RestaurantChartSpec.withCuisinesAndLocationsAndSituations(List.of(favoriteCuisine), null, null, "ACTIVE", null, true))
-                .stream().map(RestaurantQueryMapper::toDto).toList()
-                .subList(0, Math.min(dtoList.size(), RECOMMENDATION_SIZE));
+        return new ArrayList<>();
+//        return restaurantChartRepository.findAll(
+//                        RestaurantChartSpec.withCuisinesAndLocationsAndSituations(List.of(favoriteCuisine), null, null, "ACTIVE", null, true))
+//                .stream().map(RestaurantQueryMapper::toDto).toList()
+//                .subList(0, Math.min(dtoList.size(), RECOMMENDATION_SIZE));
     }
 
 //    public String getFavoriteCuisine(Long userId) {
