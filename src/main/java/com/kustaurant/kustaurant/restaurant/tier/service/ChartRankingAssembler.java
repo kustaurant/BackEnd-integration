@@ -15,7 +15,7 @@ public class ChartRankingAssembler {
     public void enrichDtoList(List<RestaurantTierDTO> dtoList, @Nullable Integer ranking) {
         for (RestaurantTierDTO dto : dtoList) {
             if (ranking != null) {
-                dto.calcRanking();
+                dto.assembleRanking(ranking);
                 ranking += 1;
             }
         }

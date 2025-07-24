@@ -76,10 +76,9 @@ public class RestaurantTierDTO {
         return RestaurantConstants.getCuisineImgUrl(restaurantCuisine);
     }
 
-    public Integer calcRanking() {
+    public void assembleRanking(int ranking) {
         if (mainTier != null && mainTier > 0) {
-            return restaurantRanking;
+            this.restaurantRanking = ranking;
         }
-        return null;
     }
 }
