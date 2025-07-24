@@ -2,11 +2,11 @@ package com.kustaurant.kustaurant.home;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.restaurant.home.RestaurantListsResponse;
-import com.kustaurant.kustaurant.restaurant.home.RestaurantHomeService;
-import com.kustaurant.kustaurant.restaurant.search.service.RestaurantSearchService;
+import com.kustaurant.kustaurant.restaurant.query.home.RestaurantListsResponse;
+import com.kustaurant.kustaurant.restaurant.query.home.RestaurantHomeService;
+import com.kustaurant.kustaurant.restaurant.query.search.service.RestaurantSearchService;
 import com.kustaurant.kustaurant.admin.notice.service.HomeBannerApiService;
-import com.kustaurant.kustaurant.restaurant.tier.dto.RestaurantTierDTO;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -37,9 +37,9 @@ public class HomeApiController {
     })
     @GetMapping("/api/v1/home")
     public ResponseEntity<RestaurantListsResponse> home(@Parameter(hidden = true) @AuthUser AuthUserInfo user) {
-        List<RestaurantTierDTO> topRestaurantsByRatingDTOs = restaurantHomeService.getTopRestaurants(); // 점수 높은 순으로 총 16개
+        List<RestaurantCoreInfoDto> topRestaurantsByRatingDTOs = restaurantHomeService.getTopRestaurants(); // 점수 높은 순으로 총 16개
         // 로그인 여부에 따라 랜덤 식당 또는 추천 식당을 반환하는 서비스 메서드를 호출합니다.
-        List<RestaurantTierDTO> restaurantsForMeDTOs = restaurantHomeService.getRecommendedOrRandomRestaurants(user.id());
+        List<RestaurantCoreInfoDto> restaurantsForMeDTOs = restaurantHomeService.getRecommendedOrRandomRestaurants(user.id());
         // 홈화면의 배너 이미지
         List<String> homePhotoUrls = homeBannerApiService.getHomeBannerImage();
         RestaurantListsResponse response = new RestaurantListsResponse(
@@ -67,9 +67,9 @@ public class HomeApiController {
             "   - partnershipInfo: **null일 수 있습니다.**\n\n" +
             "   - restaurantScore: **null일 수 있습니다.**")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantTierDTO.class)))}),
+            @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCoreInfoDto.class)))}),
     })
-    public ResponseEntity<List<RestaurantTierDTO>> search(
+    public ResponseEntity<List<RestaurantCoreInfoDto>> search(
             @RequestParam(value = "kw", defaultValue = "") String kw,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
