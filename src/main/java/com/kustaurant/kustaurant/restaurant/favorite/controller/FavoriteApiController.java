@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.restaurant.favorite.controller;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
+import com.kustaurant.kustaurant.restaurant.favorite.controller.response.FavoriteResponseDTO;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class RestaurantFavoriteController {
+public class FavoriteApiController {
 
     private final RestaurantFavoriteService restaurantFavoriteService;
 
@@ -61,20 +62,6 @@ public class RestaurantFavoriteController {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 즐겨찾기 로직
-        boolean result = restaurantFavoriteService.toggleFavorite(user.id(), restaurantId);
-        // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
-        long count = restaurantFavoriteService.countByRestaurantId(restaurantId);
-        return ResponseEntity.ok(new FavoriteResponseDTO(result, count));
-    }
-
-
-    // 식당 즐겨찾기
-    @PostMapping("/web/api/restaurants/{restaurantId}/favorite/toggle")
-    public ResponseEntity<FavoriteResponseDTO> toggleFavorite(
-            @PathVariable Integer restaurantId,
-            @AuthUser AuthUserInfo user
-    ) {
-
         boolean result = restaurantFavoriteService.toggleFavorite(user.id(), restaurantId);
         // 즐겨찾기 이후 결과(즐겨찾기가 해제됐는지, 추가됐는지와 해당 식당의 즐겨찾기 개수)를 반환
         long count = restaurantFavoriteService.countByRestaurantId(restaurantId);

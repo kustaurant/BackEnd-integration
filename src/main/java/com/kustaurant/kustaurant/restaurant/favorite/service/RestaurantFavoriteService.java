@@ -6,13 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class RestaurantFavoriteService {
     // repository
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
 
-    @Transactional(readOnly = true)
     public long countByRestaurantId(Integer restaurantId) {
         return restaurantFavoriteRepository.countByRestaurantId(restaurantId);
     }

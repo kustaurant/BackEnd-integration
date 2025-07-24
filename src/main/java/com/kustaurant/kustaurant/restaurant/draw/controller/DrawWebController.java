@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.restaurant.draw.controller;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import java.util.*;
 @RequiredArgsConstructor
 @Controller
 public class DrawWebController {
-    private final RestaurantWebService restaurantWebService;
     private static final Logger logger = LoggerFactory.getLogger(DrawWebController.class);
 
     // 메뉴추천 화면
@@ -47,7 +45,8 @@ public class DrawWebController {
             if (item.equals("카페")) {
                 item="카페/디저트";
             }
-            List<RestaurantEntity> retaurantList = restaurantWebService.getRestaurantListByRandomPick(item,location);
+//            List<RestaurantEntity> retaurantList = restaurantWebService.getRestaurantListByRandomPick(item,location);
+            List<RestaurantEntity> retaurantList = List.of();
             combinedRestaurantList.addAll(retaurantList);
         }
 
@@ -82,8 +81,8 @@ public class DrawWebController {
     // id에 해당 하는 식당 정보 반환
     @GetMapping("/api/recommend/restaurant")
     public ResponseEntity<RestaurantEntity> recommendRestaurant(@RequestParam(name = "restaurantId") String restaurantId) {
-        RestaurantEntity restaurant = restaurantWebService.getRestaurant(Integer.valueOf(restaurantId));
-        return ResponseEntity.ok(restaurant);
+//        RestaurantEntity restaurant = restaurantWebService.getRestaurant(Integer.valueOf(restaurantId));
+        return ResponseEntity.ok(null);
     }
 
 }

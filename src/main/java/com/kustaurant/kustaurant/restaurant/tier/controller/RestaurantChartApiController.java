@@ -2,7 +2,6 @@ package com.kustaurant.kustaurant.restaurant.tier.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.restaurant.tier.RestaurantChartService;
 import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.LocationList;
@@ -40,9 +39,6 @@ import java.util.List;
 public class RestaurantChartApiController {
 
     private final RestaurantChartService restaurantChartService;
-
-    private final RestaurantApiService restaurantApiService;
-    private final RestaurantFavoriteService restaurantFavoriteService;
 
     @Operation(summary = "티어표 리스트 불러오기", description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
             "- 반환 값 보충 설명\n\n" +

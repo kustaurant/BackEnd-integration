@@ -1,20 +1,22 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.controller.web;
+package com.kustaurant.kustaurant.restaurant.restaurant.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
+import com.kustaurant.kustaurant.restaurant.restaurant.controller.response.RestaurantDetailDTO;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantQueryService;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
 @Controller
+@RequiredArgsConstructor
 public class RestaurantWebController {
 
-    private final RestaurantWebService restaurantWebService;
+    private final RestaurantQueryService restaurantQueryService;
 
     @Value("${restaurant.initialDisplayMenuCount}")
     private int initialDisplayMenuCount;
@@ -26,16 +28,18 @@ public class RestaurantWebController {
             @AuthUser AuthUserInfo user
     ) {
         model.addAttribute("initialDisplayMenuCount", initialDisplayMenuCount);
+
         // 식당 정보
-        RestaurantDetailWebDto restaurantDetailWebDto = restaurantWebService.getRestaurantWebDetails(user.id(), restaurantId);
-        model.addAttribute("restaurantDto", restaurantDetailWebDto);
-        String evaluationButton =
-                (user != null && restaurantDetailWebDto.getRestaurantDetail().getIsEvaluated()) ? "다시 평가하기" : " 평가하기";
+        RestaurantDetail detailDto = restaurantQueryService.getRestaurantDetail(restaurantId,
+                user.id());
+
+        model.addAttribute("restaurantDto", detailDto);
+        String evaluationButton
+                = (user != null && detailDto.getIsEvaluated()) ? "다시 평가하기" : " 평가하기";
         model.addAttribute("evaluationButton", evaluationButton);
+
         // 메뉴 정보
-        model.addAttribute("menus", restaurantDetailWebDto.getRestaurantDetail().getRestaurantMenuList());
-        // 식당 댓글
-        model.addAttribute("restaurantComments", restaurantDetailWebDto.getComments());
+        model.addAttribute("menus", detailDto.getRestaurantMenuList());
 
         return "restaurant";
     }

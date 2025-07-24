@@ -1,19 +1,22 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantMenu;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.text.DecimalFormat;
 import java.util.List;
+import lombok.ToString;
 
-@Data
-@AllArgsConstructor
+@Getter
+@ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "restaurant detail information")
 public class RestaurantDetailDTO {
     @Schema(description = "식당 id", example = "1")
@@ -55,6 +58,18 @@ public class RestaurantDetailDTO {
     @Schema(description = "메뉴 리스트")
     private List<RestaurantMenu> restaurantMenuList;
 
+    // 웹 사이트 렌더링 용
+    @JsonIgnore
+    private String restaurantType;
+    @JsonIgnore
+    private String restaurantTel;
+    @JsonIgnore
+    private Integer visitCount;
+    @JsonIgnore
+    private Double latitude;
+    @JsonIgnore
+    private Double longitude;
+
     public static RestaurantDetailDTO from(
             Restaurant restaurant,
             List<RestaurantMenu> restaurantMenus,
@@ -83,7 +98,12 @@ public class RestaurantDetailDTO {
                 isFavorite,
 //                restaurant.getFavoriteCount(),
                 0,
-                restaurantMenus
+                restaurantMenus,
+                restaurant.getRestaurantType(),
+                restaurant.getRestaurantTel(),
+                restaurant.getVisitCount(),
+                restaurant.getGeoPosition().coordinates().latitude(),
+                restaurant.getGeoPosition().coordinates().longitude()
         );
     }
 }

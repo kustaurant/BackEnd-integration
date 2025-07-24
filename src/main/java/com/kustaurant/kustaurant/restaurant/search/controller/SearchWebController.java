@@ -5,7 +5,6 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.tier.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
 import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,8 +19,6 @@ import java.util.List;
 public class SearchWebController {
 
     private final EvaluationService evaluationService;
-    private final CustomOAuth2UserService userService;
-    private final RestaurantWebService restaurantWebService;
 
     // 검색 결과 화면
     @GetMapping("/search")
@@ -38,7 +35,8 @@ public class SearchWebController {
         }
 
         String[] kwList = kw.split(" "); // 검색어 공백 단위로 끊음
-        List<RestaurantEntity> restaurantList = restaurantWebService.searchRestaurants(kwList);
+//        List<RestaurantEntity> restaurantList = restaurantWebService.searchRestaurants(kwList);
+        List<RestaurantEntity> restaurantList = List.of();
 
         List<RestaurantTierDataClass> restaurantTierDataClassList = evaluationService.convertToTierDataClassList(restaurantList, user.id(), false);
 

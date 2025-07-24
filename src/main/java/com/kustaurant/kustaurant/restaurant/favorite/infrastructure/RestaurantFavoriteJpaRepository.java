@@ -18,4 +18,6 @@ public interface RestaurantFavoriteJpaRepository extends JpaRepository<Restauran
         ORDER BY rf.createdAt DESC""")
     List<RestaurantFavoriteEntity> findSortedFavoritesByUserIdDesc(@Param("userId") Long userId);
 
+    boolean existsByUserIdAndRestaurantId(Long userId, Integer restaurantId);
+
 }

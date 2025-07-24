@@ -1,8 +1,8 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.controller.api;
+package com.kustaurant.kustaurant.restaurant.restaurant.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantQueryService;
 import com.kustaurant.kustaurant.restaurant.restaurant.controller.response.RestaurantDetailDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 public class RestaurantApiController {
 
-    private final RestaurantService restaurantService;
+    private final RestaurantQueryService restaurantQueryService;
 
     @Operation(summary = "식당 상세 화면 정보 불러오기", description = "식당 하나에 대한 상세 정보가 반환됩니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
             "- 반환 값 보충 설명\n\n" +
@@ -61,7 +61,7 @@ public class RestaurantApiController {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return new ResponseEntity<>(
-                restaurantService.getActiveRestaurantDetailDto(restaurantId, user.id()),
+                restaurantQueryService.getActiveRestaurantDetailDto(restaurantId, user.id()),
                 HttpStatus.OK
         );
     }
@@ -97,7 +97,7 @@ public class RestaurantApiController {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return new ResponseEntity<>(
-                restaurantService.getActiveRestaurantDetailDto(restaurantId, user.id()),
+                restaurantQueryService.getActiveRestaurantDetailDto(restaurantId, user.id()),
                 HttpStatus.OK
         );
     }

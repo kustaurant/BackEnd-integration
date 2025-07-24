@@ -1,3 +1,7 @@
+// csrf 토큰 읽어오기
+// CSRF 토큰 가져오기
+const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 // 창이 로드될 때와 창 크기가 바뀔 때 적용할 함수 넣어주기
 var map;
 var marker;
@@ -52,25 +56,27 @@ function toggleFavoriteRequest() {
             [csrfHeader]: csrfToken
         }
     })
-        .then(response => {
-            if (response.redirected) {
-                window.location.href = "/user/login";
-            } else {
-                // 리다이렉션이 없는 경우에 대한 처리
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                toggleFavoriteHTML(favoriteImg);
-                return response;
+    .then(response => {
+        if (response.redirected) {
+            window.location.href = "/user/login";
+        } else {
+            // 리다이렉션이 없는 경우에 대한 처리
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-        })
-        .catch(error => console.error('Error:', error));
+            return response.json();
+        }
+    })
+    .then(data => {
+      toggleFavoriteHTML(data.isFavorite);
+      changeFavoriteCount(data.count);
+    })
+    .catch(error => console.error('Error:', error));
 }
 // 식당 Favorite 버튼 토글 변경
-function toggleFavoriteHTML(favoriteImg) {
-    const isFavorite = favoriteImg.classList.contains('after-favorite');
-
-    if (isFavorite) {
+function toggleFavoriteHTML(afterToggle) {
+    // const isFavorite = favoriteImg.classList.contains('after-favorite');
+    if (!afterToggle) {
         favoriteImg.src = beforeImgUrl;
         favoriteImg.classList.remove('after-favorite');
         favoriteImg.classList.add('before-favorite');
@@ -80,6 +86,10 @@ function toggleFavoriteHTML(favoriteImg) {
         favoriteImg.classList.add('after-favorite');
     }
 }
+function changeFavoriteCount(count) {
+  document.getElementById('favoriteCount').innerText = `${count}개`;
+}
+//
 
 // 메뉴
 function fillMenuInfo(data, num) { //num은 처음 표시할 메뉴 개수임. -1일 경우 모든 메뉴 표시

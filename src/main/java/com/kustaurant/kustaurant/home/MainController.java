@@ -1,11 +1,8 @@
 package com.kustaurant.kustaurant.home;
 
 import com.kustaurant.kustaurant.admin.modal.HomeModalService;
-import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
-import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.admin.modal.HomeModalEntity;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +15,6 @@ import java.util.*;
 @RequiredArgsConstructor
 @Controller
 public class MainController {
-    private final RestaurantWebService restaurantWebService;
     private final HomeModalService homeModalService;
 
     //@Value("#{'${restaurant.cuisines}'.split(',\\s*')}")
@@ -49,7 +45,8 @@ public class MainController {
     public String root(
             Model model
     ) {
-        List<RestaurantEntity> restaurants = restaurantWebService.getTopRestaurants();
+//        List<RestaurantEntity> restaurants = restaurantWebService.getTopRestaurants();
+        List<RestaurantEntity> restaurants = List.of();
         List<String> cuisines = new ArrayList<>(Arrays.asList("한식","일식","중식","양식","아시안","고기","치킨","햄버거","분식","해산물","술집","샐러드","카페","베이커리","기타","전체"));
 
         HomeModalEntity homeModal = homeModalService.get();

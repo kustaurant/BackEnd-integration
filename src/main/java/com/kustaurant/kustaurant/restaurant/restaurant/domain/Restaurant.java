@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.domain;
 
+import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.RestaurantConstants;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -30,8 +31,8 @@ public class Restaurant {
 
     private Tier mainTier;
 
-    public String getCuisineImgUrl(String cuisine) {
-        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/cuisine-icon/" + restaurantCuisine.getValue().replaceAll("/", "") + ".svg";
+    public String getCuisineImgUrl() {
+        return RestaurantConstants.getCuisineImgUrl(restaurantCuisine.getValue());
     }
 
     public void afterEvaluationCreated(Double score) {

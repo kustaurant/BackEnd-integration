@@ -5,6 +5,7 @@ import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteCheckRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,8 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepository {
+public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepository,
+        RestaurantFavoriteCheckRepository {
 
     private final RestaurantFavoriteJpaRepository jpaRepository;
 
@@ -50,4 +52,8 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
         return jpaRepository.countByRestaurantIdAndStatus(restaurantId, "ACTIVE");
     }
 
+    @Override
+    public boolean isUserFavorite(Long userId, Integer restaurantId) {
+        return jpaRepository.existsByUserIdAndRestaurantId(userId, restaurantId);
+    }
 }

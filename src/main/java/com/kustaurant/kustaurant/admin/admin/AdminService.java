@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.admin.admin;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantApiService;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,16 +15,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminService {
 
-    private final RestaurantApiService restaurantService;
-
     // 식당 정보 갱신
     @Transactional
     public void updateRestaurantInfo(int id, RestaurantInfoDto info) {
-        RestaurantEntity restaurant = restaurantService.findRestaurantById(id);
+//        RestaurantEntity restaurant = restaurantService.findRestaurantById(id);
 
-        setRestaurant(restaurant, info);
+//        setRestaurant(restaurant, info);
 
-        restaurantService.saveRestaurant(restaurant);
+//        restaurantService.saveRestaurant(restaurant);
     }
 
     private void setRestaurant(RestaurantEntity restaurant, RestaurantInfoDto info) {
@@ -57,19 +54,20 @@ public class AdminService {
 
     // 식당 id로 RestaurantInfo 객체 가져오기
     public Optional<RestaurantInfoDto> getRestaurantInfo(int id) {
-        RestaurantEntity restaurant = restaurantService.findRestaurantById(id);
-        return Optional.of(new RestaurantInfoDto(
-                restaurant.getRestaurantName(),
-                restaurant.getRestaurantType(),
-                restaurant.getRestaurantCuisine(),
-                restaurant.getRestaurantAddress(),
-                restaurant.getRestaurantTel(),
-                restaurant.getRestaurantUrl(),
-                restaurant.getRestaurantImgUrl(),
-                restaurant.getRestaurantPosition(),
-                restaurant.getPartnershipInfo(),
-                parseDoubleOrNull(restaurant.getLatitude().toString()),
-                parseDoubleOrNull(restaurant.getLongitude().toString())));
+//        RestaurantEntity restaurant = restaurantService.findRestaurantById(id);
+//        return Optional.of(new RestaurantInfoDto(
+//                restaurant.getRestaurantName(),
+//                restaurant.getRestaurantType(),
+//                restaurant.getRestaurantCuisine(),
+//                restaurant.getRestaurantAddress(),
+//                restaurant.getRestaurantTel(),
+//                restaurant.getRestaurantUrl(),
+//                restaurant.getRestaurantImgUrl(),
+//                restaurant.getRestaurantPosition(),
+//                restaurant.getPartnershipInfo(),
+//                parseDoubleOrNull(restaurant.getLatitude().toString()),
+//                parseDoubleOrNull(restaurant.getLongitude().toString())));
+        return Optional.empty();
     }
 
     // String을 Double 형으로 바꿀 수 있으면 바꾸고, 못 바꾸면 null 반환
@@ -112,6 +110,6 @@ public class AdminService {
 
         log.info("식당 정보 저장 완료\n{}", info);
 
-        restaurantService.saveRestaurant(restaurant);
+//        restaurantService.saveRestaurant(restaurant);
     }
 }
