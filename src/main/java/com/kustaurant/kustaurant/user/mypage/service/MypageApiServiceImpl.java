@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageApiService;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.*;
+import com.kustaurant.kustaurant.user.mypage.infrastructure.projection.MypageMainProjection;
 import com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo.*;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
@@ -38,7 +39,7 @@ public class MypageApiServiceImpl implements MypageApiService {
     //1
     // 마이페이지 화면에서 표시될 "유저닉네임, 좋아요맛집 갯수, 내 게시글 갯수" 를 반환.
     public MypageMainResponse getMypageInfo(Long userId){
-        var raw = mypageQueryRepository.findMypageMainByUserId(userId);
+        MypageMainProjection raw = mypageQueryRepository.findMypageMainByUserId(userId);
         String iconUrl = UserIconResolver.resolve(raw.evalCnt());
 
         return new MypageMainResponse(
