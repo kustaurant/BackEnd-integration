@@ -9,10 +9,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  jwt:
+    secret: test-secret
+    access-ttl: 1800000
+    refresh-ttl: 1209600000
   cloud:
     aws:
       credentials:
-        access-key: "a-very-long-test-jwt-secret-key-must-be-over-32-bytes!!"
+        access-key: dummy
         secret-key: dummy
       region:
         static: us-east-1
