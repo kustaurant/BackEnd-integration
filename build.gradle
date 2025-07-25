@@ -9,9 +9,9 @@ group = 'com.kustaurant'
 version = '0.1.0-SNAPSHOT'
 // 배포 자바 버젼
 java {
-	sourceCompatibility = '17'
-//	sourceCompatibility = JavaVersion.VERSION_21
-//	targetCompatibility = JavaVersion.VERSION_21
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
 }
 // jar 제외하고 bootjar 로만 실행파일생성
 jar {
