@@ -1,7 +1,8 @@
-package com.kustaurant.kustaurant.home;
+package com.kustaurant.kustaurant.admin;
 
 import com.kustaurant.kustaurant.admin.modal.HomeModalService;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
+import com.kustaurant.kustaurant.restaurant.query.home.RestaurantHomeService;
 import com.kustaurant.kustaurant.admin.modal.HomeModalEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,9 @@ import java.util.*;
 @RequiredArgsConstructor
 @Controller
 public class MainController {
+
     private final HomeModalService homeModalService;
+    private final RestaurantHomeService restaurantHomeService;
 
     //@Value("#{'${restaurant.cuisines}'.split(',\\s*')}")
     private List<String> cuisines = Arrays.asList(
@@ -45,14 +48,13 @@ public class MainController {
     public String root(
             Model model
     ) {
-//        List<RestaurantEntity> restaurants = restaurantWebService.getTopRestaurants();
-        List<RestaurantEntity> restaurants = List.of();
+        List<RestaurantCoreInfoDto> topRestaurants = restaurantHomeService.getTopRestaurants(null);
         List<String> cuisines = new ArrayList<>(Arrays.asList("한식","일식","중식","양식","아시안","고기","치킨","햄버거","분식","해산물","술집","샐러드","카페","베이커리","기타","전체"));
 
         HomeModalEntity homeModal = homeModalService.get();
 
         model.addAttribute("cuisines", cuisines);
-        model.addAttribute("restaurants",restaurants);
+        model.addAttribute("restaurants", topRestaurants);
         model.addAttribute("currentPage","home");
         model.addAttribute("homeModal", homeModal);
         return "home";

@@ -25,6 +25,9 @@ public class RestaurantChartQuery {
 
     private final JPAQueryFactory queryFactory;
 
+    /**
+     * 조건(conditino)을 만족하는 식당 id들을 반환
+     */
     public Page<Integer> getRestaurantIds(ChartCondition condition, Pageable pageable) {
 
         NumberExpression<Double> avgScore = new CaseBuilder()
@@ -89,9 +92,4 @@ public class RestaurantChartQuery {
                 )
                 .exists();
     }
-
-    // -------------------------------------------------------------
-
-
-
 }
