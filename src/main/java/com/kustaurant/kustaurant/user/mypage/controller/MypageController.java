@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.user.mypage.controller;
 
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
-import com.kustaurant.kustaurant.user.mypage.controller.response.MypageDataView;
+import com.kustaurant.kustaurant.user.mypage.controller.response.web.MypageDataView;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import lombok.RequiredArgsConstructor;

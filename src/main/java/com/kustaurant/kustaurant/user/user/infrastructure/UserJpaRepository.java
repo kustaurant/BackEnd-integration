@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.user.user.infrastructure;
 
+import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -56,4 +58,7 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     int countByLoginApi(@Param("loginApi") String loginApi);
 
     List<UserEntity> findByIdIn(List<Long> ids);
+
+    boolean existsByNickname(Nickname nickname);
+    boolean existsByPhoneNumber(PhoneNumber phoneNumber);
 }

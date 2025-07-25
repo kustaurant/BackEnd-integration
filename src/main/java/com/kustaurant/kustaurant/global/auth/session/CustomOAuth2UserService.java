@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.global.auth.session;
 
 import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
+import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;

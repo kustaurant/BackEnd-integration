@@ -10,6 +10,8 @@ version = '0.1.0-SNAPSHOT'
 // 배포 자바 버젼
 java {
 	sourceCompatibility = '17'
+//	sourceCompatibility = JavaVersion.VERSION_21
+//	targetCompatibility = JavaVersion.VERSION_21
 }
 // jar 제외하고 bootjar 로만 실행파일생성
 jar {
@@ -27,7 +29,6 @@ repositories {
 }
 
 dependencies {
-
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
@@ -41,27 +42,31 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	implementation 'org.jsoup:jsoup:1.17.2'
-
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-
+	//s3 및 spring‑cloud‑aws,AWS SDK v2 모듈 전체 버전 관리
+	implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1')
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 	// QueryDSL
-	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
-	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
-	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
-
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+	ext {
+		querydslVersion = '7.0'
+	}
+	implementation "io.github.openfeign.querydsl:querydsl-jpa:${querydslVersion}"
+	annotationProcessor(
+			"io.github.openfeign.querydsl:querydsl-apt:${querydslVersion}:jakarta",
+			"jakarta.annotation:jakarta.annotation-api",
+			"jakarta.persistence:jakarta.persistence-api"
+	)
+	compileOnly "io.github.openfeign.querydsl:querydsl-apt:${querydslVersion}:jakarta"
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.junit.jupiter:junit-jupiter'
 
-	implementation 'com.google.code.gson:gson:2.8.9'
+	implementation 'com.google.code.gson:gson'
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 	//jwt
@@ -69,7 +74,7 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 	// crawling
-	implementation "org.seleniumhq.selenium:selenium-java:4.20.0"
+	// implementation "org.seleniumhq.selenium:selenium-java:4.20.0"
 	//flyway
 	implementation 'org.flywaydb:flyway-mysql'
 	//env
@@ -79,7 +84,10 @@ dependencies {
 	//redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.session:spring-session-data-redis'
-
+	//testContainer
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation "org.testcontainers:junit-jupiter:1.19.7"
+	testImplementation "org.testcontainers:mysql:1.19.7"
 }
 
 tasks.named('test') {

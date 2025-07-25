@@ -1,30 +1,83 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationEntity;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.Repository;
-import org.springframework.data.repository.query.Param;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QSituationEntity;
+import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRatedRestaurantResponse;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-public interface MyEvaluationQueryRepository extends Repository<EvaluationEntity, Long> {
-    // TODO: 연관 관계 삭제로 인해 쿼리 임시 수정
-//    @Query("""
-//        select distinct e
-//        from EvaluationEntity e
-//        join fetch e.restaurant r
-//        left join fetch e.evaluationSituationEntityList es
-//        left join fetch es.situation s
-//        where e.userId = :userId
-//          and e.status  = 'ACTIVE'
-//        order by e.createdAt desc
-//    """)
-    @Query("""
-        select distinct e
-        from EvaluationEntity e
-        where e.userId = :userId
-          and e.status  = 'ACTIVE'
-        order by e.createdAt desc
-    """)
-    List<EvaluationEntity> findActiveByUserId(@Param("userId") Long userId);
+@Repository
+@RequiredArgsConstructor
+public class MyEvaluationQueryRepository{
+    private final JPAQueryFactory factory;
+
+    private static final QEvaluationEntity evaluation = QEvaluationEntity.evaluationEntity;
+    private static final QRestaurantEntity restaurant = QRestaurantEntity.restaurantEntity;
+    private static final QSituationEntity situation = QSituationEntity.situationEntity;
+
+    public List<MyRatedRestaurantResponse> findByUserId(Long userId) {
+
+        // -------- 1. 메인 정보 (Evaluation + Restaurant) --------
+        List<Tuple> rows = factory.select(
+                        evaluation.id,
+                        restaurant.restaurantId,
+                        restaurant.restaurantName,
+                        restaurant.restaurantImgUrl,
+                        restaurant.restaurantCuisine,
+                        evaluation.evaluationScore,
+                        evaluation.body
+                )
+                .from(evaluation)
+                .join(restaurant).on(restaurant.restaurantId.eq(evaluation.restaurantId))
+                .where(
+                        evaluation.userId.eq(userId),
+                        evaluation.status.eq("ACTIVE")
+                )
+                .orderBy(evaluation.createdAt.desc())
+                .fetch();
+
+        List<Long> evalIds = rows.stream()
+                .map(t -> t.get(evaluation.id))
+                .toList();
+
+        if (evalIds.isEmpty()) return List.of();
+
+        // -------- 2. 상황 이름 매핑 --------
+        NumberPath<Long> sid = Expressions.numberPath(Long.class, "sid");
+
+        Map<Long, List<String>> evalIdToSituations =
+                factory.select(evaluation.id, situation.situationName)
+                        .from(evaluation)
+                        .join(evaluation.situationIds, sid)
+                        .join(situation).on(situation.situationId.eq(sid))
+                        .where(evaluation.id.in(evalIds))
+                        .fetch()
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                t -> t.get(evaluation.id),
+                                Collectors.mapping(t -> t.get(situation.situationName), Collectors.toList())
+                        ));
+
+        /* -------- 3. DTO 변환 -------- */
+        return rows.stream()
+                .map(t -> new MyRatedRestaurantResponse(
+                        t.get(restaurant.restaurantId),
+                        t.get(restaurant.restaurantName),
+                        t.get(restaurant.restaurantImgUrl),
+                        t.get(restaurant.restaurantCuisine),
+                        t.get(evaluation.evaluationScore),
+                        t.get(evaluation.body),
+                        evalIdToSituations.getOrDefault(t.get(evaluation.id), List.of())
+                ))
+                .toList();
+    }
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @Profile("local")
-@RestController("/api/v1/test/token/exp")
+@RestController("/api/v2/test/token/exp")
 @RequiredArgsConstructor
 public class TestTokenController {
     private final UserApiLoginService userApiLoginService;

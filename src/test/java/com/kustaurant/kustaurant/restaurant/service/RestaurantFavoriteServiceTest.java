@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.restaurant.service;
 
-import com.kustaurant.kustaurant.mock.FakeRestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.mock.restaurant.FakeRestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
@@ -26,8 +26,6 @@ class RestaurantFavoriteServiceTest {
         // Given
         Long userId = 1L;
         Integer restaurantId = 2;
-        UserEntity user = new UserEntity();
-        user.setId(userId);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(restaurantId)
                 .restaurantName("곤칼")
@@ -37,7 +35,7 @@ class RestaurantFavoriteServiceTest {
         favoriteService.addFavorite(userId, restaurantId);
 
         // Then
-        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getId(), restaurant.getRestaurantId()))
+        assertThat(favoriteRepository.existsByUserAndRestaurant(userId, restaurant.getRestaurantId()))
                 .isTrue();
     }
 
@@ -46,21 +44,19 @@ class RestaurantFavoriteServiceTest {
         // Given
         Long userId = 1L;
         Integer restaurantId = 2;
-        UserEntity user = new UserEntity();
-        user.setId(userId);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(restaurantId)
                 .restaurantName("곤칼")
                 .build();
 
         favoriteService.addFavorite(userId, restaurantId);
-        RestaurantFavorite favorite = favoriteRepository.findByUserIdAndRestaurantId(user.getId(), restaurant.getRestaurantId());
+        RestaurantFavorite favorite = favoriteRepository.findByUserIdAndRestaurantId(userId, restaurant.getRestaurantId());
 
         // When
         favoriteService.deleteFavorite(favorite);
 
         // Then
-        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getId(), restaurant.getRestaurantId()))
+        assertThat(favoriteRepository.existsByUserAndRestaurant(userId, restaurant.getRestaurantId()))
                 .isFalse();
     }
 
@@ -69,8 +65,6 @@ class RestaurantFavoriteServiceTest {
         // Given
         Long userId = 1L;
         Integer restaurantId = 2;
-        UserEntity user = new UserEntity();
-        user.setId(userId);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(restaurantId)
                 .restaurantName("곤칼")
@@ -81,7 +75,7 @@ class RestaurantFavoriteServiceTest {
 
         // Then
         assertThat(result).isTrue();
-        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getId(), restaurant.getRestaurantId()))
+        assertThat(favoriteRepository.existsByUserAndRestaurant(userId, restaurant.getRestaurantId()))
                 .isTrue();
     }
 
@@ -90,8 +84,6 @@ class RestaurantFavoriteServiceTest {
         // Given
         Long userId = 1L;
         Integer restaurantId = 2;
-        UserEntity user = new UserEntity();
-        user.setId(userId);
         Restaurant restaurant = Restaurant.builder()
                 .restaurantId(restaurantId)
                 .restaurantName("곤칼")
@@ -105,7 +97,7 @@ class RestaurantFavoriteServiceTest {
 
         // Then
         assertThat(result).isFalse();
-        assertThat(favoriteRepository.existsByUserAndRestaurant(user.getId(), restaurant.getRestaurantId()))
+        assertThat(favoriteRepository.existsByUserAndRestaurant(userId, restaurant.getRestaurantId()))
                 .isFalse();
     }
 
