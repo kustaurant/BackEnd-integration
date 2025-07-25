@@ -10,44 +10,45 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  small-test:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Gradle test (small only)
+        run: ./gradlew smallTest
+      - name: Publish Small Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: build/test-results/smallTest/TEST-*.xml
+          check_name: Small (Unit) Tests
 
+  middle-test:
+    runs-on: ubuntu-latest
     services:
       docker:
         image: docker:24.0.2
         options: >-
           --privileged
-
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Set up JDK 21
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
-      - name: Run Small (Unit) Tests
-        run: ./gradlew smallTest
-
-      - name: Publish Small (Unit) Test Report
-        if: always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: build/test-results/smallTest/TEST-*.xml
-          check_name: Small (Unit) Tests
-
-      - name: Run Middle (Integration) Tests
+      - name: Gradle test (middle only)
         run: ./gradlew middleTest
-
-      - name: Publish Middle (Integration) Test Report
-        if: always()
+      - name: Publish Middle Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
         with:
           files: build/test-results/middleTest/TEST-*.xml
           check_name: Middle (Integration) Tests
