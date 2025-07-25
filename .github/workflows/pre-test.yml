@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   small-test:
+    name: 🧪 Run Small(Unit) Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,9 +28,10 @@ jobs:
         if: always()
         with:
           files: build/test-results/smallTest/TEST-*.xml
-          check_name: Small (Unit) Tests
+          check_name: 🧪 Run Small(Unit) Tests
 
   middle-test:
+    name: 🔧 Run Middle(Integration) Tests
     runs-on: ubuntu-latest
     services:
       docker:
@@ -51,4 +53,4 @@ jobs:
         if: always()
         with:
           files: build/test-results/middleTest/TEST-*.xml
-          check_name: Middle (Integration) Tests
+          check_name: 🔧 Run Middle(Integration) Tests
