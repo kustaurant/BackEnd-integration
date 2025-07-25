@@ -28,11 +28,11 @@ jobs:
         if: always()
         with:
           files: build/test-results/smallTest/TEST-*.xml
-          check_name: show small tests report
+          check_name: 🧪 Run Small(Unit) Tests
           check_run: false
 
   middle-test:
-    name: 🔧 Run Middle(Integration) Tests
+    name: 🚀 Run Middle(Integration) Tests
     runs-on: ubuntu-latest
     services:
       docker:
@@ -54,5 +54,5 @@ jobs:
         if: always()
         with:
           files: build/test-results/middleTest/TEST-*.xml
-          check_name: show middle tests report
+          check_name: 🚀 Run Middle(Integration) Tests
           check_run: false
