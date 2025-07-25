@@ -1,7 +1,8 @@
-package com.kustaurant.kustaurant.restaurant.query.search.controller;
+package com.kustaurant.kustaurant.restaurant.query.search;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,8 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 public class SearchWebController {
+
+    private final RestaurantSearchService restaurantSearchService;
 
     // 검색 결과 화면
     @GetMapping("/search")
@@ -30,12 +33,9 @@ public class SearchWebController {
         }
 
         String[] kwList = kw.split(" "); // 검색어 공백 단위로 끊음
-//        List<RestaurantEntity> restaurantList = restaurantWebService.searchRestaurants(kwList);
-        List<RestaurantEntity> restaurantList = List.of();
+        List<RestaurantCoreInfoDto> result = restaurantSearchService.search(kwList, user.id());
 
-//        List<RestaurantTierDataClass> restaurantTierDataClassList = evaluationService.convertToTierDataClassList(restaurantList, user.id(), false);
-
-        model.addAttribute("restaurantTierData", List.of());
+        model.addAttribute("searchResult", result);
 
         return "searchResult";
     }

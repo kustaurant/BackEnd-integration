@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query;
 
+import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCommonExpressions.restaurantActive;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCommonExpressions.situationMatches;
 import static java.util.Objects.isNull;
@@ -43,7 +44,8 @@ public class RestaurantChartQuery {
                 .where(
                         cuisinesIn(condition.cuisines()),
                         positionsIn(condition.positions()),
-                        hasSituation(condition.situations(), restaurantEntity)
+                        hasSituation(condition.situations(), restaurantEntity),
+                        restaurantActive(restaurantEntity)
                 )
                 .orderBy(avgScore.desc())
                 .offset(pageable.getOffset())
@@ -56,7 +58,8 @@ public class RestaurantChartQuery {
                 .where(
                         cuisinesIn(condition.cuisines()),
                         positionsIn(condition.positions()),
-                        hasSituation(condition.situations(), restaurantEntity)
+                        hasSituation(condition.situations(), restaurantEntity),
+                        restaurantActive(restaurantEntity)
                 )
                 .fetchOne();
 

@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query;
 
+import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCommonExpressions.restaurantActive;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.*;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -29,6 +29,7 @@ public class RestaurantHomeQuery {
 
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
+                .where(restaurantActive(restaurantEntity))
                 .orderBy(avgScore.desc())
                 .limit(size)
                 .fetch();
@@ -37,6 +38,7 @@ public class RestaurantHomeQuery {
     public List<Integer> getRandomRestaurantIds(int size) {
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
+                .where(restaurantActive(restaurantEntity))
                 .orderBy(
                         Expressions.numberTemplate(Double.class, "RAND()").asc()
                 )

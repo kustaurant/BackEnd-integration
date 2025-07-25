@@ -1,9 +1,8 @@
-package com.kustaurant.kustaurant.restaurant.query.search.controller;
+package com.kustaurant.kustaurant.restaurant.query.search;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
-import com.kustaurant.kustaurant.restaurant.query.search.service.RestaurantSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

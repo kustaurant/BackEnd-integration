@@ -41,6 +41,9 @@ public class RestaurantCoreInfoDto {
     @Schema(description = "식당 점수", example = "4.5")
     private Double restaurantScore;
 
+    /**
+     * Web 타임리프 렌더링 용 필드
+     */
     @JsonIgnore
     private List<String> situations;
     @JsonIgnore
