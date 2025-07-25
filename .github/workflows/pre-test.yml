@@ -48,7 +48,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Load ENV_FILE secret into .env file
-        run: echo "${{ secrets.ENV_FILE }}" > .env
+        run: |
+          printf "%s" "${{ secrets.ENV_FILE }}" > .env
       - name: Gradle test (middle only)
         run: ./gradlew middleTest
         env:
