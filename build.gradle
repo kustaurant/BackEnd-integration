@@ -93,3 +93,27 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// 아래는 소형/중형 테스트 분리를 위한 설정임
+
+tasks.register('smallTest', Test) {
+	useJUnitPlatform {
+		excludeTags 'middleTest'
+	}
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	shouldRunAfter test
+	reports.junitXml.destination = layout.buildDirectory.dir("test-results/smallTest").get().asFile
+	reports.html.destination = layout.buildDirectory.dir("reports/tests/smallTest").get().asFile
+}
+
+tasks.register('middleTest', Test) {
+	useJUnitPlatform {
+		includeTags 'middleTest'
+	}
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	shouldRunAfter test
+	reports.junitXml.destination = layout.buildDirectory.dir("test-results/integrationTest").get().asFile
+	reports.html.destination = layout.buildDirectory.dir("reports/tests/integrationTest").get().asFile
+}

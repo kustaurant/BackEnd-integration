@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
+@Tag("middleTest")
 class MypageApiServiceIT {
 
     @Autowired MypageApiService mypageApiService;
