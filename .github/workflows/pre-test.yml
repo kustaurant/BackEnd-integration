@@ -49,6 +49,10 @@ jobs:
           distribution: 'temurin'
       - name: Gradle test (middle only)
         run: ./gradlew middleTest
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_ACCESS_TOKEN_EXPIRATION: ${{ secrets.JWT_ACCESS_TOKEN_EXPIRATION }}
+          gJWT_REFRESH_TOKEN_EXPIRATION: ${{ secrets.JWT_REFRESH_TOKEN_EXPIRATION }}
       - name: Publish Middle Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
