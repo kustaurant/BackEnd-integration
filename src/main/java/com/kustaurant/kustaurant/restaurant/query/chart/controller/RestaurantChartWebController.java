@@ -1,5 +1,5 @@
 
-package com.kustaurant.kustaurant.restaurant.query.chart;
+package com.kustaurant.kustaurant.restaurant.query.chart.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +11,7 @@ import com.kustaurant.kustaurant.restaurant.query.chart.service.RestaurantChartS
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.SituationList;
-import com.kustaurant.kustaurant.restaurant.query.chart.service.port.ChartCondition;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

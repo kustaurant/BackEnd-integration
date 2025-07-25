@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.query.chart.service.port;
+package com.kustaurant.kustaurant.restaurant.query.common.dto;
 
 import java.util.List;
 

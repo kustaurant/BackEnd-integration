@@ -1,10 +1,11 @@
-package com.kustaurant.kustaurant.restaurant.query.draw.service;
+package com.kustaurant.kustaurant.restaurant.query.draw;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantChartRepository;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,23 +16,30 @@ import java.util.*;
 public class RestaurantDrawService {
 
     private final int TARGET_SIZE = 30;
-    private final RestaurantChartRepository restaurantChartRepository;
+
+    private final RestaurantDrawRepository restaurantDrawRepository;
 
     Random rand = new Random();
 
-    public List<RestaurantCoreInfoDto> draw(List<String> cuisines, List<String> locations) {
-//        List<RestaurantTierDTO> dtoList = restaurantChartRepository.findAll(
-//                RestaurantChartSpec.withCuisinesAndLocationsAndSituations(cuisines, locations, null, "ACTIVE", null, false))
-//                .stream().map(RestaurantQueryMapper::toDto)
-//                .collect(Collectors.toList());
-        List<RestaurantCoreInfoDto> dtoList = new ArrayList<>();
+    public Restaurant getById(Integer restaurantId) {
+        return restaurantDrawRepository.getById(restaurantId);
+    }
+
+    public List<RestaurantCoreInfoDto> draw(List<String> cuisines, List<String> positions) {
+        if (cuisines.contains("전체")) {
+            cuisines = null;
+        }
+        if (positions.contains("전체")) {
+            positions = null;
+        }
+        List<RestaurantCoreInfoDto> restaurants = restaurantDrawRepository.draw(cuisines, positions, 2000);
 
         // 조건에 맞는 식당이 없을 경우 404 에러 반환
-        if (dtoList.isEmpty()) {
+        if (restaurants.isEmpty()) {
             throw new DataNotFoundException(RESTAURANT_NOT_FOUND, "해당 조건에 맞는 맛집이 존재하지 않습니다.");
         }
 
-        return pickRandomUnique(dtoList);
+        return pickRandomUnique(new ArrayList<>(restaurants));
     }
 
     private List<RestaurantCoreInfoDto> pickRandomUnique(List<RestaurantCoreInfoDto> candidates) {

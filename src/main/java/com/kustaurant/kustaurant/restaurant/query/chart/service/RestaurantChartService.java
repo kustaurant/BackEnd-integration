@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.restaurant.restaurant.constants.MapConstants;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
-import com.kustaurant.kustaurant.restaurant.query.chart.service.port.ChartCondition;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantChartRepository;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import lombok.RequiredArgsConstructor;

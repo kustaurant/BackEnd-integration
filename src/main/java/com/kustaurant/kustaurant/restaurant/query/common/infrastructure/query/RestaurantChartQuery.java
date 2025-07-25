@@ -7,7 +7,7 @@ import static java.util.Objects.isNull;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
-import com.kustaurant.kustaurant.restaurant.query.chart.service.port.ChartCondition;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -67,7 +67,7 @@ public class RestaurantChartQuery {
     }
 
     private BooleanExpression cuisinesIn(List<String> cuisines) {
-        if (isNull(cuisines)) {
+        if (isNull(cuisines) || cuisines.isEmpty()) {
             return null;
         }
         if (cuisines.contains("JH")) {
@@ -77,7 +77,7 @@ public class RestaurantChartQuery {
     }
 
     private BooleanExpression positionsIn(List<String> positions) {
-        return isNull(positions) ? null : restaurantEntity.restaurantPosition.in(positions);
+        return isNull(positions) || positions.isEmpty() ? null : restaurantEntity.restaurantPosition.in(positions);
     }
 
     private BooleanExpression hasSituation(List<Long> situations, QRestaurantEntity r) {

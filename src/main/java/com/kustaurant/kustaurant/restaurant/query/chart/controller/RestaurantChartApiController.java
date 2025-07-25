@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.query.chart;
+package com.kustaurant.kustaurant.restaurant.query.chart.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
@@ -8,7 +8,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.Cuisi
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.LocationList;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTO;
-import com.kustaurant.kustaurant.restaurant.query.chart.service.port.ChartCondition;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

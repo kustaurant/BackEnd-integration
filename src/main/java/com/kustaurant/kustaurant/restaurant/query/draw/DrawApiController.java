@@ -1,6 +1,5 @@
-package com.kustaurant.kustaurant.restaurant.query.draw.controller;
+package com.kustaurant.kustaurant.restaurant.query.draw;
 
-import com.kustaurant.kustaurant.restaurant.query.draw.service.RestaurantDrawService;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.CuisineList;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.LocationList;

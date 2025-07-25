@@ -1,9 +1,9 @@
-package com.kustaurant.kustaurant.restaurant.query.draw.controller;
+package com.kustaurant.kustaurant.restaurant.query.draw;
 
+import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,10 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
 
-@RequiredArgsConstructor
 @Controller
+@RequiredArgsConstructor
 public class DrawWebController {
-    private static final Logger logger = LoggerFactory.getLogger(DrawWebController.class);
+
+    private final RestaurantDrawService restaurantDrawService;
 
     // 메뉴추천 화면
     @GetMapping("/recommend")
@@ -30,14 +31,14 @@ public class DrawWebController {
     }
 
     // 메뉴 리스트 받아오기
-    @GetMapping("/api/recommend")
-    public ResponseEntity<List<RestaurantEntity>> getRestaurantListForCuisine(
-            @RequestParam(value = "cuisine", defaultValue = "전체") String cuisine, @RequestParam(value = "location",defaultValue = "전체") String location, @RequestParam(value = "evaluation",defaultValue = "전체") String evaluation
+    @GetMapping("/web/api/recommend")
+    public ResponseEntity<List<RestaurantCoreInfoDto>> getRestaurantListForCuisine(
+            @RequestParam(value = "cuisine", defaultValue = "전체") String cuisine,
+            @RequestParam(value = "location",defaultValue = "전체") String location,
+            @RequestParam(value = "evaluation",defaultValue = "전체") String evaluation
     ) {
         String[] cuisinesArray = cuisine.split("-");
         List<String> cuisinesList = Arrays.asList(cuisinesArray);
-        List<RestaurantEntity> combinedRestaurantList = new ArrayList<>();
-        // 음식 종류마다 location 과 일치하는 식당 리스트 반환해서 combinedRestaurantList에 추가
         for (String item : cuisinesList) {
             if(item.equals("햄버거")){
                 item="햄버거/피자";
@@ -45,14 +46,10 @@ public class DrawWebController {
             if (item.equals("카페")) {
                 item="카페/디저트";
             }
-//            List<RestaurantEntity> retaurantList = restaurantWebService.getRestaurantListByRandomPick(item,location);
-            List<RestaurantEntity> retaurantList = List.of();
-            combinedRestaurantList.addAll(retaurantList);
         }
-
-        // 랜덤으로 30개 선택
-        return new ResponseEntity<>(getRandomSubList(combinedRestaurantList, 30), HttpStatus.OK);
-
+        List<RestaurantCoreInfoDto> restaurants = restaurantDrawService.draw(cuisinesList,
+                List.of(location));
+        return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
     // 랜덤으로 섞은 후 정확히 target 변수 만큼 의 식당을 반환하는 메소드
@@ -79,10 +76,12 @@ public class DrawWebController {
 
 
     // id에 해당 하는 식당 정보 반환
-    @GetMapping("/api/recommend/restaurant")
-    public ResponseEntity<RestaurantEntity> recommendRestaurant(@RequestParam(name = "restaurantId") String restaurantId) {
-//        RestaurantEntity restaurant = restaurantWebService.getRestaurant(Integer.valueOf(restaurantId));
-        return ResponseEntity.ok(null);
+    @GetMapping("/web/api/recommend/restaurant")
+    public ResponseEntity<Restaurant> recommendRestaurant(
+            @RequestParam(name = "restaurantId") Integer restaurantId
+    ) {
+        Restaurant restaurant = restaurantDrawService.getById(restaurantId);
+        return ResponseEntity.ok(restaurant);
     }
 
 }

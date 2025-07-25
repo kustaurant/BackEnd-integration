@@ -11,9 +11,5 @@ import java.util.Optional;
 
 public interface RestaurantJpaRepository extends JpaRepository<RestaurantEntity, Integer> {
 
-    List<RestaurantEntity> findAll(Specification<RestaurantEntity> spec);
-
-    Page<RestaurantEntity> findAll(Specification<RestaurantEntity> spec, Pageable pageable);
-
     Optional<RestaurantEntity> findByRestaurantIdAndStatus(Integer id, String status);
 }
