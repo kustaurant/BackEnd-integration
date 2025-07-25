@@ -10,7 +10,7 @@ spring:
     hibernate:
       ddl-auto: none
   jwt:
-    secret: test-secret
+    secret: "a-very-long-test-jwt-secret-key-must-be-over-32-bytes!!"
     access-ttl: 1800000
     refresh-ttl: 1209600000
   cloud:
