@@ -136,4 +136,4 @@ class PostCommentServiceTest {
 //    // 댓글 목록 조회 테스트는 제거된 getParentComments 메서드 대신
 //    // buildPostDetailView 메서드나 PostCommentQueryDAO를 직접 테스트하는 것이 좋습니다.
 //    // 실제 통합 테스트에서 전체 플로우를 검증하는 것을 권장합니다.
-//}
+}
