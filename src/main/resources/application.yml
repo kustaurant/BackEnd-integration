@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   config:
     import:
       - "optional:auth.yml"

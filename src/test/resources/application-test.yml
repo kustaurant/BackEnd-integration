@@ -1,8 +1,4 @@
 spring:
-  config:
-    import:
-      - "optional:auth.yml"
-      - "optional:.env"
   datasource:
     url: jdbc:tc:mysql:8.0.37:///testdb
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
@@ -16,7 +12,7 @@ spring:
   cloud:
     aws:
       credentials:
-        access-key: dummy
+        access-key: "a-very-long-test-jwt-secret-key-must-be-over-32-bytes!!"
         secret-key: dummy
       region:
         static: us-east-1
