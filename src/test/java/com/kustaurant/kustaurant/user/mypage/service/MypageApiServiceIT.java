@@ -78,7 +78,7 @@ class MypageApiServiceIT {
     }
 
     // 1
-    @Tag("middleTest") @Test @DisplayName("프로필 조회 정상동작")
+    @Test @DisplayName("프로필 조회 정상동작")
     void get_profile() {
         // g
         // w
