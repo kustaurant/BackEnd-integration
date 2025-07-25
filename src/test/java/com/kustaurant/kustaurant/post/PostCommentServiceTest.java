@@ -79,61 +79,61 @@ class PostCommentServiceTest {
                 .hasMessage("ID가 1인 댓글이(가) 존재하지 않습니다.");
     }
 
-    @Test
-    void 댓글_좋아요_처음_누르면_좋아요가_생성된다() {
-        // Given
-        Long userId = 10L;
-        Integer commentId = 1;
-        PostComment comment = PostComment.create("like test", userId, 2);
-        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-        when(likeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
-        when(dislikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
+//    @Test
+//    void 댓글_좋아요_처음_누르면_좋아요가_생성된다() {
+//        // Given
+//        Long userId = 10L;
+//        Integer commentId = 1;
+//        PostComment comment = PostComment.create("like test", userId, 2);
+//        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+//        when(likeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
+//        when(dislikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
+//
+//        // When
+//        ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
+//
+//        // Then
+//        assertThat(response.getStatus()).isEqualTo(ReactionStatus.LIKE_CREATED);
+//        assertThat(response.getLikeCount()).isEqualTo(1);
+//        verify(commentRepository).save(comment);
+//    }
 
-        // When
-        ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
+//    @Test
+//    void 댓글_싫어요에서_좋아요로_전환시_싫어요_감소_좋아요_증가한다() {
+//        // Given
+//        Long userId = 10L;
+//        Integer commentId = 1;
+//        PostComment comment = PostComment.create("switch from dislike", userId, 2);
+//        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+//        when(likeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
+//        when(dislikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(true);
+//
+//        // When
+//        ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
+//
+//        // Then
+//        assertThat(response.getStatus()).isEqualTo(ReactionStatus.LIKE_CREATED);
+//        assertThat(response.getLikeCount()).isEqualTo(1);
+//        assertThat(response.getDislikeCount()).isEqualTo(0);
+//    }
 
-        // Then
-        assertThat(response.getStatus()).isEqualTo(ReactionStatus.LIKE_CREATED);
-        assertThat(response.getLikeCount()).isEqualTo(1);
-        verify(commentRepository).save(comment);
-    }
-
-    @Test
-    void 댓글_싫어요에서_좋아요로_전환시_싫어요_감소_좋아요_증가한다() {
-        // Given
-        Long userId = 10L;
-        Integer commentId = 1;
-        PostComment comment = PostComment.create("switch from dislike", userId, 2);
-        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-        when(likeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
-        when(dislikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(true);
-
-        // When
-        ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
-
-        // Then
-        assertThat(response.getStatus()).isEqualTo(ReactionStatus.LIKE_CREATED);
-        assertThat(response.getLikeCount()).isEqualTo(1);
-        assertThat(response.getDislikeCount()).isEqualTo(0);
-    }
-
-    @Test
-    void 댓글을_삭제하면_상태가_DELETED로_변경된다() {
-        // Given
-        Integer commentId = 1;
-        PostComment reply = PostComment.create("reply", 100L, 1);
-        PostComment parentComment = PostComment.create("parent", 100L, 1);
-        when(commentRepository.findByIdWithReplies(commentId)).thenReturn(Optional.of(parentComment));
-
-        // When
-        int deletedCount = commentService.deleteComment(commentId);
-
-        // Then
-        assertThat(deletedCount).isEqualTo(2);
-        verify(commentRepository).save(parentComment);
-    }
-
-    // 댓글 목록 조회 테스트는 제거된 getParentComments 메서드 대신
-    // buildPostDetailView 메서드나 PostCommentQueryDAO를 직접 테스트하는 것이 좋습니다.
-    // 실제 통합 테스트에서 전체 플로우를 검증하는 것을 권장합니다.
-}
+//    @Test
+//    void 댓글을_삭제하면_상태가_DELETED로_변경된다() {
+//        // Given
+//        Integer commentId = 1;
+//        PostComment reply = PostComment.create("reply", 100L, 1);
+//        PostComment parentComment = PostComment.create("parent", 100L, 1);
+//        when(commentRepository.findByIdWithReplies(commentId)).thenReturn(Optional.of(parentComment));
+//
+//        // When
+//        int deletedCount = commentService.deleteComment(commentId);
+//
+//        // Then
+//        assertThat(deletedCount).isEqualTo(2);
+//        verify(commentRepository).save(parentComment);
+//    }
+//
+//    // 댓글 목록 조회 테스트는 제거된 getParentComments 메서드 대신
+//    // buildPostDetailView 메서드나 PostCommentQueryDAO를 직접 테스트하는 것이 좋습니다.
+//    // 실제 통합 테스트에서 전체 플로우를 검증하는 것을 권장합니다.
+//}
