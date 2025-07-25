@@ -1,4 +1,8 @@
 spring:
+  config:
+    import:
+      - "optional:auth.yml"
+      - "optional:.env"
   datasource:
     url: jdbc:tc:mysql:8.0.37:///testdb
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
