@@ -1,4 +1,4 @@
-name: 테스트 자동화
+name: 자동테스트
 
 on:
   pull_request:
@@ -16,13 +16,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
+
       - name: Gradle test (small only)
         run: ./gradlew smallTest
+
       - name: Publish Small Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
@@ -30,6 +33,14 @@ jobs:
           files: build/test-results/smallTest/TEST-*.xml
           check_name: 🧪 Run Small(Unit) Tests
           check_run: false
+
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: 🧪 소형 테스트 리포트
+          path: build/test-results/smallTest/*.xml
+          reporter: java-junit
 
   middle-test:
     name: 🚀 중형 테스트
@@ -68,3 +79,11 @@ jobs:
           files: build/test-results/middleTest/TEST-*.xml
           check_name: 🚀 Run Middle(Integration) Tests
           check_run: false
+
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: 🚀 중형 테스트 리포트
+          path: build/test-results/middleTest/*.xml
+          reporter: java-junit
