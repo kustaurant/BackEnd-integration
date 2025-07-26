@@ -31,7 +31,7 @@ jobs:
         if: always()
         with:
           files: build/test-results/smallTest/TEST-*.xml
-          check_name: 🧪 소형 테스트 결과
+          check_name: 🧪 소형(단위) 테스트 결과
           check_run: false
 
   #      - name: Publish Test Report
@@ -77,7 +77,7 @@ jobs:
         if: always()
         with:
           files: build/test-results/middleTest/TEST-*.xml
-          check_name: 🚀 중형 테스트 결과
+          check_name: 🚀 중형(통합) 테스트 결과
           check_run: false
 
 #      - name: Publish Test Report
