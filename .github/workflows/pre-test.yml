@@ -1,5 +1,4 @@
-name: Github-actions 자동 테스트
-
+name: pre-test.yml
 on:
   pull_request:
     branches: [ main, develop ]
@@ -10,57 +9,34 @@ permissions:
   contents: read
 
 jobs:
-#  small-test:
-#    name: 🧪 Run Small(Unit) Tests
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#      - name: Set up JDK
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: '21'
-#          distribution: 'temurin'
-#      - name: Gradle test (small only)
-#        run: ./gradlew smallTest
-#      - name: Publish Small Test Results
-#        uses: EnricoMi/publish-unit-test-result-action@v2
-#        if: always()
-#        with:
-#          files: build/test-results/smallTest/TEST-*.xml
-#          check_name: 🧪 Run Small(Unit) Tests
-#          check_run: false
-
-  middle-test:
-    name: 🚀 Run Middle(Integration) Tests
+  test:
     runs-on: ubuntu-latest
+
     services:
       docker:
         image: docker:24.0.2
         options: >-
           --privileged
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK
+      - name: Set up JDK 20
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Load ENV_FILE secret into .env file
-        working-directory: ./BackEnd-integration
-        run: |
-          printf "%s\n" "${{ secrets.ENV_FILE }}" > .env
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
 
-      - name: Gradle test (middle only)
-        run: ./gradlew middleTest
+      - name: Run Tests
+        run: ./gradlew test
 
-      - name: Publish Middle Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+      - name: Publish Test Report
         if: always()
+        uses: dorny/test-reporter@v1
         with:
-          files: build/test-results/middleTest/TEST-*.xml
-          check_name: 🚀 Run Middle(Integration) Tests
-          check_run: false
+          name: JUnit Tests
+          path: build/test-results/test/*.xml
+          reporter: java-junit
