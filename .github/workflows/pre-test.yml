@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
   contents: read
 
-#jobs:
+jobs:
 #  small-test:
 #    name: 🧪 Run Small(Unit) Tests
 #    runs-on: ubuntu-latest
