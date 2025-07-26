@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.user.service;
 
+import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
@@ -67,6 +68,6 @@ class UserServiceImplTest {
         //t
         assertThatThrownBy(()->{
             userServiceImpl.getUserById(2L);
-        }).isInstanceOf(DataNotFoundException.class);
+        }).isInstanceOf(UserNotFoundException.class);
     }
 }
