@@ -41,7 +41,7 @@ jobs:
       NAVER_CLIENT_ID : kustaurant
       NAVER_CLIENT_SECRET : secreat
       APPLE_CLIENT_ID : kustaurant
-      APPLE_PUBLIC_KEYS_URL : keyurl
+      APPLE_PUBLIC_KEYS_URL : https://appleid.apple.com/auth/keys
 
     services:
       docker:
