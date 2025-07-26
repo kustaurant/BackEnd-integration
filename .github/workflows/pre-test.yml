@@ -48,15 +48,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Load ENV_FILE secret into .env file
-        run: |
-          printf "%s" "${{ secrets.ENV_FILE }}" > .env
+        run: echo "${{ secrets.ENV_FILE }}" > .env
       - name: Gradle test (middle only)
-        working-directory: ./BackEnd-integration
         run: ./gradlew middleTest
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_ACCESS_TOKEN_EXPIRATION: ${{ secrets.JWT_ACCESS_TOKEN_EXPIRATION }}
-          JWT_REFRESH_TOKEN_EXPIRATION: ${{ secrets.JWT_REFRESH_TOKEN_EXPIRATION }}
       - name: Publish Middle Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
