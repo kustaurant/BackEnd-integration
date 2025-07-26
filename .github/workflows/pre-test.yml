@@ -38,6 +38,10 @@ jobs:
       JWT_SECRET: thisIsA32ByteLengthSecretKeyForJWT!
       JWT_ACCESS_TOKEN_EXPIRATION : 900
       JWT_REFRESH_TOKEN_EXPIRATION : 604800
+      NAVER_CLIENT_ID : kustaurant
+      NAVER_CLIENT_SECRET : secreat
+      APPLE_CLIENT_ID : kustaurant
+      APPLE_PUBLIC_KEYS_URL : keyurl
 
     services:
       docker:
