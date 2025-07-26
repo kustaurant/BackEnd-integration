@@ -36,6 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       JWT_SECRET: thisIsA32ByteLengthSecretKeyForJWT!
+      JWT_ACCESS_TOKEN_EXPIRATION : 900
+      JWT_REFRESH_TOKEN_EXPIRATION : 604800
+
     services:
       docker:
         image: docker:24.0.2
