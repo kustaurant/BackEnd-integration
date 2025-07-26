@@ -112,6 +112,6 @@ tasks.register('middleTest', Test) {
 	testClassesDirs = sourceSets.test.output.classesDirs
 	classpath = sourceSets.test.runtimeClasspath
 	shouldRunAfter test
-	reports.junitXml.destination = layout.buildDirectory.dir("test-results/integrationTest").get().asFile
-	reports.html.destination = layout.buildDirectory.dir("reports/tests/integrationTest").get().asFile
+	reports.junitXml.destination = layout.buildDirectory.dir("test-results/middleTest").get().asFile
+	reports.html.destination = layout.buildDirectory.dir("reports/tests/middleTest").get().asFile
 }
