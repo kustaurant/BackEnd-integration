@@ -51,6 +51,7 @@ jobs:
         run: |
           printf "%s" "${{ secrets.ENV_FILE }}" > .env
       - name: Gradle test (middle only)
+        working-directory: ./BackEnd-integration
         run: ./gradlew middleTest
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
