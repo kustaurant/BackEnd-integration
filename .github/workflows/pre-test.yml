@@ -1,4 +1,4 @@
-name: pre-test.yml
+name: Github-actions 자동 테스트
 
 on:
   pull_request:
@@ -48,7 +48,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Load ENV_FILE secret into .env file
-        run: echo "${{ secrets.ENV_FILE }}" > .env
+        run: |
+          printf "%s\n" "${{ secrets.ENV_FILE }}" > .env
       - name: Gradle test (middle only)
         run: ./gradlew middleTest
       - name: Publish Middle Test Results
