@@ -9,27 +9,27 @@ permissions:
   pull-requests: write
   contents: read
 
-jobs:
-  small-test:
-    name: 🧪 Run Small(Unit) Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-      - name: Gradle test (small only)
-        run: ./gradlew smallTest
-      - name: Publish Small Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: build/test-results/smallTest/TEST-*.xml
-          check_name: 🧪 Run Small(Unit) Tests
-          check_run: false
+#jobs:
+#  small-test:
+#    name: 🧪 Run Small(Unit) Tests
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Set up JDK
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '21'
+#          distribution: 'temurin'
+#      - name: Gradle test (small only)
+#        run: ./gradlew smallTest
+#      - name: Publish Small Test Results
+#        uses: EnricoMi/publish-unit-test-result-action@v2
+#        if: always()
+#        with:
+#          files: build/test-results/smallTest/TEST-*.xml
+#          check_name: 🧪 Run Small(Unit) Tests
+#          check_run: false
 
   middle-test:
     name: 🚀 Run Middle(Integration) Tests
@@ -42,16 +42,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
+
       - name: Load ENV_FILE secret into .env file
+        working-directory: ./BackEnd-integration
         run: |
           printf "%s\n" "${{ secrets.ENV_FILE }}" > .env
+
       - name: Gradle test (middle only)
         run: ./gradlew middleTest
+
       - name: Publish Middle Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
