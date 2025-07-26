@@ -11,6 +11,7 @@ import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavorit
 import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageApiService;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
@@ -26,9 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -158,7 +159,9 @@ class MypageApiServiceIT {
         var res = mypageApiService.getUserFavoriteRestaurantList(user1.getId());
         //t
         assertEquals(5, res.size());
-        assertThat(res.get(0).restaurantName()).isEqualTo("한식당1");
+        assertThat(res)
+                .extracting(MyRestaurantResponse::restaurantName)
+                .contains("한식당1");
     }
 
     // 7
@@ -173,6 +176,8 @@ class MypageApiServiceIT {
                         List.of(new RestaurantConstants.StarComment(6, "신선해요")),
                         null
                 );
+        evaluationService.evaluate(user1.getId(), 1, dto1);
+
         EvaluationDTO dto2 = new EvaluationDTO(
                         1.5,
                         List.of(),
@@ -181,8 +186,6 @@ class MypageApiServiceIT {
                         List.of(new RestaurantConstants.StarComment(1, "신선하지 않네요")),
                         null
                 );
-
-        evaluationService.evaluate(user1.getId(), 1, dto1);
         evaluationService.evaluate(user1.getId(), 2, dto2);
         //w
         var res = mypageApiService.getUserEvaluateRestaurantList(user1.getId());

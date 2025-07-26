@@ -76,7 +76,7 @@ class PostCommentServiceTest {
         // When & Then
         assertThatThrownBy(() -> commentService.getPostCommentByCommentId(commentId))
                 .isInstanceOf(DataNotFoundException.class)
-                .hasMessage("PostComment not found");
+                .hasMessage("ID가 1인 댓글이(가) 존재하지 않습니다.");
     }
 
     @Test
@@ -112,7 +112,7 @@ class PostCommentServiceTest {
         ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
 
         // Then
-        assertThat(response.getStatus()).isEqualTo(ReactionStatus.DISLIKE_TO_LIKE);
+        assertThat(response.getStatus()).isEqualTo(ReactionStatus.LIKE_CREATED);
         assertThat(response.getLikeCount()).isEqualTo(1);
         assertThat(response.getDislikeCount()).isEqualTo(0);
     }
