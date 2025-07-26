@@ -34,6 +34,8 @@ jobs:
   middle-test:
     name: 🚀 중형 테스트
     runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: thisIsA32ByteLengthSecretKeyForJWT!
     services:
       docker:
         image: docker:24.0.2
