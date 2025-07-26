@@ -10,26 +10,26 @@ permissions:
   contents: read
 
 jobs:
-#  small-test:
-#    name: 🧪 소형 테스트
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#      - name: Set up JDK
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: '21'
-#          distribution: 'temurin'
-#      - name: Gradle test (small only)
-#        run: ./gradlew smallTest
-#      - name: Publish Small Test Results
-#        uses: EnricoMi/publish-unit-test-result-action@v2
-#        if: always()
-#        with:
-#          files: build/test-results/smallTest/TEST-*.xml
-#          check_name: 🧪 Run Small(Unit) Tests
-#          check_run: false
+  small-test:
+    name: 🧪 소형 테스트
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Gradle test (small only)
+        run: ./gradlew smallTest
+      - name: Publish Small Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: build/test-results/smallTest/TEST-*.xml
+          check_name: 🧪 Run Small(Unit) Tests
+          check_run: false
 
   middle-test:
     name: 🚀 중형 테스트
