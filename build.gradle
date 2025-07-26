@@ -7,11 +7,10 @@ plugins {
 group = 'com.kustaurant'
 // 배포 버젼
 version = '0.1.0-SNAPSHOT'
-// 배포 자바 버젼
 java {
-	sourceCompatibility = '17'
-//	sourceCompatibility = JavaVersion.VERSION_21
-//	targetCompatibility = JavaVersion.VERSION_21
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
 }
 // jar 제외하고 bootjar 로만 실행파일생성
 jar {
@@ -92,4 +91,27 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// 아래는 소형/중형 테스트 분리를 위한 설정임
+tasks.register('smallTest', Test) {
+	useJUnitPlatform {
+		excludeTags 'middleTest'
+	}
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	shouldRunAfter test
+	reports.junitXml.destination = layout.buildDirectory.dir("test-results/smallTest").get().asFile
+	reports.html.destination = layout.buildDirectory.dir("reports/tests/smallTest").get().asFile
+}
+
+tasks.register('middleTest', Test) {
+	useJUnitPlatform {
+		includeTags 'middleTest'
+	}
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	shouldRunAfter test
+	reports.junitXml.destination = layout.buildDirectory.dir("test-results/integrationTest").get().asFile
+	reports.html.destination = layout.buildDirectory.dir("reports/tests/integrationTest").get().asFile
 }
