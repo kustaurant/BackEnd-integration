@@ -1,4 +1,5 @@
-name: pre-test.yml
+name: 테스트 자동화
+
 on:
   pull_request:
     branches: [ main, develop ]
@@ -9,34 +10,52 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+#  small-test:
+#    name: 🧪 소형 테스트
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#      - name: Set up JDK
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '21'
+#          distribution: 'temurin'
+#      - name: Gradle test (small only)
+#        run: ./gradlew smallTest
+#      - name: Publish Small Test Results
+#        uses: EnricoMi/publish-unit-test-result-action@v2
+#        if: always()
+#        with:
+#          files: build/test-results/smallTest/TEST-*.xml
+#          check_name: 🧪 Run Small(Unit) Tests
+#          check_run: false
 
+  middle-test:
+    name: 🚀 중형 테스트
+    runs-on: ubuntu-latest
     services:
       docker:
         image: docker:24.0.2
         options: >-
           --privileged
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set up JDK 20
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+      - name: Gradle test (middle only)
+        run: ./gradlew middleTest
 
-      - name: Run Tests
-        run: ./gradlew test
-
-      - name: Publish Test Report
+      - name: Publish Middle Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
-        uses: dorny/test-reporter@v1
         with:
-          name: JUnit Tests
-          path: build/test-results/test/*.xml
-          reporter: java-junit
+          files: build/test-results/middleTest/TEST-*.xml
+          check_name: 🚀 Run Middle(Integration) Tests
+          check_run: false
