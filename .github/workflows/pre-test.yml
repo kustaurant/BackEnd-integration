@@ -31,16 +31,16 @@ jobs:
         if: always()
         with:
           files: build/test-results/smallTest/TEST-*.xml
-          check_name: 🧪 Run Small(Unit) Tests
+          check_name: 🧪 소형 테스트 결과 출력
           check_run: false
 
-      - name: Publish Test Report
-        if: always()
-        uses: dorny/test-reporter@v1
-        with:
-          name: 🧪 소형 테스트 리포트
-          path: build/test-results/smallTest/*.xml
-          reporter: java-junit
+#      - name: Publish Test Report
+#        if: always()
+#        uses: dorny/test-reporter@v1
+#        with:
+#          name: 🧪 소형 테스트 리포트
+#          path: build/test-results/smallTest/*.xml
+#          reporter: java-junit
 
   middle-test:
     name: 🚀 중형 테스트
@@ -77,13 +77,13 @@ jobs:
         if: always()
         with:
           files: build/test-results/middleTest/TEST-*.xml
-          check_name: 🚀 Run Middle(Integration) Tests
+          check_name: 🚀 중형 테스트 결과 출력
           check_run: false
 
-      - name: Publish Test Report
-        if: always()
-        uses: dorny/test-reporter@v1
-        with:
-          name: 🚀 중형 테스트 리포트
-          path: build/test-results/middleTest/*.xml
-          reporter: java-junit
+#      - name: Publish Test Report
+#        if: always()
+#        uses: dorny/test-reporter@v1
+#        with:
+#          name: 🚀 중형 테스트 리포트
+#          path: build/test-results/middleTest/*.xml
+#          reporter: java-junit
