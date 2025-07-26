@@ -1,0 +1,89 @@
+name: 자동테스트
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  small-test:
+    name: 🧪 소형 테스트
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Gradle test (small only)
+        run: ./gradlew smallTest
+
+      - name: Publish Small Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: build/test-results/smallTest/TEST-*.xml
+          check_name: 🧪 소형 테스트 결과
+          check_run: false
+
+  #      - name: Publish Test Report
+  #        if: always()
+  #        uses: dorny/test-reporter@v1
+  #        with:
+  #          name: 🧪 소형 테스트 리포트
+  #          path: build/test-results/smallTest/*.xml
+  #          reporter: java-junit
+
+  middle-test:
+    name: 🚀 중형 테스트
+    runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: thisIsA32ByteLengthSecretKeyForJWT!
+      JWT_ACCESS_TOKEN_EXPIRATION : 900
+      JWT_REFRESH_TOKEN_EXPIRATION : 604800
+      NAVER_CLIENT_ID : kustaurant
+      NAVER_CLIENT_SECRET : secreat
+      APPLE_CLIENT_ID : kustaurant
+      APPLE_PUBLIC_KEYS_URL : https://appleid.apple.com/auth/keys
+
+    services:
+      docker:
+        image: docker:24.0.2
+        options: >-
+          --privileged
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Gradle test (middle only)
+        run: ./gradlew middleTest
+
+      - name: Publish Middle Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: build/test-results/middleTest/TEST-*.xml
+          check_name: 🚀 중형 테스트 결과
+          check_run: false
+
+#      - name: Publish Test Report
+#        if: always()
+#        uses: dorny/test-reporter@v1
+#        with:
+#          name: 🚀 중형 테스트 리포트
+#          path: build/test-results/middleTest/*.xml
+#          reporter: java-junit
