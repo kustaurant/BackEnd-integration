@@ -62,7 +62,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getUserById는_DELETED상태의_유저는_찾아선_안된다() {
+    void getUserById는_softDeleteD상태의_유저는_찾아선_안된다() {
         //g
         //w
         //t

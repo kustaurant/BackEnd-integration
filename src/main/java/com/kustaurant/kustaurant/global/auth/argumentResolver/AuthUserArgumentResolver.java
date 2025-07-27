@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.global.auth.argumentResolver;
 
-import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2User;
+import com.kustaurant.kustaurant.user.login.web.CustomOAuth2User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.global.exception.exception.auth.UnauthenticatedException;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,8 @@
-package com.kustaurant.kustaurant.global.auth.jwt.apple;
+package com.kustaurant.kustaurant.user.login.api.infrastructure;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kustaurant.kustaurant.global.exception.exception.business.ProviderApiException;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,7 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class AppleApiService {
+public class AppleOAuthClient {
     @Value("${apple.APPLE_PUBLIC_KEYS_URL}")
     private String applePublicKeysURL;
     @Value("${apple.APPLE_CLIENT_ID}")
@@ -46,11 +47,11 @@ public class AppleApiService {
 
             return claimsJws.getPayload();
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("토큰이 만료되었습니다.");
+            throw new ProviderApiException("APPLE", "토큰이 만료되었습니다.", e);
         } catch (IncorrectClaimException|MissingClaimException e) {
-            throw new RuntimeException("Apple Id 토큰이 유효하지 않습니다.",e);
+            throw new ProviderApiException("Apple", "Id 토큰이 유효하지 않습니다.", e);
         } catch (JwtException e) {
-            throw new RuntimeException("Apple Id 토큰 검증 실패",e);
+            throw new ProviderApiException("APPLE", "IdentityToken 검증 실패", e);
         }
     }
 
@@ -74,13 +75,13 @@ public class AppleApiService {
             }
         } catch (IOException e) {
             log.error("Failed to parse Apple public keys response", e);
-            throw new RuntimeException("Failed to fetch Apple public keys due to parsing error", e);
+            throw new ProviderApiException("APPLE", "공개키 응답 JSON 파싱 실패", e);
         } catch (RestClientException e) {
             log.error("Failed to fetch Apple public keys from URL: " + publicKeyUrl, e);
-            throw new RuntimeException("Failed to fetch Apple public keys due to network error", e);
+            throw new ProviderApiException("APPLE", "공개키 요청 통신 실패", e);
         } catch (Exception e) {
             log.error("Unexpected error while fetching Apple public keys", e);
-            throw new RuntimeException("Failed to fetch Apple public keys", e);
+            throw new ProviderApiException("APPLE", "공개키 요청 중 알 수 없는 오류", e);
         }
     }
 

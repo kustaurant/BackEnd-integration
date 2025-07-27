@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.auth.jwt.core;
+package com.kustaurant.kustaurant.user.login.api.infrastructure;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;

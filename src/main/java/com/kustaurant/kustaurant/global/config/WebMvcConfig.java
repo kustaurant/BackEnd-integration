@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.CuisineListAr
 import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.LocationListArgumentResolver;
 import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.SituationListArgumentResolver;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserArgumentResolver;
-import com.kustaurant.kustaurant.global.auth.session.MyInterceptor;
+import com.kustaurant.kustaurant.global.auth.web.MyInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

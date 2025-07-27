@@ -6,7 +6,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.tier.RestaurantTierDataClass;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantWebService;
-import com.kustaurant.kustaurant.global.auth.session.CustomOAuth2UserService;
+import com.kustaurant.kustaurant.user.login.web.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

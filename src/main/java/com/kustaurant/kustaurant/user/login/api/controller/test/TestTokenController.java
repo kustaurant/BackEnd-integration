@@ -1,7 +1,7 @@
-package com.kustaurant.kustaurant.global.auth.jwt.core.test;
+package com.kustaurant.kustaurant.user.login.api.controller.test;
 
-import com.kustaurant.kustaurant.global.auth.jwt.core.UserApiLoginService;
-import com.kustaurant.kustaurant.global.auth.jwt.response.TokenResponse;
+import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
+import com.kustaurant.kustaurant.user.login.api.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("/api/v2/test/token/exp")
 @RequiredArgsConstructor
 public class TestTokenController {
-    private final UserApiLoginService userApiLoginService;
+    private final TokenService tokenService;
 
     //1
     @Operation(
@@ -25,7 +25,7 @@ public class TestTokenController {
     public ResponseEntity<?> testWithExpiredACT(
             @RequestHeader("Authorization") String accessToken
     ) {
-        String newAccess = userApiLoginService.yoloAccessToken(stripBearer(accessToken));
+        String newAccess = tokenService.yoloAccess(stripBearer(accessToken));
         return ResponseEntity.ok(new TokenResponse(newAccess, null));
     }
 
@@ -38,7 +38,7 @@ public class TestTokenController {
     public ResponseEntity<?> testWithExpiredRFT(
             @RequestHeader("Authorization") String accessToken
     ) {
-        String newRefresh = userApiLoginService.yoloRefreshToken(stripBearer(accessToken));
+        String newRefresh = tokenService.yoloRefresh(stripBearer(accessToken));
         return ResponseEntity.ok(new TokenResponse(null, newRefresh));
     }
 

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.auth.jwt.response;
+package com.kustaurant.kustaurant.user.login.api.controller.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

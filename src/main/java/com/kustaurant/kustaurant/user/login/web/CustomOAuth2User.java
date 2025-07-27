@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.auth.session;
+package com.kustaurant.kustaurant.user.login.web;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

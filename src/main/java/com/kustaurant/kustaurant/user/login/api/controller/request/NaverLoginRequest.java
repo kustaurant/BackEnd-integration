@@ -1,10 +1,8 @@
-package com.kustaurant.kustaurant.global.auth.jwt.naver;
+package com.kustaurant.kustaurant.user.login.api.controller.request;
 
 import jakarta.validation.constraints.NotBlank;
 
 public record NaverLoginRequest (
-    @NotBlank
-    String provider,
     @NotBlank
     String providerId,
     @NotBlank

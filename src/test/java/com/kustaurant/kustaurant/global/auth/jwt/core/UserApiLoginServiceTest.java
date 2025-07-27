@@ -4,12 +4,17 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtProperties;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
-import com.kustaurant.kustaurant.global.auth.jwt.apple.AppleApiService;
-import com.kustaurant.kustaurant.global.auth.jwt.apple.AppleLoginRequest;
-import com.kustaurant.kustaurant.global.auth.jwt.naver.NaverApiService;
-import com.kustaurant.kustaurant.global.auth.jwt.naver.NaverLoginRequest;
-import com.kustaurant.kustaurant.global.auth.jwt.response.TokenResponse;
+import com.kustaurant.kustaurant.global.auth.jwt.TokenType;
+import com.kustaurant.kustaurant.user.login.api.infrastructure.AppleOAuthClient;
+import com.kustaurant.kustaurant.user.login.api.controller.request.AppleLoginRequest;
+import com.kustaurant.kustaurant.user.login.api.infrastructure.RefreshTokenStore;
+import com.kustaurant.kustaurant.user.login.api.service.ApiLoginService;
+import com.kustaurant.kustaurant.user.login.api.infrastructure.NaverOAuthClient;
+import com.kustaurant.kustaurant.user.login.api.controller.request.NaverLoginRequest;
+import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
 import com.kustaurant.kustaurant.global.exception.exception.auth.RefreshTokenInvalidException;
+import com.kustaurant.kustaurant.user.login.api.service.TokenService;
+import com.kustaurant.kustaurant.user.login.api.service.WithdrawService;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
@@ -38,17 +43,22 @@ class UserApiLoginServiceTest {
     @Mock
     UserRepository userRepository;
     @Mock
-    NaverApiService naverApiService;
+    NaverOAuthClient naverApiService;
     @Mock
-    AppleApiService appleApiService;
-    @Mock RefreshTokenStore   refreshStore;
+    AppleOAuthClient appleApiService;
+    @Mock
+    RefreshTokenStore refreshStore;
+    @Mock
+    TokenService tokenService;
+    @Mock
+    WithdrawService withdrawService;
     @Mock
     JwtUtil jwtUtil;
     @Mock
     JwtProperties jwtProperties;
 
     @InjectMocks
-    private UserApiLoginService service;
+    private ApiLoginService loginService;
 
     final String ACCESS  = "access.jwt.token";
     final String REFRESH = "refresh.jwt.token";
@@ -62,7 +72,6 @@ class UserApiLoginServiceTest {
         void returnsTokens_whenUserIsActive() {
             //g
             NaverLoginRequest req = new NaverLoginRequest(
-                    "NAVER",
                     "PID123",
                     "naverAccess"
             );
@@ -87,7 +96,7 @@ class UserApiLoginServiceTest {
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
-            var tokenResponse = service.processNaverLogin(req);
+            var tokenResponse = loginService.processNaverLogin(req);
 
             //t
             assertThat(tokenResponse.accessToken()).isEqualTo(ACCESS);
@@ -128,7 +137,7 @@ class UserApiLoginServiceTest {
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             // w
-            TokenResponse token = service.processNaverLogin(req);
+            TokenResponse token = loginService.processNaverLogin(req);
 
             //t
             assertThat(token.accessToken()).isEqualTo(ACCESS);
@@ -168,7 +177,7 @@ class UserApiLoginServiceTest {
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             // w
-            TokenResponse token = service.processNaverLogin(req);
+            TokenResponse token = loginService.processNaverLogin(req);
 
             // t
             assertThat(token.accessToken()).isEqualTo(ACCESS);
@@ -221,7 +230,7 @@ class UserApiLoginServiceTest {
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
-            TokenResponse res = service.processAppleLogin(req);
+            TokenResponse res = loginService.processAppleLogin(req);
 
             //t
             assertThat(res.accessToken()).isEqualTo(ACCESS);
@@ -256,7 +265,7 @@ class UserApiLoginServiceTest {
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
-            TokenResponse res = service.processAppleLogin(req);
+            TokenResponse res = loginService.processAppleLogin(req);
 
             //t
             assertThat(res.accessToken()).isEqualTo(ACCESS);
@@ -290,7 +299,7 @@ class UserApiLoginServiceTest {
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
-            TokenResponse res = service.processAppleLogin(req);
+            TokenResponse res = loginService.processAppleLogin(req);
 
             //t
             assertThat(res.accessToken()).isEqualTo(ACCESS);
@@ -315,14 +324,14 @@ class UserApiLoginServiceTest {
             //g
             Long userId = 1L;
             String role = "ROLE_USER";
-            JwtUtil.ParsedToken parsedToken = new JwtUtil.ParsedToken(userId, role, "RT");
+            JwtUtil.ParsedToken parsedToken = new JwtUtil.ParsedToken(userId, role, TokenType.REFRESH);
 
             when(jwtUtil.parse(REFRESH)).thenReturn(parsedToken);
             when(refreshStore.get(userId)).thenReturn(REFRESH);
             when(jwtUtil.generateAccessToken(userId, role)).thenReturn(ACCESS);
 
             // w
-            String newAccessToken = service.refreshAccessToken(REFRESH);
+            String newAccessToken = tokenService.refreshAccess(REFRESH);
 
             // then
             assertThat(newAccessToken).isEqualTo(ACCESS);
@@ -332,13 +341,13 @@ class UserApiLoginServiceTest {
         @DisplayName("저장값과 불일치 -> RefreshTokenInvalidException 발생")
         void refreshAccessToken_mismatch() {
             //g
-            JwtUtil.ParsedToken parsed = new JwtUtil.ParsedToken(1L, "ROLE_USER", "RT");
+            JwtUtil.ParsedToken parsed = new JwtUtil.ParsedToken(1L, "ROLE_USER", TokenType.REFRESH);
 
             when(jwtUtil.parse(REFRESH)).thenReturn(parsed);
             when(refreshStore.get(1L)).thenReturn("DIFFERENT");
 
             //w + d
-            assertThatThrownBy(() -> service.refreshAccessToken(REFRESH))
+            assertThatThrownBy(() -> tokenService.refreshAccess(REFRESH))
                     .isInstanceOf(RefreshTokenInvalidException.class);
         }
     }
@@ -356,7 +365,7 @@ class UserApiLoginServiceTest {
             Long userId = 55L;
 
             // when
-            service.logoutUser(userId);
+            withdrawService.logoutUser(userId);
 
             // then
             verify(refreshStore).delete(userId);
@@ -372,7 +381,7 @@ class UserApiLoginServiceTest {
 
         @Test
         @DisplayName("deleteUserById()는 status를 DELETED로 바꾸고 Refresh도 삭제한다")
-        void deleteUser_marksDeleted() {
+        void softDeleteUser_marksDeleted() {
             //g
             Long userId = 99L;
             User testUser = User.builder()
@@ -389,7 +398,7 @@ class UserApiLoginServiceTest {
             when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
 
             // w
-            service.deleteUserById(userId);
+            withdrawService.deleteUserById(userId);
 
             // t
             assertThat(testUser.getStatus()).isEqualTo(UserStatus.DELETED);
@@ -412,7 +421,7 @@ class UserApiLoginServiceTest {
 
             // w
             String nickname = (String) ReflectionTestUtils
-                    .invokeMethod(service, "nextAppleNickname");
+                    .invokeMethod(loginService, "nextAppleNickname");
 
             // t
             assertThat(nickname).isEqualTo("애플사용자1");
@@ -426,7 +435,7 @@ class UserApiLoginServiceTest {
 
             // w
             String nickname = (String) ReflectionTestUtils
-                    .invokeMethod(service, "nextAppleNickname");
+                    .invokeMethod(loginService, "nextAppleNickname");
 
             // t
             assertThat(nickname).isEqualTo("애플사용자43");
