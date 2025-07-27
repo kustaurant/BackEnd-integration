@@ -18,6 +18,6 @@ public enum Position {
         return Arrays.stream(Position.values())
                 .filter(v -> v.value.equals(value))
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException(value + " Position은 존재하지 않습니다."));
     }
 }
