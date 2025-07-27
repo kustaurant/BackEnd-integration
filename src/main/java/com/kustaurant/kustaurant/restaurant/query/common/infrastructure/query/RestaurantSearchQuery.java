@@ -44,6 +44,7 @@ public class RestaurantSearchQuery {
                 .select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
                 .where(andBuilder)
+                .limit(size)
                 .fetch();
     }
 }

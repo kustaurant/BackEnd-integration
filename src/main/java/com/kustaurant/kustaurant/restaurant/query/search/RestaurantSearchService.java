@@ -16,6 +16,9 @@ public class RestaurantSearchService {
     private final RestaurantSearchRepository restaurantSearchRepository;
 
     public List<RestaurantCoreInfoDto> search(String[] kwArr, @Nullable Long userId) {
+        if (kwArr == null || kwArr.length == 0) {
+            return List.of();
+        }
         return restaurantSearchRepository.search(kwArr, userId, SEARCH_MAX_SIZE);
     }
 }

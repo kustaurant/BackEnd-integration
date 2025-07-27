@@ -7,11 +7,11 @@ import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConst
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Set;
-import lombok.Data;
 
 import java.util.List;
+import lombok.Getter;
 
-@Data
+@Getter
 @Schema(description = "restaurant tier entity")
 public class RestaurantCoreInfoDto {
     @Schema(description = "식당 id", example = "1")

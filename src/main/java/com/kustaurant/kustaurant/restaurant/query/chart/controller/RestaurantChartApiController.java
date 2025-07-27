@@ -76,6 +76,9 @@ public class RestaurantChartApiController {
     ) {
         // page 0부터 시작하게 수정
         page--;
+        if (page < 0) {
+            page = 0;
+        }
         // 조회
         ChartCondition condition = new ChartCondition(cuisines, situations, locations);
         Pageable pageable = PageRequest.of(page, limit);

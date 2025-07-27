@@ -34,7 +34,7 @@ public class RestaurantChartService {
                 pageable, userId);
         // 순위 정보 채우기
         int startRanking = pageable.getPageSize() * pageable.getPageNumber() + 1;
-        chartRankingAssembler.enrichDtoList(result.getContent(), startRanking);
+        chartRankingAssembler.enrichDtoListWithRanking(result.getContent(), startRanking);
         return result;
     }
 

@@ -21,6 +21,6 @@ public enum Cuisine {
         return Arrays.stream(Cuisine.values())
                 .filter(v -> v.value.equals(value))
                 .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException(value + " is not a valid cuisine"));
     }
 }

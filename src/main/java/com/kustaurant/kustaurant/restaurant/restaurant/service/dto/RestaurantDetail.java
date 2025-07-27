@@ -111,7 +111,7 @@ public class RestaurantDetail {
                     avgScorePostprocessing(restaurantScoreSum, evaluationCount),
                     isEvaluated,
                     isFavorite,
-                    (int) (long) favoriteCount,
+                    favoriteCount.intValue(),
                     restaurantMenuSet.stream().toList(),
                     restaurantType,
                     restaurantTel,

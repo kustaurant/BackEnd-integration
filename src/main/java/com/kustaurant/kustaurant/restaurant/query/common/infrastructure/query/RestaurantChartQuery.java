@@ -6,6 +6,7 @@ import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.q
 import static java.util.Objects.isNull;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Cuisine;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -94,7 +95,7 @@ public class RestaurantChartQuery {
         if (isNull(cuisines) || cuisines.isEmpty()) {
             return null;
         }
-        if (cuisines.contains("JH")) {
+        if (cuisines.contains(Cuisine.JH.name())) {
             return restaurantEntity.partnershipInfo.isNotNull().and(restaurantEntity.partnershipInfo.ne(""));
         }
         return restaurantEntity.restaurantCuisine.in(cuisines);

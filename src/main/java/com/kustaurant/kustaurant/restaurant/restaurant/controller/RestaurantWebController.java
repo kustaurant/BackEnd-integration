@@ -33,8 +33,8 @@ public class RestaurantWebController {
                 user.id());
 
         model.addAttribute("restaurantDto", detailDto);
-        String evaluationButton
-                = (user != null && detailDto.getIsEvaluated()) ? "다시 평가하기" : " 평가하기";
+        boolean hasEvaluated = detailDto.getIsEvaluated();
+        String evaluationButton = hasEvaluated ? "다시 평가하기" : " 평가하기";
         model.addAttribute("evaluationButton", evaluationButton);
 
         // 메뉴 정보

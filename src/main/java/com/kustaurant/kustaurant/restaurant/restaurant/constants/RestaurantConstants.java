@@ -31,8 +31,11 @@ public abstract class RestaurantConstants {
     }
 
     public static double avgScorePostprocessing(double scoreSum, long evaluationCount) {
-        DecimalFormat df = new DecimalFormat("#.0");
-        return evaluationCount == 0 ? 0 : Double.parseDouble(df.format(scoreSum / evaluationCount));
+        if (evaluationCount == 0) {
+            return 0.0;
+        }
+        double avg = scoreSum / evaluationCount;
+        return Math.round(avg * 10) / 10.0;
     }
 
     public static String positionPostprocessing(String restaurantPosition) {
