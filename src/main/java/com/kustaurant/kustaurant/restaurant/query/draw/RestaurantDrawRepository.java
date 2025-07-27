@@ -8,5 +8,5 @@ public interface RestaurantDrawRepository {
 
     Restaurant getById(Integer id);
 
-    List<RestaurantCoreInfoDto> draw(List<String> cuisines, List<String> positions, int size);
+    List<RestaurantCoreInfoDto> draw(List<String> cuisines, List<String> positions);
 }

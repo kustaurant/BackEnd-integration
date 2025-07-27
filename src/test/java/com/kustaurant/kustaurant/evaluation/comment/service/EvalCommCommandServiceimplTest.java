@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalComme
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
 import com.kustaurant.kustaurant.global.exception.exception.auth.ForbiddenException;
-import com.kustaurant.kustaurant.mock.FakeEvalCommentRepository;
+import com.kustaurant.kustaurant.mock.evaluation.FakeEvalCommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

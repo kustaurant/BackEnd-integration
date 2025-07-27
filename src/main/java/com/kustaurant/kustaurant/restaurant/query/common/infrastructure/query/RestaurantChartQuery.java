@@ -12,6 +12,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class RestaurantChartQuery {
     /**
      * 조건(conditino)을 만족하는 식당 id들을 반환
      */
-    public Page<Integer> getRestaurantIds(ChartCondition condition, Pageable pageable) {
+    public Page<Integer> getRestaurantIdsWithPage(ChartCondition condition, Pageable pageable) {
 
         NumberExpression<Double> avgScore = new CaseBuilder()
                 .when(restaurantEntity.mainTier.gt(0)
@@ -64,6 +65,29 @@ public class RestaurantChartQuery {
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
+    }
+
+
+    public List<Integer> getRestaurantIds(ChartCondition condition) {
+
+        NumberExpression<Double> avgScore = new CaseBuilder()
+                .when(restaurantEntity.mainTier.gt(0)
+                        .and(restaurantEntity.restaurantEvaluationCount.isNotNull())
+                        .and(restaurantEntity.restaurantEvaluationCount.gt(0)))
+                .then(restaurantEntity.restaurantScoreSum
+                        .divide(restaurantEntity.restaurantEvaluationCount))
+                .otherwise(0.0);
+
+        return queryFactory.select(restaurantEntity.restaurantId)
+                .from(restaurantEntity)
+                .where(
+                        cuisinesIn(condition.cuisines()),
+                        positionsIn(condition.positions()),
+                        hasSituation(condition.situations(), restaurantEntity),
+                        restaurantActive(restaurantEntity)
+                )
+                .orderBy(avgScore.desc())
+                .fetch();
     }
 
     private BooleanExpression cuisinesIn(List<String> cuisines) {

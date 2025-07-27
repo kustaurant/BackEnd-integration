@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:tc:mysql:8.0.37:///testdb
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration/test
+    clean-disabled: false
+  jpa:
+    hibernate:
+      ddl-auto: none
+  cloud:
+    aws:
+      credentials:
+        access-key: dummy
+        secret-key: dummy
+      region:
+        static: us-east-1
+      s3:
+        enabled: false
+        bucket: dummy-bucket

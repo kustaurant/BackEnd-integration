@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
 import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
-import com.kustaurant.kustaurant.user.mypage.controller.response.MypageDataView;
+import com.kustaurant.kustaurant.user.mypage.controller.response.web.MypageDataView;
 
 import java.util.List;
 

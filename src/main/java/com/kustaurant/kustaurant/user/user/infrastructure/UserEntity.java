@@ -9,24 +9,19 @@ import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
 import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "users_tbl")
-@NoArgsConstructor
-@SQLRestriction("status = 'ACTIVE'")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -57,10 +52,10 @@ public class UserEntity {
     @Column(nullable = false)
     private UserRole role;
 
-    @OneToOne(fetch = LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
-            orphanRemoval = true)
-    @PrimaryKeyJoinColumn
+    @OneToOne(mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = LAZY)
     private UserStatsEntity stats;
 
     @Transient
@@ -88,21 +83,23 @@ public class UserEntity {
     }
 
     public static UserEntity from(User user) {
-        return UserEntity.builder()
-                .providerId(user.getProviderId())
+        UserEntity entity = UserEntity.builder()
                 .loginApi(user.getLoginApi())
+                .providerId(user.getProviderId())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
+                .userNickname(user.getNickname())
                 .role(user.getRole())
                 .status(user.getStatus())
                 .createdAt(user.getCreatedAt())
                 .build();
+
+        entity.stats = UserStatsEntity.of(entity, user.getStats());
+
+        return entity;
     }
 
     public User toModel(){
-        // TODO: stats 엔티티가 정상적으로 매핑되면 하드코딩 제거
-        int evalCnt = (stats != null) ? stats.getRatedRestCnt() : 0;
-
         return User.builder()
                 .id(id)
                 .nickname(nickname)
@@ -113,7 +110,8 @@ public class UserEntity {
                 .loginApi(loginApi)
                 .status(status)
                 .createdAt(createdAt)
-                .rankImg(UserIconResolver.resolve(evalCnt))
+                .stats(stats.toModel())
+                .rankImg(UserIconResolver.resolve(stats.getRatedRestCnt()))
                 .build();
     }
 

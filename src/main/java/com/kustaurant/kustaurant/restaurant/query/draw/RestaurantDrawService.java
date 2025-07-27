@@ -32,7 +32,7 @@ public class RestaurantDrawService {
         if (positions.contains("전체")) {
             positions = null;
         }
-        List<RestaurantCoreInfoDto> restaurants = restaurantDrawRepository.draw(cuisines, positions, 2000);
+        List<RestaurantCoreInfoDto> restaurants = restaurantDrawRepository.draw(cuisines, positions);
 
         // 조건에 맞는 식당이 없을 경우 404 에러 반환
         if (restaurants.isEmpty()) {

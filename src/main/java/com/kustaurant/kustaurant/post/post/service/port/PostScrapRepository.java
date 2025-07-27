@@ -1,7 +1,6 @@
 package com.kustaurant.kustaurant.post.post.service.port;
 
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
-import com.kustaurant.kustaurant.user.mypage.controller.response.ScrappedPostView;
 
 import java.util.List;
 import java.util.Optional;

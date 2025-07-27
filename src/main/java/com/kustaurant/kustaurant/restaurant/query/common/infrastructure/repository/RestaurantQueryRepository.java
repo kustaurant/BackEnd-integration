@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -39,7 +38,7 @@ public class RestaurantQueryRepository implements RestaurantChartRepository,
     @Override
     public Page<RestaurantCoreInfoDto> getChartRestaurantsByCondition(ChartCondition condition, Pageable pageable, Long userId) {
         // 정렬해서 페이지에 맞는 식당 id만 읽어오기
-        Page<Integer> ids = restaurantChartQuery.getRestaurantIds(condition, pageable);
+        Page<Integer> ids = restaurantChartQuery.getRestaurantIdsWithPage(condition, pageable);
         // 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
         List<RestaurantCoreInfoDto> content = restaurantCoreInfoQuery.getRestaurantTiers(
                 ids.getContent(), userId);
@@ -89,12 +88,10 @@ public class RestaurantQueryRepository implements RestaurantChartRepository,
     }
 
     @Override
-    public List<RestaurantCoreInfoDto> draw(List<String> cuisines, List<String> positions, int size) {
+    public List<RestaurantCoreInfoDto> draw(List<String> cuisines, List<String> positions) {
         ChartCondition condition = new ChartCondition(cuisines, null, positions);
-        Pageable pageable = PageRequest.of(0, size);
         // 정렬해서 페이지에 맞는 식당 id만 읽어오기
-        List<Integer> ids = restaurantChartQuery.getRestaurantIds(condition, pageable)
-                .getContent();
+        List<Integer> ids = restaurantChartQuery.getRestaurantIds(condition);
         // 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
         return restaurantCoreInfoQuery.getRestaurantTiers(ids, null);
     }
