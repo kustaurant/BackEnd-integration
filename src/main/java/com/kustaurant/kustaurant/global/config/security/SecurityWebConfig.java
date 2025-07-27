@@ -42,7 +42,7 @@ public class SecurityWebConfig {
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Frame Options 비활성화
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/restaurant/**", "/evaluation/**", "/user/myPage", "/community/write","/api/posts/**","/api/comments/**", "/api/images/**", "/admin/**").authenticated()
+                        .requestMatchers("/restaurant/**", "/evaluation/**", "/user/myPage", "/community/write", "/api/posts/**","/api/comments/**", "/api/images/**", "/admin/**").authenticated()
                         .anyRequest().permitAll()) // 모든 요청 허용
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/user/login"))

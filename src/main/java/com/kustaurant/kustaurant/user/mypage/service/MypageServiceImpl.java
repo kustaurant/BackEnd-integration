@@ -11,8 +11,8 @@ import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProj
 import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
+import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
 import com.kustaurant.kustaurant.user.mypage.controller.response.web.MypageDataView;
 import com.kustaurant.kustaurant.user.mypage.controller.response.web.PostCommentView;

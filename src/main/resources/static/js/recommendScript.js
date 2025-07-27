@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const apiUrl = `/api/recommend?cuisine=${Array.from(selectedCuisines).join('-')}&location=${restaurantLocation}`;
+        const apiUrl = `/web/api/recommend?cuisine=${Array.from(selectedCuisines).join('-')}&location=${restaurantLocation}`;
 
         fetch(apiUrl)
             .then(response => {
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const image = findClosestImageToSelectBox();
         const restaurantId = image.dataset.id;
 
-        fetch(`/api/recommend/restaurant?restaurantId=${restaurantId}`)
+        fetch(`/web/api/recommend/restaurant?restaurantId=${restaurantId}`)
             .then(response => response.json())
             .then(matchedData => {
                 if (matchedData) {
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedBox.style.backgroundImage = '';
         processingTitle.innerHTML = '맛집을 고르는 중... <img class="title-icon" src="/img/recommend/wondering.png" alt="wondering_img">';
 
-        const apiUrl = `/api/recommend?cuisine=${Array.from(selectedCuisines).join('-')}&location=${restaurantLocation}`;
+        const apiUrl = `/web/api/recommend?cuisine=${Array.from(selectedCuisines).join('-')}&location=${restaurantLocation}`;
 
         fetch(apiUrl)
             .then(response => {

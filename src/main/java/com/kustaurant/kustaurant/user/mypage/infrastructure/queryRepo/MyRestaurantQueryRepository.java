@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
+import com.kustaurant.kustaurant.restaurant.favorite.infrastructure.QRestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -29,7 +29,7 @@ public class MyRestaurantQueryRepository {
                         restaurant.restaurantPosition
                 ))
                 .from(favorite)
-                .join(favorite.restaurant, restaurant)
+                .join(restaurant).on(favorite.restaurantId.eq(restaurant.restaurantId))
                 .where(
                         favorite.userId.eq(userId),
                         favorite.status.eq("ACTIVE")

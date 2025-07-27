@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.admin.admin;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.enums.CuisineEnum;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.enums.LocationEnum;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Cuisine;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,13 +43,13 @@ public class AdminController {
             model.addAllAttributes(Map.of(
                     "title", "식당 정보 수정",
                     "content", "revise-restaurant",
-                    "locations", Arrays.stream(LocationEnum.values())
-                            .map(LocationEnum::getValue)
-                            .filter(l -> !l.equals(LocationEnum.ALL.getValue()))
+                    "locations", Arrays.stream(Position.values())
+                            .map(Position::getValue)
+                            .filter(l -> !l.equals(Position.ALL.getValue()))
                             .toList(),
-                    "cuisines", Arrays.stream(CuisineEnum.values())
-                            .map(CuisineEnum::getValue)
-                            .filter(c -> !c.equals(CuisineEnum.ALL.getValue()) && !c.equals(CuisineEnum.JH.getValue()))
+                    "cuisines", Arrays.stream(Cuisine.values())
+                            .map(Cuisine::getValue)
+                            .filter(c -> !c.equals(Cuisine.ALL.getValue()) && !c.equals(Cuisine.JH.getValue()))
                             .toList(),
                     "restaurantInfo", adminService.getRestaurantInfo(id).get(),
                     "id", id
@@ -89,13 +89,13 @@ public class AdminController {
         model.addAllAttributes(Map.of(
                 "title", "식당 추가",
                 "content", "add-restaurant",
-                "locations", Arrays.stream(LocationEnum.values())
-                        .map(LocationEnum::getValue)
-                        .filter(l -> !l.equals(LocationEnum.ALL.getValue()))
+                "locations", Arrays.stream(Position.values())
+                        .map(Position::getValue)
+                        .filter(l -> !l.equals(Position.ALL.getValue()))
                         .toList(),
-                "cuisines", Arrays.stream(CuisineEnum.values())
-                        .map(CuisineEnum::getValue)
-                        .filter(c -> !c.equals(CuisineEnum.ALL.getValue()) && !c.equals(CuisineEnum.JH.getValue()))
+                "cuisines", Arrays.stream(Cuisine.values())
+                        .map(Cuisine::getValue)
+                        .filter(c -> !c.equals(Cuisine.ALL.getValue()) && !c.equals(Cuisine.JH.getValue()))
                         .toList()
         ));
         return "admin/admin";
