@@ -1,38 +1,35 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantMenu;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Table(name="restaurant_menus_tbl")
 public class RestaurantMenuEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer menuId;
+    @Column(name = "menu_id")
+    private Integer id;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name="restaurant_id")
-    RestaurantEntity restaurant;
+    @Column(name = "restaurant_id", nullable = false)
+    private Integer restaurantId;
 
     private String menuName;
     private String menuPrice;
     private String naverType;
     private String menuImgUrl;
 
-    public RestaurantMenu toDomain() {
+    public RestaurantMenu toModel() {
         return RestaurantMenu.builder()
-                .menuId(this.menuId)
+                .menuId(this.id)
                 .menuImgUrl(this.menuImgUrl)
                 .menuName(this.menuName)
                 .menuPrice(this.menuPrice)
                 .naverType(this.naverType)
-                .restaurant(this.restaurant.toDomain())
+                .restaurantId(this.restaurantId)
                 .build();
     }
 }

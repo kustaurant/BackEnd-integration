@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.user.mypage.controller.response.web;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
+import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -94,12 +94,14 @@ class PostCommentServiceTest {
 
         // When
         ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
+        System.out.println(response.toString());
 
         // Then
         assertThat(response.getStatus()).isEqualTo(ReactionStatus.LIKE_CREATED);
         assertThat(response.getLikeCount()).isEqualTo(1);
         assertThat(response.getDislikeCount()).isEqualTo(0);
         verify(postCommentLikeRepository).save(any());
+
     }
 
     @Test
@@ -120,6 +122,7 @@ class PostCommentServiceTest {
         // Then
         assertThat(response.getStatus()).isEqualTo(ReactionStatus.DISLIKE_TO_LIKE);
         assertThat(response.getLikeCount()).isEqualTo(1);
+
         assertThat(response.getDislikeCount()).isEqualTo(0);
         verify(postCommentDislikeRepository).deleteByUserIdAndCommentId(userId, commentId);
         verify(postCommentLikeRepository).save(any());
@@ -138,11 +141,13 @@ class PostCommentServiceTest {
         when(commentRepository.findByParentCommentId(commentId)).thenReturn(replies);
         when(commentRepository.saveAll(replies)).thenReturn(replies);
 
+
         // When
         int deletedCount = commentService.deleteComment(commentId);
 
         // Then
         assertThat(deletedCount).isEqualTo(3);
+
         verify(commentRepository).save(parentComment);
         verify(commentRepository).saveAll(replies);
     }

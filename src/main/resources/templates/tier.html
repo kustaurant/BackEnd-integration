@@ -169,39 +169,39 @@
                             <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/cuisine-icon/전체.svg">
                             <span>전체</span>
                         </a>
-                        <a th:class="${situations ne null and #lists.contains(situations, 1) ? 'selected button category' : 'unselected button category'}" data-situation="1">
+                        <a th:class="${situations ne null and #lists.contains(situations, 1L) ? 'selected button category' : 'unselected button category'}" data-situation="1">
                             <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/혼밥.png">
                             <span>혼밥</span>
                         </a>
-                        <a th:class="${situations ne null and #lists.contains(situations, 2) ? 'selected button category' : 'unselected button category'}" data-situation="2">
+                        <a th:class="${situations ne null and #lists.contains(situations, 2L) ? 'selected button category' : 'unselected button category'}" data-situation="2">
                             <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/2~4인.png">
                             <span>2~4인</span>
                         </a>
-                        <a th:class="${situations ne null and #lists.contains(situations, 3) ? 'selected button category' : 'unselected button category'}" data-situation="3">
+                        <a th:class="${situations ne null and #lists.contains(situations, 3L) ? 'selected button category' : 'unselected button category'}" data-situation="3">
                             <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/5인%20이상.png">
                             <span>5인 이상</span>
                         </a>
-                        <a th:class="${situations ne null and #lists.contains(situations, 4) ? 'selected button category' : 'unselected button category'}" data-situation="4">
+                        <a th:class="${situations ne null and #lists.contains(situations, 4L) ? 'selected button category' : 'unselected button category'}" data-situation="4">
                             <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/단체%20회식.png">
                             <span>단체 회식</span>
                         </a>
-                        <a th:class="${situations ne null and #lists.contains(situations, 5) ? 'selected button category' : 'unselected button category'}" data-situation="5">
+                        <a th:class="${situations ne null and #lists.contains(situations, 5L) ? 'selected button category' : 'unselected button category'}" data-situation="5">
                             <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/배달.png">
                             <span>배달</span>
                         </a>
-                        <a th:class="${situations ne null and #lists.contains(situations, 6) ? 'selected button category' : 'unselected button category'}" data-situation="6">
+                        <a th:class="${situations ne null and #lists.contains(situations, 6L) ? 'selected button category' : 'unselected button category'}" data-situation="6">
                             <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/야식.png">
                             <span>야식</span>
                         </a>
-                        <a th:class="${situations ne null and #lists.contains(situations, 7) ? 'selected button category' : 'unselected button category'}" data-situation="7">
+                        <a th:class="${situations ne null and #lists.contains(situations, 7L) ? 'selected button category' : 'unselected button category'}" data-situation="7">
                             <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/친구%20초대.png">
                             <span>친구 초대</span>
                         </a>
-                        <a th:class="${situations ne null and #lists.contains(situations, 8) ? 'selected button category' : 'unselected button category'}" data-situation="8">
+                        <a th:class="${situations ne null and #lists.contains(situations, 8L) ? 'selected button category' : 'unselected button category'}" data-situation="8">
                             <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/데이트.png">
                             <span>데이트</span>
                         </a>
-                        <a th:class="${situations ne null and #lists.contains(situations, 9) ? 'selected button category' : 'unselected button category'}" data-situation="9">
+                        <a th:class="${situations ne null and #lists.contains(situations, 9L) ? 'selected button category' : 'unselected button category'}" data-situation="9">
                             <img src="https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/소개팅.png">
                             <span>소개팅</span>
                         </a>
@@ -269,7 +269,7 @@
             <!-- 메인 데이터 행 -->
             <tr th:class="${isJH != null and isJH ? 'tr-data-when-partnership tr-main' : 'tr-data tr-main'}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantTierData.restaurantId})} + '\''">
                 <td class="td-rank"
-                    th:text="${isJH != null and isJH} ? '-' : ${restaurantTierData.restaurantRanking}"
+                    th:text="${restaurantTierData.restaurantRanking == null or (isJH != null and isJH)} ? '-' : ${restaurantTierData.restaurantRanking}"
                     style="min-width: 32px"></td>
                 <td class="td-center" style="min-width: 58px; position: relative;">
                     <div style="width: fit-content; height: fit-content; padding: 0; margin: auto; position: relative;">
