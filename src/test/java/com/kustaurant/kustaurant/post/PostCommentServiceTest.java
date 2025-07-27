@@ -18,6 +18,7 @@ import com.kustaurant.kustaurant.post.post.service.web.PostQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -86,8 +87,10 @@ class PostCommentServiceTest {
         Integer commentId = 1;
         PostComment comment = PostComment.create("like test", userId, 2);
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-        when(likeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
-        when(dislikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
+        when(postCommentLikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
+        when(postCommentDislikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
+        when(postCommentLikeRepository.countByCommentId(commentId)).thenReturn(1);
+        when(postCommentDislikeRepository.countByCommentId(commentId)).thenReturn(0);
 
         // When
         ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
@@ -95,8 +98,10 @@ class PostCommentServiceTest {
 
         // Then
         assertThat(response.getStatus()).isEqualTo(ReactionStatus.LIKE_CREATED);
-//        assertThat(response.getLikeCount()).isEqualTo(1);
-//        verify(commentRepository).save(comment);
+        assertThat(response.getLikeCount()).isEqualTo(1);
+        assertThat(response.getDislikeCount()).isEqualTo(0);
+        verify(postCommentLikeRepository).save(any());
+
     }
 
     @Test
@@ -106,35 +111,45 @@ class PostCommentServiceTest {
         Integer commentId = 1;
         PostComment comment = PostComment.create("switch from dislike", userId, 2);
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
-        when(likeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
-        when(dislikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(true);
+        when(postCommentLikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(false);
+        when(postCommentDislikeRepository.existsByUserIdAndCommentId(userId, commentId)).thenReturn(true);
+        when(postCommentLikeRepository.countByCommentId(commentId)).thenReturn(1);
+        when(postCommentDislikeRepository.countByCommentId(commentId)).thenReturn(0);
 
         // When
         ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
 
         // Then
-        assertThat(response.getStatus()).isEqualTo(ReactionStatus.LIKE_CREATED);
-//        assertThat(response.getLikeCount()).isEqualTo(1);
+        assertThat(response.getStatus()).isEqualTo(ReactionStatus.DISLIKE_TO_LIKE);
+        assertThat(response.getLikeCount()).isEqualTo(1);
+
         assertThat(response.getDislikeCount()).isEqualTo(0);
+        verify(postCommentDislikeRepository).deleteByUserIdAndCommentId(userId, commentId);
+        verify(postCommentLikeRepository).save(any());
     }
 
     @Test
     void 댓글을_삭제하면_상태가_DELETED로_변경된다() {
         // Given
         Integer commentId = 1;
-        PostComment reply = PostComment.create("reply", 100L, 1);
         PostComment parentComment = PostComment.create("parent", 100L, 1);
+        PostComment reply1 = PostComment.create("reply1", 101L, 1);
+        PostComment reply2 = PostComment.create("reply2", 102L, 1);
+        List<PostComment> replies = List.of(reply1, reply2);
+        
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(parentComment));
+        when(commentRepository.findByParentCommentId(commentId)).thenReturn(replies);
+        when(commentRepository.saveAll(replies)).thenReturn(replies);
+
 
         // When
         int deletedCount = commentService.deleteComment(commentId);
 
         // Then
-//        assertThat(deletedCount).isEqualTo(2);
+        assertThat(deletedCount).isEqualTo(3);
+
         verify(commentRepository).save(parentComment);
+        verify(commentRepository).saveAll(replies);
     }
 
-    // 댓글 목록 조회 테스트는 제거된 getParentComments 메서드 대신
-    // buildPostDetailView 메서드나 PostCommentQueryDAO를 직접 테스트하는 것이 좋습니다.
-    // 실제 통합 테스트에서 전체 플로우를 검증하는 것을 권장합니다.
 }
