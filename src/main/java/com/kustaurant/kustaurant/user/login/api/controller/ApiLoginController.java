@@ -2,11 +2,6 @@ package com.kustaurant.kustaurant.user.login.api.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
-import com.kustaurant.kustaurant.user.login.api.controller.request.AppleLoginRequest;
-import com.kustaurant.kustaurant.user.login.api.controller.request.NaverLoginRequest;
-import com.kustaurant.kustaurant.user.login.api.domain.LoginCommand;
-import com.kustaurant.kustaurant.user.login.api.domain.ProviderType;
 import com.kustaurant.kustaurant.user.login.api.service.LoginService;
 import com.kustaurant.kustaurant.user.login.api.service.WithdrawService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class ApiLoginController {
-    private final LoginService facade;
+    private final LoginService loginService;
     private final WithdrawService withdrawService;
 
     //1
@@ -37,16 +32,9 @@ public class ApiLoginController {
     })
     @PostMapping("/api/v2/login/naver")
     public ResponseEntity<TokenResponse> loginWithNaver(
-            @Valid @RequestBody NaverLoginRequest req
+            @Valid @RequestBody LoginRequest req
     ) {
-        LoginCommand cmd = new LoginCommand(
-                ProviderType.NAVER,
-                req.providerId(),
-                req.naverAccessToken(),
-                null
-        );
-
-        return ResponseEntity.ok(facade.login(cmd));
+        return ResponseEntity.ok(loginService.login(req));
     }
 
     //2
@@ -60,16 +48,9 @@ public class ApiLoginController {
     })
     @PostMapping("/api/v2/login/apple")
     public ResponseEntity<TokenResponse> loginWithApple(
-            @Valid @RequestBody AppleLoginRequest req
+            @Valid @RequestBody LoginRequest req
     ) {
-        LoginCommand cmd = new LoginCommand(
-                ProviderType.APPLE,
-                null,
-                req.identityToken(),
-                req.authorizationCode()
-        );
-
-        return ResponseEntity.ok(facade.login(cmd));
+        return ResponseEntity.ok(loginService.login(req));
     }
 
     //3

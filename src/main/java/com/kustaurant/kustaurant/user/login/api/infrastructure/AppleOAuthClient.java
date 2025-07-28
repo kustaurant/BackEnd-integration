@@ -47,9 +47,9 @@ public class AppleOAuthClient {
 
             return claimsJws.getPayload();
         } catch (ExpiredJwtException e) {
-            throw new ProviderApiException("APPLE", "토큰이 만료되었습니다.", e);
+            throw new ProviderApiException("APPLE", "토큰이 만료", e);
         } catch (IncorrectClaimException|MissingClaimException e) {
-            throw new ProviderApiException("Apple", "Id 토큰이 유효하지 않습니다.", e);
+            throw new ProviderApiException("Apple", "토큰이 유효하지 않음", e);
         } catch (JwtException e) {
             throw new ProviderApiException("APPLE", "IdentityToken 검증 실패", e);
         }

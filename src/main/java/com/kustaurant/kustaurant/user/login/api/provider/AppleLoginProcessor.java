@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.user.login.api.provider;
 
-import com.kustaurant.kustaurant.user.login.api.domain.LoginCommand;
+import com.kustaurant.kustaurant.user.login.api.controller.LoginRequest;
 import com.kustaurant.kustaurant.user.login.api.domain.ProviderType;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.AppleOAuthClient;
 import com.kustaurant.kustaurant.user.user.domain.User;
@@ -22,7 +22,7 @@ public class AppleLoginProcessor implements LoginProcessor {
     }
 
     @Override
-    public User handle(LoginCommand cmd) {
+    public User handle(LoginRequest cmd) {
         Claims claims = appleClient.verifyAppleIdentityToken(cmd.token());
         String appleId = claims.getSubject();
 

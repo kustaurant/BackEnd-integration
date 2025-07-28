@@ -8,7 +8,7 @@
 //import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 //import com.kustaurant.kustaurant.global.auth.jwt.JwtProperties;
 //import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
-//import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
+//import com.kustaurant.kustaurant.user.login.api.controller.TokenResponse;
 //import com.kustaurant.kustaurant.user.login.api.infrastructure.AppleOAuthClient;
 //import com.kustaurant.kustaurant.user.login.api.controller.request.AppleLoginRequest;
 //import com.kustaurant.kustaurant.user.login.api.infrastructure.NaverOAuthClient;

@@ -1,18 +1,18 @@
-package com.kustaurant.kustaurant.global.auth.jwt.core;
+package com.kustaurant.kustaurant.user.login;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtProperties;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
 import com.kustaurant.kustaurant.global.auth.jwt.TokenType;
+import com.kustaurant.kustaurant.user.login.api.controller.LoginRequest;
+import com.kustaurant.kustaurant.user.login.api.domain.ProviderType;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.AppleOAuthClient;
-import com.kustaurant.kustaurant.user.login.api.controller.request.AppleLoginRequest;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.RefreshTokenStore;
-import com.kustaurant.kustaurant.user.login.api.service.ApiLoginService;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.NaverOAuthClient;
-import com.kustaurant.kustaurant.user.login.api.controller.request.NaverLoginRequest;
-import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
+import com.kustaurant.kustaurant.user.login.api.controller.TokenResponse;
 import com.kustaurant.kustaurant.global.exception.exception.auth.RefreshTokenInvalidException;
+import com.kustaurant.kustaurant.user.login.api.service.LoginService;
 import com.kustaurant.kustaurant.user.login.api.service.TokenService;
 import com.kustaurant.kustaurant.user.login.api.service.WithdrawService;
 import com.kustaurant.kustaurant.user.user.domain.User;
@@ -57,8 +57,7 @@ class UserApiLoginServiceTest {
     @Mock
     JwtProperties jwtProperties;
 
-    @InjectMocks
-    private ApiLoginService loginService;
+    @InjectMocks private LoginService loginService;
 
     final String ACCESS  = "access.jwt.token";
     final String REFRESH = "refresh.jwt.token";
@@ -71,9 +70,11 @@ class UserApiLoginServiceTest {
         @DisplayName("기존 ACTIVE회원에게 토큰2종 반환")
         void returnsTokens_whenUserIsActive() {
             //g
-            NaverLoginRequest req = new NaverLoginRequest(
+            LoginRequest cmd = new LoginRequest(
+                    ProviderType.NAVER,
                     "PID123",
-                    "naverAccess"
+                    "naverAccess",
+                    null
             );
             User user = User.builder()
                     .id(1L)
@@ -91,12 +92,12 @@ class UserApiLoginServiceTest {
 
             when(naverApiService.getUserInfo("naverAccess")).thenReturn(naverInfo);
             when(userRepository.findByProviderId("PID123")).thenReturn(Optional.of(user));
-            when(jwtUtil.generateAccessToken(1L, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(1L, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccess(1L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefresh(1L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
-            var tokenResponse = loginService.processNaverLogin(req);
+            var tokenResponse = loginService.login(cmd);
 
             //t
             assertThat(tokenResponse.accessToken()).isEqualTo(ACCESS);
@@ -110,8 +111,12 @@ class UserApiLoginServiceTest {
         @DisplayName("미가입 사용자라면 signUp 실행해 회원가입 처리후 토큰2종 반환")
         void returnsTokens_whenUserIsNew() {
             // g
-            NaverLoginRequest req = new NaverLoginRequest(
-                    "NAVER", "NEW_PID", "naverAccess");
+            LoginRequest cmd = new LoginRequest(
+                    ProviderType.NAVER,
+                    "NEW_PID",
+                    "naverAccess",
+                    null
+            );
 
             ObjectNode naverInfo = JsonNodeFactory.instance.objectNode()
                     .put("email", "new@user.com");
@@ -132,12 +137,12 @@ class UserApiLoginServiceTest {
                     .build();
             when(userRepository.save(any(User.class))).thenReturn(newUser);
 
-            when(jwtUtil.generateAccessToken(99L, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(99L, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccess(99L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefresh(99L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             // w
-            TokenResponse token = loginService.processNaverLogin(req);
+            TokenResponse token = loginService.login(cmd);
 
             //t
             assertThat(token.accessToken()).isEqualTo(ACCESS);
@@ -151,8 +156,12 @@ class UserApiLoginServiceTest {
         @DisplayName("탈퇴한 사용자가 재로그인시 rejoinIfDeleted 실행해 재가입 처리한뒤 토큰2종 반환()")
         void  returnsTokens_whenUserWasDeleted() {
             // g
-            NaverLoginRequest req = new NaverLoginRequest(
-                    "NAVER", "PID_DEL", "naverAccess");
+            LoginRequest cmd = new LoginRequest(
+                    ProviderType.NAVER,
+                    "PID_DEL",
+                    "naverAccess",
+                    null
+            );
 
             ObjectNode naverInfo = JsonNodeFactory.instance.objectNode()
                     .put("email", "re@join.com");
@@ -172,12 +181,12 @@ class UserApiLoginServiceTest {
             when(userRepository.findByProviderId("PID_DEL"))
                     .thenReturn(Optional.of(deletedUser));
 
-            when(jwtUtil.generateAccessToken(7L, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(7L, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccess(7L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefresh(7L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             // w
-            TokenResponse token = loginService.processNaverLogin(req);
+            TokenResponse token = loginService.login(cmd);
 
             // t
             assertThat(token.accessToken()).isEqualTo(ACCESS);
@@ -201,15 +210,20 @@ class UserApiLoginServiceTest {
         private static final String ID_TOKEN  = "apple.id.token";
         private static final String AUTH_CODE = "apple.auth.code";
 
-        AppleLoginRequest buildReq() {
-            return new AppleLoginRequest("APPLE", ID_TOKEN, AUTH_CODE);
+        LoginRequest buildReq() {
+            return new LoginRequest(
+                    ProviderType.APPLE,
+                    ID_TOKEN,
+                    null,
+                    AUTH_CODE
+            );
         }
 
         @Test
         @DisplayName("기존 ACTIVE 회원이면 토큰 2종을 반환한다")
         void returnsTokens_whenUserIsActive() {
             //g
-            AppleLoginRequest req = buildReq();
+            LoginRequest cmd = buildReq();
             Claims claims = mock(Claims.class);
             when(claims.getSubject()).thenReturn(APPLE_ID);
 
@@ -225,12 +239,12 @@ class UserApiLoginServiceTest {
                     .build();
 
             when(userRepository.findByProviderId(APPLE_ID)).thenReturn(Optional.of(user));
-            when(jwtUtil.generateAccessToken(1L, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(1L, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccess(1L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefresh(1L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
-            TokenResponse res = loginService.processAppleLogin(req);
+            TokenResponse res = loginService.login(cmd);
 
             //t
             assertThat(res.accessToken()).isEqualTo(ACCESS);
@@ -243,7 +257,7 @@ class UserApiLoginServiceTest {
         @DisplayName("미가입 사용자라면 회원가입 처리 후 토큰 2종을 반환한다")
         void returnsTokens_whenUserIsNew() {
             //g
-            AppleLoginRequest req = buildReq();
+            LoginRequest cmd = buildReq();
             Claims claims = mock(Claims.class);
             when(claims.getSubject()).thenReturn(APPLE_ID);
 
@@ -260,12 +274,12 @@ class UserApiLoginServiceTest {
                     .build();
 
             when(userRepository.save(any(User.class))).thenReturn(newUser);
-            when(jwtUtil.generateAccessToken(99L, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(99L, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccess(99L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefresh(99L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
-            TokenResponse res = loginService.processAppleLogin(req);
+            TokenResponse res = loginService.login(cmd);
 
             //t
             assertThat(res.accessToken()).isEqualTo(ACCESS);
@@ -278,7 +292,7 @@ class UserApiLoginServiceTest {
         @DisplayName("탈퇴 회원이면 재활성화 후 토큰 2종을 반환한다")
         void returnsTokens_whenUserWasDeleted() {
             //g
-            AppleLoginRequest req = buildReq();
+            LoginRequest cmd = buildReq();
             Claims claims = mock(Claims.class);
             when(claims.getSubject()).thenReturn(APPLE_ID);
 
@@ -294,12 +308,12 @@ class UserApiLoginServiceTest {
                     .build();
 
             when(userRepository.findByProviderId(APPLE_ID)).thenReturn(Optional.of(deleted));
-            when(jwtUtil.generateAccessToken(7L, "ROLE_USER")).thenReturn(ACCESS);
-            when(jwtUtil.generateRefreshToken(7L, "ROLE_USER")).thenReturn(REFRESH);
+            when(jwtUtil.generateAccess(7L, "ROLE_USER")).thenReturn(ACCESS);
+            when(jwtUtil.generateRefresh(7L, "ROLE_USER")).thenReturn(REFRESH);
             when(jwtProperties.getRefreshTtl()).thenReturn(Duration.ofDays(15));
 
             //w
-            TokenResponse res = loginService.processAppleLogin(req);
+            TokenResponse res = loginService.login(cmd);
 
             //t
             assertThat(res.accessToken()).isEqualTo(ACCESS);
@@ -328,7 +342,7 @@ class UserApiLoginServiceTest {
 
             when(jwtUtil.parse(REFRESH)).thenReturn(parsedToken);
             when(refreshStore.get(userId)).thenReturn(REFRESH);
-            when(jwtUtil.generateAccessToken(userId, role)).thenReturn(ACCESS);
+            when(jwtUtil.generateAccess(userId, role)).thenReturn(ACCESS);
 
             // w
             String newAccessToken = tokenService.refreshAccess(REFRESH);

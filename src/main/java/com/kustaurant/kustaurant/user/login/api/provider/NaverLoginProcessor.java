@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.user.login.api.provider;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.kustaurant.kustaurant.user.login.api.domain.LoginCommand;
+import com.kustaurant.kustaurant.user.login.api.controller.LoginRequest;
 import com.kustaurant.kustaurant.user.login.api.domain.ProviderType;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.NaverOAuthClient;
 import com.kustaurant.kustaurant.user.user.domain.User;
@@ -22,7 +22,7 @@ public class NaverLoginProcessor implements LoginProcessor {
     }
 
     @Override
-    public User handle(LoginCommand cmd) {
+    public User handle(LoginRequest cmd) {
         JsonNode info = naverClient.getUserInfo(cmd.token());
         String email  = info.path("email").asText();
         String pid    = cmd.providerId();

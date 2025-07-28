@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.user.login.api.controller.test;
 
-import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
+import com.kustaurant.kustaurant.user.login.api.controller.TokenResponse;
 import com.kustaurant.kustaurant.user.login.api.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

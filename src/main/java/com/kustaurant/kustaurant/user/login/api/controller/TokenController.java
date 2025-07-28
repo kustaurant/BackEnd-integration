@@ -2,7 +2,6 @@ package com.kustaurant.kustaurant.user.login.api.controller;
 
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
 import com.kustaurant.kustaurant.global.exception.exception.auth.AccessTokenInvalidException;
-import com.kustaurant.kustaurant.user.login.api.controller.response.AccessTokenResponse;
 import com.kustaurant.kustaurant.user.login.api.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,18 +28,18 @@ public class TokenController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "액세스 토큰 재발행 성공",
-                    content = @Content(schema = @Schema(implementation = AccessTokenResponse.class))),
+                    content = @Content(schema = @Schema(implementation = TokenResponse.class))),
             @ApiResponse(responseCode = "401", description = "리프레시 토큰 만료 또는 유효하지 않음"),
             @ApiResponse(responseCode = "400", description = "요청 헤더 누락 또는 잘못된 형식")
     })
     @PostMapping("/api/v2/token/refresh")
-    public ResponseEntity<AccessTokenResponse> refreshAccessToken(
+    public ResponseEntity<TokenResponse> refreshAccessToken(
             @RequestHeader("Authorization") String refreshToken
     ) {
         String refresh = stripBearer(refreshToken);
         String newAccessToken = tokenService.refreshAccess(refresh);
 
-        return ResponseEntity.ok(new AccessTokenResponse(newAccessToken));
+        return ResponseEntity.ok(new TokenResponse(newAccessToken, null));
     }
 
 

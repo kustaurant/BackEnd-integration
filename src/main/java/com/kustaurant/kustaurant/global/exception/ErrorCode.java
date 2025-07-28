@@ -45,7 +45,8 @@ public enum ErrorCode {
     ACCESS_DENIED (HttpStatus.FORBIDDEN, "AUTH-FORBIDDEN", "접근 권한이 없습니다."),
 
     /* ── EXTERNAL PROVIDER ── */
-    PROVIDER_API_FAIL     (HttpStatus.SERVICE_UNAVAILABLE,  "EXT-001", "외부 로그인 공급자 API 서버에 문제가 있습니다.");
+    PROVIDER_API_FAIL   (HttpStatus.SERVICE_UNAVAILABLE,  "PROVIDER-001", "외부 로그인 공급자 API 서버에 문제가 있습니다."),
+    PROVIDER_NOT_VALID  (HttpStatus.BAD_REQUEST, "PROVIDER-002", "지원하지 않는 PROVIDER 입니다");
 
     private final HttpStatus status;
     private final String     code;

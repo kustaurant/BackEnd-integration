@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.user.login.api.controller.response;
+package com.kustaurant.kustaurant.user.login.api.controller;
 
 public record TokenResponse(
         String accessToken,

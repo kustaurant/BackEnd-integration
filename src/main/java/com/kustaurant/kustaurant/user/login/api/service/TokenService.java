@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.global.auth.jwt.JwtProperties;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
 import com.kustaurant.kustaurant.global.auth.jwt.TokenType;
 import com.kustaurant.kustaurant.global.exception.exception.auth.RefreshTokenInvalidException;
-import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
+import com.kustaurant.kustaurant.user.login.api.controller.TokenResponse;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.RefreshTokenStore;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import lombok.AllArgsConstructor;
@@ -21,8 +21,8 @@ public class TokenService {
 
     // 1. 로그인 직후 발급
     public TokenResponse issue(User u) {
-        String at = jwt.generateAccessToken(u.getId(), u.getRole().getValue());
-        String rt = jwt.generateRefreshToken(u.getId(), u.getRole().getValue());
+        String at = jwt.generateAccess(u.getId(), u.getRole().getValue());
+        String rt = jwt.generateRefresh(u.getId(), u.getRole().getValue());
         store.save(u.getId(), rt, prop.getRefreshTtl());
         return new TokenResponse(at, rt);
     }
@@ -38,19 +38,19 @@ public class TokenService {
         if (!refreshToken.equals(saved))
             throw new RefreshTokenInvalidException();
 
-        return jwt.generateAccessToken(tk.userId(), tk.role());
+        return jwt.generateAccess(tk.userId(), tk.role());
     }
 
     //3. yolo 테스트용
     public String yoloAccess(String anyToken) {
         JwtUtil.ParsedToken t = jwt.parse(anyToken);
-        return jwt.generateYOLOToken(t.userId(), t.role());
+        return jwt.generateYOLO(t.userId(), t.role());
     }
 
-    //4.
+    //4. yolo 테스트용
     public String yoloRefresh(String anyToken) {
         JwtUtil.ParsedToken t = jwt.parse(anyToken);
-        String rt = jwt.generateYOLOToken(t.userId(), t.role());
+        String rt = jwt.generateYOLO(t.userId(), t.role());
         store.save(t.userId(), rt, Duration.ofSeconds(10));
         return rt;
     }

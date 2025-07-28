@@ -34,33 +34,33 @@ class JwtUtilTest {
 
     @Test
     @DisplayName("AccessToken을 잘 발행한다")
-    void generateAccessToken() {
+    void generateAccess() {
         // given
         Long userId = 1L;
         String role = "ROLE_USER";
 
         // when
-        String token = jwtUtil.generateAccessToken(userId, role);
+        String token = jwtUtil.generateAccess(userId, role);
 
         // then
         JwtUtil.ParsedToken tk = jwtUtil.parse(token);
         assertThat(tk.userId()).isEqualTo(userId);
         assertThat(tk.role()).isEqualTo(role);
-        assertThat(tk.tokenType()).isEqualTo("AT");
+        assertThat(tk.tokenType()).isEqualTo(TokenType.ACCESS);
         assertThat(jwtUtil.isValid(token)).isTrue();
     }
 
     @Test
     @DisplayName("refreshToken발행시 tokenType은 RT")
-    void generateRefreshToken_claims() {
+    void generateRefresh_claims() {
         // given
         Long userId = 5L;
 
         // when
-        String token = jwtUtil.generateRefreshToken(userId, "ROLE_ADMIN");
+        String token = jwtUtil.generateRefresh(userId, "ROLE_ADMIN");
 
         // then
-        assertThat(jwtUtil.parse(token).tokenType()).isEqualTo("RT");
+        assertThat(jwtUtil.parse(token).tokenType()).isEqualTo(TokenType.REFRESH);
     }
 
     @Test
@@ -92,13 +92,13 @@ class JwtUtilTest {
         Long userId = 42L;
 
         // w
-        String token = jwtUtil.generateAccessToken(userId, "ROLE_USER");
+        String token = jwtUtil.generateAccess(userId, "ROLE_USER");
         JwtUtil.ParsedToken tk = jwtUtil.parse(token);
 
         // t
         assertThat(tk.userId()).isEqualTo(userId);
         assertThat(tk.role()).isEqualTo("ROLE_USER");
-        assertThat(tk.tokenType()).isEqualTo("AT");
+        assertThat(tk.tokenType()).isEqualTo(TokenType.ACCESS);
     }
 
 }

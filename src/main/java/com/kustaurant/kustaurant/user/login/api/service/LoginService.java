@@ -1,7 +1,9 @@
 package com.kustaurant.kustaurant.user.login.api.service;
 
-import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
-import com.kustaurant.kustaurant.user.login.api.domain.LoginCommand;
+import com.kustaurant.kustaurant.global.exception.ErrorCode;
+import com.kustaurant.kustaurant.global.exception.exception.business.ProviderApiException;
+import com.kustaurant.kustaurant.user.login.api.controller.TokenResponse;
+import com.kustaurant.kustaurant.user.login.api.controller.LoginRequest;
 import com.kustaurant.kustaurant.user.login.api.provider.LoginProcessor;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +19,12 @@ public class LoginService {
     private final List<LoginProcessor> processors;
     private final TokenService tokenService;
 
-    public TokenResponse login(LoginCommand cmd) {
+    public TokenResponse login(LoginRequest req) {
         LoginProcessor loginProcessor = processors.stream()
-                .filter(pr -> pr.supports(cmd.provider()))
+                .filter(pr -> pr.supports(req.provider()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("지원 안 하는 Provider"));
-        User user = loginProcessor.handle(cmd);
+                .orElseThrow(() -> new ProviderApiException(ErrorCode.PROVIDER_NOT_VALID));
+        User user = loginProcessor.handle(req);
         return tokenService.issue(user);
     }
 }

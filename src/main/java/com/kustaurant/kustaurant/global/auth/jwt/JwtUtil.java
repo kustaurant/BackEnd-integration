@@ -38,7 +38,7 @@ public class JwtUtil {
                 .claims( Jwts.claims()
                         .subject(String.valueOf(userId))
                         .add("role",role)
-                        .add("tokenType", tokenType.getType())
+                        .add("tokenType", tokenType.name())
                         .build() )
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
@@ -46,13 +46,13 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String generateAccessToken(Long userId, String role) {
+    public String generateAccess(Long userId, String role) {
         return generate(userId, role, TokenType.ACCESS, jwtProperties.getAccessTtl());
     }
-    public String generateRefreshToken(Long userId, String role) {
+    public String generateRefresh(Long userId, String role) {
         return generate(userId, role, TokenType.REFRESH, jwtProperties.getRefreshTtl());
     }
-    public String generateYOLOToken(Long userId, String role) { // 테스트용 10초짜리 토큰 생성
+    public String generateYOLO(Long userId, String role) { // 테스트용 10초짜리 토큰 생성
         return generate(userId, role, TokenType.YOLO, Duration.ofSeconds(10));
     }
 
