@@ -1,9 +1,7 @@
 package com.kustaurant.kustaurant.global.auth.jwt;
 
-import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.auth.AccessTokenExpiredException;
 import com.kustaurant.kustaurant.global.exception.exception.auth.AccessTokenInvalidException;
-import com.kustaurant.kustaurant.global.exception.exception.auth.JwtAuthException;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -42,7 +40,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             try {
                 JwtUtil.ParsedToken tk = jwtUtil.parse(token);
 
-                if (!"AT".equals(tk.tokenType())) {
+                if (tk.tokenType() != TokenType.ACCESS) {
                     throw new AccessTokenInvalidException();
                 }
                 //권한 세팅

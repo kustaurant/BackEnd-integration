@@ -12,12 +12,16 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
 
 @Configuration
 @RequiredArgsConstructor
@@ -30,35 +34,51 @@ public class SecurityWebConfig {
     private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     @Bean(name = "filterChainWeb")
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, SessionRegistry sessionRegistry) throws Exception {
         http
                 .securityMatcher(request -> !request.getServletPath().matches("^/api/v\\d+/.*$"))
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // 기본적으로 CSRF 보호 활성화
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
                 .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // Frame Options 비활성화
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
+
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/restaurant/**", "/evaluation/**", "/user/myPage", "/community/write","/api/posts/**","/api/comments/**", "/api/images/**", "/admin/**").authenticated()
-                        .anyRequest().permitAll()) // 모든 요청 허용
+                        .anyRequest().permitAll())
+
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/user/login"))
                         .accessDeniedHandler((req, res, ex2) ->
                                 res.sendRedirect(req.getContextPath() + "/user/login")))
+
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/user/login")
                         .failureUrl("/user/login?error")
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                        .successHandler(customLoginSuccessHandler)) // 로그인 성공 핸들러
+                        .successHandler(customLoginSuccessHandler))
+
                 .logout(logout -> logout
                         .logoutUrl("/user/logout")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler(customLogoutSuccessHandler)); // 로그아웃 성공 핸들러
+                        .logoutSuccessHandler(customLogoutSuccessHandler))
+
+                .sessionManagement(sess->sess
+                        .maximumSessions(1)
+                        .sessionRegistry(sessionRegistry)
+                );
 
         return http.build();
+    }
+
+    @Bean
+    public SpringSessionBackedSessionRegistry<? extends Session> sessionRegistry(
+            FindByIndexNameSessionRepository<? extends Session> sessionRepository) {
+
+        return new SpringSessionBackedSessionRegistry<>(sessionRepository);
     }
 
     @Bean

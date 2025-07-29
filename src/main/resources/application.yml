@@ -26,6 +26,12 @@ spring:
       s3:
         bucket: kustaurant
 
+  session:
+    redis:
+      flush-mode: on-save
+      namespace: spring:session
+      repository-type: indexed
+
 # logging level
 logging.level.com.kustaurant: trace
 
