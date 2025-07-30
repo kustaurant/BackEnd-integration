@@ -40,7 +40,7 @@ public class RestaurantWebController {
         // 메뉴 정보
         model.addAttribute("menus", detailDto.getRestaurantMenuList());
 
-        return "restaurant";
+        return "restaurant/restaurant";
     }
 
 

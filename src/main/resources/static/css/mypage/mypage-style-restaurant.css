@@ -1,0 +1,151 @@
+@import "../variables.css";
+* {
+    font-family: 'NanumSquare', sans-serif;
+}
+/* 저장된 맛집 */
+#area2Contents {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.restaurant-favorite-container {
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 5px 9px;
+    margin-bottom: 10px;
+    border: #888 solid 1px;
+    border-radius: 6px;
+}
+.restaurant-img {
+    width: 50px;
+    min-width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    margin-right: 7px;
+}
+.restaurant-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 7px;
+}
+.restaurant-name {
+    font-size: 16px;
+    color: black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+@media only screen and (max-width: 490px) {
+    .restaurant-name {
+        width: 239px;
+    }
+}
+@media only screen and (max-width: 400px) {
+    .restaurant-name {
+        width: 205px;
+    }
+}
+@media only screen and (max-width: 370px) {
+    .restaurant-name {
+        width: 190px;
+    }
+}
+@media only screen and (max-width: 340px) {
+    .restaurant-name {
+        width: 170px;
+    }
+}
+@media only screen and (max-width: 310px) {
+    .restaurant-name {
+        width: 150px;
+    }
+}
+.restaurant-type {
+    font-size: 12px;
+    color: #444;
+}
+.restaurant-cuisine-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    margin-right: 20px;
+}
+/* 평가 모음 */
+#area3Contents {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.dropdown-outer {
+    width: 100%;
+    display: flex;
+    justify-content: left;
+}
+.dropdown {
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.dropdown button {
+    padding: 6px 13px;
+    border: #666 solid 1px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.dropdown span {
+    line-height: 24px;
+    font-size: 15px;
+}
+.dropdown ul {
+    border: #333 solid 1px;
+    line-height: 24px;
+    font-size: 15px;
+}
+.dropdown li:hover {
+    background-color: var(--main-light-color);
+}
+
+.restaurant-evaluation-container-outer {
+    width: 100%;
+}
+.restaurant-evaluation-container {
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 5px 9px;
+    margin-bottom: 10px;
+    border: #888 solid 1px;
+    border-radius: 6px;
+}
+.evaluation-restaurant-info {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+/* 평가 점수 부분 */
+.evaluation-outer {
+    display: flex;
+}
+.category-main-name {
+    width: 70px;
+    font-size: 15px;
+    color: #222;
+}
+.category-main-score {
+    text-align: center;
+    width: 70px;
+    font-size: 16px;
+    color: #000;
+    font-weight: 550;
+}
+.category-name {
+    width: 70px;
+    font-size: 14px;
+    color: #444;
+}

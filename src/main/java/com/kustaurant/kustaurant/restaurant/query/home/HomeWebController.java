@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.restaurant.query.home;
 
+import com.kustaurant.kustaurant.admin.modal.HomeModalEntity;
 import com.kustaurant.kustaurant.admin.modal.HomeModalService;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
-import com.kustaurant.kustaurant.admin.modal.HomeModalEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,7 +28,7 @@ public class HomeWebController {
 
     @RequestMapping("/temp")
     public String temp() {
-        return "temp";
+        return "home/temp";
     }
 
     @GetMapping("/home")
@@ -56,25 +56,25 @@ public class HomeWebController {
         model.addAttribute("restaurants", topRestaurants);
         model.addAttribute("currentPage","home");
         model.addAttribute("homeModal", homeModal);
-        return "home";
+        return "home/home";
     }
 
     // 이용약관
     @GetMapping("/terms_of_use")
     public String terms_of_use(){
-        return "terms_of_use";
+        return "home/terms_of_use";
     }
 
     // 개인정보 처리방침
     @GetMapping("/privacy-policy")
     public String privacyPolicy() {
-        return "privacy-policy";
+        return "home/privacy-policy";
     }
 
     // 마케팅
     @GetMapping("/marketing")
     public String marketing() {
-        return "marketing";
+        return "home/marketing";
     }
 
     @GetMapping("/web/api/auth/status")

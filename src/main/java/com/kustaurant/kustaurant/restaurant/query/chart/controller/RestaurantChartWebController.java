@@ -98,7 +98,7 @@ public class RestaurantChartWebController {
         model.addAttribute("paging", data);
         model.addAttribute("queryString", getQueryStringWithoutPage(request));
 
-        return "tier";
+        return "restaurant/tier";
     }
 
     private String getQueryStringWithoutPage(HttpServletRequest request) {

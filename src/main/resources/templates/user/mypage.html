@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C47HQ74QCF"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-C47HQ74QCF');
+    </script>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T2CX8XG3');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+
+    <title>쿠스토랑 - 마이페이지</title>
+
+    <!-- 탭 관련 라이브러리 / 순서 지켜야함 -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/library/vendors.min.css">
+    <link rel="stylesheet" href="/css/library/style.min.css">
+    <link rel="stylesheet" href="/css/library/responsive.min.css">
+    <link rel="stylesheet" href="/css/library/restaurant.css">
+    <link rel="stylesheet" href="/css/mypage/mypage-style.css">
+    <link rel="stylesheet" href="/css/mypage/mypage-style-restaurant.css">
+    <!-- 파비콘 -->
+    <link rel="icon" type="image/x-icon" href="/img/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <!-- js   -->
+    <script type="text/javascript" src="/js/library/jquery.js"></script>
+    <script type="text/javascript" src="/js/library/vendors.min.js"></script>
+    <script type="text/javascript" src="/js/library/main.js"></script>
+    <script src="/js/mypage/mypageScript.js" defer></script>
+    <script src="/js/mypage/mypageRestaurantSectionScript.js" defer></script>
+</head>
+
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T2CX8XG3"
+                  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<header th:replace="~{common/navbar-new :: navbarFragment}"></header>
+
+<div id="navBar">
+    <div th:class="${menuIndex == 0 ? 'navbar-title selected' : 'navbar-title'}">
+        <p>내 정보</p>
+    </div>
+    <div th:class="${menuIndex == 1 ? 'navbar-title selected' : 'navbar-title'}">
+        <p>저장된 맛집</p>
+    </div>
+    <div th:class="${menuIndex == 2 ? 'navbar-title selected' : 'navbar-title'}">
+        <p>평가한 맛집</p>
+    </div>
+    <div th:class="${menuIndex == 3 ? 'navbar-title selected' : 'navbar-title'}">
+        <p>작성한 글</p>
+    </div>
+    <div th:class="${menuIndex == 4 ? 'navbar-title selected' : 'navbar-title'}">
+        <p>댓글단 글</p>
+    </div>
+    <div th:class="${menuIndex == 5 ? 'navbar-title selected' : 'navbar-title'}">
+        <p>저장된 글</p>
+    </div>
+    <hr class="hr">
+</div>
+
+<div id="mainContents">
+
+
+
+    <div id="Area1">
+        <div id="area1Contents" class="gray-border-circular">
+            <div id="area1Top">
+
+                <!--<div id="profileImgArea">
+                    <p>프로필 이미지 : </p>
+                    <div id="profileimg"></div>
+                </div>-->
+
+                <div id="emailArea">
+                    <p>이메일 : </p>
+                    <span th:text="${user.getEmail()}"></span>
+                </div>
+
+                <div id="phoneNumberArea">
+                    <p>연락처 : </p>
+                    <input id=phoneNumber type="text" th:placeholder="${user.phoneNumber}">
+                </div>
+                <div id="phoneNumberComment">이벤트 쿠폰 수신을 위해 핸드폰 번호를 입력해주세요. ('-'제외)</div>
+
+                <div id="nicknameArea">
+                    <p>닉네임 : </p>
+                    <input id=nickname type="text" th:placeholder="${user.nickname}">
+                </div>
+                <div id="nicknameComment">닉네임은 30일에 한번만 변경 가능합니다.</div>
+
+                <div id="saveBtnArea">
+                    <button id="saveBtn">저장하기</button>
+                </div>
+
+<!--                <form id="saveForm" action="/user/logout" method="post">-->
+<!--                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>-->
+<!--                    <button id="saveBtn">저장하기</button>-->
+<!--                </form>-->
+
+            </div>
+
+            <hr class="margin25px">
+
+            <div id="countInfo">
+                <p>저장된 맛집 수 : <span th:text="${restaurantFavoriteList.size()}"></span></p>
+                <p>평가한 맛집 수 : <span th:text="${restaurantEvaluationList.size()}"></span></p>
+                <p>커뮤니티 작성한 글 수 : <span th:text="${postList.size()}"></span></p>
+                <p>커뮤니티 작성한 댓글 수 : <span th:text="${postCommentList.size()}"></span></p>
+                <p>커뮤니티 저장된 글 수 : <span th:text="${postScrapList.size()}"></span></p>
+            </div>
+
+            <hr class="margin25px">
+
+            <div id="logoutArea">
+                <form id="logoutForm" action="/user/logout" method="post">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                    <button type="submit" id="logoutBtn">로그아웃</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="Area2" class="hidden">
+        <div id="area2Contents" class="gray-border-circular">
+            <p th:if="${#lists.isEmpty(restaurantFavoriteList)}">저장된 정보가 없습니다.</p>
+            <div class="restaurant-favorite-container" th:each="restaurantFavorie: ${restaurantFavoriteList}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantFavorie.getRestaurant().restaurantId})} + '\''">
+                <!-- 메인 이미지 -->
+                <img th:if="${restaurantFavorie.getRestaurant().getRestaurantImgUrl() != 'no_img'}" class="restaurant-img" th:src="${restaurantFavorie.getRestaurant().getRestaurantImgUrl()}">
+                <img th:if="${restaurantFavorie.getRestaurant().getRestaurantImgUrl() == 'no_img'}" class="restaurant-img" src="/img/restaurant/no_img.png">
+                <!-- 식당 이름, 타입 -->
+                <div class="restaurant-info">
+                    <span class="restaurant-name" th:text="${restaurantFavorie.getRestaurant().getRestaurantName()}"></span>
+                    <span class="restaurant-type" th:text="${restaurantFavorie.getRestaurant().getRestaurantType()}"></span>
+                </div>
+                <!-- 식당 cuisine -->
+                <img class="restaurant-cuisine-img" th:src="${restaurantFavorie.getRestaurant().getCuisineImgUrl(restaurantFavorie.getRestaurant().getRestaurantCuisine())}">
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="Area3" class="hidden">
+        <div id="area3Contents" class="gray-border-circular">
+            <p th:if="${#lists.isEmpty(restaurantEvaluationList)}">저장된 정보가 없습니다.</p>
+            <div class="dropdown-outer">
+                <div class="dropdown">
+                    <button class="btn btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        <span>최신순</span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <li class="dropdown-item">
+                            최신순
+                        </li>
+                        <li class="dropdown-item">
+                            오래된순
+                        </li>
+                        <li class="dropdown-item">
+                            높게 평가한순
+                        </li>
+                        <li class="dropdown-item">
+                            낮게 평가한순
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="restaurant-evaluation-container-outer">
+                <div class="restaurant-evaluation-container" th:each="restaurantEvaluation: ${restaurantEvaluationList}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantEvaluation.getRestaurant().restaurantId})} + '\''">
+                    <div class="evaluation-restaurant-info">
+                        <!-- 메인 이미지 -->
+                        <img th:if="${restaurantEvaluation.getRestaurant().getRestaurantImgUrl() != 'no_img'}" class="restaurant-img" th:src="${restaurantEvaluation.getRestaurant().getRestaurantImgUrl()}">
+                        <img th:if="${restaurantEvaluation.getRestaurant().getRestaurantImgUrl() == 'no_img'}" class="restaurant-img" src="/img/restaurant/no_img.png">
+                        <!-- 식당 이름, 타입 -->
+                        <div class="restaurant-info">
+                            <span class="restaurant-name" th:text="${restaurantEvaluation.getRestaurant().getRestaurantName()}"></span>
+                            <span class="restaurant-type" th:text="${restaurantEvaluation.getRestaurant().getRestaurantType()}"></span>
+                        </div>
+                        <!-- 식당 cuisine -->
+                        <img class="restaurant-cuisine-img" th:src="${restaurantEvaluation.getRestaurant().getCuisineImgUrl(restaurantEvaluation.getRestaurant().getRestaurantCuisine())}">
+                    </div>
+                    <div class="evaluation-score-section">
+                        <div class="evaluation-outer main-evaluation">
+                            <span class="category-main-name" th:text="${restaurantEvaluation.getRestaurant().getRestaurantCuisine()}"></span>
+                            <span class="category-main-score" th:text="${restaurantEvaluation.getEvaluationScore()} + '/5.0'" th:data-score="${restaurantEvaluation.getEvaluationScore()}"></span>
+                        </div>
+                        <div class="evaluation-outer" th:each="situationEval: ${restaurantEvaluation.getEvaluationSituationList()}">
+                            <span class="category-name" th:text="${situationEval.getSituation().getSituationName()}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="Area4" class="hidden">
+        <div id="area5Contents" class="gray-border-circular">
+            <!-- postList가 비어있거나 모든 post의 status가 DELETED인 경우에만 메시지를 출력 -->
+            <p class="text-center" th:if="${#lists.isEmpty(postList)}">저장된 정보가 없습니다.</p>
+            <ul class="postul" th:unless="${#lists.isEmpty(postList)}">
+
+                <!--                    <li th:each="post,iterStat: ${paging}" class="postli">-->
+                <li th:each="postlist:${postList}" th:unless="${postlist.status=='DELETED'}" class="postli">
+                    <hr>
+                    <span class="recommend-tab">
+                        <img class="likecount" src="../img/community/up.png" alt="이미지">
+                        <span th:text="${postlist.likeCount}"></span>
+                    </span>
+
+                    <div class="postBox">
+                        <div>
+                            <a class="postLink" th:text="${postlist.title}" th:href="@{/community/{postId}(postId=${postlist.id})}"></a>
+                            </span>
+                        </div>
+
+                            <div class="underLink">
+                                <span class="category" th:text="${postlist.category}"></span>
+                                <span class="createdAt" th:text="${postlist.calculateTimeAgo()}"> </span>
+                            </div>
+
+                    </div>
+
+                    <!--                        &lt;!&ndash; 게시글에 사진이 있으면 썸네일 표시 &ndash;&gt;-->
+                    <!--                        <img class="postImage" th:if="${not #lists.isEmpty(post.postPhotoList)}"-->
+                    <!--                             th:src="${post.postPhotoList.get(0).photoImgUrl}"/>-->
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+
+    <div id="Area5" class="hidden">
+        <div id="area6Contents" class="gray-border-circular">
+            <p class="text-center" th:if="${#lists.isEmpty(postCommentList)}">저장된 정보가 없습니다.</p>
+            <ul class="postul" th:unless="${#lists.isEmpty(postCommentList)}">
+                <li th:each="commentlist:${postCommentList}" class="postli">
+                    <hr>
+                    <span class="recommend-tab">
+                        <img class="likecount" src="../img/community/up.png" alt="이미지">
+                        <span th:text="${commentlist.likeCount}"></span>
+                    </span>
+
+                    <div class="postBox">
+                        <div>
+                            <a class="postLink"
+                               th:text="${commentlist.commentBody}"
+                               th:href="@{/community/{postId}(postId=${commentlist.postId})}">
+                            </a>
+                        </div>
+
+                        <div class="underLink">
+                            <span class="category">게시글 제목 :&nbsp;</span>
+                            <span class="category" th:text="${commentlist.postTitle}"></span>
+                            <span class="createdAt" th:text="${commentlist.timeAgo}"> </span>
+                        </div>
+
+                    </div>
+
+                    <!--                        &lt;!&ndash; 게시글에 사진이 있으면 썸네일 표시 &ndash;&gt;-->
+                    <!--                        <img class="postImage" th:if="${not #lists.isEmpty(post.postPhotoList)}"-->
+                    <!--                             th:src="${post.postPhotoList.get(0).photoImgUrl}"/>-->
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+
+    <div id="Area6" class="hidden">
+        <div id="area7Contents" class="gray-border-circular">
+            <p class="text-center" th:if="${#lists.isEmpty(postScrapList)}">저장된 정보가 없습니다.</p>
+            <ul class="postul" th:unless="${#lists.isEmpty(postScrapList)}">
+                <li th:each="postScrap:${postScrapList}" class="postli">
+                    <hr>
+                    <span class="recommend-tab">
+                        <img class="likecount" src="../img/community/up.png" alt="이미지">
+                        <span th:text="${postScrap.likeCount}"></span>
+                    </span>
+
+                    <div class="postBox">
+                        <div>
+                            <a class="postLink" th:text="${postScrap.title}" th:href="@{/community/{postId}(postId=${postScrap.postId})}"></a>
+                        </div>
+
+                        <div class="underLink">
+                            <span class="category" th:text="${postScrap.category}"></span>
+<!--                            <span class="createdAt" th:text="${postScrap.post.calculateTimeAgo()}"> </span>-->
+                        </div>
+
+                    </div>
+
+                    <!--                        &lt;!&ndash; 게시글에 사진이 있으면 썸네일 표시 &ndash;&gt;-->
+                    <!--                        <img class="postImage" th:if="${not #lists.isEmpty(post.postPhotoList)}"-->
+                    <!--                             th:src="${post.postPhotoList.get(0).photoImgUrl}"/>-->
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
+<script type="text/javascript">
+    if(!wcs_add) var wcs_add = {};
+    wcs_add["wa"] = "14b5af05d120a20";
+    if(window.wcs) {
+        wcs_do();
+    }
+</script>
+</body>
+
+<footer th:replace="~{common/footer::footerFragment}"></footer>
+
+</html>

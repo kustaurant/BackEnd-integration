@@ -44,7 +44,7 @@ public class UserController {
         }
         String imgUrl = selectRandomString(loginImgUrlList);
         model.addAttribute("imgUrl", imgUrl);
-        return "login_form";
+        return "common/login";
     }
 
     public static String selectRandomString(List<String> stringList) {

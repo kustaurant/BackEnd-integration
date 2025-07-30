@@ -3,7 +3,6 @@ package com.kustaurant.kustaurant.restaurant.query.search;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +26,7 @@ public class SearchWebController {
     ) {
         if (kw.isEmpty()) {
             model.addAttribute("kw", "입력된 검색어가 없습니다.");
-            return "searchResult";
+            return "restaurant/searchResult";
         } else {
             model.addAttribute("kw", kw);
         }
@@ -37,7 +36,7 @@ public class SearchWebController {
 
         model.addAttribute("searchResult", result);
 
-        return "searchResult";
+        return "restaurant/searchResult";
     }
 
 }
