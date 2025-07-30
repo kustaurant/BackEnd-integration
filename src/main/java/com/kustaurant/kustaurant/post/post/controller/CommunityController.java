@@ -38,7 +38,6 @@ public class CommunityController {
     private final PostCommentService postCommentService;
     private final PostScrapService postScrapService;
     private final StorageService storageService;
-    private final UserService userService;
 
     // 커뮤니티 메인 화면
     @GetMapping("/community")
@@ -60,7 +59,7 @@ public class CommunityController {
         model.addAttribute("sort", sort);
         model.addAttribute("paging", paging);
         model.addAttribute("postList", paging.getContent());
-        return "community";
+        return "community/community";
     }
 
     // 커뮤니티 게시글 상세 화면
@@ -73,10 +72,11 @@ public class CommunityController {
     ) {
         PostDetailView view = postCommentService.buildPostDetailView(postId, user.id(), sort);
         model.addAttribute("view", view);
-        return "community_post";
+        return "community/community_post";
     }
 
     // 게시글 삭제
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @DeleteMapping("/api/posts/{postId}")
     public ResponseEntity<String> deletePost(@PathVariable Integer postId, @AuthUser AuthUserInfo user) {
         log.info("Deleting post with ID: {} by user: {}", postId, user.id());
@@ -92,8 +92,8 @@ public class CommunityController {
     }
 
     // 댓글 삭제
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @DeleteMapping("/api/comments/{commentId}")
-    @Transactional
     public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable Integer commentId, @AuthUser AuthUserInfo user) {
         // 댓글 조회 및 작성자 권한 확인
         com.kustaurant.kustaurant.post.comment.domain.PostComment comment = postCommentService.getPostCommentByCommentId(commentId);
@@ -110,6 +110,7 @@ public class CommunityController {
     }
 
     // 댓글 or 대댓글 생성
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/posts/{postId}/comments")
     public ResponseEntity<String> createComment(
             @PathVariable Integer postId,
@@ -160,7 +161,7 @@ public class CommunityController {
         model.addAttribute("sort", sort);
         model.addAttribute("postCategory", postCategory);
         model.addAttribute("postList", paging.getContent());
-        return "community";
+        return "community/community";
     }
 
     // 게시글 댓글 좋아요
@@ -186,14 +187,16 @@ public class CommunityController {
     }
 
     // 커뮤니티 게시글 작성 화면
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/community/write")
     public String writePost(
             @AuthUser AuthUserInfo user
     ) {
-        return "community_write";
+        return "community/community_write";
     }
 
     // 게시글 생성
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/posts")
     public ResponseEntity<String> createPost(
             @RequestParam("title") String title,
@@ -206,6 +209,7 @@ public class CommunityController {
     }
 
     //게시글 수정 화면
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/community/post/update")
     public String updatePost(
             @RequestParam Integer postId,
@@ -214,10 +218,11 @@ public class CommunityController {
     ) {
         Post post = postQueryService.getPost(postId);
         model.addAttribute("post", PostDTO.from(post));
-        return "community_update";
+        return "community/community_update";
     }
 
     // 게시글 수정
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PutMapping("/api/posts/{postId}")
     public ResponseEntity<String> updatePost(
             @PathVariable Integer postId,
@@ -235,6 +240,7 @@ public class CommunityController {
     }
 
     // 이미지 업로드 (미리보기)
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/images")
     public ResponseEntity<?> imageUpload(
             @RequestParam("image") MultipartFile imageFile,
@@ -265,6 +271,7 @@ public class CommunityController {
     }
 
     // 댓글 입력창 포커스시 로그인 상태 확인
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/api/login/comment-write")
     public ResponseEntity<String> checkLogin(
             @AuthUser AuthUserInfo user

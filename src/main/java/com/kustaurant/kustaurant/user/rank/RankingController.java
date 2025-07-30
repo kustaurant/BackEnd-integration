@@ -44,7 +44,7 @@ public class RankingController {
             model.addAttribute("myRank", null);
         }
         model.addAttribute("currentPage","ranking");
-        return "ranking";
+        return "user/ranking";
     }
 
     private List<UserRank> calculateRank(List<User> userList) {

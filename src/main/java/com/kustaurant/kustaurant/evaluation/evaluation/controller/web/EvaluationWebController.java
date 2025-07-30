@@ -45,7 +45,7 @@ public class EvaluationWebController {
         EvaluationDTO preEval = evaluationQueryService.getPreEvaluation(user.id(), restaurantId);
         model.addAttribute("preEval", preEval);
 
-        return "evaluation";
+        return "evaluation/evaluation";
     }
 
 

@@ -27,7 +27,7 @@ public class DrawWebController {
         List<String> cuisines = new ArrayList<>(Arrays.asList("한식","일식","중식","양식","아시안","고기","치킨","햄버거","분식","해산물","술집","샐러드","카페","베이커리","기타","전체"));
 
         model.addAttribute("cuisines", cuisines);
-        return "recommend";
+        return "restaurant/recommend";
     }
 
     // 메뉴 리스트 받아오기
