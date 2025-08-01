@@ -7,4 +7,6 @@ import java.util.Map;
 public interface RatingEvaluationRepository {
 
     Map<Integer, List<EvaluationWithContext>> getEvaluationsByRestaurantIds(List<Integer> restaurantIds);
+
+    double getGlobalAvg();
 }

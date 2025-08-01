@@ -34,15 +34,24 @@ restaurant:
   initialDisplayMenuCount: 2
   rating:
     policy:
+      prior_weight: 5
       evaluation:
         recency_lambda: 0.05
+        recency_boost_gamma: 0.5
+        min_decay: 0.3
         reaction_divisor: 10
+        reaction_scale: 0.5
         evaluator_k: 5
         completeness_weight:
-          comment: 0.5
-          situation: 0.2
-          image: 0.3
+          score: 0.5
+          comment: 0.25
+          situation: 0.1
+          image: 0.15
       restaurant:
+        popularity_scale:
+          visit: 4
+          favorite: 2
+          evaluation: 2
         popularity_weight:
           visits: 0.1
           favorites: 0.2

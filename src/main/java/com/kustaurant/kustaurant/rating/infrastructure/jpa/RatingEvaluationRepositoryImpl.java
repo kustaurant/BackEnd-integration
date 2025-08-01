@@ -14,4 +14,9 @@ public class RatingEvaluationRepositoryImpl implements RatingEvaluationRepositor
             List<Integer> restaurantIds) {
         return Map.of();
     }
+
+    @Override
+    public double getGlobalAvg() {
+        return 0;
+    }
 }

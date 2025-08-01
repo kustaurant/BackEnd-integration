@@ -9,6 +9,8 @@ import com.kustaurant.kustaurant.rating.domain.service.TierCalculationService;
 import com.kustaurant.kustaurant.rating.service.port.RatingEvaluationRepository;
 import com.kustaurant.kustaurant.rating.service.port.RatingRepository;
 import com.kustaurant.kustaurant.rating.service.port.RatingRestaurantRepository;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +47,13 @@ public class RatingOrchestrationService {
         ratingRepository.saveAll(ratings);
     }
 
-    List<RatingScore> calculateScores(List<Integer> ids) {
+    private List<RatingScore> calculateScores(List<Integer> ids) {
         Map<Integer, RestaurantStats> statsMap = ratingRestaurantRepository.getRestaurantStatsByIds(
                 ids);
         Map<Integer, List<EvaluationWithContext>> evalMap = ratingEvaluationRepository.getEvaluationsByRestaurantIds(
                 ids);
-        return scoreCalculationService.calculateScores(ids, statsMap, evalMap);
+        double globalAvg = ratingEvaluationRepository.getGlobalAvg();
+        return scoreCalculationService.calculateScores(
+                ids, statsMap, evalMap, globalAvg, LocalDate.now(ZoneId.of("Asia/Seoul")));
     }
 }

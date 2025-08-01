@@ -13,11 +13,14 @@ class RatingPolicyTest {
     RatingPolicy ratingPolicy;
 
     @Test
-    void RatingPolicy_빈_정상_등록_확인() {
-        assertThat(ratingPolicy).isNotNull();
-        assertThat(ratingPolicy.evaluation()).isNotNull();
-        assertThat(ratingPolicy.restaurant()).isNotNull();
-        assertThat(ratingPolicy.tier()).isNotNull();
-        System.out.println(ratingPolicy);
+    void 평가_완성도_가중치의_합은_1이어야_한다() {
+        double weightSum = ratingPolicy.evaluation().completenessWeight().getWeightSum();
+        assertThat(weightSum).isCloseTo(1.0, within(1e-6));
+    }
+
+    @Test
+    void 식당_스탯_가중치의_합은_1이어야_한다() {
+        double weightSum = ratingPolicy.restaurant().popularityWeight().getWeightSum();
+        assertThat(weightSum).isCloseTo(1.0, within(1e-6));
     }
 }
