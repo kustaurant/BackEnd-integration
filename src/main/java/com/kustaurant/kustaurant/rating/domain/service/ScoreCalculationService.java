@@ -11,12 +11,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ScoreCalculationService {
 
-    public RatingScore calculate(RestaurantStats restaurant, EvaluationWithContext evaluation) {
+    public RatingScore calculate(RestaurantStats restaurant, List<EvaluationWithContext> evaluation) {
         return null;
     }
 
-    public List<RatingScore> calculateScores(List<Integer> ids, Map<Integer, RestaurantStats> statsMap,
-            Map<Integer, EvaluationWithContext> evalMap) {
+    public List<RatingScore> calculateScores(
+            List<Integer> ids,
+            Map<Integer, RestaurantStats> statsMap,
+            Map<Integer, List<EvaluationWithContext>> evalMap
+    ) {
         List<RatingScore> scores = new ArrayList<>(ids.size());
         for (Integer id : ids) {
             RatingScore score = calculate(statsMap.get(id), evalMap.get(id));

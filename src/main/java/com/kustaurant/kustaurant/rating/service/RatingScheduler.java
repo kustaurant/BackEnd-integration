@@ -12,7 +12,8 @@ public class RatingScheduler {
 
     private final RatingOrchestrationService ratingOrchestrationService;
 
-    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul")
+    // 매일 새벽 3시에 진행
+    @Scheduled(cron = "0 0 3 * * *", zone = "Asia/Seoul")
     public void run() {
         ratingOrchestrationService.calculateAllRatings();
     }

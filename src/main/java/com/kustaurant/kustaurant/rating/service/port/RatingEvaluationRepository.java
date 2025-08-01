@@ -6,5 +6,5 @@ import java.util.Map;
 
 public interface RatingEvaluationRepository {
 
-    Map<Integer, EvaluationWithContext> getEvaluationsByRestaurantIds(List<Integer> restaurantIds);
+    Map<Integer, List<EvaluationWithContext>> getEvaluationsByRestaurantIds(List<Integer> restaurantIds);
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public class RatingEvaluationRepositoryImpl implements RatingEvaluationRepository {
 
     @Override
-    public Map<Integer, EvaluationWithContext> getEvaluationsByRestaurantIds(
+    public Map<Integer, List<EvaluationWithContext>> getEvaluationsByRestaurantIds(
             List<Integer> restaurantIds) {
         return Map.of();
     }

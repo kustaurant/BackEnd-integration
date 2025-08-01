@@ -41,22 +41,15 @@ public class RatingOrchestrationService {
         }
         // 티어 계산
         List<Rating> ratings = tierCalculationService.calculate(scores);
-        // Chunk 단위로 저장
-        for (int i = 0; i < ratings.size(); i += CHUNK_SIZE) {
-            List<Rating> chunk = ratings.subList(i, Math.min(i + CHUNK_SIZE, ratings.size()));
-            saveChunk(chunk);
-        }
+        // 저장
+        ratingRepository.saveAll(ratings);
     }
 
     List<RatingScore> calculateScores(List<Integer> ids) {
         Map<Integer, RestaurantStats> statsMap = ratingRestaurantRepository.getRestaurantStatsByIds(
                 ids);
-        Map<Integer, EvaluationWithContext> evalMap = ratingEvaluationRepository.getEvaluationsByRestaurantIds(
+        Map<Integer, List<EvaluationWithContext>> evalMap = ratingEvaluationRepository.getEvaluationsByRestaurantIds(
                 ids);
         return scoreCalculationService.calculateScores(ids, statsMap, evalMap);
-    }
-
-    void saveChunk(List<Rating> chunk) {
-        ratingRepository.saveAll(chunk);
     }
 }
