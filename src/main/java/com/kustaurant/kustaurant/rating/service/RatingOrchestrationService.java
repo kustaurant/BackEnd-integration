@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class RatingOrchestrationService {
     private final TierCalculationService tierCalculationService;
     private final RatingRepository ratingRepository;
 
+    @Transactional
     public void calculateAllRatings() {
         List<Integer> ids = ratingRestaurantRepository.getRestaurantIds();
         // Chunk 단위로 계산

@@ -9,6 +9,6 @@ import org.springframework.stereotype.Service;
 public class TierCalculationService {
 
     public List<Rating> calculate(List<RatingScore> scores) {
-        return null;
+        return List.of();
     }
 }

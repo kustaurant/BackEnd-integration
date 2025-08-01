@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,12 +24,18 @@ public class RatingEntity {
     private double score;
     @Column(nullable = false)
     private int tier;
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean isTemp;
+    @Column(nullable = false)
+    private LocalDateTime ratedAt;
 
     public static RatingEntity from(Rating rating) {
         return new RatingEntity(
                 rating.restaurantId(),
                 rating.score(),
-                rating.tier().getValue()
+                rating.tier().getValue(),
+                rating.isTemp(),
+                rating.ratedAt()
         );
     }
 }
