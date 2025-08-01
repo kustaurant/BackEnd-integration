@@ -1,0 +1,23 @@
+package com.kustaurant.kustaurant.restaurant.favorite.infrastructure;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface RestaurantFavoriteJpaRepository extends JpaRepository<RestaurantFavoriteEntity, Integer> {
+    Optional<RestaurantFavoriteEntity> findByUserIdAndRestaurantId(Long userId, Integer restaurantId);
+
+    long countByRestaurantIdAndStatus(Integer restaurantId, String status);
+
+    @Query("""
+        SELECT rf FROM RestaurantFavoriteEntity rf
+        WHERE rf.userId = :userId
+        ORDER BY rf.createdAt DESC""")
+    List<RestaurantFavoriteEntity> findSortedFavoritesByUserIdDesc(@Param("userId") Long userId);
+
+    boolean existsByUserIdAndRestaurantId(Long userId, Integer restaurantId);
+
+}

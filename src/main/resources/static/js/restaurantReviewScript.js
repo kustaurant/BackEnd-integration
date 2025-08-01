@@ -1,8 +1,3 @@
-// csrf 토큰 읽어오기
-// CSRF 토큰 가져오기
-const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
 const btn1 = document.getElementById('button1');
 const btn2 = document.getElementById('button2');
 let activeButton = btn1;

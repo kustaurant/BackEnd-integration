@@ -34,7 +34,7 @@ public class MypageController {
         model.addAttribute("postCommentList", data.getPostCommentList());
         model.addAttribute("postScrapList", data.getPostScrapList());
 
-        return "mypage";
+        return "user/mypage";
     }
 
 

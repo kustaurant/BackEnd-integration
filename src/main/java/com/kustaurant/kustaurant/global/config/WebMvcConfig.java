@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.global.config;
 
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.CuisineListArgumentResolver;
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.LocationListArgumentResolver;
-import com.kustaurant.kustaurant.restaurant.tier.argument_resolver.SituationListArgumentResolver;
+import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.CuisineListArgumentResolver;
+import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.LocationListArgumentResolver;
+import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.SituationListArgumentResolver;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserArgumentResolver;
 import com.kustaurant.kustaurant.global.auth.web.MyInterceptor;
 import lombok.RequiredArgsConstructor;

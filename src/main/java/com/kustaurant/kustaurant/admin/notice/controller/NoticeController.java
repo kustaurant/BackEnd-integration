@@ -21,7 +21,7 @@ public class NoticeController {
     ){
         List<NoticeDTO> notices = noticeService.getAllNotices();
         model.addAttribute("notices", notices);
-        return "notice";
+        return "home/notice";
     }
 
 }

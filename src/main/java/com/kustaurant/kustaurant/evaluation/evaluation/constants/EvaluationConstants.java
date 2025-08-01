@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.constants;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

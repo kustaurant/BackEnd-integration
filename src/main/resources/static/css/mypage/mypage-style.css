@@ -1,0 +1,285 @@
+/* 여기 수정 */
+@import "../variables.css";
+/* ------------------- 화면 구성 ----------------- */
+
+/* TABLET */
+@media only screen and (max-width: 1023px) {
+    #mainContents {
+        margin: 10px auto;
+        padding: 0 var(--mobile-outer-container-side-width);
+        min-width: var(--min-width);
+        width: 100%;
+    }
+    .gray-border-circular{
+        padding: 10px;
+    }
+    #phoneNumber{
+        padding: 5px;
+    }
+    #phoneNumberComment{
+        padding-left: 10px;
+    }
+    #nickname{
+        padding: 5px;
+    }
+    #area1Top p{
+        width: 120px;
+    }
+    #nicknameComment{
+        padding-left: 10px;
+    }
+}
+/* PC */
+@media only screen and (min-width: 1024px) {
+    #mainContents {
+        width: var(--pc-outer-container-width);
+        max-width: var(--max-width);
+        margin: 10px auto;
+    }
+    .gray-border-circular{
+        padding: 50px;
+    }
+    #area1Top p{
+        width: 180px;
+    }
+    #phoneNumberComment{
+        padding-left: 200px;
+    }
+    #nicknameComment{
+        padding-left: 200px;
+    }
+}
+/* ------------------- 화면 구성 ----------------- */
+.hr{
+    margin: 0;
+    text-align: center;
+}
+#navBar{
+    overflow-x: auto;
+    overflow-x: hidden;
+    white-space: nowrap;
+    margin-top: 110px;
+    text-align: center;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    border-top: 1px solid rgba(128, 128, 128, 0.3);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+}
+#navBar div{
+    display: inline-block;
+}
+.navbar-title{
+    cursor: pointer;
+}
+.navbar-title p{
+    margin: 10px 20px;
+}
+.selected{
+    color: #0a3622;
+    border-bottom: 2px solid #0a3622;
+}
+.hidden{
+    display: none;
+}
+.gray-border-circular{
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 5px;
+}
+/*----------------- 내정보 영역(Area1) ---------------*/
+.margin25px{
+    margin-bottom:50px;
+}
+#area1Top p{
+    color: black;
+    margin: 10px;
+}
+#area1Contents div{
+    margin-bottom: 15px;
+}
+#profileImgArea{
+    display: flex;
+    max-width: 800px;
+}
+#profileimg{
+    width: 150px;
+    height: 150px;
+    background-color: lightgray;
+    border-radius: 5px;
+}
+#emailArea {
+    display: flex;
+    align-items: center;
+    max-width: 800px;
+}
+#emailArea > span {
+    flex: 1;
+}
+
+#phoneNumberArea{
+    display: flex;
+    max-width: 800px;
+}
+#phoneNumber{
+    width: 60%;
+    border-radius: 5px;
+    margin-right: 15px;
+    flex: 1;
+}
+#phoneNumberComment{
+    width: 100%;
+    color: gray;
+    font-size: 12px;
+}
+
+#nicknameArea{
+    display: flex;
+    max-width: 800px;
+}
+#nickname{
+    width: 60%;
+    border-radius: 5px;
+    margin-right: 15px;
+    flex: 1;
+}
+#nicknameComment{
+    width: 100%;
+    color: gray;
+    font-size: 12px;
+}
+#saveBtnArea{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+#saveBtn{
+    border: none;
+    border-radius: 5px;
+    width: 90px;
+    height: 40px;
+    font-size: 15px;
+}
+#countInfo p{
+    margin: 15px 0;
+    font-size: 16px;
+    color: #555;
+}
+
+/*----------------- 로그아웃 버튼 ---------------*/
+
+#logoutBtn{
+    border: none;
+    border-radius: 5px;
+    background-color: var(--main-color);
+    color: #FFF;
+
+    width: 100%;
+    height: 42px;
+}
+
+/*----------------- 내가 작성한 게시글 영역(Area5) ---------------*/
+
+.postul {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-left: 0;
+    border-top: 1px solid white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+.postli {
+    width: 100%;
+    display: flex;
+    height: 77px;
+    align-items: center;
+    padding: 8px;
+    line-height: 18px;
+    font-size: 14px;
+    background: white;
+    border-top: 1px solid #ebeef1;
+    position: relative;
+}
+.recommend-tab{
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    justify-content: center;
+    font-size: 14px;
+    color: gray;
+    white-space: nowrap;
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+    text-align: center;
+
+    flex-shrink: 0;
+}
+.recommend-tab img{
+    width: 14px;
+    height: 14px;
+}
+.postBox{
+
+    display: flex;
+
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+    overflow: hidden;
+    padding-right: 12px;
+}
+
+.postLink {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-decoration: none;
+    color: black;
+    display: inline-block;
+    font-weight: 600;
+}
+
+.comment-count{
+    color: #d51f0f !important;
+    margin-left: 2px;
+    margin-bottom: 2px;
+}
+
+.underLink{
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    color: #8b99a6;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    height: 24px;
+}
+.underLink > span{
+    float: left;
+    padding-left: 8px;
+    line-height: 24px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+.category{
+    padding-left: 0 !important;
+}
+.createdAt::before, .author::before{
+    display: inline-block;
+    vertical-align: middle;
+    border-left: 1px solid #ebeef1;
+    height: 12px;
+    content: "";
+    margin-right: 8px;
+}
+#author{
+    flex: 1;
+    overflow: hidden;
+}
