@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.config;
+package com.kustaurant.kustaurant.global.config.jpa;
 
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;

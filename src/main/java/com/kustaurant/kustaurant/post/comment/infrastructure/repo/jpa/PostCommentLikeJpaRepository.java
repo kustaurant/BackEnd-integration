@@ -1,5 +1,6 @@
-package com.kustaurant.kustaurant.post.comment.infrastructure;
+package com.kustaurant.kustaurant.post.comment.infrastructure.repo.jpa;
 
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.PostCommentLikeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

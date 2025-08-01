@@ -77,7 +77,7 @@ public class MypageServiceImpl implements MypageService {
                         comment.getId(),
                         comment.getCommentBody(),
                         0,
-                        comment.calculateTimeAgo(),
+                        TimeAgoUtil.toKor(comment.getCreatedAt()),
                         postIdToTitle.getOrDefault(comment.getPostId(), "알 수 없음"),
                         comment.getPostId()
                 ))

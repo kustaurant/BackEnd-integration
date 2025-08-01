@@ -1,8 +1,10 @@
-package com.kustaurant.kustaurant.post.comment.infrastructure;
+package com.kustaurant.kustaurant.post.comment.infrastructure.repo;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.COMMENT_NOT_FOUND;
 
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.PostCommentEntity;
+import com.kustaurant.kustaurant.post.comment.infrastructure.repo.jpa.PostCommentJpaRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
@@ -22,7 +24,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
 
     @Override
     public List<PostComment> findActiveByUserId(Long userId) {
-        return postCommentJpaRepository.findActiveByUserIdOrderByCreatedAtDesc(userId).stream().map(PostCommentEntity::toDomain).toList();
+        return postCommentJpaRepository.findActiveByUserIdOrderByCreatedAtDesc(userId).stream().map(PostCommentEntity::toModel).toList();
     }
 
     @Override
@@ -34,19 +36,19 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
                 .collect(Collectors.toList());
 
         return parentComments.stream()
-                .map(PostCommentEntity::toDomain)
+                .map(PostCommentEntity::toModel)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<PostComment> findById(Integer comment_id) {
-        return postCommentJpaRepository.findById(comment_id).map(PostCommentEntity::toDomain);
+        return postCommentJpaRepository.findById(comment_id).map(PostCommentEntity::toModel);
     }
 
     @Override
     public Optional<PostComment> findByIdWithReplies(Integer commentId) {
         return postCommentJpaRepository.findById(commentId)
-                .map(PostCommentEntity::toDomain);
+                .map(PostCommentEntity::toModel);
     }
 
     @Override
@@ -55,7 +57,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
         if (comment.getId() == null) {
             PostCommentEntity entity = PostCommentEntity.from(comment);
             postCommentJpaRepository.save(entity);
-            return entity.toDomain();
+            return entity.toModel();
         }
 
         // 기존 댓글 수정
@@ -66,7 +68,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
         // likeCount 필드 제거됨
 
         postCommentJpaRepository.save(entity);
-        return entity.toDomain();
+        return entity.toModel();
     }
 
     @Override
@@ -82,7 +84,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     @Override
     public List<PostComment> findByPostId(Integer postId) {
         return postCommentJpaRepository.findByPostId(postId).stream()
-                .map(PostCommentEntity::toDomain)
+                .map(PostCommentEntity::toModel)
                 .collect(Collectors.toList());
     }
 

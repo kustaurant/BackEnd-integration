@@ -1,17 +1,24 @@
 package com.kustaurant.kustaurant.restaurant.favorite.infrastructure;
 
+import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
 import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Setter
 @Getter
+@SQLDelete(sql = "update restaurant_favorite_tbl set status = 'DELETED' where favorite_id = ?")
+@SQLRestriction("status = 'ACTIVE'")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="restaurant_favorite_tbl")
-public class RestaurantFavoriteEntity {
+public class RestaurantFavoriteEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +32,19 @@ public class RestaurantFavoriteEntity {
     private Integer restaurantId;
 
     private String status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+
+    public static RestaurantFavoriteEntity from(RestaurantFavorite domain) {
+        if (domain == null) {
+            return null;
+        }
+        RestaurantFavoriteEntity entity = new RestaurantFavoriteEntity();
+        entity.id = domain.getId();
+        entity.userId = domain.getUserId();
+        entity.restaurantId = domain.getRestaurantId();
+        entity.status = domain.getStatus();
+
+        return entity;
+    }
 
     public RestaurantFavorite toModel() {
         return RestaurantFavorite.builder()
@@ -34,24 +52,8 @@ public class RestaurantFavoriteEntity {
                 .userId(userId)
                 .restaurantId(restaurantId)
                 .status(status)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
+                .createdAt(getCreatedAt())
+                .updatedAt(getUpdatedAt())
                 .build();
-    }
-
-    public static RestaurantFavoriteEntity from(RestaurantFavorite domain) {
-        if (domain == null) {
-            return null;
-        }
-
-        RestaurantFavoriteEntity entity = new RestaurantFavoriteEntity();
-        entity.id = domain.getId();
-        entity.userId = domain.getUserId();
-        entity.restaurantId = domain.getRestaurantId();
-        entity.status = domain.getStatus();
-        entity.createdAt = domain.getCreatedAt();
-        entity.updatedAt = domain.getUpdatedAt();
-
-        return entity;
     }
 }

@@ -1,32 +1,31 @@
-package com.kustaurant.kustaurant.post.comment.infrastructure;
+package com.kustaurant.kustaurant.post.comment.infrastructure.entity;
 
+import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
-
-@Getter
-@Setter
 @Entity
+@Getter
+@SQLDelete(sql = "update post_comments_tbl set status = 'DELETED' where comment_id = ?")
+@SQLRestriction("status = 'ACTIVE'")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="post_comments_tbl")
-public class PostCommentEntity {
+public class PostCommentEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer commentId;
     String commentBody;
 
-    @Column(columnDefinition = "varchar(20)")
+    @Column(length = 20)
     @Enumerated(EnumType.STRING)
     ContentStatus status;
 
     @Column(name = "parent_comment_id")
     Integer parentCommentId;
-
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 
     @Column(name = "post_id", nullable = false)
     Integer postId;
@@ -34,46 +33,40 @@ public class PostCommentEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    public PostCommentEntity() {
-    }
-
+    @Builder
     public PostCommentEntity(
             String commentBody,
             ContentStatus status,
-            LocalDateTime createdAt,
             Integer postId,
+            Integer parentCommentId,
             Long userId
     ) {
         this.commentBody = commentBody;
         this.status = status;
-        this.createdAt = createdAt;
         this.postId = postId;
+        this.parentCommentId = parentCommentId;
         this.userId = userId;
     }
 
     public static PostCommentEntity from(PostComment comment) {
-        PostCommentEntity entity = new PostCommentEntity();
-        entity.setCommentId(comment.getId());
-        entity.setCommentBody(comment.getCommentBody());
-        entity.setStatus(comment.getStatus());
-        entity.setCreatedAt(comment.getCreatedAt());
-        entity.setUpdatedAt(comment.getUpdatedAt());
-        entity.setPostId(comment.getPostId());
-        entity.setUserId(comment.getUserId());
-        entity.setParentCommentId(comment.getParentCommentId());
-
-        return entity;
+        return PostCommentEntity.builder()
+                .commentBody(comment.getCommentBody())
+                .status(comment.getStatus())
+                .postId(comment.getPostId())
+                .userId(comment.getUserId())
+                .parentCommentId(comment.getParentCommentId())
+                .build();
     }
 
-    public PostComment toDomain() {
+    public PostComment toModel() {
         return PostComment.builder()
                 .id(this.commentId)
                 .commentBody(this.commentBody)
                 .postId(this.postId)
                 .userId(this.userId)
                 .status(this.status)
-                .createdAt(this.createdAt)
-                .updatedAt(this.updatedAt)
+                .createdAt(getCreatedAt())
+                .updatedAt(getUpdatedAt())
                 .parentCommentId(this.parentCommentId)
                 .build();
     }

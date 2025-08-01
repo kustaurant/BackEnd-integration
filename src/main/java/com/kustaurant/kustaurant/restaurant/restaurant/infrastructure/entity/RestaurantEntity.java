@@ -1,6 +1,8 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Coordinates;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Cuisine;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.GeoPosition;
@@ -8,8 +10,7 @@ import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Tier;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,8 +21,10 @@ import org.hibernate.annotations.DynamicUpdate;
 @Setter
 @Entity
 @DynamicUpdate
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonIgnoreProperties({"createdAt", "updatedAt"})
 @Table(name = "restaurants_tbl")
-public class RestaurantEntity {
+public class RestaurantEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer restaurantId;
@@ -45,11 +48,6 @@ public class RestaurantEntity {
     private String partnershipInfo;
 
     private String status;
-    @JsonIgnore
-    private LocalDateTime createdAt;
-
-    @JsonIgnore
-    private LocalDateTime updatedAt;
 
     public void updateStatistics(Restaurant restaurant) {
         this.visitCount = restaurant.getVisitCount();
@@ -73,8 +71,6 @@ public class RestaurantEntity {
         entity.setLatitude(restaurant.getGeoPosition().coordinates().latitude());
         entity.setPartnershipInfo(restaurant.getPartnershipInfo());
         entity.setStatus(restaurant.getStatus());
-        entity.setCreatedAt(restaurant.getCreatedAt());
-        entity.setUpdatedAt(restaurant.getUpdatedAt());
         entity.setVisitCount(restaurant.getVisitCount());
         entity.setRestaurantEvaluationCount(restaurant.getRestaurantEvaluationCount());
         entity.setRestaurantScoreSum(restaurant.getRestaurantScoreSum());
@@ -98,8 +94,8 @@ public class RestaurantEntity {
                 .restaurantImgUrl(restaurantImgUrl)
                 .partnershipInfo(partnershipInfo)
                 .status(status)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
+                .createdAt(getCreatedAt())
+                .updatedAt(getUpdatedAt())
                 .visitCount(visitCount)
                 .restaurantEvaluationCount(restaurantEvaluationCount)
                 .restaurantScoreSum(restaurantScoreSum)

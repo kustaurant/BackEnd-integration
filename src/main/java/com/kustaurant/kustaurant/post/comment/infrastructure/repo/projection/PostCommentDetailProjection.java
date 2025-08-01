@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.post.comment.infrastructure.projection;
+package com.kustaurant.kustaurant.post.comment.infrastructure.repo.projection;
 
 import java.time.LocalDateTime;
 

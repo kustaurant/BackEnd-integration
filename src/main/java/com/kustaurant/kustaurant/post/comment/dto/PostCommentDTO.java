@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.post.comment.dto;
 
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
-import com.kustaurant.kustaurant.post.comment.infrastructure.projection.PostCommentDetailProjection;
+import com.kustaurant.kustaurant.post.comment.infrastructure.repo.projection.PostCommentDetailProjection;
 import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
@@ -61,7 +61,7 @@ public class PostCommentDTO {
                 .user(userDtoMap.get(comment.getUserId()))
                 .likeCount(0) // 리액션 지표는 별도 서비스에서 계산
                 .dislikeCount(0) // 리액션 지표는 별도 서비스에서 계산
-                .timeAgo(comment.calculateTimeAgo())
+                .timeAgo(TimeAgoUtil.toKor(comment.getCreatedAt()))
                 .repliesList(List.of()) // ID 기반으로 별도 조회 필요
                 .build();
     }
@@ -76,7 +76,7 @@ public class PostCommentDTO {
                 .user(UserDTO.from(user))
                 .likeCount(0) // 리액션 지표는 별도 서비스에서 계산
                 .dislikeCount(0) // 리액션 지표는 별도 서비스에서 계산
-                .timeAgo(comment.calculateTimeAgo())
+                .timeAgo(TimeAgoUtil.toKor(comment.getCreatedAt()))
                 .repliesList(List.of()) // ID 기반으로 별도 조회 필요
                 .build();
     }

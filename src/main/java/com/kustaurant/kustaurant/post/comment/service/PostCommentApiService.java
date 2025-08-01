@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.post.comment.service;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
+import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
 import com.kustaurant.kustaurant.post.post.service.api.PostQueryApiService;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
@@ -175,7 +176,7 @@ public class PostCommentApiService {
                 .dislikeCount(0) // 리액션 지표는 별도 서비스에서 계산
                 .createdAt(postComment.getCreatedAt())
                 .updatedAt(postComment.getUpdatedAt())
-                .timeAgo(postComment.calculateTimeAgo())
+                .timeAgo(TimeAgoUtil.toKor(postComment.getCreatedAt()))
                 .isLiked(isLiked(postComment, userId))
                 .isDisliked(isDisliked(postComment, userId))
                 .isCommentMine(isCommentMine(postComment, userId))

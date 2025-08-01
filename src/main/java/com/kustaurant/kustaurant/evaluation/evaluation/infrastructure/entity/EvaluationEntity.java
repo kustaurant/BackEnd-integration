@@ -1,8 +1,10 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity;
 
+import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,11 +15,10 @@ import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Entity
-@DynamicUpdate // 변경된 필드만 Update
-// 한 사용자가 한 식당을 중복 평가 할 수 없음
+@DynamicUpdate
 @Table(name="evaluations_tbl")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class EvaluationEntity {
+public class EvaluationEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +27,6 @@ public class EvaluationEntity {
 
     private Double evaluationScore;
     private String status;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     // 평가 내용 관련
     private String body;
     private String imgUrl;
@@ -47,11 +46,20 @@ public class EvaluationEntity {
     @Column(name = "situation_id")
     private List<Long> situationIds = new ArrayList<>();
 
-    public EvaluationEntity(Double evaluationScore, String status, LocalDateTime createdAt, String body, String imgUrl, Integer likeCount, Integer dislikeCount, Long userId, Integer restaurantId) {
+    @Builder
+    public EvaluationEntity(
+            Double evaluationScore,
+            String status,
+            String body,
+            String imgUrl,
+            Integer likeCount,
+            Integer dislikeCount,
+            Long userId,
+            Integer restaurantId
+    ) {
         this.evaluationScore = evaluationScore;
         this.userId = userId;
         this.status = status;
-        this.createdAt = createdAt;
         this.body = body;
         this.imgUrl = imgUrl;
         this.likeCount = likeCount;
@@ -64,8 +72,6 @@ public class EvaluationEntity {
         entity.id = evaluation.getId();
         entity.evaluationScore = evaluation.getEvaluationScore();
         entity.status = evaluation.getStatus();
-        entity.createdAt = evaluation.getCreatedAt();
-        entity.updatedAt = evaluation.getUpdatedAt();
         entity.body = evaluation.getCommentBody();
         entity.imgUrl = evaluation.getCommentImgUrl();
         entity.likeCount = evaluation.getLikeCount();
@@ -78,7 +84,6 @@ public class EvaluationEntity {
 
     public void reEvaluate(Evaluation evaluation) {
         this.evaluationScore = evaluation.getEvaluationScore();
-        this.updatedAt = evaluation.getUpdatedAt();
         this.body = evaluation.getCommentBody();
         this.imgUrl = evaluation.getCommentImgUrl();
         updateSituations(evaluation.getSituationIds());
@@ -103,8 +108,8 @@ public class EvaluationEntity {
                 .id(this.id)
                 .evaluationScore(this.evaluationScore)
                 .status(this.status)
-                .createdAt(this.createdAt)
-                .updatedAt(this.updatedAt)
+                .createdAt(getCreatedAt())
+                .updatedAt(getUpdatedAt())
                 .commentBody(this.body)
                 .commentImgUrl(this.imgUrl)
                 .situationIds(this.situationIds)

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.post.comment.infrastructure;
+package com.kustaurant.kustaurant.post.comment.infrastructure.entity;
 
 import com.kustaurant.kustaurant.post.comment.domain.PostCommentLike;
 import jakarta.persistence.*;

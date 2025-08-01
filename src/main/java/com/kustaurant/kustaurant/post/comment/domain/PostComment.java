@@ -17,18 +17,13 @@ public class PostComment {
 
     private Integer id;
     private final String commentBody;
-    @Setter
     private ContentStatus status;
-    @Setter
     private LocalDateTime createdAt;
-    @Setter
     private LocalDateTime updatedAt;
 
     private final Long userId;
-    @Setter
     private Integer postId;
 
-    
     private Integer parentCommentId;
     private List<Integer> replyIds;
 
@@ -36,8 +31,6 @@ public class PostComment {
         return PostComment.builder()
                 .commentBody(commentBody)
                 .status(ContentStatus.ACTIVE)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .userId(userId)
                 .postId(postId)
                 .replyIds(new ArrayList<>())
@@ -53,28 +46,6 @@ public class PostComment {
         // 대댓글들은 별도 서비스에서 처리
     }
 
-    public String calculateTimeAgo() {
-        LocalDateTime now = LocalDateTime.now();
-        if (createdAt == null) return "";
-
-        long years = ChronoUnit.YEARS.between(createdAt, now);
-        if (years > 0) return years + "년 전";
-
-        long months = ChronoUnit.MONTHS.between(createdAt, now);
-        if (months > 0) return months + "달 전";
-
-        long days = ChronoUnit.DAYS.between(createdAt, now);
-        if (days > 0) return days + "일 전";
-
-        long hours = ChronoUnit.HOURS.between(createdAt, now);
-        if (hours > 0) return hours + "시간 전";
-
-        long minutes = ChronoUnit.MINUTES.between(createdAt, now);
-        if (minutes > 0) return minutes + "분 전";
-
-        long seconds = ChronoUnit.SECONDS.between(createdAt, now);
-        return seconds + "초 전";
-    }
 
     public ReactionStatus toggleLike(boolean isLikedBefore, boolean isDislikedBefore) {
         if (isLikedBefore) {

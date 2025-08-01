@@ -1,6 +1,7 @@
 
 package com.kustaurant.kustaurant.user.user.infrastructure;
 
+import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
 import com.kustaurant.kustaurant.user.mypage.infrastructure.UserStatsEntity;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
@@ -10,8 +11,8 @@ import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -19,9 +20,11 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @Entity
-@Table(name = "users_tbl")
+@SQLDelete(sql = "update users_tbl set status = 'DELETED' where user_id = ?")
+@SQLRestriction("status = 'ACTIVE'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserEntity {
+@Table(name = "users_tbl")
+public class UserEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -44,18 +47,14 @@ public class UserEntity {
     @Column(nullable = false)
     private UserStatus status;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 
-    @OneToOne(mappedBy = "user",
-            cascade = CascadeType.ALL,
+    @OneToOne(cascade = CascadeType.ALL,
             orphanRemoval = true,
             fetch = LAZY)
+    @JoinColumn(name = "user_id")
     private UserStatsEntity stats;
 
     @Transient
@@ -70,7 +69,7 @@ public class UserEntity {
             Nickname userNickname,
             UserRole role,
             UserStatus status,
-            LocalDateTime createdAt
+            UserStatsEntity stats
     ) {
         this.providerId = providerId;
         this.loginApi = loginApi;
@@ -79,11 +78,11 @@ public class UserEntity {
         this.nickname = userNickname;
         this.role = role;
         this.status = status;
-        this.createdAt = createdAt;
+        this.stats = stats;
     }
 
     public static UserEntity from(User user) {
-        UserEntity entity = UserEntity.builder()
+        return UserEntity.builder()
                 .loginApi(user.getLoginApi())
                 .providerId(user.getProviderId())
                 .email(user.getEmail())
@@ -91,12 +90,8 @@ public class UserEntity {
                 .userNickname(user.getNickname())
                 .role(user.getRole())
                 .status(user.getStatus())
-                .createdAt(user.getCreatedAt())
+                .stats(UserStatsEntity.of(user.getId(), user.getStats()))
                 .build();
-
-        entity.stats = UserStatsEntity.of(entity, user.getStats());
-
-        return entity;
     }
 
     public User toModel(){
@@ -108,8 +103,8 @@ public class UserEntity {
                 .role(role)
                 .providerId(providerId)
                 .loginApi(loginApi)
+                .createdAt(getCreatedAt())
                 .status(status)
-                .createdAt(createdAt)
                 .stats(stats.toModel())
                 .rankImg(UserIconResolver.resolve(stats.getRatedRestCnt()))
                 .build();

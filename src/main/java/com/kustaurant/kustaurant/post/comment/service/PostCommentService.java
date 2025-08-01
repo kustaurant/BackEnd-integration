@@ -6,12 +6,13 @@ import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.domain.PostCommentDislike;
 import com.kustaurant.kustaurant.post.comment.domain.PostCommentLike;
 import com.kustaurant.kustaurant.post.comment.dto.PostCommentDTO;
-import com.kustaurant.kustaurant.post.comment.infrastructure.*;
-import com.kustaurant.kustaurant.post.comment.infrastructure.projection.PostCommentDetailProjection;
+import com.kustaurant.kustaurant.post.comment.infrastructure.repo.projection.PostCommentDetailProjection;
+import com.kustaurant.kustaurant.post.comment.infrastructure.repo.jpa.PostCommentDislikeJpaRepository;
+import com.kustaurant.kustaurant.post.comment.infrastructure.repo.jpa.PostCommentLikeJpaRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentDislikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
-import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryDAO;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryRepository;
 import com.kustaurant.kustaurant.post.post.domain.PostDetailView;
 import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
 import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
@@ -41,7 +42,7 @@ import java.util.*;
 @Slf4j
 public class PostCommentService {
     private final PostCommentRepository postCommentRepository;
-    private final PostCommentQueryDAO postCommentQueryDAO;
+    private final PostCommentQueryRepository postCommentQueryDAO;
     private final PostQueryDAO postQueryDAO;
     private final PostQueryService postQueryService;
     private final PostCommentLikeJpaRepository postCommentLikeJpaRepository;

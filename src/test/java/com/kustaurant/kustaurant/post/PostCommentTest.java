@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.post;
 
+import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
@@ -121,7 +122,7 @@ class PostCommentTest {
         comment.setCreatedAt(LocalDateTime.now().minusMinutes(10));
 
         // When
-        String timeAgo = comment.calculateTimeAgo();
+        String timeAgo = TimeAgoUtil.toKor(comment.getCreatedAt());
 
         // Then
         assertThat(timeAgo).isEqualTo("10분 전");
@@ -134,7 +135,7 @@ class PostCommentTest {
         comment.setCreatedAt(LocalDateTime.now().minusSeconds(30));
 
         // When
-        String timeAgo = comment.calculateTimeAgo();
+        String timeAgo = TimeAgoUtil.toKor(comment.getCreatedAt());
 
         // Then
         assertThat(timeAgo).isEqualTo("30초 전");

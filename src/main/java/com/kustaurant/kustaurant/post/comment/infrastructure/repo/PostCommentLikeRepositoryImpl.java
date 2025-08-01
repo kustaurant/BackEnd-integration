@@ -1,10 +1,9 @@
-package com.kustaurant.kustaurant.post.comment.infrastructure;
-
-import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
+package com.kustaurant.kustaurant.post.comment.infrastructure.repo;
 
 import com.kustaurant.kustaurant.post.comment.domain.PostCommentLike;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.PostCommentLikeEntity;
+import com.kustaurant.kustaurant.post.comment.infrastructure.repo.jpa.PostCommentLikeJpaRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentLikeRepository;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

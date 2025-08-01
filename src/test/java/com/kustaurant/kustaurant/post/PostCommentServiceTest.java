@@ -2,12 +2,12 @@ package com.kustaurant.kustaurant.post;
 
 import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
-import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentDislikeJpaRepository;
-import com.kustaurant.kustaurant.post.comment.infrastructure.PostCommentLikeJpaRepository;
+import com.kustaurant.kustaurant.post.comment.infrastructure.repo.jpa.PostCommentDislikeJpaRepository;
+import com.kustaurant.kustaurant.post.comment.infrastructure.repo.jpa.PostCommentLikeJpaRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentDislikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
-import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryDAO;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryRepository;
 import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
 import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
 import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 
 class PostCommentServiceTest {
     private PostCommentRepository commentRepository;
-    private PostCommentQueryDAO postCommentQueryDAO;
+    private PostCommentQueryRepository postCommentQueryDAO;
     private PostQueryDAO postQueryDAO;
     private PostCommentLikeJpaRepository likeRepository;
     private PostCommentDislikeJpaRepository dislikeRepository;
@@ -40,7 +40,7 @@ class PostCommentServiceTest {
     @BeforeEach
     void setUp() {
         commentRepository = mock(PostCommentRepository.class);
-        postCommentQueryDAO = mock(PostCommentQueryDAO.class);
+        postCommentQueryDAO = mock(PostCommentQueryRepository.class);
         postQueryDAO = mock(PostQueryDAO.class);
         likeRepository = mock(PostCommentLikeJpaRepository.class);
         dislikeRepository = mock(PostCommentDislikeJpaRepository.class);
