@@ -1,0 +1,60 @@
+package com.kustaurant.kustaurant.rating.service;
+
+import com.kustaurant.kustaurant.rating.domain.model.Rating;
+import com.kustaurant.kustaurant.rating.domain.model.RatingScore;
+import com.kustaurant.kustaurant.rating.domain.service.ScoreCalculationService;
+import com.kustaurant.kustaurant.rating.domain.model.EvaluationWithContext;
+import com.kustaurant.kustaurant.rating.domain.model.RestaurantStats;
+import com.kustaurant.kustaurant.rating.domain.service.TierCalculationService;
+import com.kustaurant.kustaurant.rating.service.port.RatingEvaluationRepository;
+import com.kustaurant.kustaurant.rating.service.port.RatingRepository;
+import com.kustaurant.kustaurant.rating.service.port.RatingRestaurantRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class RatingOrchestrationService {
+
+    private final int CHUNK_SIZE = 50;
+
+    private final RatingRestaurantRepository ratingRestaurantRepository;
+    private final RatingEvaluationRepository ratingEvaluationRepository;
+
+    private final ScoreCalculationService scoreCalculationService;
+    private final TierCalculationService tierCalculationService;
+    private final RatingRepository ratingRepository;
+
+    public void calculateAllRatings() {
+        List<Integer> ids = ratingRestaurantRepository.getRestaurantIds();
+        // Chunk 단위로 계산
+        List<RatingScore> scores = new ArrayList<>(ids.size());
+        for (int i = 0; i < ids.size(); i += CHUNK_SIZE) {
+            List<Integer> chunkIds = ids.subList(i, Math.min(i + CHUNK_SIZE, ids.size()));
+            List<RatingScore> chunkScores = calculateScores(chunkIds);
+            scores.addAll(chunkScores);
+        }
+        // 티어 계산
+        List<Rating> ratings = tierCalculationService.calculate(scores);
+        // Chunk 단위로 저장
+        for (int i = 0; i < ratings.size(); i += CHUNK_SIZE) {
+            List<Rating> chunk = ratings.subList(i, Math.min(i + CHUNK_SIZE, ratings.size()));
+            saveChunk(chunk);
+        }
+    }
+
+    List<RatingScore> calculateScores(List<Integer> ids) {
+        Map<Integer, RestaurantStats> statsMap = ratingRestaurantRepository.getRestaurantStatsByIds(
+                ids);
+        Map<Integer, EvaluationWithContext> evalMap = ratingEvaluationRepository.getEvaluationsByRestaurantIds(
+                ids);
+        return scoreCalculationService.calculateScores(ids, statsMap, evalMap);
+    }
+
+    void saveChunk(List<Rating> chunk) {
+        ratingRepository.saveAll(chunk);
+    }
+}
