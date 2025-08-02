@@ -38,12 +38,12 @@ public record RatingPolicy(
             return 1 + recencyBoostGamma * Math.exp(-recencyLambda * ageDays);
         }
 
-        public double getReactionW(int reactionScore) {
+        public double getReactionW(long reactionScore) {
             double score = Math.max(-reactionDivisor, Math.min(reactionDivisor, reactionScore));
             return 1 + reactionScale * Math.tanh(score / reactionDivisor);
         }
 
-        public double getEvaluationReliabilityW(int evalCount) {
+        public double getEvaluationReliabilityW(long evalCount) {
             return evalCount / (double)(evalCount + evaluatorK);
         }
 
@@ -83,7 +83,7 @@ public record RatingPolicy(
     }
 
     public record TierPolicy(
-            @NotEmpty @Size(min=5, max=5) Map<@Min(1) @Max(5) Integer, @Valid TierLevel> levels
+            @NotEmpty @Size(min=4, max=4) Map<@Min(1) @Max(4) Integer, @Valid TierLevel> levels
     ) {
         public record TierLevel(
                 @DecimalMin("0.0") double minScore,

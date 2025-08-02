@@ -70,6 +70,3 @@ restaurant:
           4:
             min_score: 2.5
             max_ratio: 0.20
-          5:
-            min_score: 2.0
-            max_ratio: 0.20

@@ -18,7 +18,7 @@ public class RatingScheduler {
         ratingOrchestrationService.calculateAllRatings();
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     public void ratingInit() {
         ratingOrchestrationService.calculateAllRatings();
     }

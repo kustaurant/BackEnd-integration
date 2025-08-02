@@ -2,19 +2,36 @@ package com.kustaurant.kustaurant.rating.domain.model;
 
 import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.EvaluationPolicy;
 import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.EvaluationPolicy.CompletenessWeight;
+import com.querydsl.core.annotations.QueryProjection;
 import java.time.Duration;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record EvaluationWithContext(
+        int restaurantId,
         double score,
-        LocalDate evaluatedAt,
+        LocalDateTime evaluatedAt,
         boolean existComment,
         boolean existSituation,
         boolean existImage,
-        int reactionScore,
+        long reactionScore,
         double userAvgScore,
-        int userEvalCount
+        long userEvalCount
 ) {
+
+    @QueryProjection
+    public EvaluationWithContext(int restaurantId, double score, LocalDateTime evaluatedAt,
+            boolean existComment, boolean existSituation, boolean existImage, long reactionScore,
+            double userAvgScore, long userEvalCount) {
+        this.restaurantId = restaurantId;
+        this.score = score;
+        this.evaluatedAt = evaluatedAt;
+        this.existComment = existComment;
+        this.existSituation = existSituation;
+        this.existImage = existImage;
+        this.reactionScore = reactionScore;
+        this.userAvgScore = userAvgScore;
+        this.userEvalCount = userEvalCount;
+    }
 
     /**
      * 평가 보정 점수 계산 함수
@@ -24,7 +41,7 @@ public record EvaluationWithContext(
      * - 평가 좋아요 점수
      * - 유저의 평가 개수, 평균 평가 점수
      */
-    public AdjustedEvaluation getAdjustedScore(EvaluationPolicy policy, double globalAvg, LocalDate today) {
+    public AdjustedEvaluation getAdjustedScore(EvaluationPolicy policy, double globalAvg, LocalDateTime today) {
         // 유저 평가 점수 보정
         double base = getCorrectedScore(globalAvg);
 

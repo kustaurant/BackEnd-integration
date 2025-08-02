@@ -7,5 +7,5 @@ import java.util.Map;
 public interface RatingRestaurantRepository {
 
     List<Integer> getRestaurantIds();
-    Map<Integer, RestaurantStats> getRestaurantStatsByIds(List<Integer> ids);
+    List<RestaurantStats> getRestaurantStatsByIds(List<Integer> ids);
 }

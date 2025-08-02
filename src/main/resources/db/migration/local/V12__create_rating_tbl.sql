@@ -9,5 +9,5 @@ CREATE TABLE restaurant_rating (
         REFERENCES restaurants_tbl(restaurant_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT chk_tier_range CHECK (tier >= 1 AND tier <= 5)
+    CONSTRAINT chk_tier_range CHECK ((tier >= 1 AND tier <= 5) OR tier = -1)
 );
