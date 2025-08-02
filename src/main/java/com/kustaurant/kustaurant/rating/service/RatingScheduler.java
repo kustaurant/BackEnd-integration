@@ -18,6 +18,7 @@ public class RatingScheduler {
         ratingOrchestrationService.calculateAllRatings();
     }
 
+    // 스프링 프로세스 시작 시 진행
     @EventListener(ApplicationReadyEvent.class)
     public void ratingInit() {
         ratingOrchestrationService.calculateAllRatings();
