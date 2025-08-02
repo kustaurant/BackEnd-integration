@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.mock.user;
 
 import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
@@ -78,7 +79,7 @@ public class FakeUserRepository implements UserRepository {
     }
 
     @Override
-    public int countByLoginApi(String apple) {
+    public int countByLoginApi(LoginApi apple) {
         return 0;
     }
 

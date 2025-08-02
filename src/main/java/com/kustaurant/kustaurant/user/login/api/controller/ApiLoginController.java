@@ -3,7 +3,6 @@ package com.kustaurant.kustaurant.user.login.api.controller;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.user.login.api.service.LoginService;
-import com.kustaurant.kustaurant.user.login.api.service.WithdrawService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ApiLoginController {
     private final LoginService loginService;
-    private final WithdrawService withdrawService;
 
     //1
     @Operation(
@@ -62,7 +60,7 @@ public class ApiLoginController {
     public ResponseEntity<?> logout(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
             ) {
-        withdrawService.logoutUser(user.id());
+        loginService.logout(user.id());
         return ResponseEntity.noContent().build();
     }
 
@@ -77,7 +75,7 @@ public class ApiLoginController {
     public ResponseEntity<Void> deleteAccount(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        withdrawService.deleteUserById(user.id());
+        loginService.withdraw(user.id());
         return ResponseEntity.noContent().build();
     }
 

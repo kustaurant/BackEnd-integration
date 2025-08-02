@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
 import com.kustaurant.kustaurant.admin.adminPage.dto.PagedUserResponse;
 import com.kustaurant.kustaurant.admin.adminPage.dto.UserListResponse;
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -109,7 +110,7 @@ public class AdminUserQueryRepository {
         Long count = queryFactory
                 .select(userEntity.count())
                 .from(userEntity)
-                .where(userEntity.loginApi.eq("naver"))
+                .where(userEntity.loginApi.eq(LoginApi.NAVER))
                 .fetchOne();
         
         return count != null ? count : 0L;
@@ -119,7 +120,7 @@ public class AdminUserQueryRepository {
         Long count = queryFactory
                 .select(userEntity.count())
                 .from(userEntity)
-                .where(userEntity.loginApi.eq("apple"))
+                .where(userEntity.loginApi.eq(LoginApi.APPLE))
                 .fetchOne();
         
         return count != null ? count : 0L;

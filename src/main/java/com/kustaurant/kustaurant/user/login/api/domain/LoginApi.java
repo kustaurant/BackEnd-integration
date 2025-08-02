@@ -1,12 +1,12 @@
 package com.kustaurant.kustaurant.user.login.api.domain;
 
-public enum ProviderType {
+public enum LoginApi {
     NAVER("NAVER"),
     APPLE("APPLE");
 
     private final String name;
 
-    ProviderType(String name) {
+    LoginApi(String name) {
         this.name = name;
     }
 

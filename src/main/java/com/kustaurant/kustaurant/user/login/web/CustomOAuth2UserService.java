@@ -28,11 +28,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oauth2User = delegate.loadUser(req);
 
-        OAuthAttributes attrs = OAuthAttributes.of(
-                req.getClientRegistration().getRegistrationId(),
-                req.getClientRegistration()
-                        .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName(),
-                oauth2User.getAttributes());
+        OAuthAttributes attrs = OAuthAttributes.of(oauth2User.getAttributes());
 
         User user = userRepository.findByProviderId(attrs.getProviderId())
                 .orElseGet(() -> {
@@ -40,8 +36,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     return userRepository.save(newUser);
                 });
 
-        Set<SimpleGrantedAuthority> authSet =
-                Set.of(new SimpleGrantedAuthority(user.getRole().getValue()));
+        Set<SimpleGrantedAuthority> authSet = Set.of(new SimpleGrantedAuthority(user.getRole().getValue()));
 
         return new CustomOAuth2User(
                 user.getId(),          // Long

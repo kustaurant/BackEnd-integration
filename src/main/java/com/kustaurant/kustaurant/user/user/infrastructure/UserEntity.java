@@ -1,6 +1,7 @@
 
 package com.kustaurant.kustaurant.user.user.infrastructure;
 
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.mypage.infrastructure.UserStatsEntity;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
@@ -10,8 +11,6 @@ import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -26,8 +25,9 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
-    @Column(nullable = false)
-    private String loginApi;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "login_api", length = 10, nullable = false)
+    private LoginApi loginApi;
     @Column(unique = true, nullable = false)
     private String providerId;
     @Column(name = "email", unique = true)
@@ -64,7 +64,7 @@ public class UserEntity {
     @Builder
     public UserEntity(
             String providerId,
-            String loginApi,
+            LoginApi loginApi,
             String email,
             PhoneNumber phoneNumber,
             Nickname userNickname,

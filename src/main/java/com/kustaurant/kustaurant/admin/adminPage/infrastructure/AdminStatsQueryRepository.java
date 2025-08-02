@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
 import com.kustaurant.kustaurant.admin.adminPage.dto.AdminStatsResponse;
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -60,13 +61,13 @@ public class AdminStatsQueryRepository {
         Long totalNaverUsers = queryFactory
                 .select(userEntity.count())
                 .from(userEntity)
-                .where(userEntity.loginApi.eq("naver"))
+                .where(userEntity.loginApi.eq(LoginApi.NAVER))
                 .fetchOne();
 
         Long totalAppleUsers = queryFactory
                 .select(userEntity.count())
                 .from(userEntity)
-                .where(userEntity.loginApi.eq("apple"))
+                .where(userEntity.loginApi.eq(LoginApi.APPLE))
                 .fetchOne();
 
         Long totalUsers = queryFactory

@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.user.user.domain;
 
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.login.web.OAuthAttributes;
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
@@ -20,7 +21,7 @@ public class User {
     private String email;
     private final UserRole role;
     private final String providerId;
-    private final String loginApi;
+    private final LoginApi loginApi;
     private UserStatus status;
     private final String rankImg;
     private final LocalDateTime createdAt;
@@ -35,7 +36,7 @@ public class User {
             String email,
             UserRole role,
             String providerId,
-            String loginApi,
+            LoginApi loginApi,
             UserStatus status,
             String rankImg,
             UserStats stats,
@@ -86,7 +87,7 @@ public class User {
     public static User createFromNaver(String providerId, String email, Nickname nickname) {
         return User.builder()
                 .providerId(providerId)
-                .loginApi("NAVER")
+                .loginApi(LoginApi.NAVER)
                 .email(email)
                 .nickname(nickname)
                 .role(UserRole.USER)
@@ -97,7 +98,7 @@ public class User {
     public static User createFromApple(String appleId, Nickname nickname) {
         return User.builder()
                 .providerId(appleId)
-                .loginApi("APPLE")
+                .loginApi(LoginApi.APPLE)
                 .nickname(nickname)
                 .role(UserRole.USER)
                 .status(UserStatus.ACTIVE)

@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.user.login.api.provider;
 
 import com.kustaurant.kustaurant.user.login.api.controller.LoginRequest;
-import com.kustaurant.kustaurant.user.login.api.domain.ProviderType;
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.AppleOAuthClient;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
@@ -17,8 +17,8 @@ public class AppleLoginProcessor implements LoginProcessor {
     private final UserRepository userRepo;
 
     @Override
-    public boolean supports(ProviderType p) {
-        return p == ProviderType.APPLE;
+    public boolean supports(LoginApi p) {
+        return p == LoginApi.APPLE;
     }
 
     @Override
@@ -41,7 +41,7 @@ public class AppleLoginProcessor implements LoginProcessor {
     }
 
     private String nextAppleNickname() {
-        int idx = userRepo.countByLoginApi("APPLE") + 1;
+        int idx = userRepo.countByLoginApi(LoginApi.APPLE) + 1;
         return "애플사용자" + idx;
     }
 }
