@@ -10,6 +10,7 @@ import com.kustaurant.kustaurant.post.post.service.web.PostScrapService;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
+import com.kustaurant.kustaurant.user.login.api.infrastructure.RefreshTokenStore;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageApiService;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRatedRestaurantResponse;
@@ -23,6 +24,8 @@ import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @Tag("middleTest")
 class MypageApiServiceIT {
+    @MockBean RefreshTokenStore refreshTokenStore;
+    @MockBean FindByIndexNameSessionRepository<?> sessionRepository;
 
     @Autowired MypageApiService mypageApiService;
     @Autowired EvaluationCommandService evaluationService;
