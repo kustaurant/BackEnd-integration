@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.user.service;
 
 import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
@@ -29,7 +30,7 @@ class UserServiceImplTest {
         fakeUserRepository.save(User.builder()
                 .id(1L)
                 .providerId("aaaa")
-                .loginApi("NAVER")
+                .loginApi(LoginApi.NAVER)
                 .nickname(new Nickname("TESTUSER01"))
                 .email("test01@test.com")
                 .phoneNumber(new PhoneNumber("01012340000"))
@@ -42,7 +43,7 @@ class UserServiceImplTest {
         fakeUserRepository.save(User.builder()
                 .id(2L)
                 .providerId("aaaa")
-                .loginApi("NAVER")
+                .loginApi(LoginApi.NAVER)
                 .nickname(new Nickname("TESTUSER02"))
                 .email("test02@test.com")
                 .phoneNumber(new PhoneNumber("01023450000"))
@@ -62,7 +63,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getUserById는_DELETED상태의_유저는_찾아선_안된다() {
+    void getUserById는_softDeleteD상태의_유저는_찾아선_안된다() {
         //g
         //w
         //t

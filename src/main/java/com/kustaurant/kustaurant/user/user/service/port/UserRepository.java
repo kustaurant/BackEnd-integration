@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.user.user.service.port;
 
 import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
@@ -21,7 +22,7 @@ public interface UserRepository {
     List<User> findUsersWithEvaluationCountDescending();
     List<User> findUsersByEvaluationCountForQuarter(int year, int quarter);
 
-    int countByLoginApi(String apple);
+    int countByLoginApi(LoginApi apple);
 
     Map<Long, UserDTO> getUserDTOMapByIds(List<Long> ids);
     List<User> findByIdIn(List<Long> ids);

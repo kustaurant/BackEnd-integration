@@ -9,8 +9,11 @@ import com.kustaurant.kustaurant.post.post.service.web.PostCommandService;
 import com.kustaurant.kustaurant.post.post.service.web.PostScrapService;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
+import com.kustaurant.kustaurant.user.login.api.infrastructure.RefreshTokenStore;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageApiService;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRatedRestaurantResponse;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
 import com.kustaurant.kustaurant.user.user.domain.User;
@@ -21,6 +24,8 @@ import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +42,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @Tag("middleTest")
 class MypageApiServiceIT {
+    @MockBean RefreshTokenStore refreshTokenStore;
+    @MockBean FindByIndexNameSessionRepository<?> sessionRepository;
 
     @Autowired MypageApiService mypageApiService;
     @Autowired EvaluationCommandService evaluationService;
@@ -54,7 +61,7 @@ class MypageApiServiceIT {
     void init(){
         user1 = userRepo.save(
                 User.builder()
-                        .loginApi("NAVER")
+                        .loginApi(LoginApi.NAVER)
                         .providerId("user1providerId")
                         .nickname(new Nickname("wcwdfu"))
                         .email("test@test.com")
@@ -68,7 +75,7 @@ class MypageApiServiceIT {
                         .build());
         user2 = userRepo.save(
                 User.builder()
-                        .loginApi("APPLE")
+                        .loginApi(LoginApi.APPLE)
                         .providerId("user2providerId")
                         .nickname(new Nickname("kustoman"))
                         .email("test2@test.com")
@@ -188,10 +195,11 @@ class MypageApiServiceIT {
                 );
         evaluationService.evaluate(user1.getId(), 2, dto2);
         //w
-        var res = mypageApiService.getUserEvaluateRestaurantList(user1.getId());
+        List<MyRatedRestaurantResponse> res = mypageApiService.getUserEvaluateRestaurantList(user1.getId());
         //t
-        assertEquals(2, res.size());
-        assertThat(res.get(0).restaurantName()).isEqualTo("한식당1");
+        assertThat(res).hasSize(2)
+                .extracting(MyRatedRestaurantResponse::restaurantName)
+                .containsExactlyInAnyOrder("한식당1", "한식당2");
     }
 
     // 8

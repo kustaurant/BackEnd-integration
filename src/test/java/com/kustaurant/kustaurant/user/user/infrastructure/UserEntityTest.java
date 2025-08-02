@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.user.user.infrastructure;
 
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
@@ -20,7 +21,7 @@ class UserEntityTest {
         // g
         User domainUser = User.builder()
                 .providerId("pid‑n")
-                .loginApi("NAVER")
+                .loginApi(LoginApi.NAVER)
                 .email("null@test.com")
                 .nickname(new Nickname("nullstats"))
                 .role(UserRole.USER)
@@ -52,7 +53,7 @@ class UserEntityTest {
 
         User domainUser = User.builder()
                 .providerId("pid‑y")
-                .loginApi("APPLE")
+                .loginApi(LoginApi.APPLE)
                 .email("copy@test.com")
                 .nickname(new Nickname("copystats"))
                 .role(UserRole.USER)

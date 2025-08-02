@@ -42,7 +42,11 @@ public enum ErrorCode {
     AT_INVALID   (HttpStatus.UNAUTHORIZED, "AUTH-401-AT-INVALID",  "유효하지 않은 Access 토큰입니다."),
     RT_EXPIRED   (HttpStatus.UNAUTHORIZED, "AUTH-401-RT-EXPIRED",  "Refresh 토큰이 만료되었습니다."),
     RT_INVALID   (HttpStatus.UNAUTHORIZED, "AUTH-401-RT-INVALID",  "유효하지 않은 Refresh 토큰입니다."),
-    ACCESS_DENIED (HttpStatus.FORBIDDEN, "AUTH-FORBIDDEN", "접근 권한이 없습니다.");
+    ACCESS_DENIED (HttpStatus.FORBIDDEN, "AUTH-FORBIDDEN", "접근 권한이 없습니다."),
+
+    /* ── EXTERNAL PROVIDER ── */
+    PROVIDER_API_FAIL   (HttpStatus.SERVICE_UNAVAILABLE,  "PROVIDER-001", "외부 로그인 공급자 API 서버에 문제가 있습니다."),
+    PROVIDER_NOT_VALID  (HttpStatus.BAD_REQUEST, "PROVIDER-002", "지원하지 않는 PROVIDER 입니다");
 
     private final HttpStatus status;
     private final String     code;
