@@ -1,5 +1,8 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
+import static com.kustaurant.kustaurant.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
+
 import com.kustaurant.kustaurant.restaurant.favorite.infrastructure.QRestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
@@ -24,12 +27,13 @@ public class MyRestaurantQueryRepository {
                         restaurant.restaurantName,
                         restaurant.restaurantId,
                         restaurant.restaurantImgUrl,
-                        restaurant.mainTier,
+                        ratingEntity.tier,
                         restaurant.restaurantCuisine,
                         restaurant.restaurantPosition
                 ))
                 .from(favorite)
                 .join(restaurant).on(favorite.restaurantId.eq(restaurant.restaurantId))
+                .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .where(
                         favorite.userId.eq(userId),
                         favorite.status.eq("ACTIVE")

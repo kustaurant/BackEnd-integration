@@ -6,16 +6,12 @@ import com.kustaurant.kustaurant.restaurant.restaurant.domain.Cuisine;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.GeoPosition;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.Tier;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
@@ -38,9 +34,6 @@ public class RestaurantEntity {
     private String restaurantUrl;
     private String restaurantImgUrl;
     private Integer visitCount;
-    private Integer restaurantEvaluationCount;
-    private Double restaurantScoreSum;
-    private Integer mainTier;
 
     private String restaurantCuisine;
     private Double latitude;
@@ -54,13 +47,6 @@ public class RestaurantEntity {
     @JsonIgnore
     private LocalDateTime updatedAt;
 
-    public void updateStatistics(Restaurant restaurant) {
-        this.visitCount = restaurant.getVisitCount();
-        this.restaurantEvaluationCount = restaurant.getRestaurantEvaluationCount();
-        this.restaurantScoreSum = restaurant.getRestaurantScoreSum();
-        this.mainTier = restaurant.getMainTier().getValue();
-    }
-
     public static RestaurantEntity from(Restaurant restaurant) {
         return new RestaurantEntity(
                 restaurant.getRestaurantId(),
@@ -72,9 +58,6 @@ public class RestaurantEntity {
                 restaurant.getRestaurantUrl(),
                 restaurant.getRestaurantImgUrl(),
                 restaurant.getVisitCount(),
-                restaurant.getRestaurantEvaluationCount(),
-                restaurant.getRestaurantScoreSum(),
-                restaurant.getMainTier().getValue(),
                 restaurant.getRestaurantCuisine().getValue(),
                 restaurant.getGeoPosition().coordinates().latitude(),
                 restaurant.getGeoPosition().coordinates().longitude(),
@@ -103,9 +86,6 @@ public class RestaurantEntity {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .visitCount(visitCount)
-                .restaurantEvaluationCount(restaurantEvaluationCount)
-                .restaurantScoreSum(restaurantScoreSum)
-                .mainTier(Tier.find(mainTier))
                 .build();
     }
 }

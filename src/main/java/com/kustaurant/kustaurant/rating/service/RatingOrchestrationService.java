@@ -36,7 +36,6 @@ public class RatingOrchestrationService {
     public void calculateAllRatings() {
         List<Integer> ids = ratingRestaurantRepository.getRestaurantIds();
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        System.out.println(now);
         // Chunk 단위로 계산
         List<RatingScore> scores = new ArrayList<>(ids.size());
         for (int i = 0; i < ids.size(); i += CHUNK_SIZE) {

@@ -1,11 +1,16 @@
 package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query;
 
+import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.*;
+import static com.kustaurant.kustaurant.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCommonExpressions.evaluationCount;
 import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCommonExpressions.restaurantActive;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCommonExpressions.situationMatches;
 import static java.util.Objects.isNull;
 
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity;
+import com.kustaurant.kustaurant.rating.infrastructure.jpa.entity.QRatingEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Cuisine;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
@@ -33,23 +38,16 @@ public class RestaurantChartQuery {
      */
     public Page<Integer> getRestaurantIdsWithPage(ChartCondition condition, Pageable pageable) {
 
-        NumberExpression<Double> avgScore = new CaseBuilder()
-                .when(restaurantEntity.mainTier.gt(0)
-                        .and(restaurantEntity.restaurantEvaluationCount.isNotNull())
-                        .and(restaurantEntity.restaurantEvaluationCount.gt(0)))
-                .then(restaurantEntity.restaurantScoreSum
-                        .divide(restaurantEntity.restaurantEvaluationCount))
-                .otherwise(0.0);
-
         List<Integer> content = queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
+                .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .where(
                         cuisinesIn(condition.cuisines()),
                         positionsIn(condition.positions()),
                         hasSituation(condition.situations(), restaurantEntity),
                         restaurantActive(restaurantEntity)
                 )
-                .orderBy(avgScore.desc())
+                .orderBy(ratingEntity.score.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -71,23 +69,16 @@ public class RestaurantChartQuery {
 
     public List<Integer> getRestaurantIds(ChartCondition condition) {
 
-        NumberExpression<Double> avgScore = new CaseBuilder()
-                .when(restaurantEntity.mainTier.gt(0)
-                        .and(restaurantEntity.restaurantEvaluationCount.isNotNull())
-                        .and(restaurantEntity.restaurantEvaluationCount.gt(0)))
-                .then(restaurantEntity.restaurantScoreSum
-                        .divide(restaurantEntity.restaurantEvaluationCount))
-                .otherwise(0.0);
-
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
+                .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .where(
                         cuisinesIn(condition.cuisines()),
                         positionsIn(condition.positions()),
                         hasSituation(condition.situations(), restaurantEntity),
                         restaurantActive(restaurantEntity)
                 )
-                .orderBy(avgScore.desc())
+                .orderBy(ratingEntity.score.desc())
                 .fetch();
     }
 

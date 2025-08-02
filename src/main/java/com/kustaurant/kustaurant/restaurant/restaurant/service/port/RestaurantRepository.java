@@ -9,6 +9,4 @@ import java.util.Optional;
 public interface RestaurantRepository {
 
     Restaurant getByIdAndStatus(Integer id, String status);
-
-    void updateStatistics(Restaurant restaurant);
 }

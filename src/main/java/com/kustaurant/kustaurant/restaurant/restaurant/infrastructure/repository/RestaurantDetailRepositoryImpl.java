@@ -28,7 +28,7 @@ public class RestaurantDetailRepositoryImpl implements RestaurantDetailRepositor
         Long favoriteCount = restaurantDetailQuery.getFavoriteCount(restaurantId);
 
         Optional<RestaurantDetail> optional = restaurantDetailQuery.getRestaurantDetails(
-                restaurantId, userId, favoriteCount);
+                restaurantId, userId);
 
         if (optional.isEmpty()) {
             throw new DataNotFoundException(ErrorCode.RESTAURANT_NOT_FOUND, restaurantId, "식당");
