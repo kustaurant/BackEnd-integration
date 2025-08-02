@@ -4,10 +4,10 @@ import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.business.BusinessException;
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.auth.JwtAuthException;
+import com.kustaurant.kustaurant.global.exception.exception.business.ProviderApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,7 +41,7 @@ public class GlobalExceptionRestHandler {
                 ErrorCode.METHOD_NOT_ALLOWED
         );
 
-        log.warn("[MethodNotAllowed] {} {}", req.getMethod(), req.getRequestURI());
+        log.warn("[MethodNotAllowed] {} {}", req.getMethod(), req.getRequestURI(), ex);
 
         return ResponseEntity.status(ErrorCode.METHOD_NOT_ALLOWED.getStatus()).body(errorResponse);
     }
@@ -54,7 +54,7 @@ public class GlobalExceptionRestHandler {
     ) {
         ErrorCode errorCode = ex.getErrorCode();
 
-//        log.error("[BusinessException] {} {}", req.getMethod(), req.getRequestURI(), ex);
+        log.error("[BusinessException] {} {}", req.getMethod(), req.getRequestURI(), ex);
 
         return ResponseEntity
                 .status(errorCode.getStatus())
@@ -70,7 +70,14 @@ public class GlobalExceptionRestHandler {
                 .body(ApiErrorResponse.of(ec));
     }
 
-    /**   5. 그 외 모든 예외   */
+    /**   5. 로그인 외부 호출 api 실패 예외   */
+    @ExceptionHandler(ProviderApiException.class)
+    public ResponseEntity<ApiErrorResponse> handleProviderFail(ProviderApiException ex) {
+        return ResponseEntity.status(ErrorCode.PROVIDER_API_FAIL.getStatus())
+                .body(ApiErrorResponse.of(ErrorCode.PROVIDER_API_FAIL));
+    }
+
+    /**   6. 그 외 모든 예외   */
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ApiErrorResponse> handleUnhandled(
             Exception ex,

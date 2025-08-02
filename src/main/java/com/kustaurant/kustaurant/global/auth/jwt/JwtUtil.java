@@ -21,30 +21,16 @@ import java.util.Date;
 public class JwtUtil {
     private final JwtProperties jwtProperties;
     private SecretKey key;
+    private JwtParser jwtParser;
 
     @PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+        this.jwtParser = Jwts.parser().verifyWith(key).build();
     }
 
-    // JWT 액세스 토큰 생성
-    public String generateAccessToken(Long userId, String role) {
-        return generate(userId, role, jwtProperties.getAccessTtl());
-    }
-
-    // JWT 리프레시 토큰 생성
-    public String generateRefreshToken(Long userId, String role) {
-        return generate(userId, role, jwtProperties.getRefreshTtl());
-    }
-
-    // 테스트용 10초짜리 토큰 생성
-    public String generateYOLOToken(Long userId, String role) {
-        return generate(userId, role,Duration.ofSeconds(10));
-    }
-
-
-    // JWT 토큰 생성 로직
-    private String generate(Long userId, String role, Duration ttl) {
+    // 1. JWT 토큰 발급
+    private String generate(Long userId, String role, TokenType tokenType, Duration ttl) {
         Instant now    = Instant.now();
         Instant expiry = now.plus(ttl);
 
@@ -52,7 +38,7 @@ public class JwtUtil {
                 .claims( Jwts.claims()
                         .subject(String.valueOf(userId))
                         .add("role",role)
-                        .add("tokenType", ttl == jwtProperties.getAccessTtl() ? "AT" : "RT")
+                        .add("tokenType", tokenType.name())
                         .build() )
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
@@ -60,20 +46,36 @@ public class JwtUtil {
                 .compact();
     }
 
-    // JWT 토큰에서 userId 추출
-    public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    public String generateAccess(Long userId, String role) {
+        return generate(userId, role, TokenType.ACCESS, jwtProperties.getAccessTtl());
+    }
+    public String generateRefresh(Long userId, String role) {
+        return generate(userId, role, TokenType.REFRESH, jwtProperties.getRefreshTtl());
+    }
+    public String generateYOLO(Long userId, String role) { // 테스트용 10초짜리 토큰 생성
+        return generate(userId, role, TokenType.YOLO, Duration.ofSeconds(10));
+    }
 
-        return Long.parseLong(claims.getSubject());
+    //2. 파싱 & 검증
+    public Claims parseAndValidate(String token) throws JwtException {
+        try {
+            return jwtParser.parseSignedClaims(token.trim()).getPayload();
+        } catch (io.jsonwebtoken.JwtException e) { //서로다른 jwt라이브러리로 별도의 예외처리 해줘서 응답상태 통일해야함
+            throw new AccessTokenInvalidException(e);
+        }
+    }
+
+    //3.
+    public ParsedToken parse(String token) {
+        Claims c = parseAndValidate(token);
+        return new ParsedToken(
+                Long.valueOf(c.getSubject()),
+                (String) c.get("role"),
+                TokenType.valueOf((String) c.get("tokenType")));
     }
 
     public boolean isValid(String token) {
-        try {
-            // 내부에서 서명 + 만료일 + 헤더/클레임 형식 전부 체크
+        try {// 내부에서 서명 + 만료일 + 헤더/클레임 형식 전부 체크
             parseAndValidate(token.trim());
             return true;
         } catch (JwtException | AccessTokenInvalidException e) {
@@ -81,24 +83,5 @@ public class JwtUtil {
         }
     }
 
-    public Claims parseAndValidate(String token) throws JwtException {
-        try {
-            return Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token.trim())
-                    .getPayload();
-            //서로다른 jwt라이브러리로 별도의 예외처리 해줘서 응답상태 통일해야함
-        } catch (io.jsonwebtoken.JwtException e) {
-            throw new AccessTokenInvalidException(e);
-        }
-    }
-
-    public record ParsedToken(Long userId, String role, String tokenType) {}
-    public ParsedToken parse(String token) {
-        Claims c = parseAndValidate(token);
-        return new ParsedToken(Long.valueOf(c.getSubject()),
-                (String) c.get("role"),
-                (String) c.get("tokenType"));
-    }
+    public record ParsedToken(Long userId, String role, TokenType tokenType) {}
 }

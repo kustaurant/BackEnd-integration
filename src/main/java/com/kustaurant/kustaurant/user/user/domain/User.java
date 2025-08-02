@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.user.user.domain;
 
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
+import com.kustaurant.kustaurant.user.login.web.OAuthAttributes;
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
@@ -19,7 +21,7 @@ public class User {
     private String email;
     private final UserRole role;
     private final String providerId;
-    private final String loginApi;
+    private final LoginApi loginApi;
     private UserStatus status;
     private final String rankImg;
     private final LocalDateTime createdAt;
@@ -34,7 +36,7 @@ public class User {
             String email,
             UserRole role,
             String providerId,
-            String loginApi,
+            LoginApi loginApi,
             UserStatus status,
             String rankImg,
             UserStats stats,
@@ -71,6 +73,39 @@ public class User {
                 .build();
     }
 
+    public static User createFromNaver(OAuthAttributes attr) {
+        return User.builder()
+                .providerId(attr.getProviderId())
+                .email(attr.getEmail())
+                .nickname(Nickname.fromEmail(attr.getEmail()))
+                .role(UserRole.USER)
+                .loginApi(attr.getLoginApi())
+                .status(UserStatus.ACTIVE)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+    public static User createFromNaver(String providerId, String email, Nickname nickname) {
+        return User.builder()
+                .providerId(providerId)
+                .loginApi(LoginApi.NAVER)
+                .email(email)
+                .nickname(nickname)
+                .role(UserRole.USER)
+                .status(UserStatus.ACTIVE)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+    public static User createFromApple(String appleId, Nickname nickname) {
+        return User.builder()
+                .providerId(appleId)
+                .loginApi(LoginApi.APPLE)
+                .nickname(nickname)
+                .role(UserRole.USER)
+                .status(UserStatus.ACTIVE)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
 
     public void changeNickname(Nickname newNickname) {
         this.nickname = newNickname;
@@ -90,10 +125,10 @@ public class User {
     }
 
     public boolean isDeleted() {
-        return UserStatus.DELETED.equals(this.status);
+        return this.status.equals(UserStatus.DELETED);
     }
 
-    public void delete() {
+    public void softDelete() {
         this.status   = UserStatus.DELETED;
         this.nickname = new Nickname("(탈퇴한 회원)");
         this.updatedAt = LocalDateTime.now();

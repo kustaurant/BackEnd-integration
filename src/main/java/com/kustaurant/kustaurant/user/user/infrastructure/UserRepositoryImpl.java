@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.user.user.infrastructure;
 
 import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
 import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
@@ -68,7 +69,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public int countByLoginApi(String loginApi) {
+    public int countByLoginApi(LoginApi loginApi) {
         return jpaRepo.countByLoginApi(loginApi);
     }
 

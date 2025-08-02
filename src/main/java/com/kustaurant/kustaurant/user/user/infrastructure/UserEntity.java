@@ -2,6 +2,7 @@
 package com.kustaurant.kustaurant.user.user.infrastructure;
 
 import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
+import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.mypage.infrastructure.UserStatsEntity;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
@@ -29,8 +30,9 @@ public class UserEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
-    @Column(nullable = false)
-    private String loginApi;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "login_api", length = 10, nullable = false)
+    private LoginApi loginApi;
     @Column(unique = true, nullable = false)
     private String providerId;
     @Column(name = "email", unique = true)
@@ -63,7 +65,7 @@ public class UserEntity extends BaseTimeEntity {
     @Builder
     public UserEntity(
             String providerId,
-            String loginApi,
+            LoginApi loginApi,
             String email,
             PhoneNumber phoneNumber,
             Nickname userNickname,
