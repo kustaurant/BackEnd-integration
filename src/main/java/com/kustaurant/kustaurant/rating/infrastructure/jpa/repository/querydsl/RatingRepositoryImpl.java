@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.rating.infrastructure.jpa;
+package com.kustaurant.kustaurant.rating.infrastructure.jpa.repository.querydsl;
 
 import com.kustaurant.kustaurant.rating.domain.model.Rating;
 import com.kustaurant.kustaurant.rating.infrastructure.jpa.entity.RatingEntity;

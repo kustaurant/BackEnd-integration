@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.rating.infrastructure.jpa;
+package com.kustaurant.kustaurant.rating.infrastructure.jpa.repository.querydsl;
 
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
 import static com.kustaurant.kustaurant.restaurant.favorite.infrastructure.QRestaurantFavoriteEntity.*;

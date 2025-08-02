@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.rating.infrastructure.jpa;
+package com.kustaurant.kustaurant.rating.infrastructure.jpa.repository.querydsl;
 
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvalUserReactionEntity.evalUserReactionEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
@@ -13,7 +13,6 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
