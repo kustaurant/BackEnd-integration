@@ -2,11 +2,13 @@ package com.kustaurant.kustaurant.user.mypage.service;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationCommandService;
-import com.kustaurant.kustaurant.global.exception.exception.business.NoProfileChangeException;
+import com.kustaurant.kustaurant.global.exception.exception.user.NoProfileChangeException;
 import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
+import com.kustaurant.kustaurant.post.post.controller.request.PostRequest;
 import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.kustaurant.post.post.service.web.PostCommandService;
-import com.kustaurant.kustaurant.post.post.service.web.PostScrapService;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
+import com.kustaurant.kustaurant.post.post.service.PostService;
+import com.kustaurant.kustaurant.post.post.service.PostScrapService;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
@@ -48,7 +50,8 @@ class MypageApiServiceIT {
     @Autowired MypageApiService mypageApiService;
     @Autowired EvaluationCommandService evaluationService;
     @Autowired RestaurantFavoriteService restaurantFavoriteService;
-    @Autowired PostCommandService postService;
+    @Autowired
+    PostService postService;
     @Autowired PostScrapService postScrapService;
     @Autowired PostCommentService postCommentService;
 
@@ -207,9 +210,12 @@ class MypageApiServiceIT {
     @DisplayName("내가 작성한 게시글 목록 조회(최신순) 정상 동작")
     void should_return_user_posts_successfully() {
         // g
-        Post post1 = postService.create("테스트게시글1", "자유게시판", "테스트내용1", user1.getId());
-        Post post2 = postService.create("테스트게시글2", "자유게시판", "테스트내용2", user1.getId());
-        Post post3 = postService.create("테스트게시글3", "건의게시판", "테스트내용3", user1.getId());
+        PostRequest req1 = new PostRequest("테스트게시글1", PostCategory.FREE, "테스트내용1");
+        PostRequest req2 = new PostRequest("테스트게시글2", PostCategory.FREE, "테스트내용2");
+        PostRequest req3 = new PostRequest("테스트게시글3", PostCategory.SUGGESTION, "테스트내용3");
+        Post post1 = postService.create(req1, user1.getId());
+        Post post2 = postService.create(req2, user1.getId());
+        Post post3 = postService.create(req3, user1.getId());
 
         // w
         var res = mypageApiService.getUserPosts(user1.getId());
@@ -226,18 +232,23 @@ class MypageApiServiceIT {
     @DisplayName("내가 스크랩한 게시글 목록 조회 정상 동작")
     void should_return_scrapped_posts_successfully() {
         // g
-        Post post1 = postService.create("테스트게시글1", "자유게시판", "테스트내용1", user2.getId());
-        Post post2 = postService.create("테스트게시글2", "자유게시판", "테스트내용2", user2.getId());
-        Post post3 = postService.create("테스트게시글3", "건의게시판", "테스트내용3", user2.getId());
-        postScrapService.toggleScrap(user1.getId(), post1.getId());
-        postScrapService.toggleScrap(user1.getId(), post2.getId());
-        postScrapService.toggleScrap(user1.getId(), post3.getId());
+        PostRequest req1 = new PostRequest("테스트게시글1", PostCategory.FREE, "테스트내용1");
+        Post post1 = postService.create(req1, user2.getId());
+        postScrapService.toggleScrapWithCount(post1.getId(), user1.getId());
+
+        PostRequest req2 = new PostRequest("테스트게시글2", PostCategory.FREE, "테스트내용2");
+        Post post2 = postService.create(req2, user2.getId());
+        postScrapService.toggleScrapWithCount(post2.getId(), user1.getId());
+
+        PostRequest req3 = new PostRequest("테스트게시글3", PostCategory.SUGGESTION, "테스트내용3");
+        Post post3 = postService.create(req3, user2.getId());
+        postScrapService.toggleScrapWithCount(post3.getId(), user1.getId());
         // w
         var res = mypageApiService.getScrappedUserPosts(user1.getId());
         // t
         assertEquals(3, res.size());
         assertThat(res.get(0).postTitle()).isEqualTo("테스트게시글1");
-        assertThat(res.get(1).postCategory()).isEqualTo("자유게시판");
+        assertThat(res.get(1).postCategory()).isEqualTo(PostCategory.FREE);
         assertThat(res.get(2).postImgUrl()).isNull();
     }
 
@@ -246,9 +257,12 @@ class MypageApiServiceIT {
     @DisplayName("내가 작성한 게시글 댓글 목록 조회 정상 동작")
     void should_return_commented_posts_successfully() {
         // g
-        Post post1 = postService.create("테스트게시글1", "자유게시판", "테스트내용1", user2.getId());
-        Post post2 = postService.create("테스트게시글2", "건의게시판", "테스트내용2", user2.getId());
+        PostRequest req1 = new PostRequest("테스트게시글1", PostCategory.FREE, "테스트내용1");
+        Post post1 = postService.create(req1, user2.getId());
         postCommentService.createComment("게시글1-댓글1",post1.getId(),null,user1.getId());
+
+        PostRequest req2 = new PostRequest("테스트게시글2", PostCategory.SUGGESTION, "테스트내용2");
+        Post post2 = postService.create(req2, user2.getId());
         postCommentService.createComment("게시글2-댓글1",post2.getId(),null,user1.getId());
 //        postCommentService.createComment("게시글2-댓글1",post1.getId(),null,user2.getId());
 //        postCommentService.createComment("게시글2-댓글1-대댓글1",post1.getId(),null,user1.getId());
@@ -258,7 +272,7 @@ class MypageApiServiceIT {
         assertEquals(2, res.size());
         assertThat(res.get(0).postTitle()).isEqualTo("테스트게시글1");
         assertThat(res.get(1).postcommentBody()).isEqualTo("게시글2-댓글1");
-        assertThat(res.get(1).postCategory()).isEqualTo("건의게시판");
+        assertThat(res.get(1).postCategory()).isEqualTo(PostCategory.SUGGESTION);
     }
 
 

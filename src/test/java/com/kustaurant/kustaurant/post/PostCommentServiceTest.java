@@ -8,13 +8,13 @@ import com.kustaurant.kustaurant.post.comment.service.port.PostCommentDislikeRep
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryRepository;
-import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
-import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
+import com.kustaurant.kustaurant.post.post.controller.response.PostReactionResponse;
+import com.kustaurant.kustaurant.post.post.domain.enums.depricated.ReactionStatus;
+import com.kustaurant.kustaurant.post.post.service.port.PostQueryRepository;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
-import com.kustaurant.kustaurant.post.post.service.web.PostQueryService;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.post.post.service.PostQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 class PostCommentServiceTest {
     private PostCommentRepository commentRepository;
     private PostCommentQueryRepository postCommentQueryDAO;
-    private PostQueryDAO postQueryDAO;
+    private PostQueryRepository postQueryDAO;
     private PostCommentLikeJpaRepository likeRepository;
     private PostCommentDislikeJpaRepository dislikeRepository;
     private PostQueryService postQueryService;
@@ -41,7 +41,7 @@ class PostCommentServiceTest {
     void setUp() {
         commentRepository = mock(PostCommentRepository.class);
         postCommentQueryDAO = mock(PostCommentQueryRepository.class);
-        postQueryDAO = mock(PostQueryDAO.class);
+        postQueryDAO = mock(PostQueryRepository.class);
         likeRepository = mock(PostCommentLikeJpaRepository.class);
         dislikeRepository = mock(PostCommentDislikeJpaRepository.class);
         postQueryService = mock(PostQueryService.class);
@@ -93,7 +93,7 @@ class PostCommentServiceTest {
         when(postCommentDislikeRepository.countByCommentId(commentId)).thenReturn(0);
 
         // When
-        ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
+        PostReactionResponse response = commentService.toggleLike(userId, commentId);
         System.out.println(response.toString());
 
         // Then
@@ -117,7 +117,7 @@ class PostCommentServiceTest {
         when(postCommentDislikeRepository.countByCommentId(commentId)).thenReturn(0);
 
         // When
-        ReactionToggleResponse response = commentService.toggleLike(userId, commentId);
+        PostReactionResponse response = commentService.toggleLike(userId, commentId);
 
         // Then
         assertThat(response.getStatus()).isEqualTo(ReactionStatus.DISLIKE_TO_LIKE);

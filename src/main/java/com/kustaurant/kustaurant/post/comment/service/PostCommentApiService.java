@@ -4,20 +4,18 @@ package com.kustaurant.kustaurant.post.comment.service;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
-import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
-import com.kustaurant.kustaurant.post.post.service.api.PostQueryApiService;
+import com.kustaurant.kustaurant.post.post.controller.response.PostDTO;
+import com.kustaurant.kustaurant.post.post.service.PostQueryApiService;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentDislikeRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostLikeRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostDislikeRepository;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
-import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
-import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.post.post.controller.response.PostReactionResponse;
 import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
-import com.kustaurant.kustaurant.post.comment.dto.PostCommentDTO;
+import com.kustaurant.kustaurant.post.comment.controller.response.PostCommentDTO;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +30,6 @@ public class PostCommentApiService {
     private final PostCommentRepository postCommentRepository;
     private final PostCommentLikeRepository postCommentLikeRepository;
     private final PostCommentDislikeRepository postCommentDislikeRepository;
-    private final PostLikeRepository postLikeRepository;
-    private final PostDislikeRepository postDislikeRepository;
-    private final PostRepository postRepository;
     private final PostQueryApiService postQueryApiService;
     private final PostCommentService postCommentService;
     private final UserService userService;
@@ -42,7 +37,6 @@ public class PostCommentApiService {
     // 댓글 생성
     public void create(Post post, Long userId, PostComment postComment) {
         // ID 기반으로 댓글 생성
-        postComment.setPostId(post.getId());
         postCommentRepository.save(postComment);
     }
 
@@ -97,24 +91,16 @@ public class PostCommentApiService {
         return postDislikeRepository.existsByUserIdAndPostId(userId, post.getId());
     }
 
-    // 해당 글의 작성자인지 여부
-    public boolean isPostMine(Post post, Long userId) {
-        if (userId == null || post == null) {
-            return false;
-        }
-        return post.getAuthorId().equals(userId);
-    }
-
     // 댓글 삭제
     public void deleteComment(Integer commentId, Long userId) {
         PostComment postComment = getPostCommentByCommentId(commentId);
-        postComment.setStatus(ContentStatus.DELETED);
+//        postComment.setStatus(PostStatus.DELETED);
 
         // 대댓글 상태 변경 - ID 기반으로 처리
         List<PostComment> replies = postCommentRepository.findByParentCommentId(commentId);
-        for (PostComment reply : replies) {
-            reply.setStatus(ContentStatus.DELETED);
-        }
+//        for (PostComment reply : replies) {
+//            reply.setStatus(PostStatus.DELETED);
+//        }
         postCommentRepository.saveAll(replies);
         postCommentRepository.save(postComment);
     }
@@ -138,8 +124,8 @@ public class PostCommentApiService {
         postCommentRepository.save(postComment);
     }
 
-    public ReactionToggleResponse toggleCommentLikeOrDislike(String action, Long userId, Integer commentId) {
-        ReactionToggleResponse reactionToggleResponse;
+    public PostReactionResponse toggleCommentLikeOrDislike(String action, Long userId, Integer commentId) {
+        PostReactionResponse reactionToggleResponse;
         if ("likes".equals(action)) {
             reactionToggleResponse = postCommentService.toggleLike(userId, commentId);
         } else if ("dislikes".equals(action)) {

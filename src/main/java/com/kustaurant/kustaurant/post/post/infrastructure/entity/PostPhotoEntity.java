@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.post.post.infrastructure.entity;
 
 import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,7 +26,7 @@ public class PostPhotoEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(20)")
-    private ContentStatus status;
+    private PostStatus status;
 
     public PostPhotoEntity() {
 

@@ -135,6 +135,6 @@ public class User {
     }
 
     public int getEvalCount() {
-        return (stats != null) ? stats.getRatedRestCnt() : 0;
+        return stats.getRatedRestCnt();
     }
 }

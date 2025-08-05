@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
-import com.kustaurant.kustaurant.post.comment.infrastructure.QPostCommentEntity;
-import com.kustaurant.kustaurant.post.comment.infrastructure.QPostCommentLikeEntity;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentEntity;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentLikeEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostLikeEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostPhotoEntity;
@@ -9,8 +9,6 @@ import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostScrapEntit
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostCommentResponse;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostsResponse;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

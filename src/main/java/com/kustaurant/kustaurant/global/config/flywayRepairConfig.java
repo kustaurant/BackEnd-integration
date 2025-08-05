@@ -5,13 +5,13 @@
 // * 주의 :: ❌ 운영에선 절대 repair 실행 금지
 // */
 //
-//package com.kustaurant.kustaurant.global.config;
-//
-//import org.flywaydb.core.Flyway;
-//import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//
+package com.kustaurant.kustaurant.global.config;
+
+import org.flywaydb.core.Flyway;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 //@Configuration
 //public class flywayRepairConfig {
 //

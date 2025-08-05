@@ -6,7 +6,7 @@ import com.kustaurant.kustaurant.evaluation.evaluation.domain.RestaurantSituatio
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.RestaurantSituationRelationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa.RestaurantSituationRelationJpaRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.RestaurantSituationRelationRepository;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

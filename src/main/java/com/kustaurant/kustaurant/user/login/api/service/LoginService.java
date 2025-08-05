@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.user.login.api.service;
 
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
-import com.kustaurant.kustaurant.global.exception.exception.business.ProviderApiException;
-import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.user.ProviderApiException;
+import com.kustaurant.kustaurant.global.exception.exception.user.UserNotFoundException;
 import com.kustaurant.kustaurant.user.login.api.controller.TokenResponse;
 import com.kustaurant.kustaurant.user.login.api.controller.LoginRequest;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.RefreshTokenStore;

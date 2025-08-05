@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.user.mypage.service;
 
-import com.kustaurant.kustaurant.global.exception.exception.business.NoProfileChangeException;
-import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.user.NoProfileChangeException;
+import com.kustaurant.kustaurant.global.exception.exception.user.UserNotFoundException;
 import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeRepository;
 

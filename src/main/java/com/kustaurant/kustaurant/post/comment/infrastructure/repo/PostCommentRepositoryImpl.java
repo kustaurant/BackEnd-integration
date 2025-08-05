@@ -6,8 +6,8 @@ import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.infrastructure.entity.PostCommentEntity;
 import com.kustaurant.kustaurant.post.comment.infrastructure.repo.jpa.PostCommentJpaRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -30,7 +30,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     @Override
     public List<PostComment> findParentComments(Integer postId) {
         // ID 기반으로 부모 댓글 조회
-        List<PostCommentEntity> parentComments = postCommentJpaRepository.findByPostIdAndStatus(postId, ContentStatus.ACTIVE)
+        List<PostCommentEntity> parentComments = postCommentJpaRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)
                 .stream()
                 .filter(comment -> comment.getParentCommentId() == null)
                 .collect(Collectors.toList());
@@ -64,7 +64,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
         PostCommentEntity entity = postCommentJpaRepository.findById(comment.getId())
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, comment.getId(), "댓글"));
 
-        entity.setStatus(comment.getStatus());
+//        entity.setStatus(comment.getStatus());
         // likeCount 필드 제거됨
 
         postCommentJpaRepository.save(entity);
@@ -76,7 +76,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
         // Soft delete 방식으로 변경
         List<PostCommentEntity> comments = postCommentJpaRepository.findByPostId(postId);
         for (PostCommentEntity comment : comments) {
-            comment.setStatus(ContentStatus.DELETED);
+//            comment.setStatus(PostStatus.DELETED);
         }
         postCommentJpaRepository.saveAll(comments);
     }

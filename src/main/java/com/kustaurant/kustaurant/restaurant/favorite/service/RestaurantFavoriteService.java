@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.favorite.service;
 
 import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

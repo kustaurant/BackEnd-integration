@@ -2,7 +2,8 @@ package com.kustaurant.kustaurant.post.post.infrastructure.entity;
 
 import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
 import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -27,9 +28,10 @@ public class PostEntity extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(20)")
-    private ContentStatus status;
-
-    private String postCategory;
+    private PostStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "post_category", columnDefinition = "varchar(20)")
+    private PostCategory postCategory;
     private Integer postVisitCount = 0;
     private Integer netLikes = 0;
 
@@ -40,8 +42,8 @@ public class PostEntity extends BaseTimeEntity {
     public PostEntity(
             String postTitle,
             String postBody,
-            String postCategory,
-            ContentStatus status,
+            PostCategory postCategory,
+            PostStatus status,
             Long userId
     ) {
         this.postTitle = postTitle;
@@ -61,7 +63,7 @@ public class PostEntity extends BaseTimeEntity {
                 .createdAt(getCreatedAt())
                 .updatedAt(getUpdatedAt())
                 .visitCount(postVisitCount)
-                .authorId(userId)
+                .writerId(userId)
                 .build();
     }
 
@@ -71,7 +73,7 @@ public class PostEntity extends BaseTimeEntity {
                 .postBody(post.getBody())
                 .postCategory(post.getCategory())
                 .status(post.getStatus())
-                .userId(post.getAuthorId())
+                .userId(post.getWriterId())
                 .build();
     }
 

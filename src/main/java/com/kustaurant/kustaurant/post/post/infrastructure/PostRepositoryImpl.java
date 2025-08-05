@@ -4,21 +4,20 @@ import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.post.comment.infrastructure.entity.PostCommentEntity;
 import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface.PostJpaRepository;
-import com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface.PostLikeJpaRepository;
-import com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface.PostDislikeJpaRepository;
+import com.kustaurant.kustaurant.post.post.infrastructure.jpa.PostJpaRepository;
+import com.kustaurant.kustaurant.post.post.infrastructure.jpa.PostLikeJpaRepository;
+import com.kustaurant.kustaurant.post.post.infrastructure.jpa.PostDislikeJpaRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.user.user.infrastructure.UserJpaRepository;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,12 +33,6 @@ public class PostRepositoryImpl implements PostRepository {
     private final PostLikeJpaRepository postLikeJpaRepository;
     private final PostDislikeJpaRepository postDislikeJpaRepository;
     private final UserJpaRepository userJpaRepository;
-    
-
-    @Override
-    public Page<Post> findAll(Pageable pageable) {
-        return postJpaRepository.findAll(pageable).map(this::toDomainWithCounts);
-    }
 
     @Override
     public List<Post> findAllById(List<Integer> ids) {
@@ -49,23 +42,8 @@ public class PostRepositoryImpl implements PostRepository {
     }
     
     @Override
-    public Page<Post> findByStatus(ContentStatus status, Pageable pageable) {
-        return postJpaRepository.findAll(pageable).map(this::toDomainWithCounts);
-    }
-    
-    @Override
-    public List<PostEntity> findActivePostsByUserId(Long userId) {
-        return postJpaRepository.findActivePostsByUserId(userId);
-    }
-    
-    @Override
-    public Post findByStatusAndPostId(ContentStatus status, Integer postId) {
+    public Post findByStatusAndPostId(PostStatus status, Integer postId) {
         return postJpaRepository.findById(postId).orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND)).toModel();
-    }
-
-    @Override
-    public PostEntity save(PostEntity postEntity){
-        return postJpaRepository.save(postEntity);
     }
 
     @Override
@@ -73,20 +51,18 @@ public class PostRepositoryImpl implements PostRepository {
         PostEntity postEntity;
         if (post.getId() == null) {
             postEntity = PostEntity.from(post);
-            postEntity.setCreatedAt(LocalDateTime.now());
-            postEntity.setUpdatedAt(LocalDateTime.now());
         } else {
             postEntity = postJpaRepository.findById(post.getId())
                     .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND, post.getId(), "게시물"));
 
             // 엔티티 상태 동기화
-            postEntity.setPostTitle(post.getTitle());
-            postEntity.setPostBody(post.getBody());
-            postEntity.setPostCategory(post.getCategory());
-            postEntity.setStatus(post.getStatus());
-            postEntity.setUpdatedAt(LocalDateTime.now());
-            // netLikes 필드 제거됨
-            postEntity.setPostVisitCount(post.getVisitCount());
+//            postEntity.setPostTitle(post.getTitle());
+//            postEntity.setPostBody(post.getBody());
+//            postEntity.setPostCategory(post.getCategory());
+//            postEntity.setStatus(post.getStatus());
+//            postEntity.setUpdatedAt(LocalDateTime.now());
+//            // netLikes 필드 제거됨
+//            postEntity.setPostVisitCount(post.getVisitCount());
         }
 
         PostEntity saved = postJpaRepository.save(postEntity);
@@ -99,44 +75,38 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Optional<Post> findByIdWithComments(Integer postId) {
-        return postJpaRepository.findById(postId).map(this::toDomainWithCounts);
-    }
-
-    @Override
     public void increaseVisitCount(Integer postId) {
         PostEntity post = postJpaRepository.findById(postId)
                 .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND, postId, "게시글"));
-        post.setPostVisitCount(post.getPostVisitCount() + 1);
+//        post.setPostVisitCount(post.getPostVisitCount() + 1);
         postJpaRepository.save(post);
     }
 
     @Override
-    public void delete(Post post) {
-        // SQLDelete 애노테이션에 의한 soft delete
-        PostEntity postEntity = postJpaRepository.findById(post.getId())
-                .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND, post.getId(), "게시글"));
-        postJpaRepository.delete(postEntity);
+    public void delete(Integer id) {
+        postJpaRepository.deleteById(id);
     }
 
     @Override
-    public List<Post> findActiveByUserId(Long userId) {
+    public List<Post> findByUserId(Long userId) {
         return postJpaRepository.findActivePostsByUserId(userId).stream()
                 .map(this::toDomainWithCounts)
                 .toList();
     }
 
+    // -------------------------------------------------------------
+
     @Override
-    public Page<Post> findByStatusAndCategory(ContentStatus status, String category, Pageable pageable) {
+    public Page<Post> findByStatusAndCategory(PostStatus status, String category, Pageable pageable) {
         Specification<PostEntity> spec = (root, query, cb) -> {
             // SQLRestriction에 의해 ACTIVE만 조회되므로 status 조건 제거
-            return cb.equal(root.get("postCategory"), category);
+            return cb.equal(root.get("category"), category);
         };
         return postJpaRepository.findAll(spec, pageable).map(this::toDomainWithCounts);
     }
 
     @Override
-    public Page<Post> findByStatusAndPopularCount(ContentStatus status, int minLikeCount, Pageable pageable) {
+    public Page<Post> findByStatusAndPopularCount(PostStatus status, int minLikeCount, Pageable pageable) {
         Specification<PostEntity> spec = (root, query, cb) -> {
             // SQLRestriction에 의해 ACTIVE만 조회되므로 status 조건 제거
             return cb.greaterThanOrEqualTo(root.get("netLikes"), minLikeCount);
@@ -145,10 +115,10 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Page<Post> findByStatusAndCategoryAndPopularCount(ContentStatus status, String category, int minLikeCount, Pageable pageable) {
+    public Page<Post> findByStatusAndCategoryAndPopularCount(PostStatus status, String category, int minLikeCount, Pageable pageable) {
         Specification<PostEntity> spec = (root, query, cb) -> {
             // SQLRestriction에 의해 ACTIVE만 조회되므로 status 조건 제거
-            Predicate categoryPredicate = cb.equal(root.get("postCategory"), category);
+            Predicate categoryPredicate = cb.equal(root.get("category"), category);
             Predicate likeCountPredicate = cb.greaterThanOrEqualTo(root.get("netLikes"), minLikeCount);
             return cb.and(categoryPredicate, likeCountPredicate);
         };
@@ -156,7 +126,7 @@ public class PostRepositoryImpl implements PostRepository {
     }
 
     @Override
-    public Page<Post> findByStatusAndSearchKeyword(ContentStatus status, String keyword, String category, int minLikeCount, Pageable pageable) {
+    public Page<Post> findByStatusAndSearchKeyword(PostStatus status, String keyword, String category, int minLikeCount, Pageable pageable) {
         Specification<PostEntity> spec = (root, query, cb) -> {
             query.distinct(true);
             
@@ -170,7 +140,7 @@ public class PostRepositoryImpl implements PostRepository {
             
             Predicate searchPredicate;
             if (!category.equals("전체")) {
-                Predicate categoryPredicate = cb.equal(root.get("postCategory"), category);
+                Predicate categoryPredicate = cb.equal(root.get("category"), category);
                 searchPredicate = cb.and(categoryPredicate, cb.or(
                     cb.like(root.get("postTitle"), "%" + keyword + "%"),
                     cb.like(root.get("postBody"), "%" + keyword + "%"),

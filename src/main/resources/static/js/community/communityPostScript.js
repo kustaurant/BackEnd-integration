@@ -109,8 +109,19 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(data => {
                 const scrapImage = document.querySelector('#scrap img');
-                if (data.scrapDelete) scrapImage.src = '/img/community/scrap.png';
-                else if (data.scrapCreated) scrapImage.src = '/img/community/scrap-green.png';
+                const scrapCountSpan = document.querySelector('#scrap span');
+                const postScrapCountSpan = document.querySelector('#postScrapCount');
+                
+                // 이미지 업데이트 (status: SCRAPPED=스크랩 생성, NOT_SCRAPPED=스크랩 삭제)
+                if (data.status === 'SCRAPPED') {
+                    scrapImage.src = '/img/community/scrap-green.png';
+                } else {
+                    scrapImage.src = '/img/community/scrap.png';
+                }
+                
+                // 스크랩 수 업데이트
+                scrapCountSpan.textContent = data.scrapCount;
+                postScrapCountSpan.textContent = '스크랩 ' + data.scrapCount;
             })
             .catch(error => console.error('Error:', error));
     });

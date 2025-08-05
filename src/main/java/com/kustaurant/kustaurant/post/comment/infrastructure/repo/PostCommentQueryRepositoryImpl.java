@@ -1,13 +1,14 @@
 package com.kustaurant.kustaurant.post.comment.infrastructure.repo;
 
-import com.kustaurant.kustaurant.post.comment.infrastructure.QPostCommentDislikeEntity;
-import com.kustaurant.kustaurant.post.comment.infrastructure.QPostCommentEntity;
-import com.kustaurant.kustaurant.post.comment.infrastructure.QPostCommentLikeEntity;
+import com.kustaurant.kustaurant.post.comment.domain.PostCommentStatus;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentDislikeEntity;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentEntity;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentLikeEntity;
 import com.kustaurant.kustaurant.post.comment.infrastructure.repo.projection.PostCommentDetailProjection;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryRepository;
 import com.kustaurant.kustaurant.user.user.infrastructure.QUserEntity;
 import com.kustaurant.kustaurant.user.mypage.infrastructure.QUserStatsEntity;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.Order;
@@ -79,7 +80,7 @@ public class PostCommentQueryRepositoryImpl implements PostCommentQueryRepositor
                 .leftJoin(userDislike).on(postComment.commentId.eq(userDislike.commentId).and(
                         currentUserId != null ? userDislike.userId.eq(currentUserId) : userDislike.userId.isNull()))
                 .where(postComment.postId.eq(postId)
-                        .and(postComment.status.eq(ContentStatus.ACTIVE)))
+                        .and(postComment.status.eq(PostCommentStatus.ACTIVE)))
                 .groupBy(postComment.commentId, postComment.commentBody, postComment.status,
                         postComment.parentCommentId, postComment.createdAt, postComment.updatedAt,
                         postComment.postId, postComment.userId, user.nickname.value, userStats.ratedRestCnt)

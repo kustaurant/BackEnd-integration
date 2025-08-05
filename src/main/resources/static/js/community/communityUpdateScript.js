@@ -79,20 +79,34 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         // TinyMCE 에디터의 내용 가져오기
         var content = tinymce.get('tiny-editor').getContent();
-        var postId= this.dataset.id;
-        console.log(postId)
-        var formData = new FormData(form);
-        formData.append('content', content); // 폼 데이터에 에디터 내용 추가
-        formData.append("postId",postId);
+        var postId = this.dataset.id;
+        var title = form.querySelector('input[name="title"]').value.trim();
+        
+        if (!title) {
+            alert('제목을 입력해주세요.');
+            return;
+        }
+        if (!content) {
+            alert('내용을 입력해주세요.');
+            return;
+        }
+        
+        // JSON 형태로 데이터 구성
+        var postData = {
+            title: title,
+            category: category,
+            content: content
+        };
 
         var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
         fetch('/api/posts/' + postId, {
             method: 'PUT',
             headers: {
+                'Content-Type': 'application/json',
                 [csrfHeader]: csrfToken
             },
-            body: formData
+            body: JSON.stringify(postData)
         }).then(response => {
             if (response.redirected)
                 window.location.href = "/user/login";

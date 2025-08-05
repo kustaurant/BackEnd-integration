@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.user.mypage.service;
 
-import com.kustaurant.kustaurant.global.exception.exception.business.NicknameCooldownException;
-import com.kustaurant.kustaurant.global.exception.exception.business.NicknameDuplicateException;
-import com.kustaurant.kustaurant.global.exception.exception.business.PhoneDuplicateException;
+import com.kustaurant.kustaurant.global.exception.exception.user.NicknameCooldownException;
+import com.kustaurant.kustaurant.global.exception.exception.user.NicknameDuplicateException;
+import com.kustaurant.kustaurant.global.exception.exception.user.PhoneDuplicateException;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;

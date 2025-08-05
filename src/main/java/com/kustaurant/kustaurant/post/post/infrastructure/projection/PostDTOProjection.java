@@ -1,12 +1,14 @@
 package com.kustaurant.kustaurant.post.post.infrastructure.projection;
 
+import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
+
 import java.time.LocalDateTime;
 
 public record PostDTOProjection(
         Integer postId,
         String postTitle,
         String postBody,
-        String postCategory,
+        PostCategory postCategory,
         String status,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,

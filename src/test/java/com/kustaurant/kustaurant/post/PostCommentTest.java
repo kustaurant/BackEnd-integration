@@ -2,8 +2,8 @@ package com.kustaurant.kustaurant.post;
 
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
-import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.depricated.ReactionStatus;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -26,7 +26,7 @@ class PostCommentTest {
         assertThat(comment.getCommentBody()).isEqualTo(content);
         assertThat(comment.getUserId()).isEqualTo(userId);
         assertThat(comment.getPostId()).isEqualTo(postId);
-        assertThat(comment.getStatus()).isEqualTo(ContentStatus.ACTIVE);
+        assertThat(comment.getStatus()).isEqualTo(PostStatus.ACTIVE);
         assertThat(comment.getReplyIds()).isEmpty();
         assertThat(comment.getCreatedAt()).isNotNull();
     }
@@ -112,7 +112,7 @@ class PostCommentTest {
         comment.delete();
 
         // Then
-        assertThat(comment.getStatus()).isEqualTo(ContentStatus.DELETED);
+        assertThat(comment.getStatus()).isEqualTo(PostStatus.DELETED);
     }
 
     @Test
@@ -160,7 +160,7 @@ class PostCommentTest {
         PostComment comment = PostComment.builder()
                 .id(100)
                 .commentBody("Test comment body")
-                .status(ContentStatus.ACTIVE)
+                .status(PostStatus.ACTIVE)
                 .createdAt(now)
                 .updatedAt(now)
                 .userId(999L)
@@ -170,7 +170,7 @@ class PostCommentTest {
         // Then
         assertThat(comment.getId()).isEqualTo(100);
         assertThat(comment.getCommentBody()).isEqualTo("Test comment body");
-        assertThat(comment.getStatus()).isEqualTo(ContentStatus.ACTIVE);
+        assertThat(comment.getStatus()).isEqualTo(PostStatus.ACTIVE);
         assertThat(comment.getUserId()).isEqualTo(999L);
         assertThat(comment.getPostId()).isEqualTo(555);
         assertThat(comment.getCreatedAt()).isEqualTo(now);

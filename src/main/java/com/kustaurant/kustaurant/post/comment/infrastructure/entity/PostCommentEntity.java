@@ -2,7 +2,8 @@ package com.kustaurant.kustaurant.post.comment.infrastructure.entity;
 
 import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.post.comment.domain.PostCommentStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -22,7 +23,7 @@ public class PostCommentEntity extends BaseTimeEntity {
 
     @Column(length = 20)
     @Enumerated(EnumType.STRING)
-    ContentStatus status;
+    PostCommentStatus status;
 
     @Column(name = "parent_comment_id")
     Integer parentCommentId;
@@ -36,7 +37,7 @@ public class PostCommentEntity extends BaseTimeEntity {
     @Builder
     public PostCommentEntity(
             String commentBody,
-            ContentStatus status,
+            PostCommentStatus status,
             Integer postId,
             Integer parentCommentId,
             Long userId

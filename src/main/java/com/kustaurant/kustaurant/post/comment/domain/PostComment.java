@@ -1,13 +1,10 @@
 package com.kustaurant.kustaurant.post.comment.domain;
 
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
-import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.depricated.ReactionStatus;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +14,7 @@ public class PostComment {
 
     private Integer id;
     private final String commentBody;
-    private ContentStatus status;
+    private PostCommentStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -30,7 +27,7 @@ public class PostComment {
     public static PostComment create(String commentBody, Long userId, Integer postId) {
         return PostComment.builder()
                 .commentBody(commentBody)
-                .status(ContentStatus.ACTIVE)
+                .status(PostCommentStatus.ACTIVE)
                 .userId(userId)
                 .postId(postId)
                 .replyIds(new ArrayList<>())
@@ -42,7 +39,7 @@ public class PostComment {
     }
 
     public void delete() {
-        this.status = ContentStatus.DELETED;
+        this.status = PostCommentStatus.DELETED;
         // 대댓글들은 별도 서비스에서 처리
     }
 

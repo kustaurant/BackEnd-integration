@@ -2,10 +2,11 @@ package com.kustaurant.kustaurant.post.comment.service;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
+import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.domain.PostCommentDislike;
 import com.kustaurant.kustaurant.post.comment.domain.PostCommentLike;
-import com.kustaurant.kustaurant.post.comment.dto.PostCommentDTO;
+import com.kustaurant.kustaurant.post.comment.controller.response.PostCommentDTO;
 import com.kustaurant.kustaurant.post.comment.infrastructure.repo.projection.PostCommentDetailProjection;
 import com.kustaurant.kustaurant.post.comment.infrastructure.repo.jpa.PostCommentDislikeJpaRepository;
 import com.kustaurant.kustaurant.post.comment.infrastructure.repo.jpa.PostCommentLikeJpaRepository;
@@ -13,21 +14,21 @@ import com.kustaurant.kustaurant.post.comment.service.port.PostCommentDislikeRep
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentLikeRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentQueryRepository;
-import com.kustaurant.kustaurant.post.post.domain.PostDetailView;
-import com.kustaurant.kustaurant.post.post.domain.dto.PostDTO;
-import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
-import com.kustaurant.kustaurant.post.post.domain.response.InteractionStatusResponse;
-import com.kustaurant.kustaurant.post.post.domain.response.ReactionToggleResponse;
-import com.kustaurant.kustaurant.post.post.enums.DislikeStatus;
-import com.kustaurant.kustaurant.post.post.enums.LikeStatus;
-import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
-import com.kustaurant.kustaurant.post.post.enums.ScrapStatus;
+import com.kustaurant.kustaurant.post.post.controller.response.PostDetailView;
+import com.kustaurant.kustaurant.post.post.controller.response.PostDTO;
+import com.kustaurant.kustaurant.post.post.controller.response.UserDTO;
+import com.kustaurant.kustaurant.post.post.controller.response.InteractionStatusResponse;
+import com.kustaurant.kustaurant.post.post.controller.response.PostReactionResponse;
+import com.kustaurant.kustaurant.post.post.domain.enums.depricated.DislikeStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.depricated.LikeStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.depricated.ReactionStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.ScrapStatus;
 import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
-import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
+import com.kustaurant.kustaurant.post.post.service.port.PostQueryRepository;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
-import com.kustaurant.kustaurant.post.post.service.web.PostQueryService;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.post.post.service.PostQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,10 +44,8 @@ import java.util.*;
 public class PostCommentService {
     private final PostCommentRepository postCommentRepository;
     private final PostCommentQueryRepository postCommentQueryDAO;
-    private final PostQueryDAO postQueryDAO;
+    private final PostQueryRepository postQueryDAO;
     private final PostQueryService postQueryService;
-    private final PostCommentLikeJpaRepository postCommentLikeJpaRepository;
-    private final PostCommentDislikeJpaRepository postCommentDislikeJpaRepository;
     private final UserService userService;
     private final PostCommentLikeRepository postCommentLikeRepository;
     private final PostCommentDislikeRepository postCommentDislikeRepository;
@@ -74,13 +73,13 @@ public class PostCommentService {
     }
 
     @Transactional
-    public ReactionToggleResponse toggleLike(Long userId, Integer commentId) {
+    public PostReactionResponse toggleLike(Long userId, Integer commentId) {
         PostComment comment = postCommentRepository.findById(commentId)
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, commentId, "댓글"));
 
         boolean isLikedBefore = postCommentLikeRepository.existsByUserIdAndCommentId(userId, commentId);
         boolean isDislikedBefore = postCommentDislikeRepository.existsByUserIdAndCommentId(userId, commentId);
-        ReactionStatus status;
+        ReactionType status;
         if (isLikedBefore) {
             postCommentLikeRepository.deleteByUserIdAndCommentId(userId, commentId);
             status = ReactionStatus.LIKE_DELETED;
@@ -104,12 +103,12 @@ public class PostCommentService {
         int likeCount = postCommentLikeRepository.countByCommentId(commentId);
         int dislikeCount = postCommentDislikeRepository.countByCommentId(commentId);
 
-        return new ReactionToggleResponse(status, likeCount - dislikeCount, likeCount, dislikeCount);
+        return new PostReactionResponse(status, likeCount - dislikeCount, likeCount, dislikeCount);
     }
 
 
     @Transactional
-    public ReactionToggleResponse toggleDislike(Long userId, Integer commentId) {
+    public PostReactionResponse toggleDislike(Long userId, Integer commentId) {
         PostComment comment = postCommentRepository.findById(commentId)
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, "댓글이 존재하지 않습니다."));
 
@@ -140,21 +139,9 @@ public class PostCommentService {
         int likeCount = postCommentLikeRepository.countByCommentId(commentId);
         int dislikeCount = postCommentDislikeRepository.countByCommentId(commentId);
 
-        return new ReactionToggleResponse(status, likeCount - dislikeCount, likeCount, dislikeCount);
+        return new PostReactionResponse(status, likeCount - dislikeCount, likeCount, dislikeCount);
     }
 
-
-
-
-
-    public InteractionStatusResponse getUserInteractionStatus(Integer commentId, Long userId) {
-        if (userId == null) {
-            return new InteractionStatusResponse(LikeStatus.NOT_LIKED, DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
-        }
-        boolean isLiked = postCommentLikeJpaRepository.existsByUserIdAndCommentId(userId, commentId);
-        boolean isDisliked = postCommentDislikeJpaRepository.existsByUserIdAndCommentId(userId, commentId);
-        return new InteractionStatusResponse(isLiked ? LikeStatus.LIKED : LikeStatus.NOT_LIKED, isDisliked ? DislikeStatus.DISLIKED : DislikeStatus.NOT_DISLIKED, ScrapStatus.NOT_SCRAPPED);
-    }
 
     @Transactional(readOnly = true)
     public PostDetailView buildPostDetailView(Integer postId, Long userId, String sort) {

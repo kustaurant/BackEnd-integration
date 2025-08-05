@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.user.user.service;
 
-import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
-import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
+import com.kustaurant.kustaurant.global.exception.exception.user.UserNotFoundException;
+import com.kustaurant.kustaurant.post.post.controller.response.UserDTO;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;

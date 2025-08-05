@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.reposit
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.RESTAURANT_NOT_FOUND;
 
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantChartQuery;
 import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCoreInfoQuery;

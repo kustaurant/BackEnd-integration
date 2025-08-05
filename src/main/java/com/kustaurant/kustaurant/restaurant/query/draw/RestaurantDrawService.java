@@ -2,9 +2,8 @@ package com.kustaurant.kustaurant.restaurant.query.draw;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
-import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantChartRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.post.post.infrastructure;
 
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostScrapEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface.PostScrapJpaRepository;
+import com.kustaurant.kustaurant.post.post.infrastructure.jpa.PostScrapJpaRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

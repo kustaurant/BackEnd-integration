@@ -8,7 +8,7 @@ import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRe
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
 import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
-import com.kustaurant.kustaurant.post.post.service.port.PostQueryDAO;
+import com.kustaurant.kustaurant.post.post.service.port.PostQueryRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteRepository;
@@ -37,7 +37,7 @@ public class MypageServiceImpl implements MypageService {
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final PostScrapRepository postScrapRepository;
-    private final PostQueryDAO postQueryDAO;
+    private final PostQueryRepository postQueryDAO;
 
     public List<RestaurantFavorite> getRestaurantFavorites(Long userId) {
         return restaurantFavoriteRepository.findSortedFavoritesByUserId(userId);
@@ -48,7 +48,7 @@ public class MypageServiceImpl implements MypageService {
     }
 
     public List<Post> getActivePosts(Long userId) {
-        return postRepository.findActiveByUserId(userId);
+        return postRepository.findByUserId(userId);
     }
 
 

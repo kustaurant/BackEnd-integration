@@ -83,8 +83,12 @@ document.addEventListener('DOMContentLoaded', function () {
             alert("내용을 입력해주세요")
             return
         }
-        var formData = new FormData(form);
-        formData.append('content', content); // 폼 데이터에 에디터 내용 추가
+        // JSON 형태로 데이터 구성
+        var postData = {
+            title: title,
+            category: category,
+            content: content
+        };
 
         var csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         var csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
@@ -92,9 +96,10 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('/api/posts', {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 [csrfHeader]: csrfToken
             },
-            body: formData
+            body: JSON.stringify(postData)
         }).then(response => {
             if (response.redirected)
                 window.location.href = "/user/login";

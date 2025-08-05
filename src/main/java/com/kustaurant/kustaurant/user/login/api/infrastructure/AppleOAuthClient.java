@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.user.login.api.infrastructure;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kustaurant.kustaurant.global.exception.exception.business.ProviderApiException;
+import com.kustaurant.kustaurant.global.exception.exception.user.ProviderApiException;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,10 @@
 package com.kustaurant.kustaurant.global.exception.advice;
 
 import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;
-import com.kustaurant.kustaurant.global.exception.exception.business.BusinessException;
+import com.kustaurant.kustaurant.global.exception.exception.BusinessException;
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.auth.JwtAuthException;
-import com.kustaurant.kustaurant.global.exception.exception.business.ProviderApiException;
+import com.kustaurant.kustaurant.global.exception.exception.user.ProviderApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

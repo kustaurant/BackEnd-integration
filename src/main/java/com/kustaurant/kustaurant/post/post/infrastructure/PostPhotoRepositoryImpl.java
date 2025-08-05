@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.post.post.infrastructure;
 
 import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostPhotoEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface.PostPhotoJpaRepository;
+import com.kustaurant.kustaurant.post.post.infrastructure.jpa.PostPhotoJpaRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

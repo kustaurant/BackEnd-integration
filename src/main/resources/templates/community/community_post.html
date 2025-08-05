@@ -116,6 +116,9 @@
                               class="third-detail" id="postRecommendCount">
 
                         </span>
+                        <span th:text="'스크랩 ' + ${view.post.scrapCount}" class="fourth-detail" id="postScrapCount">
+
+                        </span>
                     </div>
                 </div>
             </div>
@@ -162,7 +165,7 @@
             <button type="button" id="scrap" class="post-button" th:data-post-id="${view.post.postId}">
                 <img th:if="${view.postInteractionStatus.scrapped.isScrapped()}" src="/img/community/scrap-green.png">
                 <img th:unless="${view.postInteractionStatus.scrapped.isScrapped()}" src="/img/community/scrap.png">
-
+                <span th:text="${view.post.scrapCount}"></span>
             </button>
         </div>
     </div>
