@@ -30,14 +30,6 @@ public abstract class RestaurantConstants {
         return imgUrl == null || imgUrl.equals("no_img") ? RestaurantConstants.REPLACE_IMG_URL : imgUrl;
     }
 
-    public static double avgScorePostprocessing(double scoreSum, long evaluationCount) {
-        if (evaluationCount == 0) {
-            return 0.0;
-        }
-        double avg = scoreSum / evaluationCount;
-        return Math.round(avg * 10) / 10.0;
-    }
-
     public static String positionPostprocessing(String restaurantPosition) {
         return restaurantPosition == null ? "건대 주변" : restaurantPosition;
     }

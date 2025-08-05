@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repositor
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity.restaurantSituationRelationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QSituationEntity.situationEntity;
+import static com.kustaurant.kustaurant.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
 import static com.kustaurant.kustaurant.restaurant.favorite.infrastructure.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantMenuEntity.restaurantMenuEntity;
@@ -32,10 +33,10 @@ public class RestaurantDetailQuery {
 
     private final JPAQueryFactory queryFactory;
 
-    public Optional<RestaurantDetail> getRestaurantDetails(Integer restaurantId, Long userId,
-            Long favoriteCount) {
+    public Optional<RestaurantDetail> getRestaurantDetails(Integer restaurantId, Long userId) {
         JPAQuery<?> q = queryFactory
                 .from(restaurantEntity)
+                .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .leftJoin(restaurantMenuEntity)
                 .on(menuRestaurantIdEq(restaurantEntity.restaurantId))
                 .leftJoin(restaurantSituationRelationEntity)
@@ -53,7 +54,7 @@ public class RestaurantDetailQuery {
                                 new QRestaurantDetail(
                                         restaurantEntity.restaurantId,
                                         restaurantEntity.restaurantImgUrl,
-                                        restaurantEntity.mainTier,
+                                        ratingEntity.tier.coalesce(0),
                                         restaurantEntity.restaurantCuisine,
                                         restaurantEntity.restaurantPosition,
                                         restaurantEntity.restaurantName,
@@ -61,11 +62,11 @@ public class RestaurantDetailQuery {
                                         restaurantEntity.restaurantUrl,
                                         set(situationEntity.situationName),
                                         restaurantEntity.partnershipInfo,
-                                        restaurantEntity.restaurantEvaluationCount,
-                                        restaurantEntity.restaurantScoreSum,
+                                        Expressions.constant(getEvaluationCount(restaurantId)),
+                                        ratingEntity.score.coalesce(0.0),
                                         evaluationEntity.isNotNull(),
                                         restaurantFavoriteEntity.isNotNull(),
-                                        Expressions.constant(favoriteCount),
+                                        Expressions.constant(getFavoriteCount(restaurantId)),
                                         set(new QRestaurantMenu(
                                                 restaurantMenuEntity.id,
                                                 restaurantMenuEntity.restaurantId,
@@ -99,6 +100,18 @@ public class RestaurantDetailQuery {
             favoriteCount = 0L;
         }
         return favoriteCount;
+    }
+
+    public Integer getEvaluationCount(Integer restaurantId) {
+        Long evaluationCount = queryFactory
+                .select(evaluationEntity.id.count())
+                .from(evaluationEntity)
+                .where(evaluationEntity.restaurantId.eq(restaurantId))
+                .fetchOne();
+        if (isNull(evaluationCount)) {
+            evaluationCount = 0L;
+        }
+        return evaluationCount.intValue();
     }
 
     private BooleanExpression restaurantIdEq(Integer restaurantId) {

@@ -53,7 +53,7 @@ public class RestaurantCoreInfoDto {
     public RestaurantCoreInfoDto(Integer restaurantId, String restaurantName,
             String restaurantCuisine, String restaurantPosition, String restaurantImgUrl,
             Integer mainTier, Boolean isEvaluated, Boolean isFavorite, Double longitude, Double latitude,
-            String partnershipInfo, Double scoreSum, Integer evaluationCount, Set<String> situations,
+            String partnershipInfo, Double score, Set<String> situations,
             String restaurantType) {
         this.restaurantId = restaurantId;
         this.restaurantName = restaurantName;
@@ -66,7 +66,7 @@ public class RestaurantCoreInfoDto {
         this.longitude = longitude;
         this.latitude = latitude;
         this.partnershipInfo = partnershipInfo;
-        this.restaurantScore = avgScorePostprocessing(scoreSum, evaluationCount);
+        this.restaurantScore = score;
         this.situations = situations.stream().toList();
         this.restaurantType = restaurantType;
     }

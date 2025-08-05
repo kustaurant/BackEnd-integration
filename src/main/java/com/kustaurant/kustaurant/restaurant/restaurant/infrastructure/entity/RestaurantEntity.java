@@ -6,20 +6,19 @@ import com.kustaurant.kustaurant.restaurant.restaurant.domain.Cuisine;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.GeoPosition;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.restaurant.restaurant.domain.Tier;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
-@Setter
 @Entity
 @DynamicUpdate
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "restaurants_tbl")
 public class RestaurantEntity {
     @Id
@@ -35,9 +34,6 @@ public class RestaurantEntity {
     private String restaurantUrl;
     private String restaurantImgUrl;
     private Integer visitCount;
-    private Integer restaurantEvaluationCount;
-    private Double restaurantScoreSum;
-    private Integer mainTier;
 
     private String restaurantCuisine;
     private Double latitude;
@@ -51,36 +47,25 @@ public class RestaurantEntity {
     @JsonIgnore
     private LocalDateTime updatedAt;
 
-    public void updateStatistics(Restaurant restaurant) {
-        this.visitCount = restaurant.getVisitCount();
-        this.restaurantEvaluationCount = restaurant.getRestaurantEvaluationCount();
-        this.restaurantScoreSum = restaurant.getRestaurantScoreSum();
-        this.mainTier = restaurant.getMainTier().getValue();
-    }
-
     public static RestaurantEntity from(Restaurant restaurant) {
-        RestaurantEntity entity = new RestaurantEntity();
-        entity.setRestaurantId(restaurant.getRestaurantId());
-        entity.setRestaurantName(restaurant.getRestaurantName());
-        entity.setRestaurantType(restaurant.getRestaurantType());
-        entity.setRestaurantPosition(restaurant.getGeoPosition().position().getValue());
-        entity.setRestaurantAddress(restaurant.getRestaurantAddress());
-        entity.setRestaurantTel(restaurant.getRestaurantTel());
-        entity.setRestaurantUrl(restaurant.getRestaurantUrl());
-        entity.setRestaurantImgUrl(restaurant.getRestaurantImgUrl());
-        entity.setRestaurantCuisine(restaurant.getRestaurantCuisine().getValue());
-        entity.setLongitude(restaurant.getGeoPosition().coordinates().longitude());
-        entity.setLatitude(restaurant.getGeoPosition().coordinates().latitude());
-        entity.setPartnershipInfo(restaurant.getPartnershipInfo());
-        entity.setStatus(restaurant.getStatus());
-        entity.setCreatedAt(restaurant.getCreatedAt());
-        entity.setUpdatedAt(restaurant.getUpdatedAt());
-        entity.setVisitCount(restaurant.getVisitCount());
-        entity.setRestaurantEvaluationCount(restaurant.getRestaurantEvaluationCount());
-        entity.setRestaurantScoreSum(restaurant.getRestaurantScoreSum());
-        entity.setMainTier(restaurant.getMainTier().getValue());
-
-        return entity;
+        return new RestaurantEntity(
+                restaurant.getRestaurantId(),
+                restaurant.getRestaurantName(),
+                restaurant.getRestaurantType(),
+                restaurant.getGeoPosition().position().getValue(),
+                restaurant.getRestaurantAddress(),
+                restaurant.getRestaurantTel(),
+                restaurant.getRestaurantUrl(),
+                restaurant.getRestaurantImgUrl(),
+                restaurant.getVisitCount(),
+                restaurant.getRestaurantCuisine().getValue(),
+                restaurant.getGeoPosition().coordinates().latitude(),
+                restaurant.getGeoPosition().coordinates().longitude(),
+                restaurant.getPartnershipInfo(),
+                restaurant.getStatus(),
+                restaurant.getCreatedAt(),
+                restaurant.getUpdatedAt()
+        );
     }
 
     public Restaurant toModel() {
@@ -101,9 +86,6 @@ public class RestaurantEntity {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .visitCount(visitCount)
-                .restaurantEvaluationCount(restaurantEvaluationCount)
-                .restaurantScoreSum(restaurantScoreSum)
-                .mainTier(Tier.find(mainTier))
                 .build();
     }
 }

@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.domain;
+package com.kustaurant.kustaurant.rating.domain.model;
 
 import java.util.Arrays;
 import lombok.Getter;

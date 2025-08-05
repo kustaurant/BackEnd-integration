@@ -38,3 +38,41 @@ logging.level.com.kustaurant: trace
 # custom setting
 restaurant:
   initialDisplayMenuCount: 2
+  rating:
+    policy:
+      prior_weight: 5
+      evaluation:
+        recency_lambda: 0.05
+        recency_boost_gamma: 0.5
+        min_decay: 0.3
+        reaction_divisor: 10
+        reaction_scale: 0.5
+        evaluator_k: 5
+        completeness_weight:
+          score: 0.5
+          comment: 0.25
+          situation: 0.1
+          image: 0.15
+      restaurant:
+        popularity_scale:
+          visit: 4
+          favorite: 2
+          evaluation: 2
+        popularity_weight:
+          visits: 0.1
+          favorites: 0.2
+          evaluations: 0.7
+      tier:
+        levels:
+          1:
+            min_score: 4.0
+            max_ratio: 0.20
+          2:
+            min_score: 3.5
+            max_ratio: 0.20
+          3:
+            min_score: 3.0
+            max_ratio: 0.20
+          4:
+            min_score: 2.5
+            max_ratio: 0.20
