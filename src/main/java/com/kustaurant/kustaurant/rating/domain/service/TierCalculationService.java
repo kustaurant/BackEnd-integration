@@ -35,11 +35,15 @@ public class TierCalculationService {
             LocalDateTime now
     ) {
         List<Rating> result = new ArrayList<>(sorted.size());
+
         int tier = 1;
         int count = 0;
+        double lastScoreInTier = -1;
+
         TierLevel level = tierP.levels().get(tier);
         int maxCount = (int) Math.ceil(tierCount * level.maxRatio());
         double minScore = level.minScore();
+
         for (RatingScore score : sorted) {
             if (score.score() == 0) {
                 result.add(new Rating(score.restaurantId(), score.score(), Tier.NONE, false, now));
@@ -49,24 +53,25 @@ public class TierCalculationService {
                 result.add(new Rating(score.restaurantId(), score.score(), Tier.FIVE, false, now));
                 continue;
             }
-            while (tier < 5 && (score.score() < minScore || count >= maxCount)) {
+            while (tier < 5 && (score.score() < minScore || (count >= maxCount && score.score() != lastScoreInTier))) {
                 tier++;
                 if (tier == 5) {
                     break;
                 }
                 count = 0;
+                lastScoreInTier = -1;
                 level = tierP.levels().get(tier);
                 maxCount = (int) Math.ceil(tierCount * level.maxRatio());
                 minScore = level.minScore();
             }
 
-            if (tier == 5) {
-                result.add(new Rating(score.restaurantId(), score.score(), Tier.FIVE, false, now));
-            } else if (score.score() >= minScore && count < maxCount) {
-                result.add(new Rating(score.restaurantId(), score.score(), Tier.find(tier), false, now));
+            Tier assignedTier = tier == 5 ? Tier.FIVE : Tier.find(tier);
+
+            result.add(new Rating(score.restaurantId(), score.score(), assignedTier, false, now));
+
+            if (assignedTier != Tier.FIVE) {
                 count++;
-            } else {
-                result.add(new Rating(score.restaurantId(), score.score(), Tier.FIVE, false, now));
+                lastScoreInTier = score.score();
             }
         }
         return result;

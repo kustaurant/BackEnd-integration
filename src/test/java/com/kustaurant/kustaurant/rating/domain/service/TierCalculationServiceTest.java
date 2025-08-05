@@ -10,22 +10,19 @@ import com.kustaurant.kustaurant.rating.domain.model.RatingScore;
 import com.kustaurant.kustaurant.rating.domain.model.Tier;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@Slf4j
 class TierCalculationServiceTest {
+
     private TierCalculationService service;
-    private RatingPolicy policy;
     private LocalDateTime now;
 
     @BeforeEach
     void setUp() {
-        // tier 정책: 1~4 티어 각각 maxRatio 0.2, minScore 4.0,3.5,3.0,2.5
+        // 1~4 티어: maxRatio 0.2 / minScore 4.0, 3.5, 3.0, 2.5
         Map<Integer, TierLevel> levels = Map.of(
                 1, new TierLevel(4.0, 0.2),
                 2, new TierLevel(3.5, 0.2),
@@ -33,166 +30,153 @@ class TierCalculationServiceTest {
                 4, new TierLevel(2.5, 0.2)
         );
         TierPolicy tierPolicy = new TierPolicy(levels);
-        policy = new RatingPolicy(0, null, null, tierPolicy);
+        RatingPolicy policy = new RatingPolicy(0, null, null, tierPolicy);
+
         service = new TierCalculationService(policy);
         now = LocalDateTime.now();
     }
 
-    // helper factory
-    private static RatingScore score(int id, double score) {
-        return new RatingScore(id, score);
-    }
-
-    private static List<RatingScore> descendingScores(double... scores) {
-        List<RatingScore> list = new ArrayList<>();
-        for (int i = 0; i < scores.length; i++) {
-            list.add(new RatingScore(i + 1, scores[i]));
+    // 헬퍼 메서드
+    private List<RatingScore> scores(Object... tuples) {
+        // 가변인자 형태: (id, score, id, score, …)
+        List<RatingScore> list = new ArrayList<>(tuples.length / 2);
+        for (int i = 0; i < tuples.length; i += 2) {
+            list.add(new RatingScore((Integer) tuples[i], (Double) tuples[i + 1]));
         }
         return list;
     }
 
-    // convert to map restaurantId -> tier value (int)
-    private static Map<Integer, Integer> toTierMap(List<Rating> ratings) {
-        Map<Integer, Integer> m = new HashMap<>();
-        for (Rating r : ratings) {
-            m.put(r.restaurantId(), r.tier().getValue());
-        }
-        return m;
+    // 헬퍼 메서드
+    private void assertTiers(List<Rating> actual, Map<Integer, Tier> expected) {
+        assertThat(actual).hasSize(expected.size());
+        expected.forEach((id, tier) ->
+                assertThat(
+                        actual.stream()
+                                .filter(r -> r.restaurantId() == id)
+                                .findFirst()
+                                .orElseThrow()
+                                .tier()
+                )
+                        .as("restaurantId=%s", id)
+                        .isEqualTo(tier)
+        );
     }
 
     @Test
-    void basicDistribution_assignsTiersAccordingToQuotaAndThresholds() {
-        // 10 positive scores descending, no zeros
-        List<RatingScore> scores = List.of(
-                score(1, 5.0),
-                score(2, 4.8),
-                score(3, 4.6),
-                score(4, 4.4),
-                score(5, 4.2),
-                score(6, 4.0),
-                score(7, 3.8),
-                score(8, 3.6),
-                score(9, 3.4),
-                score(10, 3.2)
+    void 일반적인_티어_분포_상황() {
+        List<RatingScore> input = scores(
+                1, 4.6,
+                2, 4.4,   // Tier 1 (2개)
+                3, 4.1,
+                4, 3.7,   // Tier 2 (2개)
+                5, 3.4,
+                6, 3.2,   // Tier 3 (2개)
+                7, 2.9,
+                8, 2.6,   // Tier 4 (2개)
+                9, 2.4,
+                10, 2.1   //  Tier 5 (2개)
         );
 
-        List<Rating> ratings = service.calculate(new ArrayList<>(scores), now);
-        Map<Integer, Integer> tierMap = toTierMap(ratings);
-
-        // Quota: tierCount =10 -> each tier1..4 has ceil(10*0.2)=2
-        // Expected:
-        // tier1: ids 1,2
-        assertThat(tierMap.get(1)).isEqualTo(Tier.ONE.getValue());
-        assertThat(tierMap.get(2)).isEqualTo(Tier.ONE.getValue());
-        // tier2: ids 3,4
-        assertThat(tierMap.get(3)).isEqualTo(Tier.TWO.getValue());
-        assertThat(tierMap.get(4)).isEqualTo(Tier.TWO.getValue());
-        // tier3: ids 5,6
-        assertThat(tierMap.get(5)).isEqualTo(Tier.THREE.getValue());
-        assertThat(tierMap.get(6)).isEqualTo(Tier.THREE.getValue());
-        // tier4: ids 7,8
-        assertThat(tierMap.get(7)).isEqualTo(Tier.FOUR.getValue());
-        assertThat(tierMap.get(8)).isEqualTo(Tier.FOUR.getValue());
-        // rest -> tier5
-        assertThat(tierMap.get(9)).isEqualTo(Tier.FIVE.getValue());
-        assertThat(tierMap.get(10)).isEqualTo(Tier.FIVE.getValue());
-    }
-
-    @Test
-    void zeroScoreProducesNoneTier_andStopsTierCountEarly() {
-        // scores: some positives, then a 0, then more positives
-        List<RatingScore> scores = List.of(
-                score(1, 5.0),  // positive
-                score(2, 4.5),  // positive
-                score(3, 4.0),  // positive
-                score(4, 3.5),  // positive
-                score(5, 3.0),  // positive -> tierCount =5
-                score(6, 0.0),  // stops tierCount here
-                score(7, 4.9),  // this will be treated after 0
-                score(8, 3.0)
+        Map<Integer, Tier> expect = Map.of(
+                1, Tier.ONE, 2, Tier.ONE,
+                3, Tier.TWO, 4, Tier.TWO,
+                5, Tier.THREE, 6, Tier.THREE,
+                7, Tier.FOUR, 8, Tier.FOUR,
+                9, Tier.FIVE, 10, Tier.FIVE
         );
 
-        List<Rating> ratings = service.calculate(new ArrayList<>(scores), now);
-        Map<Integer, Integer> tierMap = toTierMap(ratings);
-
-        // tierCount = 5 => quotas each tier1..4 = ceil(5*0.2)=1
-        // positive before zero: ids 1..5 get:
-        // tier1: id1 (5.0)
-        assertThat(tierMap.get(1)).isEqualTo(Tier.ONE.getValue());
-        // tier2: next highest (4.5) id2
-        assertThat(tierMap.get(2)).isEqualTo(Tier.TWO.getValue());
-        // tier3: id3 (4.0)
-        assertThat(tierMap.get(3)).isEqualTo(Tier.THREE.getValue());
-        // tier4: id4 (3.5)
-        assertThat(tierMap.get(4)).isEqualTo(Tier.FOUR.getValue());
-        // remaining positive before zero id5 -> since tier1..4 quotas filled, goes to tier5
-        assertThat(tierMap.get(5)).isEqualTo(Tier.FIVE.getValue());
-
-        // zero score -> NONE
-        assertThat(tierMap.get(6)).isEqualTo(Tier.NONE.getValue());
-
-        // after zero appears, tierCount stopped; remaining ones (7,8) should both end up in tier5
-        assertThat(tierMap.get(7)).isEqualTo(Tier.FIVE.getValue());
-        assertThat(tierMap.get(8)).isEqualTo(Tier.FIVE.getValue());
+        assertTiers(service.calculate(input, now), expect);
     }
 
     @Test
-    void tieAtBoundary_movesThirdSameScoreToNextTier() {
-        // Three same high scores; quota for tier1 is 2 (assume total positives=5 including some others)
-        List<RatingScore> scores = List.of(
-                score(1, 5.0),
-                score(2, 5.0),
-                score(3, 5.0),
-                score(4, 3.9),
-                score(5, 3.7)
+    void 점수_0점인_경우는_Tier_가_없음() {
+        List<RatingScore> input = scores(
+                11, 4.2,
+                12, 0.0,   // NONE
+                13, 3.8,
+                14, 0.0,   // NONE
+                15, 2.9
         );
-        // total positive =5 => each tier1..4 quota=1
-        // After applying algorithm:
-        // tier1: id1 (5.0)
-        // tier2: id2 (5.0) because quota for tier1=1 reached
-        // tier3: id3 (5.0)
-        // tier4: id4 (3.9) because it meets threshold 2.5 etc.
-        // remaining (id5) -> tier5
 
-        List<Rating> ratings = service.calculate(new ArrayList<>(scores), now);
-        Map<Integer, Integer> tierMap = toTierMap(ratings);
+        Map<Integer, Tier> expect = Map.of(
+                11, Tier.ONE,
+                12, Tier.NONE,
+                13, Tier.TWO,
+                14, Tier.NONE,
+                15, Tier.FOUR
+        );
 
-        assertThat(tierMap.get(1)).isEqualTo(Tier.ONE.getValue());
-        assertThat(tierMap.get(2)).isEqualTo(Tier.TWO.getValue());
-        assertThat(tierMap.get(3)).isEqualTo(Tier.THREE.getValue());
-        assertThat(tierMap.get(4)).isEqualTo(Tier.FOUR.getValue());
-        assertThat(tierMap.get(5)).isEqualTo(Tier.FIVE.getValue());
+        assertTiers(service.calculate(input, now), expect);
     }
 
     @Test
-    void allZeroFirst_thenAllPositive_goToTierFiveExceptZero() {
-        List<RatingScore> scores = new ArrayList<>();
-        scores.add(score(1, 0.0)); // zero at top
-        // positives follow
-        for (int i = 2; i <= 6; i++) {
-            scores.add(score(i, 4.5 - 0.1 * (i - 2))); // descending positives
-        }
+    void 점수_조건에_충족하지_않아서_티어1이_없는_경우() {
+        List<RatingScore> input = scores(
+                21, 3.9,
+                22, 3.8,
+                23, 3.6,
+                24, 3.5,
+                25, 3.2,
+                26, 3.0,
+                27, 2.9
+        ); // 7개 → 각 티어 최대 2개
 
-        List<Rating> ratings = service.calculate(new ArrayList<>(scores), now);
+        Map<Integer, Tier> expect = Map.of(
+                21, Tier.TWO, 22, Tier.TWO,
+                23, Tier.THREE, 24, Tier.THREE,
+                25, Tier.FOUR, 26, Tier.FOUR,
+                27, Tier.FIVE
+        );
+
+        assertTiers(service.calculate(input, now), expect);
+    }
+
+    @Test
+    void 점수_조건에_충족하지_않아서_중간_티어가_없고_티어_비율을_넘었는데_동점인_경우() {
+        List<RatingScore> input = scores(
+                21, 4.0,
+                22, 3.1,
+                23, 3.1,
+                24, 3.1,
+                25, 3.1,
+                26, 3.0,
+                27, 2.8,
+                28, 2.8,
+                29, 2.8,
+                30, 2.6
+        );
+
+        Map<Integer, Tier> expect = Map.of(
+                21, Tier.ONE, 22, Tier.THREE,
+                23, Tier.THREE, 24, Tier.THREE,
+                25, Tier.THREE, 26, Tier.FOUR,
+                27, Tier.FOUR, 28, Tier.FOUR,
+                29, Tier.FOUR, 30, Tier.FIVE
+        );
+
+        List<Rating> ratings = service.calculate(input, now);
         System.out.println(ratings);
-        Map<Integer, Integer> tierMap = toTierMap(ratings);
-
-        // first is NONE
-        assertThat(tierMap.get(1)).isEqualTo(Tier.NONE.getValue());
-        // Because tierCount=0 (first is zero), all positives must fall into tier5
-        for (int i = 2; i <= 6; i++) {
-            assertThat(tierMap.get(i)).isEqualTo(Tier.FIVE.getValue());
-        }
+        assertTiers(ratings, expect);
     }
 
     @Test
-    void belowAnyThresholdButPositive_goesToTierFive() {
-        // Single score below all thresholds (e.g., 1.0)
-        List<RatingScore> scores = List.of(score(1, 1.0));
+    void 중간에_티어를_많이_건너뛴_경우() {
+        List<RatingScore> input = scores(
+                31, 4.7,
+                32, 2.3,
+                33, 2.2,
+                34, 0.0,
+                35, 2.1
+        );
 
-        List<Rating> ratings = service.calculate(new ArrayList<>(scores), now);
-        Map<Integer, Integer> tierMap = toTierMap(ratings);
+        Map<Integer, Tier> expect = Map.of(
+                31, Tier.ONE,
+                32, Tier.FIVE,
+                33, Tier.FIVE,
+                34, Tier.NONE,
+                35, Tier.FIVE
+        );
 
-        assertThat(tierMap.get(1)).isEqualTo(Tier.FIVE.getValue());
+        assertTiers(service.calculate(input, now), expect);
     }
 }

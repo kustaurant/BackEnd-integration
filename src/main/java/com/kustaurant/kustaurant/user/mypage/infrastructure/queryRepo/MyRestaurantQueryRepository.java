@@ -33,7 +33,7 @@ public class MyRestaurantQueryRepository {
                 ))
                 .from(favorite)
                 .join(restaurant).on(favorite.restaurantId.eq(restaurant.restaurantId))
-                .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
+                .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurant.restaurantId))
                 .where(
                         favorite.userId.eq(userId),
                         favorite.status.eq("ACTIVE")

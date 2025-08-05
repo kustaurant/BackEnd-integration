@@ -19,11 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RatingOrchestrationService {
 
-    private final int CHUNK_SIZE = 50;
+    private final int CHUNK_SIZE = 100;
 
     private final RatingRestaurantRepository ratingRestaurantRepository;
     private final RatingEvaluationRepository ratingEvaluationRepository;
@@ -42,9 +43,11 @@ public class RatingOrchestrationService {
             List<Integer> chunkIds = ids.subList(i, Math.min(i + CHUNK_SIZE, ids.size()));
             List<RatingScore> chunkScores = calculateScores(chunkIds, now);
             scores.addAll(chunkScores);
+            log.info("{}~{} 점수 계산 완료", i + 1, i + chunkIds.size());
         }
         // 티어 계산
         List<Rating> ratings = tierCalculationService.calculate(scores, now);
+        log.info("티어 계산 완료");
         // 저장
         ratingRepository.saveAll(ratings);
     }

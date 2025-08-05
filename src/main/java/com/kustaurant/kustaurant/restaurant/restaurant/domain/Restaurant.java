@@ -26,6 +26,4 @@ public class Restaurant {
     private LocalDateTime updatedAt;
 
     private Integer visitCount;
-    private Integer restaurantEvaluationCount;
-    private Double restaurantScoreSum;
 }

@@ -26,6 +26,10 @@ public class ScoreCalculationService {
             double globalAvg,
             LocalDateTime date
     ) {
+        if (evaluations == null) {
+            evaluations = List.of();
+        }
+
         // 평가 개수 미달인 경우 0점 처리
         if (stats.evaluationCount() < MIN_EVALUATION_COUNT) {
             return new RatingScore(stats.restaurantId(), 0);
@@ -42,6 +46,9 @@ public class ScoreCalculationService {
         }
 
         // 누적 평가 점수를 가중 평균
+        if (weightSum == 0) {
+            return new RatingScore(stats.restaurantId(), 0);
+        }
         double coreScore = numerator / weightSum;
 
         // 식당의 인기도를 구함

@@ -26,7 +26,7 @@ public record RestaurantStats(
         double popularity = (weight.visits() * (1 + Math.tanh(Math.log1p(visitCount) / scale.visit()))
                 + weight.favorites() * (1 + Math.tanh(Math.log1p(favoriteCount) / scale.favorite()))
                 + weight.evaluations() * (1 + Math.tanh(Math.log1p(evaluationCount) / scale.evaluation())))
-                / 3;
+                / (weight.visits() + weight.favorites() + weight.evaluations());
 
         return score * popularity;
     }

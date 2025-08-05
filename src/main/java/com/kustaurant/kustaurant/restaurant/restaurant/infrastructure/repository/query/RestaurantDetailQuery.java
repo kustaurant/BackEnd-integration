@@ -54,7 +54,7 @@ public class RestaurantDetailQuery {
                                 new QRestaurantDetail(
                                         restaurantEntity.restaurantId,
                                         restaurantEntity.restaurantImgUrl,
-                                        ratingEntity.tier,
+                                        ratingEntity.tier.coalesce(0),
                                         restaurantEntity.restaurantCuisine,
                                         restaurantEntity.restaurantPosition,
                                         restaurantEntity.restaurantName,
@@ -63,7 +63,7 @@ public class RestaurantDetailQuery {
                                         set(situationEntity.situationName),
                                         restaurantEntity.partnershipInfo,
                                         Expressions.constant(getEvaluationCount(restaurantId)),
-                                        ratingEntity.score,
+                                        ratingEntity.score.coalesce(0.0),
                                         evaluationEntity.isNotNull(),
                                         restaurantFavoriteEntity.isNotNull(),
                                         Expressions.constant(getFavoriteCount(restaurantId)),

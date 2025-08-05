@@ -13,6 +13,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -45,7 +46,7 @@ public class RatingEvaluationRepositoryImpl implements RatingEvaluationRepositor
                         existString(evaluationEntity.body),
                         existSituation(),
                         existString(evaluationEntity.imgUrl),
-                        Expressions.constant(0L),
+                        reactionScore(),
                         userAvgScore(),
                         userEvalCount()
                         ))
@@ -84,16 +85,32 @@ public class RatingEvaluationRepositoryImpl implements RatingEvaluationRepositor
     }
 
     private Expression<Long> reactionScore() {
-        return JPAExpressions.select(
-                        new CaseBuilder()
-                                .when(evalUserReactionEntity.reaction.eq(ReactionType.LIKE)).then(1L)
-                                .when(evalUserReactionEntity.reaction.eq(ReactionType.DISLIKE)).then(-1L)
-                                .otherwise(0L)
-                                .sumLong()
-                                .coalesce(0L)
-                )
-                .from(evalUserReactionEntity)
-                .where(evalUserReactionEntity.evaluationId.eq(evaluationEntity.id));
+        // 1) 좋아요 개수
+        NumberExpression<Long> likeCnt = Expressions.numberTemplate(
+                Long.class,
+                "({0})",
+                JPAExpressions
+                        .select(evalUserReactionEntity.count())
+                        .from(evalUserReactionEntity)
+                        .where(
+                                evalUserReactionEntity.evaluationId.eq(evaluationEntity.id)
+                                        .and(evalUserReactionEntity.reaction.eq(ReactionType.LIKE))
+                        )
+        );
+        // 2) 싫어요 개수
+        NumberExpression<Long> dislikeCnt = Expressions.numberTemplate(
+                Long.class,
+                "({0})",
+                JPAExpressions
+                        .select(evalUserReactionEntity.count())
+                        .from(evalUserReactionEntity)
+                        .where(
+                                evalUserReactionEntity.evaluationId.eq(evaluationEntity.id)
+                                        .and(evalUserReactionEntity.reaction.eq(ReactionType.DISLIKE))
+                        )
+        );
+        // 좋아요 개수 - 싫어요 개수
+        return likeCnt.subtract(dislikeCnt).coalesce(0L);
     }
 
     private BooleanExpression existSituation() {
