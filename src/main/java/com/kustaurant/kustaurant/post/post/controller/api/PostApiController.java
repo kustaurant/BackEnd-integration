@@ -5,8 +5,8 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;
 import com.kustaurant.kustaurant.global.exception.ErrorResponse;
 import com.kustaurant.kustaurant.post.post.controller.request.PostRequest;
-import com.kustaurant.kustaurant.post.post.controller.response.ImageUplodeDTO;
-import com.kustaurant.kustaurant.post.post.controller.response.PostDTO;
+import com.kustaurant.kustaurant.post.post.controller.response.ImageUplodeResponse;
+import com.kustaurant.kustaurant.post.community.controller.response.PostDetailResponse;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.service.S3Service;
 import com.kustaurant.kustaurant.post.post.service.PostService;
@@ -41,17 +41,17 @@ public class PostApiController {
             "   - category: 필수.\n\n" +
             "   - content: 필수.\n\n")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글이 생성되었습니다", content = @Content(schema = @Schema(implementation = PostDTO.class))),
+            @ApiResponse(responseCode = "200", description = "게시글이 생성되었습니다", content = @Content(schema = @Schema(implementation = PostDetailResponse.class))),
             @ApiResponse(responseCode = "500", description = "게시글 생성에 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<PostDTO> postCreate(
+    public ResponseEntity<PostDetailResponse> postCreate(
             @RequestBody PostRequest req,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         Post post = postService.create(req, user.id());
         User writer = userService.getUserById(user.id());
         URI location = URI.create("/posts/" + post.getId());
-        return ResponseEntity.created(location).body(PostDTO.from(post,writer));
+        return ResponseEntity.created(location).body(PostDetailResponse.from(post,writer));
     }
 
     // 2. 게시글 수정
@@ -95,8 +95,8 @@ public class PostApiController {
     // 4. 이미지 업로드
     @PostMapping("/api/v1/auth/community/posts/image")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이미지 업로드가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ImageUplodeDTO.class))),
-            @ApiResponse(responseCode = "400", description = "파일 이미지가 없거나 유효하지 않습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "이미지 업로드가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ImageUplodeResponse.class))),
+            @ApiResponse(responseCode = "400", description = "파일 이미지가 없거나 유효하지 않습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @Operation(summary = "게시글 작성 중 이미지 업로드", description = "게시글 작성화면에서 이미지를 업로드합니다")
     public ResponseEntity<?> imageUpload(
@@ -104,7 +104,7 @@ public class PostApiController {
     ) {
         try {
             String imageUrl = S3Service.storeImage(imageFile);
-            return ResponseEntity.ok(new ImageUplodeDTO(imageUrl));
+            return ResponseEntity.ok(new ImageUplodeResponse(imageUrl));
         } catch (Exception e) {
             throw new IllegalArgumentException("파일 이미지가 유효하지 않습니다");
         }

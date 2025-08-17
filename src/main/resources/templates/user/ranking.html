@@ -40,6 +40,49 @@
     <link rel="stylesheet" href="/css/library/responsive.min.css">
     <link rel="stylesheet" href="/css/library/restaurant.css">
     <link rel="stylesheet" type="text/css" href="/css/ranking-style.css">
+    <style>
+        .ranking-sort-section {
+            padding: 20px 0;
+        }
+        
+        .sort-buttons {
+            display: inline-flex;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            overflow: hidden;
+            background-color: #f8f9fa;
+        }
+        
+        .sort-btn {
+            padding: 12px 24px;
+            border: none;
+            background-color: transparent;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-right: 1px solid #ddd;
+        }
+        
+        .sort-btn:last-child {
+            border-right: none;
+        }
+        
+        .sort-btn:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        
+        .sort-btn.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+        
+        .sort-btn.active:hover {
+            background-color: #0056b3;
+        }
+    </style>
     <!-- 파비콘 -->
     <link rel="icon" type="image/x-icon" href="/img/favicon.png">
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
@@ -73,6 +116,20 @@
 </section>
 
     <div class="ranking-container">
+        <!-- 정렬 옵션 선택 -->
+        <div class="ranking-sort-section" style="text-align: center; margin-bottom: 30px;">
+            <div class="sort-buttons">
+                <button type="button" class="sort-btn" data-sort="CUMULATIVE" 
+                        th:classappend="${sort == T(com.kustaurant.kustaurant.user.rank.domain.RankingSortOption).CUMULATIVE ? ' active' : ''}">
+                    누적순
+                </button>
+                <button type="button" class="sort-btn" data-sort="SEASONAL"
+                        th:classappend="${sort == T(com.kustaurant.kustaurant.user.rank.domain.RankingSortOption).SEASONAL ? ' active' : ''}">
+                    시즌별
+                </button>
+            </div>
+        </div>
+        
         <div th:if="${myRank != null}" class="user-description-outer">
             <div class="user-description">
                 <div class="green-rectangle"></div>
@@ -98,42 +155,57 @@
             </thead>
             <tbody id="tierTableBody">
                 <tr th:if="${myRank != null}" class="my-rank">
-                    <td class="td-rank" th:text="${myRank.getRank()}"></td>
+                    <td class="td-rank" th:text="${myRank.rank()}"></td>
                     <td class="td-img">
                         <div>
-                            <img th:src="${myRank.getUser().getRankImg()}" alt="소">
+                            <img th:src="${myRank.iconUrl()}" alt="소">
                         </div>
                     </td>
-                    <td th:text="${myRank.getUser().getUserNickname()}"></td>
+                    <td th:text="${myRank.nickname()}"></td>
                     <td class="td-eval-count">
                         <div>
-                            <span th:text="${myRank.getUser().getEvaluationList().size()} + '개'"></span>
+                            <span th:text="${myRank.evaluationCount()} + '개'"></span>
                         </div>
                     </td>
                 </tr>
                 <tr th:each="userRank :${rankList}"
-                    th:class="${userRank.getRank() == 1 ? 'rank-first' :
-                    (userRank.getRank() == 2 ? 'rank-second' :
-                    (userRank.getRank() == 3 ? 'rank-third' : ''))}">
-                    <td class="td-rank" th:text="${userRank.getRank()}"></td>
+                    th:class="${userRank.rank() == 1 ? 'rank-first' :
+                    (userRank.rank() == 2 ? 'rank-second' :
+                    (userRank.rank() == 3 ? 'rank-third' : ''))}">
+                    <td class="td-rank" th:text="${userRank.rank()}"></td>
                     <td class="td-img">
                         <div>
-                            <img th:src="${userRank.getUser().getRankImg()}" alt="소">
+                            <img th:src="${userRank.iconUrl()}" alt="소">
                         </div>
                     </td>
-                    <td th:if="${userRank.getUser().getUpdatedAt() == null}"
-                        th:text="${userRank.getUser().getNickname().substring(0,2)} + '****'"></td>
-                    <td th:if="${userRank.getUser().getUpdatedAt() != null}"
-                        th:text="${userRank.getUser().getNickname()} "></td>
+                    <td th:text="${userRank.nickname()}"></td>
                     <td class="td-eval-count">
                         <div>
-                            <span th:text="${userRank.getUser().getStats().getRatedRestCnt()} + '개'"></span>
+                            <span th:text="${userRank.evaluationCount()} + '개'"></span>
                         </div>
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
+    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 정렬 버튼 클릭 이벤트 처리
+            const sortButtons = document.querySelectorAll('.sort-btn');
+            sortButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const sortValue = this.getAttribute('data-sort');
+                    if (sortValue && (sortValue === 'CUMULATIVE' || sortValue === 'SEASONAL')) {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('sort', sortValue);
+                        window.location.href = url.toString();
+                    }
+                });
+            });
+        });
+    </script>
 
 <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
 <script type="text/javascript">

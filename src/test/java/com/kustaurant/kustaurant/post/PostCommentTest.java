@@ -23,8 +23,8 @@ class PostCommentTest {
         PostComment comment = PostComment.create(content, userId, postId);
 
         // Then
-        assertThat(comment.getCommentBody()).isEqualTo(content);
-        assertThat(comment.getUserId()).isEqualTo(userId);
+        assertThat(comment.getBody()).isEqualTo(content);
+        assertThat(comment.getWriterId()).isEqualTo(userId);
         assertThat(comment.getPostId()).isEqualTo(postId);
         assertThat(comment.getStatus()).isEqualTo(PostStatus.ACTIVE);
         assertThat(comment.getReplyIds()).isEmpty();
@@ -159,19 +159,19 @@ class PostCommentTest {
         LocalDateTime now = LocalDateTime.now();
         PostComment comment = PostComment.builder()
                 .id(100)
-                .commentBody("Test comment body")
+                .body("Test comment body")
                 .status(PostStatus.ACTIVE)
                 .createdAt(now)
                 .updatedAt(now)
-                .userId(999L)
+                .writerId(999L)
                 .postId(555)
                 .build();
 
         // Then
         assertThat(comment.getId()).isEqualTo(100);
-        assertThat(comment.getCommentBody()).isEqualTo("Test comment body");
+        assertThat(comment.getBody()).isEqualTo("Test comment body");
         assertThat(comment.getStatus()).isEqualTo(PostStatus.ACTIVE);
-        assertThat(comment.getUserId()).isEqualTo(999L);
+        assertThat(comment.getWriterId()).isEqualTo(999L);
         assertThat(comment.getPostId()).isEqualTo(555);
         assertThat(comment.getCreatedAt()).isEqualTo(now);
         assertThat(comment.getUpdatedAt()).isEqualTo(now);

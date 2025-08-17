@@ -1,0 +1,101 @@
+package com.kustaurant.kustaurant.post.comment.infrastructure;
+
+import static com.kustaurant.kustaurant.global.exception.ErrorCode.COMMENT_NOT_FOUND;
+
+import com.kustaurant.kustaurant.post.comment.domain.PostComment;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.PostCommentEntity;
+import com.kustaurant.kustaurant.post.comment.infrastructure.jpa.PostCommentJpaRepository;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@RequiredArgsConstructor
+@Repository
+@Slf4j
+public class PostCommentRepositoryImpl implements PostCommentRepository {
+    private final PostCommentJpaRepository jpa;
+
+    @Override
+    public List<PostComment> findActiveByUserId(Long userId) {
+        return jpa.findActiveByUserIdOrderByCreatedAtDesc(userId).stream().map(PostCommentEntity::toModel).toList();
+    }
+
+
+    @Override
+    public Optional<PostComment> findById(Integer commentId) {
+        return jpa.findById(commentId).map(PostCommentEntity::toModel);
+    }
+
+    @Override
+    public PostComment save(PostComment comment) {
+        // 신규 댓글 (id가 null)
+        if (comment.getId() == null) {
+            PostCommentEntity entity = PostCommentEntity.from(comment);
+            jpa.save(entity);
+            return entity.toModel();
+        }
+
+        // 기존 댓글 수정
+        PostCommentEntity entity = jpa.findById(comment.getId())
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, comment.getId(), "댓글"));
+
+        // 댓글 내용과 상태 업데이트
+        PostCommentEntity updatedEntity = PostCommentEntity.builder()
+                .commentBody(comment.getBody())
+                .status(comment.getStatus())
+                .postId(entity.getPostId())
+                .parentCommentId(entity.getParentCommentId())
+                .userId(entity.getUserId())
+                .build();
+        updatedEntity = jpa.save(updatedEntity);
+        return updatedEntity.toModel();
+    }
+
+
+    @Override
+    public List<PostComment> findByParentCommentId(Integer parentCommentId) {
+        return jpa.findByParentCommentId(parentCommentId)
+                .stream()
+                .map(PostCommentEntity::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public long countActiveRepliesByParentCommentId(Integer parentCommentId) {
+        return jpa.countActiveRepliesByParentCommentId(parentCommentId);
+    }
+
+    @Override
+    public long countActiveRepliesByPostId(Integer postId) {
+        return jpa.countByPostId(postId);
+    }
+
+    @Override
+    public void delete(PostComment comment) {
+        PostCommentEntity entity = jpa.findById(comment.getId())
+                .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, comment.getId(), "댓글"));
+        jpa.delete(entity);
+    }
+
+    @Override
+    public List<PostComment> saveAll(List<PostComment> comments) {
+        List<PostCommentEntity> entities = comments.stream()
+                .map(PostCommentEntity::from)
+                .collect(Collectors.toList());
+        return jpa.saveAll(entities)
+                .stream()
+                .map(PostCommentEntity::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteByPostId(Integer postId) {
+        jpa.deleteByPostId(postId);
+    }
+}

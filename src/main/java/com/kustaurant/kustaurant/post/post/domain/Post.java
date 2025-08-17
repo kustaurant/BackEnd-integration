@@ -40,6 +40,7 @@ public class Post {
         if (!this.writerId.equals(userId))
             throw new NoDeleteAuthorityException();
     }
+
     public void ensureDeletable() {
         if (this.status == PostStatus.DELETED)
             throw new AlreadyDeletedException();

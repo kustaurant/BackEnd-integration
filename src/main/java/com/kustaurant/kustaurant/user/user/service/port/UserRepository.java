@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.user.user.service.port;
 
-import com.kustaurant.kustaurant.post.post.controller.response.UserDTO;
+import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
@@ -24,6 +24,6 @@ public interface UserRepository {
 
     int countByLoginApi(LoginApi apple);
 
-    Map<Long, UserDTO> getUserDTOMapByIds(List<Long> ids);
+    Map<Long, UserSummary> getUserDTOMapByIds(List<Long> ids);
     List<User> findByIdIn(List<Long> ids);
 }

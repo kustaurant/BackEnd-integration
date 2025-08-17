@@ -6,7 +6,6 @@ import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.mypage.infrastructure.UserStatsEntity;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
@@ -15,8 +14,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
-
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
@@ -53,14 +51,9 @@ public class UserEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private UserRole role;
 
-    @OneToOne(cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = LAZY)
+    @OneToOne(mappedBy = "user", cascade = ALL, orphanRemoval = true, fetch = LAZY)
     @JoinColumn(name = "user_id")
     private UserStatsEntity stats;
-
-    @Transient
-    private String rankImg;
 
     @Builder
     public UserEntity(
@@ -108,8 +101,6 @@ public class UserEntity extends BaseTimeEntity {
                 .createdAt(getCreatedAt())
                 .status(status)
                 .stats(stats.toModel())
-                .rankImg(UserIconResolver.resolve(stats.getRatedRestCnt()))
                 .build();
     }
-
 }

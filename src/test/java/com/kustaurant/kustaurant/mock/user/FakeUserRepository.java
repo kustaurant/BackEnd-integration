@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.mock.user;
 
-import com.kustaurant.kustaurant.post.post.controller.response.UserDTO;
+import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
@@ -84,7 +84,7 @@ public class FakeUserRepository implements UserRepository {
     }
 
     @Override
-    public Map<Long, UserDTO> getUserDTOMapByIds(List<Long> ids) {
+    public Map<Long, UserSummary> getUserDTOMapByIds(List<Long> ids) {
         return Map.of();
     }
 

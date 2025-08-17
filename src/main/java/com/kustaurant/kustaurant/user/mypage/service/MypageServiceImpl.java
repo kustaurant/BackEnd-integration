@@ -7,8 +7,7 @@ import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
-import com.kustaurant.kustaurant.post.post.infrastructure.projection.PostDTOProjection;
-import com.kustaurant.kustaurant.post.post.service.port.PostQueryRepository;
+import com.kustaurant.kustaurant.post.post.infrastructure.projection.OPostDTOProjection;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteRepository;
@@ -37,7 +36,6 @@ public class MypageServiceImpl implements MypageService {
     private final PostRepository postRepository;
     private final PostCommentRepository postCommentRepository;
     private final PostScrapRepository postScrapRepository;
-    private final PostQueryRepository postQueryDAO;
 
     public List<RestaurantFavorite> getRestaurantFavorites(Long userId) {
         return restaurantFavoriteRepository.findSortedFavoritesByUserId(userId);
@@ -75,7 +73,7 @@ public class MypageServiceImpl implements MypageService {
         return postComments.stream()
                 .map(comment -> new PostCommentView(
                         comment.getId(),
-                        comment.getCommentBody(),
+                        comment.getBody(),
                         0,
                         TimeAgoUtil.toKor(comment.getCreatedAt()),
                         postIdToTitle.getOrDefault(comment.getPostId(), "알 수 없음"),
@@ -91,7 +89,7 @@ public class MypageServiceImpl implements MypageService {
                 .toList();
     }
 
-    private ScrappedPostView toScrapView(PostDTOProjection p) {
+    private ScrappedPostView toScrapView(OPostDTOProjection p) {
         return ScrappedPostView.builder()
                 .postId(p.postId())
                 .title(p.postTitle())

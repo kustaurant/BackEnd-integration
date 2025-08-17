@@ -3,16 +3,13 @@ package com.kustaurant.kustaurant.post.post.infrastructure.entity;
 import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@AllArgsConstructor
 @Table(name = "post_photoes_tbl")
 public class PostPhotoEntity {
     @Id
@@ -27,10 +24,6 @@ public class PostPhotoEntity {
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(20)")
     private PostStatus status;
-
-    public PostPhotoEntity() {
-
-    }
 
     public PostPhoto toDomain() {
         return new PostPhoto(

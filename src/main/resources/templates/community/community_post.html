@@ -58,7 +58,13 @@
     <script type="text/javascript" src="/js/library/jquery.js"></script>
     <script type="text/javascript" src="/js/library/vendors.min.js"></script>
     <script type="text/javascript" src="/js/library/main.js"></script>
-    <script src="/js/community/communityPostScript.js"></script>
+    <!-- Community modules -->
+    <script src="/js/community/utils.js"></script>
+    <script src="/js/community/postReactions.js"></script>
+    <script src="/js/community/commentManager.js"></script>
+    <script src="/js/community/commentReactions.js"></script>
+    <script src="/js/community/modalManager.js"></script>
+    <script src="/js/community/communityPost.js"></script>
 
 </head>
 <body>
@@ -175,18 +181,17 @@
         <div class="comment-bar"></div>
         <div class="comment-write">
             <div>
-                <form class="comment-form" action="/api/comment/create" method="post">
-                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
-                    <textarea name="content" class="comment-content" maxlength="300"
+                <div class="comment-form">
+                    <textarea class="comment-content" maxlength="300"
                               placeholder="타인의 권리를 침해하거나 명예를 훼손하는 게시물은 제재를 받을 수 있습니다."></textarea>
                     <div class="under-content">
                         <div>
                         </div>
-                        <button type="submit">
+                        <button type="button" class="comment-submit-btn">
                             작성
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
 
         </div>
@@ -208,7 +213,7 @@
                                     <img th:if="${comment.isLiked}" src="/img/community/up-green.png">
                                     <img th:unless="${comment.isLiked}" src="/img/community/up.png">
                                 </button>
-                                <span class="totalLikeCount" th:text="${comment.likeCount}"></span>
+                                <span class="totalLikeCount" th:text="${comment.netLikeCount}"></span>
                                 <button class="comment-down" type="button" th:data-id="${comment.commentId}">
                                     <img th:if="${comment.isDisliked}" src="/img/community/down-red.png">
                                     <img th:unless="${comment.isDisliked}" src="/img/community/down.png">
@@ -259,7 +264,7 @@
                                                 <img th:if="${reply.isLiked}" src="/img/community/up-green.png">
                                                 <img th:unless="${reply.isLiked}" src="/img/community/up.png">
                                             </button>
-                                            <span class="totalLikeCount" th:text="${reply.likeCount}"></span>
+                                            <span class="totalLikeCount" th:text="${reply.netLikeCount}"></span>
                                             <button class="comment-down" type="button" th:data-id="${reply.commentId}">
                                                 <img th:if="${reply.isDisliked}" src="/img/community/down-red.png">
                                                 <img th:unless="${reply.isDisliked}" src="/img/community/down.png">

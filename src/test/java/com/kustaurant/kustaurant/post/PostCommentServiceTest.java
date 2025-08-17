@@ -14,7 +14,7 @@ import com.kustaurant.kustaurant.post.post.service.port.PostQueryRepository;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.post.post.service.PostQueryService;
+import com.kustaurant.kustaurant.post.post.service.OPostQueryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ class PostCommentServiceTest {
     private PostQueryRepository postQueryDAO;
     private PostCommentLikeJpaRepository likeRepository;
     private PostCommentDislikeJpaRepository dislikeRepository;
-    private PostQueryService postQueryService;
+    private OPostQueryService postQueryService;
     private UserRepository userRepository;
     private PostCommentService commentService;
     private UserService userService;
@@ -44,7 +44,7 @@ class PostCommentServiceTest {
         postQueryDAO = mock(PostQueryRepository.class);
         likeRepository = mock(PostCommentLikeJpaRepository.class);
         dislikeRepository = mock(PostCommentDislikeJpaRepository.class);
-        postQueryService = mock(PostQueryService.class);
+        postQueryService = mock(OPostQueryService.class);
         userRepository = mock(UserRepository.class);
         userService = mock(UserService.class);
         postCommentDislikeRepository = mock(PostCommentDislikeRepository.class);
@@ -65,7 +65,7 @@ class PostCommentServiceTest {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getCommentBody()).isEqualTo("content");
+        assertThat(result.getBody()).isEqualTo("content");
     }
 
     @Test
@@ -143,7 +143,7 @@ class PostCommentServiceTest {
 
 
         // When
-        int deletedCount = commentService.deleteComment(commentId);
+        int deletedCount = commentService.delete(commentId);
 
         // Then
         assertThat(deletedCount).isEqualTo(3);

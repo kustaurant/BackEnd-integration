@@ -8,13 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ScrapToggleResponse {
-    public ScrapToggleResponse(Integer scrapCount, ScrapStatus status) {
-        this.scrapCount = scrapCount;
+    public ScrapToggleResponse(Integer postScrapCount, ScrapStatus status) {
+        this.postScrapCount = postScrapCount;
         this.status = status;
     }
 
     @Schema(description = "스크랩 수", example = "10")
-    Integer scrapCount;
+    Integer postScrapCount;
 
     @Schema(description = "현재 상태", example = "SCRAPPED")
     ScrapStatus status;

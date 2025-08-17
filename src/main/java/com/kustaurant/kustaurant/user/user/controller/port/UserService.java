@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.user.user.controller.port;
 
-import com.kustaurant.kustaurant.post.post.controller.response.UserDTO;
+import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.user.user.domain.User;
 
 import java.util.List;
@@ -11,5 +11,5 @@ public interface UserService {
     User create(User user);
     User update(User user);
 
-    Map<Long, UserDTO> getUserDTOsByIds(List<Long> userIds);
+    Map<Long, UserSummary> getUserDTOsByIds(List<Long> userIds);
     }

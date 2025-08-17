@@ -7,10 +7,7 @@ import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.jpa.PostJpaRepository;
-import com.kustaurant.kustaurant.post.post.infrastructure.jpa.PostLikeJpaRepository;
-import com.kustaurant.kustaurant.post.post.infrastructure.jpa.PostDislikeJpaRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.user.user.infrastructure.UserJpaRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,9 +27,6 @@ import jakarta.persistence.criteria.Predicate;
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepository {
     private final PostJpaRepository postJpaRepository;
-    private final PostLikeJpaRepository postLikeJpaRepository;
-    private final PostDislikeJpaRepository postDislikeJpaRepository;
-    private final UserJpaRepository userJpaRepository;
 
     @Override
     public List<Post> findAllById(List<Integer> ids) {

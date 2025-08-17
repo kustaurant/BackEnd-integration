@@ -259,11 +259,11 @@ class MypageApiServiceIT {
         // g
         PostRequest req1 = new PostRequest("테스트게시글1", PostCategory.FREE, "테스트내용1");
         Post post1 = postService.create(req1, user2.getId());
-        postCommentService.createComment("게시글1-댓글1",post1.getId(),null,user1.getId());
+        postCommentService.create("게시글1-댓글1",post1.getId(),null,user1.getId());
 
         PostRequest req2 = new PostRequest("테스트게시글2", PostCategory.SUGGESTION, "테스트내용2");
         Post post2 = postService.create(req2, user2.getId());
-        postCommentService.createComment("게시글2-댓글1",post2.getId(),null,user1.getId());
+        postCommentService.create("게시글2-댓글1",post2.getId(),null,user1.getId());
 //        postCommentService.createComment("게시글2-댓글1",post1.getId(),null,user2.getId());
 //        postCommentService.createComment("게시글2-댓글1-대댓글1",post1.getId(),null,user1.getId());
         // w

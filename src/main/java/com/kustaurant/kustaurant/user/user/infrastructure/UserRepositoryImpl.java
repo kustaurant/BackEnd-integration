@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.user.user.infrastructure;
 
 import com.kustaurant.kustaurant.global.exception.exception.user.UserNotFoundException;
-import com.kustaurant.kustaurant.post.post.controller.response.UserDTO;
+import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
@@ -75,11 +75,11 @@ public class UserRepositoryImpl implements UserRepository {
 
 
     @Override
-    public Map<Long, UserDTO> getUserDTOMapByIds(List<Long> ids) {
+    public Map<Long, UserSummary> getUserDTOMapByIds(List<Long> ids) {
         return jpaRepo.findAllById(ids).stream()
                 .collect(Collectors.toMap(
                         UserEntity::getId,
-                        e->UserDTO.from(e.toModel()),
+                        e-> UserSummary.from(e.toModel()),
                         (a,b)->a,
                         LinkedHashMap::new
                 ));

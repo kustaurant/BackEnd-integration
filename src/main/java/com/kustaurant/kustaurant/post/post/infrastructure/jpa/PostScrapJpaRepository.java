@@ -23,14 +23,4 @@ public interface PostScrapJpaRepository extends JpaRepository<PostScrapEntity, I
     Optional<PostScrapEntity> findByUserIdAndPostId(Long userId, Integer postId);
     
     int countByPostId(Integer postId);
-
-//    @Query("""
-//        select ps
-//          from PostScrapEntity ps
-//          join fetch ps.post p
-//         where ps.userId = :userId
-//           and p.status     = 'ACTIVE'
-//         order by ps.createdAt desc
-//    """)
-//    List<PostScrapEntity> findWithPostByUserId(@Param("userId") Long userId);
 }

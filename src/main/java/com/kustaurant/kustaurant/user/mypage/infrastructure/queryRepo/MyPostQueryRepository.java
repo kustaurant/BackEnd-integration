@@ -1,9 +1,7 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
 import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentEntity;
-import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentLikeEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostLikeEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostPhotoEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostScrapEntity;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostCommentResponse;

@@ -1,9 +1,12 @@
 package com.kustaurant.kustaurant.post.post.service;
 
+import com.kustaurant.kustaurant.post.comment.infrastructure.jpa.PostCommentReactionRepository;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.post.controller.request.PostRequest;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
+import com.kustaurant.kustaurant.post.post.infrastructure.PostReactionRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
@@ -25,6 +28,9 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostScrapRepository postScrapRepository;
     private final PostPhotoRepository postPhotoRepository;
+    private final PostCommentRepository postCommentRepository;
+    private final PostReactionRepository postReactionRepository;
+    private final PostCommentReactionRepository postCommentReactionRepository;
 
     // 조회수 증가
     public void increaseVisitCount(Integer postId) {
@@ -80,9 +86,10 @@ public class PostService {
         post.ensureDeletable();
 
         postRepository.delete(post.getId());
-        // 댓글 삭제 (ID 기반으로 처리)
-        // 댓글들은 별도 서비스에서 처리하므로 여기서는 게시글만 삭제
         postScrapRepository.deleteByPostId(postId);
         postPhotoRepository.deleteByPostId(postId);
+        postReactionRepository.deleteByPostId(postId);
+        postCommentRepository.deleteByPostId(postId);
+        postCommentReactionRepository.deleteByPostId(postId);
     }
 }

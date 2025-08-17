@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.post.post.infrastructure.entity;
 
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="post_scraps_tbl")
 public class PostScrapEntity {
 

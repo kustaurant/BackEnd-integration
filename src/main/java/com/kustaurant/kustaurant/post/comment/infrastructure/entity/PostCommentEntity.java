@@ -3,7 +3,6 @@ package com.kustaurant.kustaurant.post.comment.infrastructure.entity;
 import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.domain.PostCommentStatus;
-import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
@@ -51,10 +50,10 @@ public class PostCommentEntity extends BaseTimeEntity {
 
     public static PostCommentEntity from(PostComment comment) {
         return PostCommentEntity.builder()
-                .commentBody(comment.getCommentBody())
+                .commentBody(comment.getBody())
                 .status(comment.getStatus())
                 .postId(comment.getPostId())
-                .userId(comment.getUserId())
+                .userId(comment.getWriterId())
                 .parentCommentId(comment.getParentCommentId())
                 .build();
     }
@@ -62,9 +61,9 @@ public class PostCommentEntity extends BaseTimeEntity {
     public PostComment toModel() {
         return PostComment.builder()
                 .id(this.commentId)
-                .commentBody(this.commentBody)
+                .body(this.commentBody)
                 .postId(this.postId)
-                .userId(this.userId)
+                .writerId(this.userId)
                 .status(this.status)
                 .createdAt(getCreatedAt())
                 .updatedAt(getUpdatedAt())
