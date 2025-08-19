@@ -16,10 +16,6 @@ public class UserStats {
     private int commCommentCnt;
     private int commSavedPostCnt;
 
-    public static UserStats createEmpty(Long id) {
-        return new UserStats(id, 0, 0, 0, 0, 0);
-    }
-
     public static UserStats from(UserStatsEntity e) {
         return new UserStats(
                 e.getId(),

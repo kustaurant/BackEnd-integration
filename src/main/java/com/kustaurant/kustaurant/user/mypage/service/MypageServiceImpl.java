@@ -1,28 +1,25 @@
 package com.kustaurant.kustaurant.user.mypage.service;
 
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
-import com.kustaurant.kustaurant.post.post.infrastructure.projection.OPostDTOProjection;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
+import com.kustaurant.kustaurant.user.mypage.controller.port.MypageApiService;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostCommentResponse;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostsResponse;
 import com.kustaurant.kustaurant.user.mypage.controller.response.web.MypageDataView;
-import com.kustaurant.kustaurant.user.mypage.controller.response.web.PostCommentView;
-import com.kustaurant.kustaurant.user.mypage.controller.response.web.ScrappedPostView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 웹 부분은 마이페이지가 모든 정보를 한번에 넘겨주도록 되어있음
@@ -34,8 +31,8 @@ public class MypageServiceImpl implements MypageService {
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
     private final EvaluationRepository evaluationRepository;
     private final PostRepository postRepository;
-    private final PostCommentRepository postCommentRepository;
-    private final PostScrapRepository postScrapRepository;
+
+    private final MypageApiService mypageApiService;
 
     public List<RestaurantFavorite> getRestaurantFavorites(Long userId) {
         return restaurantFavoriteRepository.findSortedFavoritesByUserId(userId);
@@ -49,63 +46,10 @@ public class MypageServiceImpl implements MypageService {
         return postRepository.findByUserId(userId);
     }
 
-
-    public List<PostComment> getActivePostComments(Long userId) {
-        return postCommentRepository.findActiveByUserId(userId);
-    }
-
-    public List<PostScrap> getPostScraps(Long userId) {
-        return postScrapRepository.findByUserId(userId);
-    }
-
-    private List<PostCommentView> convertCommentsToDTOs(List<PostComment> postComments) {
-        List<Integer> postIds = postComments.stream()
-                .map(PostComment::getPostId)
-                .distinct()
-                .toList();
-
-        Map<Integer, String> postIdToTitle = postRepository.findAllById(postIds).stream()
-                .collect(Collectors.toMap(
-                        Post::getId,
-                        Post::getTitle
-                ));
-
-        return postComments.stream()
-                .map(comment -> new PostCommentView(
-                        comment.getId(),
-                        comment.getBody(),
-                        0,
-                        TimeAgoUtil.toKor(comment.getCreatedAt()),
-                        postIdToTitle.getOrDefault(comment.getPostId(), "알 수 없음"),
-                        comment.getPostId()
-                ))
-                .toList();
-    }
-
-    private List<ScrappedPostView> getScrapViews(Long userId) {
-        return postQueryDAO.findMyScrappedPosts(userId)
-                .stream()
-                .map(this::toScrapView)
-                .toList();
-    }
-
-    private ScrappedPostView toScrapView(OPostDTOProjection p) {
-        return ScrappedPostView.builder()
-                .postId(p.postId())
-                .title(p.postTitle())
-                .category(p.postCategory())
-                .likeCount(p.getNetLikes())
-                .timeAgo(TimeAgoUtil.toKor(
-                        p.updatedAt() != null ? p.updatedAt()
-                                : p.createdAt()))
-                .build();
-    }
-
     @Override
     public MypageDataView getMypageData(Long userId) {
-        List<PostComment> comments = getActivePostComments(userId);
-        List<PostCommentView> postCommentDTO = convertCommentsToDTOs(comments);
-        List<ScrappedPostView> postScrapDTO = getScrapViews(userId);
+        List<MyPostCommentResponse> postCommentDTO = mypageApiService.getCommentedUserPosts(userId);
+        List<MyPostsResponse> postScrapDTO = mypageApiService.getScrappedUserPosts(userId);
 
         return MypageDataView.builder()
                 .restaurantFavoriteList(getRestaurantFavorites(userId))

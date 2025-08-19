@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name="post_scraps_tbl")
+@Table(name="post_scraps")
 public class PostScrapEntity {
 
     @Id
@@ -28,7 +28,7 @@ public class PostScrapEntity {
     private LocalDateTime createdAt;
 
     @Builder
-    private PostScrapEntity(
+    private PostScrapEntity (
             Integer scrapId,
             Long userId,
             Integer postId,

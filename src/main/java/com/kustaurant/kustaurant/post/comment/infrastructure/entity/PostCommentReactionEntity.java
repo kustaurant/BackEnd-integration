@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @IdClass(PostCommUserReactionId.class)
-@Table(name="post_comm_user_reaction")
+@Table(name="post_comment_reaction")
 public class PostCommentReactionEntity {
     @Id
-    @Column(name = "post_comm_id")
+    @Column(name = "post_comment_id")
     private Integer postCommentId;
 
     @Id

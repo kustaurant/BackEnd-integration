@@ -52,7 +52,6 @@ public class UserEntity extends BaseTimeEntity {
     private UserRole role;
 
     @OneToOne(mappedBy = "user", cascade = ALL, orphanRemoval = true, fetch = LAZY)
-    @JoinColumn(name = "user_id")
     private UserStatsEntity stats;
 
     @Builder

@@ -97,7 +97,7 @@ public class MypageApiServiceImpl implements MypageApiService {
     // 4. 유저가 즐겨찾기한 레스토랑 리스트들 반환 (추가한 순서)
     public List<MyRestaurantResponse> getUserFavoriteRestaurantList(Long userId) {
 
-        return myRestaurantQueryRepository.findActiveFavorites(userId);
+        return myRestaurantQueryRepository.findMyFavoritesRestaurants(userId);
     }
 
 

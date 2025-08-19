@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @IdClass(PostUserReactionId.class)
-@Table(name="post_user_reaction")
+@Table(name="post_reaction")
 public class PostReactionEntity {
     @Id
     @Column(name = "post_id")

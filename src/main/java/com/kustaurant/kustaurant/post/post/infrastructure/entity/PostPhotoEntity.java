@@ -4,19 +4,20 @@ import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Builder
-@Table(name = "post_photoes_tbl")
+@Table(name = "post_photos")
 public class PostPhotoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer photoId;
 
-    @Column(name = "post_id", nullable = false)
+    @Column(name = "post_id", nullable = false, insertable = false, updatable = false)
     private Integer postId;
 
     private String photoImgUrl;

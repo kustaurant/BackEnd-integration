@@ -45,17 +45,5 @@ public class Post {
         if (this.status == PostStatus.DELETED)
             throw new AlreadyDeletedException();
     }
-
-    public void updateCommentIds(List<Integer> commentIds) {
-        this.commentIds = commentIds;
-    }
-
-    public void updatePhotoIds(List<Integer> photoIds) {
-        this.photoIds = photoIds;
-    }
-
-    public void updateScrapIds(List<Integer> scrapIds) {
-        this.scrapIds = scrapIds;
-    }
 }
 

@@ -1,13 +1,11 @@
 package com.kustaurant.kustaurant.post.community.controller;
 
-import com.kustaurant.kustaurant.common.enums.SortOption;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.post.community.controller.request.PostListRequest;
 import com.kustaurant.kustaurant.post.community.controller.response.PostListResponse;
-import com.kustaurant.kustaurant.post.post.domain.Post;
+import com.kustaurant.kustaurant.post.post.controller.response.PostResponse;
 import com.kustaurant.kustaurant.post.community.controller.response.PostDetailResponse;
-import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
 import com.kustaurant.kustaurant.post.community.service.PostQueryService;
 import groovy.util.logging.Slf4j;
 import jakarta.validation.Valid;
@@ -30,7 +28,7 @@ public class CommunityController {
             @Valid @ModelAttribute PostListRequest req,
             Model model
     ) {
-        Page<PostListResponse> paging = postQueryService.getPostList(req.page(), 10, req.category(), req.sort());
+        Page<PostListResponse> paging = postQueryService.getPostList(req.page(), req.category(), req.sort());
 
         model.addAttribute("currentPage", "community");
         model.addAttribute("postCategory", req.category());
@@ -57,15 +55,12 @@ public class CommunityController {
     public String search(
             Model model,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "kw", defaultValue = "") String kw,
-            @RequestParam(defaultValue = "LATEST") SortOption sort,
-            @RequestParam(defaultValue = "ALL") PostCategory postCategory
+            @RequestParam(value = "kw", defaultValue = "") String kw
     ) {
-        Page<PostDetailResponse> paging = postQueryService.getList(page, sort, kw, postCategory);
+        Page<PostListResponse> paging = postQueryService.searchLatest(page, kw);
+
         model.addAttribute("paging", paging);
         model.addAttribute("postSearchKw", kw);
-        model.addAttribute("sort", sort);
-        model.addAttribute("postCategory", postCategory);
         model.addAttribute("postList", paging.getContent());
         return "community/community";
     }
@@ -85,9 +80,8 @@ public class CommunityController {
             Model model,
             @AuthUser AuthUserInfo user
     ) {
-        Post post = postQueryService.getPost(postId);
-        model.addAttribute("post", PostDetailResponse.from(post));
+        PostResponse response = postQueryService.getPostForUpdate(postId, user.id());
+        model.addAttribute("post", response);
         return "community/community_update";
     }
-
 }

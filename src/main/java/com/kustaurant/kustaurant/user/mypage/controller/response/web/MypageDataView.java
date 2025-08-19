@@ -3,6 +3,8 @@ package com.kustaurant.kustaurant.user.mypage.controller.response.web;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostCommentResponse;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostsResponse;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,6 +16,6 @@ public class MypageDataView {
     private List<RestaurantFavorite> restaurantFavoriteList;
     private List<Evaluation> restaurantEvaluationList;
     private List<Post> postList;
-    private List<PostCommentView> postCommentList;
-    private List<ScrappedPostView> postScrapList;
+    private List<MyPostCommentResponse> postCommentList;
+    private List<MyPostsResponse> postScrapList;
 }

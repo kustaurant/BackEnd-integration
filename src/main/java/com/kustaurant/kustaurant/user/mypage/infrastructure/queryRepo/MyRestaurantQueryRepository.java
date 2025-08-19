@@ -17,7 +17,7 @@ public class MyRestaurantQueryRepository {
     private static final QRestaurantFavoriteEntity favorite = QRestaurantFavoriteEntity.restaurantFavoriteEntity;
     private static final QRestaurantEntity restaurant = QRestaurantEntity.restaurantEntity;
 
-    public List<MyRestaurantResponse> findActiveFavorites(Long userId) {
+    public List<MyRestaurantResponse> findMyFavoritesRestaurants(Long userId) {
 
         return factory.select(Projections.constructor(
                 MyRestaurantResponse.class,

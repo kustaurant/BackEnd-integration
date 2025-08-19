@@ -1,12 +1,19 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
+import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentEntity;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentReactionEntity;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostPhotoEntity;
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostReactionEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostScrapEntity;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostCommentResponse;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostsResponse;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,56 +26,85 @@ public class MyPostQueryRepository {
     private final JPAQueryFactory factory;
 
     private static final QPostEntity post = QPostEntity.postEntity;
-    private static final QPostLikeEntity like = QPostLikeEntity.postLikeEntity;
     private static final QPostCommentEntity comment = QPostCommentEntity.postCommentEntity;
     private static final QPostPhotoEntity photo = QPostPhotoEntity.postPhotoEntity;
     private static final QPostScrapEntity scrap = QPostScrapEntity.postScrapEntity;
-    private static final QPostCommentLikeEntity commentLike = QPostCommentLikeEntity.postCommentLikeEntity;
+    private static final QPostReactionEntity postReaction = QPostReactionEntity.postReactionEntity;
+    private static final QPostCommentReactionEntity commentReaction = QPostCommentReactionEntity.postCommentReactionEntity;
 
+    private Expression<String> coverPhotoExprForPost() {
+        QPostPhotoEntity p2 = new QPostPhotoEntity("p2");
+        return JPAExpressions
+                .select(p2.photoImgUrl.min())
+                .from(p2)
+                .where(p2.postId.eq(post.postId));
+    }
+
+    private Expression<Long> postLikeCountExpr() {
+        QPostReactionEntity r2 = new QPostReactionEntity("r2");
+        var likeCase = new CaseBuilder()
+                .when(r2.reaction.eq(ReactionType.LIKE)).then(1)
+                .otherwise(0);
+        return JPAExpressions
+                .select(likeCase.sum().longValue())
+                .from(r2)
+                .where(r2.postId.eq(post.postId));
+    }
+
+    private Expression<Long> postCommentCountExpr() {
+        QPostCommentEntity c2 = new QPostCommentEntity("c2");
+        return JPAExpressions
+                .select(c2.count())
+                .from(c2)
+                .where(c2.postId.eq(post.postId));
+    }
+
+    private Expression<Long> commentLikeCountExpr(QPostCommentEntity c) {
+        QPostCommentReactionEntity cr2 = new QPostCommentReactionEntity("cr2");
+        var likeCase = new CaseBuilder()
+                .when(cr2.reaction.eq(ReactionType.LIKE)).then(1)
+                .otherwise(0);
+        return JPAExpressions
+                .select(likeCase.sum().longValue())
+                .from(cr2)
+                .where(cr2.postCommentId.eq(c.commentId));
+    }
+    //-----
     public List<MyPostsResponse> findMyPostsByUserId(Long userId) {
         return factory.select(Projections.constructor(
                 MyPostsResponse.class,
                 post.postId,
                 post.postCategory,
                 post.postTitle,
-                photo.photoImgUrl.min(),
+                coverPhotoExprForPost(),
                 post.postBody,
-                like.postLikesId.countDistinct(),
-                comment.commentId.countDistinct(),
+                postLikeCountExpr(),
+                postCommentCountExpr(),
                 post.createdAt
         ))
                 .from(post)
-                .leftJoin(like).on(like.postId.eq(post.postId))
-                .leftJoin(comment).on(comment.postId.eq(post.postId))
-                .leftJoin(photo).on(photo.postId.eq(post.postId))
-                .where(post.userId.eq(userId))
-                .groupBy(post.postId)
+                .where(post.userId.eq(userId)
+                        .and(post.status.eq(PostStatus.ACTIVE)))
                 .orderBy(post.createdAt.desc())
                 .fetch();
     }
 
     public List<MyPostsResponse> findMyScrappedPostsByUserId(Long userId) {
-        // “첫 번째 사진 1장” 가져올 서브쿼리용 별칭
-        QPostPhotoEntity subPhoto = new QPostPhotoEntity("subPhoto");
-
         return factory.select(Projections.constructor(
                         MyPostsResponse.class,
                         post.postId,
                         post.postCategory,
                         post.postTitle,
-                        photo.photoImgUrl.min(),
+                        coverPhotoExprForPost(),
                         post.postBody,
-                        like.postLikesId.countDistinct(),
-                        comment.commentId.countDistinct(),
+                        postLikeCountExpr(),
+                        postCommentCountExpr(),
                         post.createdAt
                 ))
                 .from(scrap)
                 .join(post).on(post.postId.eq(scrap.postId))
-                .leftJoin(like).on(like.postId.eq(post.postId))
-                .leftJoin(comment).on(comment.postId.eq(post.postId))
-                .leftJoin(photo).on(photo.postId.eq(post.postId))
-                .where(scrap.userId.eq(userId))
-                .groupBy(post.postId)
+                .where(scrap.userId.eq(userId)
+                        .and(post.status.eq(PostStatus.ACTIVE)))
                 .orderBy(scrap.createdAt.desc())
                 .fetch();
     }
@@ -80,14 +116,13 @@ public class MyPostQueryRepository {
                 post.postCategory,
                 post.postTitle,
                 comment.commentBody,
-                commentLike.commentLikeId.countDistinct(),
+                commentLikeCountExpr(comment),
                 comment.createdAt
                 ))
                 .from(comment)
                 .join(post).on(post.postId.eq(comment.postId))
-                .leftJoin(commentLike).on(commentLike.commentId.eq(comment.commentId))
-                .where(comment.userId.eq(userId))
-                .groupBy(comment.commentId, post.postId, post.postCategory, post.postTitle, comment.commentBody, comment.createdAt)
+                .where(comment.userId.eq(userId)
+                        .and(post.status.eq(PostStatus.ACTIVE)))
                 .orderBy(comment.createdAt.desc())
                 .fetch();
     }

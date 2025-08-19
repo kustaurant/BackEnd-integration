@@ -18,7 +18,7 @@ public class EvaluationCommandService {
     private final EvaluationQueryRepository evaluationQueryRepository;
 
     private final EvaluationRestaurantService restaurantEvaluationService;
-    private final S3Service s3Service;
+    private final EvalS3Service s3Service;
 
     @Transactional
     public void evaluate(Long userId, Integer restaurantId, EvaluationDTO dto) {

@@ -47,15 +47,20 @@ public class PostService {
                 .visitCount(0)
                 .build());
 
-        List<String> imageUrls = ImageExtractor.extract(req.content());
+        List<String> imgUrls = ImageExtractor.extract(req.content());
 
-        for (String imageUrl : imageUrls) {
-            postPhotoRepository.save(PostPhoto.builder()
-                    .postId(savedPost.getId())
-                    .photoImgUrl(imageUrl)
-                    .status(PostStatus.ACTIVE)
-                    .build());
+        if(!imgUrls.isEmpty()) {
+            List<PostPhoto> photos = imgUrls.stream()
+                    .map(url -> PostPhoto.builder()
+                            .postId(savedPost.getId())
+                            .photoImgUrl(url)
+                            .status(PostStatus.ACTIVE)
+                            .build())
+                    .toList();
+
+            postPhotoRepository.saveAll(photos);
         }
+
         return savedPost;
     }
 

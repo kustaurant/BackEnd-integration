@@ -53,7 +53,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class S3Service {
+public class PostS3Service {
 
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;

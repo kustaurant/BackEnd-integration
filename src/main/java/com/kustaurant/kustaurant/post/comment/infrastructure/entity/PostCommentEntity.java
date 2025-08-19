@@ -13,7 +13,7 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLDelete(sql = "update post_comments_tbl set status = 'DELETED' where comment_id = ?")
 @SQLRestriction("status = 'ACTIVE'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name="post_comments_tbl")
+@Table(name="post_comments")
 public class PostCommentEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -46,7 +46,7 @@ public class CommunityApiController {
     public ResponseEntity<List<PostListResponse>> community(
             @Valid @ParameterObject PostListRequest req
     ) {
-        Page<PostListResponse> paging = postQueryService.getPostList(req.page(), 10, req.category(), req.sort());
+        Page<PostListResponse> paging = postQueryService.getPostList(req.page(), req.category(), req.sort());
 
         return ResponseEntity.ok(paging.getContent());
     }

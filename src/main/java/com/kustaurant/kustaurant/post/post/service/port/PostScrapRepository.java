@@ -6,10 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostScrapRepository {
-    List<PostScrap> findByUserId(Long userId);
-
-    boolean existsByUserIdAndPostId(Long userId, Integer postId);
-
     void delete(PostScrap postScrap);
 
     void deleteByPostId(Integer postId);

@@ -16,16 +16,6 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
     private final PostScrapJpaRepository postScrapJpaRepository;
 
     @Override
-    public List<PostScrap> findByUserId(Long userId) {
-        return postScrapJpaRepository.findByUserIdOrderByCreatedAtDesc(userId).stream().map(PostScrap::from).toList();
-    }
-
-    @Override
-    public boolean existsByUserIdAndPostId(Long userId, Integer postId) {
-        return postScrapJpaRepository.existsByUserIdAndPostId(userId, postId);
-    }
-
-    @Override
     public void delete(PostScrap postScrap) {
         postScrapJpaRepository.findByUserIdAndPostId(postScrap.getUserId(), postScrap.getPostId())
                 .ifPresent(postScrapJpaRepository::delete);

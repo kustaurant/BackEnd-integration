@@ -15,23 +15,27 @@ import com.kustaurant.kustaurant.post.community.infrastructure.projection.PostLi
 import com.kustaurant.kustaurant.user.mypage.infrastructure.QUserStatsEntity;
 import com.kustaurant.kustaurant.user.user.infrastructure.QUserEntity;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -125,7 +129,7 @@ public class PostQueryRepository {
         return PageableExecutionUtils.getPage(projections, pageable, countQuery::fetchOne);
     }
 
-    // 2. 게시글 1개의 상세 페이지 조회
+    // 2. 게시글 1개의 상세 페이지 조회(~댓글까지)
     public Optional<PostDetailProjection> findPostDetail(Integer postId, Long currentUserId) {
         Expression<Long> likeCount = JPAExpressions
                 .select(reaction.userId.count())
@@ -181,5 +185,149 @@ public class PostQueryRepository {
                 .fetchOne();
 
         return Optional.ofNullable(projection);
+    }
+
+    // 3. 포스트 검색
+    public Page<PostListProjection> searchLatest(String keyword, Pageable pageable) {
+        // 1) ID만 최신순으로 페이징 (post 단독 + 인덱스 타서 가볍게)
+        BooleanExpression cond = buildSearchCond(keyword);
+
+        List<Integer> ids = queryFactory
+                .select(post.postId)
+                .from(post)
+                .where(cond)
+                .orderBy(post.createdAt.desc(), post.postId.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long totalL = queryFactory
+                .select(post.count())
+                .from(post)
+                .where(cond)
+                .fetchOne();
+        long total = (totalL == null) ? 0L : totalL;
+
+        if (ids.isEmpty()) {
+            return new PageImpl<>(List.of(), pageable, total);
+        }
+
+        // 2) 상세/집계는 ID 집합에 대해서만
+        // 2-1) 기본 + 작성자 + 작성자 통계(평가수)
+        List<Tuple> basics = queryFactory.select(
+                        post.postId,
+                        post.postCategory,
+                        post.postTitle,
+                        post.postBody,
+                        user.id,
+                        user.nickname.value,
+                        userStats.ratedRestCnt,
+                        post.createdAt
+                )
+                .from(post)
+                .join(user).on(post.userId.eq(user.id))
+                .leftJoin(userStats).on(user.id.eq(userStats.id))
+                .where(post.postId.in(ids))
+                .fetch();
+
+        // 2-2) 좋아요 수
+        NumberExpression<Long> likeCountExpr = reaction.count();
+        List<Tuple> likeRows = queryFactory
+                .select(reaction.postId, likeCountExpr)
+                .from(reaction)
+                .where(reaction.postId.in(ids)
+                        .and(reaction.reaction.eq(ReactionType.LIKE)))
+                .groupBy(reaction.postId)
+                .fetch();
+        Map<Integer, Long> likeMap = likeRows.stream()
+                .collect(Collectors.toMap(
+                        t -> t.get(reaction.postId),
+                        t -> Optional.ofNullable(t.get(likeCountExpr)).orElse(0L)
+                ));
+
+        // 2-3) 댓글 수
+        NumberExpression<Long> commentCountExpr = comment.count();
+        List<Tuple> commentRows = queryFactory
+                .select(comment.postId, commentCountExpr)
+                .from(comment)
+                .where(comment.postId.in(ids))
+                .groupBy(comment.postId)
+                .fetch();
+        Map<Integer, Long> commentMap = commentRows.stream()
+                .collect(Collectors.toMap(
+                        t -> t.get(comment.postId),
+                        t -> Optional.ofNullable(t.get(commentCountExpr)).orElse(0L)
+                ));
+
+        // 2-4) 대표 사진 (ACTIVE만, 한 장 선택: min(url))
+        StringExpression minPhotoUrlExpr = photo.photoImgUrl.min();
+        List<Tuple> photoRows = queryFactory
+                .select(photo.postId, minPhotoUrlExpr)
+                .from(photo)
+                .where(photo.postId.in(ids)
+                        .and(photo.status.eq(PostStatus.ACTIVE)))
+                .groupBy(photo.postId)
+                .fetch();
+        Map<Integer, String> photoMap = photoRows.stream()
+                .collect(Collectors.toMap(
+                        t -> t.get(photo.postId),
+                        t -> t.get(minPhotoUrlExpr)
+                ));
+
+        // 3) 원래 ID 순서로 결과 조립
+        Map<Integer, Integer> orderIndex = new HashMap<>();
+        for (int i = 0; i < ids.size(); i++) orderIndex.put(ids.get(i), i);
+
+        PostListProjection[] bucket = new PostListProjection[ids.size()];
+
+        for (Tuple b : basics) {
+            Integer pid = b.get(post.postId);
+            int pos = orderIndex.get(pid);
+
+            PostCategory category = b.get(post.postCategory);
+            String title = b.get(post.postTitle);
+            String body = b.get(post.postBody);
+
+            Long writerId = b.get(user.id);
+            String writerNickName = b.get(user.nickname.value);
+            Number writerEvalCntNum = b.get(userStats.ratedRestCnt);
+            long writerEvalCount = (writerEvalCntNum == null) ? 0L : writerEvalCntNum.longValue();
+
+            LocalDateTime createdAt = b.get(post.createdAt);
+
+            long totalLikes = likeMap.getOrDefault(pid, 0L);
+            long commentCount = commentMap.getOrDefault(pid, 0L);
+            String photoUrl = photoMap.get(pid);
+
+            bucket[pos] = new PostListProjection(
+                    pid,
+                    category,
+                    title,
+                    body,
+                    writerId,
+                    writerNickName,
+                    writerEvalCount,
+                    photoUrl,
+                    createdAt,
+                    totalLikes,
+                    commentCount
+            );
+        }
+        List<PostListProjection> ordered = new ArrayList<>(bucket.length);
+        for (PostListProjection p : bucket) if (p != null) ordered.add(p);
+
+        return new PageImpl<>(ordered, pageable, total);
+    }
+
+    private BooleanExpression buildSearchCond(String keyword) {
+        BooleanExpression cond = post.status.eq(PostStatus.ACTIVE);
+        if (keyword != null && !keyword.isBlank()) {
+            String kw = keyword.trim();
+            cond = cond.and(
+                    post.postTitle.containsIgnoreCase(kw)
+                            .or(post.postBody.containsIgnoreCase(kw))
+            );
+        }
+        return cond;
     }
 }

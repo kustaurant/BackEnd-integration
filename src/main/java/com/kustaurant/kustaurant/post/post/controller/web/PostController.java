@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.post.post.controller.request.PostRequest;
 import com.kustaurant.kustaurant.post.post.service.PostService;
-import com.kustaurant.kustaurant.post.post.service.S3Service;
+import com.kustaurant.kustaurant.post.post.service.PostS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-    private final S3Service storageService;
+    private final PostS3Service storageService;
 
     // 1. 게시글 생성
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
@@ -32,7 +32,7 @@ public class PostController {
         return ResponseEntity.ok("글이 성공적으로 저장되었습니다.");
     }
 
-    // 2. 게시글 수정
+    // 3. 게시글 수정 완료
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PutMapping("/api/posts/{postId}")
     public ResponseEntity<String> updatePost(
@@ -44,7 +44,7 @@ public class PostController {
         return ResponseEntity.ok("글이 성공적으로 수정되었습니다.");
     }
 
-    // 3. 게시글 삭제
+    // 4. 게시글 삭제
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @DeleteMapping("/api/posts/{postId}")
     public ResponseEntity<String> deletePost(
@@ -55,7 +55,7 @@ public class PostController {
         return ResponseEntity.ok("게시물이 성공적으로 삭제되었습니다.");
     }
 
-    // 8. 이미지 업로드 (미리보기)
+    // 5. 이미지 업로드 (미리보기)
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/images")
     public ResponseEntity<Map<String, Object>> imageUpload(

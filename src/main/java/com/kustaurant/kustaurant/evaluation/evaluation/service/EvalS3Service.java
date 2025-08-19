@@ -83,7 +83,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class S3Service {
+public class EvalS3Service {
 
     private final S3Client s3Client;
 

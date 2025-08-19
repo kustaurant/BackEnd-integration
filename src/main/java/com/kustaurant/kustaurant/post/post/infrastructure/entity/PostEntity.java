@@ -5,12 +5,17 @@ import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,21 +24,25 @@ import org.hibernate.annotations.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "posts_tbl")
 public class PostEntity extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer postId;
 
     private String postTitle;
     private String postBody;
 
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(20)")
+    @Enumerated(EnumType.STRING) @Column(columnDefinition = "varchar(20)")
     private PostStatus status;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "post_category", columnDefinition = "varchar(20)")
+
+    @Enumerated(EnumType.STRING) @Column(name = "post_category", columnDefinition = "varchar(20)")
     private PostCategory postCategory;
+
     private Integer postVisitCount = 0;
     private Integer netLikes = 0;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "post_id", nullable = false)
+    @OrderBy("photoId ASC")
+    private List<PostPhotoEntity> photos = new ArrayList<>();
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
@@ -76,5 +85,4 @@ public class PostEntity extends BaseTimeEntity {
                 .userId(post.getWriterId())
                 .build();
     }
-
 }

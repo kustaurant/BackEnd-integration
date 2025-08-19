@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.post.community.infrastructure;
 
-import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostPhotoEntity;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +16,7 @@ public class PhotoQueryRepository {
     public List<String> findPostPhotoUrls(Integer postId) {
         return queryFactory.select(photo.photoImgUrl)
                 .from(photo)
-                .where(photo.postId.eq(postId)
-                        .and(photo.status.eq(PostStatus.ACTIVE)))
+                .where(photo.postId.eq(postId))
                 .orderBy(photo.photoId.asc())
                 .fetch();
     }

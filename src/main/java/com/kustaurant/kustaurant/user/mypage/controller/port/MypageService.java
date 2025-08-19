@@ -13,8 +13,5 @@ public interface MypageService {
     List<RestaurantFavorite> getRestaurantFavorites(Long userId);
     List<Evaluation> getEvaluations(Long userId);
     List<Post> getActivePosts(Long userId);
-    List<PostComment> getActivePostComments(Long userId);
-    List<PostScrap> getPostScraps(Long userId);
-
     MypageDataView getMypageData(Long userId);
 }

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PostPhotoJpaRepository extends JpaRepository<PostPhotoEntity, Integer> {
     List<PostPhotoEntity> findByPostId(Integer postId);
+    void deleteByPostId(Integer postId);
 }

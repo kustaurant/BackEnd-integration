@@ -14,12 +14,12 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class PostPhotoRepositoryImpl implements PostPhotoRepository {
-    private final PostPhotoJpaRepository postPhotoJpaRepository;
+    private final PostPhotoJpaRepository jpa;
     
     @Override
     public void save(PostPhoto postPhoto) {
         PostPhotoEntity entity = PostPhotoEntity.from(postPhoto);
-        postPhotoJpaRepository.save(entity);
+        jpa.save(entity);
     }
 
     @Override
@@ -27,16 +27,16 @@ public class PostPhotoRepositoryImpl implements PostPhotoRepository {
         List<PostPhotoEntity> entities = photos.stream()
                 .map(PostPhotoEntity::from)
                 .toList();
-        postPhotoJpaRepository.saveAll(entities);
+        jpa.saveAll(entities);
     }
 
     @Override
     public List<PostPhoto> findByPostId(Integer postId) {
-        return List.of();
+        return jpa.findByPostId(postId).stream().map(PostPhotoEntity::toDomain).toList();
     }
 
     @Override
     public void deleteByPostId(Integer postId) {
-
+        jpa.deleteByPostId(postId);
     }
 }
