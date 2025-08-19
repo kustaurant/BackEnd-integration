@@ -2,7 +2,10 @@ package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
 import com.kustaurant.kustaurant.admin.adminPage.dto.PagedRestaurantResponse;
 import com.kustaurant.kustaurant.admin.adminPage.dto.RestaurantListResponse;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.*;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 
 @Repository
@@ -19,6 +23,12 @@ public class AdminRestaurantQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     public PagedRestaurantResponse getAllRestaurants(Pageable pageable) {
+
+        Expression<Long> evaluationCount = queryFactory
+                .select(evaluationEntity.count().coalesce(0L))
+                .from(evaluationEntity)
+                .where(evaluationEntity.restaurantId.eq(restaurantEntity.restaurantId));
+
         List<RestaurantListResponse> restaurants = queryFactory
                 .select(Projections.constructor(RestaurantListResponse.class,
                         restaurantEntity.restaurantId,
@@ -27,7 +37,7 @@ public class AdminRestaurantQueryRepository {
                         restaurantEntity.restaurantPosition,
                         restaurantEntity.restaurantType,
                         restaurantEntity.status,
-                        restaurantEntity.restaurantEvaluationCount,
+                        evaluationCount,
                         restaurantEntity.createdAt
                 ))
                 .from(restaurantEntity)

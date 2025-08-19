@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity.restaurantSituationRelationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QSituationEntity.situationEntity;
+import static com.kustaurant.kustaurant.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
 import static com.kustaurant.kustaurant.restaurant.favorite.infrastructure.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCommonExpressions.situationMatches;
@@ -35,6 +36,7 @@ public class RestaurantCoreInfoQuery {
     public List<RestaurantCoreInfoDto> getRestaurantTiers(List<Integer> restaurantIds, Long userId) {
         Map<Integer, RestaurantCoreInfoDto> map = queryFactory
                 .from(restaurantEntity)
+                .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .leftJoin(restaurantSituationRelationEntity)
                 .on(situationMatches(restaurantSituationRelationEntity,
                         restaurantEntity.restaurantId))
@@ -53,14 +55,13 @@ public class RestaurantCoreInfoQuery {
                                         restaurantEntity.restaurantCuisine,
                                         restaurantEntity.restaurantPosition,
                                         restaurantEntity.restaurantImgUrl,
-                                        restaurantEntity.mainTier,
+                                        ratingEntity.tier,
                                         evaluationEntity.isNotNull(),
                                         restaurantFavoriteEntity.isNotNull(),
                                         restaurantEntity.longitude,
                                         restaurantEntity.latitude,
                                         restaurantEntity.partnershipInfo,
-                                        restaurantEntity.restaurantScoreSum,
-                                        restaurantEntity.restaurantEvaluationCount,
+                                        ratingEntity.score,
                                         set(situationEntity.situationName),
                                         restaurantEntity.restaurantType
                                 )

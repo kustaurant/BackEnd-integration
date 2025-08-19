@@ -1,7 +1,5 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository;
 
-import static com.querydsl.core.group.GroupBy.groupBy;
-import static com.querydsl.core.group.GroupBy.list;
 import static java.util.Objects.isNull;
 
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
@@ -25,10 +23,8 @@ public class RestaurantDetailRepositoryImpl implements RestaurantDetailRepositor
             throw new IllegalArgumentException("restaurantId is null");
         }
 
-        Long favoriteCount = restaurantDetailQuery.getFavoriteCount(restaurantId);
-
         Optional<RestaurantDetail> optional = restaurantDetailQuery.getRestaurantDetails(
-                restaurantId, userId, favoriteCount);
+                restaurantId, userId);
 
         if (optional.isEmpty()) {
             throw new DataNotFoundException(ErrorCode.RESTAURANT_NOT_FOUND, restaurantId, "식당");

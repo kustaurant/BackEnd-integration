@@ -20,13 +20,4 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
         return jpaRepository.findByRestaurantIdAndStatus(id, status).map(RestaurantEntity::toModel)
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND, "요청한 restaurant가 존재하지 않습니다. 요청 정보 - id: " + id + ", status: " + status));
     }
-
-    @Override
-    public void updateStatistics(Restaurant restaurant) {
-        RestaurantEntity entity = jpaRepository.findById(restaurant.getRestaurantId())
-                .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND,
-                        restaurant.getRestaurantId(), "식당"));
-
-        entity.updateStatistics(restaurant);
-    }
 }

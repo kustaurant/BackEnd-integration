@@ -44,8 +44,7 @@ public class EvaluationCommandService {
         // 식당 평가 관련 데이터 갱신
         restaurantEvaluationService.afterEvaluationCreated(
                 restaurantId,
-                dto.getEvaluationSituations(),
-                dto.getEvaluationScore()
+                dto.getEvaluationSituations()
         );
     }
 
@@ -56,7 +55,6 @@ public class EvaluationCommandService {
         evaluationQueryRepository
                 .findActiveByUserAndRestaurant(userId, restaurantId)
                 .ifPresent(evaluation -> { // 항상 존재함.
-                    double oldScore = evaluation.getEvaluationScore();
                     List<Long> oldSituations = new ArrayList<>(evaluation.getSituationIds());
 
                     // 재평가
@@ -69,9 +67,7 @@ public class EvaluationCommandService {
                     restaurantEvaluationService.afterReEvaluated(
                             restaurantId,
                             oldSituations,
-                            dto.getEvaluationSituations(),
-                            oldScore,
-                            dto.getEvaluationScore()
+                            dto.getEvaluationSituations()
                     );
                 });
     }

@@ -1,0 +1,21 @@
+package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity;
+
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "evaluation_situations_tbl")
+public class EvaluationSituationEntity {
+    @EmbeddedId
+    private EvaluationSituationId id;
+
+    protected EvaluationSituationEntity() {}
+
+    public EvaluationSituationEntity(Long evaluationId, Long situationId) {
+        this.id = new EvaluationSituationId(evaluationId, situationId);
+    }
+
+    public Long getEvaluationId() { return id.getEvaluationId(); }
+    public Long getSituationId() { return id.getSituationId(); }
+}

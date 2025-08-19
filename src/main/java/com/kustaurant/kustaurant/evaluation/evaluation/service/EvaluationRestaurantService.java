@@ -2,7 +2,6 @@ package com.kustaurant.kustaurant.evaluation.evaluation.service;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.RestaurantSituationRelation;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.RestaurantSituationRelationRepository;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantRatingService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,26 +16,20 @@ public class EvaluationRestaurantService {
 
     private final RestaurantSituationRelationRepository relationRepository;
 
-    private final RestaurantRatingService restaurantRatingService;
-
     @Transactional
-    public void afterEvaluationCreated(Integer restaurantId, List<Long> situationIds, Double score) {
+    public void afterEvaluationCreated(Integer restaurantId, List<Long> situationIds) {
         // 식당 상황 수 테이블 업데이트
         increaseSituationRelationCounts(restaurantId, situationIds);
-        // 식당 정보 업데이트
-        restaurantRatingService.afterEvaluationCreated(restaurantId, score);
     }
 
     @Transactional
     public void afterReEvaluated(
             Integer restaurantId,
-            List<Long> preSituations, List<Long> postSituations,
-            Double preScore, Double postScore
+            List<Long> preSituations,
+            List<Long> postSituations
     ) {
         // 식당 상황 수 테이블 업데이트
         syncSituationRelationCountsForRemoved(restaurantId, preSituations, postSituations);
-        // 식당 정보 업데이트
-        restaurantRatingService.afterReEvaluated(restaurantId, preScore, postScore);
     }
 
     private void increaseSituationRelationCounts(Integer restaurantId, List<Long> situationIds) {

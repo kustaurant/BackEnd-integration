@@ -26,32 +26,4 @@ public class Restaurant {
     private LocalDateTime updatedAt;
 
     private Integer visitCount;
-    private Integer restaurantEvaluationCount;
-    private Double restaurantScoreSum;
-
-    private Tier mainTier;
-
-    public String getCuisineImgUrl() {
-        return RestaurantConstants.getCuisineImgUrl(restaurantCuisine.getValue());
-    }
-
-    public void afterEvaluationCreated(Double score) {
-        this.restaurantScoreSum += score;
-        this.restaurantEvaluationCount++;
-    }
-
-    public void afterReEvaluated(Double preScore, Double postScore) {
-        this.restaurantScoreSum += (postScore - preScore);
-    }
-
-    public void changeTier(int mainTier) {
-        this.mainTier = Tier.find(mainTier);
-    }
-
-    public double getAvgScore() {
-        if (restaurantEvaluationCount == 0) {
-            return 0.0;
-        }
-        return restaurantScoreSum / restaurantEvaluationCount;
-    }
 }

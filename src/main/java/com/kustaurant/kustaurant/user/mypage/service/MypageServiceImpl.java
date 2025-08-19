@@ -1,13 +1,9 @@
 package com.kustaurant.kustaurant.user.mypage.service;
 
-import com.kustaurant.kustaurant.post.comment.domain.PostComment;
-import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.kustaurant.post.post.domain.PostScrap;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
-import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageApiService;
