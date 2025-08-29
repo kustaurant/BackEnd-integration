@@ -25,7 +25,7 @@ public class PostCommentService {
     private final PostCommentRepository postCommentRepository;
     private final PostRepository postRepository;
 
-    public PostComment create(Integer postId, PostCommentRequest req, Long userId) {
+    public PostComment create(Long postId, PostCommentRequest req, Long userId) {
         postRepository.findById(postId).orElseThrow(()->new DataNotFoundException(POST_NOT_FOUND));
         if (req.parentCommentId() != null) {
             postCommentRepository.findById(req.parentCommentId())
@@ -37,29 +37,26 @@ public class PostCommentService {
 
     public PostCommentDeleteResponse delete(Integer commentId, Long userId) {
         // 댓글 조회 및 권한 검증
-        PostComment comment = postCommentRepository.findById(commentId)
+        PostComment comment = postCommentRepository.findByIdForUpdate(commentId)
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, commentId, "댓글"));
         comment.ensureWriterBy(userId);
 
         // 응답 빌드 준비
         Integer parentId = comment.getParentCommentId();
-        Integer postId = comment.getPostId();
-        PostCommentStatus finalStatus;
+        Long postId = comment.getPostId();
         List<Integer> removedIds = new ArrayList<>();
+        PostCommentStatus finalStatus;
 
-        // 대댓글인 경우
+        // 대댓글인 경우 대댓글은 즉시삭제
         if (comment.isReplyComment()) {
-            // 대댓글은 즉시삭제
             postCommentRepository.delete(comment);
             removedIds.add(comment.getId());
             finalStatus = PostCommentStatus.DELETED;
             // 부모 댓글이 PENDING 상태인지 확인하고 필요시 삭제
-            checkAndDeleteParentIfNeeded(comment.getParentCommentId(), removedIds);
-        } 
-        // 부모 댓글인 경우
-        else {
-            long activeReplyCount = postCommentRepository.countActiveRepliesByParentCommentId(commentId);
-            
+            checkAndDeleteParentIfNeeded(parentId, removedIds);
+        } else { // 부모 댓글인 경우
+            long activeReplyCount = postCommentRepository.countActiveRepliesByParentCommentId(comment.getId());
+
             if (comment.hasActiveReplies(activeReplyCount)) {
                 // 활성 대댓글이 있으면 PENDING 삭제
                 comment.pendingDelete();
@@ -72,7 +69,7 @@ public class PostCommentService {
                 finalStatus = PostCommentStatus.DELETED;
             }
         }
-        long totalVisible = postCommentRepository.countActiveRepliesByPostId(postId);
+        long totalVisible = postCommentRepository.countVisibleRepliesByPostId(postId);
 
         return new PostCommentDeleteResponse(
                 comment.getId(),

@@ -53,7 +53,7 @@ class AppleLoginProcessorTest {
     @DisplayName("애플 로그인")
     class AppleLogin {
         @Test
-        @DisplayName("기존 ACTIVE 회원이면 그대로 반환")
+        @DisplayName("로그인시 기존 ACTIVE 회원이면 존재하는 유저정보 그대로 반환")
         void existingActiveUser() {
             //g
             LoginRequest req = req();
@@ -81,7 +81,7 @@ class AppleLoginProcessorTest {
         }
 
         @Test
-        @DisplayName("미가입 사용자면 새로 저장 후 반환")
+        @DisplayName("미가입 사용자면 신규 저장 후 반환")
         void newUser() {
             //g
             LoginRequest req = req();
@@ -143,7 +143,7 @@ class AppleLoginProcessorTest {
     }
 
     @Test
-    @DisplayName("가입자 42명 → 애플사용자43")
+    @DisplayName("애플 가입자 42명 존재시, 다음 가입자 닉네임은 애플사용자43")
     void incrementNickname() throws Exception {
         //g
         when(userRepo.countByLoginApi(LoginApi.APPLE)).thenReturn(42);

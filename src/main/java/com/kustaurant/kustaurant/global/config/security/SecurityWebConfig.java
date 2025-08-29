@@ -19,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.session.security.SpringSessionBackedSessionRegistry;
@@ -39,8 +40,8 @@ public class SecurityWebConfig {
                 .securityMatcher(request -> !request.getServletPath().matches("^/api/v\\d+/.*$"))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                )
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
 
@@ -48,10 +49,60 @@ public class SecurityWebConfig {
                         .requestMatchers("/restaurant/**", "/evaluation/**", "/user/myPage", "/community/write","/api/posts/**","/api/comments/**", "/api/images/**", "/admin/**").authenticated()
                         .anyRequest().permitAll())
 
+                .requestCache(rc -> {
+                    var cache = new HttpSessionRequestCache();
+                    cache.setRequestMatcher(request -> {
+                        String method = request.getMethod();
+                        String uri    = request.getRequestURI();
+                        String accept = request.getHeader("Accept");
+
+                        boolean isHtmlNav = accept != null && accept.contains("text/html");
+                        boolean isApi     = uri.startsWith("/api/") || uri.startsWith("/web/api/");
+                        boolean isAction  = uri.startsWith("/evaluation/");
+                        boolean isLoginFlow = uri.startsWith("/user/") || uri.startsWith("/oauth2/") || uri.startsWith("/login");
+
+                        return "GET".equalsIgnoreCase(method)
+                                && isHtmlNav
+                                && !isApi
+                                && !isAction
+                                && !isLoginFlow;
+                    });
+                    rc.requestCache(cache);
+                })
+
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/user/login"))
-                        .accessDeniedHandler((req, res, ex2) ->
-                                res.sendRedirect(req.getContextPath() + "/user/login")))
+                        .authenticationEntryPoint((req, res, authEx) -> {
+                            String uri = req.getRequestURI();
+                            String accept = req.getHeader("Accept");
+                            String rw = req.getHeader("X-Requested-With");
+
+                            boolean isApi = uri.startsWith("/api/") || uri.startsWith("/web/api/");
+                            boolean isAjax = "XMLHttpRequest".equalsIgnoreCase(rw) || (accept != null && accept.contains("application/json"));
+
+                            if (isApi || isAjax) {
+                                res.setStatus(401);
+                                res.setContentType("application/json;charset=UTF-8");
+                                res.getWriter().write("{\"status\":\"UNAUTHORIZED\",\"message\":\"로그인이 필요한 기능입니다.\"}");
+                                return;
+                            }
+
+                            new LoginUrlAuthenticationEntryPoint("/user/login").commence(req, res, authEx);
+                        })
+                        .accessDeniedHandler((req, res, ex2) -> {
+                            String uri = req.getRequestURI();
+                            String accept = req.getHeader("Accept");
+                            boolean isApi = uri.startsWith("/api/") || uri.startsWith("/web/api/");
+                            boolean isAjax = accept != null && accept.contains("application/json");
+
+                            if (isApi || isAjax) {
+                                res.setStatus(403);
+                                res.setContentType("application/json;charset=UTF-8");
+                                res.getWriter().write("{\"status\":\"FORBIDDEN\",\"message\":\"권한이 없습니다.\"}");
+                                return;
+                            }
+                            res.sendRedirect("/user/login");
+                        })
+                )
 
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/user/login")

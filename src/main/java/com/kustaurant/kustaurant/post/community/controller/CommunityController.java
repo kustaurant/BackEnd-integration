@@ -1,5 +1,8 @@
 package com.kustaurant.kustaurant.post.community.controller;
 
+import com.kustaurant.kustaurant.common.view.ViewCountService;
+import com.kustaurant.kustaurant.common.view.ViewResourceType;
+import com.kustaurant.kustaurant.common.view.ViewerKeyProvider;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.post.community.controller.request.PostListRequest;
@@ -8,6 +11,8 @@ import com.kustaurant.kustaurant.post.post.controller.response.PostResponse;
 import com.kustaurant.kustaurant.post.community.controller.response.PostDetailResponse;
 import com.kustaurant.kustaurant.post.community.service.PostQueryService;
 import groovy.util.logging.Slf4j;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +26,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CommunityController {
     private final PostQueryService postQueryService;
+
+    private final ViewerKeyProvider viewerKeyProvider;
+    private final ViewCountService viewCountService;
 
     // 1. 커뮤니티 메인 화면
     @GetMapping("/community")
@@ -42,11 +50,16 @@ public class CommunityController {
     @GetMapping("/community/{postId}")
     public String postDetail(
             Model model,
-            @PathVariable Integer postId,
-            @AuthUser AuthUserInfo user
+            @PathVariable Long postId,
+            @AuthUser AuthUserInfo user,
+            HttpServletRequest req,
+            HttpServletResponse res
     ) {
-        PostDetailResponse res = postQueryService.getPostDetail(postId, user.id());
-        model.addAttribute("view", res);
+        String viewerKey = viewerKeyProvider.resolveViewerKey(user, req, res);
+        viewCountService.countOncePerHour(ViewResourceType.POST, postId, viewerKey);
+
+        PostDetailResponse response = postQueryService.getPostDetail(postId, user.id());
+        model.addAttribute("view", response);
         return "community/community_post";
     }
 
@@ -76,7 +89,7 @@ public class CommunityController {
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @GetMapping("/community/post/update")
     public String updatePost(
-            @RequestParam Integer postId,
+            @RequestParam Long postId,
             Model model,
             @AuthUser AuthUserInfo user
     ) {

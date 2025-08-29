@@ -10,10 +10,10 @@ public class RestaurantSituationRelation {
     private Long relationId;
 
     private Long situationId;
-    private Integer restaurantId;
+    private Long restaurantId;
     private Integer dataCount;
 
-    public static RestaurantSituationRelation create(Long situationId, Integer restaurantId, Integer dataCount) {
+    public static RestaurantSituationRelation create(Long situationId, Long restaurantId, Integer dataCount) {
         return RestaurantSituationRelation.builder()
                 .situationId(situationId)
                 .restaurantId(restaurantId)

@@ -19,7 +19,7 @@ import lombok.ToString;
 public class RestaurantDetail {
 
     @Schema(description = "식당 id", example = "1")
-    private Integer restaurantId;
+    private Long restaurantId;
     @Schema(description = "식당 메인 이미지 주소", example = "https://search.pstatic.net/common/?autoRotate=true&type=w560_sharpen&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20221219_73%2F1671415873694AWTMq_JPEG%2FDSC04440.jpg")
     private String restaurantImgUrl;
     @Schema(description = "식당 티어", example = "1")
@@ -71,7 +71,7 @@ public class RestaurantDetail {
 
     @QueryProjection
     public RestaurantDetail(
-            Integer restaurantId,
+            Long restaurantId,
             String restaurantImgUrl,
             Integer mainTier,
             String restaurantCuisine,

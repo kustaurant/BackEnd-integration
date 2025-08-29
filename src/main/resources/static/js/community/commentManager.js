@@ -19,14 +19,13 @@ class CommentManager {
 
         commentInput.addEventListener("focus", async () => {
             try {
-                const response = await fetch("/api/login/comment-write", { method: 'GET' });
-                if (response.ok && response.redirected) {
-                    Utils.redirectTo("/user/login");
-                    return;
-                }
-                await response.json();
-            } catch (error) {
-                console.error('Error:', error);
+                const res = await fetch("/api/login/comment-write", {
+                    method: 'GET',
+                    headers: Utils.apiHeaders()
+                });
+                if (res.status === 401) Utils.redirectToLogin();
+            } catch (err) {
+                console.error('login-check error:', err);
             }
         });
     }
@@ -55,169 +54,186 @@ class CommentManager {
         if (!commentUl) return;
 
         commentUl.addEventListener('click', (e) => {
-            if (!e.target.matches('.comment-submit-btn')) return;
-            
+            const btn = e.target.closest('.comment-submit-btn');
+            if (!btn) return;
             e.preventDefault();
-            this.submitReply(e.target);
+            this.submitReply(btn);
         });
     }
 
     async submitComment() {
+        const submitBtn = document.querySelector('.post-footer .comment-submit-btn');
         const contentInput = document.querySelector('.post-footer .comment-content');
         const content = contentInput?.value.trim();
 
-        if (!content) {
-            Utils.showAlert('댓글 내용을 입력해주세요.');
-            return;
-        }
+        if (!content) return Utils.showAlert('댓글 내용을 입력해주세요.');
 
         const postId = Utils.getPostIdFromUrl();
-        const requestData = {
-            content: content,
-            parentCommentId: null
-        };
+        const body = JSON.stringify({ content, parentCommentId: null });
 
         try {
-            const response = await fetch(`/api/posts/${postId}/comments`, {
+            submitBtn?.setAttribute('disabled', 'true');
+
+            const res = await fetch(`/api/posts/${postId}/comments`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...Utils.getCsrfHeaders()
-                },
-                body: JSON.stringify(requestData)
+                headers: Utils.apiHeaders({ json: true }),
+                body
             });
 
-            if (response.ok) {
-                if (Utils.handleLoginRedirect(response)) return;
-                Utils.reloadPage();
+            if (res.status === 401) { Utils.redirectToLogin(); return; }
+
+            if (!res.ok) {
+                const err = await Utils.safeJson(res);
+                Utils.showAlert(err?.message || '댓글 작성에 실패했습니다.');
+                return;
             }
+
+            Utils.reloadPage();
         } catch (error) {
-            Utils.showAlert(error.message);
-            console.error('Error:', error);
+            console.error('submitComment error:', error);
+            Utils.showAlert('네트워크 오류가 발생했습니다.');
+        } finally {
+            submitBtn?.removeAttribute('disabled');
         }
     }
 
     async submitReply(submitButton) {
-        const commentWriteForm = submitButton.closest('.comment-write');
-        const content = commentWriteForm?.querySelector('.comment-content')?.value.trim();
-        
-        if (!content) {
-            Utils.showAlert('댓글 내용을 입력해주세요.');
-            return;
-        }
+        const form = submitButton.closest('.comment-write');
+        const input = form?.querySelector('.comment-content');
+        const content = input?.value.trim();
+
+        if (!content) return Utils.showAlert('댓글 내용을 입력해주세요.');
 
         const postId = Utils.getPostIdFromUrl();
-        const parentCommentId = commentWriteForm?.getAttribute('data-comment-id');
-
-        const requestData = {
-            content: content,
-            parentCommentId: parentCommentId ? parseInt(parentCommentId) : null
-        };
+        const parentCommentId = parseInt(form?.getAttribute('data-comment-id') || '0', 10) || null;
+        const body = JSON.stringify({ content, parentCommentId });
 
         try {
-            const response = await fetch(`/api/posts/${postId}/comments`, {
+            submitButton.setAttribute('disabled', 'true');
+
+            const res = await fetch(`/api/posts/${postId}/comments`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...Utils.getCsrfHeaders()
-                },
-                body: JSON.stringify(requestData)
+                headers: Utils.apiHeaders({ json: true }),
+                body
             });
 
-            if (response.ok) {
-                if (Utils.handleLoginRedirect(response)) return;
-                Utils.reloadPage();
+            if (res.status === 401) { Utils.redirectToLogin(); return; }
+
+            if (!res.ok) {
+                const err = await Utils.safeJson(res);
+                Utils.showAlert(err?.message || '댓글 작성에 실패했습니다.');
+                return;
             }
+
+            Utils.reloadPage();
         } catch (error) {
-            Utils.showAlert(error.message);
-            console.error('Error:', error);
+            console.error('submitReply error:', error);
+            Utils.showAlert('네트워크 오류가 발생했습니다.');
+        } finally {
+            submitButton.removeAttribute('disabled');
         }
     }
 
     toggleReplyForm(replyButton) {
-        const allForms = document.querySelectorAll('.comment-ul .comment-write');
         const parentComment = replyButton.closest('.comment-li');
-        
-        // 기존 폼이 있는지 확인
-        let existingForm = null;
-        allForms.forEach(form => {
-            if (parentComment.nextSibling === form) {
-                existingForm = form;
-            }
-        });
+        if (!parentComment) return;
 
-        // 기존 폼이 있으면 제거
-        if (existingForm) {
-            existingForm.remove();
+        // 기존 임시 폼 모두 제거
+        document.querySelectorAll('.comment-ul .comment-write[data-reply-form="true"]').forEach(f => f.remove());
+
+        // 바로 뒤에 동일 폼이 있으면 접기
+        const next = parentComment.nextElementSibling;
+        if (next?.classList.contains('comment-write') && next?.dataset.replyForm === 'true') {
+            next.remove();
             return;
         }
 
-        // 모든 기존 폼 제거
-        allForms.forEach(form => form.remove());
-
-        // 새 댓글 작성 창 생성
+        // 원본 폼 복제
         const originalForm = document.querySelector('.comment-write');
         if (!originalForm) return;
 
-        const commentWriteForm = originalForm.cloneNode(true);
-        const parentCommentId = parentComment.getAttribute('data-id');
-        
-        commentWriteForm.setAttribute('data-comment-id', parentCommentId);
-        
-        // 버튼 타입 변경
-        const submitButton = commentWriteForm.querySelector('.comment-submit-btn') || 
-                           commentWriteForm.querySelector('button[type="submit"]');
+        const form = originalForm.cloneNode(true);
+        form.dataset.replyForm = 'true';
+        form.setAttribute('data-comment-id', parentComment.getAttribute('data-id') || '');
+
+        // 버튼 보장
+        const submitButton = form.querySelector('.comment-submit-btn') ||
+            form.querySelector('button[type="submit"]');
         if (submitButton) {
             submitButton.type = 'button';
-            submitButton.className = 'comment-submit-btn';
+            submitButton.classList.add('comment-submit-btn');
         }
 
-        parentComment.parentNode.insertBefore(commentWriteForm, parentComment.nextSibling);
-        commentWriteForm.querySelector('textarea')?.focus();
+        parentComment.parentNode.insertBefore(form, parentComment.nextSibling);
+        form.querySelector('textarea')?.focus();
     }
 
     async deleteComment(commentId) {
         try {
-            const response = await fetch(`/api/comments/${commentId}`, {
+            const res = await fetch(`/api/comments/${commentId}`, {
                 method: 'DELETE',
-                headers: Utils.getCsrfHeaders()
+                headers: Utils.apiHeaders()
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                
-                // removeIds에 포함된 댓글들을 DOM에서 제거
-                if (data.removeIds && data.removeIds.length > 0) {
-                    data.removeIds.forEach(id => {
-                        const commentElement = document.querySelector(`[data-id="${id}"]`)?.closest('.comment-li');
-                        if (commentElement) {
-                            commentElement.remove();
-                        }
-                    });
-                }
-                
-                // 서버에서 제공하는 총 댓글 수로 업데이트
-                if (data.postTotalCommentCount !== undefined) {
-                    this.setCommentCount(data.postTotalCommentCount);
-                }
+            if (res.status === 401) { Utils.redirectToLogin(); return; }
+
+            if (res.status === 204) {
+                // 바로 제거
+                document.querySelector(`[data-id="${commentId}"]`)?.closest('.comment-li')?.remove();
+                return;
+            }
+
+            if (!res.ok) {
+                const err = await Utils.safeJson(res);
+                Utils.showAlert(err?.message || '댓글 삭제에 실패했습니다.');
+                return;
+            }
+
+            const data = await Utils.safeJson(res) || {};
+
+            // 삭제 → PENDING 전환 UI
+            if (data.status === 'PENDING' && data.id) {
+                this.updateCommentToPending(data.id);
+            }
+
+            // removeIds에 포함된 댓글 제거
+            (data.removeIds || []).forEach(id => {
+                document.querySelector(`[data-id="${id}"]`)?.closest('.comment-li')?.remove();
+            });
+
+            // 총 댓글 수 반영
+            if (typeof data.postTotalCommentCount === 'number') {
+                this.setCommentCount(data.postTotalCommentCount);
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('deleteComment error:', error);
+            Utils.showAlert('네트워크 오류가 발생했습니다.');
         }
     }
 
-    updateCommentCount(delta) {
-        const commentCountSpan = document.querySelector("#commentCount");
-        if (!commentCountSpan) return;
+    updateCommentToPending(commentId) {
+        const commentElement = document.querySelector(`[data-id="${commentId}"]`)?.closest('.comment-li');
+        if (!commentElement) return;
 
-        const currentCount = parseInt(commentCountSpan.innerText.replace('댓글 ', ''));
-        commentCountSpan.innerText = '댓글 ' + (currentCount + delta);
+        const commentDiv = commentElement.querySelector('.comment-div');
+        if (!commentDiv) return;
+
+        const pendingCommentHtml = `
+            <div class="comment-content">
+                <div class="comment-body">
+                    <div>
+                        <p>삭제된 댓글입니다.</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        commentDiv.innerHTML = pendingCommentHtml;
     }
 
     setCommentCount(totalCount) {
         const commentCountSpan = document.querySelector("#commentCount");
         if (!commentCountSpan) return;
-
-        commentCountSpan.innerText = '댓글 ' + totalCount;
+        commentCountSpan.innerText = '댓글 ' + (Number(totalCount) || 0);
     }
+
 }

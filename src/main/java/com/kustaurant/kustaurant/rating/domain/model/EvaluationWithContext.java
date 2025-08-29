@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public record EvaluationWithContext(
-        int restaurantId,
+        long restaurantId,
         double score,
         LocalDateTime evaluatedAt,
         boolean existComment,
@@ -19,7 +19,7 @@ public record EvaluationWithContext(
 ) {
 
     @QueryProjection
-    public EvaluationWithContext(int restaurantId, double score, LocalDateTime evaluatedAt,
+    public EvaluationWithContext(long restaurantId, double score, LocalDateTime evaluatedAt,
             boolean existComment, boolean existSituation, boolean existImage, long reactionScore,
             double userAvgScore, long userEvalCount) {
         this.restaurantId = restaurantId;

@@ -36,7 +36,7 @@ public class EvaluationEntity extends BaseTimeEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
     @Column(name = "restaurant_id", nullable = false)
-    private Integer restaurantId;
+    private Long restaurantId;
 
     @ElementCollection
     @CollectionTable(
@@ -55,7 +55,7 @@ public class EvaluationEntity extends BaseTimeEntity {
             Integer likeCount,
             Integer dislikeCount,
             Long userId,
-            Integer restaurantId
+            Long restaurantId
     ) {
         this.evaluationScore = evaluationScore;
         this.userId = userId;

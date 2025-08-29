@@ -8,7 +8,7 @@ import java.util.List;
 
 public record PostResponse(
         @Schema(description = "게시글 ID")
-        Integer postId,
+        Long postId,
         @Schema(description = "게시글 카테고리")
         PostCategory category,
         @Schema(description = "게시글 제목")

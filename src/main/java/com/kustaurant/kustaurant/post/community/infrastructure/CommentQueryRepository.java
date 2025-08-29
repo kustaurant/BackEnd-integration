@@ -26,22 +26,18 @@ public class CommentQueryRepository {
     private static final QUserEntity user = QUserEntity.userEntity;
     private static final QUserStatsEntity userStats = QUserStatsEntity.userStatsEntity;
 
-    public List<PostCommentProjection> findComments(Integer postId, Long currentUserId) {
-        Expression<Long> likeCount = JPAExpressions
-                .select(reaction.userId.count())
+    public List<PostCommentProjection> findComments(Long postId, Long currentUserId) {
+        Expression<Long> likeCount = JPAExpressions.select(reaction.userId.count())
                 .from(reaction)
-                .where(
-                        reaction.postCommentId.eq(comment.commentId)
-                                .and(reaction.reaction.eq(ReactionType.LIKE))
+                .where(reaction.postCommentId.eq(comment.commentId)
+                        .and(reaction.reaction.eq(ReactionType.LIKE))
                 );
-        Expression<Long> dislikeCount = JPAExpressions
-                .select(reaction.userId.count())
+        Expression<Long> dislikeCount = JPAExpressions.select(reaction.userId.count())
                 .from(reaction)
-                .where(
-                        reaction.postCommentId.eq(comment.commentId)
-                                .and(reaction.reaction.eq(ReactionType.DISLIKE))
+                .where(reaction.postCommentId.eq(comment.commentId)
+                        .and(reaction.reaction.eq(ReactionType.DISLIKE))
                 );
-        Expression<ReactionType> myReaction = currentUserId == null ? Expressions.nullExpression()
+        Expression<ReactionType> myReaction = currentUserId == null ? Expressions.nullExpression(ReactionType.class)
                 : JPAExpressions.select(reaction.reaction)
                 .from(reaction)
                 .where(reaction.postCommentId.eq(comment.commentId)

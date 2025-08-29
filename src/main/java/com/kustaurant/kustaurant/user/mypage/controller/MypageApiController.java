@@ -3,10 +3,9 @@ package com.kustaurant.kustaurant.user.mypage.controller;
 import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.user.mypage.controller.port.MypageApiService;
+import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.*;
-import com.kustaurant.kustaurant.user.mypage.service.MypageApiServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class MypageApiController {
-    private final MypageApiService mypageApiService;
+    private final MypageService mypageApiService;
 
     //1-1
     @Operation(
@@ -31,14 +30,14 @@ public class MypageApiController {
                     "로그인하지 않은 회원인 경우 기본적인 빈 객체가 반환됩니다."
     )
     @GetMapping("/api/v2/mypage")
-    public ResponseEntity<MypageMainResponse> getMypageView(
+    public ResponseEntity<ProfileResponse> getMypageView(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
-        MypageMainResponse response;
+        ProfileResponse response;
         if (user == null) {
-            response = new MypageMainResponse(null,null,0,0);
+            response = new ProfileResponse(null,0,0,0,0,0,null,null);
         } else{
-            response = mypageApiService.getMypageInfo(user.id());
+            response = mypageApiService.getProfile(user.id());
         }
 
         return ResponseEntity.ok(response);
@@ -75,11 +74,11 @@ public class MypageApiController {
                     "전화번호는 숫자로만 11자리여야 합니다.('-'제외)")
     })
     @PatchMapping("/api/v2/auth/mypage/profile")
-    public ResponseEntity<ProfileResponse> updateMypageProfile(
+    public ResponseEntity<ProfileUpdateResponse> updateMypageProfile(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user,
             @Valid @RequestBody ProfileUpdateRequest req
     ){
-        ProfileResponse response = mypageApiService.updateUserProfile(user.id(), req);
+        ProfileUpdateResponse response = mypageApiService.updateUserProfile(user.id(), req);
 
         return ResponseEntity.ok(response);
     }

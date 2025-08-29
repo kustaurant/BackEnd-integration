@@ -18,7 +18,7 @@ public class RestaurantDetailRepositoryImpl implements RestaurantDetailRepositor
     private final RestaurantDetailQuery restaurantDetailQuery;
 
     @Override
-    public RestaurantDetail getRestaurantDetail(Integer restaurantId, Long userId) {
+    public RestaurantDetail getRestaurantDetail(Long restaurantId, Long userId) {
         if (isNull(restaurantId)) {
             throw new IllegalArgumentException("restaurantId is null");
         }

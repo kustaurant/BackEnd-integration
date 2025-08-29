@@ -20,7 +20,7 @@ public class RestaurantSituationRelationEntity {
     private Long situationId;
 
     @Column(name = "restaurant_id")
-    private Integer restaurantId;
+    private Long restaurantId;
 
     private Integer dataCount;
 

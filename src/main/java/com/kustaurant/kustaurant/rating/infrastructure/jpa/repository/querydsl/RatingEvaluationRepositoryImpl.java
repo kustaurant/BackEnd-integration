@@ -32,8 +32,8 @@ public class RatingEvaluationRepositoryImpl implements RatingEvaluationRepositor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Map<Integer, List<EvaluationWithContext>> getEvaluationsByRestaurantIds(
-            List<Integer> restaurantIds) {
+    public Map<Long, List<EvaluationWithContext>> getEvaluationsByRestaurantIds(
+            List<Long> restaurantIds) {
         if (restaurantIds == null || restaurantIds.isEmpty()) {
             return new HashMap<>();
         }

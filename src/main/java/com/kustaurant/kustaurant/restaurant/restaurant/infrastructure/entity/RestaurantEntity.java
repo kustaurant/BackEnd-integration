@@ -27,7 +27,7 @@ import org.hibernate.annotations.DynamicUpdate;
 public class RestaurantEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer restaurantId;
+    private Long restaurantId;
 
     private String restaurantName;
     private String restaurantType;

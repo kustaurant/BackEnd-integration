@@ -4,5 +4,5 @@ import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDet
 
 public interface RestaurantDetailRepository {
 
-    RestaurantDetail getRestaurantDetail(Integer restaurantId, Long userId);
+    RestaurantDetail getRestaurantDetail(Long restaurantId, Long userId);
 }

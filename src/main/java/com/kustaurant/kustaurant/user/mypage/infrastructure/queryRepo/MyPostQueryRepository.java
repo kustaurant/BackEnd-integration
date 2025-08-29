@@ -12,7 +12,6 @@ import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostComme
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostsResponse;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -27,28 +26,33 @@ public class MyPostQueryRepository {
 
     private static final QPostEntity post = QPostEntity.postEntity;
     private static final QPostCommentEntity comment = QPostCommentEntity.postCommentEntity;
-    private static final QPostPhotoEntity photo = QPostPhotoEntity.postPhotoEntity;
     private static final QPostScrapEntity scrap = QPostScrapEntity.postScrapEntity;
-    private static final QPostReactionEntity postReaction = QPostReactionEntity.postReactionEntity;
-    private static final QPostCommentReactionEntity commentReaction = QPostCommentReactionEntity.postCommentReactionEntity;
 
     private Expression<String> coverPhotoExprForPost() {
-        QPostPhotoEntity p2 = new QPostPhotoEntity("p2");
+        QPostPhotoEntity p1 = new QPostPhotoEntity("p1"); // 서브쿼리1: 최소 photoId
+        QPostPhotoEntity p2 = new QPostPhotoEntity("p2"); // 서브쿼리2: 그 photoId의 URL
+
+        // 해당 post의 가장 이른(photoId 최소) 사진 id
+        var minPhotoIdExpr = JPAExpressions
+                .select(p1.photoId.min())
+                .from(p1)
+                .where(p1.postId.eq(post.postId));
+
+        // 그 행의 URL 반환
         return JPAExpressions
-                .select(p2.photoImgUrl.min())
+                .select(p2.photoImgUrl)
                 .from(p2)
-                .where(p2.postId.eq(post.postId));
+                .where(p2.postId.eq(post.postId)
+                        .and(p2.photoId.eq(minPhotoIdExpr)));
     }
 
     private Expression<Long> postLikeCountExpr() {
         QPostReactionEntity r2 = new QPostReactionEntity("r2");
-        var likeCase = new CaseBuilder()
-                .when(r2.reaction.eq(ReactionType.LIKE)).then(1)
-                .otherwise(0);
         return JPAExpressions
-                .select(likeCase.sum().longValue())
+                .select(r2.count())
                 .from(r2)
-                .where(r2.postId.eq(post.postId));
+                .where(r2.postId.eq(post.postId)
+                        .and(r2.reaction.eq(ReactionType.LIKE)));
     }
 
     private Expression<Long> postCommentCountExpr() {
@@ -61,13 +65,11 @@ public class MyPostQueryRepository {
 
     private Expression<Long> commentLikeCountExpr(QPostCommentEntity c) {
         QPostCommentReactionEntity cr2 = new QPostCommentReactionEntity("cr2");
-        var likeCase = new CaseBuilder()
-                .when(cr2.reaction.eq(ReactionType.LIKE)).then(1)
-                .otherwise(0);
         return JPAExpressions
-                .select(likeCase.sum().longValue())
+                .select(cr2.count())
                 .from(cr2)
-                .where(cr2.postCommentId.eq(c.commentId));
+                .where(cr2.postCommentId.eq(c.commentId)
+                        .and(cr2.reaction.eq(ReactionType.LIKE)));
     }
     //-----
     public List<MyPostsResponse> findMyPostsByUserId(Long userId) {
@@ -109,7 +111,7 @@ public class MyPostQueryRepository {
                 .fetch();
     }
 
-    public List<MyPostCommentResponse> findCommentsByUserId(Long userId) {
+    public List<MyPostCommentResponse> findMyPostCommentsByUserId(Long userId) {
         return factory.select(Projections.constructor(
                 MyPostCommentResponse.class,
                 post.postId,

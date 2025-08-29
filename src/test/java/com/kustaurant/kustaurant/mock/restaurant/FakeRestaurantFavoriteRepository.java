@@ -14,7 +14,7 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
 
 
     @Override
-    public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Integer restaurantId) {
+    public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Long restaurantId) {
         return store.stream()
                 .filter(fav -> fav.getUserId().equals(userId) &&
                         fav.getRestaurantId().equals(restaurantId))
@@ -22,7 +22,7 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_FAVORITE_NOT_FOUND, "Favorite not found - UserId:" + userId + ", RestaurantId:" + restaurantId));
     }
 
-    public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
+    public boolean existsByUserAndRestaurant(Long userId, Long restaurantId) {
         return store.stream()
                 .anyMatch(fav -> fav.getUserId().equals(userId) &&
                         fav.getRestaurantId().equals(restaurantId));
@@ -50,7 +50,7 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     }
 
     @Override
-    public long countByRestaurantId(Integer restaurantId) {
+    public long countByRestaurantId(Long restaurantId) {
         return 0;
     }
 

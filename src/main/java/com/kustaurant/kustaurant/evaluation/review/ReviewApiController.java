@@ -37,7 +37,7 @@ public class ReviewApiController {
     })
     @GetMapping("/api/v1/restaurants/{restaurantId}/comments")
     public ResponseEntity<List<ReviewsResponse>> getReviewList(
-            @PathVariable Integer restaurantId,
+            @PathVariable Long restaurantId,
             @RequestParam(defaultValue = "POPULARITY") @Parameter(description = "인기순: POPULARITY, 최신순: LATEST") SortOption sort,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {

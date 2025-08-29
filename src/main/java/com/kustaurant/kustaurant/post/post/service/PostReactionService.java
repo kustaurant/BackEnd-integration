@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PostReactionService {
     private final PostReactionRepository reactionRepo;
-    public PostReactionResponse toggleLike(Integer postId, Long userId, ReactionType reactionCommand) {
+    public PostReactionResponse toggleLike(Long postId, Long userId, ReactionType reactionCommand) {
         PostUserReactionId id = new PostUserReactionId(postId, userId);
         PostReactionEntity existing = reactionRepo.findById(id).orElse(null);
 
@@ -34,6 +34,6 @@ public class PostReactionService {
         int likeCount = reactionRepo.countByPostIdAndReaction(postId, ReactionType.LIKE);
         int dislikeCount = reactionRepo.countByPostIdAndReaction(postId, ReactionType.DISLIKE);
 
-        return new PostReactionResponse(userReaction, likeCount - dislikeCount, likeCount, dislikeCount);
+        return new PostReactionResponse(userReaction, likeCount, dislikeCount, likeCount - dislikeCount);
     }
 }

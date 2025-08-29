@@ -37,7 +37,7 @@ class NaverLoginProcessorTest {
     }
 
     @Test
-    @DisplayName("기존 ACTIVE 유저는 그대로 반환")
+    @DisplayName("로그인시 기존 ACTIVE 유저는 기존 유저정보 그대로 반환")
     void existingActiveUser() {
         //g
         LoginRequest req = new LoginRequest(
@@ -64,7 +64,7 @@ class NaverLoginProcessorTest {
     }
 
     @Test
-    @DisplayName("신규 유저면 createFromNaver → save 호출")
+    @DisplayName("신규 유저면 createFromNaver -> save 호출")
     void returnsTokens_whenUserIsNew() {
         // g
         LoginRequest req = new LoginRequest(

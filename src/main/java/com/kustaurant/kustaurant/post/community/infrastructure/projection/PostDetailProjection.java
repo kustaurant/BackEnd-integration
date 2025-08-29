@@ -7,25 +7,25 @@ import java.time.LocalDateTime;
 
 public record PostDetailProjection(
         // 게시글
-        Integer postId,
+        Long postId,
         PostCategory category,
         String title,
         String body,
         // 작성자
         Long writerId,
         String writerNickName,
-        long writerEvalCount,
+        Long writerEvalCount,
         // 시간
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         // 집계 수치
-        int visitCount,
-        long likeOnlyCount,
-        long dislikeOnlyCount,
-        long commentCount,
-        long scrapCount,
+        Integer visitCount,
+        Long likeOnlyCount,
+        Long dislikeOnlyCount,
+        Long commentCount,
+        Long scrapCount,
         // 상호작용 정보
         ReactionType myReaction,
-        boolean isScrapped
+        Boolean isScrapped
 ) {
 }

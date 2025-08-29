@@ -130,7 +130,7 @@ public class PostQueryRepository {
     }
 
     // 2. 게시글 1개의 상세 페이지 조회(~댓글까지)
-    public Optional<PostDetailProjection> findPostDetail(Integer postId, Long currentUserId) {
+    public Optional<PostDetailProjection> findPostDetail(Long postId, Long currentUserId) {
         Expression<Long> likeCount = JPAExpressions
                 .select(reaction.userId.count())
                 .from(reaction)
@@ -148,7 +148,7 @@ public class PostQueryRepository {
                 .from(scrap)
                 .where(scrap.postId.eq(post.postId));
 
-        Expression<ReactionType> myReaction = currentUserId == null ? Expressions.nullExpression()
+        Expression<ReactionType> myReaction = currentUserId == null ? Expressions.nullExpression(ReactionType.class)
                 : JPAExpressions.select(reaction.reaction)
                 .from(reaction)
                 .where(reaction.postId.eq(post.postId)
@@ -192,7 +192,7 @@ public class PostQueryRepository {
         // 1) ID만 최신순으로 페이징 (post 단독 + 인덱스 타서 가볍게)
         BooleanExpression cond = buildSearchCond(keyword);
 
-        List<Integer> ids = queryFactory
+        List<Long> ids = queryFactory
                 .select(post.postId)
                 .from(post)
                 .where(cond)
@@ -239,7 +239,7 @@ public class PostQueryRepository {
                         .and(reaction.reaction.eq(ReactionType.LIKE)))
                 .groupBy(reaction.postId)
                 .fetch();
-        Map<Integer, Long> likeMap = likeRows.stream()
+        Map<Long, Long> likeMap = likeRows.stream()
                 .collect(Collectors.toMap(
                         t -> t.get(reaction.postId),
                         t -> Optional.ofNullable(t.get(likeCountExpr)).orElse(0L)
@@ -253,7 +253,7 @@ public class PostQueryRepository {
                 .where(comment.postId.in(ids))
                 .groupBy(comment.postId)
                 .fetch();
-        Map<Integer, Long> commentMap = commentRows.stream()
+        Map<Long, Long> commentMap = commentRows.stream()
                 .collect(Collectors.toMap(
                         t -> t.get(comment.postId),
                         t -> Optional.ofNullable(t.get(commentCountExpr)).orElse(0L)
@@ -268,20 +268,20 @@ public class PostQueryRepository {
                         .and(photo.status.eq(PostStatus.ACTIVE)))
                 .groupBy(photo.postId)
                 .fetch();
-        Map<Integer, String> photoMap = photoRows.stream()
+        Map<Long, String> photoMap = photoRows.stream()
                 .collect(Collectors.toMap(
                         t -> t.get(photo.postId),
                         t -> t.get(minPhotoUrlExpr)
                 ));
 
         // 3) 원래 ID 순서로 결과 조립
-        Map<Integer, Integer> orderIndex = new HashMap<>();
+        Map<Long, Integer> orderIndex = new HashMap<>();
         for (int i = 0; i < ids.size(); i++) orderIndex.put(ids.get(i), i);
 
         PostListProjection[] bucket = new PostListProjection[ids.size()];
 
         for (Tuple b : basics) {
-            Integer pid = b.get(post.postId);
+            Long pid = b.get(post.postId);
             int pos = orderIndex.get(pid);
 
             PostCategory category = b.get(post.postCategory);

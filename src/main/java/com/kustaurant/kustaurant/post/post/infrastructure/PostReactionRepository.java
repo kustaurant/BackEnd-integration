@@ -6,7 +6,7 @@ import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostUserReactio
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostReactionRepository extends JpaRepository<PostReactionEntity, PostUserReactionId> {
-    int countByPostIdAndReaction(Integer postId, ReactionType reaction);
+    int countByPostIdAndReaction(Long postId, ReactionType reaction);
 
-    void deleteByPostId(Integer postId);
+    void deleteByPostId(Long postId);
 }

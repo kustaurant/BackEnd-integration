@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.admin.feedback.service;
 
 import com.kustaurant.kustaurant.admin.feedback.controller.Request.FeedbackRequest;
 import com.kustaurant.kustaurant.admin.feedback.domain.Feedback;
-import com.kustaurant.kustaurant.common.service.port.ClockHolder;
+import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
 import com.kustaurant.kustaurant.mock.admin.FakeFeedbackRepository;
 import com.kustaurant.kustaurant.mock.common.TestClockHolder;
 import org.junit.jupiter.api.BeforeEach;

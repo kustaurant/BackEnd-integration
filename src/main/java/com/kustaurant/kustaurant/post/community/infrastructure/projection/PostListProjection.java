@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
 import java.time.LocalDateTime;
 
 public record PostListProjection(
-        Integer postId,
+        Long postId,
         PostCategory category,
         String title,
         String body,

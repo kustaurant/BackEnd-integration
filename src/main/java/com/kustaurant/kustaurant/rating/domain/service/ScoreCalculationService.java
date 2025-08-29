@@ -62,7 +62,7 @@ public class ScoreCalculationService {
 
     public List<RatingScore> calculateScores(
             List<RestaurantStats> statsList,
-            Map<Integer, List<EvaluationWithContext>> evalMap,
+            Map<Long, List<EvaluationWithContext>> evalMap,
             double globalAvg,
             LocalDateTime date
     ) {

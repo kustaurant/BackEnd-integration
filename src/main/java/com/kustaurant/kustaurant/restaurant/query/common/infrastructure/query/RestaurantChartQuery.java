@@ -36,9 +36,9 @@ public class RestaurantChartQuery {
     /**
      * 조건(conditino)을 만족하는 식당 id들을 반환
      */
-    public Page<Integer> getRestaurantIdsWithPage(ChartCondition condition, Pageable pageable) {
+    public Page<Long> getRestaurantIdsWithPage(ChartCondition condition, Pageable pageable) {
 
-        List<Integer> content = queryFactory.select(restaurantEntity.restaurantId)
+        List<Long> content = queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .where(
@@ -67,7 +67,7 @@ public class RestaurantChartQuery {
     }
 
 
-    public List<Integer> getRestaurantIds(ChartCondition condition) {
+    public List<Long> getRestaurantIds(ChartCondition condition) {
 
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)

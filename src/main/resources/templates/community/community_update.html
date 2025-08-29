@@ -70,14 +70,14 @@
             </div>
             <select name="postCategory">
                 <option value="" disabled hidden>채널 선택</option>
-                <option value="FREE" th:selected="${post.postCategory == 'FREE'}">자유게시판</option>
-                <option value="COLUMN" th:selected="${post.postCategory == 'COLUMN'}">칼럼게시판</option>
-                <option value="SUGGESTION" th:selected="${post.postCategory == 'SUGGESTION'}">건의게시판</option>
+                <option value="FREE" th:selected="${post.category() == 'FREE'}">자유게시판</option>
+                <option value="COLUMN" th:selected="${post.category() == 'COLUMN'}">칼럼게시판</option>
+                <option value="SUGGESTION" th:selected="${post.category() == 'SUGGESTION'}">건의게시판</option>
             </select>
-            <input name="title" placeholder="제목" th:value="${post.postTitle}">
+            <input name="title" placeholder="제목" th:value="${post.title()}">
             <div class="post-body">
                 <div class="post-body-inner">
-                    <textarea th:utext="${post.postBody}" class="post-content" id="tiny-editor" maxlength="2000"></textarea>
+                    <textarea th:utext="${post.body()}" class="post-content" id="tiny-editor" maxlength="2000"></textarea>
                 </div>
             </div>
 

@@ -9,14 +9,14 @@ public interface EvaluationQueryRepository {
 
     Evaluation findActiveById(Long id);
 
-    boolean existsByUserAndRestaurant(Long userId, Integer restaurantId);
+    boolean existsByUserAndRestaurant(Long userId, Long restaurantId);
 
-    boolean existsByRestaurantAndEvaluation(Integer restaurantId, Long evaluationId);
+    boolean existsByRestaurantAndEvaluation(Long restaurantId, Long evaluationId);
 
-    Optional<Evaluation> findActiveByUserAndRestaurant(Long userId, Integer restaurantId);
+    Optional<Evaluation> findActiveByUserAndRestaurant(Long userId, Long restaurantId);
 
     int countByStatus(String status);
 
-    List<Evaluation> findByRestaurantIdOrderByCreatedAtDesc(Integer restaurantId);
-    List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Integer restaurantId);
+    List<Evaluation> findByRestaurantIdOrderByCreatedAtDesc(Long restaurantId);
+    List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Long restaurantId);
 }

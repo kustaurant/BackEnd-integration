@@ -35,12 +35,12 @@ public class RatingOrchestrationService {
 
     @Transactional
     public void calculateAllRatings() {
-        List<Integer> ids = ratingRestaurantRepository.getRestaurantIds();
+        List<Long> ids = ratingRestaurantRepository.getRestaurantIds();
         LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         // Chunk 단위로 계산
         List<RatingScore> scores = new ArrayList<>(ids.size());
         for (int i = 0; i < ids.size(); i += CHUNK_SIZE) {
-            List<Integer> chunkIds = ids.subList(i, Math.min(i + CHUNK_SIZE, ids.size()));
+            List<Long> chunkIds = ids.subList(i, Math.min(i + CHUNK_SIZE, ids.size()));
             List<RatingScore> chunkScores = calculateScores(chunkIds, now);
             scores.addAll(chunkScores);
             log.info("{}~{} 점수 계산 완료", i + 1, i + chunkIds.size());
@@ -53,10 +53,10 @@ public class RatingOrchestrationService {
     }
 
     // 점수 계산 호출
-    private List<RatingScore> calculateScores(List<Integer> ids, LocalDateTime now) {
+    private List<RatingScore> calculateScores(List<Long> ids, LocalDateTime now) {
         List<RestaurantStats> statsList = ratingRestaurantRepository
                 .getRestaurantStatsByIds(ids);
-        Map<Integer, List<EvaluationWithContext>> evalMap = ratingEvaluationRepository
+        Map<Long, List<EvaluationWithContext>> evalMap = ratingEvaluationRepository
                 .getEvaluationsByRestaurantIds(ids);
         double globalAvg = ratingEvaluationRepository.getGlobalAvg();
 

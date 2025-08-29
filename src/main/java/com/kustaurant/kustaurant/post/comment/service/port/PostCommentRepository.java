@@ -8,14 +8,15 @@ import java.util.Optional;
 public interface PostCommentRepository {
 
     Optional<PostComment> findById(Integer comment_id);
+    Optional<PostComment> findByIdForUpdate(Integer comment_id);
 
     PostComment save(PostComment comment);
     
     List<PostComment> findByParentCommentId(Integer parentCommentId);
     
     long countActiveRepliesByParentCommentId(Integer parentCommentId);
-    long countActiveRepliesByPostId(Integer postId);
+    long countVisibleRepliesByPostId(Long postId);
     void delete(PostComment comment);
     List<PostComment> saveAll(List<PostComment> comments);
-    void deleteByPostId(Integer postId);
+    void deleteByPostId(Long postId);
 }

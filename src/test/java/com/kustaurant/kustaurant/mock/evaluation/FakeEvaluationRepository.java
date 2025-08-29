@@ -38,17 +38,17 @@ public class FakeEvaluationRepository implements EvaluationQueryRepository, Eval
     }
 
     @Override
-    public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
+    public boolean existsByUserAndRestaurant(Long userId, Long restaurantId) {
         return false;
     }
 
     @Override
-    public boolean existsByRestaurantAndEvaluation(Integer restaurantId, Long evaluationId) {
+    public boolean existsByRestaurantAndEvaluation(Long restaurantId, Long evaluationId) {
         return false;
     }
 
     @Override
-    public Optional<Evaluation> findActiveByUserAndRestaurant(Long userId, Integer restaurantId) {
+    public Optional<Evaluation> findActiveByUserAndRestaurant(Long userId, Long restaurantId) {
         return Optional.empty();
     }
 
@@ -58,7 +58,7 @@ public class FakeEvaluationRepository implements EvaluationQueryRepository, Eval
     }
 
     @Override
-    public List<Evaluation> findByRestaurantIdOrderByCreatedAtDesc(Integer restaurantId) {
+    public List<Evaluation> findByRestaurantIdOrderByCreatedAtDesc(Long restaurantId) {
         return data.values().stream()
                 .filter(ev -> ev.getRestaurantId().equals(restaurantId))
                 .sorted(Comparator.comparing(Evaluation::getCreatedAt).reversed())
@@ -66,7 +66,7 @@ public class FakeEvaluationRepository implements EvaluationQueryRepository, Eval
     }
 
     @Override
-    public List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Integer restaurantId) {
+    public List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Long restaurantId) {
         return data.values().stream()
                 .filter(ev -> ev.getRestaurantId().equals(restaurantId))
                 .sorted(Comparator.comparing(Evaluation::getLikeCount).reversed())

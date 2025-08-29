@@ -6,14 +6,14 @@ import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.RestaurantPoli
 import com.querydsl.core.annotations.QueryProjection;
 
 public record RestaurantStats(
-        int restaurantId,
+        long restaurantId,
         int visitCount,
         long favoriteCount,
         long evaluationCount
 ) {
 
     @QueryProjection
-    public RestaurantStats(int restaurantId, int visitCount, long favoriteCount, long evaluationCount) {
+    public RestaurantStats(long restaurantId, int visitCount, long favoriteCount, long evaluationCount) {
         this.restaurantId = restaurantId;
         this.visitCount = visitCount;
         this.favoriteCount = favoriteCount;

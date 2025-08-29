@@ -1,12 +1,11 @@
 package com.kustaurant.kustaurant.post.comment.domain;
 
-import com.kustaurant.kustaurant.global.exception.exception.post.NoDeleteAuthorityException;
+import com.kustaurant.kustaurant.global.exception.exception.auth.AccessDeniedException;
 import com.kustaurant.kustaurant.post.comment.controller.request.PostCommentRequest;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Builder
@@ -18,7 +17,7 @@ public class PostComment {
     private PostCommentStatus status;
 
     private final Long writerId;
-    private Integer postId;
+    private Long postId;
 
     private Integer parentCommentId;
     private Set<Integer> replyIds;
@@ -26,7 +25,7 @@ public class PostComment {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static PostComment create(Integer postId, PostCommentRequest req,Long userId) {
+    public static PostComment create(Long postId, PostCommentRequest req,Long userId) {
         return PostComment.builder()
                 .body(req.content())
                 .status(PostCommentStatus.ACTIVE)
@@ -39,7 +38,7 @@ public class PostComment {
 
     public void ensureWriterBy(Long userId) {
         if (!this.writerId.equals(userId))
-            throw new NoDeleteAuthorityException();
+            throw new AccessDeniedException();
     }
 
     public void pendingDelete() {
@@ -50,11 +49,7 @@ public class PostComment {
     public boolean hasActiveReplies(long activeReplyCount) {
         return activeReplyCount > 0;
     }
-    
-    public boolean isParentComment() {
-        return this.parentCommentId == null;
-    }
-    
+
     public boolean isReplyComment() {
         return this.parentCommentId != null;
     }

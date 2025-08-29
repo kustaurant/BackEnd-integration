@@ -1,46 +1,49 @@
 package com.kustaurant.kustaurant.global.auth.web;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.DefaultRedirectStrategy;
-import org.springframework.security.web.RedirectStrategy;
-import org.springframework.security.web.WebAttributes;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @Component
-public class CustomLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final RequestCache requestCache = new HttpSessionRequestCache();
-    private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+@Slf4j
+public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+
+    public CustomLoginSuccessHandler() {
+        setDefaultTargetUrl("/");
+        setAlwaysUseDefaultTargetUrl(false);
+        setTargetUrlParameter("redirect");
+    }
+
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+    public void onAuthenticationSuccess(
+            HttpServletRequest request, HttpServletResponse response, Authentication authentication
+    ) throws IOException, ServletException {
 
-        clearSession(request);
+        var cache = new HttpSessionRequestCache();
+        SavedRequest saved = cache.getRequest(request, response);
 
-        // 1) 로그인 전 요청이 저장돼 있으면 그곳으로
-        SavedRequest saved = requestCache.getRequest(request, response);
-        if (saved != null) {
-            redirectStrategy.sendRedirect(request, response, saved.getRedirectUrl());
+        if (saved != null && saved.getRedirectUrl() != null && !saved.getRedirectUrl().contains("/user/login")) {
+            super.onAuthenticationSuccess(request, response, authentication);
             return;
         }
 
-        // 2) 그 외엔 메인 페이지로
-        redirectStrategy.sendRedirect(request, response, "/");
-    }
-
-    // 로그인 실패 후 성공 시 남아있는 에러 세션 제거
-    private void clearSession(HttpServletRequest request) {
+        // 없으면 바로 직전 페이지(인터셉터가 저장)로
         HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+        String current = session == null ? null : (String) session.getAttribute("currentUrl");
+        if (current != null && !current.contains("/user/login")) {
+            session.removeAttribute("currentUrl");
+            getRedirectStrategy().sendRedirect(request, response, current);
+            return;
         }
+
+        super.onAuthenticationSuccess(request, response, authentication);
     }
 }
+

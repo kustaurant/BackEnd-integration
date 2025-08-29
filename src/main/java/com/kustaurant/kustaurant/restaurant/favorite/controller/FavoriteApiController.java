@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.restaurant.favorite.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.global.exception.ErrorResponse;
+import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;
 import com.kustaurant.kustaurant.restaurant.favorite.controller.response.FavoriteResponseDTO;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,11 +29,11 @@ public class FavoriteApiController {
             "- 반환 값 보충 설명\n\n" +
             "   - boolean: not null")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))}),
-            @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+            @ApiResponse(responseCode = "200", description = "success", content = {@Content(schema = @Schema(implementation = Boolean.class))}),
+            @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))})
     })
     public ResponseEntity<Boolean> restaurantFavoriteToggle(
-            @PathVariable Integer restaurantId,
+            @PathVariable Long restaurantId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 즐겨찾기 로직
@@ -53,12 +53,12 @@ public class FavoriteApiController {
             "   - boolean: not null\n\n" +
             "   - int: not null")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "success", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = FavoriteResponseDTO.class))}),
-            @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))})
+            @ApiResponse(responseCode = "200", description = "success", content = {@Content(schema = @Schema(implementation = FavoriteResponseDTO.class))}),
+            @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))})
     })
     @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle2")
     public ResponseEntity<FavoriteResponseDTO> restaurantFavoriteToggle2(
-            @PathVariable Integer restaurantId,
+            @PathVariable Long restaurantId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 즐겨찾기 로직

@@ -39,7 +39,7 @@ public class PostQueryService {
 
     private static final int PAGE_SIZE = 10;
 
-    public PostResponse getPostForUpdate(Integer postId, Long userId) {
+    public PostResponse getPostForUpdate(Long postId, Long userId) {
         Post post = postRepo.findById(postId).orElseThrow(() -> new DataNotFoundException(ErrorCode.POST_NOT_FOUND));
         post.ensureWriterBy(userId);
         List<String> photoUrls = photoQueryRepo.findPostPhotoUrls(postId);
@@ -54,7 +54,7 @@ public class PostQueryService {
         return projections.map(PostListResponse::from);
     }
 
-    public PostDetailResponse getPostDetail(Integer postId, Long currentUserId) {
+    public PostDetailResponse getPostDetail(Long postId, Long currentUserId) {
         PostDetailProjection projection = postQueryRepo.findPostDetail(postId, currentUserId)
                 .orElseThrow(() -> new DataNotFoundException(ErrorCode.POST_NOT_FOUND));
         List<String> photos = photoQueryRepo.findPostPhotoUrls(postId);

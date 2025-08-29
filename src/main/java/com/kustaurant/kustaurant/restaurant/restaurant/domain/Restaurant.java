@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 public class Restaurant {
-    private Integer restaurantId;
+    private Long restaurantId;
 
     private String restaurantName;
     private Cuisine restaurantCuisine;

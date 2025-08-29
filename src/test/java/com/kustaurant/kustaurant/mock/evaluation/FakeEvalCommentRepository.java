@@ -40,7 +40,7 @@ public class FakeEvalCommentRepository implements EvalCommentRepository {
     }
 
     @Override
-    public Optional<EvalComment> findByIdAndRestaurantId(Long evalCommentId, Integer restaurantId) {
+    public Optional<EvalComment> findByIdAndRestaurantId(Long evalCommentId, Long restaurantId) {
         EvalComment evalComment = data.get(evalCommentId);
         return (evalComment != null && evalComment.getRestaurantId().equals(restaurantId))
                 ? Optional.of(evalComment) : Optional.empty();

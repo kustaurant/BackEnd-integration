@@ -11,15 +11,15 @@ public class EvaluationQueryService {
 
     private final EvaluationQueryRepository evaluationQueryRepository;
 
-    public boolean isUserEvaluated(Long userId, Integer restaurantId) {
+    public boolean isUserEvaluated(Long userId, Long restaurantId) {
         return evaluationQueryRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 
-    public boolean hasEvaluation(Integer restaurantId, Long evaluationId) {
+    public boolean hasEvaluation(Long restaurantId, Long evaluationId) {
         return evaluationQueryRepository.existsByRestaurantAndEvaluation(restaurantId, evaluationId);
     }
 
-    public EvaluationDTO getPreEvaluation(Long userId, Integer restaurantId) {
+    public EvaluationDTO getPreEvaluation(Long userId, Long restaurantId) {
         return evaluationQueryRepository.findActiveByUserAndRestaurant(userId, restaurantId)
                 .map(EvaluationDTO::toDto)
                 .orElse(EvaluationDTO.createIfNotPreEvaluated());

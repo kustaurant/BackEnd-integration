@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.admin.feedback.domain;
 
 import com.kustaurant.kustaurant.admin.feedback.controller.Request.FeedbackRequest;
-import com.kustaurant.kustaurant.common.service.port.ClockHolder;
+import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
 import lombok.Builder;
 import lombok.Getter;
 

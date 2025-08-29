@@ -10,7 +10,6 @@ import java.util.Optional;
 public interface EvaluationRepository {
     Integer countAllByStatus(String status);
     List<Evaluation> findByUserId(Long userId);
-    List<Evaluation> findSortedEvaluationByUserIdDesc(Long userId);
     Optional<Evaluation> findById(Long id);
 
 }

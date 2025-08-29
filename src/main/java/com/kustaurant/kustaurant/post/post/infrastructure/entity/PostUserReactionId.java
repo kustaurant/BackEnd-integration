@@ -12,7 +12,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostUserReactionId implements Serializable {
-    private Integer postId;
+    private Long postId;
     private Long userId;
 
     @Override

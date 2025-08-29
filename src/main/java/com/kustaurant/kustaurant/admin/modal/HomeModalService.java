@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.admin.modal;
 
-import com.kustaurant.kustaurant.common.service.port.ClockHolder;
+import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

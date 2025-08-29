@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.common.enums.Status;
 import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalCommentRequest;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
-import com.kustaurant.kustaurant.global.exception.exception.auth.ForbiddenException;
+import com.kustaurant.kustaurant.global.exception.exception.auth.AccessDeniedException;
 import com.kustaurant.kustaurant.mock.evaluation.FakeEvalCommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +47,7 @@ class EvalCommCommandServiceimplTest {
     void create_returnsProperEvalComment() {
         //g
         Long evalId = 2L;
-        Integer restaurantId = 2;
+        Long restaurantId = 2L;
         Long userId = 2L;
         EvalCommentRequest req = new EvalCommentRequest("테스트 댓글 본문");
 
@@ -90,7 +90,7 @@ class EvalCommCommandServiceimplTest {
 
         //w
         //t
-        assertThrows(ForbiddenException.class,
+        assertThrows(AccessDeniedException.class,
                 ()-> service.delete(1L,1,otherUserId));
         // 1) 댓글이 그대로 ACTIVE 상태인지 확인
         EvalComment after = commentRepo.findById(1L).orElseThrow();

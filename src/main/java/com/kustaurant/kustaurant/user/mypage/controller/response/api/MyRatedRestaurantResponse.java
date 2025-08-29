@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 public record MyRatedRestaurantResponse (
-        Integer restaurantId,
+        Long restaurantId,
         String restaurantName,
         String restaurantImgURL,
         String cuisine,

@@ -3,12 +3,14 @@ package com.kustaurant.kustaurant.user.mypage.controller.response.api;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
+import org.jsoup.Jsoup;
 
 import java.time.LocalDateTime;
 
 public record MyPostsResponse (
-        Integer postId,
-        String postCategory,
+        Long postId,
+        PostCategory postCategory,
         String postTitle,
         String postImgUrl,
         String fullBody,
@@ -16,7 +18,7 @@ public record MyPostsResponse (
         Long commentCount,
         @JsonIgnore LocalDateTime createdAt
 ){
-    private static final int PREVIEW_LENGTH = 20;
+    private static final int PREVIEW_LENGTH = 30;
 
     @JsonProperty("timeAgo")
     public String timeAgo() {
@@ -26,8 +28,8 @@ public record MyPostsResponse (
     @JsonProperty("body")
     public String postBodyPreview() {
         if (fullBody == null) return "";
-        return fullBody.length() <= PREVIEW_LENGTH
-                ? fullBody
-                : fullBody.substring(0, PREVIEW_LENGTH) + "…";
+        String plain = Jsoup.parse(fullBody).text();
+        plain = plain.replaceAll("\\s+", " ").trim();
+        return plain.length() <= PREVIEW_LENGTH ? plain : plain.substring(0, PREVIEW_LENGTH) + "…";
     }
 }

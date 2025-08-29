@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.post.post.domain.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -9,18 +11,22 @@ public enum PostCategory {
     COLUMN("칼럼게시판"),
     SUGGESTION("건의게시판");
 
-    private final String koreanName;
+    private final String koreanCategory;
 
-    PostCategory(String koreanName) {
-        this.koreanName = koreanName;
+    PostCategory(String koreanCategory) {
+        this.koreanCategory = koreanCategory;
     }
-
-    public static PostCategory fromStringToEnum(String category) {
-        for (PostCategory pc : PostCategory.values()) {
-            if (pc.name().equalsIgnoreCase(category)) {
-                return pc;
-            }
+    @JsonCreator
+    public static PostCategory from(Object raw) {
+        if (raw == null) return null;
+        String s = raw.toString().trim();
+        for (PostCategory c : values()) {
+            if (c.name().equalsIgnoreCase(s) || c.koreanCategory.equals(s)) return c;
         }
-        throw new IllegalArgumentException("PostCategory 파라미터가 유효하지 않습니다.");
+        throw new IllegalArgumentException("Unknown PostCategory: " + raw);
+    }
+    @JsonValue
+    public String toJson() {
+        return koreanCategory;
     }
 }

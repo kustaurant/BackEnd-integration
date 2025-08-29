@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +27,7 @@ public class PostCommentReactionEntity {
     @Column(nullable = false)
     private ReactionType reaction;
 
+    @CreationTimestamp
     @Column(name = "reacted_at", nullable = false)
     private LocalDateTime reactedAt;
 

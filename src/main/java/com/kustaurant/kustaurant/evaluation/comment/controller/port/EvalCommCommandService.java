@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalComme
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 
 public interface EvalCommCommandService {
-    EvalComment create(Long evaluationId, Integer restaurantId, Long userId, EvalCommentRequest req);
-    void delete(Long evalCommentId, Integer restaurantId, Long userId);
+    EvalComment create(Long evaluationId, Long restaurantId, Long userId, EvalCommentRequest req);
+    void delete(Long evalCommentId, Long restaurantId, Long userId);
 
 }

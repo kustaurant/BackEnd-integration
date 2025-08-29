@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class PostScrap {
     private Integer scrapId;
     private Long userId;
-    private Integer postId;
+    private Long postId;
     private final LocalDateTime createdAt;
 
     public static PostScrap from(PostScrapEntity entity) {

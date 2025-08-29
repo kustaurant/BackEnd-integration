@@ -15,7 +15,7 @@ import java.util.List;
 public record PostDetailResponse (
         // 게시글
         @Schema(description = "게시글 ID", example = "1")
-        Integer postId,
+        Long postId,
         @Schema(description = "게시글 카테고리", example = "자유게시판")
         PostCategory category,
         @Schema(description = "게시글 제목", example = "맛집 추천해주세요")
@@ -44,7 +44,7 @@ public record PostDetailResponse (
         @Schema(description = "스크랩 수")
         long scrapCount,
         @Schema(description = "방문 수")
-        int visitCount,
+        long visitCount,
         @Schema(description = "유저의 좋아요,싫어요 상호작용 유무 (LIKE: 좋아요, DISLIKE: 싫어요, null: 아무것도 누르지 않음)")
         ReactionType myReaction,
         // 상호작용 정보

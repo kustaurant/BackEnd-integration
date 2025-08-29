@@ -13,7 +13,7 @@ public class PhotoQueryRepository {
     private final JPAQueryFactory queryFactory;
     private static final QPostPhotoEntity photo = QPostPhotoEntity.postPhotoEntity;
 
-    public List<String> findPostPhotoUrls(Integer postId) {
+    public List<String> findPostPhotoUrls(Long postId) {
         return queryFactory.select(photo.photoImgUrl)
                 .from(photo)
                 .where(photo.postId.eq(postId))

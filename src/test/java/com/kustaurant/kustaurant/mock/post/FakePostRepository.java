@@ -15,13 +15,8 @@ public class FakePostRepository implements PostRepository {
     private final List<Post> data = Collections.synchronizedList(new ArrayList<>());
 
     @Override
-    public Optional<Post> findById(Integer id) {
+    public Optional<Post> findById(Long id) {
         return data.stream().filter(item -> item.getId().equals(id)).findAny();
-    }
-
-    @Override
-    public Optional<Post> findByIdWithComments(Integer id) {
-        return Optional.empty();
     }
 
     @Override
@@ -44,55 +39,14 @@ public class FakePostRepository implements PostRepository {
     }
 
 
-
-    @Override
-    public List<Post> findAllById(List<Integer> ids) {
-        return List.of();
-    }
-
-    @Override
-    public void increaseVisitCount(Integer postId) {
-
-    }
-
     @Override
     public void delete(Integer id) {
 
     }
 
     @Override
-    public List<Post> findByUserId(Long userId) {
-        return List.of();
+    public void increaseVisitCount(Long postId) {
+
     }
 
-    @Override
-    public Page<Post> findByStatusAndCategory(PostStatus status, String category, Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public Page<Post> findByStatusAndPopularCount(PostStatus status, int minLikeCount, Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public Page<Post> findByStatusAndCategoryAndPopularCount(PostStatus status, String category, int minLikeCount, Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public Page<Post> findByStatusAndSearchKeyword(PostStatus status, String keyword, String category, int minLikeCount, Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public Post findByStatusAndPostId(PostStatus status, Integer postId) {
-        return null;
-    }
-
-
-    @Override
-    public PostEntity save(PostEntity postEntity) {
-        return null;
-    }
 }

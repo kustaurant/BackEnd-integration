@@ -8,11 +8,11 @@ import java.util.Optional;
 public interface PostScrapRepository {
     void delete(PostScrap postScrap);
 
-    void deleteByPostId(Integer postId);
+    void deleteByPostId(Long postId);
 
-    Optional<PostScrap> findByUserIdAndPostId(Long userId,Integer postId);
+    Optional<PostScrap> findByUserIdAndPostId(Long userId,Long postId);
 
     void save(PostScrap postScrap);
     
-    int countByPostId(Integer postId);
+    int countByPostId(Long postId);
 }

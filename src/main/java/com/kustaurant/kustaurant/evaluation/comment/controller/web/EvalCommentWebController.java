@@ -28,7 +28,7 @@ public class EvalCommentWebController {
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
     @PostMapping("/web/api/restaurants/{restaurantId}/comments/{evalCommentId}")
     public ResponseEntity<EvalCommentResponse> postRestaurantComment(
-            @PathVariable Integer restaurantId,
+            @PathVariable Long restaurantId,
             @PathVariable Long evalCommentId,
             @Valid @RequestBody EvalCommentRequest req,
             @AuthUser AuthUserInfo user
@@ -46,7 +46,7 @@ public class EvalCommentWebController {
     @DeleteMapping("/web/api/restaurants/{restaurantId}/comments/{evalCommentId}")
     public ResponseEntity<Void> deleteRestaurantComment(
             @PathVariable Long evalCommentId,
-            @PathVariable Integer restaurantId,
+            @PathVariable Long restaurantId,
             @AuthUser AuthUserInfo user
     ) {
         evalCommCommandService.delete(evalCommentId, restaurantId, user.id());

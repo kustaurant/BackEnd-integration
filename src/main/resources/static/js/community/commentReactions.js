@@ -1,86 +1,94 @@
 /**
- * 댓글 반응(좋아요, 싫어요) 관리
+ * 댓글 반응(좋아요, 싫어요) 관리 - 이벤트 위임 + 401 처리 + 안전 파싱
  */
 class CommentReactions {
     constructor() {
+        this.onClick = this.onClick.bind(this);
         this.init();
     }
 
     init() {
-        this.bindCommentLikeButtons();
-        this.bindCommentDislikeButtons();
+        // 댓글 리스트 컨테이너 기준(없으면 document에 바인딩)
+        this.container = document.querySelector('.comment-ul') || document;
+        this.container.addEventListener('click', this.onClick, false);
     }
 
-    bindCommentLikeButtons() {
-        document.querySelectorAll('.comment-up').forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                const commentId = e.currentTarget.getAttribute('data-id');
-                this.toggleCommentLike(commentId, e.currentTarget);
-            });
-        });
-    }
+    // 이벤트 위임: .comment-up / .comment-down 클릭 처리
+    onClick(e) {
+        const likeBtn = e.target.closest('.comment-up');
+        const dislikeBtn = e.target.closest('.comment-down');
 
-    bindCommentDislikeButtons() {
-        document.querySelectorAll('.comment-down').forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                const commentId = e.currentTarget.getAttribute('data-id');
-                this.toggleCommentDislike(commentId, e.currentTarget);
-            });
-        });
-    }
+        if (!likeBtn && !dislikeBtn) return;
 
-    async toggleCommentLike(commentId, buttonElement) {
-        try {
-            const response = await fetch(`/api/comments/${commentId}/like`, {
-                method: 'POST',
-                headers: Utils.getCsrfHeaders()
-            });
+        e.preventDefault();
 
-            if (Utils.handleLoginRedirect(response)) return;
+        const btn = likeBtn || dislikeBtn;
+        const commentId = btn.getAttribute('data-id') || btn.dataset.id;
+        if (!commentId) return;
 
-            const data = await response.json();
-            this.updateCommentReactionUI(buttonElement, data);
-        } catch (error) {
-            console.error('Error:', error);
+        if (btn.dataset.loading === '1') return; // 중복 요청 방지
+        btn.dataset.loading = '1';
+
+        if (likeBtn) {
+            this.toggleReaction(commentId, btn, 'like');
+        } else {
+            this.toggleReaction(commentId, btn, 'dislike');
         }
     }
 
-    async toggleCommentDislike(commentId, buttonElement) {
+    async toggleReaction(commentId, buttonElement, kind /* 'like' | 'dislike' */) {
         try {
-            const response = await fetch(`/api/comments/${commentId}/dislike`, {
+            const res = await fetch(`/api/comments/${commentId}/${kind}`, {
                 method: 'POST',
-                headers: Utils.getCsrfHeaders()
+                headers: Utils.apiHeaders()
             });
 
-            if (Utils.handleLoginRedirect(response)) return;
+            if (res.status === 401) {
+                Utils.redirectToLogin();
+                return;
+            }
 
-            const data = await response.json();
+            if (!res.ok) {
+                const err = await Utils.safeJson(res);
+                console.error('Comment reaction failed:', res.status, err?.message);
+                Utils.showAlert(err?.message || '처리에 실패했습니다.');
+                return;
+            }
+
+            const data = await Utils.safeJson(res) || {};
             this.updateCommentReactionUI(buttonElement, data);
-        } catch (error) {
-            console.error('Error:', error);
+        } catch (err) {
+            console.error('toggleReaction error:', err);
+            Utils.showAlert('네트워크 오류가 발생했습니다.');
+        } finally {
+            delete buttonElement.dataset.loading;
         }
     }
 
     updateCommentReactionUI(buttonElement, data) {
-        const netLikes = data.likeCount - data.dislikeCount;
-        const parentNode = buttonElement.parentNode;
-        const totalLikeCountElement = parentNode.querySelector(".totalLikeCount");
-        
-        if (totalLikeCountElement) {
-            totalLikeCountElement.textContent = netLikes;
-        }
+        // 반응 영역 컨테이너 추정 (구조에 맞게 가장 가까운 공통 부모)
+        const box =
+            buttonElement.closest('.comment-reaction') ||
+            buttonElement.closest('.comment-actions') ||
+            buttonElement.parentNode;
 
-        const likeButtonImage = parentNode.querySelector('.comment-up img');
-        const dislikeButtonImage = parentNode.querySelector('.comment-down img');
+        // 합산 카운트 갱신
+        const likeCount = Number(data.likeCount ?? 0);
+        const dislikeCount = Number(data.dislikeCount ?? 0);
+        const netLikes = likeCount - dislikeCount;
 
-        if (likeButtonImage && dislikeButtonImage) {
-            this.updateReactionImages(data.reactionType, likeButtonImage, dislikeButtonImage);
-        }
+        const totalLikeCountEl = box?.querySelector('.totalLikeCount');
+        if (totalLikeCountEl) totalLikeCountEl.textContent = String(netLikes);
+
+        // 아이콘 스왑
+        const likeImg = box?.querySelector('.comment-up img');
+        const dislikeImg = box?.querySelector('.comment-down img');
+        this.updateReactionImages(data.reactionType, likeImg, dislikeImg);
     }
 
     updateReactionImages(reactionType, likeImage, dislikeImage) {
+        if (!likeImage || !dislikeImage) return;
+
         if (reactionType === 'LIKE') {
             likeImage.src = '/img/community/up-green.png';
             dislikeImage.src = '/img/community/down.png';
@@ -88,7 +96,7 @@ class CommentReactions {
             likeImage.src = '/img/community/up.png';
             dislikeImage.src = '/img/community/down-red.png';
         } else {
-            // reactionType이 null인 경우 (반응 취소됨)
+            // null: 반응 해제
             likeImage.src = '/img/community/up.png';
             dislikeImage.src = '/img/community/down.png';
         }

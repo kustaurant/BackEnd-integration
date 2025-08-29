@@ -13,7 +13,7 @@ import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteS
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.RefreshTokenStore;
-import com.kustaurant.kustaurant.user.mypage.controller.port.MypageApiService;
+import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRatedRestaurantResponse;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
@@ -47,7 +47,8 @@ class MypageApiServiceIT {
     @MockBean RefreshTokenStore refreshTokenStore;
     @MockBean FindByIndexNameSessionRepository<?> sessionRepository;
 
-    @Autowired MypageApiService mypageApiService;
+    @Autowired
+    MypageService mypageApiService;
     @Autowired EvaluationCommandService evaluationService;
     @Autowired RestaurantFavoriteService restaurantFavoriteService;
     @Autowired
@@ -271,7 +272,7 @@ class MypageApiServiceIT {
         // t
         assertEquals(2, res.size());
         assertThat(res.get(0).postTitle()).isEqualTo("테스트게시글1");
-        assertThat(res.get(1).postcommentBody()).isEqualTo("게시글2-댓글1");
+        assertThat(res.get(1).body()).isEqualTo("게시글2-댓글1");
         assertThat(res.get(1).postCategory()).isEqualTo(PostCategory.SUGGESTION);
     }
 

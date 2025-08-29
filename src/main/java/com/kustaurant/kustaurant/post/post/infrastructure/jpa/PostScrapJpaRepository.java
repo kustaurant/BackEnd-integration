@@ -15,12 +15,12 @@ public interface PostScrapJpaRepository extends JpaRepository<PostScrapEntity, I
         ORDER BY ps.createdAt DESC""")
     List<PostScrapEntity> findByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
 
-    boolean existsByUserIdAndPostId(Long userId, Integer postId);
+    boolean existsByUserIdAndPostId(Long userId, Long postId);
 
 
-    void deleteByPostId(Integer postId);
+    void deleteByPostId(Long postId);
 
-    Optional<PostScrapEntity> findByUserIdAndPostId(Long userId, Integer postId);
+    Optional<PostScrapEntity> findByUserIdAndPostId(Long userId, Long postId);
     
-    int countByPostId(Integer postId);
+    int countByPostId(Long postId);
 }

@@ -1,9 +1,8 @@
 package com.kustaurant.kustaurant.global.exception.advice;
 
+import com.kustaurant.kustaurant.global.exception.WebErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -34,13 +33,13 @@ public class GlobalExceptionWebHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public Map<String,String> handleValidation(MethodArgumentNotValidException ex) {
+    public WebErrorResponse handleValidation(MethodArgumentNotValidException ex) {
         String msg = ex.getFieldErrors().stream()
                 .findFirst()
                 .map(FieldError::getDefaultMessage)
-                .orElse("");
+                .orElse("입력값이 올바르지 않습니다.");
 
-        return Map.of("message", msg);
+        return new WebErrorResponse("BAD_REQUEST", msg);
     }
 
     @ExceptionHandler(Exception.class)

@@ -32,11 +32,6 @@ public class PostService {
     private final PostReactionRepository postReactionRepository;
     private final PostCommentReactionRepository postCommentReactionRepository;
 
-    // 조회수 증가
-    public void increaseVisitCount(Integer postId) {
-        postRepository.increaseVisitCount(postId);
-    }
-
     public Post create(PostRequest req, Long userId) {
         Post savedPost = postRepository.save(Post.builder()
                 .title(req.title())
@@ -64,27 +59,26 @@ public class PostService {
         return savedPost;
     }
 
-    public void update(Integer postId, PostRequest req,Long userId) {
+    public void update(Long postId, PostRequest req,Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new DataNotFoundException(POST_NOT_FOUND));
         post.ensureWriterBy(userId);
+        Post update = post.update(postId, req);
 
         List<String> imageUrls = ImageExtractor.extract(req.content());
-        post.update(req);
-
         postPhotoRepository.deleteByPostId(postId);
         // ID 기반으로 사진 저장
-        for (String imageUrl : imageUrls) {
+        for (String url : imageUrls) {
             postPhotoRepository.save(PostPhoto.builder()
                     .postId(postId)
-                    .photoImgUrl(imageUrl)
+                    .photoImgUrl(url)
                     .status(PostStatus.ACTIVE)
                     .build());
         };
-        postRepository.save(post);
+        postRepository.save(update);
     }
 
-    public void delete(Integer postId, Long userId) {
+    public void delete(Long postId, Long userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND, postId, "게시글"));
         post.ensureWriterBy(userId);

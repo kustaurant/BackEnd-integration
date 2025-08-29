@@ -21,7 +21,7 @@ public class FavoriteWebController {
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
     @PostMapping("/web/api/restaurants/{restaurantId}/favorite/toggle")
     public ResponseEntity<FavoriteResponseDTO> toggleFavorite(
-            @PathVariable Integer restaurantId,
+            @PathVariable Long restaurantId,
             @AuthUser AuthUserInfo user
     ) {
         // 즐겨찾기 로직

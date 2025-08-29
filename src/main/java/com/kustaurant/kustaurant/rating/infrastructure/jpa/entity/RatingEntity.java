@@ -19,7 +19,7 @@ public class RatingEntity {
 
     @Id
     @Column(name = "restaurant_id")
-    private int restaurantId;
+    private long restaurantId;
     @Column(nullable = false)
     private double score;
     @Column(nullable = false)

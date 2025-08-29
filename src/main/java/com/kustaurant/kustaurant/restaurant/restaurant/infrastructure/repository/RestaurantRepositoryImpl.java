@@ -13,11 +13,16 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class RestaurantRepositoryImpl implements RestaurantRepository {
 
-    private final RestaurantJpaRepository jpaRepository;
+    private final RestaurantJpaRepository jpa;
 
     @Override
-    public Restaurant getByIdAndStatus(Integer id, String status) {
-        return jpaRepository.findByRestaurantIdAndStatus(id, status).map(RestaurantEntity::toModel)
+    public Restaurant getByIdAndStatus(Long id, String status) {
+        return jpa.findByRestaurantIdAndStatus(id, status).map(RestaurantEntity::toModel)
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND, "요청한 restaurant가 존재하지 않습니다. 요청 정보 - id: " + id + ", status: " + status));
+    }
+
+    @Override
+    public void increaseVisitCount(Long restaurantId) {
+        jpa.incrementViews(restaurantId);
     }
 }

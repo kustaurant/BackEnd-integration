@@ -78,7 +78,7 @@ public class DrawWebController {
     // id에 해당 하는 식당 정보 반환
     @GetMapping("/web/api/recommend/restaurant")
     public ResponseEntity<Restaurant> recommendRestaurant(
-            @RequestParam(name = "restaurantId") Integer restaurantId
+            @RequestParam(name = "restaurantId") Long restaurantId
     ) {
         Restaurant restaurant = restaurantDrawService.getById(restaurantId);
         return ResponseEntity.ok(restaurant);

@@ -1,17 +1,28 @@
 package com.kustaurant.kustaurant.user.mypage.controller.port;
 
-import com.kustaurant.kustaurant.post.comment.domain.PostComment;
-import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
-import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.kustaurant.post.post.domain.PostScrap;
-import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
+import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
+import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.*;
 import com.kustaurant.kustaurant.user.mypage.controller.response.web.MypageDataView;
 
 import java.util.List;
 
 public interface MypageService {
-    List<RestaurantFavorite> getRestaurantFavorites(Long userId);
-    List<Evaluation> getEvaluations(Long userId);
-    List<Post> getActivePosts(Long userId);
-    MypageDataView getMypageData(Long userId);
+
+    ProfileResponse getProfile(Long userId);
+
+    ProfileUpdateResponse updateUserProfile(Long userId, ProfileUpdateRequest req);
+
+    List<MyRestaurantResponse> getUserFavoriteRestaurantList(Long userId);
+
+    List<MyRatedRestaurantResponse> getUserEvaluateRestaurantList(Long userId);
+
+    List<MyPostsResponse> getUserPosts(Long userId);
+
+    List<MyPostsResponse> getScrappedUserPosts(Long userId);
+
+    List<MyPostCommentResponse> getCommentedUserPosts(Long userId);
+
+    List<NoticeDTO> getAllNotices();
+    MypageDataView getMypageWebData(Long userId);
 }

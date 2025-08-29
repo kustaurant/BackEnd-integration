@@ -32,7 +32,6 @@ public enum ErrorCode {
 
     /* ──── POST ──── */
     POST_NOT_FOUND        (HttpStatus.NOT_FOUND  , "POST-001", "게시글을 찾을 수 없습니다."),
-    POST_NO_AUTHORITY     (HttpStatus.FORBIDDEN  , "POST-002", "게시글을 삭제할 권한이 없습니다."),
     POST_ALREADY_DELETED  (HttpStatus.CONFLICT   , "POST-003", "이미 삭제된 게시글입니다."),
 
     /* ──── COMMENT ──── */

@@ -23,7 +23,7 @@ public class PostScrapEntity {
     private Long userId;
 
     @Column(name="post_id", nullable = false)
-    private Integer postId;
+    private Long postId;
 
     private LocalDateTime createdAt;
 
@@ -31,7 +31,7 @@ public class PostScrapEntity {
     private PostScrapEntity (
             Integer scrapId,
             Long userId,
-            Integer postId,
+            Long postId,
             LocalDateTime createdAt
     ) {
         this.scrapId = scrapId;

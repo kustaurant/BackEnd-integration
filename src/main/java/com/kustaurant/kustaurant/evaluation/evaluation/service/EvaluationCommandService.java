@@ -21,7 +21,7 @@ public class EvaluationCommandService {
     private final EvalS3Service s3Service;
 
     @Transactional
-    public void evaluate(Long userId, Integer restaurantId, EvaluationDTO dto) {
+    public void evaluate(Long userId, Long restaurantId, EvaluationDTO dto) {
         EvaluationDTO updated = applyImgUrlIfNewImageAdded(dto);
 
         if (hasUserEvaluatedRestaurant(userId, restaurantId)) {
@@ -34,7 +34,7 @@ public class EvaluationCommandService {
     /**
      * 평가 새로 생성
      */
-    private void createEvaluation(Long userId, Integer restaurantId, EvaluationDTO dto) {
+    private void createEvaluation(Long userId, Long restaurantId, EvaluationDTO dto) {
         // 평가 생성
         Evaluation created = Evaluation.create(userId, restaurantId, dto);
 
@@ -51,7 +51,7 @@ public class EvaluationCommandService {
     /**
      * 재평가
      */
-    private void reEvaluate(Long userId, Integer restaurantId, EvaluationDTO dto) {
+    private void reEvaluate(Long userId, Long restaurantId, EvaluationDTO dto) {
         evaluationQueryRepository
                 .findActiveByUserAndRestaurant(userId, restaurantId)
                 .ifPresent(evaluation -> { // 항상 존재함.
@@ -84,7 +84,7 @@ public class EvaluationCommandService {
         return evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty();
     }
 
-    private boolean hasUserEvaluatedRestaurant(Long userId, Integer restaurantId) {
+    private boolean hasUserEvaluatedRestaurant(Long userId, Long restaurantId) {
         return evaluationQueryRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 }

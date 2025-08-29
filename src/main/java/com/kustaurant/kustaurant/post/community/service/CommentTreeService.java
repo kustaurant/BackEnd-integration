@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class CommentTreeService {
     private final CommentQueryRepository commentQueryRepository;
 
-    public List<ParentComment> getCommentTree(Integer postId, Long currentUserId) {
+    public List<ParentComment> getCommentTree(Long postId, Long currentUserId) {
         List<PostCommentProjection> projections = commentQueryRepository.findComments(postId,currentUserId);
         // 부모 댓글 목록
         List<PostCommentProjection> parents = projections.stream()

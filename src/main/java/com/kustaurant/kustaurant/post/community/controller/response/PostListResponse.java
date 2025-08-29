@@ -7,7 +7,7 @@ import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
 import org.jsoup.Jsoup;
 
 public record PostListResponse(
-        Integer postId,
+        Long postId,
         PostCategory category,
         String title,
         String body,

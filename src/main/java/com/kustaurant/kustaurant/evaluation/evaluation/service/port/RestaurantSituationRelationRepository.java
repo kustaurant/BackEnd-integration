@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public interface RestaurantSituationRelationRepository {
 
-    Optional<RestaurantSituationRelation> findByRestaurantIdAndSituationId(Integer restaurantId, Long situationId);
+    Optional<RestaurantSituationRelation> findByRestaurantIdAndSituationId(Long restaurantId, Long situationId);
 
     Long create(RestaurantSituationRelation restaurantSituationRelation);
 

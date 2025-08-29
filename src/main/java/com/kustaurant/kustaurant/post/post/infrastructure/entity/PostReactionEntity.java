@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 public class PostReactionEntity {
     @Id
     @Column(name = "post_id")
-    private Integer postId;
+    private Long postId;
 
     @Id
     @Column(name = "user_id")
@@ -26,11 +27,12 @@ public class PostReactionEntity {
     @Column(nullable = false)
     private ReactionType reaction;
 
+    @CreationTimestamp
     @Column(name = "reacted_at", nullable = false)
     private LocalDateTime reactedAt;
 
     public static PostReactionEntity of(
-            Integer postId, Long userId, ReactionType reaction
+            Long postId, Long userId, ReactionType reaction
     ) {
         PostReactionEntity entity = new PostReactionEntity();
         entity.postId   = postId;

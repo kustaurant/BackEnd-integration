@@ -19,7 +19,7 @@ public class EvalCommentEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private Long userId;
     @Column(nullable = false)
-    private Integer restaurantId;
+    private Long restaurantId;
     @Column(nullable = false)
     private Long evaluationId;
     @Column(nullable = false)

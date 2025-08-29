@@ -27,6 +27,11 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     }
 
     @Override
+    public Optional<PostComment> findByIdForUpdate(Integer comment_id) {
+        return jpa.findByIdForUpdate(comment_id).map(PostCommentEntity::toModel);
+    }
+
+    @Override
     public PostComment save(PostComment comment) {
         // 신규 댓글 (id가 null)
         if (comment.getId() == null) {
@@ -41,6 +46,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
 
         // 댓글 내용과 상태 업데이트
         PostCommentEntity updatedEntity = PostCommentEntity.builder()
+                .commentId(comment.getId())
                 .commentBody(comment.getBody())
                 .status(comment.getStatus())
                 .postId(entity.getPostId())
@@ -66,7 +72,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     }
 
     @Override
-    public long countActiveRepliesByPostId(Integer postId) {
+    public long countVisibleRepliesByPostId(Long postId) {
         return jpa.countByPostId(postId);
     }
 
@@ -89,7 +95,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     }
 
     @Override
-    public void deleteByPostId(Integer postId) {
+    public void deleteByPostId(Long postId) {
         jpa.deleteByPostId(postId);
     }
 }

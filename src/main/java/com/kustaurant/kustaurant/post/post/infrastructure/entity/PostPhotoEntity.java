@@ -4,7 +4,6 @@ import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
@@ -17,8 +16,8 @@ public class PostPhotoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer photoId;
 
-    @Column(name = "post_id", nullable = false, insertable = false, updatable = false)
-    private Integer postId;
+    @Column(name = "post_id", nullable = false)
+    private Long postId;
 
     private String photoImgUrl;
 

@@ -13,13 +13,13 @@ public class RestaurantFavoriteService {
     // repository
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
 
-    public long countByRestaurantId(Integer restaurantId) {
+    public long countByRestaurantId(Long restaurantId) {
         return restaurantFavoriteRepository.countByRestaurantId(restaurantId);
     }
 
     // 즐겨찾기 토글
     @Transactional
-    public boolean toggleFavorite(Long userId, Integer restaurantId) {
+    public boolean toggleFavorite(Long userId, Long restaurantId) {
         RestaurantFavorite favorite;
         try {
             // 즐겨찾기 정보 조회
@@ -34,7 +34,7 @@ public class RestaurantFavoriteService {
         return false;
     }
 
-    public void addFavorite(Long userId, Integer restaurantId) {
+    public void addFavorite(Long userId, Long restaurantId) {
         restaurantFavoriteRepository.save(
                 RestaurantFavorite.create(userId, restaurantId)
         );

@@ -49,7 +49,7 @@ class ModalManager {
         try {
             const response = await fetch(`/api/posts/${postId}`, {
                 method: 'DELETE',
-                headers: Utils.getCsrfHeaders()
+                headers: Utils.apiHeaders()
             });
 
             if (response.ok) {

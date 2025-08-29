@@ -15,7 +15,7 @@ public class RestaurantMenuEntity {
     private Integer id;
 
     @Column(name = "restaurant_id", nullable = false)
-    private Integer restaurantId;
+    private Long restaurantId;
 
     private String menuName;
     private String menuPrice;

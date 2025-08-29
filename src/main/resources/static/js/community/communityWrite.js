@@ -2,19 +2,11 @@
  * 커뮤니티 게시글 작성 페이지
  */
 document.addEventListener('DOMContentLoaded', function () {
-    // 에디터 초기화
     const editorManager = new EditorManager();
     editorManager.initializeEditor();
 
-    // 뒤로 가기 버튼
-    const backButton = document.getElementById('back-button');
-    if (backButton) {
-        backButton.addEventListener('click', () => {
-            window.history.back();
-        });
-    }
+    document.getElementById('back-button')?.addEventListener('click', () => window.history.back());
 
-    // 폼 제출 처리
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', (event) => {
@@ -24,54 +16,43 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleFormSubmit(form) {
-        // 입력 검증
-        const category = form.querySelector('select[name="postCategory"]').value;
-        if (!category) {
-            Utils.showAlert('카테고리를 선택해주세요.');
-            return;
-        }
+        const category = form.querySelector('select[name="postCategory"]')?.value;
+        if (!category) return Utils.showAlert('카테고리를 선택해주세요.');
 
-        const title = form.querySelector(".title").value.trim();
-        if (!title) {
-            Utils.showAlert('제목을 입력해주세요.');
-            return;
-        }
+        const title = form.querySelector('.title')?.value.trim();
+        if (!title) return Utils.showAlert('제목을 입력해주세요.');
 
-        const content = tinymce.get('tiny-editor').getContent();
-        if (!content) {
-            Utils.showAlert('내용을 입력해주세요.');
-            return;
-        }
+        const content = tinymce.get('tiny-editor')?.getContent();
+        if (!content) return Utils.showAlert('내용을 입력해주세요.');
 
-        // 서버로 전송
-        const postData = {
-            title: title,
-            category: category,
-            content: content
-        };
-
-        submitPost(postData);
+        submitPost({ title, category, content });
     }
 
     async function submitPost(postData) {
         try {
-            const response = await fetch('/api/posts', {
+            const res = await fetch('/api/posts', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...Utils.getCsrfHeaders()
-                },
+                headers: Utils.apiHeaders({ json: true }),
                 body: JSON.stringify(postData)
             });
 
-            if (Utils.handleLoginRedirect(response)) return;
+            if (res.status === 401) { Utils.redirectToLogin(); return; }
+
+            if (!res.ok) {
+                const err = await Utils.safeJson(res);
+                Utils.showAlert(err?.message || `작성 실패 (${res.status})`);
+                return;
+            }
+
+            // 서버가 생성된 글 ID를 JSON으로 준다면:
+            // const data = await Utils.safeJson(res);
+            // if (data?.postId) return Utils.redirectTo(`/community/${data.postId}`);
 
             Utils.redirectTo('/community');
         } catch (error) {
-            Utils.showAlert(error.message);
-            console.error('Error:', error);
+            console.error('submitPost error:', error);
+            Utils.showAlert('네트워크 오류가 발생했습니다.');
             Utils.redirectTo('/community');
         }
     }
-
 });

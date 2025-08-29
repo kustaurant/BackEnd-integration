@@ -37,7 +37,7 @@ public class EvalCommentApiController {
     })
     @PostMapping("/api/v1/auth/restaurants/{restaurantId}/comments/{evalCommentId}")
     public ResponseEntity<EvalCommentResponse> addEvaluationComment(
-            @PathVariable Integer restaurantId,
+            @PathVariable Long restaurantId,
             @PathVariable Long evalCommentId,
             @Valid @RequestBody EvalCommentRequest req,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
@@ -59,7 +59,7 @@ public class EvalCommentApiController {
     })
     @DeleteMapping("/api/v1/auth/restaurants/{restaurantId}/comments/{evalCommentId}")
     public ResponseEntity<Void> deleteComment(
-            @PathVariable Integer restaurantId,
+            @PathVariable Long restaurantId,
             @PathVariable Long evalCommentId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {

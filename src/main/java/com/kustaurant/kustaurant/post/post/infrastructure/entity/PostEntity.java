@@ -25,7 +25,7 @@ import java.util.List;
 @Table(name = "posts_tbl")
 public class PostEntity extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer postId;
+    private Long postId;
 
     private String postTitle;
     private String postBody;
@@ -33,33 +33,41 @@ public class PostEntity extends BaseTimeEntity {
     @Enumerated(EnumType.STRING) @Column(columnDefinition = "varchar(20)")
     private PostStatus status;
 
-    @Enumerated(EnumType.STRING) @Column(name = "post_category", columnDefinition = "varchar(20)")
+    @Enumerated(EnumType.STRING) @Column(name = "post_category", columnDefinition = "enum('FREE','COLUMN','SUGGESTION')")
     private PostCategory postCategory;
 
     private Integer postVisitCount = 0;
     private Integer netLikes = 0;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "post_id", nullable = false)
-    @OrderBy("photoId ASC")
-    private List<PostPhotoEntity> photos = new ArrayList<>();
-
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Builder
+    @Builder(toBuilder = true)
     public PostEntity(
+            Long postId,
             String postTitle,
             String postBody,
             PostCategory postCategory,
             PostStatus status,
             Long userId
     ) {
+        this.postId = postId;
         this.postTitle = postTitle;
         this.postBody = postBody;
         this.postCategory = postCategory;
         this.status = status;
         this.userId = userId;
+    }
+
+    public static PostEntity from(Post post) {
+        return PostEntity.builder()
+                .postId(post.getId())
+                .postTitle(post.getTitle())
+                .postBody(post.getBody())
+                .postCategory(post.getCategory())
+                .status(post.getStatus())
+                .userId(post.getWriterId())
+                .build();
     }
 
     public Post toModel() {
@@ -73,16 +81,6 @@ public class PostEntity extends BaseTimeEntity {
                 .updatedAt(getUpdatedAt())
                 .visitCount(postVisitCount)
                 .writerId(userId)
-                .build();
-    }
-
-    public static PostEntity from(Post post) {
-        return PostEntity.builder()
-                .postTitle(post.getTitle())
-                .postBody(post.getBody())
-                .postCategory(post.getCategory())
-                .status(post.getStatus())
-                .userId(post.getWriterId())
                 .build();
     }
 }

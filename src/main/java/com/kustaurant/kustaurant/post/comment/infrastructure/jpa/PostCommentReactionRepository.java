@@ -19,5 +19,5 @@ public interface PostCommentReactionRepository extends JpaRepository<PostComment
             where c.postId = :postId
         )
     """)
-    void deleteByPostId(Integer postId);
+    void deleteByPostId(Long postId);
 }

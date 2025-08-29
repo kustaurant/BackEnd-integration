@@ -31,12 +31,7 @@ public class PostPhotoRepositoryImpl implements PostPhotoRepository {
     }
 
     @Override
-    public List<PostPhoto> findByPostId(Integer postId) {
-        return jpa.findByPostId(postId).stream().map(PostPhotoEntity::toDomain).toList();
-    }
-
-    @Override
-    public void deleteByPostId(Integer postId) {
+    public void deleteByPostId(Long postId) {
         jpa.deleteByPostId(postId);
     }
 }

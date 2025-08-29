@@ -28,7 +28,7 @@ public class EvalCommentRepositoryImpl implements EvalCommentRepository {
     }
 
     @Override
-    public Optional<EvalComment> findByIdAndRestaurantId(Long evalCommentId, Integer restaurantId) {
+    public Optional<EvalComment> findByIdAndRestaurantId(Long evalCommentId, Long restaurantId) {
         return jpaRepository.findByIdAndRestaurantId(evalCommentId, restaurantId).map(EvalCommentEntity::toModel);
     }
 

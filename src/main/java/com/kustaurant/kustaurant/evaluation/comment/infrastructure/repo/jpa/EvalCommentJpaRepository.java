@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface EvalCommentJpaRepository extends JpaRepository<EvalCommentEntity, Long> {
 
-    Optional<EvalCommentEntity> findByIdAndRestaurantId(Long id, Integer restaurantId);
+    Optional<EvalCommentEntity> findByIdAndRestaurantId(Long id, Long restaurantId);
 
     List<EvalCommentEntity> findAllByEvaluationIdInAndStatus(List<Long> evalIds, Status status);
 }

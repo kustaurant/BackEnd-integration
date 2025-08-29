@@ -12,10 +12,10 @@ public record PostCommentProjection(
         PostCommentStatus status,
         Long writerId,
         String writerNickname,
-        long writerEvalCount,
+        Long  writerEvalCount,
         LocalDateTime createdAt,
-        long likeCount,
-        long dislikeCount,
+        Long  likeCount,
+        Long  dislikeCount,
         ReactionType myReaction
 ) {
 }

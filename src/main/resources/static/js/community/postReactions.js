@@ -46,50 +46,47 @@ class PostReactions {
 
     async togglePostLike(postId) {
         try {
-            const response = await fetch(`/api/posts/${postId}/like`, {
+            const res = await fetch(`/api/posts/${postId}/like`, {
                 method: 'POST',
-                headers: Utils.getCsrfHeaders()
+                headers: Utils.apiHeaders()
             });
 
-            if (Utils.handleLoginRedirect(response)) return;
-
-            const data = await response.json();
+            if (res.status === 401) { Utils.redirectToLogin(); return; }
+            if (!res.ok) {
+                let msg = ''; try { msg = (await res.json()).message; } catch {}
+                Utils.showAlert(msg || '좋아요 처리에 실패했습니다.'); return;
+            }
+            const data = await res.json();
             this.updateLikeDislikeUI(data);
-        } catch (error) {
-            console.error('Error:', error);
-        }
+        } catch (e) { console.error(e); Utils.showAlert('네트워크 오류가 발생했습니다.'); }
     }
 
     async togglePostDislike(postId) {
-        try {
-            const response = await fetch(`/api/posts/${postId}/dislike`, {
-                method: 'POST',
-                headers: Utils.getCsrfHeaders()
-            });
-
-            if (Utils.handleLoginRedirect(response)) return;
-
-            const data = await response.json();
-            this.updateLikeDislikeUI(data);
-        } catch (error) {
-            console.error('Error:', error);
+        const res = await fetch(`/api/posts/${postId}/dislike`, {
+            method: 'POST',
+            headers: Utils.apiHeaders()
+        });
+        if (res.status === 401) { Utils.redirectToLogin(); return; }
+        if (!res.ok) {
+            let msg=''; try { msg=(await res.json()).message; } catch {}
+            Utils.showAlert(msg || '싫어요 처리에 실패했습니다.'); return;
         }
+        const data = await res.json();
+        this.updateLikeDislikeUI(data);
     }
 
     async togglePostScrap(postId) {
-        try {
-            const response = await fetch(`/api/posts/${postId}/scrap`, {
-                method: 'POST',
-                headers: Utils.getCsrfHeaders()
-            });
-
-            if (Utils.handleLoginRedirect(response)) return;
-
-            const data = await response.json();
-            this.updateScrapUI(data);
-        } catch (error) {
-            console.error('Error:', error);
+        const res = await fetch(`/api/posts/${postId}/scrap`, {
+            method: 'POST',
+            headers: Utils.apiHeaders()
+        });
+        if (res.status === 401) { Utils.redirectToLogin(); return; }
+        if (!res.ok) {
+            let msg=''; try { msg=(await res.json()).message; } catch {}
+            Utils.showAlert(msg || '스크랩 처리에 실패했습니다.'); return;
         }
+        const data = await res.json();
+        this.updateScrapUI(data);
     }
 
     updateLikeDislikeUI(data) {
@@ -99,7 +96,7 @@ class PostReactions {
         const recommendSpan = document.querySelector("#postRecommendCount");
 
         if (likeSpan) likeSpan.textContent = data.likeCount;
-        if (dislikeSpan) dislikeSpan.textContent = data.dislikeCount === 0 ? 0 : "-" + data.dislikeCount;
+        if (dislikeSpan) dislikeSpan.textContent = data.dislikeCount;
         if (recommendSpan) recommendSpan.textContent = "추천 " + (data.likeCount - data.dislikeCount);
 
         // reactionType 기반 이미지 처리
@@ -126,7 +123,6 @@ class PostReactions {
     updateScrapUI(data) {
         const scrapImage = document.querySelector('#scrap img');
         const scrapCountSpan = document.querySelector('#scrap span');
-        const postScrapCountSpan = document.querySelector('#postScrapCount');
         
         if (scrapImage) {
             scrapImage.src = data.status === 'SCRAPPED' 
@@ -134,7 +130,8 @@ class PostReactions {
                 : '/img/community/scrap.png';
         }
         
-        if (scrapCountSpan) scrapCountSpan.textContent = data.scrapCount;
-        if (postScrapCountSpan) postScrapCountSpan.textContent = '스크랩 ' + data.scrapCount;
+        if (scrapCountSpan) {
+            scrapCountSpan.textContent = data.postScrapCount;
+        }
     }
 }

@@ -20,7 +20,7 @@ public class RestaurantDrawService {
 
     Random rand = new Random();
 
-    public Restaurant getById(Integer restaurantId) {
+    public Restaurant getById(Long restaurantId) {
         return restaurantDrawRepository.getById(restaurantId);
     }
 

@@ -27,10 +27,7 @@ public class OAuthAttributes {
         this.nameAttributeKey = nameAttributeKey;
     }
 
-    public static OAuthAttributes of(
-            Map<String, Object> attributes
-    ) {
-
+    public static OAuthAttributes of(Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
         return OAuthAttributes.builder()

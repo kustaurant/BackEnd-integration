@@ -23,12 +23,12 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
 
 
     @Override
-    public void deleteByPostId(Integer postId) {
+    public void deleteByPostId(Long postId) {
         postScrapJpaRepository.deleteByPostId(postId);
     }
 
     @Override
-    public Optional<PostScrap> findByUserIdAndPostId(Long userId, Integer postId) {
+    public Optional<PostScrap> findByUserIdAndPostId(Long userId, Long postId) {
         return postScrapJpaRepository.findByUserIdAndPostId(userId, postId).map(PostScrapEntity::toModel);
     }
 
@@ -38,7 +38,7 @@ public class PostScrapRepositoryImpl implements PostScrapRepository {
     }
 
     @Override
-    public int countByPostId(Integer postId) {
+    public int countByPostId(Long postId) {
         return postScrapJpaRepository.countByPostId(postId);
     }
 }

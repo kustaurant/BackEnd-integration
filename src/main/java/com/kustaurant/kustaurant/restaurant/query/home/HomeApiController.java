@@ -29,7 +29,9 @@ public class HomeApiController {
             @ApiResponse(responseCode = "404", description = "restaurant not found", content = {@Content(mediaType = "application/json")})
     })
     @GetMapping("/api/v1/home")
-    public ResponseEntity<RestaurantListsResponse> home(@Parameter(hidden = true) @AuthUser AuthUserInfo user) {
+    public ResponseEntity<RestaurantListsResponse> home(
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
+    ) {
         List<RestaurantCoreInfoDto> topRestaurantsByRatingDTOs = restaurantHomeService.getTopRestaurants(
                 user.id()); // 점수 높은 순으로 총 16개
         // 로그인 여부에 따라 랜덤 식당 또는 추천 식당을 반환하는 서비스 메서드를 호출합니다.

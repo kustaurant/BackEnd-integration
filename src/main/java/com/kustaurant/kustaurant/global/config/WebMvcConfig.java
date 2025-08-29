@@ -1,11 +1,12 @@
 package com.kustaurant.kustaurant.global.config;
 
+import com.kustaurant.kustaurant.global.auth.web.CurrentUrlInterceptor;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.CuisineListArgumentResolver;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.LocationListArgumentResolver;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.SituationListArgumentResolver;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserArgumentResolver;
-import com.kustaurant.kustaurant.global.auth.web.MyInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -37,6 +38,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new MyInterceptor());
+        registry.addInterceptor(new CurrentUrlInterceptor()).addPathPatterns("/**");
     }
 }

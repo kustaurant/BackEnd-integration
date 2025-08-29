@@ -10,8 +10,8 @@ import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
-@SQLDelete(sql = "update post_comments_tbl set status = 'DELETED' where comment_id = ?")
-@SQLRestriction("status = 'ACTIVE'")
+@SQLDelete(sql = "update post_comments set status = 'DELETED' where comment_id = ?")
+@SQLRestriction("status <> 'DELETED'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="post_comments")
 public class PostCommentEntity extends BaseTimeEntity {
@@ -28,19 +28,21 @@ public class PostCommentEntity extends BaseTimeEntity {
     Integer parentCommentId;
 
     @Column(name = "post_id", nullable = false)
-    Integer postId;
+    Long postId;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @Builder
     public PostCommentEntity(
+            Integer commentId,
             String commentBody,
             PostCommentStatus status,
-            Integer postId,
+            Long postId,
             Integer parentCommentId,
             Long userId
     ) {
+        this.commentId = commentId;
         this.commentBody = commentBody;
         this.status = status;
         this.postId = postId;

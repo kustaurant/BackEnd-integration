@@ -17,14 +17,14 @@ public class EvaluationRestaurantService {
     private final RestaurantSituationRelationRepository relationRepository;
 
     @Transactional
-    public void afterEvaluationCreated(Integer restaurantId, List<Long> situationIds) {
+    public void afterEvaluationCreated(Long restaurantId, List<Long> situationIds) {
         // 식당 상황 수 테이블 업데이트
         increaseSituationRelationCounts(restaurantId, situationIds);
     }
 
     @Transactional
     public void afterReEvaluated(
-            Integer restaurantId,
+            Long restaurantId,
             List<Long> preSituations,
             List<Long> postSituations
     ) {
@@ -32,13 +32,13 @@ public class EvaluationRestaurantService {
         syncSituationRelationCountsForRemoved(restaurantId, preSituations, postSituations);
     }
 
-    private void increaseSituationRelationCounts(Integer restaurantId, List<Long> situationIds) {
+    private void increaseSituationRelationCounts(Long restaurantId, List<Long> situationIds) {
         for (Long situationId : situationIds) {
             updateOrCreateRelation(restaurantId, situationId, 1);
         }
     }
 
-    private void syncSituationRelationCountsForRemoved(Integer restaurantId,
+    private void syncSituationRelationCountsForRemoved(Long restaurantId,
             List<Long> preSituations, List<Long> postSituations) {
         for (Long preSituation : preSituations) { // 삭제된 situation 감소시키기
             if (postSituations.contains(preSituation)) {
@@ -55,7 +55,7 @@ public class EvaluationRestaurantService {
     }
 
     // 기존에 데이터가 있으면 업데이트하고, 없으면 새로 생성합니다.
-    private void updateOrCreateRelation(Integer restaurantId, Long situationId, Integer addDataCount) {
+    private void updateOrCreateRelation(Long restaurantId, Long situationId, Integer addDataCount) {
         relationRepository.findByRestaurantIdAndSituationId(restaurantId, situationId)
                 .ifPresentOrElse(
                         r -> updateRelation(r, addDataCount), // 기존에 있는 경우 업데이트
@@ -68,7 +68,7 @@ public class EvaluationRestaurantService {
         relationRepository.changeDataCount(relation);
     }
 
-    private void saveRelationWhenAddingPositive(Integer restaurantId, Long situationId, Integer addDataCount) {
+    private void saveRelationWhenAddingPositive(Long restaurantId, Long situationId, Integer addDataCount) {
         if (addDataCount > 0) {
             relationRepository.create(RestaurantSituationRelation.create(situationId, restaurantId, addDataCount));
         }

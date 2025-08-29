@@ -4,11 +4,13 @@
  * 모듈화된 기능들을 초기화하고 관리합니다.
  */
 document.addEventListener('DOMContentLoaded', function () {
-    // 모듈 초기화
+    if (window.__communityPostInit) return;
+    window.__communityPostInit = true;
+
     const postReactions = new PostReactions();
     const commentManager = new CommentManager();
     const commentReactions = new CommentReactions();
     const modalManager = new ModalManager(commentManager);
 
-    console.log('Community post page initialized with modular architecture');
+    console.log('Community post page initialized');
 });

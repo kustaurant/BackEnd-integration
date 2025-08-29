@@ -28,7 +28,7 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
     }
 
     @Override
-    public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
+    public boolean existsByUserAndRestaurant(Long userId, Long restaurantId) {
         if (userId == null || restaurantId == null) {
             return false;
         }
@@ -36,7 +36,7 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
     }
 
     @Override
-    public boolean existsByRestaurantAndEvaluation(Integer restaurantId, Long evaluationId) {
+    public boolean existsByRestaurantAndEvaluation(Long restaurantId, Long evaluationId) {
         if (restaurantId == null || evaluationId == null) {
             return false;
         }
@@ -44,7 +44,7 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
     }
 
     @Override
-    public Optional<Evaluation> findActiveByUserAndRestaurant(Long userId, Integer restaurantId) {
+    public Optional<Evaluation> findActiveByUserAndRestaurant(Long userId, Long restaurantId) {
         return jpaRepository.findByUserIdAndRestaurantIdAndStatus(userId, restaurantId, "ACTIVE")
                 .map(EvaluationEntity::toModel);
     }
@@ -55,7 +55,7 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
     }
 
     @Override
-    public List<Evaluation> findByRestaurantIdOrderByCreatedAtDesc(Integer restaurantId) {
+    public List<Evaluation> findByRestaurantIdOrderByCreatedAtDesc(Long restaurantId) {
         return jpaRepository.findByRestaurantIdAndStatusOrderByCreatedAtDesc(restaurantId, "ACTIVE")
                 .stream()
                 .map(EvaluationEntity::toModel)
@@ -63,7 +63,7 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
     }
 
     @Override
-    public List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Integer restaurantId) {
+    public List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Long restaurantId) {
         return jpaRepository.findByRestaurantIdAndStatusOrderByLikeCountDesc(restaurantId, "ACTIVE")
                 .stream()
                 .map(EvaluationEntity::toModel)

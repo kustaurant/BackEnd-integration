@@ -11,7 +11,7 @@ import lombok.Getter;
 public class RestaurantMenu {
     private Integer menuId;
 
-    private Integer restaurantId;
+    private Long restaurantId;
 
     private String menuName;
     private String menuPrice;
@@ -19,7 +19,7 @@ public class RestaurantMenu {
     private String menuImgUrl;
 
     @QueryProjection
-    public RestaurantMenu(Integer menuId, Integer restaurantId, String menuName, String menuPrice,
+    public RestaurantMenu(Integer menuId, Long restaurantId, String menuName, String menuPrice,
             String naverType, String menuImgUrl) {
         this.menuId = menuId;
         this.restaurantId = restaurantId;

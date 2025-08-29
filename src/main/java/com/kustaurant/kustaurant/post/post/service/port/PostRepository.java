@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository {
-    Optional<Post> findById(Integer id);
+    Optional<Post> findById(Long id);
     Post save(Post post);
-    void delete(Integer id);
-    List<Post> findAllById(List<Integer> ids);
-    void increaseVisitCount(Integer postId);
-    List<Post> findByUserId(Long userId);
+    void delete(Long id);
+    void increaseVisitCount(Long postId);
 }

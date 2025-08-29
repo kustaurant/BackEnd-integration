@@ -29,7 +29,7 @@ public class RestaurantFavoriteEntity extends BaseTimeEntity {
     private Long userId;
 
     @Column(name = "restaurant_id", nullable = false)
-    private Integer restaurantId;
+    private Long restaurantId;
 
     private String status;
 

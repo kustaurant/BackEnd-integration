@@ -20,7 +20,7 @@ public class RestaurantSituationRelationRepositoryImpl implements
 
     @Override
     public Optional<RestaurantSituationRelation> findByRestaurantIdAndSituationId(
-            Integer restaurantId, Long situationId) {
+            Long restaurantId, Long situationId) {
         return jpaRepository.findByRestaurantIdAndSituationId(restaurantId, situationId)
                 .map(RestaurantSituationRelationEntity::toModel);
     }

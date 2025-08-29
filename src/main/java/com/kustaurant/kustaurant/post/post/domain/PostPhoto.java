@@ -11,8 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PostPhoto {
     private Integer id;
-    private Integer postId;
+    private Long postId;
     private String photoImgUrl;
-    @Setter
     private PostStatus status;
 }

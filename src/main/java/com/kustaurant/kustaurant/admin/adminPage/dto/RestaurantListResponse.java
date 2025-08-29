@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RestaurantListResponse {
-    private Integer restaurantId;
+    private Long restaurantId;
     private String restaurantName;
     private String restaurantAddress;
     private String restaurantPosition;

@@ -23,7 +23,7 @@ public class PostScrapService {
     private final PostScrapRepository postScrapRepository;
     private final PostRepository postRepository;
 
-    public ScrapToggleResponse toggleScrapWithCount(Integer postId, Long userId) {
+    public ScrapToggleResponse toggleScrapWithCount(Long postId, Long userId) {
         postRepository.findById(postId).orElseThrow(
                 ()-> new DataNotFoundException(ErrorCode.POST_NOT_FOUND)
         );

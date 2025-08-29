@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.admin.feedback.controller.Request.FeedbackReque
 import com.kustaurant.kustaurant.admin.feedback.controller.port.FeedbackService;
 import com.kustaurant.kustaurant.admin.feedback.domain.Feedback;
 import com.kustaurant.kustaurant.admin.feedback.service.port.FeedbackRepository;
-import com.kustaurant.kustaurant.common.service.port.ClockHolder;
+import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
