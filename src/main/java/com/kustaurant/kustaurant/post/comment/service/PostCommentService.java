@@ -9,6 +9,7 @@ import com.kustaurant.kustaurant.post.comment.domain.PostCommentStatus;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
+import com.kustaurant.kustaurant.user.mypage.service.UserStatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,8 @@ public class PostCommentService {
     private final PostCommentRepository postCommentRepository;
     private final PostRepository postRepository;
 
+    private final UserStatsService userStatsService;
+
     public PostComment create(Long postId, PostCommentRequest req, Long userId) {
         postRepository.findById(postId).orElseThrow(()->new DataNotFoundException(POST_NOT_FOUND));
         if (req.parentCommentId() != null) {
@@ -32,19 +35,20 @@ public class PostCommentService {
                     .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, "부모 댓글을 찾을 수 없습니다."));
         }
 
+        userStatsService.incPostComment(userId);
         return postCommentRepository.save(PostComment.create(postId, req, userId));
     }
 
-    public PostCommentDeleteResponse delete(Integer commentId, Long userId) {
+    public PostCommentDeleteResponse delete(Long commentId, Long userId) {
         // 댓글 조회 및 권한 검증
         PostComment comment = postCommentRepository.findByIdForUpdate(commentId)
                 .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, commentId, "댓글"));
         comment.ensureWriterBy(userId);
 
         // 응답 빌드 준비
-        Integer parentId = comment.getParentCommentId();
+        Long parentId = comment.getParentCommentId();
         Long postId = comment.getPostId();
-        List<Integer> removedIds = new ArrayList<>();
+        List<Long> removedIds = new ArrayList<>();
         PostCommentStatus finalStatus;
 
         // 대댓글인 경우 대댓글은 즉시삭제
@@ -71,6 +75,7 @@ public class PostCommentService {
         }
         long totalVisible = postCommentRepository.countVisibleRepliesByPostId(postId);
 
+        userStatsService.decPostComment(userId);
         return new PostCommentDeleteResponse(
                 comment.getId(),
                 parentId,
@@ -80,7 +85,7 @@ public class PostCommentService {
         );
     }
     
-    private void checkAndDeleteParentIfNeeded(Integer parentId, List<Integer> removedIds) {
+    private void checkAndDeleteParentIfNeeded(Long parentId, List<Long> removedIds) {
         PostComment parent = postCommentRepository.findById(parentId).orElse(null);
         
         if (parent != null && parent.getStatus() == PostCommentStatus.PENDING) {

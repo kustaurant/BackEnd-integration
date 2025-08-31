@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.post.comment.domain;
 
 import com.kustaurant.kustaurant.global.exception.exception.auth.AccessDeniedException;
 import com.kustaurant.kustaurant.post.comment.controller.request.PostCommentRequest;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,18 +10,19 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Builder
+@AllArgsConstructor
 @Getter
 public class PostComment {
 
-    private Integer id;
+    private Long id;
     private String body;
     private PostCommentStatus status;
 
     private final Long writerId;
     private Long postId;
 
-    private Integer parentCommentId;
-    private Set<Integer> replyIds;
+    private Long parentCommentId;
+    private Set<Long> replyIds;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

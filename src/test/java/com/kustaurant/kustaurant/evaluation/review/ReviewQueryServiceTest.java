@@ -44,7 +44,7 @@ class ReviewQueryServiceTest {
 
     private ReviewQueryService service;
 
-    private static final Integer RESTAURANT_ID = 1;
+    private static final long RESTAURANT_ID = 1L;
     private static final long USER_ID1 = 1L;
     private static final long VIEWER_ID = 2L;
     private static final long USER_ID3 = 3L;

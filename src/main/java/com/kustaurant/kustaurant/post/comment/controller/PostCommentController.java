@@ -44,7 +44,7 @@ public class PostCommentController {
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @DeleteMapping("/api/comments/{commentId}")
     public ResponseEntity<PostCommentDeleteResponse> deleteComment(
-            @PathVariable Integer commentId,
+            @PathVariable Long commentId,
             @AuthUser AuthUserInfo user
     ) {
         return ResponseEntity.ok(postCommentService.delete(commentId, user.id()));

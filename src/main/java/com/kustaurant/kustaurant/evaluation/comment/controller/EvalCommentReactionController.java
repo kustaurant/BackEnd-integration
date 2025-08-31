@@ -1,9 +1,8 @@
-package com.kustaurant.kustaurant.evaluation.comment.controller.web;
+package com.kustaurant.kustaurant.evaluation.comment.controller;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommUserReactionService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentReactionResponse;
-import com.kustaurant.kustaurant.evaluation.comment.service.EvalCommUserReactionServiceImpl;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class EvalCommUserReactionWebController {
+public class EvalCommentReactionController {
     private final EvalCommUserReactionService evalCommUserReactionService;
 
 

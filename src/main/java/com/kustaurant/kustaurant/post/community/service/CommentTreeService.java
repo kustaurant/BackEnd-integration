@@ -30,7 +30,7 @@ public class CommentTreeService {
                 .filter(p -> p.parentCommentId() == null)
                 .toList();
         // 자식 댓글 parentId별로 그룹핑
-        Map<Integer, List<PostCommentProjection>> children = projections.stream()
+        Map<Long, List<PostCommentProjection>> children = projections.stream()
                 .filter(p -> p.parentCommentId() != null)
                 .collect(Collectors.groupingBy(PostCommentProjection::parentCommentId,
                         LinkedHashMap::new,

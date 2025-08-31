@@ -5,8 +5,8 @@ import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.common.enums.ReactionType;
 
 public record CommentReply(
-        Integer commentId,
-        Integer parentCommentId,
+        long commentId,
+        Long parentCommentId,
         String body,
         String status,
         long likeCount,

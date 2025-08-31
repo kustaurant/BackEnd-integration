@@ -32,7 +32,7 @@ public class PostCommReactionApiController {
             @ApiResponse(responseCode = "404", description = "해당 ID의 댓글을 찾을 수 없습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<PostCommReactionResponse> togglePostCommentLike(
-            @PathVariable @Parameter(description = "댓글 id", example = "30") Integer commentId,
+            @PathVariable @Parameter(description = "댓글 id", example = "30") Long commentId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         PostCommReactionResponse response = reactionService.toggleUserReaction(commentId,user.id(), ReactionType.LIKE);
@@ -48,7 +48,7 @@ public class PostCommReactionApiController {
             @ApiResponse(responseCode = "404", description = "해당 ID의 댓글을 찾을 수 없습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<PostCommReactionResponse> togglePostCommentDislike(
-            @PathVariable @Parameter(description = "댓글 id입니다", example = "30") Integer commentId,
+            @PathVariable @Parameter(description = "댓글 id입니다", example = "30") Long commentId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         PostCommReactionResponse response = reactionService.toggleUserReaction(commentId,user.id(), ReactionType.DISLIKE);

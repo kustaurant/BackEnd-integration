@@ -4,7 +4,7 @@ CREATE TABLE post_comment_reaction (
     post_comment_id      INT             NOT NULL,
     user_id         BIGINT UNSIGNED NOT NULL,
     reaction        ENUM('LIKE','DISLIKE') NOT NULL,
-    reacted_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reacted_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     CONSTRAINT pk_post_comment_reaction PRIMARY KEY (post_comment_id, user_id),
 
@@ -32,11 +32,11 @@ ALTER TABLE post_comments_tbl
     NOT NULL DEFAULT 'ACTIVE';
 
 -- post_user_reaction 테이블 생성
-CREATE TABLE post_user_reaction (
+CREATE TABLE post_reaction (
                                     post_id     INT             NOT NULL,
                                     user_id     BIGINT UNSIGNED NOT NULL,
                                     reaction    ENUM('LIKE','DISLIKE') NOT NULL,
-                                    reacted_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                    reacted_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                     PRIMARY KEY (post_id, user_id),
                                     INDEX idx_user_post (user_id, post_id),
 
@@ -47,12 +47,12 @@ CREATE TABLE post_user_reaction (
 );
 
 -- LIKE 데이터 이관
-INSERT INTO post_user_reaction (post_id, user_id, reaction, reacted_at)
+INSERT INTO post_reaction (post_id, user_id, reaction, reacted_at)
 SELECT  post_id, user_id, 'LIKE' AS reaction, COALESCE(created_at, NOW()) AS reacted_at
 FROM post_likes_tbl;
 
 -- DISLIKE 데이터 이관
-INSERT INTO post_user_reaction (post_id, user_id, reaction, reacted_at)
+INSERT INTO post_reaction (post_id, user_id, reaction, reacted_at)
 SELECT  post_id, user_id, 'DISLIKE' AS reaction, COALESCE(created_at, NOW()) AS reacted_at
 FROM post_dislikes_tbl;
 
@@ -72,24 +72,36 @@ DROP TABLE IF EXISTS post_comment_dislikes_tbl;
 RENAME TABLE eval_comm_user_reaction TO evaluation_comment_reaction;
 RENAME TABLE eval_user_reaction TO evaluation_reaction;
 RENAME TABLE eval_comment To evaluation_comment;
-RENAME TABLE post_user_reaction TO post_reaction;
-RENAME TABLE post_comments_tbl TO post_comments;
-RENAME TABLE post_photoes_tbl TO post_photos;
-RENAME TABLE post_scraps_tbl TO post_scraps;
+RENAME TABLE post_comments_tbl TO post_comment;
+RENAME TABLE post_photoes_tbl TO post_photo;
+RENAME TABLE post_scraps_tbl TO post_scrap;
+RENAME TABLE posts_tbl TO post;
 
-/* 기타 */
-RENAME TABLE home_modal_tbl TO home_modal;
+/* 그외 이름들 변경 */
+RENAME TABLE feedbacks_tbl TO admin_feedback;
+RENAME TABLE home_modal_tbl TO admin_home_modal;
+RENAME TABLE notice_tbl TO admin_notice;
+RENAME TABLE report TO admin_report;
+
+RENAME TABLE evaluation_situations_tbl TO evaluation_situation;
+RENAME TABLE evaluations_tbl TO evaluation;
+
+RENAME TABLE situations_tbl TO restaurant_situation;
+RENAME TABLE restaurant_favorite_tbl TO restaurant_favorite;
+RENAME TABLE restaurant_menus_tbl TO restaurant_menus;
+RENAME TABLE restaurant_situation_relations_tbl TO restaurant_situation_relation;
+RENAME TABLE restaurants_tbl TO restaurant;
+
+RENAME TABLE user_stats_tbl TO user_stats;
 
 /* post 필드 일부 수정 */
-UPDATE posts_tbl SET post_category = 'FREE' WHERE post_category = '자유게시판';
-UPDATE posts_tbl SET post_category = 'COLUMN' WHERE post_category = '칼럼게시판';
-UPDATE posts_tbl SET post_category = 'SUGGESTION' WHERE post_category = '건의게시판';
+UPDATE post SET post_category = 'FREE' WHERE post_category = '자유게시판';
+UPDATE post SET post_category = 'COLUMN' WHERE post_category = '칼럼게시판';
+UPDATE post SET post_category = 'SUGGESTION' WHERE post_category = '건의게시판';
 
-ALTER TABLE posts_tbl
-    MODIFY COLUMN post_category ENUM('FREE','COLUMN','SUGGESTION') NOT NULL;
-ALTER TABLE posts_tbl
-    MODIFY COLUMN status VARCHAR(20) NOT NULL;
+ALTER TABLE post MODIFY COLUMN post_category ENUM('FREE','COLUMN','SUGGESTION') NOT NULL;
+ALTER TABLE post MODIFY COLUMN status VARCHAR(20) NOT NULL;
 
 /* post_comment 필드 일부 수정 */
-ALTER TABLE `post_comments`
-    MODIFY COLUMN `status` ENUM('ACTIVE','PENDING','DELETED') NOT NULL DEFAULT 'ACTIVE';
+ALTER TABLE `post_comment` MODIFY COLUMN `status` ENUM('ACTIVE','PENDING','DELETED') NOT NULL DEFAULT 'ACTIVE';
+

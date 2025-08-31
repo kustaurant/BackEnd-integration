@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.evaluation.comment.controller.api;
+package com.kustaurant.kustaurant.evaluation.comment.controller;
 
 import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommCommandService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalCommentRequest;

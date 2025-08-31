@@ -22,11 +22,6 @@ public class UserRepositoryImpl implements UserRepository {
     private final UserJpaRepository jpaRepo;
 
     @Override
-    public User getById(Long id) {
-        return findById(id).orElseThrow(UserNotFoundException::new);
-    }
-
-    @Override
     public Optional<User> findByProviderId(String providerId) {
         return jpaRepo.findByProviderId(providerId).map(UserEntity::toModel);
     }
@@ -52,21 +47,6 @@ public class UserRepositoryImpl implements UserRepository {
         return jpaRepo.save(UserEntity.from(user)).toModel();
     }
 
-    @Override
-    public List<User> findUsersWithEvaluationCountDescending() {
-        return jpaRepo.findUsersWithEvaluationCountDescending()
-                .stream()
-                .map(UserEntity::toModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<User> findUsersByEvaluationCountForQuarter(int year, int quarter) {
-        return jpaRepo.findUsersByEvaluationCountForQuarter(year, quarter)
-                .stream()
-                .map(UserEntity::toModel)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public int countByLoginApi(LoginApi loginApi) {

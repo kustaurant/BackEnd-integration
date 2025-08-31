@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.evaluation.comment.controller.web;
+package com.kustaurant.kustaurant.evaluation.comment.controller;
 
 import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommCommandService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalCommentRequest;
@@ -14,12 +14,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
-public class EvalCommentWebController {
+public class EvalCommentController {
 
     private final EvalCommCommandService evalCommCommandService;
     private final UserService userService;

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface UserRepository {
-    User getById(Long userId);
+
     Optional<User> findByProviderId(String providerId);
     Boolean existsByNickname(Nickname nickname);
     Boolean existsByPhoneNumber(PhoneNumber phoneNumber);
@@ -19,8 +19,6 @@ public interface UserRepository {
     Optional<User> findById(Long userId);
     User save(User user);
 
-    List<User> findUsersWithEvaluationCountDescending();
-    List<User> findUsersByEvaluationCountForQuarter(int year, int quarter);
 
     int countByLoginApi(LoginApi apple);
 

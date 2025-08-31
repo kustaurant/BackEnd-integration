@@ -34,7 +34,7 @@ class EvalCommUserReactionServiceImplTest {
         commentRepo.save(EvalComment.builder()
                 .id(1L)
                 .userId(1L)
-                .restaurantId(1)
+                .restaurantId(1L)
                 .evaluationId(1L)
                 .body("저는 테스트용 평가에 달린 댓글 이에요")
                 .status(Status.ACTIVE)

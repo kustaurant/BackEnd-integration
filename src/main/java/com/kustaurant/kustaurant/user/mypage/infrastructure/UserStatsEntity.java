@@ -13,7 +13,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "user_stats_tbl")
+@Table(name = "user_stats")
 public class UserStatsEntity {
     @Id
     @Column(name = "user_id")
@@ -30,20 +30,14 @@ public class UserStatsEntity {
     private int commCommentCnt;
     private int commSavedPostCnt;
 
-    public UserStats toModel() {
-        return UserStats.builder()
-                .id(id)
-                .savedRestCnt(savedRestCnt)
-                .ratedRestCnt(ratedRestCnt)
-                .commPostCnt(commPostCnt)
-                .commCommentCnt(commCommentCnt)
-                .commSavedPostCnt(commSavedPostCnt)
-                .build();
-    }
-
     private UserStatsEntity(Long userId) {
         this.id = userId;
     }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
     public static UserStatsEntity of(Long userId, @Nullable UserStats stats) {
         UserStatsEntity statsEntity = new UserStatsEntity(userId);
         if (stats != null) {
@@ -55,5 +49,17 @@ public class UserStatsEntity {
         }
         return statsEntity;
     }
+
+    public UserStats toModel() {
+        return UserStats.builder()
+                .id(id)
+                .savedRestCnt(savedRestCnt)
+                .ratedRestCnt(ratedRestCnt)
+                .commPostCnt(commPostCnt)
+                .commCommentCnt(commCommentCnt)
+                .commSavedPostCnt(commSavedPostCnt)
+                .build();
+    }
+
 
 }

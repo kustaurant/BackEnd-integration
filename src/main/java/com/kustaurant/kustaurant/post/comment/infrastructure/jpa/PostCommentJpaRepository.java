@@ -11,19 +11,17 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface PostCommentJpaRepository extends JpaRepository<PostCommentEntity, Integer>, JpaSpecificationExecutor<PostCommentEntity> {
+public interface PostCommentJpaRepository extends JpaRepository<PostCommentEntity, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select c from PostCommentEntity c where c.commentId = :id")
-    Optional<PostCommentEntity> findByIdForUpdate(@Param("id") Integer id);
+    @Query("select c from PostCommentEntity c where c.postCommentId = :id")
+    Optional<PostCommentEntity> findByIdForUpdate(@Param("id") Long id);
 
-    List<PostCommentEntity> findByParentCommentId(Integer parentCommentId);
-    
     @Query("""
         SELECT COUNT(pc) FROM PostCommentEntity pc
         WHERE pc.parentCommentId = :parentCommentId AND pc.status = 'ACTIVE'
         """)
-    long countActiveRepliesByParentCommentId(@Param("parentCommentId") Integer parentCommentId);
+    long countActiveRepliesByParentCommentId(@Param("parentCommentId") Long parentCommentId);
 
     long countByPostId(Long postId);
 

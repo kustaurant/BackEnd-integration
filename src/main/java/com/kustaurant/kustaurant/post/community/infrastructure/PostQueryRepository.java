@@ -55,20 +55,20 @@ public class PostQueryRepository {
     public Page<PostListProjection> findPostList(PostCategory category, SortOption sort, Pageable pageable) {
         // 전체 좋아요 수 계산
         Expression<Long> likeCount = JPAExpressions
-                .select(reaction.userId.count())
+                .select(reaction.id.userId.count())
                 .from(reaction)
-                .where(reaction.postId.eq(post.postId)
+                .where(reaction.id.postId.eq(post.postId)
                         .and(reaction.reaction.eq(ReactionType.LIKE)));
         Expression<Long> dislikeCount = JPAExpressions
-                .select(reaction.userId.count())
+                .select(reaction.id.userId.count())
                 .from(reaction)
-                .where(reaction.postId.eq(post.postId)
+                .where(reaction.id.postId.eq(post.postId)
                         .and(reaction.reaction.eq(ReactionType.DISLIKE)));
         NumberExpression<Long> totalLikesExpr =
                 Expressions.numberTemplate(Long.class, "({0} - {1})", likeCount, dislikeCount);
         // 전체 댓글 수 계산
         Expression<Long> commentCount = JPAExpressions
-                .select(comment.commentId.count())
+                .select(comment.postCommentId.count())
                 .from(comment)
                 .where(comment.postId.eq(post.postId)
                         .and(comment.status.ne(PostCommentStatus.DELETED)));
@@ -132,30 +132,30 @@ public class PostQueryRepository {
     // 2. 게시글 1개의 상세 페이지 조회(~댓글까지)
     public Optional<PostDetailProjection> findPostDetail(Long postId, Long currentUserId) {
         Expression<Long> likeCount = JPAExpressions
-                .select(reaction.userId.count())
+                .select(reaction.id.userId.count())
                 .from(reaction)
-                .where(reaction.postId.eq(postId).and(reaction.reaction.eq(ReactionType.LIKE)));
+                .where(reaction.id.postId.eq(postId).and(reaction.reaction.eq(ReactionType.LIKE)));
         Expression<Long> dislikeCount = JPAExpressions
-                .select(reaction.userId.count())
+                .select(reaction.id.userId.count())
                 .from(reaction)
-                .where(reaction.postId.eq(postId).and(reaction.reaction.eq(ReactionType.DISLIKE)));
+                .where(reaction.id.postId.eq(postId).and(reaction.reaction.eq(ReactionType.DISLIKE)));
         Expression<Long> commentCount = JPAExpressions
-                .select(comment.commentId.count())
+                .select(comment.postCommentId.count())
                 .from(comment)
                 .where(comment.postId.eq(post.postId).and(comment.status.eq(PostCommentStatus.ACTIVE)));
         Expression<Long> scrapCount = JPAExpressions
-                .select(scrap.userId.count())
+                .select(scrap.id.userId.count())
                 .from(scrap)
-                .where(scrap.postId.eq(post.postId));
+                .where(scrap.id.postId.eq(post.postId));
 
         Expression<ReactionType> myReaction = currentUserId == null ? Expressions.nullExpression(ReactionType.class)
                 : JPAExpressions.select(reaction.reaction)
                 .from(reaction)
-                .where(reaction.postId.eq(post.postId)
-                        .and(reaction.userId.eq(currentUserId)));
+                .where(reaction.id.postId.eq(post.postId)
+                        .and(reaction.id.userId.eq(currentUserId)));
         Expression<Boolean> isScrapped = currentUserId == null ? Expressions.FALSE
                 : JPAExpressions.selectOne().from(scrap)
-                .where(scrap.postId.eq(post.postId).and(scrap.userId.eq(currentUserId)))
+                .where(scrap.id.postId.eq(post.postId).and(scrap.id.userId.eq(currentUserId)))
                 .exists();
 
         PostDetailProjection projection = queryFactory
@@ -233,15 +233,15 @@ public class PostQueryRepository {
         // 2-2) 좋아요 수
         NumberExpression<Long> likeCountExpr = reaction.count();
         List<Tuple> likeRows = queryFactory
-                .select(reaction.postId, likeCountExpr)
+                .select(reaction.id.postId, likeCountExpr)
                 .from(reaction)
-                .where(reaction.postId.in(ids)
+                .where(reaction.id.postId.in(ids)
                         .and(reaction.reaction.eq(ReactionType.LIKE)))
-                .groupBy(reaction.postId)
+                .groupBy(reaction.id.postId)
                 .fetch();
         Map<Long, Long> likeMap = likeRows.stream()
                 .collect(Collectors.toMap(
-                        t -> t.get(reaction.postId),
+                        t -> t.get(reaction.id.postId),
                         t -> Optional.ofNullable(t.get(likeCountExpr)).orElse(0L)
                 ));
 

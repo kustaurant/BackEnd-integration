@@ -21,7 +21,7 @@ public class PostCommReactionController {
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/comments/{commentId}/like")
     public ResponseEntity<PostCommReactionResponse> toggleCommentLike(
-            @PathVariable Integer commentId,
+            @PathVariable Long commentId,
             @AuthUser AuthUserInfo user
     ) {
         return ResponseEntity.ok(reactionService.toggleUserReaction(commentId, user.id(), ReactionType.LIKE));
@@ -31,7 +31,7 @@ public class PostCommReactionController {
     @PreAuthorize("isAuthenticated() and hasRole('USER')")
     @PostMapping("/api/comments/{commentId}/dislike")
     public ResponseEntity<PostCommReactionResponse> toggleCommentDislike(
-            @PathVariable Integer commentId,
+            @PathVariable Long commentId,
             @AuthUser AuthUserInfo user
     ) {
         return ResponseEntity.ok(reactionService.toggleUserReaction(commentId, user.id(), ReactionType.DISLIKE));

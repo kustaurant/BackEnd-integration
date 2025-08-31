@@ -59,7 +59,7 @@ public class PostCommentApiController {
             @ApiResponse(responseCode = "404", description = "해당 id의 댓글이 존재하지 않습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public ResponseEntity<PostCommentDeleteResponse> commentDelete(
-            @PathVariable @Parameter(description = "삭제할 댓글 ID", example = "123") Integer commentId,
+            @PathVariable @Parameter(description = "삭제할 댓글 ID", example = "123") Long commentId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         return ResponseEntity.ok(postCommentService.delete(commentId, user.id()));

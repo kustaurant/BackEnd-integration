@@ -16,7 +16,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @Entity
 @DynamicUpdate
-@Table(name="evaluations_tbl")
+@Table(name="evaluation")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class EvaluationEntity extends BaseTimeEntity {
 
@@ -40,7 +40,7 @@ public class EvaluationEntity extends BaseTimeEntity {
 
     @ElementCollection
     @CollectionTable(
-            name = "evaluation_situations_tbl",
+            name = "evaluation_situation",
             joinColumns = @JoinColumn(name = "evaluation_id")
     )
     @Column(name = "situation_id")

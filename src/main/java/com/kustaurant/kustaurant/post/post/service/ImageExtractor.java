@@ -15,7 +15,7 @@ public final class ImageExtractor {
         Document doc = Jsoup.parse(html);
         for (Element img : doc.select("img")) {
             String url = img.attr("src");
-            if (url != null && !url.isEmpty()) {
+            if (url != null && !url.isBlank()) {
                 result.add(url);
             }
         }

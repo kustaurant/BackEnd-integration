@@ -13,6 +13,6 @@ public record PostCommentRequest(
                 description = "대댓글을 작성할 경우, 부모 댓글의 ID를 입력합니다. null이면 일반 댓글로 처리합니다.",
                 example = "456"
         )
-        Integer parentCommentId
+        Long parentCommentId
 ) {
 }

@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.evaluation.evaluation.controller;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.evaluation.evaluation.controller.response.EvalReactionResponse;
-import com.kustaurant.kustaurant.evaluation.evaluation.service.EvalUserReactionService;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationReactionService;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class EvalUserReactionController {
-    private final EvalUserReactionService evalUserReactionService;
+public class EvaluationReactionController {
+    private final EvaluationReactionService evalUserReactionService;
 
     // 1. 평가 좋아요/싫어요 토글
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")

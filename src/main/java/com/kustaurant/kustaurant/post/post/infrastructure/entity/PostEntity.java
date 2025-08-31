@@ -20,9 +20,9 @@ import java.util.List;
 @Entity
 @Getter
 @SQLRestriction("status = 'ACTIVE'")
-@SQLDelete(sql = "update posts_tbl set status = 'DELETED' where post_id = ?")
+@SQLDelete(sql = "update post set status = 'DELETED' where post_id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "posts_tbl")
+@Table(name = "post")
 public class PostEntity extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;

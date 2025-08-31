@@ -10,7 +10,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor
 @DynamicUpdate // 변경된 필드만 Update
-@Table(name = "restaurant_situation_relations_tbl")
+@Table(name = "restaurant_situation_relation")
 public class RestaurantSituationRelationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

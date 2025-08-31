@@ -7,16 +7,15 @@ import java.util.Optional;
 
 public interface PostCommentRepository {
 
-    Optional<PostComment> findById(Integer comment_id);
-    Optional<PostComment> findByIdForUpdate(Integer comment_id);
+    Optional<PostComment> findById(Long id);
+    Optional<PostComment> findByIdForUpdate(Long id);
 
     PostComment save(PostComment comment);
+
     
-    List<PostComment> findByParentCommentId(Integer parentCommentId);
-    
-    long countActiveRepliesByParentCommentId(Integer parentCommentId);
-    long countVisibleRepliesByPostId(Long postId);
+    long countActiveRepliesByParentCommentId(Long parentCommentId);
+    long countVisibleRepliesByPostId(Long postId); // 댓글,대댓글 status = active인것들 모두 count
+
     void delete(PostComment comment);
-    List<PostComment> saveAll(List<PostComment> comments);
     void deleteByPostId(Long postId);
 }

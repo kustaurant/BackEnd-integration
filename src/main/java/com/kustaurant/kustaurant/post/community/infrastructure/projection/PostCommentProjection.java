@@ -6,8 +6,8 @@ import com.kustaurant.kustaurant.post.comment.domain.PostCommentStatus;
 import java.time.LocalDateTime;
 
 public record PostCommentProjection(
-        Integer commentId,
-        Integer parentCommentId,
+        Long commentId,
+        Long parentCommentId,
         String body,
         PostCommentStatus status,
         Long writerId,

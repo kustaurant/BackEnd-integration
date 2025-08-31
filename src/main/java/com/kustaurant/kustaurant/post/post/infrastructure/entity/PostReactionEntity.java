@@ -1,10 +1,10 @@
 package com.kustaurant.kustaurant.post.post.infrastructure.entity;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
+import com.kustaurant.kustaurant.post.post.domain.PostReaction;
+import com.kustaurant.kustaurant.post.post.domain.PostReactionId;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -12,36 +12,33 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@IdClass(PostUserReactionId.class)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 @Table(name="post_reaction")
 public class PostReactionEntity {
-    @Id
-    @Column(name = "post_id")
-    private Long postId;
-
-    @Id
-    @Column(name = "user_id")
-    private Long userId;
+    @EmbeddedId
+    private PostReactionJpaId id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReactionType reaction;
 
     @CreationTimestamp
-    @Column(name = "reacted_at", nullable = false)
+    @Column(name = "reacted_at", nullable = false, insertable = false, updatable = false)
     private LocalDateTime reactedAt;
 
-    public static PostReactionEntity of(
-            Long postId, Long userId, ReactionType reaction
-    ) {
-        PostReactionEntity entity = new PostReactionEntity();
-        entity.postId   = postId;
-        entity.userId   = userId;
-        entity.reaction = reaction;
-        return entity;
+    public static PostReactionEntity from(PostReaction domain) {
+        return PostReactionEntity.builder()
+                .id(new PostReactionJpaId(domain.getId().postId(), domain.getId().userId()))
+                .reaction(domain.getReaction())
+                .build();
     }
 
-    public void changeTo(ReactionType newReaction) {
-        this.reaction = newReaction;
+    public PostReaction toModel() {
+        return PostReaction.builder()
+                .id(new PostReactionId(id.getPostId(), id.getUserId()))
+                .reaction(reaction)
+                .build();
     }
+
 }

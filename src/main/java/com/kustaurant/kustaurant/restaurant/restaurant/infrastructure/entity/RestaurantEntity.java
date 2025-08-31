@@ -23,7 +23,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonIgnoreProperties({"createdAt", "updatedAt"})
-@Table(name = "restaurants_tbl")
+@Table(name = "restaurant")
 public class RestaurantEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -51,7 +51,7 @@ public class MyPostQueryRepository {
         return JPAExpressions
                 .select(r2.count())
                 .from(r2)
-                .where(r2.postId.eq(post.postId)
+                .where(r2.id.postId.eq(post.postId)
                         .and(r2.reaction.eq(ReactionType.LIKE)));
     }
 
@@ -68,7 +68,7 @@ public class MyPostQueryRepository {
         return JPAExpressions
                 .select(cr2.count())
                 .from(cr2)
-                .where(cr2.postCommentId.eq(c.commentId)
+                .where(cr2.id.postCommentId.eq(c.postCommentId)
                         .and(cr2.reaction.eq(ReactionType.LIKE)));
     }
     //-----
@@ -104,8 +104,8 @@ public class MyPostQueryRepository {
                         post.createdAt
                 ))
                 .from(scrap)
-                .join(post).on(post.postId.eq(scrap.postId))
-                .where(scrap.userId.eq(userId)
+                .join(post).on(post.postId.eq(scrap.id.postId))
+                .where(scrap.id.userId.eq(userId)
                         .and(post.status.eq(PostStatus.ACTIVE)))
                 .orderBy(scrap.createdAt.desc())
                 .fetch();

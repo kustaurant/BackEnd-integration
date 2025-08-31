@@ -76,7 +76,7 @@ public class UserEntity extends BaseTimeEntity {
     }
 
     public static UserEntity from(User user) {
-        return UserEntity.builder()
+        UserEntity entity = UserEntity.builder()
                 .loginApi(user.getLoginApi())
                 .providerId(user.getProviderId())
                 .email(user.getEmail())
@@ -84,9 +84,21 @@ public class UserEntity extends BaseTimeEntity {
                 .userNickname(user.getNickname())
                 .role(user.getRole())
                 .status(user.getStatus())
-                .stats(UserStatsEntity.of(user.getId(), user.getStats()))
                 .build();
+
+        UserStatsEntity statsEntity = UserStatsEntity.of(null, user.getStats());
+        entity.setStats(statsEntity);
+
+        return entity;
     }
+
+    public void setStats(UserStatsEntity stats) {
+        this.stats = stats;
+        if (stats != null && stats.getUser() != this) {
+            stats.setUser(this);
+        }
+    }
+
 
     public User toModel(){
         return User.builder()

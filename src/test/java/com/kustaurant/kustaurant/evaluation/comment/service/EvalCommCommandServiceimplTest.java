@@ -33,7 +33,7 @@ class EvalCommCommandServiceimplTest {
         commentRepo.save(EvalComment.builder()
                         .id(1L)
                         .userId(1L)
-                        .restaurantId(1)
+                        .restaurantId(1L)
                         .evaluationId(1L)
                         .body("저는 테스트용 평가에 달린 댓글 이에요")
                         .status(Status.ACTIVE)
@@ -72,7 +72,7 @@ class EvalCommCommandServiceimplTest {
         //g
 
         //w
-        service.delete(1L,1,1L);
+        service.delete(1L,1L,1L);
         //t
         // 1) 댓글이 SOFT_DELETE 상태로 바뀌었는지
         EvalComment after = commentRepo.findById(1L).orElseThrow();
@@ -91,7 +91,7 @@ class EvalCommCommandServiceimplTest {
         //w
         //t
         assertThrows(AccessDeniedException.class,
-                ()-> service.delete(1L,1,otherUserId));
+                ()-> service.delete(1L,1L,otherUserId));
         // 1) 댓글이 그대로 ACTIVE 상태인지 확인
         EvalComment after = commentRepo.findById(1L).orElseThrow();
         assertEquals(Status.ACTIVE, after.getStatus());

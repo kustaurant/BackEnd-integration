@@ -22,13 +22,13 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
     private final PostCommentJpaRepository jpa;
 
     @Override
-    public Optional<PostComment> findById(Integer commentId) {
-        return jpa.findById(commentId).map(PostCommentEntity::toModel);
+    public Optional<PostComment> findById(Long id) {
+        return jpa.findById(id).map(PostCommentEntity::toModel);
     }
 
     @Override
-    public Optional<PostComment> findByIdForUpdate(Integer comment_id) {
-        return jpa.findByIdForUpdate(comment_id).map(PostCommentEntity::toModel);
+    public Optional<PostComment> findByIdForUpdate(Long id) {
+        return jpa.findByIdForUpdate(id).map(PostCommentEntity::toModel);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
 
         // 댓글 내용과 상태 업데이트
         PostCommentEntity updatedEntity = PostCommentEntity.builder()
-                .commentId(comment.getId())
+                .parentCommentId(comment.getId())
                 .commentBody(comment.getBody())
                 .status(comment.getStatus())
                 .postId(entity.getPostId())
@@ -59,15 +59,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
 
 
     @Override
-    public List<PostComment> findByParentCommentId(Integer parentCommentId) {
-        return jpa.findByParentCommentId(parentCommentId)
-                .stream()
-                .map(PostCommentEntity::toModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public long countActiveRepliesByParentCommentId(Integer parentCommentId) {
+    public long countActiveRepliesByParentCommentId(Long parentCommentId) {
         return jpa.countActiveRepliesByParentCommentId(parentCommentId);
     }
 
@@ -83,16 +75,6 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
         jpa.delete(entity);
     }
 
-    @Override
-    public List<PostComment> saveAll(List<PostComment> comments) {
-        List<PostCommentEntity> entities = comments.stream()
-                .map(PostCommentEntity::from)
-                .collect(Collectors.toList());
-        return jpa.saveAll(entities)
-                .stream()
-                .map(PostCommentEntity::toModel)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public void deleteByPostId(Long postId) {

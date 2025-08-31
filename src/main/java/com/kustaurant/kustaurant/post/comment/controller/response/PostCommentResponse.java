@@ -14,8 +14,8 @@ import java.util.List;
 
 @Builder
 public record PostCommentResponse(
-        Integer commentId,
-        Integer parentCommentId,
+        Long commentId,
+        Long parentCommentId,
         String body,
         String status,
         long likeCount,

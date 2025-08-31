@@ -18,11 +18,6 @@ public class FakeUserRepository implements UserRepository {
     private final List<User> data = new ArrayList<>();
 
     @Override
-    public User getById(Long id) {
-        return null;
-    }
-
-    @Override
     public Optional<User> findByProviderId(String providerId) {
         return Optional.empty();
     }
@@ -54,7 +49,6 @@ public class FakeUserRepository implements UserRepository {
                     .providerId(user.getProviderId())
                     .loginApi(user.getLoginApi())
                     .status(user.getStatus())
-                    .rankImg(user.getRankImg())
                     .createdAt(user.getCreatedAt())
                     .updatedAt(user.getUpdatedAt())
                     .stats(user.getStats())
@@ -66,16 +60,6 @@ public class FakeUserRepository implements UserRepository {
             data.add(user);
             return user;
         }
-    }
-
-    @Override
-    public List<User> findUsersWithEvaluationCountDescending() {
-        return List.of();
-    }
-
-    @Override
-    public List<User> findUsersByEvaluationCountForQuarter(int year, int quarter) {
-        return List.of();
     }
 
     @Override

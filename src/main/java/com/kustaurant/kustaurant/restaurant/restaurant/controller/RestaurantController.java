@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
-public class RestaurantWebController {
+public class RestaurantController {
 
     private final RestaurantQueryService restaurantQueryService;
 

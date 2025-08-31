@@ -10,39 +10,41 @@ import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
-@SQLDelete(sql = "update post_comments set status = 'DELETED' where comment_id = ?")
+@SQLDelete(sql = "update post_comment set status = 'DELETED' where post_comment_id = ?")
 @SQLRestriction("status <> 'DELETED'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name="post_comments")
+@Table(name="post_comment")
 public class PostCommentEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer commentId;
-    String commentBody;
-
-    @Column(length = 20)
-    @Enumerated(EnumType.STRING)
-    PostCommentStatus status;
-
-    @Column(name = "parent_comment_id")
-    Integer parentCommentId;
+    private Long postCommentId;
 
     @Column(name = "post_id", nullable = false)
-    Long postId;
+    private Long postId;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    private String commentBody;
+
+    @Column(name = "parent_comment_id")
+    private Long parentCommentId;
+
+    @Column(length = 20)
+    @Enumerated(EnumType.STRING)
+    private PostCommentStatus status;
+
+
     @Builder
     public PostCommentEntity(
-            Integer commentId,
+            Long postCommentId,
             String commentBody,
             PostCommentStatus status,
             Long postId,
-            Integer parentCommentId,
+            Long parentCommentId,
             Long userId
     ) {
-        this.commentId = commentId;
+        this.postCommentId = postCommentId;
         this.commentBody = commentBody;
         this.status = status;
         this.postId = postId;
@@ -62,7 +64,7 @@ public class PostCommentEntity extends BaseTimeEntity {
 
     public PostComment toModel() {
         return PostComment.builder()
-                .id(this.commentId)
+                .id(this.postCommentId)
                 .body(this.commentBody)
                 .postId(this.postId)
                 .writerId(this.userId)

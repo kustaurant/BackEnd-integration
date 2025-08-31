@@ -1,16 +1,17 @@
 package com.kustaurant.kustaurant.post.post.service;
 
-import com.kustaurant.kustaurant.post.comment.infrastructure.jpa.PostCommentReactionRepository;
+import com.kustaurant.kustaurant.post.comment.service.port.PostCommentReactionRepository;
 import com.kustaurant.kustaurant.post.comment.service.port.PostCommentRepository;
 import com.kustaurant.kustaurant.post.post.controller.request.PostRequest;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
-import com.kustaurant.kustaurant.post.post.infrastructure.PostReactionRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
+import com.kustaurant.kustaurant.post.post.service.port.PostReactionRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.user.mypage.service.UserStatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,21 +27,16 @@ import static com.kustaurant.kustaurant.global.exception.ErrorCode.POST_NOT_FOUN
 @Transactional
 public class PostService {
     private final PostRepository postRepository;
-    private final PostScrapRepository postScrapRepository;
     private final PostPhotoRepository postPhotoRepository;
-    private final PostCommentRepository postCommentRepository;
+    private final PostScrapRepository postScrapRepository;
     private final PostReactionRepository postReactionRepository;
+    private final PostCommentRepository postCommentRepository;
     private final PostCommentReactionRepository postCommentReactionRepository;
 
+    private final UserStatsService userStatsService;
+
     public Post create(PostRequest req, Long userId) {
-        Post savedPost = postRepository.save(Post.builder()
-                .title(req.title())
-                .category(req.category())
-                .body(req.content())
-                .status(PostStatus.ACTIVE)
-                .writerId(userId)
-                .visitCount(0)
-                .build());
+        Post savedPost = postRepository.save(Post.create(userId, req));
 
         List<String> imgUrls = ImageExtractor.extract(req.content());
 
@@ -56,10 +52,11 @@ public class PostService {
             postPhotoRepository.saveAll(photos);
         }
 
+        userStatsService.incPost(userId);
         return savedPost;
     }
 
-    public void update(Long postId, PostRequest req,Long userId) {
+    public Post update(Long postId, PostRequest req,Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new DataNotFoundException(POST_NOT_FOUND));
         post.ensureWriterBy(userId);
@@ -75,7 +72,7 @@ public class PostService {
                     .status(PostStatus.ACTIVE)
                     .build());
         };
-        postRepository.save(update);
+        return postRepository.save(update);
     }
 
     public void delete(Long postId, Long userId) {
@@ -90,5 +87,6 @@ public class PostService {
         postReactionRepository.deleteByPostId(postId);
         postCommentRepository.deleteByPostId(postId);
         postCommentReactionRepository.deleteByPostId(postId);
+        userStatsService.decPost(userId);
     }
 }

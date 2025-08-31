@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Entity
-@Table(name="restaurant_menus_tbl")
+@Table(name="restaurant_menus")
 public class RestaurantMenuEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

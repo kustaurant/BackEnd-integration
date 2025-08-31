@@ -12,7 +12,6 @@ import com.kustaurant.kustaurant.post.post.service.PostScrapService;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
-import com.kustaurant.kustaurant.user.login.api.infrastructure.RefreshTokenStore;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRatedRestaurantResponse;
@@ -26,8 +25,6 @@ import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,16 +40,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
 @Tag("middleTest")
-class MypageApiServiceIT {
-    @MockBean RefreshTokenStore refreshTokenStore;
-    @MockBean FindByIndexNameSessionRepository<?> sessionRepository;
+class MypageServiceIT {
 
-    @Autowired
-    MypageService mypageApiService;
+    @Autowired MypageService mypageService;
     @Autowired EvaluationCommandService evaluationService;
     @Autowired RestaurantFavoriteService restaurantFavoriteService;
-    @Autowired
-    PostService postService;
+    @Autowired PostService postService;
     @Autowired PostScrapService postScrapService;
     @Autowired PostCommentService postCommentService;
 
@@ -94,7 +87,7 @@ class MypageApiServiceIT {
     void get_profile() {
         // g
         // w
-        var response = mypageApiService.getProfile(user1.getId());
+        var response = mypageService.getProfile(user1.getId());
         // t
         assertThat(response.nickname()).isEqualTo("wcwdfu");
         assertThat(response.email()).isEqualTo("test@test.com");
@@ -105,7 +98,7 @@ class MypageApiServiceIT {
     void get_mypage_info() {
         // g
         // w
-        var response = mypageApiService.getMypageInfo(user1.getId());
+        var response = mypageService.getProfile(user1.getId());
         // t
         assertThat(response.nickname()).isEqualTo("wcwdfu");
         assertThat(response.evalCnt()).isEqualTo(1);
@@ -119,7 +112,7 @@ class MypageApiServiceIT {
         var noChangeReq = new ProfileUpdateRequest(null, null);
         // w + t
         assertThatThrownBy(() ->
-                mypageApiService.updateUserProfile(user1.getId(), noChangeReq)
+                mypageService.updateUserProfile(user1.getId(), noChangeReq)
         ).isInstanceOf(NoProfileChangeException.class);
     }
 
@@ -129,7 +122,7 @@ class MypageApiServiceIT {
         //g
         var req = new ProfileUpdateRequest("wcwdfu2", "01099998888");
         //w
-        var res = mypageApiService.updateUserProfile(user1.getId(), req);
+        var res = mypageService.updateUserProfile(user1.getId(), req);
         //t
         assertThat(res.nickname()).isEqualTo("wcwdfu2");
         assertThat(res.phoneNumber()).isEqualTo("01099998888");
@@ -141,7 +134,7 @@ class MypageApiServiceIT {
         //g
         var req = new ProfileUpdateRequest("wcwdfu2", null);
         //w
-        var res = mypageApiService.updateUserProfile(user1.getId(), req);
+        var res = mypageService.updateUserProfile(user1.getId(), req);
         //t
         assertThat(res.nickname()).isEqualTo("wcwdfu2");
     }
@@ -152,7 +145,7 @@ class MypageApiServiceIT {
         //g
         var req = new ProfileUpdateRequest(null, "01099998888");
         //w
-        var res = mypageApiService.updateUserProfile(user1.getId(), req);
+        var res = mypageService.updateUserProfile(user1.getId(), req);
         //t
         assertThat(res.phoneNumber()).isEqualTo("01099998888");
     }
@@ -161,13 +154,13 @@ class MypageApiServiceIT {
     @Test @DisplayName("즐겨찾기한 식당 조회 정상동작")
     void should_return_favorite_restaurants_successfully() {
         //g
-        restaurantFavoriteService.addFavorite(user1.getId(),1);
-        restaurantFavoriteService.addFavorite(user1.getId(),2);
-        restaurantFavoriteService.addFavorite(user1.getId(),3);
-        restaurantFavoriteService.addFavorite(user1.getId(),4);
-        restaurantFavoriteService.addFavorite(user1.getId(),5);
+        restaurantFavoriteService.addFavorite(user1.getId(),1L);
+        restaurantFavoriteService.addFavorite(user1.getId(),2L);
+        restaurantFavoriteService.addFavorite(user1.getId(),3L);
+        restaurantFavoriteService.addFavorite(user1.getId(),4L);
+        restaurantFavoriteService.addFavorite(user1.getId(),5L);
         //w
-        var res = mypageApiService.getUserFavoriteRestaurantList(user1.getId());
+        var res = mypageService.getUserFavoriteRestaurantList(user1.getId());
         //t
         assertEquals(5, res.size());
         assertThat(res)
@@ -187,7 +180,7 @@ class MypageApiServiceIT {
                         List.of(new RestaurantConstants.StarComment(6, "신선해요")),
                         null
                 );
-        evaluationService.evaluate(user1.getId(), 1, dto1);
+        evaluationService.evaluate(user1.getId(), 1L, dto1);
 
         EvaluationDTO dto2 = new EvaluationDTO(
                         1.5,
@@ -197,9 +190,9 @@ class MypageApiServiceIT {
                         List.of(new RestaurantConstants.StarComment(1, "신선하지 않네요")),
                         null
                 );
-        evaluationService.evaluate(user1.getId(), 2, dto2);
+        evaluationService.evaluate(user1.getId(), 2L, dto2);
         //w
-        List<MyRatedRestaurantResponse> res = mypageApiService.getUserEvaluateRestaurantList(user1.getId());
+        List<MyRatedRestaurantResponse> res = mypageService.getUserEvaluateRestaurantList(user1.getId());
         //t
         assertThat(res).hasSize(2)
                 .extracting(MyRatedRestaurantResponse::restaurantName)
@@ -219,7 +212,7 @@ class MypageApiServiceIT {
         Post post3 = postService.create(req3, user1.getId());
 
         // w
-        var res = mypageApiService.getUserPosts(user1.getId());
+        var res = mypageService.getUserPosts(user1.getId());
 
         // t
         assertEquals(3, res.size());
@@ -245,7 +238,7 @@ class MypageApiServiceIT {
         Post post3 = postService.create(req3, user2.getId());
         postScrapService.toggleScrapWithCount(post3.getId(), user1.getId());
         // w
-        var res = mypageApiService.getScrappedUserPosts(user1.getId());
+        var res = mypageService.getScrappedUserPosts(user1.getId());
         // t
         assertEquals(3, res.size());
         assertThat(res.get(0).postTitle()).isEqualTo("테스트게시글1");
@@ -265,10 +258,10 @@ class MypageApiServiceIT {
         PostRequest req2 = new PostRequest("테스트게시글2", PostCategory.SUGGESTION, "테스트내용2");
         Post post2 = postService.create(req2, user2.getId());
         postCommentService.create("게시글2-댓글1",post2.getId(),null,user1.getId());
-//        postCommentService.createComment("게시글2-댓글1",post1.getId(),null,user2.getId());
-//        postCommentService.createComment("게시글2-댓글1-대댓글1",post1.getId(),null,user1.getId());
+//        postCommentService.create("게시글2-댓글1",post1.getId(),null,user2.getId());
+//        postCommentService.create("게시글2-댓글1-대댓글1",post1.getId(),null,user1.getId());
         // w
-        var res = mypageApiService.getCommentedUserPosts(user1.getId());
+        var res = mypageService.getCommentedUserPosts(user1.getId());
         // t
         assertEquals(2, res.size());
         assertThat(res.get(0).postTitle()).isEqualTo("테스트게시글1");

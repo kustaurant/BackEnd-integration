@@ -22,16 +22,6 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_FAVORITE_NOT_FOUND, "Favorite not found - UserId:" + userId + ", RestaurantId:" + restaurantId));
     }
 
-    public boolean existsByUserAndRestaurant(Long userId, Long restaurantId) {
-        return store.stream()
-                .anyMatch(fav -> fav.getUserId().equals(userId) &&
-                        fav.getRestaurantId().equals(restaurantId));
-    }
-
-    public List<RestaurantFavorite> findByUser(Long userId) {
-        return List.of();
-    }
-
 
     @Override
     public RestaurantFavorite save(RestaurantFavorite restaurantFavorite) {
@@ -42,11 +32,6 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     @Override
     public void delete(RestaurantFavorite restaurantFavorite) {
         store.remove(restaurantFavorite);
-    }
-
-    @Override
-    public List<RestaurantFavorite> findSortedFavoritesByUserId(Long userId) {
-        return List.of();
     }
 
     @Override

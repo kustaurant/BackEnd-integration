@@ -7,7 +7,7 @@ import com.kustaurant.kustaurant.common.enums.ReactionType;
 import java.util.List;
 
 public record ParentComment(
-        Integer commentId,
+        long commentId,
         String body,
         String status,
         long likeCount,

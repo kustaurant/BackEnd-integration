@@ -28,6 +28,15 @@ public class Post {
     private List<Integer> photoIds;
     private List<Integer> scrapIds;
 
+    public static Post create(Long userId, PostRequest req) {
+        return Post.builder()
+                .title(req.title())
+                .body(req.content())
+                .category(req.category())
+                .writerId(userId)
+                .build();
+    }
+
     public Post update(Long postId, PostRequest req) {
         return this.toBuilder()
                 .id(postId)

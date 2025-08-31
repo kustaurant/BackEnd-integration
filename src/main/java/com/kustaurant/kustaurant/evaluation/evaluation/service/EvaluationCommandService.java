@@ -6,6 +6,8 @@ import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationCo
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.kustaurant.kustaurant.user.mypage.service.UserStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,8 @@ public class EvaluationCommandService {
     private final EvaluationRestaurantService restaurantEvaluationService;
     private final EvalS3Service s3Service;
 
+    private final UserStatsService userStatsService;
+
     @Transactional
     public void evaluate(Long userId, Long restaurantId, EvaluationDTO dto) {
         EvaluationDTO updated = applyImgUrlIfNewImageAdded(dto);
@@ -28,6 +32,7 @@ public class EvaluationCommandService {
             reEvaluate(userId, restaurantId, updated);
         } else {
             createEvaluation(userId, restaurantId, updated);
+            userStatsService.incEvaluatedRestaurant(userId);
         }
     }
 

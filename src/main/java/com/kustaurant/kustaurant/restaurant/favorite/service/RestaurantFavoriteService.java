@@ -2,16 +2,18 @@ package com.kustaurant.kustaurant.restaurant.favorite.service;
 
 import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.user.mypage.service.UserStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class RestaurantFavoriteService {
-    // repository
     private final RestaurantFavoriteRepository restaurantFavoriteRepository;
+
+    private final UserStatsService userStatsService;
 
     public long countByRestaurantId(Long restaurantId) {
         return restaurantFavoriteRepository.countByRestaurantId(restaurantId);
@@ -27,10 +29,12 @@ public class RestaurantFavoriteService {
         } catch (DataNotFoundException e) {
             // 즐겨찾기가 안 되어 있는 경우
             addFavorite(userId, restaurantId);
+            userStatsService.incFavoriteRestaurant(userId);
             return true;
         }
         // 즐겨찾기가 되어 있던 경우
         deleteFavorite(favorite);
+        userStatsService.decFavoriteRestaurant(userId);
         return false;
     }
 

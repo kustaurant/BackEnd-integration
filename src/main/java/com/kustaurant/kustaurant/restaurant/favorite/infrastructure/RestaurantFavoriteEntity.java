@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @SQLDelete(sql = "update restaurant_favorite_tbl set status = 'DELETED' where favorite_id = ?")
 @SQLRestriction("status = 'ACTIVE'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name="restaurant_favorite_tbl")
+@Table(name="restaurant_favorite")
 public class RestaurantFavoriteEntity extends BaseTimeEntity {
 
     @Id

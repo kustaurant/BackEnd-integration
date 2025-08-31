@@ -1,6 +1,5 @@
 ﻿SET FOREIGN_KEY_CHECKS = 0;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `eval_comm_user_reaction` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `eval_comment_id` bigint unsigned NOT NULL,
@@ -13,9 +12,7 @@ CREATE TABLE `eval_comm_user_reaction` (
   CONSTRAINT `fk_eval_comment` FOREIGN KEY (`eval_comment_id`) REFERENCES `eval_comment` (`id`),
   CONSTRAINT `fk_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `eval_comment` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -35,9 +32,7 @@ CREATE TABLE `eval_comment` (
   CONSTRAINT `fk_restaurant_comments_evaluation` FOREIGN KEY (`evaluation_id`) REFERENCES `evaluations_tbl` (`evaluation_id`),
   CONSTRAINT `fk_restaurant_comments_TBL_restaurant_TBL1` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants_tbl` (`restaurant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `eval_user_reaction` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -49,9 +44,7 @@ CREATE TABLE `eval_user_reaction` (
   CONSTRAINT `fk_comment_likes_evaluation` FOREIGN KEY (`evaluation_id`) REFERENCES `evaluations_tbl` (`evaluation_id`),
   CONSTRAINT `fk_rest_cmt_likes_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `evaluation_situations_tbl` (
   `evaluation_id` bigint NOT NULL,
   `situation_id` bigint NOT NULL,
@@ -60,9 +53,7 @@ CREATE TABLE `evaluation_situations_tbl` (
   CONSTRAINT `fk_evaluation_situations_evaluation` FOREIGN KEY (`evaluation_id`) REFERENCES `evaluations_tbl` (`evaluation_id`),
   CONSTRAINT `fk_evaluation_situations_situation` FOREIGN KEY (`situation_id`) REFERENCES `situations_tbl` (`situation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `evaluations_tbl` (
   `evaluation_id` bigint NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -81,9 +72,7 @@ CREATE TABLE `evaluations_tbl` (
   CONSTRAINT `fk_evaluations_TBL_restaurants_TBL1` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants_tbl` (`restaurant_id`),
   CONSTRAINT `fk_evaluations_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `feedbacks_tbl` (
   `feedback_id` int NOT NULL AUTO_INCREMENT,
   `comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -93,9 +82,7 @@ CREATE TABLE `feedbacks_tbl` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_feedbacks_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `home_modal_tbl` (
   `modal_id` int NOT NULL AUTO_INCREMENT,
   `modal_title` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -104,9 +91,7 @@ CREATE TABLE `home_modal_tbl` (
   `expired_at` datetime DEFAULT NULL,
   PRIMARY KEY (`modal_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `notice_tbl` (
   `notice_id` int NOT NULL AUTO_INCREMENT,
   `notice_title` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -116,9 +101,7 @@ CREATE TABLE `notice_tbl` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`notice_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_comment_dislikes_tbl` (
   `comment_dislike_id` int NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -130,9 +113,7 @@ CREATE TABLE `post_comment_dislikes_tbl` (
   CONSTRAINT `fk_post_cmt_dislikes_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`),
   CONSTRAINT `post_comment_dislikes_tbl_ibfk_2` FOREIGN KEY (`comment_id`) REFERENCES `post_comments_tbl` (`comment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_comment_dislikes_tbl_old` (
   `comment_id` int NOT NULL,
   `user_id` bigint unsigned NOT NULL,
@@ -141,9 +122,7 @@ CREATE TABLE `post_comment_dislikes_tbl_old` (
   CONSTRAINT `fk_post_cmt_dislikes_user_old` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`),
   CONSTRAINT `post_comment_dislikes_tbl_old_ibfk_1` FOREIGN KEY (`comment_id`) REFERENCES `post_comments_tbl` (`comment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_comment_likes_tbl` (
   `comment_like_id` int NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -155,9 +134,7 @@ CREATE TABLE `post_comment_likes_tbl` (
   CONSTRAINT `fk_post_cmt_likes_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`),
   CONSTRAINT `post_comment_likes_tbl_ibfk_2` FOREIGN KEY (`comment_id`) REFERENCES `post_comments_tbl` (`comment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_comment_likes_tbl_old` (
   `comment_id` int NOT NULL,
   `user_id` bigint unsigned NOT NULL,
@@ -166,9 +143,7 @@ CREATE TABLE `post_comment_likes_tbl_old` (
   CONSTRAINT `fk_post_cmt_likes_user_old` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`),
   CONSTRAINT `post_comment_likes_tbl_old_ibfk_1` FOREIGN KEY (`comment_id`) REFERENCES `post_comments_tbl` (`comment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_comments_tbl` (
   `comment_id` int NOT NULL AUTO_INCREMENT,
   `post_id` int NOT NULL,
@@ -185,9 +160,7 @@ CREATE TABLE `post_comments_tbl` (
   CONSTRAINT `fk_post_comments_TBL_posts_TBL1` FOREIGN KEY (`post_id`) REFERENCES `posts_tbl` (`post_id`),
   CONSTRAINT `fk_post_comments_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_dislikes_tbl` (
   `post_dislikes_id` int NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -199,9 +172,7 @@ CREATE TABLE `post_dislikes_tbl` (
   CONSTRAINT `fk_post_dislikes_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`),
   CONSTRAINT `post_dislikes_tbl_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts_tbl` (`post_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_dislikes_tbl_old` (
   `post_id` int NOT NULL,
   `user_id` bigint unsigned NOT NULL,
@@ -210,9 +181,7 @@ CREATE TABLE `post_dislikes_tbl_old` (
   CONSTRAINT `fk_post_dislikes_user_old` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`),
   CONSTRAINT `post_dislikes_tbl_old_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts_tbl` (`post_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_likes_tbl` (
   `post_likes_id` int NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -224,9 +193,7 @@ CREATE TABLE `post_likes_tbl` (
   CONSTRAINT `fk_post_likes_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`),
   CONSTRAINT `post_likes_tbl_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts_tbl` (`post_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_likes_tbl_old` (
   `post_id` int NOT NULL,
   `user_id` bigint unsigned NOT NULL,
@@ -235,9 +202,7 @@ CREATE TABLE `post_likes_tbl_old` (
   CONSTRAINT `fk_post_likes_user_old` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`),
   CONSTRAINT `post_likes_tbl_old_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts_tbl` (`post_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_photoes_tbl` (
   `photo_id` int NOT NULL AUTO_INCREMENT,
   `post_id` int NOT NULL,
@@ -247,9 +212,7 @@ CREATE TABLE `post_photoes_tbl` (
   KEY `fk_post_photoes_TBL_posts_TBL1_idx` (`post_id`),
   CONSTRAINT `fk_post_photoes_TBL_posts_TBL1` FOREIGN KEY (`post_id`) REFERENCES `posts_tbl` (`post_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `post_scraps_tbl` (
   `scrap_id` int NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -262,9 +225,7 @@ CREATE TABLE `post_scraps_tbl` (
   CONSTRAINT `fk_post_scraps_post` FOREIGN KEY (`post_id`) REFERENCES `posts_tbl` (`post_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_post_scraps_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `posts_tbl` (
   `post_id` int NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -280,9 +241,7 @@ CREATE TABLE `posts_tbl` (
   KEY `fk_posts_TBL_users_TBL1_idx` (`user_id`),
   CONSTRAINT `fk_posts_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `report` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -296,9 +255,7 @@ CREATE TABLE `report` (
   KEY `idx_report_target` (`target_type`,`target_id`),
   CONSTRAINT `fk_report_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `restaurant_favorite_tbl` (
   `favorite_id` int NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -312,9 +269,7 @@ CREATE TABLE `restaurant_favorite_tbl` (
   CONSTRAINT `fk_rest_favorite_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`),
   CONSTRAINT `fk_restaurant_favorite_TBL_restaurants_TBL1` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants_tbl` (`restaurant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `restaurant_menus_tbl` (
   `menu_id` int NOT NULL,
   `restaurant_id` int NOT NULL,
@@ -326,9 +281,7 @@ CREATE TABLE `restaurant_menus_tbl` (
   KEY `fk_restaurant_menus_TBL_restaurants_TBL1_idx` (`restaurant_id`),
   CONSTRAINT `fk_restaurant_menus_TBL_restaurants_TBL1` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants_tbl` (`restaurant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `restaurant_situation_relations_tbl` (
   `relation_id` bigint NOT NULL AUTO_INCREMENT,
   `restaurant_id` int NOT NULL,
@@ -340,9 +293,7 @@ CREATE TABLE `restaurant_situation_relations_tbl` (
   CONSTRAINT `fk_restaurant_categories_TBL_restaurant_TBL1` FOREIGN KEY (`restaurant_id`) REFERENCES `restaurants_tbl` (`restaurant_id`),
   CONSTRAINT `fk_restaurant_situation_relations_situation` FOREIGN KEY (`situation_id`) REFERENCES `situations_tbl` (`situation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `restaurants_tbl` (
   `restaurant_id` int NOT NULL AUTO_INCREMENT,
   `restaurant_name` varchar(200) NOT NULL,
@@ -366,18 +317,14 @@ CREATE TABLE `restaurants_tbl` (
   `partnership_info` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`restaurant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `situations_tbl` (
   `situation_id` bigint NOT NULL AUTO_INCREMENT,
   `situation_name` varchar(45) NOT NULL,
   PRIMARY KEY (`situation_id`),
   UNIQUE KEY `category_name_UNIQUE` (`situation_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `user_stats_tbl` (
   `user_id` bigint unsigned NOT NULL,
   `saved_rest_cnt` int NOT NULL DEFAULT '0',
@@ -388,9 +335,7 @@ CREATE TABLE `user_stats_tbl` (
   PRIMARY KEY (`user_id`),
   CONSTRAINT `fk_user_stats_user` FOREIGN KEY (`user_id`) REFERENCES `users_tbl` (`user_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+
 CREATE TABLE `users_tbl` (
   `user_id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `provider_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -422,5 +367,5 @@ CREATE TABLE restaurant_rating (
        ON UPDATE CASCADE,
     CONSTRAINT chk_tier_range CHECK ((tier >= 1 AND tier <= 5) OR tier = -1)
 );
-/*!40101 SET character_set_client = @saved_cs_client */;
+
 SET FOREIGN_KEY_CHECKS = 1;

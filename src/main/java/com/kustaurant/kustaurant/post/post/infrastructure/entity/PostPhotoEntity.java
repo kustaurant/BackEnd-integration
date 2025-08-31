@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(name = "post_photos")
+@Table(name = "post_photo")
 public class PostPhotoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
