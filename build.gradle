@@ -139,3 +139,7 @@ tasks.named('test') { enabled = false }
 tasks.named('check') {
 	dependsOn tasks.named('smallTest'), tasks.named('middleTest')
 }
+
+tasks.named('processIntegrationTestResources', Copy) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

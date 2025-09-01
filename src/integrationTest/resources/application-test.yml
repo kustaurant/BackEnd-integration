@@ -19,6 +19,3 @@ spring:
       s3:
         enabled: false
         bucket: dummy-bucket
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
