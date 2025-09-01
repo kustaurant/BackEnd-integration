@@ -33,6 +33,7 @@ public class Post {
                 .title(req.title())
                 .body(req.content())
                 .category(req.category())
+                .status(PostStatus.ACTIVE)
                 .writerId(userId)
                 .build();
     }

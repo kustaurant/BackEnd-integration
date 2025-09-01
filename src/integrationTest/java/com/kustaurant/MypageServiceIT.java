@@ -1,8 +1,9 @@
-package com.kustaurant.kustaurant.user.mypage.service;
+package com.kustaurant;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationCommandService;
 import com.kustaurant.kustaurant.global.exception.exception.user.NoProfileChangeException;
+import com.kustaurant.kustaurant.post.comment.controller.request.PostCommentRequest;
 import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
 import com.kustaurant.kustaurant.post.post.controller.request.PostRequest;
 import com.kustaurant.kustaurant.post.post.domain.Post;
@@ -25,7 +26,12 @@ import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -35,11 +41,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@SpringBootTest(classes = com.kustaurant.kustaurant.RestaurantTierApplication.class)
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
-@Tag("middleTest")
 class MypageServiceIT {
 
     @Autowired MypageService mypageService;
@@ -50,6 +55,9 @@ class MypageServiceIT {
     @Autowired PostCommentService postCommentService;
 
     @Autowired UserRepository userRepo;
+
+    @MockBean StringRedisTemplate stringRedisTemplate;
+    @MockBean FindByIndexNameSessionRepository<Session> sessionRepository;
 
     private User user1;
     private User user2;
@@ -65,6 +73,7 @@ class MypageServiceIT {
                         .status(UserStatus.ACTIVE)
                         .role(UserRole.USER)
                         .createdAt(LocalDateTime.now().minusMonths(2))
+                        .updatedAt(LocalDateTime.now().minusMonths(2))
                         .stats(UserStats.builder()
                                 .ratedRestCnt(1)
                                 .commPostCnt(1)
@@ -79,6 +88,7 @@ class MypageServiceIT {
                         .status(UserStatus.ACTIVE)
                         .role(UserRole.USER)
                         .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
                         .build());
     }
 
@@ -217,7 +227,7 @@ class MypageServiceIT {
         // t
         assertEquals(3, res.size());
         assertThat(res.get(0).postTitle()).isEqualTo("테스트게시글1");
-        assertThat(res.get(1).postCategory()).isEqualTo("자유게시판");
+        assertThat(res.get(1).postCategory().getKoreanCategory()).isEqualTo("자유게시판");
         assertThat(res.get(2).postImgUrl()).isNull();
     }
 
@@ -251,15 +261,12 @@ class MypageServiceIT {
     @DisplayName("내가 작성한 게시글 댓글 목록 조회 정상 동작")
     void should_return_commented_posts_successfully() {
         // g
-        PostRequest req1 = new PostRequest("테스트게시글1", PostCategory.FREE, "테스트내용1");
-        Post post1 = postService.create(req1, user2.getId());
-        postCommentService.create("게시글1-댓글1",post1.getId(),null,user1.getId());
+        Post post1 = postService.create(new PostRequest("테스트게시글1", PostCategory.FREE, "테스트내용1"), user2.getId());
+        postCommentService.create(post1.getId(), new PostCommentRequest("게시글1-댓글1",null),user1.getId());
 
-        PostRequest req2 = new PostRequest("테스트게시글2", PostCategory.SUGGESTION, "테스트내용2");
-        Post post2 = postService.create(req2, user2.getId());
-        postCommentService.create("게시글2-댓글1",post2.getId(),null,user1.getId());
-//        postCommentService.create("게시글2-댓글1",post1.getId(),null,user2.getId());
-//        postCommentService.create("게시글2-댓글1-대댓글1",post1.getId(),null,user1.getId());
+        Post post2 = postService.create(new PostRequest("테스트게시글2", PostCategory.SUGGESTION, "테스트내용2"), user2.getId());
+        postCommentService.create(post2.getId(), new PostCommentRequest("게시글2-댓글1",null),user1.getId());
+
         // w
         var res = mypageService.getCommentedUserPosts(user1.getId());
         // t
@@ -268,8 +275,5 @@ class MypageServiceIT {
         assertThat(res.get(1).body()).isEqualTo("게시글2-댓글1");
         assertThat(res.get(1).postCategory()).isEqualTo(PostCategory.SUGGESTION);
     }
-
-
-
 
 }

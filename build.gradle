@@ -5,8 +5,8 @@ plugins {
 }
 
 group = 'com.kustaurant'
-// 배포 버젼
 version = '0.1.0-SNAPSHOT'
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
@@ -90,29 +90,52 @@ dependencies {
 	testImplementation "org.testcontainers:mysql:1.19.7"
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+
+// 1) 소스셋 분리
+sourceSets {
+	test { // 소형 테스트
+		java.srcDirs('src/test/java')
+		resources.srcDirs('src/test/resources')
+	}
+	integrationTest { // 중형/통합 테스트
+		java.srcDirs('src/integrationTest/java')
+		resources.srcDirs('src/integrationTest/resources')
+		compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+		runtimeClasspath += output + compileClasspath
+	}
 }
 
-// 아래는 소형/중형 테스트 분리를 위한 설정임
+// 2) 의존성 구성 (integrationTest가 test 의존성 상속)
+configurations {
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+// 3) 실행 task 분리
 tasks.register('smallTest', Test) {
-	useJUnitPlatform {
-		excludeTags 'middleTest'
-	}
+	description = 'Run unit (small) tests'
+	group = 'verification'
 	testClassesDirs = sourceSets.test.output.classesDirs
 	classpath = sourceSets.test.runtimeClasspath
-	shouldRunAfter test
-	reports.junitXml.destination = layout.buildDirectory.dir("test-results/smallTest").get().asFile
-	reports.html.destination = layout.buildDirectory.dir("reports/tests/smallTest").get().asFile
+	useJUnitPlatform()
+	reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/smallTest")
+	reports.html.outputLocation     = layout.buildDirectory.dir("reports/tests/smallTest")
 }
 
 tasks.register('middleTest', Test) {
-	useJUnitPlatform {
-		includeTags 'middleTest'
-	}
-	testClassesDirs = sourceSets.test.output.classesDirs
-	classpath = sourceSets.test.runtimeClasspath
-	shouldRunAfter test
-	reports.junitXml.destination = layout.buildDirectory.dir("test-results/middleTest").get().asFile
-	reports.html.destination = layout.buildDirectory.dir("reports/tests/middleTest").get().asFile
+	description = 'Run integration (middle) tests'
+	group = 'verification'
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	useJUnitPlatform()
+	reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/middleTest")
+	reports.html.outputLocation     = layout.buildDirectory.dir("reports/tests/middleTest")
+}
+
+// 기본 test는 비활성화(선택)
+tasks.named('test') { enabled = false }
+
+// check 시 둘 다 돌리고 싶으면
+tasks.named('check') {
+	dependsOn tasks.named('smallTest'), tasks.named('middleTest')
 }
