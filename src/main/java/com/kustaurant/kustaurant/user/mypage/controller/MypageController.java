@@ -1,11 +1,16 @@
 package com.kustaurant.kustaurant.user.mypage.controller;
 
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
+import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.ProfileUpdateResponse;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.mypage.controller.response.web.MypageDataView;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +28,7 @@ public class MypageController {
             @AuthUser AuthUserInfo user,
             Model model
     ){
-        MypageDataView data = mypageService.getMypageData(user.id());
+        MypageDataView data = mypageService.getMypageWebData(user.id());
 
         // 메뉴 탭 인덱스 정보
         model.addAttribute("menuIndex", menuIndex);
@@ -38,38 +43,14 @@ public class MypageController {
     }
 
 
-//    @PreAuthorize("isAuthenticated() and hasRole('USER')")
-//    @PatchMapping("/api/myPage/updateProfile")
-//    public ResponseEntity<String> updateProfile(
-//            @RequestBody Map<String, String> requestBody,
-//            Principal principal
-//    ) {
-//        User user = customOAuth2User.getUser();
-//        UserEntity userEntity = customOAuth2UserService.getUser(principal.getName());
-//        String newNickname = requestBody.get("newNickname");
-//        String newPhoneNum = requestBody.get("newPhoneNum");
-//
-//        if ((newNickname == null || newNickname.isBlank()) &&
-//                (newPhoneNum == null || newPhoneNum.isBlank())) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("변경된 내용이 없습니다.");
-//        }
-//
-//        try {
-//            // 닉네임이 입력되었다면 변경
-//            if (newNickname != null && !newNickname.isBlank()) {
-//                user.changeNickname(new Nickname(newNickname));
-//            }
-//
-//            // 전화번호가 입력되었다면 변경
-//            if (newPhoneNum != null && !newPhoneNum.isBlank()) {
-//                user.changePhoneNumber(new PhoneNumber(newPhoneNum));
-//            }
-//
-//            userRepository.save(user);
-//            return ResponseEntity.ok().build();
-//
-//        } catch (IllegalArgumentException | IllegalStateException e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-//        }
-//    }
+    @PreAuthorize("isAuthenticated() and hasRole('USER')")
+    @PatchMapping("/api/myPage/updateProfile")
+    public ResponseEntity<ProfileUpdateResponse> updateProfile(
+            @RequestBody @Valid ProfileUpdateRequest req,
+            @AuthUser AuthUserInfo user
+    ) {
+        ProfileUpdateResponse response = mypageService.updateUserProfile(user.id(), req);
+
+        return ResponseEntity.ok(response);
+    }
 }

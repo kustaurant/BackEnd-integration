@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "home_modal_tbl")
+@Table(name = "admin_home_modal")
 public class HomeModalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -31,7 +31,7 @@ public class ReviewQueryService {
     private final UserRepository userRepo;
 
     public List<ReviewsResponse> fetchEvaluationsWithComments(
-            Integer restaurantId,
+            Long restaurantId,
             Long currentUserId,
             SortOption sort
     ) {

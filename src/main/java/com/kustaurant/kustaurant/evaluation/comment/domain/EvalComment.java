@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.evaluation.comment.domain;
 
 import com.kustaurant.kustaurant.common.enums.Status;
 import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalCommentRequest;
-import com.kustaurant.kustaurant.global.exception.exception.auth.ForbiddenException;
+import com.kustaurant.kustaurant.global.exception.exception.auth.AccessDeniedException;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class EvalComment {
     private Long id;
     private Long userId;
-    private Integer restaurantId;
+    private Long restaurantId;
     private Long evaluationId;
     private String body;
     private Integer likeCount;
@@ -22,7 +22,7 @@ public class EvalComment {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static EvalComment create(Long userId, Integer restaurantId, Long evaluationId, EvalCommentRequest req) {
+    public static EvalComment create(Long userId, Long restaurantId, Long evaluationId, EvalCommentRequest req) {
         return EvalComment.builder()
                 .userId(userId)
                 .restaurantId(restaurantId)
@@ -37,7 +37,7 @@ public class EvalComment {
 
     public void softDelete(Long requestUserId) {
         if(!userId.equals(requestUserId)) {
-            throw new ForbiddenException();
+            throw new AccessDeniedException();
         }
         if(isDeleted()) return;
         status = Status.DELETED;

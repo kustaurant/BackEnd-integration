@@ -18,7 +18,7 @@ public class RestaurantHomeQuery {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<Integer> getTopRestaurantIds(int size) {
+    public List<Long> getTopRestaurantIds(int size) {
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
@@ -28,7 +28,7 @@ public class RestaurantHomeQuery {
                 .fetch();
     }
 
-    public List<Integer> getRandomRestaurantIds(int size) {
+    public List<Long> getRandomRestaurantIds(int size) {
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
                 .where(restaurantActive(restaurantEntity))

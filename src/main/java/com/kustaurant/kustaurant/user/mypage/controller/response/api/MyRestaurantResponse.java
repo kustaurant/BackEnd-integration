@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.user.mypage.controller.response.api;
 
 public record MyRestaurantResponse(
         String restaurantName,
-        Integer restaurantId,
+        Long restaurantId,
         String restaurantImgURL,
         Integer mainTier,
         String restaurantType,

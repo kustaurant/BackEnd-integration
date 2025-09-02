@@ -16,6 +16,11 @@ public enum UserLevel {
                 .filter(lv -> cnt >= lv.min && cnt <= lv.max)
                 .findFirst().orElse(NEWBIE);
     }
+    public static UserLevel of(long cnt) {
+        return Arrays.stream(values())
+                .filter(lv -> cnt >= lv.min && cnt <= lv.max)
+                .findFirst().orElse(NEWBIE);
+    }
 
     /* 확장자 고정—여기선 .svg 하나만 */
     public String iconPath() {

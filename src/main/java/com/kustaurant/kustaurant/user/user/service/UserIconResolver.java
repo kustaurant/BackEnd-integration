@@ -8,4 +8,7 @@ public final class UserIconResolver {
     public static String resolve(int evaluationCnt) {
         return UserLevel.of(evaluationCnt).iconPath();
     }
+    public static String resolve(long evaluationCnt) {
+        return UserLevel.of(evaluationCnt).iconPath();
+    }
 }

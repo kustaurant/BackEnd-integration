@@ -3,13 +3,14 @@ package com.kustaurant.kustaurant.admin.feedback.infrastructure;
 import com.kustaurant.kustaurant.admin.feedback.domain.Feedback;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@Table(name="feedbacks_tbl")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name="admin_feedback")
 public class FeedbackEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +22,7 @@ public class FeedbackEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     public static FeedbackEntity from(Long userId, Feedback feedback) {
@@ -28,7 +30,6 @@ public class FeedbackEntity {
         feedbackEntity.id = feedback.getId();
         feedbackEntity.comment = feedback.getComment();
         feedbackEntity.userId = userId;
-        feedbackEntity.createdAt = feedback.getCreatedAt();
 
         return feedbackEntity;
     }

@@ -9,6 +9,6 @@ public interface EvalCommentRepository {
     EvalComment save(EvalComment evalComment);
     Optional<EvalComment> findById(Long id);
 
-    Optional<EvalComment> findByIdAndRestaurantId(Long evalCommentId, Integer restaurantId);
+    Optional<EvalComment> findByIdAndRestaurantId(Long evalCommentId, Long restaurantId);
     List<EvalComment> findAllByEvaluationIdIn(List<Long> evalIds);
 }

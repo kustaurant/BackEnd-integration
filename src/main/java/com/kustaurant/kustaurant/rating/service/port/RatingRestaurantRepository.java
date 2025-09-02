@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface RatingRestaurantRepository {
 
-    List<Integer> getRestaurantIds();
-    List<RestaurantStats> getRestaurantStatsByIds(List<Integer> ids);
+    List<Long> getRestaurantIds();
+    List<RestaurantStats> getRestaurantStatsByIds(List<Long> ids);
 }

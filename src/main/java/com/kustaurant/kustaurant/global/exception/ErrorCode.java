@@ -9,10 +9,10 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     /* ── COMMON ── */
-    INVALID_INPUT_VALUE   (HttpStatus.BAD_REQUEST,          "COMMON-001", "잘못된 입력 값입니다."),
-    METHOD_NOT_ALLOWED    (HttpStatus.METHOD_NOT_ALLOWED,   "COMMON-002", "허용되지 않은 HTTP 메서드입니다."),
-    INTERNAL_SERVER_ERROR (HttpStatus.INTERNAL_SERVER_ERROR,"COMMON-003", "예상치 못한 서버 오류입니다."),
-
+    INVALID_INPUT_VALUE   (HttpStatus.BAD_REQUEST,           "COMMON-001", "잘못된 입력 값입니다."),
+    METHOD_NOT_ALLOWED    (HttpStatus.METHOD_NOT_ALLOWED,    "COMMON-002", "허용되지 않은 HTTP 메서드입니다."),
+    INTERNAL_SERVER_ERROR (HttpStatus.INTERNAL_SERVER_ERROR, "COMMON-003", "예상치 못한 서버 오류입니다."),
+    IMAGE_UPLOAD_FAIL     (HttpStatus.INTERNAL_SERVER_ERROR, "COMMON-004", "이미지 업로드에 실패했습니다."),
     /* ──── USER ──── */
     USER_NOT_FOUND        (HttpStatus.NOT_FOUND,            "USER-001",   "유저를 찾을 수 없습니다."),
     NICKNAME_COOLDOWN       (HttpStatus.BAD_REQUEST,    "USER-002", "닉네임 변경은 30일에 한 번만 가능합니다."),
@@ -31,7 +31,8 @@ public enum ErrorCode {
     RESTAURANT_SITUATION_RELATION_NOT_FOUND(HttpStatus.NOT_FOUND, "RELATION-001", "레스토랑 상황을 찾을 수 없습니다"),
 
     /* ──── POST ──── */
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-001", "게시글을 찾을 수 없습니다."),
+    POST_NOT_FOUND        (HttpStatus.NOT_FOUND  , "POST-001", "게시글을 찾을 수 없습니다."),
+    POST_ALREADY_DELETED  (HttpStatus.CONFLICT   , "POST-003", "이미 삭제된 게시글입니다."),
 
     /* ──── COMMENT ──── */
     COMMENT_NOT_FOUND (HttpStatus.NOT_FOUND, "COMMENT-001", "댓글을 찾을 수 없습니다."),

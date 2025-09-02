@@ -18,7 +18,7 @@ public class RestaurantSearchQuery {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<Integer> searchRestaurantIds(String[] kwArr, int size) {
+    public List<Long> searchRestaurantIds(String[] kwArr, int size) {
         BooleanBuilder andBuilder = new BooleanBuilder();
         for (String kw : kwArr) {
             String pattern = "%" + kw + "%";

@@ -4,7 +4,7 @@ import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
 import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,22 +14,12 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
 
 
     @Override
-    public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Integer restaurantId) {
+    public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Long restaurantId) {
         return store.stream()
                 .filter(fav -> fav.getUserId().equals(userId) &&
                         fav.getRestaurantId().equals(restaurantId))
                 .findFirst()
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_FAVORITE_NOT_FOUND, "Favorite not found - UserId:" + userId + ", RestaurantId:" + restaurantId));
-    }
-
-    public boolean existsByUserAndRestaurant(Long userId, Integer restaurantId) {
-        return store.stream()
-                .anyMatch(fav -> fav.getUserId().equals(userId) &&
-                        fav.getRestaurantId().equals(restaurantId));
-    }
-
-    public List<RestaurantFavorite> findByUser(Long userId) {
-        return List.of();
     }
 
 
@@ -45,12 +35,7 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     }
 
     @Override
-    public List<RestaurantFavorite> findSortedFavoritesByUserId(Long userId) {
-        return List.of();
-    }
-
-    @Override
-    public long countByRestaurantId(Integer restaurantId) {
+    public long countByRestaurantId(Long restaurantId) {
         return 0;
     }
 

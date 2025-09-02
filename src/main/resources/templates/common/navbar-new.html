@@ -1,6 +1,5 @@
 <!--상단 탭-->
-<header th:fragment="navbarFragment" class="sticky-active">
-
+<header th:fragment="navbarFragment" class="sticky-active" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 
@@ -165,9 +164,6 @@
                             </form>
                         </div>
                         <div id="myPageToggleBackdrop"></div>
-                        <!--<a class="d-none d-lg-block" href="/user/myPage" sec:authorize="isAuthenticated()">
-                            <img id="myPage" src="/img/home/account.png" alt="쿠스토랑 마이페이지">
-                        </a>-->
                         <!-- 로그인 버튼 !-->
                         <a href="/user/login" sec:authorize="isAnonymous()"
                            class="login-button d-none d-lg-block btn btn-dark-gray btn-medium btn-box-shadow left-icon btn-switch-text">

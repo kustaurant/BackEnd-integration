@@ -140,27 +140,23 @@
         </div>
     </div>
 
-
-
     <div id="Area2" class="hidden">
         <div id="area2Contents" class="gray-border-circular">
             <p th:if="${#lists.isEmpty(restaurantFavoriteList)}">저장된 정보가 없습니다.</p>
-            <div class="restaurant-favorite-container" th:each="restaurantFavorie: ${restaurantFavoriteList}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantFavorie.getRestaurant().restaurantId})} + '\''">
+            <div class="restaurant-favorite-container" th:each="restaurantFavorie: ${restaurantFavoriteList}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantFavorie.restaurantId})} + '\''">
                 <!-- 메인 이미지 -->
-                <img th:if="${restaurantFavorie.getRestaurant().getRestaurantImgUrl() != 'no_img'}" class="restaurant-img" th:src="${restaurantFavorie.getRestaurant().getRestaurantImgUrl()}">
-                <img th:if="${restaurantFavorie.getRestaurant().getRestaurantImgUrl() == 'no_img'}" class="restaurant-img" src="/img/restaurant/no_img.png">
+                <img th:if="${restaurantFavorie.restaurantImgURL != 'no_img'}" class="restaurant-img" th:src="${restaurantFavorie.restaurantImgURL}">
+                <img th:if="${restaurantFavorie.restaurantImgURL == 'no_img'}" class="restaurant-img" src="/img/restaurant/no_img.png">
                 <!-- 식당 이름, 타입 -->
                 <div class="restaurant-info">
-                    <span class="restaurant-name" th:text="${restaurantFavorie.getRestaurant().getRestaurantName()}"></span>
-                    <span class="restaurant-type" th:text="${restaurantFavorie.getRestaurant().getRestaurantType()}"></span>
+                    <span class="restaurant-name" th:text="${restaurantFavorie.restaurantName}"></span>
+                    <span class="restaurant-type" th:text="${restaurantFavorie.restaurantType}"></span>
                 </div>
-                <!-- 식당 cuisine -->
-                <img class="restaurant-cuisine-img" th:src="${restaurantFavorie.getRestaurant().getCuisineImgUrl(restaurantFavorie.getRestaurant().getRestaurantCuisine())}">
+                <!-- 식당 position -->
+                <span class="restaurant-position" th:text="${restaurantFavorie.restaurantPosition}"></span>
             </div>
         </div>
     </div>
-
-
 
     <div id="Area3" class="hidden">
         <div id="area3Contents" class="gray-border-circular">
@@ -189,34 +185,33 @@
                 </div>
             </div>
             <div class="restaurant-evaluation-container-outer">
-                <div class="restaurant-evaluation-container" th:each="restaurantEvaluation: ${restaurantEvaluationList}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantEvaluation.getRestaurant().restaurantId})} + '\''">
+                <div class="restaurant-evaluation-container" th:each="restaurantEvaluation: ${restaurantEvaluationList}" th:onclick="'window.location.href = \'' + @{/restaurants/{restaurantId}(restaurantId=${restaurantEvaluation.restaurantId})} + '\''">
                     <div class="evaluation-restaurant-info">
                         <!-- 메인 이미지 -->
-                        <img th:if="${restaurantEvaluation.getRestaurant().getRestaurantImgUrl() != 'no_img'}" class="restaurant-img" th:src="${restaurantEvaluation.getRestaurant().getRestaurantImgUrl()}">
-                        <img th:if="${restaurantEvaluation.getRestaurant().getRestaurantImgUrl() == 'no_img'}" class="restaurant-img" src="/img/restaurant/no_img.png">
+                        <img th:if="${restaurantEvaluation.restaurantImgURL != 'no_img'}" class="restaurant-img" th:src="${restaurantEvaluation.restaurantImgURL}">
+                        <img th:if="${restaurantEvaluation.restaurantImgURL == 'no_img'}" class="restaurant-img" src="/img/restaurant/no_img.png">
                         <!-- 식당 이름, 타입 -->
                         <div class="restaurant-info">
-                            <span class="restaurant-name" th:text="${restaurantEvaluation.getRestaurant().getRestaurantName()}"></span>
-                            <span class="restaurant-type" th:text="${restaurantEvaluation.getRestaurant().getRestaurantType()}"></span>
+                            <span class="restaurant-name" th:text="${restaurantEvaluation.restaurantName}"></span>
+                            <span class="restaurant-type" th:text="${restaurantEvaluation.cuisine}"></span>
                         </div>
-                        <!-- 식당 cuisine -->
-                        <img class="restaurant-cuisine-img" th:src="${restaurantEvaluation.getRestaurant().getCuisineImgUrl(restaurantEvaluation.getRestaurant().getRestaurantCuisine())}">
                     </div>
                     <div class="evaluation-score-section">
                         <div class="evaluation-outer main-evaluation">
-                            <span class="category-main-name" th:text="${restaurantEvaluation.getRestaurant().getRestaurantCuisine()}"></span>
-                            <span class="category-main-score" th:text="${restaurantEvaluation.getEvaluationScore()} + '/5.0'" th:data-score="${restaurantEvaluation.getEvaluationScore()}"></span>
+                            <span class="category-main-name" th:text="${restaurantEvaluation.cuisine}"></span>
+                            <span class="category-main-score" th:text="${restaurantEvaluation.evaluationScore} + '/5.0'" th:data-score="${restaurantEvaluation.evaluationScore}"></span>
                         </div>
-                        <div class="evaluation-outer" th:each="situationEval: ${restaurantEvaluation.getEvaluationSituationList()}">
-                            <span class="category-name" th:text="${situationEval.getSituation().getSituationName()}"></span>
+                        <div class="evaluation-body" th:if="${restaurantEvaluation.evaluationBody != null}">
+                            <span th:text="${restaurantEvaluation.evaluationBody}"></span>
+                        </div>
+                        <div class="evaluation-items" th:if="${!#lists.isEmpty(restaurantEvaluation.evaluationItemScores)}">
+                            <span th:each="item: ${restaurantEvaluation.evaluationItemScores}" class="evaluation-item" th:text="${item}"></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-
 
     <div id="Area4" class="hidden">
         <div id="area5Contents" class="gray-border-circular">
@@ -225,7 +220,7 @@
             <ul class="postul" th:unless="${#lists.isEmpty(postList)}">
 
                 <!--                    <li th:each="post,iterStat: ${paging}" class="postli">-->
-                <li th:each="postlist:${postList}" th:unless="${postlist.status=='DELETED'}" class="postli">
+                <li th:each="postlist:${postList}" class="postli">
                     <hr>
                     <span class="recommend-tab">
                         <img class="likecount" src="../img/community/up.png" alt="이미지">
@@ -234,26 +229,23 @@
 
                     <div class="postBox">
                         <div>
-                            <a class="postLink" th:text="${postlist.title}" th:href="@{/community/{postId}(postId=${postlist.id})}"></a>
-                            </span>
+                            <a class="postLink" th:text="${postlist.postTitle}" th:href="@{/community/{postId}(postId=${postlist.postId})}"></a>
                         </div>
 
-                            <div class="underLink">
-                                <span class="category" th:text="${postlist.category}"></span>
-                                <span class="createdAt" th:text="${postlist.calculateTimeAgo()}"> </span>
-                            </div>
+                        <div class="underLink">
+                            <span class="category" th:text="${postlist.postCategory.koreanCategory}"></span>
+                            <span class="createdAt" th:text="${postlist.timeAgo}"> </span>
+                        </div>
 
+                        <div class="post-body" th:if="${postlist.postBodyPreview() != null}">
+                            <span th:text="${postlist.postBodyPreview()}"></span>
+                        </div>
                     </div>
-
-                    <!--                        &lt;!&ndash; 게시글에 사진이 있으면 썸네일 표시 &ndash;&gt;-->
-                    <!--                        <img class="postImage" th:if="${not #lists.isEmpty(post.postPhotoList)}"-->
-                    <!--                             th:src="${post.postPhotoList.get(0).photoImgUrl}"/>-->
+                    <img class="postImage" th:if="${!#strings.isEmpty(postlist.postImgUrl())}" th:src="${postlist.postImgUrl()}" alt="post cover"/>
                 </li>
             </ul>
         </div>
     </div>
-
-
 
     <div id="Area5" class="hidden">
         <div id="area6Contents" class="gray-border-circular">
@@ -269,7 +261,7 @@
                     <div class="postBox">
                         <div>
                             <a class="postLink"
-                               th:text="${commentlist.commentBody}"
+                               th:text="${commentlist.body}"
                                th:href="@{/community/{postId}(postId=${commentlist.postId})}">
                             </a>
                         </div>
@@ -279,18 +271,11 @@
                             <span class="category" th:text="${commentlist.postTitle}"></span>
                             <span class="createdAt" th:text="${commentlist.timeAgo}"> </span>
                         </div>
-
                     </div>
-
-                    <!--                        &lt;!&ndash; 게시글에 사진이 있으면 썸네일 표시 &ndash;&gt;-->
-                    <!--                        <img class="postImage" th:if="${not #lists.isEmpty(post.postPhotoList)}"-->
-                    <!--                             th:src="${post.postPhotoList.get(0).photoImgUrl}"/>-->
                 </li>
             </ul>
         </div>
     </div>
-
-
 
     <div id="Area6" class="hidden">
         <div id="area7Contents" class="gray-border-circular">
@@ -305,25 +290,26 @@
 
                     <div class="postBox">
                         <div>
-                            <a class="postLink" th:text="${postScrap.title}" th:href="@{/community/{postId}(postId=${postScrap.postId})}"></a>
+                            <a class="postLink" th:text="${postScrap.postTitle}" th:href="@{/community/{postId}(postId=${postScrap.postId})}"></a>
                         </div>
 
                         <div class="underLink">
-                            <span class="category" th:text="${postScrap.category}"></span>
-<!--                            <span class="createdAt" th:text="${postScrap.post.calculateTimeAgo()}"> </span>-->
+                            <span class="category" th:text="${postScrap.postCategory.koreanCategory}"></span>
+                            <span class="createdAt" th:text="${postScrap.timeAgo}"> </span>
                         </div>
 
+                        <div class="post-body" th:if="${postScrap.postBodyPreview() != null}">
+                            <span th:text="${postScrap.postBodyPreview()}"></span>
+                        </div>
                     </div>
-
-                    <!--                        &lt;!&ndash; 게시글에 사진이 있으면 썸네일 표시 &ndash;&gt;-->
-                    <!--                        <img class="postImage" th:if="${not #lists.isEmpty(post.postPhotoList)}"-->
-                    <!--                             th:src="${post.postPhotoList.get(0).photoImgUrl}"/>-->
+                    <img class="postImage" th:if="${!#strings.isEmpty(postScrap.postImgUrl())}" th:src="${(postScrap.postImgUrl())}" alt="post cover"/>
                 </li>
             </ul>
         </div>
     </div>
 
 </div>
+<footer th:replace="~{common/footer::footerFragment}"></footer>
 
 <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
 <script type="text/javascript">
@@ -335,6 +321,6 @@
 </script>
 </body>
 
-<footer th:replace="~{common/footer::footerFragment}"></footer>
+
 
 </html>

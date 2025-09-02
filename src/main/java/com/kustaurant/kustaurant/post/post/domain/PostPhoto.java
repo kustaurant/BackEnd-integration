@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.post.post.domain;
 
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,8 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PostPhoto {
     private Integer id;
-    private Integer postId;
+    private Long postId;
     private String photoImgUrl;
-    @Setter
-    private ContentStatus status;
+    private PostStatus status;
 }

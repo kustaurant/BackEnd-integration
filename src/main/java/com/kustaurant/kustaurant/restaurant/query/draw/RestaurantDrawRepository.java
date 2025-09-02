@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface RestaurantDrawRepository {
 
-    Restaurant getById(Integer id);
+    Restaurant getById(Long id);
 
     List<RestaurantCoreInfoDto> draw(List<String> cuisines, List<String> positions);
 }

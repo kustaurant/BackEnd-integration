@@ -13,11 +13,9 @@
 .appledown:hover {
     box-shadow: -3px 3px 20px rgba(0, 0, 0, 0.3); /* 호버 시 그림자 강화 */
 }
-
 /* 전체 페이지에 대한 기본 스타일 */
 body {
     display: flex;
-
 }
 html{
     margin: 0;
@@ -25,60 +23,40 @@ html{
     height: 100%;
     min-height: 100vh; /* 화면의 전체 높이 */
 }
-
 .slider-row{
     padding:0 3rem 0;
 }
 .row .col .position-absolute {
     font-weight: bold;
 }
-
 .home .col .col-12 {
 
     border: none;
     border-radius: 10px;
 }
-
 main {
     flex: 1; /* main 태그가 가능한 많은 공간을 차지하도록 함 */
     background-color: white;
 }
-
 .cell {
     padding: 0.75rem;
 }
-
-
-
 .mobile-cuisine-name span{
     white-space: nowrap;
 }
-
-
-
 .home .cell-button > .img {
     padding: 1.5rem;
     background-color: #f9f6f3;
 }
-
-
-
-
-
-
-
 .swiper-slide:hover {
     cursor: default !important;
 }
-
-
 #restaurantImageContainer {
     position: relative;
     width: 100%; /* 컨테이너 너비를 부모 요소에 맞춤 */
     padding-top: 75%; /* 너비와 동일한 높이 설정 */
     overflow: hidden; /* 이미지가 컨테이너를 벗어나지 않도록 함 */
 }
-
 #restaurantImage {
     position: absolute;
     top: 0;
@@ -100,7 +78,6 @@ body {
 .home-grid{
     padding: 0 6% 6%;
 }
-
 .mobile-cuisine-name {
     display: flex;
     justify-content: center;
@@ -109,7 +86,6 @@ body {
     margin-top:7px;
 
 }
-
 /* 모바일 화면에서 종류 카테고리 이름 보이게 */
 @media only screen and (max-width:1024px) {
     .mobile-cuisine-name {
@@ -211,7 +187,7 @@ footer{
 /* 메인 글자를 h1에서 h2로 바꿔서 글자 크기가 알아서 안바뀌는것같아서 media query 추가함 */
 @media only screen and (min-width: 992px) {
     h2.main-page-title {
-        font-size: 50px;
+        font-size: 45px;
         line-height:80px;
         color: #2a2a2a;
     }

@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvalUserReactionEntity;
+import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.EvaluationReactionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,17 +11,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public interface EvalUserReactionRepository extends JpaRepository<EvalUserReactionEntity, Long> {
-    @Query("select l from EvalUserReactionEntity l "
+public interface EvalUserReactionRepository extends JpaRepository<EvaluationReactionEntity, Long> {
+    @Query("select l from EvaluationReactionEntity l "
             + "where l.evaluationId = :evaluationId and l.userId = :userId")
-    Optional<EvalUserReactionEntity> findByEvaluationIdAndUserId(
+    Optional<EvaluationReactionEntity> findByEvaluationIdAndUserId(
             @Param("evaluationId") Long evaluationId,
             @Param("userId") Long userId
     );
 
     @Query("""
         select new map(r.evaluationId as evalId, r.reaction as type)
-        from EvalUserReactionEntity r
+        from EvaluationReactionEntity r
         where r.userId = :userId
           and r.evaluationId in :evalIds
     """)

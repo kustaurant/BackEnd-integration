@@ -29,7 +29,7 @@ public class ReportController {
     })
     @PostMapping("/api/v1/auth/restaurants/{restaurantId}/comments/{commentId}/report")
     public ResponseEntity<Void> reportComment(
-            @PathVariable Integer restaurantId,
+            @PathVariable Long restaurantId,
             @PathVariable Integer commentId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {

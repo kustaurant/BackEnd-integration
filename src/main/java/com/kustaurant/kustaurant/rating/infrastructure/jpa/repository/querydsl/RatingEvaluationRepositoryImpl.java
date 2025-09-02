@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.rating.infrastructure.jpa.repository.querydsl;
 
-import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvalUserReactionEntity.evalUserReactionEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
+import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationReactionEntity.evaluationReactionEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationSituationEntity.evaluationSituationEntity;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
@@ -11,7 +11,6 @@ import com.kustaurant.kustaurant.rating.domain.model.QEvaluationWithContext;
 import com.kustaurant.kustaurant.rating.service.port.RatingEvaluationRepository;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.StringPath;
@@ -32,8 +31,8 @@ public class RatingEvaluationRepositoryImpl implements RatingEvaluationRepositor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Map<Integer, List<EvaluationWithContext>> getEvaluationsByRestaurantIds(
-            List<Integer> restaurantIds) {
+    public Map<Long, List<EvaluationWithContext>> getEvaluationsByRestaurantIds(
+            List<Long> restaurantIds) {
         if (restaurantIds == null || restaurantIds.isEmpty()) {
             return new HashMap<>();
         }
@@ -90,11 +89,11 @@ public class RatingEvaluationRepositoryImpl implements RatingEvaluationRepositor
                 Long.class,
                 "({0})",
                 JPAExpressions
-                        .select(evalUserReactionEntity.count())
-                        .from(evalUserReactionEntity)
+                        .select(evaluationReactionEntity.count())
+                        .from(evaluationReactionEntity)
                         .where(
-                                evalUserReactionEntity.evaluationId.eq(evaluationEntity.id)
-                                        .and(evalUserReactionEntity.reaction.eq(ReactionType.LIKE))
+                                evaluationReactionEntity.evaluationId.eq(evaluationEntity.id)
+                                        .and(evaluationReactionEntity.reaction.eq(ReactionType.LIKE))
                         )
         );
         // 2) 싫어요 개수
@@ -102,11 +101,11 @@ public class RatingEvaluationRepositoryImpl implements RatingEvaluationRepositor
                 Long.class,
                 "({0})",
                 JPAExpressions
-                        .select(evalUserReactionEntity.count())
-                        .from(evalUserReactionEntity)
+                        .select(evaluationReactionEntity.count())
+                        .from(evaluationReactionEntity)
                         .where(
-                                evalUserReactionEntity.evaluationId.eq(evaluationEntity.id)
-                                        .and(evalUserReactionEntity.reaction.eq(ReactionType.DISLIKE))
+                                evaluationReactionEntity.evaluationId.eq(evaluationEntity.id)
+                                        .and(evaluationReactionEntity.reaction.eq(ReactionType.DISLIKE))
                         )
         );
         // 좋아요 개수 - 싫어요 개수

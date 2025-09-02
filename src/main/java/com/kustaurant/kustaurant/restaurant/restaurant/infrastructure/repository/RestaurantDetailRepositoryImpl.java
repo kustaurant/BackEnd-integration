@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repositor
 import static java.util.Objects.isNull;
 
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository.query.RestaurantDetailQuery;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetailRepository;
@@ -18,7 +18,7 @@ public class RestaurantDetailRepositoryImpl implements RestaurantDetailRepositor
     private final RestaurantDetailQuery restaurantDetailQuery;
 
     @Override
-    public RestaurantDetail getRestaurantDetail(Integer restaurantId, Long userId) {
+    public RestaurantDetail getRestaurantDetail(Long restaurantId, Long userId) {
         if (isNull(restaurantId)) {
             throw new IllegalArgumentException("restaurantId is null");
         }

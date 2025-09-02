@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.mock.common;
 
-import com.kustaurant.kustaurant.common.service.port.ClockHolder;
+import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
 
 import java.time.LocalDateTime;
 

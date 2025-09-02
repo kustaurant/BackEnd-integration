@@ -1,28 +1,25 @@
 package com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity;
 
 import com.kustaurant.kustaurant.common.enums.Status;
+import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name="eval_comment")
-public class EvalCommentEntity {
+@Table(name="evaluation_comment")
+public class EvalCommentEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private Long userId;
     @Column(nullable = false)
-    private Integer restaurantId;
+    private Long restaurantId;
     @Column(nullable = false)
     private Long evaluationId;
     @Column(nullable = false)
@@ -31,13 +28,9 @@ public class EvalCommentEntity {
     private Integer likeCount;
     private Integer dislikeCount;
 
-    @Enumerated(EnumType.STRING)           // ← enum 으로 매핑
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 8)
     private Status status;
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
     public static EvalCommentEntity from(EvalComment evalComment) {
         EvalCommentEntity evalCommentEntity = new EvalCommentEntity();
@@ -49,8 +42,6 @@ public class EvalCommentEntity {
         evalCommentEntity.likeCount = evalComment.getLikeCount();
         evalCommentEntity.dislikeCount = evalComment.getDislikeCount();
         evalCommentEntity.status = evalComment.getStatus();
-        evalCommentEntity.createdAt = evalComment.getCreatedAt();
-        evalCommentEntity.updatedAt = evalComment.getUpdatedAt();
         return evalCommentEntity;
     }
 
@@ -64,8 +55,8 @@ public class EvalCommentEntity {
                 .likeCount(likeCount)
                 .dislikeCount(dislikeCount)
                 .status(status)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
+                .createdAt(getCreatedAt())
+                .updatedAt(getUpdatedAt())
                 .build();
     }
 

@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.post.post.infrastructure;
 
 import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.PostPhotoEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.repositoryInterface.PostPhotoJpaRepository;
+import com.kustaurant.kustaurant.post.post.infrastructure.jpa.PostPhotoJpaRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +14,12 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class PostPhotoRepositoryImpl implements PostPhotoRepository {
-    private final PostPhotoJpaRepository postPhotoJpaRepository;
+    private final PostPhotoJpaRepository jpa;
     
     @Override
     public void save(PostPhoto postPhoto) {
         PostPhotoEntity entity = PostPhotoEntity.from(postPhoto);
-        postPhotoJpaRepository.save(entity);
+        jpa.save(entity);
     }
 
     @Override
@@ -27,16 +27,11 @@ public class PostPhotoRepositoryImpl implements PostPhotoRepository {
         List<PostPhotoEntity> entities = photos.stream()
                 .map(PostPhotoEntity::from)
                 .toList();
-        postPhotoJpaRepository.saveAll(entities);
+        jpa.saveAll(entities);
     }
 
     @Override
-    public List<PostPhoto> findByPostId(Integer postId) {
-        return List.of();
-    }
-
-    @Override
-    public void deleteByPostId(Integer postId) {
-
+    public void deleteByPostId(Long postId) {
+        jpa.deleteByPostId(postId);
     }
 }

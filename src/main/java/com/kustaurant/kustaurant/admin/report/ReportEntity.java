@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@Table(name="report")
+@Table(name="admin_report")
 @NoArgsConstructor
 public class ReportEntity {
     @Id

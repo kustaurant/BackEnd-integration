@@ -1,102 +1,59 @@
 package com.kustaurant.kustaurant.post.comment.domain;
 
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
-import com.kustaurant.kustaurant.post.post.enums.ReactionStatus;
+import com.kustaurant.kustaurant.global.exception.exception.auth.AccessDeniedException;
+import com.kustaurant.kustaurant.post.comment.controller.request.PostCommentRequest;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @Builder
+@AllArgsConstructor
 @Getter
 public class PostComment {
 
-    private Integer id;
-    private final String commentBody;
-    @Setter
-    private ContentStatus status;
-    @Setter
+    private Long id;
+    private String body;
+    private PostCommentStatus status;
+
+    private final Long writerId;
+    private Long postId;
+
+    private Long parentCommentId;
+    private Set<Long> replyIds;
+
     private LocalDateTime createdAt;
-    @Setter
     private LocalDateTime updatedAt;
 
-    private final Long userId;
-    @Setter
-    private Integer postId;
-
-    
-    private Integer parentCommentId;
-    private List<Integer> replyIds;
-
-    public static PostComment create(String commentBody, Long userId, Integer postId) {
+    public static PostComment create(Long postId, PostCommentRequest req,Long userId) {
         return PostComment.builder()
-                .commentBody(commentBody)
-                .status(ContentStatus.ACTIVE)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .userId(userId)
+                .body(req.content())
+                .status(PostCommentStatus.ACTIVE)
+                .writerId(userId)
                 .postId(postId)
-                .replyIds(new ArrayList<>())
+                .parentCommentId(req.parentCommentId()==null?null:req.parentCommentId())
                 .build();
     }
 
-    public void setParentCommentId(Integer parentCommentId) {
-        this.parentCommentId = parentCommentId;
+
+    public void ensureWriterBy(Long userId) {
+        if (!this.writerId.equals(userId))
+            throw new AccessDeniedException();
     }
 
-    public void delete() {
-        this.status = ContentStatus.DELETED;
-        // 대댓글들은 별도 서비스에서 처리
+    public void pendingDelete() {
+        this.status = PostCommentStatus.PENDING;
+        this.body = "삭제된 댓글입니다.";
+    }
+    
+    public boolean hasActiveReplies(long activeReplyCount) {
+        return activeReplyCount > 0;
     }
 
-    public String calculateTimeAgo() {
-        LocalDateTime now = LocalDateTime.now();
-        if (createdAt == null) return "";
-
-        long years = ChronoUnit.YEARS.between(createdAt, now);
-        if (years > 0) return years + "년 전";
-
-        long months = ChronoUnit.MONTHS.between(createdAt, now);
-        if (months > 0) return months + "달 전";
-
-        long days = ChronoUnit.DAYS.between(createdAt, now);
-        if (days > 0) return days + "일 전";
-
-        long hours = ChronoUnit.HOURS.between(createdAt, now);
-        if (hours > 0) return hours + "시간 전";
-
-        long minutes = ChronoUnit.MINUTES.between(createdAt, now);
-        if (minutes > 0) return minutes + "분 전";
-
-        long seconds = ChronoUnit.SECONDS.between(createdAt, now);
-        return seconds + "초 전";
+    public boolean isReplyComment() {
+        return this.parentCommentId != null;
     }
 
-    public ReactionStatus toggleLike(boolean isLikedBefore, boolean isDislikedBefore) {
-        if (isLikedBefore) {
-            return ReactionStatus.LIKE_DELETED;
-        }
-
-        if (isDislikedBefore) {
-            return ReactionStatus.DISLIKE_TO_LIKE;
-        }
-
-        return ReactionStatus.LIKE_CREATED;
-    }
-
-    public ReactionStatus toggleDislike(boolean isLikedBefore, boolean isDislikedBefore) {
-        if (isLikedBefore) {
-            return ReactionStatus.LIKE_TO_DISLIKE;
-        }
-
-        if (isDislikedBefore) {
-            return ReactionStatus.DISLIKE_DELETED;
-        }
-
-        return ReactionStatus.DISLIKE_CREATED;
-    }
 }

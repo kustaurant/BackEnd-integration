@@ -6,6 +6,8 @@ import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationCo
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.kustaurant.kustaurant.user.mypage.service.UserStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,23 +20,26 @@ public class EvaluationCommandService {
     private final EvaluationQueryRepository evaluationQueryRepository;
 
     private final EvaluationRestaurantService restaurantEvaluationService;
-    private final S3Service s3Service;
+    private final EvalS3Service s3Service;
+
+    private final UserStatsService userStatsService;
 
     @Transactional
-    public void evaluate(Long userId, Integer restaurantId, EvaluationDTO dto) {
+    public void evaluate(Long userId, Long restaurantId, EvaluationDTO dto) {
         EvaluationDTO updated = applyImgUrlIfNewImageAdded(dto);
 
         if (hasUserEvaluatedRestaurant(userId, restaurantId)) {
             reEvaluate(userId, restaurantId, updated);
         } else {
             createEvaluation(userId, restaurantId, updated);
+            userStatsService.incEvaluatedRestaurant(userId);
         }
     }
 
     /**
      * 평가 새로 생성
      */
-    private void createEvaluation(Long userId, Integer restaurantId, EvaluationDTO dto) {
+    private void createEvaluation(Long userId, Long restaurantId, EvaluationDTO dto) {
         // 평가 생성
         Evaluation created = Evaluation.create(userId, restaurantId, dto);
 
@@ -51,7 +56,7 @@ public class EvaluationCommandService {
     /**
      * 재평가
      */
-    private void reEvaluate(Long userId, Integer restaurantId, EvaluationDTO dto) {
+    private void reEvaluate(Long userId, Long restaurantId, EvaluationDTO dto) {
         evaluationQueryRepository
                 .findActiveByUserAndRestaurant(userId, restaurantId)
                 .ifPresent(evaluation -> { // 항상 존재함.
@@ -84,7 +89,7 @@ public class EvaluationCommandService {
         return evaluationDTO.getNewImage() != null && !evaluationDTO.getNewImage().isEmpty();
     }
 
-    private boolean hasUserEvaluatedRestaurant(Long userId, Integer restaurantId) {
+    private boolean hasUserEvaluatedRestaurant(Long userId, Long restaurantId) {
         return evaluationQueryRepository.existsByUserAndRestaurant(userId, restaurantId);
     }
 }

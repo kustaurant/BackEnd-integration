@@ -1,26 +1,29 @@
 
 package com.kustaurant.kustaurant.user.user.infrastructure;
 
+import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.mypage.infrastructure.UserStatsEntity;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
 import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
-
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @Entity
-@Table(name = "users_tbl")
+@SQLDelete(sql = "update users_tbl set status = 'DELETED' where user_id = ?")
+@SQLRestriction("status = 'ACTIVE'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserEntity {
+@Table(name = "users_tbl")
+public class UserEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -44,22 +47,12 @@ public class UserEntity {
     @Column(nullable = false)
     private UserStatus status;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
 
-    @OneToOne(mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = LAZY)
+    @OneToOne(mappedBy = "user", cascade = ALL, orphanRemoval = true, fetch = LAZY)
     private UserStatsEntity stats;
-
-    @Transient
-    private String rankImg;
 
     @Builder
     public UserEntity(
@@ -70,7 +63,7 @@ public class UserEntity {
             Nickname userNickname,
             UserRole role,
             UserStatus status,
-            LocalDateTime createdAt
+            UserStatsEntity stats
     ) {
         this.providerId = providerId;
         this.loginApi = loginApi;
@@ -79,7 +72,7 @@ public class UserEntity {
         this.nickname = userNickname;
         this.role = role;
         this.status = status;
-        this.createdAt = createdAt;
+        this.stats = stats;
     }
 
     public static UserEntity from(User user) {
@@ -91,13 +84,21 @@ public class UserEntity {
                 .userNickname(user.getNickname())
                 .role(user.getRole())
                 .status(user.getStatus())
-                .createdAt(user.getCreatedAt())
                 .build();
 
-        entity.stats = UserStatsEntity.of(entity, user.getStats());
+        UserStatsEntity statsEntity = UserStatsEntity.of(null, user.getStats());
+        entity.setStats(statsEntity);
 
         return entity;
     }
+
+    public void setStats(UserStatsEntity stats) {
+        this.stats = stats;
+        if (stats != null && stats.getUser() != this) {
+            stats.setUser(this);
+        }
+    }
+
 
     public User toModel(){
         return User.builder()
@@ -108,11 +109,9 @@ public class UserEntity {
                 .role(role)
                 .providerId(providerId)
                 .loginApi(loginApi)
+                .createdAt(getCreatedAt())
                 .status(status)
-                .createdAt(createdAt)
                 .stats(stats.toModel())
-                .rankImg(UserIconResolver.resolve(stats.getRatedRestCnt()))
                 .build();
     }
-
 }

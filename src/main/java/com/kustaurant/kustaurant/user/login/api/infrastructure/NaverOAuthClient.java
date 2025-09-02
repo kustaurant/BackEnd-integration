@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.user.login.api.infrastructure;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kustaurant.kustaurant.global.exception.exception.business.ProviderApiException;
+import com.kustaurant.kustaurant.global.exception.exception.user.ProviderApiException;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +11,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
-import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor

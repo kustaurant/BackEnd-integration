@@ -25,8 +25,7 @@ public class ApiLoginController {
             description = "기존유저조회 or 회원가입 처리 후 토큰2종 발행해 리턴합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(schema = @Schema(implementation = TokenResponse.class)))
+            @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = TokenResponse.class)))
     })
     @PostMapping("/api/v2/login/naver")
     public ResponseEntity<TokenResponse> loginWithNaver(
@@ -41,8 +40,7 @@ public class ApiLoginController {
             description = "기존유저조회or회원가입 처리 후 토큰2종 발행해 리턴합니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공",
-                    content = @Content(schema = @Schema(implementation = TokenResponse.class)))
+            @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = TokenResponse.class)))
     })
     @PostMapping("/api/v2/login/apple")
     public ResponseEntity<TokenResponse> loginWithApple(

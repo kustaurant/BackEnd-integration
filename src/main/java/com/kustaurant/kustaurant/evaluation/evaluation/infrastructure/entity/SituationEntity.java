@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Entity
 @Setter
-@Table(name="situations_tbl")
+@Table(name="restaurant_situation")
 @NoArgsConstructor
 public class SituationEntity {
     @Id

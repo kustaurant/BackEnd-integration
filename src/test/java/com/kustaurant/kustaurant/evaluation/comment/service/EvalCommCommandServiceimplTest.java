@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.common.enums.Status;
 import com.kustaurant.kustaurant.evaluation.comment.controller.request.EvalCommentRequest;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
-import com.kustaurant.kustaurant.global.exception.exception.auth.ForbiddenException;
+import com.kustaurant.kustaurant.global.exception.exception.auth.AccessDeniedException;
 import com.kustaurant.kustaurant.mock.evaluation.FakeEvalCommentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +33,7 @@ class EvalCommCommandServiceimplTest {
         commentRepo.save(EvalComment.builder()
                         .id(1L)
                         .userId(1L)
-                        .restaurantId(1)
+                        .restaurantId(1L)
                         .evaluationId(1L)
                         .body("저는 테스트용 평가에 달린 댓글 이에요")
                         .status(Status.ACTIVE)
@@ -47,7 +47,7 @@ class EvalCommCommandServiceimplTest {
     void create_returnsProperEvalComment() {
         //g
         Long evalId = 2L;
-        Integer restaurantId = 2;
+        Long restaurantId = 2L;
         Long userId = 2L;
         EvalCommentRequest req = new EvalCommentRequest("테스트 댓글 본문");
 
@@ -72,7 +72,7 @@ class EvalCommCommandServiceimplTest {
         //g
 
         //w
-        service.delete(1L,1,1L);
+        service.delete(1L,1L,1L);
         //t
         // 1) 댓글이 SOFT_DELETE 상태로 바뀌었는지
         EvalComment after = commentRepo.findById(1L).orElseThrow();
@@ -90,8 +90,8 @@ class EvalCommCommandServiceimplTest {
 
         //w
         //t
-        assertThrows(ForbiddenException.class,
-                ()-> service.delete(1L,1,otherUserId));
+        assertThrows(AccessDeniedException.class,
+                ()-> service.delete(1L,1L,otherUserId));
         // 1) 댓글이 그대로 ACTIVE 상태인지 확인
         EvalComment after = commentRepo.findById(1L).orElseThrow();
         assertEquals(Status.ACTIVE, after.getStatus());

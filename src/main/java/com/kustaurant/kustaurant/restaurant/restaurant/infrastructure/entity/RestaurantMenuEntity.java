@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Entity
-@Table(name="restaurant_menus_tbl")
+@Table(name="restaurant_menus")
 public class RestaurantMenuEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,7 +15,7 @@ public class RestaurantMenuEntity {
     private Integer id;
 
     @Column(name = "restaurant_id", nullable = false)
-    private Integer restaurantId;
+    private Long restaurantId;
 
     private String menuName;
     private String menuPrice;

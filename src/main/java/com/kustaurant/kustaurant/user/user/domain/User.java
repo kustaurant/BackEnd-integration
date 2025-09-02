@@ -23,7 +23,6 @@ public class User {
     private final String providerId;
     private final LoginApi loginApi;
     private UserStatus status;
-    private final String rankImg;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private UserStats stats;
@@ -38,7 +37,6 @@ public class User {
             String providerId,
             LoginApi loginApi,
             UserStatus status,
-            String rankImg,
             UserStats stats,
             LocalDateTime createdAt,
             LocalDateTime updatedAt
@@ -51,26 +49,9 @@ public class User {
         this.providerId = providerId;
         this.loginApi = loginApi;
         this.status = status;
-        this.rankImg = rankImg;
         this.stats = stats;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-    public static User from(UserEntity entity) {
-        return User.builder()
-                .id(entity.getId())
-                .nickname(entity.getNickname())
-                .phoneNumber(entity.getPhoneNumber())
-                .email(entity.getEmail())
-                .role(entity.getRole())
-                .providerId(entity.getProviderId())
-                .loginApi(entity.getLoginApi())
-                .status(entity.getStatus())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .rankImg(entity.getRankImg())
-                .build();
     }
 
     public static User createFromNaver(OAuthAttributes attr) {
@@ -135,6 +116,6 @@ public class User {
     }
 
     public int getEvalCount() {
-        return (stats != null) ? stats.getRatedRestCnt() : 0;
+        return stats.getRatedRestCnt();
     }
 }

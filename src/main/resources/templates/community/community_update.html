@@ -44,7 +44,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
             crossorigin="anonymous"></script>
-    <script src="/js/community/communityUpdateScript.js"></script>
+    <script src="/js/community/utils.js"></script>
+    <script src="/js/community/editorManager.js"></script>
+    <script src="/js/community/communityUpdate.js"></script>
     <script src="https://cdn.tiny.cloud/1/digg1r45hnwpvnziectokoy8wzl63w48rw4t7rxio2tgwkue/tinymce/6/tinymce.min.js"
             referrerpolicy="origin"></script>
 
@@ -68,14 +70,14 @@
             </div>
             <select name="postCategory">
                 <option value="" disabled hidden>채널 선택</option>
-                <option value="자유게시판" th:selected="${post.postCategory == '자유게시판'}">자유게시판</option>
-                <option value="칼럼게시판" th:selected="${post.postCategory == '칼럼게시판'}">칼럼게시판</option>
-                <option value="건의게시판" th:selected="${post.postCategory == '건의게시판'}">건의게시판</option>
+                <option value="FREE" th:selected="${post.category() == 'FREE'}">자유게시판</option>
+                <option value="COLUMN" th:selected="${post.category() == 'COLUMN'}">칼럼게시판</option>
+                <option value="SUGGESTION" th:selected="${post.category() == 'SUGGESTION'}">건의게시판</option>
             </select>
-            <input name="title" placeholder="제목" th:value="${post.postTitle}">
+            <input name="title" placeholder="제목" th:value="${post.title()}">
             <div class="post-body">
                 <div class="post-body-inner">
-                    <textarea th:utext="${post.postBody}" class="post-content" id="tiny-editor" maxlength="2000"></textarea>
+                    <textarea th:utext="${post.body()}" class="post-content" id="tiny-editor" maxlength="2000"></textarea>
                 </div>
             </div>
 

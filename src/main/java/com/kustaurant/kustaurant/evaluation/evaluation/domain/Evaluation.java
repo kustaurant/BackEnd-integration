@@ -21,12 +21,12 @@ public class Evaluation {
     private List<Long> situationIds;
     // 참조키
     private Long userId;
-    private Integer restaurantId;
+    private Long restaurantId;
     // 추가
     private Integer likeCount;
     private Integer dislikeCount;
 
-    public static Evaluation create(Long userId, Integer restaurantId, EvaluationDTO dto) {
+    public static Evaluation create(Long userId, Long restaurantId, EvaluationDTO dto) {
         return Evaluation.builder()
                 .evaluationScore(dto.getEvaluationScore())
                 .status("ACTIVE")

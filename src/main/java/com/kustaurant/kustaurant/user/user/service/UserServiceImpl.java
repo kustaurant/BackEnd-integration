@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.user.user.service;
 
-import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
-import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
+import com.kustaurant.kustaurant.global.exception.exception.user.UserNotFoundException;
+import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<Long, UserDTO> getUserDTOsByIds(List<Long> userIds) {
+    public Map<Long, UserSummary> getUserDTOsByIds(List<Long> userIds) {
         return userRepository.getUserDTOMapByIds(userIds);
     }
 }

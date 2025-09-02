@@ -1,36 +1,29 @@
 package com.kustaurant.kustaurant.post.post.infrastructure.entity;
 
 import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
-import com.kustaurant.kustaurant.post.post.enums.ContentStatus;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
 @Entity
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "post_photoes_tbl")
+@Builder
+@Table(name = "post_photo")
 public class PostPhotoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer photoId;
 
     @Column(name = "post_id", nullable = false)
-    private Integer postId;
+    private Long postId;
 
     private String photoImgUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(20)")
-    private ContentStatus status;
-
-    public PostPhotoEntity() {
-
-    }
+    private PostStatus status;
 
     public PostPhoto toDomain() {
         return new PostPhoto(

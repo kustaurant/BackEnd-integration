@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.user.user.infrastructure;
 
-import com.kustaurant.kustaurant.global.exception.exception.business.UserNotFoundException;
-import com.kustaurant.kustaurant.post.post.domain.dto.UserDTO;
+import com.kustaurant.kustaurant.global.exception.exception.user.UserNotFoundException;
+import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
@@ -20,11 +20,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
     private final UserJpaRepository jpaRepo;
-
-    @Override
-    public User getById(Long id) {
-        return findById(id).orElseThrow(UserNotFoundException::new);
-    }
 
     @Override
     public Optional<User> findByProviderId(String providerId) {
@@ -52,21 +47,6 @@ public class UserRepositoryImpl implements UserRepository {
         return jpaRepo.save(UserEntity.from(user)).toModel();
     }
 
-    @Override
-    public List<User> findUsersWithEvaluationCountDescending() {
-        return jpaRepo.findUsersWithEvaluationCountDescending()
-                .stream()
-                .map(UserEntity::toModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<User> findUsersByEvaluationCountForQuarter(int year, int quarter) {
-        return jpaRepo.findUsersByEvaluationCountForQuarter(year, quarter)
-                .stream()
-                .map(UserEntity::toModel)
-                .collect(Collectors.toList());
-    }
 
     @Override
     public int countByLoginApi(LoginApi loginApi) {
@@ -75,11 +55,11 @@ public class UserRepositoryImpl implements UserRepository {
 
 
     @Override
-    public Map<Long, UserDTO> getUserDTOMapByIds(List<Long> ids) {
+    public Map<Long, UserSummary> getUserDTOMapByIds(List<Long> ids) {
         return jpaRepo.findAllById(ids).stream()
                 .collect(Collectors.toMap(
                         UserEntity::getId,
-                        e->UserDTO.from(e.toModel()),
+                        e-> UserSummary.from(e.toModel()),
                         (a,b)->a,
                         LinkedHashMap::new
                 ));

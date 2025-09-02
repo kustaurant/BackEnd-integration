@@ -1,15 +1,17 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
-import com.kustaurant.kustaurant.post.comment.infrastructure.QPostCommentEntity;
-import com.kustaurant.kustaurant.post.comment.infrastructure.QPostCommentLikeEntity;
+import com.kustaurant.kustaurant.common.enums.ReactionType;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentEntity;
+import com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentReactionEntity;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostEntity;
-import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostLikeEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostPhotoEntity;
+import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostReactionEntity;
 import com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostScrapEntity;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostCommentResponse;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostsResponse;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -23,75 +25,106 @@ public class MyPostQueryRepository {
     private final JPAQueryFactory factory;
 
     private static final QPostEntity post = QPostEntity.postEntity;
-    private static final QPostLikeEntity like = QPostLikeEntity.postLikeEntity;
     private static final QPostCommentEntity comment = QPostCommentEntity.postCommentEntity;
-    private static final QPostPhotoEntity photo = QPostPhotoEntity.postPhotoEntity;
     private static final QPostScrapEntity scrap = QPostScrapEntity.postScrapEntity;
-    private static final QPostCommentLikeEntity commentLike = QPostCommentLikeEntity.postCommentLikeEntity;
 
+    private Expression<String> coverPhotoExprForPost() {
+        QPostPhotoEntity p1 = new QPostPhotoEntity("p1"); // 서브쿼리1: 최소 photoId
+        QPostPhotoEntity p2 = new QPostPhotoEntity("p2"); // 서브쿼리2: 그 photoId의 URL
+
+        // 해당 post의 가장 이른(photoId 최소) 사진 id
+        var minPhotoIdExpr = JPAExpressions
+                .select(p1.photoId.min())
+                .from(p1)
+                .where(p1.postId.eq(post.postId));
+
+        // 그 행의 URL 반환
+        return JPAExpressions
+                .select(p2.photoImgUrl)
+                .from(p2)
+                .where(p2.postId.eq(post.postId)
+                        .and(p2.photoId.eq(minPhotoIdExpr)));
+    }
+
+    private Expression<Long> postLikeCountExpr() {
+        QPostReactionEntity r2 = new QPostReactionEntity("r2");
+        return JPAExpressions
+                .select(r2.count())
+                .from(r2)
+                .where(r2.id.postId.eq(post.postId)
+                        .and(r2.reaction.eq(ReactionType.LIKE)));
+    }
+
+    private Expression<Long> postCommentCountExpr() {
+        QPostCommentEntity c2 = new QPostCommentEntity("c2");
+        return JPAExpressions
+                .select(c2.count())
+                .from(c2)
+                .where(c2.postId.eq(post.postId));
+    }
+
+    private Expression<Long> commentLikeCountExpr(QPostCommentEntity c) {
+        QPostCommentReactionEntity cr2 = new QPostCommentReactionEntity("cr2");
+        return JPAExpressions
+                .select(cr2.count())
+                .from(cr2)
+                .where(cr2.id.postCommentId.eq(c.postCommentId)
+                        .and(cr2.reaction.eq(ReactionType.LIKE)));
+    }
+    //-----
     public List<MyPostsResponse> findMyPostsByUserId(Long userId) {
         return factory.select(Projections.constructor(
                 MyPostsResponse.class,
                 post.postId,
                 post.postCategory,
                 post.postTitle,
-                photo.photoImgUrl.min(),
+                coverPhotoExprForPost(),
                 post.postBody,
-                like.postLikesId.countDistinct(),
-                comment.commentId.countDistinct(),
+                postLikeCountExpr(),
+                postCommentCountExpr(),
                 post.createdAt
         ))
                 .from(post)
-                .leftJoin(like).on(like.postId.eq(post.postId))
-                .leftJoin(comment).on(comment.postId.eq(post.postId))
-                .leftJoin(photo).on(photo.postId.eq(post.postId))
-                .where(post.userId.eq(userId))
-                .groupBy(post.postId)
+                .where(post.userId.eq(userId)
+                        .and(post.status.eq(PostStatus.ACTIVE)))
                 .orderBy(post.createdAt.desc())
                 .fetch();
     }
 
     public List<MyPostsResponse> findMyScrappedPostsByUserId(Long userId) {
-        // “첫 번째 사진 1장” 가져올 서브쿼리용 별칭
-        QPostPhotoEntity subPhoto = new QPostPhotoEntity("subPhoto");
-
         return factory.select(Projections.constructor(
                         MyPostsResponse.class,
                         post.postId,
                         post.postCategory,
                         post.postTitle,
-                        photo.photoImgUrl.min(),
+                        coverPhotoExprForPost(),
                         post.postBody,
-                        like.postLikesId.countDistinct(),
-                        comment.commentId.countDistinct(),
+                        postLikeCountExpr(),
+                        postCommentCountExpr(),
                         post.createdAt
                 ))
                 .from(scrap)
-                .join(post).on(post.postId.eq(scrap.postId))
-                .leftJoin(like).on(like.postId.eq(post.postId))
-                .leftJoin(comment).on(comment.postId.eq(post.postId))
-                .leftJoin(photo).on(photo.postId.eq(post.postId))
-                .where(scrap.userId.eq(userId))
-                .groupBy(post.postId)
+                .join(post).on(post.postId.eq(scrap.id.postId))
+                .where(scrap.id.userId.eq(userId)
+                        .and(post.status.eq(PostStatus.ACTIVE)))
                 .orderBy(scrap.createdAt.desc())
                 .fetch();
     }
 
-    public List<MyPostCommentResponse> findCommentsByUserId(Long userId) {
+    public List<MyPostCommentResponse> findMyPostCommentsByUserId(Long userId) {
         return factory.select(Projections.constructor(
                 MyPostCommentResponse.class,
                 post.postId,
                 post.postCategory,
                 post.postTitle,
                 comment.commentBody,
-                commentLike.commentLikeId.countDistinct(),
+                commentLikeCountExpr(comment),
                 comment.createdAt
                 ))
                 .from(comment)
                 .join(post).on(post.postId.eq(comment.postId))
-                .leftJoin(commentLike).on(commentLike.commentId.eq(comment.commentId))
-                .where(comment.userId.eq(userId))
-                .groupBy(comment.commentId, post.postId, post.postCategory, post.postTitle, comment.commentBody, comment.createdAt)
+                .where(comment.userId.eq(userId)
+                        .and(post.status.eq(PostStatus.ACTIVE)))
                 .orderBy(comment.createdAt.desc())
                 .fetch();
     }

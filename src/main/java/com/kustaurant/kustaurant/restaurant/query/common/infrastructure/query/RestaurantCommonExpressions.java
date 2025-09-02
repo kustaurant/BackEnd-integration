@@ -15,7 +15,7 @@ public abstract class RestaurantCommonExpressions {
      * 식당의 상황 리스트 조건
      */
     public static BooleanExpression situationMatches(
-            QRestaurantSituationRelationEntity rs, NumberPath<Integer> restaurantId) {
+            QRestaurantSituationRelationEntity rs, NumberPath<Long> restaurantId) {
         return rs.restaurantId.eq(restaurantId)
                 .and(rs.dataCount.goe(RestaurantConstants.SITUATION_GOE));
     }
@@ -27,7 +27,7 @@ public abstract class RestaurantCommonExpressions {
     }
 
     public static Expression<Long> evaluationCount(
-            JPAQueryFactory queryFactory, QEvaluationEntity e, NumberPath<Integer> restaurantId
+            JPAQueryFactory queryFactory, QEvaluationEntity e, NumberPath<Long> restaurantId
     ) {
         return queryFactory
                 .select(e.count().coalesce(0L))

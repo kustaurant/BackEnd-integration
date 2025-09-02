@@ -33,7 +33,7 @@ public class RestaurantDetailQuery {
 
     private final JPAQueryFactory queryFactory;
 
-    public Optional<RestaurantDetail> getRestaurantDetails(Integer restaurantId, Long userId) {
+    public Optional<RestaurantDetail> getRestaurantDetails(Long restaurantId, Long userId) {
         JPAQuery<?> q = queryFactory
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
@@ -48,7 +48,7 @@ public class RestaurantDetailQuery {
                 .leftJoin(restaurantFavoriteEntity)
                 .on(favoriteRestaurantIdEq(restaurantEntity.restaurantId, userId));
 
-        Map<Integer, RestaurantDetail> result = q.where(restaurantIdEq(restaurantId))
+        Map<Long, RestaurantDetail> result = q.where(restaurantIdEq(restaurantId))
                 .transform(
                         groupBy(restaurantEntity.restaurantId).as(
                                 new QRestaurantDetail(
@@ -90,7 +90,7 @@ public class RestaurantDetailQuery {
         return Optional.of(result.get(restaurantId));
     }
 
-    public Long getFavoriteCount(Integer restaurantId) {
+    public Long getFavoriteCount(Long restaurantId) {
         Long favoriteCount = queryFactory
                 .select(restaurantFavoriteEntity.id.count())
                 .from(restaurantFavoriteEntity)
@@ -102,7 +102,7 @@ public class RestaurantDetailQuery {
         return favoriteCount;
     }
 
-    public Integer getEvaluationCount(Integer restaurantId) {
+    public Integer getEvaluationCount(Long restaurantId) {
         Long evaluationCount = queryFactory
                 .select(evaluationEntity.id.count())
                 .from(evaluationEntity)
@@ -114,20 +114,20 @@ public class RestaurantDetailQuery {
         return evaluationCount.intValue();
     }
 
-    private BooleanExpression restaurantIdEq(Integer restaurantId) {
+    private BooleanExpression restaurantIdEq(Long restaurantId) {
         return restaurantEntity.restaurantId.eq(restaurantId);
     }
 
-    private BooleanExpression menuRestaurantIdEq(NumberPath<Integer> restaurantId) {
+    private BooleanExpression menuRestaurantIdEq(NumberPath<Long> restaurantId) {
         return restaurantMenuEntity.restaurantId.eq(restaurantId);
     }
 
-    private BooleanExpression evaluationRestaurantIdEq(NumberPath<Integer> restaurantId, Long userId) {
+    private BooleanExpression evaluationRestaurantIdEq(NumberPath<Long> restaurantId, Long userId) {
         return isNull(userId) ? Expressions.FALSE
                 : evaluationEntity.restaurantId.eq(restaurantId).and(evaluationEntity.userId.eq(userId));
     }
 
-    private BooleanExpression favoriteRestaurantIdEq(NumberPath<Integer> restaurantId, Long userId) {
+    private BooleanExpression favoriteRestaurantIdEq(NumberPath<Long> restaurantId, Long userId) {
         return isNull(userId) ? Expressions.FALSE
                 : restaurantFavoriteEntity.restaurantId.eq(restaurantId).and(restaurantFavoriteEntity.userId.eq(userId));
     }
@@ -139,7 +139,7 @@ public class RestaurantDetailQuery {
     /**
      * 식당의 상황 리스트 조건
      */
-    private BooleanExpression situationMatches(NumberPath<Integer> restaurantId) {
+    private BooleanExpression situationMatches(NumberPath<Long> restaurantId) {
         return restaurantSituationRelationEntity.restaurantId.eq(restaurantId)
                 .and(restaurantSituationRelationEntity.dataCount.goe(RestaurantConstants.SITUATION_GOE));
     }

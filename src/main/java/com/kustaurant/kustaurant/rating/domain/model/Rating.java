@@ -5,7 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record Rating(
-        int restaurantId,
+        long restaurantId,
         double score,
         Tier tier,
         boolean isTemp,

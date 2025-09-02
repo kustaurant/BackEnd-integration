@@ -70,17 +70,17 @@
         <div class="dropdown">
             <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
                     aria-expanded="false">
-                <span th:text="${postCategory}"></span>
+                <span th:text="${postCategory.koreanCategory}"></span>
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <li><a class="dropdown-item" th:href="@{/templates/community}"
-                       th:classappend="${postCategory == '전체' ? 'active' : ''}">전체</a></li>
-                <li><a class="dropdown-item" th:href="@{/community(postCategory='자유게시판')}"
-                       th:classappend="${postCategory == '자유게시판' ? 'active' : ''}">자유 게시판</a></li>
-                <li><a class="dropdown-item" th:href="@{/community(postCategory='칼럼게시판')}"
-                       th:classappend="${postCategory == '칼럼게시판' ? 'active' : ''}">칼럼 게시판</a></li>
-                <li><a class="dropdown-item" th:href="@{/community(postCategory='건의게시판')}"
-                       th:classappend="${postCategory == '건의게시판' ? 'active' : ''}">건의 게시판</a></li>
+                <li><a class="dropdown-item" th:href="@{/community}"
+                       th:classappend="${postCategory.name() == 'ALL' ? 'active' : ''}">전체</a></li>
+                <li><a class="dropdown-item" th:href="@{/community(postCategory='FREE')}"
+                       th:classappend="${postCategory.name() == 'FREE' ? 'active' : ''}">자유 게시판</a></li>
+                <li><a class="dropdown-item" th:href="@{/community(postCategory='COLUMN')}"
+                       th:classappend="${postCategory.name() == 'COLUMN' ? 'active' : ''}">칼럼 게시판</a></li>
+                <li><a class="dropdown-item" th:href="@{/community(postCategory='SUGGESTION')}"
+                       th:classappend="${postCategory.name() == 'SUGGESTION' ? 'active' : ''}">건의 게시판</a></li>
             </ul>
         </div>
         <div class="right-Icon">
@@ -90,41 +90,41 @@
     <div>
 
         <a class="filter firstFilter"
-           th:href="${'/community?sort=recent&postCategory=' + postCategory}">
+           th:href="${'/community?sort=LATEST&postCategory=' + postCategory}">
 
-            <img src="/img/community/recent-green.png" th:if="${sort.equals('recent')}"><img
-                src="/img/community/recent.png" th:if="${sort.equals('popular')}">최신</a>
+            <img src="/img/community/recent-green.png" th:if="${sort.name() == 'LATEST'}"><img
+                src="/img/community/recent.png" th:if="${sort.name() == 'POPULARITY'}">최신</a>
         <a class="filter"
-           th:href="${'/community?sort=popular&postCategory=' + postCategory}">
+           th:href="${'/community?sort=POPULARITY&postCategory=' + postCategory}">
 
-            <img src="/img/community/fire-green.png" th:if="${sort.equals('popular')}"><img
-                src="/img/community/fire.png" th:if="${sort.equals('recent')}">인기</a>
+            <img src="/img/community/fire-green.png" th:if="${sort.name() == 'POPULARITY'}"><img
+                src="/img/community/fire.png" th:if="${sort.name() == 'LATEST'}">인기</a>
     </div>
     <ul id="postul">
         <li th:each="post,iterStat: ${postList}" class="postli">
         <span class="recommend-tab">
             <img src="/img/community/up.png">
-            <span th:text="${post.likeCount}"></span>
+            <span th:text="${post.totalLikes()}"></span>
         </span>
             <div class="postBox">
                 <div>
-                    <a class="postLink" th:text="${post.postTitle}" th:href="@{/community/{postId}(postId=${post.postId})}"></a>
+                    <a class="postLink" th:text="${post.title()}" th:href="@{/community/{postId}(postId=${post.postId})}"></a>
                     <span th:if="${post.commentCount!=0}" class="comment-count" th:text="'[' + ${post.commentCount} + ']'">
                     </span>
                 </div>
 
                 <div class="underLink">
-                    <span id="category" th:text="${post.postCategory}"></span>
+                    <span id="category" th:text="${post.category().koreanCategory}"></span>
 
                     <!--     현재 postList의 인덱스에 해당하는 포스트의 생성시간으로부터의 경과 표시 (ex.1시간 전)               -->
                     <span id="createdAt" th:text="${post.timeAgo}"> </span>
-                    <span id="author" th:text="${post.user.nickname}"></span>
+                    <span id="author" th:text="${post.writerNickname()}"></span>
                 </div>
             </div>
 
             <!-- 게시글에 사진이 있으면 썸네일 표시 -->
-            <img class="postImage" th:if="${post.postPhotoImgUrl!= null && !post.postPhotoImgUrl.equals('')}"
-                 th:src="${post.postPhotoImgUrl}"/>
+            <img class="postImage" th:if="${post.photoUrl()!= null && !post.photoUrl().equals('')}"
+                 th:src="${post.photoUrl()}"/>
         </li>
     </ul>
 
@@ -156,6 +156,6 @@
     <input type="hidden" id="kw" name="kw" th:value="${postSearchKw}">
     <input type="hidden" id="page" name="page" th:value="${paging.number}">
     <input type="hidden" id="sort" name="sort" th:value="${sort}">
-    <input type="hidden" id="postCategory" name="postCategory" th:value="${postCategory}">
+    <input type="hidden" id="postCategory" name="postCategory" th:value="${postCategory.koreanCategory}">
 </form>
 </html>

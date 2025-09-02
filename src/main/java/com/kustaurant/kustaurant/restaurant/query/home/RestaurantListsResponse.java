@@ -16,5 +16,4 @@ public class RestaurantListsResponse {
     private List<RestaurantCoreInfoDto> restaurantsForMe;
     @Schema(description = "배너 이미지 리스트", example = "https://search.pstatic.net/common/?autoRotate=true&type=w560_sharpen&src=https%3A%2F%2Fldb-phinf.pstatic.net%2F20221219_73%2F1671415873694AWTMq_JPEG%2FDSC04440.jpg")
     private List<String> photoUrls;
-
 }

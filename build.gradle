@@ -5,8 +5,8 @@ plugins {
 }
 
 group = 'com.kustaurant'
-// 배포 버젼
 version = '0.1.0-SNAPSHOT'
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
@@ -34,31 +34,32 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-web-services'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 	testImplementation 'org.springframework.security:spring-security-test'
+
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	implementation 'org.jsoup:jsoup:1.17.2'
+	//로컬캐시
+	implementation "org.springframework.boot:spring-boot-starter-cache"
+	implementation "com.github.ben-manes.caffeine:caffeine:3.1.8"
 	//s3 및 spring‑cloud‑aws,AWS SDK v2 모듈 전체 버전 관리
 	implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1')
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 	// QueryDSL
-	ext {
-		querydslVersion = '7.0'
-	}
-	implementation "io.github.openfeign.querydsl:querydsl-jpa:${querydslVersion}"
-	annotationProcessor(
-			"io.github.openfeign.querydsl:querydsl-apt:${querydslVersion}:jakarta",
-			"jakarta.annotation:jakarta.annotation-api",
-			"jakarta.persistence:jakarta.persistence-api"
-	)
-	compileOnly "io.github.openfeign.querydsl:querydsl-apt:${querydslVersion}:jakarta"
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
+
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -89,29 +90,56 @@ dependencies {
 	testImplementation "org.testcontainers:mysql:1.19.7"
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+
+// 1) 소스셋 분리
+sourceSets {
+	test { // 소형 테스트
+		java.srcDirs('src/test/java')
+		resources.srcDirs('src/test/resources')
+	}
+	integrationTest { // 중형/통합 테스트
+		java.srcDirs('src/integrationTest/java')
+		resources.srcDirs('src/integrationTest/resources')
+		compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+		runtimeClasspath += output + compileClasspath
+	}
 }
 
-// 아래는 소형/중형 테스트 분리를 위한 설정임
+// 2) 의존성 구성 (integrationTest가 test 의존성 상속)
+configurations {
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+// 3) 실행 task 분리
 tasks.register('smallTest', Test) {
-	useJUnitPlatform {
-		excludeTags 'middleTest'
-	}
+	description = 'Run unit (small) tests'
+	group = 'verification'
 	testClassesDirs = sourceSets.test.output.classesDirs
 	classpath = sourceSets.test.runtimeClasspath
-	shouldRunAfter test
-	reports.junitXml.destination = layout.buildDirectory.dir("test-results/smallTest").get().asFile
-	reports.html.destination = layout.buildDirectory.dir("reports/tests/smallTest").get().asFile
+	useJUnitPlatform()
+	reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/smallTest")
+	reports.html.outputLocation     = layout.buildDirectory.dir("reports/tests/smallTest")
 }
 
 tasks.register('middleTest', Test) {
-	useJUnitPlatform {
-		includeTags 'middleTest'
-	}
-	testClassesDirs = sourceSets.test.output.classesDirs
-	classpath = sourceSets.test.runtimeClasspath
-	shouldRunAfter test
-	reports.junitXml.destination = layout.buildDirectory.dir("test-results/middleTest").get().asFile
-	reports.html.destination = layout.buildDirectory.dir("reports/tests/middleTest").get().asFile
+	description = 'Run integration (middle) tests'
+	group = 'verification'
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	useJUnitPlatform()
+	reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/middleTest")
+	reports.html.outputLocation     = layout.buildDirectory.dir("reports/tests/middleTest")
+}
+
+// 기본 test는 비활성화(선택)
+tasks.named('test') { enabled = false }
+
+// check 시 둘 다 돌리고 싶으면
+tasks.named('check') {
+	dependsOn tasks.named('smallTest'), tasks.named('middleTest')
+}
+
+tasks.named('processIntegrationTestResources', Copy) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

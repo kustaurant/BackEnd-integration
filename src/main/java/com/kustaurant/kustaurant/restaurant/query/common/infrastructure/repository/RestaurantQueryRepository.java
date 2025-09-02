@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.reposit
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.RESTAURANT_NOT_FOUND;
 
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantChartQuery;
 import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCoreInfoQuery;
@@ -38,7 +38,7 @@ public class RestaurantQueryRepository implements RestaurantChartRepository,
     @Override
     public Page<RestaurantCoreInfoDto> getChartRestaurantsByCondition(ChartCondition condition, Pageable pageable, Long userId) {
         // 정렬해서 페이지에 맞는 식당 id만 읽어오기
-        Page<Integer> ids = restaurantChartQuery.getRestaurantIdsWithPage(condition, pageable);
+        Page<Long> ids = restaurantChartQuery.getRestaurantIdsWithPage(condition, pageable);
         // 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
         List<RestaurantCoreInfoDto> content = restaurantCoreInfoQuery.getRestaurantTiers(
                 ids.getContent(), userId);
@@ -53,7 +53,7 @@ public class RestaurantQueryRepository implements RestaurantChartRepository,
     @Override
     public List<RestaurantCoreInfoDto> getTopRestaurants(int size, Long userId) {
         // 식당 id만 읽어오기
-        List<Integer> ids = restaurantHomeQuery.getTopRestaurantIds(size);
+        List<Long> ids = restaurantHomeQuery.getTopRestaurantIds(size);
         // 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
         return restaurantCoreInfoQuery.getRestaurantTiers(ids, userId);
     }
@@ -61,7 +61,7 @@ public class RestaurantQueryRepository implements RestaurantChartRepository,
     @Override
     public List<RestaurantCoreInfoDto> getRandomRestaurants(int size, Long userId) {
         // 식당 id만 읽어오기
-        List<Integer> ids = restaurantHomeQuery.getRandomRestaurantIds(size);
+        List<Long> ids = restaurantHomeQuery.getRandomRestaurantIds(size);
         // 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
         return restaurantCoreInfoQuery.getRestaurantTiers(ids, userId);
     }
@@ -73,7 +73,7 @@ public class RestaurantQueryRepository implements RestaurantChartRepository,
     @Override
     public List<RestaurantCoreInfoDto> search(String[] kwArr, Long userId, int size) {
         // 식당 id만 읽어오기
-        List<Integer> ids = restaurantSearchQuery.searchRestaurantIds(kwArr, size);
+        List<Long> ids = restaurantSearchQuery.searchRestaurantIds(kwArr, size);
         // 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
         return restaurantCoreInfoQuery.getRestaurantTiers(ids, userId);
     }
@@ -81,7 +81,7 @@ public class RestaurantQueryRepository implements RestaurantChartRepository,
     // -------------------------------------------------------
 
     @Override
-    public Restaurant getById(Integer id) {
+    public Restaurant getById(Long id) {
         return restaurantJpaRepository.findByRestaurantIdAndStatus(id, "ACTIVE")
                 .map(RestaurantEntity::toModel)
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND, id, "식당"));
@@ -91,7 +91,7 @@ public class RestaurantQueryRepository implements RestaurantChartRepository,
     public List<RestaurantCoreInfoDto> draw(List<String> cuisines, List<String> positions) {
         ChartCondition condition = new ChartCondition(cuisines, null, positions);
         // 정렬해서 페이지에 맞는 식당 id만 읽어오기
-        List<Integer> ids = restaurantChartQuery.getRestaurantIds(condition);
+        List<Long> ids = restaurantChartQuery.getRestaurantIds(condition);
         // 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
         return restaurantCoreInfoQuery.getRestaurantTiers(ids, null);
     }

@@ -15,7 +15,7 @@ import lombok.Getter;
 @Schema(description = "restaurant tier entity")
 public class RestaurantCoreInfoDto {
     @Schema(description = "식당 id", example = "1")
-    private Integer restaurantId;
+    private Long restaurantId;
     @Schema(description = "식당 ranking", example = "1")
     private Integer restaurantRanking;
     @Schema(description = "식당 이름", example = "제주곤이칼국수 건대점")
@@ -50,7 +50,7 @@ public class RestaurantCoreInfoDto {
     private String restaurantType;
 
     @QueryProjection
-    public RestaurantCoreInfoDto(Integer restaurantId, String restaurantName,
+    public RestaurantCoreInfoDto(Long restaurantId, String restaurantName,
             String restaurantCuisine, String restaurantPosition, String restaurantImgUrl,
             Integer mainTier, Boolean isEvaluated, Boolean isFavorite, Double longitude, Double latitude,
             String partnershipInfo, Double score, Set<String> situations,

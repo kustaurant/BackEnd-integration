@@ -8,7 +8,7 @@ import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCo
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
 import com.kustaurant.kustaurant.evaluation.comment.service.port.EvalCommentRepository;
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
-import com.kustaurant.kustaurant.global.exception.exception.business.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

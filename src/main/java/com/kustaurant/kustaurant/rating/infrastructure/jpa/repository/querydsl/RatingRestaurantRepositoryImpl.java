@@ -7,8 +7,8 @@ import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.ent
 import com.kustaurant.kustaurant.rating.domain.model.QRestaurantStats;
 import com.kustaurant.kustaurant.rating.domain.model.RestaurantStats;
 import com.kustaurant.kustaurant.rating.service.port.RatingRestaurantRepository;
+import com.querydsl.core.types.Expression;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLSubQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class RatingRestaurantRepositoryImpl implements RatingRestaurantRepositor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Integer> getRestaurantIds() {
+    public List<Long> getRestaurantIds() {
         return queryFactory
                 .select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
@@ -30,9 +30,9 @@ public class RatingRestaurantRepositoryImpl implements RatingRestaurantRepositor
     }
 
     @Override
-    public List<RestaurantStats> getRestaurantStatsByIds(List<Integer> ids) {
+    public List<RestaurantStats> getRestaurantStatsByIds(List<Long> ids) {
 
-        JPQLSubQuery<Long> evaluationCount = JPAExpressions
+        Expression<Long> evaluationCount = JPAExpressions
                 .select(evaluationEntity.count())
                 .from(evaluationEntity)
                 .where(
@@ -40,7 +40,7 @@ public class RatingRestaurantRepositoryImpl implements RatingRestaurantRepositor
                                 .and(evaluationEntity.status.eq("ACTIVE"))
                 );
 
-        JPQLSubQuery<Long> favoriteCount = JPAExpressions
+        Expression<Long> favoriteCount = JPAExpressions
                 .select(restaurantFavoriteEntity.count())
                 .from(restaurantFavoriteEntity)
                 .where(

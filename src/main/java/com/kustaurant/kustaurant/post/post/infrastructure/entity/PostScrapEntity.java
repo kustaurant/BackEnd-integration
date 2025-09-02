@@ -1,59 +1,34 @@
 package com.kustaurant.kustaurant.post.post.infrastructure.entity;
 
+import com.kustaurant.kustaurant.post.post.domain.PostReactionId;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
-@NoArgsConstructor
-@Table(name="post_scraps_tbl")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@Table(name="post_scrap")
 public class PostScrapEntity {
+    @EmbeddedId
+    private PostReactionJpaId id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer scrapId;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
-    @Column(name="post_id", nullable = false)
-    private Integer postId;
-
+    @CreationTimestamp
     private LocalDateTime createdAt;
-
-    @Builder
-    private PostScrapEntity(
-            Integer scrapId,
-            Long userId,
-            Integer postId,
-            LocalDateTime createdAt
-    ) {
-        this.scrapId = scrapId;
-        this.userId = userId;
-        this.postId = postId;
-        this.createdAt = createdAt;
-    }
 
 
     public PostScrap toModel() {
-        return new PostScrap(
-                scrapId,
-                userId,
-                postId,
-                createdAt
-        );
+        return new PostScrap(new PostReactionId(id.getPostId(), id.getUserId()));
     }
-    public static PostScrapEntity from(PostScrap postScrap) {
+
+    public static PostScrapEntity from(PostScrap domain) {
         return PostScrapEntity.builder()
-                .scrapId(postScrap.getScrapId())
-                .userId(postScrap.getUserId())
-                .postId(postScrap.getPostId())
-                .createdAt(postScrap.getCreatedAt())
+                .id(new PostReactionJpaId(domain.getId().postId(), domain.getId().userId()))
                 .build();
     }
 }

@@ -63,8 +63,13 @@ document.getElementById('saveBtn').addEventListener('click',function (){
     // 서버로 전송할 데이터 객체 생성
     var dataToSend = {};
 
-    dataToSend.newNickname = newNickname;
-    dataToSend.newPhoneNum = newPhoneNum;
+    if (newNickname && newNickname.trim() !== '') {
+        dataToSend.nickname = newNickname;
+    }
+    
+    if (newPhoneNum && newPhoneNum.trim() !== '') {
+        dataToSend.phoneNumber = newPhoneNum;
+    }
 
 
     // 변경된 데이터가 없으면 요청을 보내지 않음
@@ -88,12 +93,20 @@ document.getElementById('saveBtn').addEventListener('click',function (){
     })
         .then(response => {
             if (response.ok) {
-                alert("변경사항 저장 성공")
+                return response.json();
             } else {
                 return response.text().then(errorMessage => {
-                    alert(errorMessage);
-                })
+                    throw new Error(errorMessage);
+                });
             }
+        })
+        .then(data => {
+            alert("변경사항 저장 성공");
+            // 페이지 새로고침하여 변경된 정보 반영
+            location.reload();
+        })
+        .catch(error => {
+            alert(error.message);
         })
 })
 

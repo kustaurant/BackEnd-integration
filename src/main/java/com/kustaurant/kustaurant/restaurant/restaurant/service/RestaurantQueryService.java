@@ -17,11 +17,11 @@ public class RestaurantQueryService {
     private final RestaurantRepository restaurantRepository;
     private final RestaurantDetailRepository restaurantDetailRepository;
 
-    public Restaurant getActiveDomain(Integer restaurantId) {
+    public Restaurant getActiveDomain(Long restaurantId) {
         return restaurantRepository.getByIdAndStatus(restaurantId, "ACTIVE");
     }
 
-    public RestaurantDetail getRestaurantDetail(Integer restaurantId, Long userId) {
+    public RestaurantDetail getRestaurantDetail(Long restaurantId, Long userId) {
         return restaurantDetailRepository.getRestaurantDetail(restaurantId, userId);
     }
 }

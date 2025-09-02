@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface RestaurantSituationRelationJpaRepository extends JpaRepository<RestaurantSituationRelationEntity, Long>, JpaSpecificationExecutor<RestaurantSituationRelationEntity> {
 
-    Optional<RestaurantSituationRelationEntity> findByRestaurantIdAndSituationId(Integer restaurantId, Long situationId);
+    Optional<RestaurantSituationRelationEntity> findByRestaurantIdAndSituationId(Long restaurantId, Long situationId);
 }

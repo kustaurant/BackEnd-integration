@@ -1,16 +1,17 @@
-
-document.addEventListener("DOMContentLoaded", function() {
-
-    //검색
-
+document.addEventListener("DOMContentLoaded", function () {
     const btn_search = document.getElementById("postSearch");
+    if (!btn_search) return;
+
     btn_search.addEventListener('click', function () {
+        const kwEl = document.getElementById('kw');
+        const inputEl = document.getElementById('search_kw');
+        const pageEl = document.getElementById('page');
+        const formEl = document.getElementById('searchForm');
 
-        // form의 값을 현재 kw와 현재 page로 설정하고 전송
+        if (!kwEl || !inputEl || !pageEl || !formEl) return;
 
-        document.getElementById('kw').value = document.getElementById('search_kw').value;
-        document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
-
-        document.getElementById('searchForm').submit();
+        kwEl.value = inputEl.value;
+        pageEl.value = 0;
+        formEl.submit();
     });
 });
