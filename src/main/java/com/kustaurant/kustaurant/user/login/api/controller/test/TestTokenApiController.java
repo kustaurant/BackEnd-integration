@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.user.login.api.controller.test;
 
-import com.kustaurant.kustaurant.user.login.api.controller.TokenResponse;
+import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
 import com.kustaurant.kustaurant.user.login.api.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("local")
 @RestController("/api/v2/test/token/exp")
 @RequiredArgsConstructor
-public class TestTokenController {
+public class TestTokenApiController {
     private final TokenService tokenService;
 
     //1

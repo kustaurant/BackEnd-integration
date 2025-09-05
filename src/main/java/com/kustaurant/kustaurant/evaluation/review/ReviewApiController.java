@@ -14,15 +14,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class ReviewApiController {
     private final ReviewQueryService reviewQueryService;
 
@@ -35,7 +33,7 @@ public class ReviewApiController {
             @ApiResponse(responseCode = "400", description = "sort 파라미터 입력값이 올바르지 않을 때 400을 반환합니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))}),
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))})
     })
-    @GetMapping("/api/v1/restaurants/{restaurantId}/comments")
+    @GetMapping("/v2/restaurants/{restaurantId}/comments")
     public ResponseEntity<List<ReviewsResponse>> getReviewList(
             @PathVariable Long restaurantId,
             @RequestParam(defaultValue = "POPULARITY") @Parameter(description = "인기순: POPULARITY, 최신순: LATEST") SortOption sort,

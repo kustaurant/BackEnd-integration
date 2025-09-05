@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.common.dto;
 
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 import lombok.Builder;
 
 @Builder

@@ -1,12 +1,12 @@
 package com.kustaurant.kustaurant.user.user.domain.vo;
 
+import com.kustaurant.kustaurant.user.user.domain.Nickname;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 class NicknameTest {
     @ParameterizedTest(name = "올바른 닉네임(\"{0}\") 은 정상 생성")

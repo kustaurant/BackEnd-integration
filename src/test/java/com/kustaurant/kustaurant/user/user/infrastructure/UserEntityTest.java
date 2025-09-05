@@ -3,9 +3,9 @@ package com.kustaurant.kustaurant.user.user.infrastructure;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.user.user.domain.UserRole;
+import com.kustaurant.kustaurant.user.user.domain.UserStatus;
+import com.kustaurant.kustaurant.user.user.domain.Nickname;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

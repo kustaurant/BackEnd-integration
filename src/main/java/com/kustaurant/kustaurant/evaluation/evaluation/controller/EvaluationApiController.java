@@ -25,13 +25,12 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api")
 public class EvaluationApiController {
     private final EvaluationQueryService evaluationQueryService;
     private final EvaluationCommandService evaluationCommandService;
 
     // 1. 이전 평가 데이터 가져오기
-    @GetMapping("/auth/restaurants/{restaurantId}/evaluation")
     @Operation(summary = "평가 하기로 갈 때 이전 평가 데이터가 있을 경우 불러오기", description = "평가하기에서 사용하는 형식과 동일합니다. 유저가 이전에 해당 식당을 평가했을 경우 이전 평가 데이터를 불러와서 이전에 평가했던 사항을 보여줍니다. " +
             "\n\n이전 데이터가 없을 경우 아무것도 반환하지 않습니다.\n\n현재 restaurantId 599, 631에 데이터 있습니다.\n\n" +
             "- 반환 값 보충 설명\n\n" +
@@ -45,6 +44,7 @@ public class EvaluationApiController {
             @ApiResponse(responseCode = "200", description = "success\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)", content = {@Content(schema = @Schema(implementation = EvaluationDTO.class))}),
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})
     })
+    @GetMapping("/v2/auth/restaurants/{restaurantId}/evaluation")
     public ResponseEntity<EvaluationDTO> getPreEvaluationInfo(
             @PathVariable Long restaurantId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
@@ -55,7 +55,7 @@ public class EvaluationApiController {
     }
 
     // 2. 평가하기
-    @PostMapping(value = "/auth/restaurants/{restaurantId}/evaluation")
+    @PostMapping(value = "/v2/auth/restaurants/{restaurantId}/evaluation")
     @Operation(summary = "평가하기", description = "평가하기 입니다.\n\n상황 리스트는 정수 리스트로 ex) [2,3,7] (1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)\n\n" +
             "- 요청 형식 보충 설명\n\n" +
             "   - evaluationScore: 필수\n\n" +

@@ -3,10 +3,10 @@ package com.kustaurant.kustaurant.post.community.controller.response;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.common.enums.ReactionType;
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
 import com.kustaurant.kustaurant.post.community.infrastructure.projection.PostDetailProjection;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -63,7 +63,7 @@ public record PostDetailResponse (
             Long currentUserId
     ) {
         String userIconUrl = UserIconResolver.resolve(p.writerEvalCount());
-        String timeAgo = TimeAgoUtil.toKor(p.createdAt());
+        String timeAgo = TimeAgoResolver.toKor(p.createdAt());
         boolean isMine = currentUserId != null && currentUserId.equals(p.writerId());
         long total = p.likeOnlyCount() - p.dislikeOnlyCount();
         UserSummary writer = new UserSummary(p.writerId(), p.writerNickName(), p.writerEvalCount(),userIconUrl);

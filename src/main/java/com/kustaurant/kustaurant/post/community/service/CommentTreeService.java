@@ -1,12 +1,12 @@
 package com.kustaurant.kustaurant.post.community.service;
 
 import com.kustaurant.kustaurant.common.dto.UserSummary;
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
 import com.kustaurant.kustaurant.post.community.controller.response.CommentReply;
 import com.kustaurant.kustaurant.post.community.controller.response.ParentComment;
 import com.kustaurant.kustaurant.post.community.infrastructure.CommentQueryRepository;
 import com.kustaurant.kustaurant.post.community.infrastructure.projection.PostCommentProjection;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +57,7 @@ public class CommentTreeService {
                                     child.status().name(),
                                     child.likeCount(),
                                     child.dislikeCount(),
-                                    TimeAgoUtil.toKor(child.createdAt()),
+                                    TimeAgoResolver.toKor(child.createdAt()),
                                     child.myReaction(),
                                     currentUserId != null && currentUserId.equals(child.writerId()),
                                     new UserSummary(
@@ -75,7 +75,7 @@ public class CommentTreeService {
                             parent.status().name(),
                             parent.likeCount(),
                             parent.dislikeCount(),
-                            TimeAgoUtil.toKor(parent.createdAt()),
+                            TimeAgoResolver.toKor(parent.createdAt()),
                             parent.myReaction(),
                             currentUserId != null && currentUserId.equals(parent.writerId()),
                             replies.size(),

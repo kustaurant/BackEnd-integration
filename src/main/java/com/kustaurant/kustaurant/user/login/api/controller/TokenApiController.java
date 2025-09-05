@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.user.login.api.controller;
 
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
 import com.kustaurant.kustaurant.global.exception.exception.auth.AccessTokenInvalidException;
+import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
 import com.kustaurant.kustaurant.user.login.api.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,14 +12,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-public class TokenController {
+@RequestMapping("/api")
+public class TokenApiController {
     private final JwtUtil jwtUtil;
     private final TokenService tokenService;
 
@@ -32,7 +31,7 @@ public class TokenController {
             @ApiResponse(responseCode = "401", description = "리프레시 토큰 만료 또는 유효하지 않음"),
             @ApiResponse(responseCode = "400", description = "요청 헤더 누락 또는 잘못된 형식")
     })
-    @PostMapping("/api/v2/token/refresh")
+    @PostMapping("/v2/token/refresh")
     public ResponseEntity<TokenResponse> refreshAccessToken(
             @RequestHeader("Authorization") String refreshToken
     ) {
@@ -49,7 +48,7 @@ public class TokenController {
             @ApiResponse(responseCode = "204", description = "토큰이 유효합니다"),
             @ApiResponse(responseCode = "401", description = "토큰이 유효하지 않습니다"),
     })
-    @GetMapping("/api/v2/token/verify")
+    @GetMapping("/v2/token/verify")
     public ResponseEntity<?> verifyToken(
             @RequestHeader("Authorization") String accessToken
     ) {

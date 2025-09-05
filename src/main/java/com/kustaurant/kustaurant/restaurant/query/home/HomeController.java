@@ -14,7 +14,7 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Controller
-public class HomeWebController {
+public class HomeController {
 
     private final HomeModalService homeModalService;
     private final RestaurantHomeService restaurantHomeService;

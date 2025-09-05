@@ -15,10 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class EvaluationReactionApiController {
     private final EvaluationReactionService evalUserReactionService;
 
@@ -33,7 +35,7 @@ public class EvaluationReactionApiController {
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없거나 commentId에 해당하는 comment가 없는 경우 404를 반환합니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))}),
             @ApiResponse(responseCode = "500", description = "없는 경우겠지만 만에 하나 DB 일관성에 문제가 생겼을 경우 500을 반환하게 했습니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))})
     })
-    @PostMapping("/api/v1/auth/restaurants/evaluations/{evaluationId}/{reaction}")
+    @PostMapping("/v2/auth/restaurants/evaluations/{evaluationId}/{reaction}")
     public ResponseEntity<EvalReactionResponse> toggleEvaluationReaction(
             @PathVariable Long evaluationId,
             @PathVariable String reaction,

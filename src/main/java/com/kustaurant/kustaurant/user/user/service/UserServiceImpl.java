@@ -1,21 +1,21 @@
 package com.kustaurant.kustaurant.user.user.service;
 
 import com.kustaurant.kustaurant.global.exception.exception.user.UserNotFoundException;
-import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
+import com.kustaurant.kustaurant.user.user.domain.UserStatus;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+
+    /** 유저 서비스를 별도로 만들지 않고 login 로직 쪽에서 user 도메인의 메서드를 직접 사용하도록 구현함
+     *  적절한 방법 일지는 잘 모르겠음
+     * */
 
     @Override
     public User getUserById(Long id) {
@@ -32,10 +32,5 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
         return null;
-    }
-
-    @Override
-    public Map<Long, UserSummary> getUserDTOsByIds(List<Long> userIds) {
-        return userRepository.getUserDTOMapByIds(userIds);
     }
 }

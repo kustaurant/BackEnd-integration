@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.user.mypage.controller.response.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
 import org.jsoup.Jsoup;
 
@@ -22,7 +22,7 @@ public record MyPostsResponse (
 
     @JsonProperty("timeAgo")
     public String timeAgo() {
-        return TimeAgoUtil.toKor(createdAt);
+        return TimeAgoResolver.toKor(createdAt);
     }
 
     @JsonProperty("body")

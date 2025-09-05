@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.user.login.api.controller.LoginRequest;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.AppleOAuthClient;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.user.user.domain.Nickname;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;

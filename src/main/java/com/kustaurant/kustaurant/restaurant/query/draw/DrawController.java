@@ -15,7 +15,7 @@ import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
-public class DrawWebController {
+public class DrawController {
 
     private final RestaurantDrawService restaurantDrawService;
 

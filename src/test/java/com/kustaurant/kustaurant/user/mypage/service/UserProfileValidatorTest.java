@@ -5,9 +5,9 @@ import com.kustaurant.kustaurant.global.exception.exception.user.NicknameDuplica
 import com.kustaurant.kustaurant.global.exception.exception.user.PhoneDuplicateException;
 import com.kustaurant.kustaurant.mock.user.FakeUserRepository;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
+import com.kustaurant.kustaurant.user.user.domain.UserStatus;
+import com.kustaurant.kustaurant.user.user.domain.Nickname;
+import com.kustaurant.kustaurant.user.user.domain.PhoneNumber;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

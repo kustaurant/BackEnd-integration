@@ -17,14 +17,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class PostCommReactionApiController {
     private final PostCommentReactionService reactionService;
 
     // 1. 댓글 좋아요
-    @PostMapping("/api/v2/auth/community/comments/{commentId}/like")
+    @PostMapping("/v2/auth/community/comments/{commentId}/like")
     @Operation(summary = "커뮤니티 포스트 댓글 좋아요",
             description = "입력된 댓글 ID에 대한 좋아요 토글 ")
     @ApiResponses(value = {
@@ -40,7 +42,7 @@ public class PostCommReactionApiController {
     }
 
     // 2. 댓글 싫어요
-    @PostMapping("/api/v2/auth/community/comments/{commentId}/dislike")
+    @PostMapping("/v2/auth/community/comments/{commentId}/dislike")
     @Operation(summary = "커뮤니티 포스트 댓글 싫어요",
             description = "입력된 댓글 ID에 대한 싫어요 토글")
     @ApiResponses(value = {

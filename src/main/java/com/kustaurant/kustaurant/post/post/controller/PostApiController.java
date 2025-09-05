@@ -93,7 +93,7 @@ public class PostApiController {
             @ApiResponse(responseCode = "403", description = "해당 게시글을 삭제할 권한이 없습니다.", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "서버 오류로 인해 삭제에 실패하였습니다.", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @DeleteMapping("/api/v1/auth/community/{postId}")
+    @DeleteMapping("/v2/auth/community/{postId}")
     public ResponseEntity<Void> postDelete(
             @PathVariable Long postId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
@@ -108,7 +108,7 @@ public class PostApiController {
             @ApiResponse(responseCode = "400", description = "파일 이미지가 없거나 유효하지 않습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @Operation(summary = "게시글 작성 중 이미지 업로드", description = "게시글 작성화면에서 이미지를 업로드합니다")
-    @PostMapping("/api/v1/auth/community/posts/image")
+    @PostMapping("/api/v2/auth/community/posts/image")
     public ResponseEntity<?> imageUpload(
             @RequestParam("image") MultipartFile imageFile
     ) {

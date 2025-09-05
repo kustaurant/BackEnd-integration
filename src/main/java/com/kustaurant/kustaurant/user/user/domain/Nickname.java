@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.user.user.domain.vo;
+package com.kustaurant.kustaurant.user.user.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

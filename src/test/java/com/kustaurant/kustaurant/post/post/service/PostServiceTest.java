@@ -3,7 +3,6 @@ package com.kustaurant.kustaurant.post.post.service;
 import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.global.exception.exception.auth.AccessDeniedException;
 import com.kustaurant.kustaurant.mock.post.*;
-import com.kustaurant.kustaurant.mock.user.FakeUserRepository;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.post.comment.domain.PostCommentReaction;
 import com.kustaurant.kustaurant.post.comment.domain.PostCommentReactionId;
@@ -13,13 +12,9 @@ import com.kustaurant.kustaurant.post.post.domain.*;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostStatus;
 import com.kustaurant.kustaurant.user.mypage.service.UserStatsService;
-import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import java.time.LocalDateTime;
 

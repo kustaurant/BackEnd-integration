@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.user.rank.controller.response;
 
 
 import com.kustaurant.kustaurant.user.rank.infrastructure.UserRankProjection;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 
 public record UserRank(
         Long userId,

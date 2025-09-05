@@ -3,8 +3,8 @@ package com.kustaurant.kustaurant.common.util;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-public final class TimeAgoUtil {
-    private TimeAgoUtil() { }
+public final class TimeAgoResolver {
+    private TimeAgoResolver() { }
 
     /** 한국어 기준 “3시간 전” / “15초 전” 반환 */
     public static String toKor(LocalDateTime past) {

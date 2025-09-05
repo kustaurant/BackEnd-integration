@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class ReviewWebController {
+public class ReviewController {
 
     private final ReviewQueryService reviewQueryService;
 

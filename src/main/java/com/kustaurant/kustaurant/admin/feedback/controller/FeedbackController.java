@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RequiredArgsConstructor
 @Controller
-public class FeedbackWebController {
+public class FeedbackController {
     private final FeedbackServiceImpl feedbackServiceImpl;
 
     @PreAuthorize("isAuthenticated() and hasRole('USER')")

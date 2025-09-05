@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.post.comment.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.kustaurant.kustaurant.common.enums.ReactionType;
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
 import com.kustaurant.kustaurant.post.comment.domain.PostComment;
 import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.user.user.domain.User;
@@ -39,7 +39,7 @@ public record PostCommentResponse(
                 .user(UserSummary.from(user))
                 .likeCount(0)
                 .dislikeCount(0)
-                .timeAgo(TimeAgoUtil.toKor(comment.getCreatedAt()))
+                .timeAgo(TimeAgoResolver.toKor(comment.getCreatedAt()))
                 .reactionType(null)
                 .isCommentMine(true)
                 .replyCount(0)

@@ -16,19 +16,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class PostReactionApiController {
     private final PostScrapService postScrapService;
     private final PostReactionService postReactionService;
 
     // 1. 게시글 좋아요/싫어요
-    @PostMapping("/api/v2/auth/community/{postId}/likes")
+    @PostMapping("/v2/auth/community/{postId}/likes")
     @Operation(summary = "게시글 좋아요/싫어요 토글",
             description = "게시글 ID를 입력받아 좋아요/싫어요 토글. " +
                     "\n\nstatus(LIKE,DISLIKE,null)와 현재 게시글의 좋아요/싫어요 수를 반환합니다. ")
@@ -46,7 +44,7 @@ public class PostReactionApiController {
     }
 
     // 2. 게시글 스크랩
-    @PostMapping("/api/v2/auth/community/{postId}/scraps")
+    @PostMapping("/v2/auth/community/{postId}/scraps")
     @Operation(summary = "게시글 스크랩",
             description = "게시글 ID를 입력받아 스크랩을 생성하거나 해제합니다. " +
                     "\n\nstatus와 현재 게시글의 스크랩 수를 반환합니다. " +
