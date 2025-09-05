@@ -27,7 +27,7 @@ public class ReportController {
             @ApiResponse(responseCode = "400", description = "restaurantId 식당에 해당 comment Id를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))}),
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.\n\n또한 commentId에 해당하는 comment가 없는 경우 404를 반환합니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))})
     })
-    @PostMapping("/api/v1/auth/restaurants/{restaurantId}/comments/{commentId}/report")
+    @PostMapping("/api/v2/auth/restaurants/{restaurantId}/comments/{commentId}/report")
     public ResponseEntity<Void> reportComment(
             @PathVariable Long restaurantId,
             @PathVariable Integer commentId,

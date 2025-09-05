@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.admin.adminPage.service;
 
-import com.kustaurant.kustaurant.admin.adminPage.dto.*;
+import com.kustaurant.kustaurant.admin.adminPage.controller.request.HomeModalUpdateRequest;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.*;
 import com.kustaurant.kustaurant.admin.adminPage.infrastructure.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -53,9 +54,9 @@ public class AdminService {
     @Transactional
     public HomeModalResponse updateModal(HomeModalUpdateRequest request) {
         return adminModalRepository.updateModal(
-                request.getTitle(),
-                request.getBody(),
-                request.getExpiredAt()
+                request.title(),
+                request.body(),
+                request.expiredAt()
         );
     }
 

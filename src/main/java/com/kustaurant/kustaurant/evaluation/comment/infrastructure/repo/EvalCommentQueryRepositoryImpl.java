@@ -1,10 +1,10 @@
 package com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo;
 
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentResponse;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.projection.CommentProjection;
 import com.kustaurant.kustaurant.evaluation.comment.service.port.EvalCommentQueryRepository;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class EvalCommentQueryRepositoryImpl implements EvalCommentQueryRepositor
                 p.commentId(),
                 iconUrl,
                 p.writerNickname(),
-                TimeAgoUtil.toKor(p.createdAt()),
+                TimeAgoResolver.toKor(p.createdAt()),
                 p.commentBody(),
                 p.myReaction(),
                 p.likeCnt().intValue(),

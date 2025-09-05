@@ -28,7 +28,7 @@ public class HomeApiController {
             @ApiResponse(responseCode = "200", description = "restaurant found", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantListsResponse.class))}),
             @ApiResponse(responseCode = "404", description = "restaurant not found", content = {@Content(mediaType = "application/json")})
     })
-    @GetMapping("/api/v1/home")
+    @GetMapping("/api/v2/home")
     public ResponseEntity<RestaurantListsResponse> home(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {

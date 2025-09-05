@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.evaluation.review;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.common.enums.SortOption;
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentResponse;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
@@ -11,7 +11,7 @@ import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa.EvalUserReactionRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -104,7 +104,7 @@ public class ReviewQueryService {
                             ev.getEvaluationScore(),                               // evalScore
                             UserIconResolver.resolve(writer.getEvalCount()),
                             writer.getNickname().toString(),
-                            TimeAgoUtil.toKor(ev.getCreatedAt()),
+                            TimeAgoResolver.toKor(ev.getCreatedAt()),
                             ev.getCommentImgUrl(),                              // evalImgUrl
                             ev.getCommentBody(),                                // evalBody
                             myEvalReact.get(ev.getId()),                 // reactionType (평가)

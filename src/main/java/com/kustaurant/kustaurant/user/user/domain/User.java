@@ -3,11 +3,6 @@ package com.kustaurant.kustaurant.user.user.domain;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.login.web.OAuthAttributes;
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
-import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
 

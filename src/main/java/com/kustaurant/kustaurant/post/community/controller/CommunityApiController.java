@@ -35,6 +35,7 @@ import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class CommunityApiController {
     private final PostQueryService postQueryService;
 
@@ -50,7 +51,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "404", description = "요청한 조건의 게시글을 찾을 수 없습니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))}),
             @ApiResponse(responseCode = "400", description = "파라미터 값이 유효하지 않습니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))})
     })
-    @GetMapping("/api/v2/community/posts")
+    @GetMapping("/v2/community/posts")
     public ResponseEntity<List<PostListResponse>> community(
             @Valid @ParameterObject PostListRequest req
     ) {
@@ -83,7 +84,7 @@ public class CommunityApiController {
             @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "서버에서 오류가 발생했습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @GetMapping("/api/v2/community/{postId}")
+    @GetMapping("/v2/community/{postId}")
     public ResponseEntity<PostDetailResponse> post(
             @PathVariable @Parameter(description = "게시글 id", example = "21") Long postId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user,

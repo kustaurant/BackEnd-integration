@@ -26,7 +26,7 @@ public class FavoriteApiController {
     private final RestaurantFavoriteService restaurantFavoriteService;
 
     // 즐겨찾기
-    @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle")
+    @PostMapping("/v2/auth/restaurants/{restaurantId}/favorite-toggle")
     @Operation(summary = "즐겨찾기 추가/해제 토글", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태를 반환합니다.\n\n눌러서 즐겨찾기가 해제된 경우 -> false반환\n\n" +
             "- 반환 값 보충 설명\n\n" +
             "   - boolean: not null")
@@ -58,7 +58,7 @@ public class FavoriteApiController {
             @ApiResponse(responseCode = "200", description = "success", content = {@Content(schema = @Schema(implementation = FavoriteResponse.class))}),
             @ApiResponse(responseCode = "404", description = "retaurantId에 해당하는 식당이 존재하지 않을 때 404를 반환합니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))})
     })
-    @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle2")
+    @PostMapping("/v2/auth/restaurants/{restaurantId}/favorite-toggle2")
     public ResponseEntity<FavoriteResponse> restaurantFavoriteToggle2(
             @PathVariable Long restaurantId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user

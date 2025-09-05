@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
-import com.kustaurant.kustaurant.admin.adminPage.dto.FeedbackListResponse;
-import com.kustaurant.kustaurant.admin.adminPage.dto.PagedFeedbackResponse;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.FeedbackListResponse;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.PagedFeedbackResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

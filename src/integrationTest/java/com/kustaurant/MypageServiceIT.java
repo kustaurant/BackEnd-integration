@@ -19,9 +19,9 @@ import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRatedRest
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.user.user.domain.UserRole;
+import com.kustaurant.kustaurant.user.user.domain.UserStatus;
+import com.kustaurant.kustaurant.user.user.domain.Nickname;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.session.Session;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;

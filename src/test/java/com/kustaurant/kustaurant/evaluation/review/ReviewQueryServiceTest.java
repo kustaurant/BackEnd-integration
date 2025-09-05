@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.evaluation.review;
 import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.common.enums.SortOption;
 import com.kustaurant.kustaurant.common.enums.Status;
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
@@ -13,9 +13,9 @@ import com.kustaurant.kustaurant.mock.evaluation.FakeEvaluationRepository;
 import com.kustaurant.kustaurant.mock.user.FakeUserRepository;
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
+import com.kustaurant.kustaurant.user.user.domain.UserStatus;
+import com.kustaurant.kustaurant.user.user.domain.Nickname;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -132,11 +132,11 @@ class ReviewQueryServiceTest {
     void fetch_byLatest_success() {
         //t
         try (MockedStatic<UserIconResolver> iconMock = Mockito.mockStatic(UserIconResolver.class);
-             MockedStatic<TimeAgoUtil>   timeMock = Mockito.mockStatic(TimeAgoUtil.class)) {
+             MockedStatic<TimeAgoResolver>   timeMock = Mockito.mockStatic(TimeAgoResolver.class)) {
 
             iconMock.when(() -> UserIconResolver.resolve(anyInt()))
                     .thenReturn("icon.png");
-            timeMock.when(() -> TimeAgoUtil.toKor(any()))
+            timeMock.when(() -> TimeAgoResolver.toKor(any()))
                     .thenReturn("2초 전");
 
             /* 조회하려는 사용자가 평가1은 LIKE, 평가2-댓글1 은 DISLIKE 누름 */

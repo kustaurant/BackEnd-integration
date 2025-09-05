@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Controller
 @Slf4j
-public class RestaurantChartWebController {
+public class RestaurantChartController {
     private final EvaluationRepository evaluationRepository;
     private final RestaurantChartService restaurantChartService;
 

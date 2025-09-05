@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.user.user.controller.web;
+package com.kustaurant.kustaurant.user.login.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/user")
-public class UserController {
+public class LoginController {
 
     private final List<String> loginImgUrlList = List.of(
             "/img/login/food1.jpg",

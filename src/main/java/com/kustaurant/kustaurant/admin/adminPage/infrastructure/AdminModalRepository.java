@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
-import com.kustaurant.kustaurant.admin.adminPage.dto.HomeModalResponse;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.HomeModalResponse;
 import com.kustaurant.kustaurant.admin.modal.HomeModalEntity;
 import com.kustaurant.kustaurant.admin.modal.HomeModalRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,11 +1,9 @@
 package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
-import com.kustaurant.kustaurant.admin.adminPage.dto.PagedRestaurantResponse;
-import com.kustaurant.kustaurant.admin.adminPage.dto.RestaurantListResponse;
-import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.PagedRestaurantResponse;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.RestaurantListResponse;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;

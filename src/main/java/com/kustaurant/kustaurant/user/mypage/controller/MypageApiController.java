@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class MypageApiController {
     private final MypageService mypageApiService;
 
@@ -29,7 +30,7 @@ public class MypageApiController {
                     "로그인하지 않은 회원도 접속 가능하기 때문에 엔드포인트에 /auth가 포함되지 않습니다. " +
                     "로그인하지 않은 회원인 경우 기본적인 빈 객체가 반환됩니다."
     )
-    @GetMapping("/api/v2/mypage")
+    @GetMapping("/v2/mypage")
     public ResponseEntity<ProfileResponse> getMypageView(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
@@ -49,7 +50,7 @@ public class MypageApiController {
             summary = "\"마이페이지 프로필 변경 화면 조회\"",
             description = "마이페이지 프로필 변경화면 로드에 정보를 불러옵니다"
     )
-    @GetMapping("/api/v2/mypage/profile")
+    @GetMapping("/v2/mypage/profile")
     public ResponseEntity<ProfileResponse> getMypageProfile(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
@@ -73,7 +74,7 @@ public class MypageApiController {
                     "이미 사용 중인 전화번호 입니다. or" +
                     "전화번호는 숫자로만 11자리여야 합니다.('-'제외)")
     })
-    @PatchMapping("/api/v2/auth/mypage/profile")
+    @PatchMapping("/v2/auth/mypage/profile")
     public ResponseEntity<ProfileUpdateResponse> updateMypageProfile(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user,
             @Valid @RequestBody ProfileUpdateRequest req
@@ -89,7 +90,7 @@ public class MypageApiController {
             summary = "\"내가 평가한 음식점 조회\"",
             description = "유저가 평가한 음식점 리스트를 불러옵니다."
     )
-    @GetMapping("/api/v2/auth/mypage/restaurants/evaluated")
+    @GetMapping("/v2/auth/mypage/restaurants/evaluated")
     public ResponseEntity<List<MyRatedRestaurantResponse>> getEvaluateRestaurantList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
@@ -104,7 +105,7 @@ public class MypageApiController {
             summary = "\"내가 저장한 음식점 조회\"",
             description = "유저가 즐겨찾기해논 맛집 정보들을 불러옵니다."
     )
-    @GetMapping("/api/v2/auth/mypage/restaurants/favorite")
+    @GetMapping("/v2/auth/mypage/restaurants/favorite")
     public ResponseEntity<List<MyRestaurantResponse>> getFavoriteRestaurantList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
@@ -119,7 +120,7 @@ public class MypageApiController {
             summary = "\"내가 작성한 커뮤니티 글 조회\"",
             description = "유저가 작성한 커뮤니티 글 리스트 정보들을 불러옵니다."
     )
-    @GetMapping("/api/v2/auth/mypage/community/posts")
+    @GetMapping("/v2/auth/mypage/community/posts")
     public ResponseEntity<List<MyPostsResponse>> getWrittenUserPostsList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
@@ -134,7 +135,7 @@ public class MypageApiController {
             summary = "\"내가 저장한 커뮤니티 게시글 조회\"",
             description = "유저가 저장해놓은 커뮤니티 게시글 리스트 정보들을 불러옵니다."
     )
-    @GetMapping("/api/v2/auth/mypage/community/scraps")
+    @GetMapping("/v2/auth/mypage/community/scraps")
     public ResponseEntity<List<MyPostsResponse>> getCommunityScrapList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
@@ -149,7 +150,7 @@ public class MypageApiController {
             summary = "\"내가 작성한 커뮤니티 댓글 조회\"",
             description = "유저가 작성한 커뮤니티의 댓글 리스트들을 불러옵니다."
     )
-    @GetMapping("/api/v2/auth/mypage/community/comments")
+    @GetMapping("/v2/auth/mypage/community/comments")
     public ResponseEntity<List<MyPostCommentResponse>> getCommunityCommentList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
@@ -164,7 +165,7 @@ public class MypageApiController {
             summary = "\"공지사항 목록 조회\"",
             description = "공지사항 리스트와 관련 링크들을 불러옵니다. (조회는 웹뷰 방식)"
     )
-    @GetMapping("/api/v2/mypage/notices")
+    @GetMapping("/v2/mypage/notices")
     public ResponseEntity<List<NoticeDTO>> getNotices() {
         List<NoticeDTO> noticeDTOs = mypageApiService.getAllNotices();
 

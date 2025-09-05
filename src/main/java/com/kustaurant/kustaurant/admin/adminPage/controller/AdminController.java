@@ -1,7 +1,10 @@
 package com.kustaurant.kustaurant.admin.adminPage.controller;
 
-import com.kustaurant.kustaurant.admin.adminPage.dto.*;
+import com.kustaurant.kustaurant.admin.adminPage.controller.request.HomeModalUpdateRequest;
+import com.kustaurant.kustaurant.admin.adminPage.controller.request.ModalPreviewRequest;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.*;
 import com.kustaurant.kustaurant.admin.adminPage.service.AdminService;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +18,7 @@ import org.thymeleaf.context.Context;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Hidden
 @Controller
 @AllArgsConstructor
 public class AdminController {
@@ -123,16 +127,16 @@ public class AdminController {
     public ResponseEntity<String> previewModal(@RequestBody ModalPreviewRequest request) {
         // Thymeleaf Context 생성
         Context context = new Context();
-        context.setVariable("title", request.getTitle());
-        context.setVariable("body", request.getBody());
+        context.setVariable("title", request.title());
+        context.setVariable("body", request.body());
         
         // expiredAt 포맷팅 (있는 경우에만)
-        if (request.getExpiredAt() != null && !request.getExpiredAt().isEmpty()) {
+        if (request.expiredAt() != null && !request.expiredAt().isEmpty()) {
             try {
-                LocalDateTime expiredAt = LocalDateTime.parse(request.getExpiredAt());
+                LocalDateTime expiredAt = LocalDateTime.parse(request.expiredAt());
                 context.setVariable("expiredAt", expiredAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
             } catch (Exception e) {
-                context.setVariable("expiredAt", request.getExpiredAt());
+                context.setVariable("expiredAt", request.expiredAt());
             }
         }
         

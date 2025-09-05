@@ -10,7 +10,7 @@ public record PostListRequest(
         PostCategory category,
         @Schema(description = "페이지 인덱스(0부터 시작)", example = "0", defaultValue = "0")
         @Min(0) Integer page,
-        @Schema(description = "정렬 방식", example = "POPULARITY", defaultValue = "LATEST")
+        @Schema(description = "정렬 방식 (POPULARITY, LATEST)", example = "POPULARITY", defaultValue = "LATEST")
         SortOption sort
 ) {
     public PostListRequest {

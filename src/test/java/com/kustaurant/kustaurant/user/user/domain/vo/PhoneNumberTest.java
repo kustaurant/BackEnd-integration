@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.user.user.domain.vo;
 
+import com.kustaurant.kustaurant.user.user.domain.PhoneNumber;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

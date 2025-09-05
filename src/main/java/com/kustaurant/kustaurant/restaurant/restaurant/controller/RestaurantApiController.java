@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2")
+@RequestMapping("/api")
 public class RestaurantApiController {
     private final RestaurantQueryService restaurantQueryService;
 
@@ -87,7 +87,7 @@ public class RestaurantApiController {
             @ApiResponse(responseCode = "200", description = "식당 존재함. 응답 정상 반환.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantDetail.class))}),
             @ApiResponse(responseCode = "404", description = "해당 id를 가진 식당이 없음. 또는 폐업함.")
     })
-    @GetMapping("/restaurants/{restaurantId}")
+    @GetMapping("/v2/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantDetail> getRestaurantDetailWithAuth(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Long restaurantId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user,

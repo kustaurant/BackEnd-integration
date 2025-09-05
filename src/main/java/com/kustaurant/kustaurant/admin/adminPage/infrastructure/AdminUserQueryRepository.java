@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
-import com.kustaurant.kustaurant.admin.adminPage.dto.PagedUserResponse;
-import com.kustaurant.kustaurant.admin.adminPage.dto.UserListResponse;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.PagedUserResponse;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.UserListResponse;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;

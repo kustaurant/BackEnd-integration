@@ -37,8 +37,8 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class RestaurantChartApiController {
 
     private final RestaurantChartService restaurantChartService;
@@ -62,7 +62,7 @@ public class RestaurantChartApiController {
             @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCoreInfoDto.class)))}),
             @ApiResponse(responseCode = "400", description = "요청 파라미터가 잘못됨.")
     })
-    @GetMapping(value = "/tier")
+    @GetMapping(value = "/v2/tier")
     public ResponseEntity<List<RestaurantCoreInfoDto>> getTierChartList(
             @Parameter(schema = @Schema(type = "string"), example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
             @CuisineList List<String> cuisines,
@@ -106,7 +106,7 @@ public class RestaurantChartApiController {
             @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCoreInfoDto.class)))}),
             @ApiResponse(responseCode = "400", description = "요청 파라미터가 잘못됨.")
     })
-    @GetMapping(value = "/auth/tier")
+    @GetMapping(value = "/v2/auth/tier")
     public ResponseEntity<List<RestaurantCoreInfoDto>> getTierChartListWithAuth(
             @Parameter(schema = @Schema(type = "string"), example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
             @CuisineList List<String> cuisines,
@@ -163,7 +163,7 @@ public class RestaurantChartApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantTierMapDTO.class))})
     })
-    @GetMapping("/tier/map")
+    @GetMapping("/v2/tier/map")
     public ResponseEntity<RestaurantTierMapDTO> getMapInfo(
             @Parameter(schema = @Schema(type = "string"), example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
             @CuisineList List<String> cuisines,
@@ -213,7 +213,7 @@ public class RestaurantChartApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantTierMapDTO.class))})
     })
-    @GetMapping("/auth/tier/map")
+    @GetMapping("/v2/auth/tier/map")
     public ResponseEntity<RestaurantTierMapDTO> getMapInfoWithAuth(
             @Parameter(schema = @Schema(type = "string"), example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
             @CuisineList List<String> cuisines,

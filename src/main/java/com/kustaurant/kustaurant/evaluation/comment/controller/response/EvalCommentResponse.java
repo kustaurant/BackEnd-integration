@@ -1,11 +1,10 @@
 package com.kustaurant.kustaurant.evaluation.comment.controller.response;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
-import com.kustaurant.kustaurant.evaluation.evaluation.domain.Evaluation;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record EvalCommentResponse(
@@ -38,7 +37,7 @@ public record EvalCommentResponse(
                 evalComment.getId(),
                 UserIconResolver.resolve(writer.getEvalCount()),
                 writer.getNickname().getValue(),
-                TimeAgoUtil.toKor(evalComment.getCreatedAt()),
+                TimeAgoResolver.toKor(evalComment.getCreatedAt()),
                 evalComment.getBody(),
                 reaction,
                 evalComment.getLikeCount(),

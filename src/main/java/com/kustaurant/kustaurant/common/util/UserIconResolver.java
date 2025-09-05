@@ -1,6 +1,6 @@
-package com.kustaurant.kustaurant.user.user.service;
+package com.kustaurant.kustaurant.common.util;
 
-import com.kustaurant.kustaurant.user.user.domain.enums.UserLevel;
+import com.kustaurant.kustaurant.user.user.domain.UserLevel;
 
 public final class UserIconResolver {
     private UserIconResolver() {}

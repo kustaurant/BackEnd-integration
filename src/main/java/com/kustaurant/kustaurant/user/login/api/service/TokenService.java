@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.global.auth.jwt.JwtProperties;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
 import com.kustaurant.kustaurant.global.auth.jwt.TokenType;
 import com.kustaurant.kustaurant.global.exception.exception.auth.RefreshTokenInvalidException;
-import com.kustaurant.kustaurant.user.login.api.controller.TokenResponse;
+import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.RefreshTokenStore;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import lombok.AllArgsConstructor;

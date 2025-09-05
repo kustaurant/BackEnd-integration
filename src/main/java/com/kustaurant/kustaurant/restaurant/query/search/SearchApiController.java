@@ -24,7 +24,6 @@ public class SearchApiController {
 
     private final RestaurantSearchService restaurantSearchService;
 
-    @GetMapping("/api/v1/search")
     @Operation(summary = "검색하기", description = "리스트 순서대로 출력해주시면 됩니다! 빈 배열인 경우 해당하는 식당이 없다는 화면을 보여주시면 됩니다!\n\n" +
             "- 반환 값 보충 설명\n\n" +
             "   - restaurantId: not null\n\n" +
@@ -43,6 +42,7 @@ public class SearchApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCoreInfoDto.class)))}),
     })
+    @GetMapping("/api/v2/search")
     public ResponseEntity<List<RestaurantCoreInfoDto>> search(
             @RequestParam(value = "kw", defaultValue = "") String kw,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user

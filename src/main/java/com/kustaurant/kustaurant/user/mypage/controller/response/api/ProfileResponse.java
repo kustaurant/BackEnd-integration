@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.user.mypage.controller.response.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 
 public record ProfileResponse(
         String nickname,

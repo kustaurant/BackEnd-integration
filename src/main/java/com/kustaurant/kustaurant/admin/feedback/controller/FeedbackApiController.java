@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api")
 public class FeedbackApiController {
     private final FeedbackServiceImpl feedbackService;
 
@@ -31,7 +31,7 @@ public class FeedbackApiController {
             @ApiResponse(responseCode = "200", description = "피드백 감사합니다!"),
             @ApiResponse(responseCode = "400", description = "내용이 없습니다."),
     })
-    @PostMapping("/auth/mypage/feedback")
+    @PostMapping("/v2/auth/mypage/feedback")
     public ResponseEntity<String> sendFeedback(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user,
             @Valid @RequestBody FeedbackRequest req

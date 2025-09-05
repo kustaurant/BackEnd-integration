@@ -3,8 +3,8 @@ package com.kustaurant.kustaurant.user.user.service.port;
 import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
-import com.kustaurant.kustaurant.user.user.domain.vo.PhoneNumber;
+import com.kustaurant.kustaurant.user.user.domain.Nickname;
+import com.kustaurant.kustaurant.user.user.domain.PhoneNumber;
 
 import java.util.List;
 import java.util.Map;

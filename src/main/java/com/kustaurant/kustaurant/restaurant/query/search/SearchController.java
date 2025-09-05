@@ -13,7 +13,7 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-public class SearchWebController {
+public class SearchController {
 
     private final RestaurantSearchService restaurantSearchService;
 

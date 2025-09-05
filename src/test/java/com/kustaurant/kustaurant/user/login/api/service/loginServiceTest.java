@@ -2,14 +2,14 @@ package com.kustaurant.kustaurant.user.login.api.service;
 
 import com.kustaurant.kustaurant.global.exception.exception.user.ProviderApiException;
 import com.kustaurant.kustaurant.user.login.api.controller.LoginRequest;
-import com.kustaurant.kustaurant.user.login.api.controller.TokenResponse;
+import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.login.api.infrastructure.RefreshTokenStore;
 import com.kustaurant.kustaurant.user.login.api.provider.LoginProcessor;
 import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserRole;
-import com.kustaurant.kustaurant.user.user.domain.enums.UserStatus;
-import com.kustaurant.kustaurant.user.user.domain.vo.Nickname;
+import com.kustaurant.kustaurant.user.user.domain.UserRole;
+import com.kustaurant.kustaurant.user.user.domain.UserStatus;
+import com.kustaurant.kustaurant.user.user.domain.Nickname;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

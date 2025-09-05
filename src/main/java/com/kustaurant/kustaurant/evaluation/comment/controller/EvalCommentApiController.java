@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class EvalCommentApiController {
     private final EvalCommCommandService evalCommCommandService;
     private final UserService userService;
@@ -35,7 +36,7 @@ public class EvalCommentApiController {
             @ApiResponse(responseCode = "400", description = "댓글은 1000자 이하여야함. 해당 식당에 해당 comment Id를 가진 comment가 없음", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))}),
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없음.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))})
     })
-    @PostMapping("/api/v1/auth/restaurants/{restaurantId}/comments/{evalCommentId}")
+    @PostMapping("v2/auth/restaurants/{restaurantId}/comments/{evalCommentId}")
     public ResponseEntity<EvalCommentResponse> addEvaluationComment(
             @PathVariable Long restaurantId,
             @PathVariable Long evalCommentId,
@@ -57,7 +58,7 @@ public class EvalCommentApiController {
             @ApiResponse(responseCode = "400", description = "restaurantId 식당에 해당 comment Id를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
             @ApiResponse(responseCode = "404", description = "restaurantId에 해당하는 식당이 없는 경우 404를 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))})
     })
-    @DeleteMapping("/api/v1/auth/restaurants/{restaurantId}/comments/{evalCommentId}")
+    @DeleteMapping("/v2/auth/restaurants/{restaurantId}/comments/{evalCommentId}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long restaurantId,
             @PathVariable Long evalCommentId,

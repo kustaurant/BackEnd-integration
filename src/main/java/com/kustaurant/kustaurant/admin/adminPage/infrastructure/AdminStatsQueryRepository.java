@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
-import com.kustaurant.kustaurant.admin.adminPage.dto.AdminStatsResponse;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.AdminStatsResponse;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

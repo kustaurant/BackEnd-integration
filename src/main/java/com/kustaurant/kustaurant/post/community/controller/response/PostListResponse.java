@@ -1,9 +1,9 @@
 package com.kustaurant.kustaurant.post.community.controller.response;
 
-import com.kustaurant.kustaurant.common.util.TimeAgoUtil;
+import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
 import com.kustaurant.kustaurant.post.community.infrastructure.projection.PostListProjection;
-import com.kustaurant.kustaurant.user.user.service.UserIconResolver;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 import org.jsoup.Jsoup;
 
 public record PostListResponse(
@@ -22,7 +22,7 @@ public record PostListResponse(
     public static PostListResponse from(PostListProjection p) {
         String excerpt = summarize(p.body(), 30);
         String userIconUrl = UserIconResolver.resolve(p.writerEvalCount());
-        String timeAgo = TimeAgoUtil.toKor(p.createdAt());
+        String timeAgo = TimeAgoResolver.toKor(p.createdAt());
 
         return new PostListResponse(
                 p.postId(),

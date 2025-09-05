@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.user.login.api.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
 import com.kustaurant.kustaurant.user.login.api.service.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-public class ApiLoginController {
+@RequestMapping("/api")
+public class LoginApiController {
     private final LoginService loginService;
 
     //1
@@ -27,7 +29,7 @@ public class ApiLoginController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = TokenResponse.class)))
     })
-    @PostMapping("/api/v2/login/naver")
+    @PostMapping("/v2/login/naver")
     public ResponseEntity<TokenResponse> loginWithNaver(
             @Valid @RequestBody LoginRequest req
     ) {
@@ -42,7 +44,7 @@ public class ApiLoginController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = TokenResponse.class)))
     })
-    @PostMapping("/api/v2/login/apple")
+    @PostMapping("/v2/login/apple")
     public ResponseEntity<TokenResponse> loginWithApple(
             @Valid @RequestBody LoginRequest req
     ) {
@@ -54,7 +56,7 @@ public class ApiLoginController {
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "로그아웃 성공")
     })
-    @PostMapping("/api/v2/auth/logout")
+    @PostMapping("/v2/auth/logout")
     public ResponseEntity<?> logout(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
             ) {
@@ -69,7 +71,7 @@ public class ApiLoginController {
             @ApiResponse(responseCode = "401", description = "인증 정보 없음"),
             @ApiResponse(responseCode = "404", description = "사용자 없음")
     })
-    @DeleteMapping("/api/v2/auth/user")
+    @DeleteMapping("/v2/auth/user")
     public ResponseEntity<Void> deleteAccount(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
