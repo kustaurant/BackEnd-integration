@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.restaurant.query.chart.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.RestaurantChartService;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.CuisineList;
@@ -51,7 +52,7 @@ public class RestaurantChartApiController implements RestaurantChartApiDoc {
             page = 0;
         }
         // 조회
-        ChartCondition condition = new ChartCondition(cuisines, situations, locations);
+        ChartCondition condition = new ChartCondition(cuisines, situations, locations, TierFilter.ALL);
         Pageable pageable = PageRequest.of(page, limit);
         Page<RestaurantCoreInfoDto> restaurants = restaurantChartService.findByConditions(condition, pageable, user.id());
 
@@ -65,7 +66,7 @@ public class RestaurantChartApiController implements RestaurantChartApiDoc {
             @LocationList List<String> locations,
             @AuthUser AuthUserInfo user
     ) {
-        ChartCondition condition = new ChartCondition(cuisines, situations, locations);
+        ChartCondition condition = new ChartCondition(cuisines, situations, locations, TierFilter.ALL);
         return new ResponseEntity<>(
                 restaurantChartService.getRestaurantTierMapDto(condition, user.id()),
                 HttpStatus.OK

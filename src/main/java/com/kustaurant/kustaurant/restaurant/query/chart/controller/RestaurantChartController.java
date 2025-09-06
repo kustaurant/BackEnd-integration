@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.RestaurantChartService;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.CuisineList;
@@ -85,7 +86,7 @@ public class RestaurantChartController {
         Pageable pageable = PageRequest.of(page, TIER_PAGE_SIZE);
 
         // DB 조회
-        ChartCondition condition = new ChartCondition(cuisines, situations, locations);
+        ChartCondition condition = new ChartCondition(cuisines, situations, locations, TierFilter.ALL);
         Page<RestaurantCoreInfoDto> data = restaurantChartService.findByConditions(condition, pageable, user.id());
 
         model.addAttribute("isJH", cuisines != null && cuisines.contains("JH"));

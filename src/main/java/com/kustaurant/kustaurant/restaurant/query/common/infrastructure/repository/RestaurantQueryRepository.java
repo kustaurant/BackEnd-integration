@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.reposit
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.RESTAURANT_NOT_FOUND;
 
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantChartQuery;
 import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCoreInfoQuery;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
@@ -36,14 +38,16 @@ public class RestaurantQueryRepository implements RestaurantChartRepository,
     private final RestaurantCoreInfoQuery restaurantCoreInfoQuery;
 
     @Override
-    public Page<RestaurantCoreInfoDto> getChartRestaurantsByCondition(ChartCondition condition, Pageable pageable, Long userId) {
+    public Page<RestaurantCoreInfoDto> getChartRestaurantsByCondition(ChartCondition condition, @Nullable Pageable pageable, Long userId) {
+        // pageable null 처리
+        Pageable p = (pageable == null) ? Pageable.unpaged() : pageable;
         // 정렬해서 페이지에 맞는 식당 id만 읽어오기
-        Page<Long> ids = restaurantChartQuery.getRestaurantIdsWithPage(condition, pageable);
+        Page<Long> ids = restaurantChartQuery.getRestaurantIdsWithPage(condition, p);
         // 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
         List<RestaurantCoreInfoDto> content = restaurantCoreInfoQuery.getRestaurantTiers(
                 ids.getContent(), userId);
         // 페이징 변환
-        return new PageImpl<>(content, pageable, ids.getTotalElements());
+        return new PageImpl<>(content, p, ids.getTotalElements());
     }
 
     // -------------------------------------------------------
@@ -89,7 +93,7 @@ public class RestaurantQueryRepository implements RestaurantChartRepository,
 
     @Override
     public List<RestaurantCoreInfoDto> draw(List<String> cuisines, List<String> positions) {
-        ChartCondition condition = new ChartCondition(cuisines, null, positions);
+        ChartCondition condition = new ChartCondition(cuisines, null, positions, TierFilter.ALL);
         // 정렬해서 페이지에 맞는 식당 id만 읽어오기
         List<Long> ids = restaurantChartQuery.getRestaurantIds(condition);
         // 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
