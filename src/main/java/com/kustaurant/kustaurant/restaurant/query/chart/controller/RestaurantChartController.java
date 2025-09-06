@@ -14,6 +14,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.Locat
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -99,6 +100,20 @@ public class RestaurantChartController {
         model.addAttribute("paging", data);
         model.addAttribute("queryString", getQueryStringWithoutPage(request));
 
+        // 지도 정보 넣어주기
+        model.addAttribute("restaurantList", data);
+        List<RestaurantCoreInfoDto> favorites = new ArrayList<>();
+        for (RestaurantCoreInfoDto d : data) {
+            if (d.getIsFavorite()) {
+                favorites.add(d);
+            }
+        }
+        model.addAttribute("favoriteRestaurantList", favorites);
+        model.addAttribute("mapLatitude", latitudeArray[0]);
+        model.addAttribute("mapLongitude", longitudeArray[0]);
+        model.addAttribute("mapZoom", zoomArray[0]);
+        model.addAttribute("locationIndex", 0);
+
         return "restaurant/tier";
     }
 
@@ -111,8 +126,8 @@ public class RestaurantChartController {
                 })
                 .collect(Collectors.joining("&"));
     }
-
-    // 티어표 화면 이전
+//
+//    // 티어표 화면 이전
 //    @GetMapping("/tier")
 //    public String tierPre(
 //            Model model,
