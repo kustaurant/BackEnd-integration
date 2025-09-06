@@ -36,7 +36,7 @@ public interface SearchApiDoc {
             @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCoreInfoDto.class)))}),
     })
     @GetMapping("/api/v2/search")
-    public ResponseEntity<List<RestaurantCoreInfoDto>> search(
+    ResponseEntity<List<RestaurantCoreInfoDto>> search(
             @RequestParam(value = "kw", defaultValue = "") String kw,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     );

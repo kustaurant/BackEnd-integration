@@ -3,13 +3,7 @@ package com.kustaurant.kustaurant.restaurant.query.search;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +21,7 @@ public class SearchApiController implements SearchApiDoc {
     @GetMapping("/api/v2/search")
     public ResponseEntity<List<RestaurantCoreInfoDto>> search(
             @RequestParam(value = "kw", defaultValue = "") String kw,
-            @Parameter(hidden = true) @AuthUser AuthUserInfo user
+            @AuthUser AuthUserInfo user
     ) {
         if (kw == null || kw.isEmpty()) {
             return ResponseEntity.ok(new ArrayList<>());

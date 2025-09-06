@@ -41,7 +41,7 @@ public interface RestaurantChartApiDoc {
             @ApiResponse(responseCode = "400", description = "요청 파라미터가 잘못됨.")
     })
     @GetMapping(value = "/v2/tier")
-    public ResponseEntity<List<RestaurantCoreInfoDto>> getTierChartList(
+    ResponseEntity<List<RestaurantCoreInfoDto>> getTierChartList(
             @Parameter(schema = @Schema(type = "string"), example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
             @CuisineList List<String> cuisines,
             @Parameter(schema = @Schema(type = "string"), example = "1,2 또는 ALL", description = "상황입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, 1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")
@@ -87,7 +87,7 @@ public interface RestaurantChartApiDoc {
             @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantTierMapDTO.class))})
     })
     @GetMapping("/v2/tier/map")
-    public ResponseEntity<RestaurantTierMapDTO> getMapInfo(
+    ResponseEntity<RestaurantTierMapDTO> getMapInfo(
             @Parameter(schema = @Schema(type = "string"), example = "KO,WE,AS 또는 ALL 또는 JH", description = "음식 종류입니다. ALL(전체)과 JH(제휴업체)를 제외하고 복수 선택 가능(콤마로 구분). ALL과 JH가 동시에 포함될 수 없고, ALL이나 JH가 포함되어 있으면 나머지 카테고리는 무시하고 ALL이나 JH를 보여줍니다. (ALL:전체, KO:한식, JA:일식, CH:중식, WE:양식, AS:아시안, ME:고기, CK:치킨, SE:해산물, HP:햄버거/피자, BS:분식, PU:술집, CA:카페/디저트, BA:베이커리, SA:샐러드, JH:제휴업체)")
             @CuisineList List<String> cuisines,
             @Parameter(schema = @Schema(type = "string"), example = "1,2 또는 ALL", description = "상황입니다. ALL(전체)을 제외하고 복수 선택 가능(콤마로 구분). ALL이 포함되어 있으면 나머지 카테고리는 무시합니다. (ALL:전체, 1:혼밥, 2:2~4인, 3:5인 이상, 4:단체 회식, 5:배달, 6:야식, 7:친구 초대, 8:데이트, 9:소개팅)")

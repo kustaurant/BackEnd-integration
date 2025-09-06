@@ -68,7 +68,7 @@ public interface RestaurantApiDoc {
             @ApiResponse(responseCode = "404", description = "해당 id를 가진 식당이 없음. 또는 폐업함.")
     })
     @GetMapping("/v2/restaurants/{restaurantId}")
-    public ResponseEntity<RestaurantDetail> getRestaurantDetailWithAuth(
+    ResponseEntity<RestaurantDetail> getRestaurantDetailWithAuth(
             @PathVariable @Parameter(required = true, description = "식당 id", example = "1") Long restaurantId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user,
             @Parameter(hidden = true) HttpServletRequest req,

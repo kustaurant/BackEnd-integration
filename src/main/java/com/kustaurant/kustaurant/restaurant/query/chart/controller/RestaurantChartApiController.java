@@ -9,7 +9,6 @@ import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.Locat
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -44,7 +43,7 @@ public class RestaurantChartApiController implements RestaurantChartApiDoc {
             @LocationList List<String> locations,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "30") Integer limit,
-            @Parameter(hidden = true) @AuthUser AuthUserInfo user
+            @AuthUser AuthUserInfo user
     ) {
         // page 0부터 시작하게 수정
         page--;
@@ -64,7 +63,7 @@ public class RestaurantChartApiController implements RestaurantChartApiDoc {
             @CuisineList List<String> cuisines,
             @SituationList List<Long> situations,
             @LocationList List<String> locations,
-            @Parameter(hidden = true) @AuthUser AuthUserInfo user
+            @AuthUser AuthUserInfo user
     ) {
         ChartCondition condition = new ChartCondition(cuisines, situations, locations);
         return new ResponseEntity<>(
