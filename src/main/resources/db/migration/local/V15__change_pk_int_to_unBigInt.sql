@@ -33,7 +33,7 @@ ALTER TABLE `post_reaction`  MODIFY COLUMN `post_id` BIGINT UNSIGNED NOT NULL;
 ALTER TABLE `post_scrap`    MODIFY COLUMN `post_id` BIGINT UNSIGNED NOT NULL;
 
 -- post_comment 참조
-ALTER TABLE post_comment_reaction MODIFY COLUMN post_comment_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE post_comment_reaction MODIFY COLUMN post_comment_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
 
 -- restaurant 참조
 ALTER TABLE `evaluation_comment`                 MODIFY COLUMN `restaurant_id` BIGINT UNSIGNED NOT NULL;
