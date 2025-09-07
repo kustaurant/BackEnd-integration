@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.restaurant.query.chart.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Controller
 @Slf4j
 public class RestaurantChartController {
-    private final EvaluationRepository evaluationRepository;
+    private final EvaluationQueryRepository evaluationQueryRepository;
     private final RestaurantChartService restaurantChartService;
 
     public static final Integer TIER_PAGE_SIZE = 40;
@@ -96,7 +96,7 @@ public class RestaurantChartController {
         model.addAttribute("situations", situations);
         model.addAttribute("locations", locations);
         model.addAttribute("currentPage","tier");
-        model.addAttribute("evaluationsCount", evaluationRepository.countAllByStatus("ACTIVE"));
+        model.addAttribute("evaluationsCount", evaluationQueryRepository.countByStatus("ACTIVE"));
         model.addAttribute("paging", data);
         model.addAttribute("queryString", getQueryStringWithoutPage(request));
 
