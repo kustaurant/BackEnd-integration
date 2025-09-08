@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.restaurant.query.chart.service;
 
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.MapConstants;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTO;
@@ -7,6 +8,7 @@ import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantChartRepository;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,13 +29,16 @@ public class RestaurantChartService {
 
     // 조건에 맞는 식당 리스트를 반환
     public Page<RestaurantCoreInfoDto> findByConditions(
-            ChartCondition condition, Pageable pageable, @Nullable Long userId
+            ChartCondition condition, @Nullable Pageable pageable, @Nullable Long userId
     ) {
         // 조건에 맞는 식당 데이터 가져오기
-        Page<RestaurantCoreInfoDto> result = restaurantChartRepository.getChartRestaurantsByCondition(condition,
-                pageable, userId);
+        Page<RestaurantCoreInfoDto> result = restaurantChartRepository
+                .getChartRestaurantsByCondition(condition, pageable, userId);
         // 순위 정보 채우기
-        int startRanking = pageable.getPageSize() * pageable.getPageNumber() + 1;
+        Integer startRanking = null;
+        if (pageable != null) {
+            startRanking = pageable.getPageSize() * pageable.getPageNumber() + 1;
+        }
         chartRankingAssembler.enrichDtoListWithRanking(result.getContent(), startRanking);
         return result;
     }
@@ -43,35 +48,41 @@ public class RestaurantChartService {
             ChartCondition condition, @Nullable Long userId
     ) {
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
-        List<RestaurantCoreInfoDto> tieredRestaurantCoreInfoDtos = findByConditions(condition, null, userId).toList();
-        List<RestaurantCoreInfoDto> nonTieredRestaurantCoreInfoDtos = findByConditions(condition, null, userId).toList();
+        List<RestaurantCoreInfoDto> tieredRestaurantCoreInfos = findByConditions(
+                condition.changeTierFilter(TierFilter.WITH_TIER), null, userId).toList();
+        List<RestaurantCoreInfoDto> nonTieredRestaurantCoreInfos = findByConditions(
+                condition.changeTierFilter(TierFilter.WITHOUT_TIER), null, userId).toList();
 
         // 2. 응답 생성하기
         RestaurantTierMapDTO response = new RestaurantTierMapDTO();
         // 2.1 즐겨찾기 리스트
-        // TODO: 나중에 이거 수정해야됨
-//        response.setFavoriteRestaurants(
-//                restaurantFavoriteService.getFavoriteRestaurantDtoList(userId)
-//                        .stream().map(DiscoveryMapper::toDto).toList()
-//        );
+        List<RestaurantCoreInfoDto> favorites = new ArrayList<>();
+        if (userId != null) {
+            for (RestaurantCoreInfoDto coreInfo : tieredRestaurantCoreInfos) {
+                if (coreInfo.getIsFavorite()) {
+                    favorites.add(coreInfo);
+                }
+            }
+        }
+        response.setFavoriteRestaurants(favorites);
         // 2.2 티어가 있는 식당 리스트
-        response.setTieredRestaurants(tieredRestaurantCoreInfoDtos);
+        response.setTieredRestaurants(tieredRestaurantCoreInfos);
         // 2.3 티어가 없는 식당 리스트
-        List<RestaurantCoreInfoDto> nonTier16 = IntStream.range(0, nonTieredRestaurantCoreInfoDtos.size())
+        List<RestaurantCoreInfoDto> nonTier16 = IntStream.range(0, nonTieredRestaurantCoreInfos.size())
                 .filter(i ->  i % 4 == 0)
-                .mapToObj(nonTieredRestaurantCoreInfoDtos::get)
+                .mapToObj(nonTieredRestaurantCoreInfos::get)
                 .toList();
-        List<RestaurantCoreInfoDto> nonTier17 = IntStream.range(0, nonTieredRestaurantCoreInfoDtos.size())
+        List<RestaurantCoreInfoDto> nonTier17 = IntStream.range(0, nonTieredRestaurantCoreInfos.size())
                 .filter(i ->  i % 4 == 1)
-                .mapToObj(nonTieredRestaurantCoreInfoDtos::get)
+                .mapToObj(nonTieredRestaurantCoreInfos::get)
                 .toList();
-        List<RestaurantCoreInfoDto> nonTier18 = IntStream.range(0, nonTieredRestaurantCoreInfoDtos.size())
+        List<RestaurantCoreInfoDto> nonTier18 = IntStream.range(0, nonTieredRestaurantCoreInfos.size())
                 .filter(i ->  i % 4 == 2)
-                .mapToObj(nonTieredRestaurantCoreInfoDtos::get)
+                .mapToObj(nonTieredRestaurantCoreInfos::get)
                 .toList();
-        List<RestaurantCoreInfoDto> nonTier19 = IntStream.range(0, nonTieredRestaurantCoreInfoDtos.size())
+        List<RestaurantCoreInfoDto> nonTier19 = IntStream.range(0, nonTieredRestaurantCoreInfos.size())
                 .filter(i ->  i % 4 == 3)
-                .mapToObj(nonTieredRestaurantCoreInfoDtos::get)
+                .mapToObj(nonTieredRestaurantCoreInfos::get)
                 .toList();
         response.insertZoomAndRestaurants(16, nonTier16);
         response.insertZoomAndRestaurants(17, nonTier17);

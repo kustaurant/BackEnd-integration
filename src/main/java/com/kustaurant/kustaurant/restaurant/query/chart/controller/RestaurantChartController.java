@@ -3,9 +3,10 @@ package com.kustaurant.kustaurant.restaurant.query.chart.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationRepository;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.RestaurantChartService;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.CuisineList;
@@ -13,6 +14,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.Locat
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.SituationList;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
 @Controller
 @Slf4j
 public class RestaurantChartController {
-    private final EvaluationRepository evaluationRepository;
+    private final EvaluationQueryRepository evaluationQueryRepository;
     private final RestaurantChartService restaurantChartService;
 
     public static final Integer TIER_PAGE_SIZE = 40;
@@ -85,7 +87,7 @@ public class RestaurantChartController {
         Pageable pageable = PageRequest.of(page, TIER_PAGE_SIZE);
 
         // DB 조회
-        ChartCondition condition = new ChartCondition(cuisines, situations, locations);
+        ChartCondition condition = new ChartCondition(cuisines, situations, locations, TierFilter.ALL);
         Page<RestaurantCoreInfoDto> data = restaurantChartService.findByConditions(condition, pageable, user.id());
 
         model.addAttribute("isJH", cuisines != null && cuisines.contains("JH"));
@@ -94,9 +96,23 @@ public class RestaurantChartController {
         model.addAttribute("situations", situations);
         model.addAttribute("locations", locations);
         model.addAttribute("currentPage","tier");
-        model.addAttribute("evaluationsCount", evaluationRepository.countAllByStatus("ACTIVE"));
+        model.addAttribute("evaluationsCount", evaluationQueryRepository.countByStatus("ACTIVE"));
         model.addAttribute("paging", data);
         model.addAttribute("queryString", getQueryStringWithoutPage(request));
+
+        // 지도 정보 넣어주기
+        model.addAttribute("restaurantList", data);
+        List<RestaurantCoreInfoDto> favorites = new ArrayList<>();
+        for (RestaurantCoreInfoDto d : data) {
+            if (d.getIsFavorite()) {
+                favorites.add(d);
+            }
+        }
+        model.addAttribute("favoriteRestaurantList", favorites);
+        model.addAttribute("mapLatitude", latitudeArray[0]);
+        model.addAttribute("mapLongitude", longitudeArray[0]);
+        model.addAttribute("mapZoom", zoomArray[0]);
+        model.addAttribute("locationIndex", 0);
 
         return "restaurant/tier";
     }
@@ -110,8 +126,8 @@ public class RestaurantChartController {
                 })
                 .collect(Collectors.joining("&"));
     }
-
-    // 티어표 화면 이전
+//
+//    // 티어표 화면 이전
 //    @GetMapping("/tier")
 //    public String tierPre(
 //            Model model,

@@ -14,6 +14,7 @@ import com.kustaurant.kustaurant.rating.infrastructure.jpa.entity.QRatingEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Cuisine;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,23 +36,29 @@ public class RestaurantChartQuery {
     private final JPAQueryFactory queryFactory;
 
     /**
-     * 조건(conditino)을 만족하는 식당 id들을 반환
+     * 조건(condition)을 만족하는 식당 id들을 반환
      */
     public Page<Long> getRestaurantIdsWithPage(ChartCondition condition, Pageable pageable) {
 
-        List<Long> content = queryFactory.select(restaurantEntity.restaurantId)
+        JPAQuery<Long> query = queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
-                .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
+                .leftJoin(ratingEntity)
+                .on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .where(
                         cuisinesIn(condition.cuisines()),
                         positionsIn(condition.positions()),
                         hasSituation(condition.situations(), restaurantEntity),
-                        restaurantActive(restaurantEntity)
+                        restaurantActive(restaurantEntity),
+                        tierFilterProcess(ratingEntity, condition)
                 )
-                .orderBy(ratingEntity.score.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+                .orderBy(ratingEntity.score.desc());
+        // pageable unpaged 처리
+        if (pageable.isPaged()) {
+            query.offset(pageable.getOffset())
+                    .limit(pageable.getPageSize());
+        }
+
+        List<Long> content = query.fetch();
 
         Long total = queryFactory
                 .select(restaurantEntity.restaurantId.countDistinct())
@@ -64,6 +72,16 @@ public class RestaurantChartQuery {
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total == null ? 0 : total);
+    }
+
+    private BooleanExpression tierFilterProcess(QRatingEntity ratingEntity, ChartCondition condition) {
+        if (condition.needAll()) {
+            return null;
+        }
+        if (condition.needOnlyTier()) {
+            return ratingEntity.tier.gt(0);
+        }
+        return ratingEntity.tier.lt(0);
     }
 
 

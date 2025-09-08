@@ -69,4 +69,5 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
                 .map(EvaluationEntity::toModel)
                 .toList();
     }
+
 }

@@ -45,7 +45,7 @@ ALTER TABLE `restaurant_situation_relation`      MODIFY COLUMN `restaurant_id` B
 
 -- 부모 테이블 pk 컬럼 변경
 ALTER TABLE `post` MODIFY COLUMN `post_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
-ALTER TABLE post_comment CHANGE COLUMN comment_id post_comment_id BIGINT UNSIGNED NOT NULL;
+ALTER TABLE post_comment CHANGE COLUMN comment_id post_comment_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
 ALTER TABLE `restaurant` MODIFY COLUMN `restaurant_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE post_comment MODIFY COLUMN parent_comment_id BIGINT UNSIGNED NULL;

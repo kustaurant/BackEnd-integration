@@ -2,9 +2,9 @@
 var latitude = parseFloat(mapInfo.getAttribute('data-latitude'));
 var longitude = parseFloat(mapInfo.getAttribute('data-longitude'));
 var mapZoom = parseInt(mapInfo.getAttribute('data-zoom'));
-var restaurantList = JSON.parse(mapInfo.getAttribute('data-restaurantList'));
+var restaurantList = restaurantDataList;
 // 즐찾한 식당 id가 들어있는 리스트
-var favoriteRestaurantList = JSON.parse(mapInfo.getAttribute('data-favoriteRestaurantIdList'));
+var favoriteRestaurantList = favoriteRestaurantDataList;
 var favoriteRestaurantIdList = favoriteRestaurantList?.map(element => element.restaurantId);
 // 네이버 지도
 var map = new naver.maps.Map('map', {
@@ -12,6 +12,9 @@ var map = new naver.maps.Map('map', {
     zoom: mapZoom,
     minZoom: 13,
 });
+console.log(`${latitude} ${longitude} ${mapZoom}`);
+console.log(restaurantList);
+console.log(favoriteRestaurantIdList);
 
 var markers = [];
 var infoWindows = [];
@@ -85,7 +88,7 @@ if (favoriteRestaurantList) {
 }
 // 일반 마커 생성
 for (var i = 0; i < restaurantList.length; i++) {
-    let restaurant = restaurantList[i].restaurant;
+    let restaurant = restaurantList[i];
     var marker;
     let mainTier = restaurant.mainTier;
     if (favoriteRestaurantIdList?.includes(restaurant.restaurantId)) { // 즐겨찾기에서 이미 마커를 생성한 경우는 티어 마커를 생성 안함.
@@ -94,7 +97,7 @@ for (var i = 0; i < restaurantList.length; i++) {
     // 티어가 있는 경우
     if (mainTier !== -1) {
         marker = new naver.maps.Marker({
-            position: new naver.maps.LatLng(restaurant.restaurantLatitude, restaurant.restaurantLongitude),
+            position: new naver.maps.LatLng(restaurant.latitude, restaurant.longitude),
             icon: {
                 url: `/img/tier/${mainTier}tier.png`, // 티어 이미지 url
                 size: new naver.maps.Size(24, 24),
@@ -106,8 +109,7 @@ for (var i = 0; i < restaurantList.length; i++) {
         });
         tierRestaurantCount++;
         // info window
-        var restaurantImgUrl = restaurant.restaurantImgUrl === 'no_img' ?
-            '/img/tier/no_img.png' : restaurant.restaurantImgUrl;
+        var restaurantImgUrl = restaurant.restaurantImgUrl;
         var infoWindow = new naver.maps.InfoWindow({
             content:
                 `<a class="map-info-window" href="/restaurants/${restaurant.restaurantId}">` +
@@ -128,7 +130,7 @@ for (var i = 0; i < restaurantList.length; i++) {
         infoWindows.push(infoWindow);
     } else { // 티어가 없는 경우
         marker = new naver.maps.Marker({
-            position: new naver.maps.LatLng(restaurant.restaurantLatitude, restaurant.restaurantLongitude),
+            position: new naver.maps.LatLng(restaurant.latitude, restaurant.longitude),
             icon: {
                 url: '/img/tier/pin.png', // 지도 핀 이미지 url
                 size: new naver.maps.Size(20, 20),
@@ -139,8 +141,7 @@ for (var i = 0; i < restaurantList.length; i++) {
             zIndex: 9950 - 6
         });
         // info window
-        var restaurantImgUrl = restaurant.restaurantImgUrl === 'no_img' ?
-            '/img/tier/no_img.png' : restaurant.restaurantImgUrl;
+        var restaurantImgUrl = restaurant.restaurantImgUrl;
         var infoWindow = new naver.maps.InfoWindow({
             content:
                 `<a class="map-info-window" href="/restaurants/${restaurant.restaurantId}">` +
