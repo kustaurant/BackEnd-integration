@@ -15,8 +15,6 @@ spring:
     username: root
     password: 1234
 
-
-
   flyway:
     enabled: true
     locations: classpath:db/migration/local

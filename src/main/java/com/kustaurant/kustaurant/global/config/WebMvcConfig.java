@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.global.config;
 
 import com.kustaurant.kustaurant.global.auth.web.CurrentUrlInterceptor;
+import com.kustaurant.kustaurant.global.interceptor.V1KillSwitchInterceptor;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.CuisineListArgumentResolver;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.LocationListArgumentResolver;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.SituationListArgumentResolver;
@@ -8,6 +9,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserArgumentRe
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
     private final AuthUserArgumentResolver authUserArgumentResolver;
+    private final V1KillSwitchInterceptor v1KillSwitchInterceptor;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
@@ -37,7 +40,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new CurrentUrlInterceptor()).addPathPatterns("/**");
+    public void addInterceptors(InterceptorRegistry reg) {
+        reg.addInterceptor(v1KillSwitchInterceptor) // TODO : v1쪽 컨트롤러 막는코드.
+                .addPathPatterns("/api/v1/**")
+                .order(Ordered.HIGHEST_PRECEDENCE);
+        reg.addInterceptor(new CurrentUrlInterceptor()).addPathPatterns("/**");
     }
 }

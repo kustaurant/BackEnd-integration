@@ -32,13 +32,14 @@ public class RestaurantChartService {
             ChartCondition condition, @Nullable Pageable pageable, @Nullable Long userId
     ) {
         // 조건에 맞는 식당 데이터 가져오기
-        Page<RestaurantCoreInfoDto> result = restaurantChartRepository
-                .getChartRestaurantsByCondition(condition, pageable, userId);
+        Page<RestaurantCoreInfoDto> result = restaurantChartRepository.getChartRestaurantsByCondition(condition, pageable, userId);
+
         // 순위 정보 채우기
         Integer startRanking = null;
         if (pageable != null) {
             startRanking = pageable.getPageSize() * pageable.getPageNumber() + 1;
         }
+
         chartRankingAssembler.enrichDtoListWithRanking(result.getContent(), startRanking);
         return result;
     }
