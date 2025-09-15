@@ -36,7 +36,7 @@ class PostCommentReactionServiceTest {
     void toggle_create_like() {
         //g
         //w
-        PostCommReactionResponse res = service.toggleUserReaction(commentId, 1L, ReactionType.LIKE);
+        PostCommReactionResponse res = service.setPostCommentReaction(commentId, 1L, ReactionType.LIKE);
         //t
         assertThat(res.likeCount()).isEqualTo(1);
         assertThat(res.dislikeCount()).isZero();
@@ -44,12 +44,12 @@ class PostCommentReactionServiceTest {
     }
 
     @Test
-    @DisplayName("동일 반응 토글 -> 제거")
+    @DisplayName("등록된 좋아요 제거")
     void toggle_same_like_then_remove() {
         // g
-        service.toggleUserReaction(commentId, 1L, ReactionType.LIKE);
+        service.setPostCommentReaction(commentId, 1L, ReactionType.LIKE);
         // w
-        PostCommReactionResponse res = service.toggleUserReaction(commentId, 1L, ReactionType.LIKE);
+        PostCommReactionResponse res = service.setPostCommentReaction(commentId, 1L, null);
         // t
         assertThat(res.likeCount()).isZero();
         assertThat(res.dislikeCount()).isZero();
@@ -59,9 +59,9 @@ class PostCommentReactionServiceTest {
     @Test
     @DisplayName("다른 반응으로 변경: LIKE -> DISLIKE")
     void toggle_switch_like_to_dislike() {
-        service.toggleUserReaction(commentId, 1L, ReactionType.LIKE);
+        service.setPostCommentReaction(commentId, 1L, ReactionType.LIKE);
 
-        PostCommReactionResponse res = service.toggleUserReaction(commentId, 1L, ReactionType.DISLIKE);
+        PostCommReactionResponse res = service.setPostCommentReaction(commentId, 1L, ReactionType.DISLIKE);
 
         assertThat(res.likeCount()).isZero();
         assertThat(res.dislikeCount()).isEqualTo(1);
@@ -71,7 +71,7 @@ class PostCommentReactionServiceTest {
     @Test
     @DisplayName("댓글이 없으면 DataNotFoundException")
     void toggle_comment_not_found() {
-        assertThatThrownBy(() -> service.toggleUserReaction(999L, 1L, ReactionType.LIKE))
+        assertThatThrownBy(() -> service.setPostCommentReaction(999L, 1L, ReactionType.LIKE))
                 .isInstanceOf(DataNotFoundException.class);
     }
 

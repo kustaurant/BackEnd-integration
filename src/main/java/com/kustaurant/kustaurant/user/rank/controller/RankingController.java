@@ -2,18 +2,15 @@ package com.kustaurant.kustaurant.user.rank.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.user.rank.controller.response.UserRank;
+import com.kustaurant.kustaurant.user.rank.controller.response.UserRankResponse;
 import com.kustaurant.kustaurant.user.rank.domain.RankingSortOption;
 import com.kustaurant.kustaurant.user.rank.service.RankingService;
-import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import lombok.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -28,7 +25,7 @@ public class RankingController {
             @AuthUser AuthUserInfo user
     ) {
         // top100 목록
-        List<UserRank> rankList = rankingService.getTop100(sort);
+        List<UserRankResponse> rankList = rankingService.getTop100(sort);
         model.addAttribute("rankList", rankList);
 
         // 내 랭크 (top100 밖이어도 전체 기준으로 단건 조회)

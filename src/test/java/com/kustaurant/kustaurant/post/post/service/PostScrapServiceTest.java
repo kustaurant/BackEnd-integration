@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.post.post.service;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.mock.post.FakePostRepository;
 import com.kustaurant.kustaurant.mock.post.FakePostScrapRepository;
-import com.kustaurant.kustaurant.post.post.controller.response.ScrapToggleResponse;
+import com.kustaurant.kustaurant.post.post.controller.response.PostScrapResponse;
 import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.PostReactionId;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
@@ -51,10 +51,10 @@ class PostScrapServiceTest {
     void givenNoScrap_whenToggle_thenScrappedAndCountIs1(){
         //g
         //w
-        ScrapToggleResponse res = postScrapService.toggleScrapWithCount(1L, 10L);
+        PostScrapResponse res = postScrapService.toggleScrapWithCount(1L, 10L,true);
         //t
         assertThat(res.postScrapCount()).isEqualTo(1);
-        assertThat(res.status()).isEqualTo(ScrapStatus.SCRAPPED);
+        assertThat(res.isScrapped()).isEqualTo(true);
         assertThat(fakePostScrapRepository.findById(new PostReactionId(1L, 10L))).isPresent();
     }
 
@@ -62,12 +62,12 @@ class PostScrapServiceTest {
     @DisplayName("이미 스크랩된 게시글을 다시 누르면 스크랩이 취소되고 NOT_SCRAPPED로 응답한다")
     void givenAlreadyScrapped_whenToggle_thenUnScrappedAndCountIs0() {
         //g 이미 스크랩을 누름
-        postScrapService.toggleScrapWithCount(1L, 10L);
+        postScrapService.toggleScrapWithCount(1L, 10L,true);
         //w 다시 토글 시도
-        ScrapToggleResponse res = postScrapService.toggleScrapWithCount(1L, 10L);
+        PostScrapResponse res = postScrapService.toggleScrapWithCount(1L, 10L,false);
         //t
         assertThat(res.postScrapCount()).isEqualTo(0);
-        assertThat(res.status()).isEqualTo(ScrapStatus.NOT_SCRAPPED);
+        assertThat(res.isScrapped()).isEqualTo(false);
         assertThat(fakePostScrapRepository.findById(new PostReactionId(1L, 10L))).isEmpty();
     }
 
@@ -76,7 +76,7 @@ class PostScrapServiceTest {
     void givenNonexistentPost_whenToggle_thenThrowsDataNotFound() {
         //g
         //w + t
-        assertThatThrownBy(() -> postScrapService.toggleScrapWithCount(999L, 10L))
+        assertThatThrownBy(() -> postScrapService.toggleScrapWithCount(999L, 10L,true))
                 .isInstanceOf(DataNotFoundException.class)
                 .hasMessageContaining("게시글을 찾을 수 없습니다.");
     }
@@ -88,9 +88,9 @@ class PostScrapServiceTest {
         RaceyPostScrapRepository raceyRepo = new RaceyPostScrapRepository();
         postScrapService = new PostScrapService(raceyRepo, fakePostRepository, userStatsService);
         // w
-        ScrapToggleResponse res = postScrapService.toggleScrapWithCount(1L, 10L);
+        PostScrapResponse res = postScrapService.toggleScrapWithCount(1L, 10L,true);
         // t
-        assertThat(res.status()).isEqualTo(ScrapStatus.SCRAPPED);
+        assertThat(res.isScrapped()).isEqualTo(true);
         assertThat(res.postScrapCount()).isEqualTo(1);
     }
 
@@ -99,12 +99,12 @@ class PostScrapServiceTest {
     void givenMultipleUsers_whenToggle_thenCountAccumulates() {
         //g
         //w
-        postScrapService.toggleScrapWithCount(1L, 10L);
-        postScrapService.toggleScrapWithCount(1L, 11L);
-        ScrapToggleResponse res = postScrapService.toggleScrapWithCount(1L, 12L);
+        postScrapService.toggleScrapWithCount(1L, 10L,true);
+        postScrapService.toggleScrapWithCount(1L, 11L,true);
+        PostScrapResponse res = postScrapService.toggleScrapWithCount(1L, 12L,true);
         //t
         assertThat(res.postScrapCount()).isEqualTo(3);
-        assertThat(res.status()).isEqualTo(ScrapStatus.SCRAPPED);
+        assertThat(res.isScrapped()).isEqualTo(true);
     }
 
 

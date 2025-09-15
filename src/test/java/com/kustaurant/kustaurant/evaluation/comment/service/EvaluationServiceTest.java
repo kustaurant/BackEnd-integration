@@ -19,7 +19,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class EvalCommCommandServiceimplTest {
+class EvaluationServiceTest {
     private EvalCommCommandServiceImpl service;
     private FakeEvalCommentRepository commentRepo;
     @Mock

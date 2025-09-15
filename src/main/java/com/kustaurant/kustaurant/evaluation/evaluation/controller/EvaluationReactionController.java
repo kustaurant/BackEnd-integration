@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,14 +21,13 @@ public class EvaluationReactionController {
 
     // 1. 평가 좋아요/싫어요 토글
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
-    @PostMapping("/web/api/restaurants/evaluations/{evaluationId}/{reaction}")
+    @PutMapping("/web/api/restaurants/evaluations/{evaluationId}/reaction")
     public ResponseEntity<EvalReactionResponse> toggleEvaluationReaction(
-            @AuthUser AuthUserInfo user,
             @PathVariable Long evaluationId,
-            @PathVariable String reaction
+            @RequestParam(required = false) ReactionType reaction,
+            @AuthUser AuthUserInfo user
     ) {
-        ReactionType reactionType = ReactionType.valueOf(reaction);
-        EvalReactionResponse response = evalUserReactionService.toggleReaction(user.id(), evaluationId, reactionType);
+        EvalReactionResponse response = evalUserReactionService.setEvaluationReaction(user.id(), evaluationId, reaction);
 
         return ResponseEntity.ok(response);
     }

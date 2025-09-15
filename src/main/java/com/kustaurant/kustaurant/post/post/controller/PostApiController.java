@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;
 import com.kustaurant.kustaurant.post.community.service.PostQueryService;
 import com.kustaurant.kustaurant.post.post.controller.request.PostRequest;
-import com.kustaurant.kustaurant.post.post.controller.response.ImageUplodeResponse;
+import com.kustaurant.kustaurant.post.post.controller.response.PostImageUplodeResponse;
 import com.kustaurant.kustaurant.post.community.controller.response.PostDetailResponse;
 import com.kustaurant.kustaurant.post.post.controller.response.PostResponse;
 import com.kustaurant.kustaurant.post.post.domain.Post;
@@ -104,7 +104,7 @@ public class PostApiController {
 
     // 5. 이미지 업로드
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이미지 업로드가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ImageUplodeResponse.class))),
+            @ApiResponse(responseCode = "200", description = "이미지 업로드가 완료되었습니다", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PostImageUplodeResponse.class))),
             @ApiResponse(responseCode = "400", description = "파일 이미지가 없거나 유효하지 않습니다.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @Operation(summary = "게시글 작성 중 이미지 업로드", description = "게시글 작성화면에서 이미지를 업로드합니다")
@@ -114,7 +114,7 @@ public class PostApiController {
     ) {
         try {
             String imageUrl = S3Service.storeImage(imageFile);
-            return ResponseEntity.ok(new ImageUplodeResponse(imageUrl));
+            return ResponseEntity.ok(new PostImageUplodeResponse(imageUrl));
         } catch (Exception e) {
             throw new IllegalArgumentException("파일 이미지가 유효하지 않습니다");
         }

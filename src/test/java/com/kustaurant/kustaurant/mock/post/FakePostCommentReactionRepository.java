@@ -32,7 +32,7 @@ public class FakePostCommentReactionRepository implements PostCommentReactionRep
     }
 
     @Override
-    public void delete(PostCommentReactionId id) {
+    public void deleteById(PostCommentReactionId id) {
         if (id == null) return;
         store.remove(id);
     }

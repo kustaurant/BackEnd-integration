@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface PostCommentReactionRepository {
     Optional<PostCommentReaction> findById(PostCommentReactionId id);
     PostCommentReaction save(PostCommentReaction postCommentReaction);
-    void delete(PostCommentReactionId id);
+    void deleteById(PostCommentReactionId id);
     int countByPostCommentIdAndReaction(Long postCommentId, ReactionType reaction);
     void deleteByPostId(Long postId);
 }

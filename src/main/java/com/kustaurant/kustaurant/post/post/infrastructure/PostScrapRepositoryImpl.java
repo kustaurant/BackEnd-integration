@@ -14,34 +14,39 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class PostScrapRepositoryImpl implements PostScrapRepository {
-    private final PostScrapJpaRepository postScrapJpaRepository;
+    private final PostScrapJpaRepository jpa;
 
     @Override
     public Optional<PostScrap> findById(PostReactionId id) {
         PostReactionJpaId jpaId = new PostReactionJpaId(id.postId(), id.userId());
-        return postScrapJpaRepository.findById(jpaId).map(PostScrapEntity::toModel);
+        return jpa.findById(jpaId).map(PostScrapEntity::toModel);
+    }
+
+    @Override
+    public boolean existsById(PostReactionId id) {
+        PostReactionJpaId jpaId = new PostReactionJpaId(id.postId(), id.userId());
+        return jpa.existsById(jpaId);
     }
 
     @Override
     public void save(PostScrap postScrap) {
-        postScrapJpaRepository.save(PostScrapEntity.from(postScrap));
+        jpa.save(PostScrapEntity.from(postScrap));
     }
 
     @Override
     public int countByPostId(Long postId) {
-        return postScrapJpaRepository.countByIdPostId(postId);
+        return jpa.countByIdPostId(postId);
     }
 
     @Override
-    public void delete(PostScrap postScrap) {
-        PostReactionJpaId jpaId = new PostReactionJpaId(postScrap.getId().postId(), postScrap.getId().userId());
-        postScrapJpaRepository.findById(jpaId)
-                .ifPresent(postScrapJpaRepository::delete);
+    public void deleteById(PostReactionId id) {
+        PostReactionJpaId jpaId = new PostReactionJpaId(id.postId(), id.userId());
+        jpa.deleteById(jpaId);
     }
 
     @Override
     public void deleteByPostId(Long postId) {
-        postScrapJpaRepository.deleteByIdPostId(postId);
+        jpa.deleteByIdPostId(postId);
     }
 
 }

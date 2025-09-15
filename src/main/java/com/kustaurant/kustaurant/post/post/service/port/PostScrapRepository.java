@@ -7,8 +7,9 @@ import java.util.Optional;
 
 public interface PostScrapRepository {
     Optional<PostScrap> findById(PostReactionId id);
+    boolean existsById(PostReactionId id);
     void save(PostScrap postScrap);
     int countByPostId(Long postId);
-    void delete(PostScrap postScrap);
+    void deleteById(PostReactionId id);
     void deleteByPostId(Long postId);
 }

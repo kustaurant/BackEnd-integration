@@ -27,7 +27,7 @@ class PostReactionServiceTest {
         // g
         Long postId = 1L; Long userId = 10L;
         // w
-        PostReactionResponse res = service.toggleLike(postId, userId, ReactionType.LIKE);
+        PostReactionResponse res = service.setPostReaction(postId, userId, ReactionType.LIKE);
         // t
         assertThat(res.reactionType()).isEqualTo(ReactionType.LIKE);
         assertThat(res.likeCount()).isEqualTo(1);
@@ -42,7 +42,7 @@ class PostReactionServiceTest {
         // g
         Long postId = 1L; Long userId = 11L;
         // w
-        PostReactionResponse res = service.toggleLike(postId, userId, ReactionType.DISLIKE);
+        PostReactionResponse res = service.setPostReaction(postId, userId, ReactionType.DISLIKE);
         // t
         assertThat(res.reactionType()).isEqualTo(ReactionType.DISLIKE);
         assertThat(res.likeCount()).isEqualTo(0);
@@ -52,13 +52,13 @@ class PostReactionServiceTest {
     }
 
     @Test
-    @DisplayName("동일 반응을 다시 누르면 해당 반응이 취소된다(삭제)")
-    void toggleOff_whenSameReaction() {
+    @DisplayName("등록된 좋아요 제거")
+    void removeLike_whenNone() {
         // g
         Long postId = 1L; Long userId = 12L;
-        service.toggleLike(postId, userId, ReactionType.LIKE); // 미리 좋아요 1회
+        service.setPostReaction(postId, userId, ReactionType.LIKE); // 미리 좋아요 1회
         // w
-        PostReactionResponse res = service.toggleLike(postId, userId, ReactionType.LIKE);
+        PostReactionResponse res = service.setPostReaction(postId, userId, null);
         // t
         assertThat(res.reactionType()).isNull();
         assertThat(res.likeCount()).isEqualTo(0);
@@ -72,9 +72,9 @@ class PostReactionServiceTest {
     void switchReaction_likeToDislike() {
         // g
         Long postId = 1L; Long userId = 13L;
-        service.toggleLike(postId, userId, ReactionType.LIKE); // 먼저 좋아요
+        service.setPostReaction(postId, userId, ReactionType.LIKE); // 먼저 좋아요
         // w
-        PostReactionResponse res = service.toggleLike(postId, userId, ReactionType.DISLIKE);
+        PostReactionResponse res = service.setPostReaction(postId, userId, ReactionType.DISLIKE);
         // t
         assertThat(res.reactionType()).isEqualTo(ReactionType.DISLIKE);
         assertThat(res.likeCount()).isEqualTo(0);
@@ -93,9 +93,9 @@ class PostReactionServiceTest {
         // g
         Long postId = 1L;
         // w
-        service.toggleLike(postId, 20L, ReactionType.LIKE);     // like:1
-        service.toggleLike(postId, 21L, ReactionType.DISLIKE);  // like:1, dislike:1
-        PostReactionResponse res = service.toggleLike(postId, 22L, ReactionType.LIKE); // like:2, dislike:1
+        service.setPostReaction(postId, 20L, ReactionType.LIKE);     // like:1
+        service.setPostReaction(postId, 21L, ReactionType.DISLIKE);  // like:1, dislike:1
+        PostReactionResponse res = service.setPostReaction(postId, 22L, ReactionType.LIKE); // like:2, dislike:1
         // t
         assertThat(res.likeCount()).isEqualTo(2);
         assertThat(res.dislikeCount()).isEqualTo(1);

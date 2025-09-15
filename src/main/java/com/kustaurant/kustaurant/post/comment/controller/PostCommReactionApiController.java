@@ -15,9 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,35 +23,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class PostCommReactionApiController {
     private final PostCommentReactionService reactionService;
 
-    // 1. 댓글 좋아요
-    @PostMapping("/v2/auth/community/comments/{commentId}/like")
-    @Operation(summary = "커뮤니티 포스트 댓글 좋아요",
-            description = "입력된 댓글 ID에 대한 좋아요 토글 ")
+    // 1. 댓글 좋아요/싫어요
+    @PutMapping("/v2/auth/community/comments/{commentId}/reaction")
+    @Operation(summary = "커뮤니티 포스트 댓글 좋아요/싫어요",
+            description = "입력된 댓글 ID에 대한 좋아요/싫어요 설정" +
+                    "\n reaction=LIKE → 좋아요 설정" +
+                    "\n reaction=DISLIKE → 싫어요 설정" +
+                    "\n reaction 파라미터 미전달 → 해제 ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "처리 완료", content = @Content(schema = @Schema(implementation = PostCommReactionResponse.class))),
             @ApiResponse(responseCode = "404", description = "해당 ID의 댓글을 찾을 수 없습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    public ResponseEntity<PostCommReactionResponse> togglePostCommentLike(
+    public ResponseEntity<PostCommReactionResponse> setPostCommentReaction(
             @PathVariable @Parameter(description = "댓글 id", example = "30") Long commentId,
+            @RequestParam(required = false) ReactionType reaction,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
-        PostCommReactionResponse response = reactionService.toggleUserReaction(commentId,user.id(), ReactionType.LIKE);
-        return ResponseEntity.ok(response);
-    }
-
-    // 2. 댓글 싫어요
-    @PostMapping("/v2/auth/community/comments/{commentId}/dislike")
-    @Operation(summary = "커뮤니티 포스트 댓글 싫어요",
-            description = "입력된 댓글 ID에 대한 싫어요 토글")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "처리 완료", content = @Content(schema = @Schema(implementation = PostCommReactionResponse.class))),
-            @ApiResponse(responseCode = "404", description = "해당 ID의 댓글을 찾을 수 없습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
-    })
-    public ResponseEntity<PostCommReactionResponse> togglePostCommentDislike(
-            @PathVariable @Parameter(description = "댓글 id입니다", example = "30") Long commentId,
-            @Parameter(hidden = true) @AuthUser AuthUserInfo user
-    ) {
-        PostCommReactionResponse response = reactionService.toggleUserReaction(commentId,user.id(), ReactionType.DISLIKE);
+        PostCommReactionResponse response = reactionService.setPostCommentReaction(commentId,user.id(), reaction);
         return ResponseEntity.ok(response);
     }
 }

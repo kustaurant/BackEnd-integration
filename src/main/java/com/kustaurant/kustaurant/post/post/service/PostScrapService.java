@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.post.post.service;
 
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
-import com.kustaurant.kustaurant.post.post.controller.response.ScrapToggleResponse;
+import com.kustaurant.kustaurant.post.post.controller.response.PostScrapResponse;
 import com.kustaurant.kustaurant.post.post.domain.PostReactionId;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
 import com.kustaurant.kustaurant.post.post.domain.enums.ScrapStatus;
@@ -15,50 +15,44 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 @Slf4j
-@Service
 @Transactional
 @RequiredArgsConstructor
+@Service
 public class PostScrapService {
     private final PostScrapRepository postScrapRepository;
     private final PostRepository postRepository;
 
     private final UserStatsService userStatsService;
 
-    public ScrapToggleResponse toggleScrapWithCount(Long postId, Long userId) {
+    public PostScrapResponse toggleScrapWithCount(Long postId, Long userId, boolean cmd) {
         postRepository.findById(postId).orElseThrow(
                 ()-> new DataNotFoundException(ErrorCode.POST_NOT_FOUND)
         );
 
         PostReactionId postReactionId = new PostReactionId(postId, userId);
-        Optional<PostScrap> existing = postScrapRepository.findById(postReactionId);
-        boolean isCreated;
+        boolean existing = postScrapRepository.existsById(postReactionId);
 
-        if (existing.isPresent()) {
-            postScrapRepository.delete(existing.get());
-            userStatsService.decScrappedPost(userId);
-            isCreated = false;
-        } else {
+        if (cmd && !existing) {
             try {
-                postScrapRepository.save(
-                        PostScrap.builder()
-                                .id(postReactionId)
-                                .build()
-                );
-                isCreated = true;
+                postScrapRepository.save(PostScrap.builder().id(postReactionId).build());
                 userStatsService.incScrappedPost(userId);
+                existing = true;
             } catch (DataIntegrityViolationException e) {
-                isCreated = true;
+                // 동시성으로 이미 들어간 경우 -> 멱등 처리
+                existing = true;
             }
+        } else if (!cmd && existing) {
+            postScrapRepository.deleteById(postReactionId);
+            userStatsService.decScrappedPost(userId);
+            existing = false;
         }
 
         // 스크랩 개수 조회
         int scrapCount = postScrapRepository.countByPostId(postReactionId.postId());
-        ScrapStatus status = isCreated ? ScrapStatus.SCRAPPED : ScrapStatus.NOT_SCRAPPED;
 
-        return new ScrapToggleResponse(scrapCount, status);
+        return new PostScrapResponse(existing, scrapCount);
     }
 
 }

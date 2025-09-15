@@ -57,7 +57,7 @@ function renderComments(reviews) {
     li.innerHTML = `
       <div>
         <!-- 댓글 좋아요/싫어요 영역 -->
-        <div class="like-div">
+        <div class="like-div" data-reaction="${(rev.reactionType || 'NONE').toUpperCase()}">
           <button class="comment-up" type="button" onclick="commentLike(this)"
                   data-id="${rev.evalId}" data-parent-id="${rev.evalId}">
             <img src="${rev.reactionType==='LIKE'
@@ -89,13 +89,13 @@ function renderComments(reviews) {
                  </button>
           </div>
           ${rev.evalBody || rev.evalImgUrl ?
-            `<div class="real-comment-container">
+        `<div class="real-comment-container">
               ${rev.evalImgUrl
             ? `<img src="${rev.evalImgUrl}"/>`
             : ''}
               <span>${escapeHtml(rev.evalBody)}</span>
             </div>`
-          : ''}
+        : ''}
         </div>
       </div>
       <!-- 대댓글 부분 -->
@@ -107,21 +107,21 @@ function renderComments(reviews) {
             <div class="reply-img-container">
               <img src="/img/restaurant/reply.svg"/>
             </div>
-            <div class="like-div">
+            <div class="like-div" data-reaction="${(reply.reactionType || 'NONE').toUpperCase()}">
               <button class="comment-up" type="button" onclick="commentLike(this)"
                       data-id="${reply.commentId}"
                       data-parent-id="${rev.evalId}">
                 <img src="${reply.reactionType==='LIKE'
-                  ? '/img/community/up-green.png'
-                  : '/img/community/up.png'}">
+        ? '/img/community/up-green.png'
+        : '/img/community/up.png'}">
               </button>
               <span>${reply.commentLikeCount - reply.commentDislikeCount}</span>
               <button class="comment-down" type="button" onclick="commentDislike(this)"
                       data-id="${reply.commentId}"
                       data-parent-id="${rev.evalId}">
                 <img src="${reply.reactionType==='DISLIKE'
-                  ? '/img/community/down-red.png'
-                  : '/img/community/down.png'}">
+        ? '/img/community/down-red.png'
+        : '/img/community/down.png'}">
               </button>
             </div>
             <div class="body-div">
@@ -130,13 +130,13 @@ function renderComments(reviews) {
                 <span class="nick-span">${escapeHtml(reply.writerNickname)}</span>
                 <span class="date-span">${reply.timeAgo}</span>
                 ${reply.isCommentMine
-                  ? `<button type="button" data-id="${reply.commentId}"
+        ? `<button type="button" data-id="${reply.commentId}"
                        class="delete-button btn btn-primary"
                        data-bs-toggle="modal"
                        data-bs-target="#exampleModal">
                        삭제
                      </button>`
-                  : ''}
+        : ''}
               </div>
               <div class="real-comment-container">
                 <span>${escapeHtml(reply.commentBody)}</span>
@@ -158,65 +158,67 @@ function getStarImgUrl(score) {
 }
 
 // 좋아요/싫어요 핸들러
-async function commentLike(btn) {
-  await handleReaction(btn, 'LIKE');
-}
-
-async function commentDislike(btn) {
-  await handleReaction(btn, 'DISLIKE');
-}
+async function commentLike(btn)    { await handleReaction(btn, 'LIKE'); }
+async function commentDislike(btn) { await handleReaction(btn, 'DISLIKE'); }
 
 async function handleReaction(btn, reaction) {
   const id       = btn.dataset.id;
   const parentId = btn.dataset.parentId;
-  // 평가인지 대댓글인지 구분
-  const isEval = id === parentId;
-  // URL 결정
-  const url = isEval
-      ? `/web/api/restaurants/evaluations/${id}/${reaction}`
-      : `/web/api/restaurants/comments/${id}/${reaction}`;
+  const isEval   = id === parentId;
+
+  // 현재 버튼이 "활성"인지 아이콘으로 판단 (같은 버튼 재클릭=해제)
+  const img = btn.querySelector('img');
+  const isActive =
+      reaction === 'LIKE'
+          ? !!img && /\/up-green\.png(?:\?|$)/.test(img.src)
+          : !!img && /\/down-red\.png(?:\?|$)/.test(img.src);
+
+  // 멱등 엔드포인트 (평가 / 평가댓글)
+  const base = isEval
+      ? `/web/api/restaurants/evaluations/${id}/reaction`
+      : `/web/api/restaurants/comments/${id}/reaction`;
+
+  // 해제 시에는 reaction 파라미터 없이 요청
+  const qs  = isActive ? '' : `?reaction=${encodeURIComponent(reaction)}`;
+  const url = `${base}${qs}`;
 
   try {
-    const res = await fetch(url, { method: 'POST', headers: {[csrfHeader]: csrfToken} });
-    if (res.redirected) {
-      // 로그인 화면으로 넘어간 상황
-      window.location.href = res.url;  // 직접 페이지 이동
-      return;
-    }
-    if (!res.ok) throw new Error(res.status);
-    const json = await res.json();
-    // 서버가 돌려주는 응답 레코드
-    // { evaluationId or evalCommentId, reaction, likeCount, dislikeCount }
-    const likeCount    = json.likeCount;
-    const dislikeCount = json.dislikeCount;
-    const newReact     = json.reaction; // "LIKE", "DISLIKE" 또는 null
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Accept': 'application/json', [csrfHeader]: csrfToken }
+    });
 
-    // 같은 .like-div 내부의 버튼·카운트 요소 가져오기
+    if (res.status === 401 || res.status === 403) { window.location.href = '/user/login'; return; }
+    if (res.redirected) { window.location.href = res.url; return; }
+    if (!res.ok) throw new Error(res.status);
+
+    const json = await res.json(); // { evaluationId|evalCommentId, reaction, likeCount, dislikeCount }
+    const likeCount    = json.likeCount ?? 0;
+    const dislikeCount = json.dislikeCount ?? 0;
+    const newReact     = json.reaction; // 'LIKE' | 'DISLIKE' | null
+
+    // 같은 .like-div 내부 요소
     const likeBtn    = btn.parentElement.querySelector('.comment-up');
     const dislikeBtn = btn.parentElement.querySelector('.comment-down');
     const countSpan  = btn.parentElement.querySelector('span');
 
-    // 1) 카운트 갱신
+    // 1) 합산 카운트 갱신 (싫어요는 음수 반영: like - dislike)
     countSpan.textContent = likeCount - dislikeCount;
 
     // 2) 아이콘 갱신
     const upImg   = likeBtn.querySelector('img');
     const downImg = dislikeBtn.querySelector('img');
-
-    upImg.src   = newReact === 'LIKE'
-        ? '/img/community/up-green.png'
-        : '/img/community/up.png';
-
-    downImg.src = newReact === 'DISLIKE'
-        ? '/img/community/down-red.png'
-        : '/img/community/down.png';
-
+    upImg.src   = newReact === 'LIKE'    ? '/img/community/up-green.png'  : '/img/community/up.png';
+    downImg.src = newReact === 'DISLIKE' ? '/img/community/down-red.png' : '/img/community/down.png';
   } catch (e) {
     console.error('Reaction error:', e);
+    alert('처리 중 오류가 발생했습니다.');
   }
 }
 
-// 평가 댓글 달기
+
+// ====== 평가 댓글 작성/삭제 (기존 그대로) ======
+
 // 현재 열려 있는 폼을 닫기
 function removeActiveForm() {
   const existing = document.querySelector('.eval-comment-form');
@@ -230,7 +232,6 @@ async function checkLoginStatus() {
       credentials: 'include',
       redirect: 'manual'
     });
-    // 리다이렉트 응답이 왔을 땐 로그인 화면으로
     if (statusRes.redirected) {
       window.location.href = statusRes.headers.get('Location') || '/user/login';
       return false;
@@ -245,24 +246,20 @@ async function checkLoginStatus() {
 
 // 1) “댓글 달기” 클릭 시: 인라인 폼 토글
 async function addEvalComment(btn) {
-  // 1) 로그인 상태 체크
   const loggedIn = await checkLoginStatus();
   if (!loggedIn) return;
-  // 2) 로그인 상태 체크 후 로직 수행
-  // 이미 열려 있으면 닫고 종료
+
   const sameContainer = btn.closest('li').querySelector('.eval-comment-form');
   if (sameContainer) {
     sameContainer.remove();
     return;
   }
-  // 다른 폼이 열려 있으면 닫기
   removeActiveForm();
 
   const li = btn.closest('li');
   const restaurantId  = window.location.pathname.split('/')[2];
-  const evalCommentId  = btn.dataset.id;
+  const evalCommentId = btn.dataset.id;
 
-  // 폼 HTML
   const form = document.createElement('div');
   form.className = 'eval-comment-form';
   form.innerHTML = `
@@ -274,17 +271,14 @@ async function addEvalComment(btn) {
     </div>
   `;
 
-  // 버튼에 context 저장
   form.dataset.restaurantId = restaurantId;
   form.dataset.evalCommentId = evalCommentId;
 
-  // 이벤트 연결
   form.querySelector('.eval-comment-submit')
-  .addEventListener('click', () => submitInlineComment(form));
+      .addEventListener('click', () => submitInlineComment(form));
   form.querySelector('.eval-comment-cancel')
-  .addEventListener('click', () => form.remove());
+      .addEventListener('click', () => form.remove());
 
-  // li 끝에 삽입
   li.appendChild(form);
 
   const textarea = form.querySelector('.eval-comment-textarea');
@@ -295,14 +289,8 @@ async function addEvalComment(btn) {
 async function submitInlineComment(form) {
   const body = form.querySelector('.eval-comment-textarea').value.trim();
 
-  if (!body) {
-    alert('댓글 내용을 입력해주세요.');
-    return;
-  }
-  if (body.length > 1000) {
-    alert('댓글은 1000자 이하로 입력해주세요.');
-    return;
-  }
+  if (!body) { alert('댓글 내용을 입력해주세요.'); return; }
+  if (body.length > 1000) { alert('댓글은 1000자 이하로 입력해주세요.'); return; }
 
   const { restaurantId, evalCommentId } = form.dataset;
   const url = `/web/api/restaurants/${restaurantId}/comments/${evalCommentId}`;
@@ -317,26 +305,17 @@ async function submitInlineComment(form) {
       },
       body: JSON.stringify({ body })
     });
-    if (res.redirected) {
-      // 로그인 화면으로 넘어간 상황
-      window.location.href = res.url;  // 직접 페이지 이동
-      return;
-    }
+    if (res.redirected) { window.location.href = res.url; return; }
     if (res.status === 400) {
       const errors = await res.json();
-      const msg = errors.message;
-      alert(msg);
+      alert(errors.message);
       return;
     }
-    if (res.status === 401 || res.status === 403) {
-      window.location.href = '/user/login';
-      return;
-    }
+    if (res.status === 401 || res.status === 403) { window.location.href = '/user/login'; return; }
     if (!res.ok) throw new Error(res.status);
-    // 성공 시 목록 새로고침
+
     removeActiveForm();
-    const sort = document.querySelector('#button1').classList.contains('active')
-        ? 'POPULARITY' : 'LATEST';
+    const sort = document.querySelector('#button1').classList.contains('active') ? 'POPULARITY' : 'LATEST';
     loadComments(sort);
 
   } catch (e) {
@@ -346,7 +325,6 @@ async function submitInlineComment(form) {
 }
 
 // ----------- 평가 댓글 삭제 ---------------
-// 모달에 평가 댓글 id 넘기기
 document.addEventListener('click', e => {
   const btn = e.target.closest('.delete-button');
   if (!btn) return;
@@ -354,41 +332,34 @@ document.addEventListener('click', e => {
   const modal = document.getElementById('exampleModal');
   modal.dataset.evalCommentId = btn.dataset.id;
 });
-// 모달에서 삭제 버튼 클릭 시 삭제
-document.getElementById('deleteAgreeButton')
-.addEventListener('click', async () => {
-  const modal = document.getElementById('exampleModal');
-  const evalCommentId = modal.dataset.evalCommentId;
-  const restaurantId  = window.location.pathname.split('/')[2];
-  const url = `/web/api/restaurants/${restaurantId}/comments/${evalCommentId}`;
 
-  try {
-    const res = await fetch(url, {
-      method: 'DELETE',
-      credentials: 'include',
-      headers: {
-        [csrfHeader]: csrfToken
+document.getElementById('deleteAgreeButton')
+    .addEventListener('click', async () => {
+      const modal = document.getElementById('exampleModal');
+      const evalCommentId = modal.dataset.evalCommentId;
+      const restaurantId  = window.location.pathname.split('/')[2];
+      const url = `/web/api/restaurants/${restaurantId}/comments/${evalCommentId}`;
+
+      try {
+        const res = await fetch(url, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: { [csrfHeader]: csrfToken }
+        });
+
+        if (res.status === 204) {
+          const sort = document.querySelector('#button1').classList.contains('active') ? 'POPULARITY' : 'LATEST';
+          loadComments(sort);
+        } else if (res.redirected) {
+          window.location.href = res.url;
+        } else if (res.status === 401 || res.status === 403) {
+          window.location.href = '/user/login';
+        } else {
+          console.error('삭제 실패', res.status);
+          alert('댓글 삭제 중 오류가 발생했습니다.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('댓글 삭제 중 오류가 발생했습니다.');
       }
     });
-
-    if (res.status === 204) {
-      // 삭제 성공: 목록 리프레시
-      const sort = document.querySelector('#button1').classList.contains('active')
-          ? 'POPULARITY' : 'LATEST';
-      loadComments(sort);
-    } else if (res.redirected) {
-      // 로그인 화면으로 넘어간 상황
-      window.location.href = res.url;  // 직접 페이지 이동
-      return;
-    } else if (res.status === 401 || res.status === 403) {
-      // 권한 문제 시 로그인으로
-      window.location.href = '/user/login';
-    } else {
-      console.error('삭제 실패', res.status);
-      alert('댓글 삭제 중 오류가 발생했습니다.');
-    }
-  } catch (err) {
-    console.error(err);
-    alert('댓글 삭제 중 오류가 발생했습니다.');
-  }
-});

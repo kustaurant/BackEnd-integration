@@ -28,7 +28,6 @@ public class EvalCommentApiController {
     private final EvalCommCommandService evalCommCommandService;
     private final UserService userService;
 
-
     // 1. 평가에 댓글 달기
     @Operation(summary = "평가에 댓글 달기", description = "작성한 평가 댓글을 반환합니다.")
     @ApiResponses(value = {

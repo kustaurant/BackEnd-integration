@@ -8,6 +8,7 @@ import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.jpa.EvalUs
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationCommandRepository;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,43 +24,39 @@ public class EvaluationReactionService {
 
     // 평가 좋아요/싫어요 토글
     @Transactional
-    public EvalReactionResponse toggleReaction(Long userId, Long evaluationId, ReactionType reaction) {
+    public EvalReactionResponse setEvaluationReaction(Long userId, Long evaluationId, ReactionType cmd) {
         Evaluation evaluation = evaluationQueryRepository.findActiveById(evaluationId);
-        Optional<EvaluationReactionEntity> evaluationLike = evaluationLikeRepository.findByEvaluationIdAndUserId(evaluationId, userId);
+        Optional<EvaluationReactionEntity> existingOpt = evaluationLikeRepository.findByEvaluationIdAndUserId(evaluationId, userId);
+        var existing = existingOpt.orElse(null);
 
-        ReactionType resultReaction;
-
-        if (evaluationLike.isEmpty()) {
-            evaluationLikeRepository.save(new EvaluationReactionEntity(userId, evaluationId, reaction));
-            if(reaction.isLike()) evaluation.adjustLikeCount(+1);
-            else evaluation.adjustDislikeCount(+1);
-
-            resultReaction = reaction;
-        } else {
-            EvaluationReactionEntity row = evaluationLike.get();
-
-            if (row.getReaction() == reaction) {
-                evaluationLikeRepository.delete(row);
-                if (reaction==ReactionType.LIKE)
+        if (cmd == null) {
+            // 해제
+            if (existing != null) {
+                if (existing.getReaction() == ReactionType.LIKE) {
                     evaluation.adjustLikeCount(-1);
-                else
-                    evaluation.adjustDislikeCount(-1);
-
-                resultReaction = null;
-            } else {
-                // 반대 버튼 -> 전환
-                row.updateReaction(reaction);
-
-                if(reaction==ReactionType.LIKE){
-                    evaluation.adjustLikeCount(+1);
-                    evaluation.adjustDislikeCount(-1);
                 } else {
-                    evaluation.adjustLikeCount(-1);
-                    evaluation.adjustDislikeCount(+1);
+                    evaluation.adjustDislikeCount(-1);
                 }
-
-                resultReaction = reaction;
+                evaluationLikeRepository.delete(existing);
             }
+        } else if (existing == null) {
+            // 신규 설정
+            try {
+                evaluationLikeRepository.save(new EvaluationReactionEntity(userId, evaluationId, cmd));
+                if (cmd == ReactionType.LIKE) evaluation.adjustLikeCount(+1);
+                else evaluation.adjustDislikeCount(+1);
+            } catch (DataIntegrityViolationException e) {
+            }
+        } else if (existing.getReaction() != cmd) {
+            // 전환 (DISLIKE -> LIKE) 또는 (LIKE -> DISLIKE)
+            if (cmd == ReactionType.LIKE) {
+                evaluation.adjustLikeCount(+1);
+                evaluation.adjustDislikeCount(-1);
+            } else {
+                evaluation.adjustLikeCount(-1);
+                evaluation.adjustDislikeCount(+1);
+            }
+            existing.updateReaction(cmd);
         }
 
         // 좋아요, 싫어요 업데이트
@@ -67,11 +64,10 @@ public class EvaluationReactionService {
 
         return new EvalReactionResponse(
                 evaluation.getId(),
-                resultReaction,
+                cmd,
                 evaluation.getLikeCount(),
                 evaluation.getDislikeCount()
         );
-
     }
 
 }

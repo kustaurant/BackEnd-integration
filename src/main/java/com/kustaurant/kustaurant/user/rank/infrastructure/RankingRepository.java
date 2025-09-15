@@ -1,18 +1,12 @@
 package com.kustaurant.kustaurant.user.rank.infrastructure;
 
-import com.kustaurant.kustaurant.user.rank.controller.response.UserRank;
-import com.kustaurant.kustaurant.user.rank.domain.SeasonRange;
 import com.kustaurant.kustaurant.user.user.infrastructure.UserEntity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +20,7 @@ public interface RankingRepository extends JpaRepository<UserEntity, Long> {
             us.user_id        AS userId,
             us.rated_rest_cnt AS evaluationCount,
             RANK() OVER (ORDER BY us.rated_rest_cnt DESC, us.user_id ASC) AS userRank
-          FROM user_stats_tbl us
+          FROM user_stats us
           JOIN users_tbl u ON u.user_id = us.user_id
           WHERE us.rated_rest_cnt > 0 AND u.status = 'ACTIVE'
         )
@@ -46,7 +40,7 @@ public interface RankingRepository extends JpaRepository<UserEntity, Long> {
     @Query(value = """
         WITH s AS (
           SELECT e.user_id AS userId, COUNT(*) AS evaluationCount
-          FROM evaluations_tbl e
+          FROM evaluation e
           WHERE e.created_at >= :start AND e.created_at < :end
           GROUP BY e.user_id
         ),
@@ -78,7 +72,7 @@ public interface RankingRepository extends JpaRepository<UserEntity, Long> {
             us.user_id        AS userId,
             us.rated_rest_cnt AS evaluationCount,
             RANK() OVER (ORDER BY us.rated_rest_cnt DESC, us.user_id ASC) AS userRank
-          FROM user_stats_tbl us
+          FROM user_stats us
           WHERE us.rated_rest_cnt > 0
         )
         SELECT
@@ -96,7 +90,7 @@ public interface RankingRepository extends JpaRepository<UserEntity, Long> {
     @Query(value = """
         WITH s AS (
           SELECT e.user_id AS userId, COUNT(*) AS evaluationCount
-          FROM evaluations_tbl e
+          FROM evaluation e
           WHERE e.created_at >= :start AND e.created_at < :end
           GROUP BY e.user_id
         ),

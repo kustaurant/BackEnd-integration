@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.user.rank.service;
 
-import com.kustaurant.kustaurant.user.rank.controller.response.UserRank;
+import com.kustaurant.kustaurant.user.rank.controller.response.UserRankResponse;
 import com.kustaurant.kustaurant.user.rank.domain.RankingSortOption;
 import com.kustaurant.kustaurant.user.rank.domain.SeasonRange;
 import com.kustaurant.kustaurant.user.rank.infrastructure.RankingRepository;
@@ -21,30 +21,30 @@ public class RankingService {
     private final RankingRepository repo;
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
-    public List<UserRank> getTop100(RankingSortOption sort) {
+    public List<UserRankResponse> getTop100(RankingSortOption sort) {
         return switch (sort) {
             case CUMULATIVE -> repo.findTop100CumulativeRows()
-                    .stream().map(UserRank::from).toList();
+                    .stream().map(UserRankResponse::from).toList();
 
             case SEASONAL -> {
                 var range = SeasonRange.current(KST);
                 yield repo.findTop100SeasonalRows(
                                 ts(range.startInclusive()), ts(range.endExclusive()))
-                        .stream().map(UserRank::from).toList();
+                        .stream().map(UserRankResponse::from).toList();
             }
         };
     }
 
-    public Optional<UserRank> getMyRank(RankingSortOption sort, Long userId) {
+    public Optional<UserRankResponse> getMyRank(RankingSortOption sort, Long userId) {
         return switch (sort) {
             case CUMULATIVE -> repo.findMyCumulativeRow(userId)
-                    .stream().findFirst().map(UserRank::from);
+                    .stream().findFirst().map(UserRankResponse::from);
 
             case SEASONAL -> {
                 var range = SeasonRange.current(KST);
                 yield repo.findMySeasonalRow(
                                 userId, ts(range.startInclusive()), ts(range.endExclusive()))
-                        .stream().findFirst().map(UserRank::from);
+                        .stream().findFirst().map(UserRankResponse::from);
             }
         };
     }

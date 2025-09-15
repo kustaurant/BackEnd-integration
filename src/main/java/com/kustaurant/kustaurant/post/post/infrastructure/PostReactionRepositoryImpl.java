@@ -29,9 +29,8 @@ public class PostReactionRepositoryImpl implements PostReactionRepository {
     }
 
     @Override
-    public void delete(PostReactionId id) {
-        PostReactionJpaId jpaId = new PostReactionJpaId(id.postId(), id.userId());
-        jpa.deleteById(jpaId);
+    public void delete(PostReaction postReaction) {
+        jpa.delete(PostReactionEntity.from(postReaction));
     }
 
 

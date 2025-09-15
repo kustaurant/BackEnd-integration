@@ -29,7 +29,7 @@ public class PostCommentReactionRepositoryImpl implements PostCommentReactionRep
     }
 
     @Override
-    public void delete(PostCommentReactionId id) {
+    public void deleteById(PostCommentReactionId id) {
         PostCommentReactionJpaId jpaId = new PostCommentReactionJpaId(id.postCommentId(), id.userId());
         jpa.deleteById(jpaId);
     }

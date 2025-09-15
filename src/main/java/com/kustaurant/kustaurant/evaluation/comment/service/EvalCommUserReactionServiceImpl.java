@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.evaluation.comment.service;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
-import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommUserReactionService;
+import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommentReactionService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentReactionResponse;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommUserReactionEntity;
@@ -11,6 +11,8 @@ import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,61 +21,47 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EvalCommUserReactionServiceImpl implements EvalCommUserReactionService {
-    private final EvalCommUserReactionRepository evalCommentLikeRepository;
-    private final EvalCommentRepository evalCommentRepository;
+public class EvalCommUserReactionServiceImpl implements EvalCommentReactionService {
+    private final EvalCommUserReactionRepository userReactionRepo;
+    private final EvalCommentRepository evalCommentRepo;
 
     @Transactional
-    public EvalCommentReactionResponse toggleReaction(Long userId, Long evalCommentId, ReactionType target) {
+    public EvalCommentReactionResponse setEvalCommentReaction(Long userId, Long evalCommentId, @Nullable ReactionType cmd) {
 
-        EvalComment evalComment = evalCommentRepository.findById(evalCommentId)
-                .orElseThrow(() -> new DataNotFoundException(ErrorCode.COMMENT_NOT_FOUND));
+        EvalComment evalComment = evalCommentRepo.findById(evalCommentId).orElseThrow(() -> new DataNotFoundException(ErrorCode.COMMENT_NOT_FOUND));
+        Optional<EvalCommUserReactionEntity> existingOpt = userReactionRepo.findByUserIdAndEvalCommentId(userId, evalCommentId);
+        var existing = existingOpt.orElse(null);
 
-        Optional<EvalCommUserReactionEntity> evalCommentLike = evalCommentLikeRepository.findByUserIdAndEvalCommentId(userId, evalCommentId);
-
-        ReactionType resultReaction;
-
-        if (evalCommentLike.isEmpty()) {
-            // 좋아요 또는 싫어요를 처음 누르는 경우
-            evalCommentLikeRepository.save(new EvalCommUserReactionEntity(evalCommentId, userId, target));
-
-            if(target==ReactionType.LIKE) evalComment.adjustLikeCount(+1);
-            else evalComment.adjustDislikeCount(+1);
-
-            resultReaction = target;
-        } else{
-            EvalCommUserReactionEntity row = evalCommentLike.get();
-
-            if (row.getReaction() == target) {
-                // 같은 버튼 다시 누름 -> 취소
-                evalCommentLikeRepository.delete(row);
-
-                if(target==ReactionType.LIKE) evalComment.adjustLikeCount(-1);
+        if (cmd == null) { // 해제
+            if (existing != null) {
+                if (existing.getReaction() == ReactionType.LIKE) evalComment.adjustLikeCount(-1);
                 else evalComment.adjustDislikeCount(-1);
-
-                resultReaction = null;
-            } else {
-                // 반대 버튼 -> 전환
-                row.setReaction(target);
-
-                if(target==ReactionType.LIKE){
-                    evalComment.adjustLikeCount(+1);
-                    evalComment.adjustDislikeCount(-1);
-                } else {
-                    evalComment.adjustLikeCount(-1);
-                    evalComment.adjustDislikeCount(+1);
-                }
-
-                resultReaction = target;
+                userReactionRepo.delete(existing);
             }
+        } else if (existing == null) { // 신규 설정
+            try {
+                userReactionRepo.save(new EvalCommUserReactionEntity(evalCommentId, userId, cmd));
+                if (cmd == ReactionType.LIKE) evalComment.adjustLikeCount(+1);
+                else evalComment.adjustDislikeCount(+1);
+            } catch (DataIntegrityViolationException e) {
+            }
+        } else if (existing.getReaction() != cmd) { // 전환
+            if (cmd == ReactionType.LIKE) { // DISLIKE -> LIKE
+                evalComment.adjustLikeCount(+1);
+                evalComment.adjustDislikeCount(-1);
+            } else { // LIKE -> DISLIKE
+                evalComment.adjustLikeCount(-1);
+                evalComment.adjustDislikeCount(+1);
+            }
+            existing.setReaction(cmd);
+            userReactionRepo.save(existing);
         }
 
-        // 좋아요, 싫어요 업데이트
-        evalCommentRepository.save(evalComment);
+        evalCommentRepo.save(evalComment);
 
         return new EvalCommentReactionResponse(
                 evalComment.getId(),
-                resultReaction,
+                cmd,
                 evalComment.getLikeCount(),
                 evalComment.getDislikeCount()
         );

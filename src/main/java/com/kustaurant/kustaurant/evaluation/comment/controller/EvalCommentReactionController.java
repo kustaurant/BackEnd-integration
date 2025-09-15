@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.evaluation.comment.controller;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
-import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommUserReactionService;
+import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommentReactionService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentReactionResponse;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
@@ -11,26 +11,25 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
 public class EvalCommentReactionController {
-    private final EvalCommUserReactionService evalCommUserReactionService;
+    private final EvalCommentReactionService evalCommUserReactionService;
 
 
-    // 1. 식당평가 댓글 좋아요
+    // 1. 식당평가 댓글 좋아요/싫어요
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_USER')")
-    @PostMapping("/web/api/restaurants/comments/{evalCommentId}/{reaction}")
+    @PutMapping("/web/api/restaurants/comments/{evalCommentId}/reaction")
     public ResponseEntity<EvalCommentReactionResponse> toggleReaction(
             @PathVariable Long evalCommentId,
-            @PathVariable String reaction,
+            @RequestParam(required = false) ReactionType reaction,
             @AuthUser AuthUserInfo user
     ) {
-        ReactionType reactionType = ReactionType.valueOf(reaction);
-        EvalCommentReactionResponse response = evalCommUserReactionService.toggleReaction(user.id(), evalCommentId, reactionType);
+        EvalCommentReactionResponse response = evalCommUserReactionService.setEvalCommentReaction(user.id(), evalCommentId, reaction);
 
         return ResponseEntity.ok(response);
     }
-
-
 }

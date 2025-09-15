@@ -25,10 +25,11 @@ public class MypageApiController {
 
     //1-1
     @Operation(
-            summary = "\"마이페이지 화면\" 로드에 필요한 정보 불러오기(/auth 없음)",
+            summary = "\"마이페이지 화면\" 로드에 필요한 정보 불러오기",
             description = "마이페이지 화면에 필요한 정보들이 반환됩니다. " +
                     "로그인하지 않은 회원도 접속 가능하기 때문에 엔드포인트에 /auth가 포함되지 않습니다. " +
-                    "로그인하지 않은 회원인 경우 기본적인 빈 객체가 반환됩니다."
+                    "로그인하지 않은 회원인 경우 기본적인 빈 객체가 반환됩니다." +
+                    "웹과 response객체를 같이 쓰다 보니 앱에서 사용하지 않는 값이 있습니다. 그 값들은 무시하시면 됩니다."
     )
     @GetMapping("/v2/mypage")
     public ResponseEntity<ProfileResponse> getMypageView(

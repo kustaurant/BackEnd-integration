@@ -1,15 +1,22 @@
 <li th:each="restaurantComment, iterStat : ${restaurantComments}" th:style="${iterStat.last ? 'border-radius: 0 0 7px 7px;' : ''}">
     <div>
         <!-- 댓글 좋아요/싫어요 영역 -->
-        <div class="like-div">
-            <button class="comment-up" type="button" onclick="commentLike(this)" th:data-id="${restaurantComment.commentId}" th:data-parent-id="${restaurantComment.commentId}">
-                <img th:if="${restaurantComment.commentLikeStatus eq 1}" src="/img/community/up-green.png">
-                <img th:unless="${restaurantComment.commentLikeStatus eq 1}" src="/img/community/up.png">
+        <div class="like-div"
+             th:attr="data-reaction=${restaurantComment.commentLikeStatus == 1 ? 'LIKE' : (restaurantComment.commentLikeStatus == -1 ? 'DISLIKE' : 'NONE')}">
+            <button class="comment-up" type="button"
+                    onclick="commentLike(this)"
+                    th:data-id="${restaurantComment.commentId}"
+                    th:data-parent-id="${restaurantComment.commentId}">
+                <img th:if="${restaurantComment.commentLikeStatus == 1}" src="/img/community/up-green.png">
+                <img th:unless="${restaurantComment.commentLikeStatus == 1}" src="/img/community/up.png">
             </button>
             <span th:text="${restaurantComment.commentLikeCount - restaurantComment.commentDislikeCount}"></span>
-            <button class="comment-down" type="button" onclick="commentDislike(this)" th:data-id="${restaurantComment.commentId}" th:data-parent-id="${restaurantComment.commentId}">
-                <img th:if="${restaurantComment.commentLikeStatus eq -1}" src="/img/community/down-red.png">
-                <img th:unless="${restaurantComment.commentLikeStatus eq -1}" src="/img/community/down.png">
+            <button class="comment-down" type="button"
+                    onclick="commentDislike(this)"
+                    th:data-id="${restaurantComment.commentId}"
+                    th:data-parent-id="${restaurantComment.commentId}">
+                <img th:if="${restaurantComment.commentLikeStatus == -1}" src="/img/community/down-red.png">
+                <img th:unless="${restaurantComment.commentLikeStatus == -1}" src="/img/community/down.png">
             </button>
         </div>
         <!-- 댓글 본문 영역 -->
@@ -39,17 +46,20 @@
             <div class="reply-img-container">
                 <img src="/img/restaurant/reply.svg"/>
             </div>
-            <div class="like-div">
-                <button class="comment-up" type="button" onclick="commentLike(this)" th:data-id="${reply.commentId}" th:data-parent-id="${restaurantComment.commentId}">
-                    <img th:if="${reply.commentLikeStatus eq 1}" src="/img/community/up-green.png">
-                    <img th:unless="${reply.commentLikeStatus eq 1}" src="/img/community/up.png">
+            <div class="like-div" th:attr="data-reaction=${reply.commentLikeStatus == 1 ? 'LIKE' : (reply.commentLikeStatus == -1 ? 'DISLIKE' : 'NONE')}">
+                <button class="comment-up" type="button" onclick="commentLike(this)"
+                        th:data-id="${reply.commentId}" th:data-parent-id="${restaurantComment.commentId}">
+                    <img th:if="${reply.commentLikeStatus == 1}" src="/img/community/up-green.png">
+                    <img th:unless="${reply.commentLikeStatus == 1}" src="/img/community/up.png">
                 </button>
                 <span th:text="${reply.commentLikeCount - reply.commentDislikeCount}"></span>
-                <button class="comment-down" type="button" onclick="commentDislike(this)" th:data-id="${reply.commentId}" th:data-parent-id="${restaurantComment.commentId}">
-                    <img th:if="${reply.commentLikeStatus eq -1}" src="/img/community/down-red.png">
-                    <img th:unless="${reply.commentLikeStatus eq -1}" src="/img/community/down.png">
+                <button class="comment-down" type="button" onclick="commentDislike(this)"
+                        th:data-id="${reply.commentId}" th:data-parent-id="${restaurantComment.commentId}">
+                    <img th:if="${reply.commentLikeStatus == -1}" src="/img/community/down-red.png">
+                    <img th:unless="${reply.commentLikeStatus == -1}" src="/img/community/down.png">
                 </button>
             </div>
+
             <div class="body-div">
                 <div class="nick-date-div">
                     <img th:src="${reply.getCommentIconImgUrl()}">

@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface PostReactionRepository {
     Optional<PostReaction> findById(PostReactionId id);
     PostReaction save(PostReaction postReaction);
-    void delete(PostReactionId id);
+    void delete(PostReaction postReaction);
 
     int countByPostIdAndReaction(Long postId, ReactionType reaction);
     void deleteByPostId(Long postId);

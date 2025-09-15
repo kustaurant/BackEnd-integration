@@ -7,27 +7,22 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class EvaluationReactionApiController implements EvaluationReactionApiDoc {
-    private final EvaluationReactionService evalUserReactionService;
+    private final EvaluationReactionService evaluationReactionService;
 
-
-    // 1. 평가 좋아요/싫어요 토글
-    @PostMapping("/v2/auth/restaurants/evaluations/{evaluationId}/{reaction}")
-    public ResponseEntity<EvalReactionResponse> toggleEvaluationReaction(
+    // 1. 평가 좋아요/싫어요
+    @PutMapping("/v2/auth/restaurants/evaluations/{evaluationId}/reaction")
+    public ResponseEntity<EvalReactionResponse> setEvaluationReactionApi(
             @PathVariable Long evaluationId,
-            @PathVariable String reaction,
+            @RequestParam(required = false) ReactionType reaction,
             @AuthUser AuthUserInfo user
     ) {
-        ReactionType reactionType = ReactionType.valueOf(reaction);
-        EvalReactionResponse response = evalUserReactionService.toggleReaction(user.id(), evaluationId, reactionType);
+        EvalReactionResponse response = evaluationReactionService.setEvaluationReaction(user.id(), evaluationId, reaction);
 
         return ResponseEntity.ok(response);
     }

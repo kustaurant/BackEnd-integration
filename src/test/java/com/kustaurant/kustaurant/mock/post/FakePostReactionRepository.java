@@ -28,7 +28,8 @@ public class FakePostReactionRepository implements PostReactionRepository {
     }
 
     @Override
-    public void delete(PostReactionId id) {
+    public void delete(PostReaction postReaction) {
+        PostReactionId id = postReaction.getId();
         if(id == null) return;
         store.remove(id);
     }

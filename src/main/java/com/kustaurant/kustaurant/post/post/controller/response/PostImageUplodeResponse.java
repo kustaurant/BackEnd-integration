@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 @Getter
 @Setter
-public class ImageUplodeResponse {
-        public ImageUplodeResponse(String imgUrl) {
+public class PostImageUplodeResponse {
+        public PostImageUplodeResponse(String imgUrl) {
             this.imgUrl = imgUrl;
         }
 

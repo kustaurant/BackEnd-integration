@@ -18,6 +18,11 @@ public class FakePostScrapRepository implements PostScrapRepository {
     }
 
     @Override
+    public boolean existsById(PostReactionId id) {
+        return id != null && store.containsKey(id);
+    }
+
+    @Override
     public void save(PostScrap postScrap) {
         if (postScrap == null || postScrap.getId() == null) return;
         store.put(postScrap.getId(), postScrap);
@@ -33,9 +38,9 @@ public class FakePostScrapRepository implements PostScrapRepository {
     }
 
     @Override
-    public void delete(PostScrap postScrap) {
-        if (postScrap == null || postScrap.getId() == null) return;
-        store.remove(postScrap.getId());
+    public void deleteById(PostReactionId id) {
+        if (id == null) return;
+        store.remove(id);
     }
 
     @Override

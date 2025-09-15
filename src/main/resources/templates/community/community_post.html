@@ -153,19 +153,20 @@
         </div>
 
         <div class="post-like">
-            <button type="button" id="likeButton" class="post-button" th:data-post-id="${view.postId}">
+            <button type="button" id="likeButton" class="post-button" th:attr="data-post-id=${view.postId},
+                 data-reaction=${view.myReaction != null ? view.myReaction.name() : 'NONE'}">
                 <img th:if="${view.myReaction != null and view.myReaction.name() == 'LIKE'}" src="/img/community/up-green.png">
                 <img th:unless="${view.myReaction != null and view.myReaction.name() == 'LIKE'}" src="/img/community/up.png">
                 <span th:text="${view.likeOnlyCount}"></span>
             </button>
-            <button type="button" id="dislikeButton" class="post-button" th:data-post-id="${view.postId}">
+            <button type="button" id="dislikeButton" class="post-button" th:attr="data-post-id=${view.postId},
+                 data-reaction=${view.myReaction != null ? view.myReaction.name() : 'NONE'}">
                 <img th:if="${view.myReaction != null and view.myReaction.name() == 'DISLIKE'}" src="/img/community/down-red.png">
                 <img th:unless="${view.myReaction != null and view.myReaction.name() == 'DISLIKE'}" src="/img/community/down.png">
-                <span th:if="${view.dislikeOnlyCount >0}" th:text="'-'+${view.dislikeOnlyCount}"></span>
-                <span th:if="${view.dislikeOnlyCount ==0}" th:text="${view.dislikeOnlyCount}"></span>
-
+                <span th:text="${view.dislikeOnlyCount}"></span>
             </button>
-            <button type="button" id="scrap" class="post-button" th:data-post-id="${view.postId}">
+
+            <button type="button" id="scrap" class="post-button" th:attr="data-post-id=${view.postId}, data-scrapped=${view.isScrapped}">
                 <img th:if="${view.isScrapped}" src="/img/community/scrap-green.png">
                 <img th:unless="${view.isScrapped}" src="/img/community/scrap.png">
                 <span th:text="${view.scrapCount}"></span>
@@ -214,19 +215,23 @@
                                 </div>
                             </div>
                         </div>
+
                         <!-- active 상태 댓글 처리 -->
                         <div th:unless="${comment.status == 'PENDING'}" class="comment-div">
-                            <div class="comment-left">
+                            <div class="comment-left comment-reaction" th:attr="data-reaction=${comment.reactionType != null ? comment.reactionType.name() : 'NONE'}">
                                 <button class="comment-up" type="button" th:data-id="${comment.commentId}">
                                     <img th:if="${comment.reactionType != null and comment.reactionType.name() == 'LIKE'}" src="/img/community/up-green.png">
                                     <img th:unless="${comment.reactionType != null and comment.reactionType.name() == 'LIKE'}" src="/img/community/up.png">
                                 </button>
+
                                 <span class="totalLikeCount" th:text="${comment.likeCount - comment.dislikeCount}"></span>
+
                                 <button class="comment-down" type="button" th:data-id="${comment.commentId}">
                                     <img th:if="${comment.reactionType != null and comment.reactionType.name() == 'DISLIKE'}" src="/img/community/down-red.png">
                                     <img th:unless="${comment.reactionType != null and comment.reactionType.name() == 'DISLIKE'}" src="/img/community/down.png">
                                 </button>
                             </div>
+
                             <div class="comment-content">
                                 <div class="comment-name">
                                     <img th:src="${comment.user.iconUrl}">
@@ -255,9 +260,8 @@
                                 </ul>
                             </div>
                         </div>
+
                         <!-- 대댓글 리스트 -->
-
-
                         <ul th:if="${not comment.replies.isEmpty()}" class="reply-ul">
                             <li class="comment-li" th:each="reply, loop:${comment.replies}"
                                 th:data-id="${reply.commentId}">
@@ -267,12 +271,15 @@
                                         <div class="reply-mark">
                                             <img class="reply-image" src="/img/community/reply.png">
                                         </div>
-                                        <div class="comment-left">
+                                        <div class="comment-left comment-reaction"
+                                             th:attr="data-reaction=${reply.reactionType != null ? reply.reactionType.name() : 'NONE'}">
                                             <button class="comment-up" type="button" th:data-id="${reply.commentId}">
                                                 <img th:if="${reply.reactionType != null and reply.reactionType.name() == 'LIKE'}" src="/img/community/up-green.png">
                                                 <img th:unless="${reply.reactionType != null and reply.reactionType.name() == 'LIKE'}" src="/img/community/up.png">
                                             </button>
+
                                             <span class="totalLikeCount" th:text="${reply.likeCount - reply.dislikeCount}"></span>
+
                                             <button class="comment-down" type="button" th:data-id="${reply.commentId}">
                                                 <img th:if="${reply.reactionType != null and reply.reactionType.name() == 'DISLIKE'}" src="/img/community/down-red.png">
                                                 <img th:unless="${reply.reactionType != null and reply.reactionType.name() == 'DISLIKE'}" src="/img/community/down.png">

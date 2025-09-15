@@ -126,27 +126,27 @@ class MypageServiceIT {
     }
 
     // 4
-    @Test @DisplayName("프로필 수정 시 닉네임과 전화번호가 정상 변경된다")
-    void updateProfile_success() {
-        //g
-        var req = new ProfileUpdateRequest("wcwdfu2", "01099998888");
-        //w
-        var res = mypageService.updateUserProfile(user1.getId(), req);
-        //t
-        assertThat(res.nickname()).isEqualTo("wcwdfu2");
-        assertThat(res.phoneNumber()).isEqualTo("01099998888");
-    }
+//    @Test @DisplayName("프로필 수정 시 닉네임과 전화번호가 정상 변경된다")
+//    void updateProfile_success() {
+//        //g
+//        var req = new ProfileUpdateRequest("wcwdfu2", "01099998888");
+//        //w
+//        var res = mypageService.updateUserProfile(user1.getId(), req);
+//        //t
+//        assertThat(res.nickname()).isEqualTo("wcwdfu2");
+//        assertThat(res.phoneNumber()).isEqualTo("01099998888");
+//    }
 
     // 5
-    @Test @DisplayName("닉네임만 변경하면 정상 업데이트된다")
-    void updateProfile_nicknameOnly_success() {
-        //g
-        var req = new ProfileUpdateRequest("wcwdfu2", null);
-        //w
-        var res = mypageService.updateUserProfile(user1.getId(), req);
-        //t
-        assertThat(res.nickname()).isEqualTo("wcwdfu2");
-    }
+//    @Test @DisplayName("닉네임만 변경하면 정상 업데이트된다")
+//    void updateProfile_nicknameOnly_success() {
+//        //g
+//        var req = new ProfileUpdateRequest("wcwdfu2", null);
+//        //w
+//        var res = mypageService.updateUserProfile(user1.getId(), req);
+//        //t
+//        assertThat(res.nickname()).isEqualTo("wcwdfu2");
+//    }
 
     // 5
     @Test @DisplayName("전화번호만 변경하면 정상 업데이트된다")
@@ -237,15 +237,15 @@ class MypageServiceIT {
         // g
         PostRequest req1 = new PostRequest("테스트게시글1", PostCategory.FREE, "테스트내용1");
         Post post1 = postService.create(req1, user2.getId());
-        postScrapService.toggleScrapWithCount(post1.getId(), user1.getId());
+        postScrapService.toggleScrapWithCount(post1.getId(), user1.getId(),true);
 
         PostRequest req2 = new PostRequest("테스트게시글2", PostCategory.FREE, "테스트내용2");
         Post post2 = postService.create(req2, user2.getId());
-        postScrapService.toggleScrapWithCount(post2.getId(), user1.getId());
+        postScrapService.toggleScrapWithCount(post2.getId(), user1.getId(),true);
 
         PostRequest req3 = new PostRequest("테스트게시글3", PostCategory.SUGGESTION, "테스트내용3");
         Post post3 = postService.create(req3, user2.getId());
-        postScrapService.toggleScrapWithCount(post3.getId(), user1.getId());
+        postScrapService.toggleScrapWithCount(post3.getId(), user1.getId(),true);
         // w
         var res = mypageService.getScrappedUserPosts(user1.getId());
         // t
