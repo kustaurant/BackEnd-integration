@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.favorite.model;
+package com.kustaurant.kustaurant.restaurant.restaurant.domain;
 
 import lombok.Builder;
 import lombok.Getter;

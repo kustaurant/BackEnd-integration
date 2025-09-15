@@ -4,9 +4,9 @@ import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.ent
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity.restaurantSituationRelationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QSituationEntity.situationEntity;
 import static com.kustaurant.kustaurant.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
-import static com.kustaurant.kustaurant.restaurant.favorite.infrastructure.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCommonExpressions.situationMatches;
+import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
 import static java.util.Objects.isNull;
@@ -81,7 +81,9 @@ public class RestaurantCoreInfoQuery {
 
     private BooleanExpression favoriteRestaurantIdEq(NumberPath<Long> restaurantId, Long userId) {
         return isNull(userId) ? Expressions.FALSE
-                : restaurantFavoriteEntity.restaurantId.eq(restaurantId).and(restaurantFavoriteEntity.userId.eq(userId));
+                : restaurantFavoriteEntity.restaurantId.eq(restaurantId)
+                        .and(restaurantFavoriteEntity.userId.eq(userId))
+                        .and(restaurantFavoriteEntity.status.eq("ACTIVE"));
     }
 
     private BooleanExpression situationIdEq(NumberPath<Long> situationId) {

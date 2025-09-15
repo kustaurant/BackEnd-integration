@@ -2,8 +2,8 @@ package com.kustaurant.kustaurant.mock.restaurant;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
-import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
-import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 
 import java.util.ArrayList;
@@ -12,6 +12,11 @@ import java.util.List;
 public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepository {
     private final List<RestaurantFavorite> store = new ArrayList<>();
 
+
+    @Override
+    public boolean existsByUserIdAndRestaurantId(Long userId, Long restaurantId) {
+        return false;
+    }
 
     @Override
     public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Long restaurantId) {
@@ -30,8 +35,8 @@ public class FakeRestaurantFavoriteRepository implements RestaurantFavoriteRepos
     }
 
     @Override
-    public void delete(RestaurantFavorite restaurantFavorite) {
-        store.remove(restaurantFavorite);
+    public void deleteByUserIdAndRestaurantId(Long userId, Long restaurantId) {
+
     }
 
     @Override

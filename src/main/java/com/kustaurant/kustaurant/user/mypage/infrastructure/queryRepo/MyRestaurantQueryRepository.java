@@ -1,10 +1,9 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
 import static com.kustaurant.kustaurant.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
-import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 
-import com.kustaurant.kustaurant.restaurant.favorite.infrastructure.QRestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
+import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;

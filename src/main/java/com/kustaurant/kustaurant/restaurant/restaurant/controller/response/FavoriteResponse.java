@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.favorite.controller.response;
+package com.kustaurant.kustaurant.restaurant.restaurant.controller.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

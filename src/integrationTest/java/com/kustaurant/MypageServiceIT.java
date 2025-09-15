@@ -10,7 +10,7 @@ import com.kustaurant.kustaurant.post.post.domain.Post;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
 import com.kustaurant.kustaurant.post.post.service.PostService;
 import com.kustaurant.kustaurant.post.post.service.PostScrapService;
-import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteService;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;

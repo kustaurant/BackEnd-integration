@@ -1,5 +1,6 @@
-package com.kustaurant.kustaurant.restaurant.favorite.infrastructure;
+package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository;
 
+import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,8 @@ public interface RestaurantFavoriteJpaRepository extends JpaRepository<Restauran
     Optional<RestaurantFavoriteEntity> findByUserIdAndRestaurantId(Long userId, Long restaurantId);
 
     long countByRestaurantIdAndStatus(Long restaurantId, String status);
+
+    long deleteByUserIdAndRestaurantId(Long userId, Long restaurantId);
 
     @Query("""
         SELECT rf FROM RestaurantFavoriteEntity rf

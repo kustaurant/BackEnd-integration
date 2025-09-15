@@ -1,20 +1,17 @@
-package com.kustaurant.kustaurant.restaurant.favorite.infrastructure;
+package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity;
 
 import com.kustaurant.kustaurant.common.infrastructure.BaseTimeEntity;
-import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
-@SQLDelete(sql = "update restaurant_favorite_tbl set status = 'DELETED' where favorite_id = ?")
+@SQLDelete(sql = "update restaurant_favorite set status = 'DELETED' where favorite_id = ?")
 @SQLRestriction("status = 'ACTIVE'")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="restaurant_favorite")

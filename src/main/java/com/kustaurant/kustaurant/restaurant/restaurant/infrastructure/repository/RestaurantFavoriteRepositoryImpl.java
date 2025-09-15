@@ -1,21 +1,25 @@
-package com.kustaurant.kustaurant.restaurant.favorite.infrastructure;
+package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository;
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
-import com.kustaurant.kustaurant.restaurant.favorite.service.RestaurantFavoriteRepository;
-import com.kustaurant.kustaurant.restaurant.favorite.model.RestaurantFavorite;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
 public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepository {
 
     private final RestaurantFavoriteJpaRepository jpaRepository;
+
+    @Override
+    public boolean existsByUserIdAndRestaurantId(Long userId, Long restaurantId) {
+        return jpaRepository.existsByUserIdAndRestaurantId(userId, restaurantId);
+    }
 
     @Override
     public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Long restaurantId) {
@@ -33,8 +37,8 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
 
     @Override
     @Transactional
-    public void delete(RestaurantFavorite restaurantFavorite) {
-        jpaRepository.delete(RestaurantFavoriteEntity.from(restaurantFavorite));
+    public void deleteByUserIdAndRestaurantId(Long userId, Long restaurantId) {
+        jpaRepository.deleteByUserIdAndRestaurantId(userId, restaurantId);
     }
 
     @Override
