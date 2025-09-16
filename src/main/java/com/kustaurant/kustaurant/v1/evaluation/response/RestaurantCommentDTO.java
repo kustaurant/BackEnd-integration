@@ -1,10 +1,14 @@
 package com.kustaurant.kustaurant.v1.evaluation.response;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
+import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
+import com.kustaurant.kustaurant.common.util.UserIconResolver;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentReactionResponse;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentResponse;
+import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
 import com.kustaurant.kustaurant.evaluation.evaluation.controller.response.EvalReactionResponse;
 import com.kustaurant.kustaurant.evaluation.review.ReviewsResponse;
+import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.v1.evaluation.EvaluationV1Controller;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -105,6 +109,23 @@ public class RestaurantCommentDTO {
                 v2.likeCount(),
                 v2.dislikeCount(),
                 null,
+                null
+        );
+    }
+
+    public static RestaurantCommentDTO fromV2(EvalComment v2, User user) {
+        return new RestaurantCommentDTO(
+                (int) (long) v2.getId(),
+                null,
+                UserIconResolver.resolve(user.getEvalCount()),
+                user.getNickname().toString(),
+                TimeAgoResolver.toKor(v2.getCreatedAt()),
+                null,
+                v2.getBody(),
+                0,
+                v2.getLikeCount(),
+                v2.getDislikeCount(),
+                true,
                 null
         );
     }

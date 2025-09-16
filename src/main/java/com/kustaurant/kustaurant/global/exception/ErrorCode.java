@@ -13,6 +13,9 @@ public enum ErrorCode {
     METHOD_NOT_ALLOWED    (HttpStatus.METHOD_NOT_ALLOWED,    "COMMON-002", "허용되지 않은 HTTP 메서드입니다."),
     INTERNAL_SERVER_ERROR (HttpStatus.INTERNAL_SERVER_ERROR, "COMMON-003", "예상치 못한 서버 오류입니다."),
     IMAGE_UPLOAD_FAIL     (HttpStatus.INTERNAL_SERVER_ERROR, "COMMON-004", "이미지 업로드에 실패했습니다."),
+    GONE (HttpStatus.GONE, "COMMON-005", "더 이상 지원하지 않는 기능입니다."),
+    SERVICE_UNAVAILABLE (HttpStatus.SERVICE_UNAVAILABLE, "COMMON-006", "해당 기능 점검중입니다."),
+
     /* ──── USER ──── */
     USER_NOT_FOUND        (HttpStatus.NOT_FOUND,            "USER-001",   "유저를 찾을 수 없습니다."),
     NICKNAME_COOLDOWN       (HttpStatus.BAD_REQUEST,    "USER-002", "닉네임 변경은 30일에 한 번만 가능합니다."),
