@@ -1,8 +1,11 @@
 package com.kustaurant.kustaurant.v1.evaluation.response;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
+import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentReactionResponse;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentResponse;
+import com.kustaurant.kustaurant.evaluation.evaluation.controller.response.EvalReactionResponse;
 import com.kustaurant.kustaurant.evaluation.review.ReviewsResponse;
+import com.kustaurant.kustaurant.v1.evaluation.EvaluationV1Controller;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -39,16 +42,15 @@ public class RestaurantCommentDTO {
     private List<RestaurantCommentDTO> commentReplies;
 
     public static RestaurantCommentDTO fromV2(ReviewsResponse v2) {
-        int likeStatus = v2.reactionType() == ReactionType.LIKE ? 1 : (v2.reactionType() == ReactionType.DISLIKE ? -1 : 0);
         return new RestaurantCommentDTO(
-                (int) (long) v2.evalId(),
+                (int) (long) v2.evalId() + EvaluationV1Controller.EVALUATION_ID_OFFSET,
                 v2.evalScore(),
                 v2.writerIconImgUrl(),
                 v2.writerNickname(),
                 v2.timeAgo(),
                 v2.evalImgUrl(),
                 v2.evalBody(),
-                likeStatus,
+                getStatus(v2.reactionType()),
                 v2.evalLikeCount(),
                 v2.evalDislikeCount(),
                 v2.isEvaluationMine(),
@@ -57,7 +59,6 @@ public class RestaurantCommentDTO {
     }
 
     public static RestaurantCommentDTO fromV2(EvalCommentResponse v2) {
-        int likeStatus = v2.reactionType() == ReactionType.LIKE ? 1 : (v2.reactionType() == ReactionType.DISLIKE ? -1 : 0);
         return new RestaurantCommentDTO(
                 (int) (long) v2.commentId(),
                 0.0,
@@ -66,11 +67,49 @@ public class RestaurantCommentDTO {
                 v2.timeAgo(),
                 null,
                 v2.commentBody(),
-                likeStatus,
+                getStatus(v2.reactionType()),
                 v2.commentLikeCount(),
                 v2.commentDislikeCount(),
                 v2.isCommentMine(),
                 null
         );
+    }
+
+    public static RestaurantCommentDTO fromV2(EvalReactionResponse v2) {
+        return new RestaurantCommentDTO(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                getStatus(v2.reaction()),
+                v2.likeCount(),
+                v2.dislikeCount(),
+                null,
+                null
+        );
+    }
+
+    public static RestaurantCommentDTO fromV2(EvalCommentReactionResponse v2) {
+        return new RestaurantCommentDTO(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                getStatus(v2.reaction()),
+                v2.likeCount(),
+                v2.dislikeCount(),
+                null,
+                null
+        );
+    }
+
+    private static int getStatus(ReactionType reactionType) {
+        return reactionType == ReactionType.LIKE ? 1 : (reactionType == ReactionType.DISLIKE ? -1 : 0);
     }
 }
