@@ -33,4 +33,16 @@ public class RestaurantV1Controller {
 
         return new ResponseEntity<>(RestaurantDetailDTO.fromV2(detail), HttpStatus.OK);
     }
+
+    @GetMapping("/auth/restaurants/{restaurantId}")
+    public ResponseEntity<RestaurantDetailDTO> getRestaurantDetailWithAuth(
+            @PathVariable Integer restaurantId,
+            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+            @AuthUser AuthUserInfo user
+    ) {
+        // 식당 데이터 DTO로 변환하기
+        RestaurantDetail detail = restaurantQueryService.getRestaurantDetail((long) restaurantId, user.id());
+
+        return new ResponseEntity<>(RestaurantDetailDTO.fromV2(detail), HttpStatus.OK);
+    }
 }
