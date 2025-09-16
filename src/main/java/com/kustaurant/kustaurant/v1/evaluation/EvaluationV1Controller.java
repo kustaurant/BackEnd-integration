@@ -105,6 +105,31 @@ public class EvaluationV1Controller {
         return new ResponseEntity<>(response.stream().map(RestaurantCommentDTO::fromV2).toList(), HttpStatus.OK);
     }
 
+    // 평가 댓글 달기
+    @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
+    public ResponseEntity<RestaurantCommentDTO> postReply(
+            @PathVariable Integer restaurantId,
+            @PathVariable Integer commentId,
+            @RequestBody String commentBody,
+            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+            @AuthUser AuthUserInfo user
+    ) {
+        int evaluationId = commentId - EVALUATION_ID_OFFSET;
+        // 댓글 내용 없는 경우 예외 처리
+        if (commentBody.trim().isEmpty()) {
+            throw new ParamException("대댓글 내용이 없습니다.");
+        }
+        // 댓글 내용 전처리
+        commentBody = commentBody.replaceAll("^\"|\"$", ""); // 양쪽 큰 따옴표 제거
+        commentBody = commentBody.replace("\\\"", "\"");     // 이스케이프된 따옴표 복구
+
+        // 평가 댓글 달기
+        EvalComment evalComment = evalCommCommandService.create((long) evaluationId, (long) restaurantId, user.id(), new EvalCommentRequest(commentBody));
+        User userById = userService.getUserById(user.id());
+
+        return new ResponseEntity<>(RestaurantCommentDTO.fromV2(evalComment, userById), HttpStatus.OK);
+    }
+
     // 식당 댓글 및 대댓글 삭제하기
     @DeleteMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(
@@ -153,29 +178,24 @@ public class EvaluationV1Controller {
         }
     }
 
-    // 평가 댓글 달기
-    @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}")
-    public ResponseEntity<RestaurantCommentDTO> postReply(
+    // 평가/댓글 추천하기
+    @PostMapping("/auth/restaurants/{restaurantId}/comments/{commentId}/dislike")
+    public ResponseEntity<RestaurantCommentDTO> dislikeComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
-            @RequestBody String commentBody,
-            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
             @AuthUser AuthUserInfo user
     ) {
-        int evaluationId = commentId - EVALUATION_ID_OFFSET;
-        // 댓글 내용 없는 경우 예외 처리
-        if (commentBody.trim().isEmpty()) {
-            throw new ParamException("대댓글 내용이 없습니다.");
+        // 평가인 경우
+        if (!isSubComment(commentId)) { // 평가 댓글인 경우
+            int evalId = commentId - EVALUATION_ID_OFFSET;
+            EvalReactionResponse response = evaluationReactionService.setEvaluationReaction(user.id(), (long) evalId, ReactionType.DISLIKE);
+
+            return ResponseEntity.ok(RestaurantCommentDTO.fromV2(response));
+        } else { // 평가에 대한 댓글인 경우
+            EvalCommentReactionResponse response = evalCommUserReactionService.setEvalCommentReaction(user.id(), (long) commentId, ReactionType.DISLIKE);
+
+            return ResponseEntity.ok(RestaurantCommentDTO.fromV2(response));
         }
-        // 댓글 내용 전처리
-        commentBody = commentBody.replaceAll("^\"|\"$", ""); // 양쪽 큰 따옴표 제거
-        commentBody = commentBody.replace("\\\"", "\"");     // 이스케이프된 따옴표 복구
-
-        // 평가 댓글 달기
-        EvalComment evalComment = evalCommCommandService.create((long) evaluationId, (long) restaurantId, user.id(), new EvalCommentRequest(commentBody));
-        User userById = userService.getUserById(user.id());
-
-        return new ResponseEntity<>(RestaurantCommentDTO.fromV2(evalComment, userById), HttpStatus.OK);
     }
 
     private boolean isSubComment(Integer id) {
