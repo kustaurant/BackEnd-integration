@@ -16,6 +16,7 @@ public enum PostCategory {
     PostCategory(String koreanCategory) {
         this.koreanCategory = koreanCategory;
     }
+
     @JsonCreator
     public static PostCategory from(Object raw) {
         if (raw == null) return null;
@@ -25,6 +26,7 @@ public enum PostCategory {
         }
         throw new IllegalArgumentException("Unknown PostCategory: " + raw);
     }
+
     @JsonValue
     public String toJson() {
         return koreanCategory;

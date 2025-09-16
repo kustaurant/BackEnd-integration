@@ -24,6 +24,7 @@ public record PostDetailResponse (
         String body,
         @Schema(description = "게시글에 등록된 이미지 url주소들")
         List<String> photoUrls,
+
         // 작성자 정보
         @Schema(description = "작성자 정보")
         @JsonUnwrapped(prefix = "writer") UserSummary writer,
@@ -32,6 +33,7 @@ public record PostDetailResponse (
         @Schema(description = "게시글이 생성된 날짜", example = "2024-05-19T18:09:06")
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
+
         // 집계 정보
         @Schema(description = "좋아요 수")
         long likeOnlyCount,
@@ -47,6 +49,7 @@ public record PostDetailResponse (
         long visitCount,
         @Schema(description = "유저의 좋아요,싫어요 상호작용 유무 (LIKE: 좋아요, DISLIKE: 싫어요, null: 아무것도 누르지 않음)")
         ReactionType myReaction,
+
         // 상호작용 정보
         @Schema(description = "유저의 스크랩 유무")
         boolean isScrapped,

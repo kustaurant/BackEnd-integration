@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.user.mypage.service;
 
 import com.kustaurant.kustaurant.global.exception.exception.user.NoProfileChangeException;
 import com.kustaurant.kustaurant.global.exception.exception.user.UserNotFoundException;
-import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
+import com.kustaurant.kustaurant.admin.notice.domain.Notice;
 import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeRepository;
 
 import java.util.stream.Collectors;
@@ -109,9 +109,9 @@ public class MypageServiceImpl implements MypageService {
 
 
     // 8. 모든 공지사항 목록 반환
-    public List<NoticeDTO> getAllNotices() {
+    public List<Notice> getAllNotices() {
         return noticeRepo.findAll().stream()
-                .map(notice -> new NoticeDTO(
+                .map(notice -> new Notice(
                         notice.getTitle(),
                         notice.getHref(),
                         notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))

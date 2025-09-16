@@ -59,7 +59,7 @@ public class LoginApiController {
     @PostMapping("/v2/auth/logout")
     public ResponseEntity<?> logout(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
-            ) {
+    ) {
         loginService.logout(user.id());
         return ResponseEntity.noContent().build();
     }

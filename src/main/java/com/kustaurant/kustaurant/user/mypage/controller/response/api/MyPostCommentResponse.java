@@ -19,5 +19,4 @@ public record MyPostCommentResponse(
     public String timeAgo() {
         return TimeAgoResolver.toKor(createdAt);
     }
-
 }

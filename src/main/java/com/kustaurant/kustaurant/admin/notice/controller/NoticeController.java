@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.admin.notice.controller;
 
-import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
+import com.kustaurant.kustaurant.admin.notice.domain.Notice;
 import com.kustaurant.kustaurant.admin.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -19,7 +19,7 @@ public class NoticeController {
     public String getNotices(
             Model model
     ){
-        List<NoticeDTO> notices = noticeService.getAllNotices();
+        List<Notice> notices = noticeService.getAllNotices();
         model.addAttribute("notices", notices);
         return "home/notice";
     }

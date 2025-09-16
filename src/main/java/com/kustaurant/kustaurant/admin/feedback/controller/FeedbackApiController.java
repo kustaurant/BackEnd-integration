@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.admin.feedback.controller;
 
 import com.kustaurant.kustaurant.admin.feedback.controller.Request.FeedbackRequest;
+import com.kustaurant.kustaurant.admin.feedback.controller.port.FeedbackService;
 import com.kustaurant.kustaurant.admin.feedback.service.FeedbackServiceImpl;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class FeedbackApiController {
-    private final FeedbackServiceImpl feedbackService;
+    private final FeedbackService feedbackService;
 
     //피드백 보내기
     @Operation(

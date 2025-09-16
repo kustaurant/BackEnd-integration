@@ -22,12 +22,9 @@ public class TokenApiController {
     private final TokenService tokenService;
 
     //1
-    @Operation(
-            summary = "액세스 토큰 재발행"
-    )
+    @Operation(summary = "액세스 토큰 재발행")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "액세스 토큰 재발행 성공",
-                    content = @Content(schema = @Schema(implementation = TokenResponse.class))),
+            @ApiResponse(responseCode = "200", description = "액세스 토큰 재발행 성공", content = @Content(schema = @Schema(implementation = TokenResponse.class))),
             @ApiResponse(responseCode = "401", description = "리프레시 토큰 만료 또는 유효하지 않음"),
             @ApiResponse(responseCode = "400", description = "요청 헤더 누락 또는 잘못된 형식")
     })

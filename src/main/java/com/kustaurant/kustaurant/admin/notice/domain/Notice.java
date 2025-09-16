@@ -6,13 +6,13 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class NoticeDTO {
+public class Notice {
     private String title;
     private String href;
     private String createdAt;
 
-    public static NoticeDTO from(NoticeEntity noticeEntity) {
-        return new NoticeDTO(
+    public static Notice from(NoticeEntity noticeEntity) {
+        return new Notice(
                 noticeEntity.getTitle(),
                 noticeEntity.getHref(),
                 noticeEntity.getCreatedAt().toString()

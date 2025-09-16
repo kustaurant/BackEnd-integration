@@ -1,9 +1,8 @@
 package com.kustaurant.kustaurant.admin.notice.service;
 
-import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
+import com.kustaurant.kustaurant.admin.notice.domain.Notice;
 import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeEntity;
 import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeRepository;
-import com.kustaurant.kustaurant.admin.notice.service.NoticeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +42,7 @@ class NoticeServiceTest {
         when(noticeRepository.findAll()).thenReturn(Arrays.asList(n1,n2));
 
         //w
-        List<NoticeDTO> result= noticeService.getAllNotices();
+        List<Notice> result= noticeService.getAllNotices();
 
         //t
         assertThat(result).hasSize(2);

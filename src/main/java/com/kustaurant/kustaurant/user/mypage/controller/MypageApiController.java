@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.user.mypage.controller;
 
-import com.kustaurant.kustaurant.admin.notice.domain.NoticeDTO;
+import com.kustaurant.kustaurant.admin.notice.domain.Notice;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
@@ -21,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class MypageApiController {
-    private final MypageService mypageApiService;
+    private final MypageService mypageService;
 
     //1-1
     @Operation(
@@ -39,7 +39,7 @@ public class MypageApiController {
         if (user == null) {
             response = new ProfileResponse(null,0,0,0,0,0,null,null);
         } else{
-            response = mypageApiService.getProfile(user.id());
+            response = mypageService.getProfile(user.id());
         }
 
         return ResponseEntity.ok(response);
@@ -55,7 +55,7 @@ public class MypageApiController {
     public ResponseEntity<ProfileResponse> getMypageProfile(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
-        ProfileResponse response = mypageApiService.getProfile(user.id());
+        ProfileResponse response = mypageService.getProfile(user.id());
 
         return ResponseEntity.ok(response);
     }
@@ -80,7 +80,7 @@ public class MypageApiController {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user,
             @Valid @RequestBody ProfileUpdateRequest req
     ){
-        ProfileUpdateResponse response = mypageApiService.updateUserProfile(user.id(), req);
+        ProfileUpdateResponse response = mypageService.updateUserProfile(user.id(), req);
 
         return ResponseEntity.ok(response);
     }
@@ -95,7 +95,7 @@ public class MypageApiController {
     public ResponseEntity<List<MyRatedRestaurantResponse>> getEvaluateRestaurantList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
-        List<MyRatedRestaurantResponse> responseList = mypageApiService.getUserEvaluateRestaurantList(user.id());
+        List<MyRatedRestaurantResponse> responseList = mypageService.getUserEvaluateRestaurantList(user.id());
 
         return ResponseEntity.ok(responseList);
     }
@@ -110,7 +110,7 @@ public class MypageApiController {
     public ResponseEntity<List<MyRestaurantResponse>> getFavoriteRestaurantList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
-        List<MyRestaurantResponse> responseList = mypageApiService.getUserFavoriteRestaurantList(user.id());
+        List<MyRestaurantResponse> responseList = mypageService.getUserFavoriteRestaurantList(user.id());
 
         return ResponseEntity.ok(responseList);
     }
@@ -125,7 +125,7 @@ public class MypageApiController {
     public ResponseEntity<List<MyPostsResponse>> getWrittenUserPostsList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
-        List<MyPostsResponse> responseList = mypageApiService.getUserPosts(user.id());
+        List<MyPostsResponse> responseList = mypageService.getUserPosts(user.id());
 
         return ResponseEntity.ok(responseList);
     }
@@ -140,7 +140,7 @@ public class MypageApiController {
     public ResponseEntity<List<MyPostsResponse>> getCommunityScrapList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
-        List<MyPostsResponse> list = mypageApiService.getScrappedUserPosts(user.id());
+        List<MyPostsResponse> list = mypageService.getScrappedUserPosts(user.id());
 
         return ResponseEntity.ok(list);
     }
@@ -155,7 +155,7 @@ public class MypageApiController {
     public ResponseEntity<List<MyPostCommentResponse>> getCommunityCommentList(
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
-        List<MyPostCommentResponse> list = mypageApiService.getCommentedUserPosts(user.id());
+        List<MyPostCommentResponse> list = mypageService.getCommentedUserPosts(user.id());
 
         return ResponseEntity.ok(list);
     }
@@ -167,9 +167,9 @@ public class MypageApiController {
             description = "공지사항 리스트와 관련 링크들을 불러옵니다. (조회는 웹뷰 방식)"
     )
     @GetMapping("/v2/mypage/notices")
-    public ResponseEntity<List<NoticeDTO>> getNotices() {
-        List<NoticeDTO> noticeDTOs = mypageApiService.getAllNotices();
+    public ResponseEntity<List<Notice>> getNotices() {
+        List<Notice> res = mypageService.getAllNotices();
 
-        return ResponseEntity.ok(noticeDTOs);
+        return ResponseEntity.ok(res);
     }
 }
