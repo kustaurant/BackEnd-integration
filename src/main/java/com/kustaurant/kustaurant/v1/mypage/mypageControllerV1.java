@@ -142,7 +142,7 @@ public class mypageControllerV1 {
     //8 커뮤니티 댓글 목록
     @GetMapping("/auth/mypage/community-comment-list")
     public ResponseEntity<List<MypagePostCommentDTO>> getCommunityCommentList(
-            @Parameter(hidden = true) @JwtToken Long userId
+            @JwtToken Long userId
     ){
         List<MyPostCommentResponse> v2 = mypageService.getCommentedUserPosts(userId);
         return ResponseEntity.ok(mapper.toLegacyCommentList(v2));

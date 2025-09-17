@@ -12,6 +12,11 @@ public final class MapStructConverters {
         return Math.toIntExact(v);
     }
 
+    @Named("longToIntegerExact")
+    public static Integer longToIntegerExactP(long v) {
+        return Math.toIntExact(v);
+    }
+
     @Named("postCategoryToString")
     public static String postCategoryToString(PostCategory c) {
         return c == null ? null : c.getKoreanCategory();

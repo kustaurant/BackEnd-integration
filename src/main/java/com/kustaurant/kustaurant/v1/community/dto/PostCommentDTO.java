@@ -36,22 +36,22 @@ public class PostCommentDTO {
         this.repliesList = repliesList;
     }
 
-    public static PostCommentDTO convertPostCommentToPostCommentDTO(PostComment comment) {
-        return new PostCommentDTO(
-                comment.getCommentId(),
-                comment.getCommentBody(),
-                comment.getStatus(),comment.getUser(),
-                comment.getLikeUserList().size(),
-                comment.getDislikeUserList().size(),
-                comment.calculateTimeAgo(),
-                comment.getCreatedAt(),
-                comment.getUpdatedAt(),
-                comment.getRepliesList().stream()
-                        .filter(reply -> reply.getStatus().equals("ACTIVE"))
-                        .sorted(Comparator.comparing(PostComment::getCreatedAt).reversed())
-                        .map(PostCommentDTO::convertPostCommentToPostCommentDTO)
-                        .toList()
-        );
-    }
+//    public static PostCommentDTO convertPostCommentToPostCommentDTO(PostComment comment) {
+//        return new PostCommentDTO(
+//                comment.getCommentId(),
+//                comment.getCommentBody(),
+//                comment.getStatus(),comment.getUser(),
+//                comment.getLikeUserList().size(),
+//                comment.getDislikeUserList().size(),
+//                comment.calculateTimeAgo(),
+//                comment.getCreatedAt(),
+//                comment.getUpdatedAt(),
+//                comment.getRepliesList().stream()
+//                        .filter(reply -> reply.getStatus().equals("ACTIVE"))
+//                        .sorted(Comparator.comparing(PostComment::getCreatedAt).reversed())
+//                        .map(PostCommentDTO::convertPostCommentToPostCommentDTO)
+//                        .toList()
+//        );
+//    }
 
 }
