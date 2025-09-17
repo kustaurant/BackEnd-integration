@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.v1.user;
 
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.auth.jwt.JwtUtil;
 import com.kustaurant.kustaurant.user.login.api.controller.LoginRequest;
 import com.kustaurant.kustaurant.user.login.api.controller.response.TokenResponse;
@@ -7,7 +9,6 @@ import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.login.api.service.LoginService;
 import com.kustaurant.kustaurant.user.login.api.service.TokenService;
 import com.kustaurant.kustaurant.v1.common.ErrorResponse;
-import com.kustaurant.kustaurant.v1.common.JwtToken;
 import com.kustaurant.kustaurant.v1.user.dto.AppleLoginRequest;
 import com.kustaurant.kustaurant.v1.user.dto.NaverLoginRequest;
 import com.kustaurant.kustaurant.v1.user.dto.V1TokenResponse;
@@ -81,10 +82,10 @@ public class loginControllerV1 {
     //5
     @PostMapping("/auth/logout")
     public ResponseEntity<?> logout(
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
         try {
-            loginService.logout(userId);
+            loginService.logout(user.id());
             return ResponseEntity.ok(new ErrorResponse("OK", "로그아웃이 완료되었습니다."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -95,9 +96,9 @@ public class loginControllerV1 {
     //6
     @PostMapping("/auth/goodbye-user")
     public ResponseEntity<?> deleteAppleAccount(
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
-        loginService.withdraw(userId);
+        loginService.withdraw(user.id());
 
         return ResponseEntity.ok(new ErrorResponse("OK", "회원탈퇴가 성공적으로 이루어졌습니다."));
     }

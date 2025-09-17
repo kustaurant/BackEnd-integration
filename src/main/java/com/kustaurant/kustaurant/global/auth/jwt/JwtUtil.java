@@ -84,9 +84,4 @@ public class JwtUtil {
     }
 
     public record ParsedToken(Long userId, String role, TokenType tokenType) {}
-
-    // TODO  v1코드: JWT 토큰에서 userId 추출
-    public Integer getUserIdFromToken(String token) {
-        return Math.toIntExact(parse(token).userId());
-    }
 }

@@ -6,7 +6,6 @@ import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.Cuisi
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.LocationListArgumentResolver;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.SituationListArgumentResolver;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserArgumentResolver;
-import com.kustaurant.kustaurant.v1.common.JwtTokenArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,12 +23,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final AuthUserArgumentResolver authUserArgumentResolver;
     private final V1KillSwitchInterceptor v1KillSwitchInterceptor;
 
-    private final JwtTokenArgumentResolver jwtTokenArgumentResolver;
-
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(authUserArgumentResolver);
-        resolvers.add(jwtTokenArgumentResolver);
         resolvers.add(new CuisineListArgumentResolver());
         resolvers.add(new SituationListArgumentResolver());
         resolvers.add(new LocationListArgumentResolver());
