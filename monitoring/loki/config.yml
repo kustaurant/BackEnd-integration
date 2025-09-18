@@ -1,0 +1,61 @@
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+common:
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+  replication_factor: 1
+
+schema_config:
+  configs:
+    - from: 2024-01-01
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+# 인덱스/청크 경로 명시(운영 필수 권장)
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /loki/index
+    cache_location: /loki/boltdb-cache
+    shared_store: filesystem
+  filesystem:
+    directory: /loki/chunks
+
+# 유입량/버스트 제한(과도한 인제션 보호)
+limits_config:
+  ingestion_rate_mb: 8
+  ingestion_burst_size_mb: 16
+  reject_old_samples: true
+  reject_old_samples_max_age: 72h
+
+# 보존기간/삭제 활성화
+table_manager:
+  retention_deletes_enabled: true
+  retention_period: 72h
+
+# 로그 알람을 Loki Ruler로 쓸 때만 켜세요.
+# Alertmanager를 grafana/alertmanager로 띄운 경우 주소를 그쪽으로 변경
+#ruler:
+#  alertmanager_url: http://alertmanager:9093
+#  rule_path: /loki/rules
+#  storage:
+#    type: local
+#    local:
+#      directory: /loki/rules
+#  ring:
+#    kvstore:
+#      store: inmemory
+#  enable_api: true

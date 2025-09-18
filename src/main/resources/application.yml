@@ -31,7 +31,21 @@ spring:
       flush-mode: on-save
       namespace: spring:session
       repository-type: indexed
-#
+
+# monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  metrics:
+    tags:
+      application: kustaurant
+
+# discord-alert
 alert:
   discord:
     webhook: ${ALERT_DISCORD_WEBHOOK}
