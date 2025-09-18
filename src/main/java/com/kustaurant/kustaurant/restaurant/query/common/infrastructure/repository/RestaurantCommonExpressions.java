@@ -1,13 +1,18 @@
-package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query;
+package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository;
+
+import static java.util.Objects.isNull;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.restaurant.restaurant.domain.Cuisine;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 
 public abstract class RestaurantCommonExpressions {
 
@@ -33,5 +38,35 @@ public abstract class RestaurantCommonExpressions {
                 .select(e.count().coalesce(0L))
                 .from(e)
                 .where(e.restaurantId.eq(restaurantId));
+    }
+
+    public static BooleanExpression hasSituation(List<Long> situations, QRestaurantEntity r) {
+        if (isNull(situations) || situations.isEmpty()) {
+            return null;
+        }
+
+        QRestaurantSituationRelationEntity rs = new QRestaurantSituationRelationEntity("reSub");
+        return JPAExpressions
+                .selectOne()
+                .from(rs)
+                .where(
+                        situationMatches(rs, r.restaurantId),
+                        rs.situationId.in(situations)
+                )
+                .exists();
+    }
+
+    public static BooleanExpression cuisinesIn(List<String> cuisines, QRestaurantEntity r) {
+        if (isNull(cuisines) || cuisines.isEmpty()) {
+            return null;
+        }
+        if (cuisines.contains(Cuisine.JH.name())) {
+            return r.partnershipInfo.isNotNull().and(r.partnershipInfo.ne(""));
+        }
+        return r.restaurantCuisine.in(cuisines);
+    }
+
+    public static BooleanExpression positionsIn(List<String> positions, QRestaurantEntity r) {
+        return isNull(positions) || positions.isEmpty() ? null : r.restaurantPosition.in(positions);
     }
 }

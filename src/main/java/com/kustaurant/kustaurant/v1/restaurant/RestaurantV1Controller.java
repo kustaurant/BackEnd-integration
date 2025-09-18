@@ -9,6 +9,7 @@ import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDet
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.v1.restaurant.response.FavoriteResponseDTO;
 import com.kustaurant.kustaurant.v1.restaurant.response.RestaurantDetailDTO;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class RestaurantV1Controller {
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetail(
             @PathVariable Integer restaurantId,
             @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 식당 데이터 DTO로 변환하기
         RestaurantDetail detail = restaurantQueryService.getRestaurantDetail((long) restaurantId, user.id());
@@ -45,7 +46,7 @@ public class RestaurantV1Controller {
     public ResponseEntity<RestaurantDetailDTO> getRestaurantDetailWithAuth(
             @PathVariable Integer restaurantId,
             @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 식당 데이터 DTO로 변환하기
         RestaurantDetail detail = restaurantQueryService.getRestaurantDetail((long) restaurantId, user.id());
@@ -57,7 +58,7 @@ public class RestaurantV1Controller {
     @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle")
     public ResponseEntity<Boolean> restaurantFavoriteToggle(
             @PathVariable Integer restaurantId,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         boolean result;
         if (favoriteRepository.existsByUserIdAndRestaurantId(user.id(), (long) restaurantId)) {
@@ -72,7 +73,7 @@ public class RestaurantV1Controller {
     @PostMapping("/auth/restaurants/{restaurantId}/favorite-toggle2")
     public ResponseEntity<FavoriteResponseDTO> restaurantFavoriteToggle2(
             @PathVariable Integer restaurantId,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         boolean result;
         if (favoriteRepository.existsByUserIdAndRestaurantId(user.id(), (long) restaurantId)) {

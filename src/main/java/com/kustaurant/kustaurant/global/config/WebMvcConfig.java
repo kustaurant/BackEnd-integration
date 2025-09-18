@@ -2,9 +2,7 @@ package com.kustaurant.kustaurant.global.config;
 
 import com.kustaurant.kustaurant.global.auth.web.CurrentUrlInterceptor;
 import com.kustaurant.kustaurant.global.interceptor.V1KillSwitchInterceptor;
-import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.CuisineListArgumentResolver;
-import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.LocationListArgumentResolver;
-import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.SituationListArgumentResolver;
+import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.ChartCondArgumentResolver;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,9 +24,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(authUserArgumentResolver);
-        resolvers.add(new CuisineListArgumentResolver());
-        resolvers.add(new SituationListArgumentResolver());
-        resolvers.add(new LocationListArgumentResolver());
+        resolvers.add(new ChartCondArgumentResolver());
     }
 
     @Override

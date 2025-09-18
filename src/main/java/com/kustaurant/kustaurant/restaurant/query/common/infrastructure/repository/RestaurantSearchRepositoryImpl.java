@@ -1,9 +1,9 @@
-package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query;
+package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository;
 
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.*;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantMenuEntity.restaurantMenuEntity;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity;
+import com.kustaurant.kustaurant.restaurant.query.search.RestaurantSearchRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RestaurantSearchQuery {
+public class RestaurantSearchRepositoryImpl implements RestaurantSearchRepository {
 
     private final JPAQueryFactory queryFactory;
 
