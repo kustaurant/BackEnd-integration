@@ -1,6 +1,8 @@
 package com.kustaurant.kustaurant.v1.community;
 
 import com.kustaurant.kustaurant.common.enums.SortOption;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
+import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.ApiStatusException;
 import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
@@ -15,7 +17,6 @@ import com.kustaurant.kustaurant.user.rank.controller.response.UserRankResponse;
 import com.kustaurant.kustaurant.user.rank.domain.RankingSortOption;
 import com.kustaurant.kustaurant.user.rank.service.RankingService;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
-import com.kustaurant.kustaurant.v1.common.JwtToken;
 import com.kustaurant.kustaurant.v1.community.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,7 +48,7 @@ public class CommunityControllerV1 {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(defaultValue = "recent") String sort,
             @RequestParam(defaultValue = "html") String postBodyType,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
         PostCategory category = PostCategory.from(postCategory);
         SortOption sortOption = mapSort(sort);
@@ -60,7 +61,7 @@ public class CommunityControllerV1 {
     @GetMapping("/api/v1/community/{postId}")
     public ResponseEntity<PostDTO> post(
             @PathVariable Long postId,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
 //        PostDetailResponse v2res = postQueryService.getPostDetail(postId, userId);
 //        PostDTO v1res = PostDTO.from(v2res);
@@ -85,7 +86,7 @@ public class CommunityControllerV1 {
             @RequestParam(name = "content", defaultValue = "") String content,
             @RequestParam(name = "postId") String postId,
             @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
 //        User user = userService.findUserById(userId);
 //        PostComment postComment = postCommentService.createComment(content, postId, userId);
@@ -104,7 +105,7 @@ public class CommunityControllerV1 {
             @RequestParam(name = "content", defaultValue = "") String content,
             @RequestParam(name = "postId") String postId,
             @RequestParam(name = "parentCommentId", defaultValue = "") String parentCommentId,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
 //        User user = userService.findUserById(userId);
 //        Post post = postService.getPost(Integer.valueOf(postId));
@@ -122,7 +123,7 @@ public class CommunityControllerV1 {
     @DeleteMapping("/api/v1/auth/community/{postId}")
     public ResponseEntity<Void> postDelete(
             @PathVariable Integer postId,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
 //        postService.deletePost(postId, userId);
 //        return ResponseEntity.noContent().build();
@@ -134,7 +135,7 @@ public class CommunityControllerV1 {
     @DeleteMapping("/api/v1/auth/community/comment/{commentId}")
     public ResponseEntity<Map<String, Object>> commentDelete(
             @PathVariable Integer commentId,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
 //        postCommentService.deleteComment(commentId, userId);
 //        return ResponseEntity.noContent().build();
@@ -145,7 +146,7 @@ public class CommunityControllerV1 {
     @PostMapping("/api/v1/auth/community/{postId}/scraps")
     public ResponseEntity<ScrapToggleDTO> postScrap(
             @PathVariable Integer postId,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
 //        User user = userService.findUserById(userId);
 //        Post post = postService.getPost(postId);
@@ -159,7 +160,7 @@ public class CommunityControllerV1 {
     @PostMapping("/api/v1/auth/community/{postId}/likes")
     public ResponseEntity<LikeOrDislikeDTO> postLikeCreate(
             @PathVariable Integer postId,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
 //        User user = userService.findUserById(userId);
 //        Post post = postService.getPost(postId);
@@ -175,7 +176,7 @@ public class CommunityControllerV1 {
     public ResponseEntity<CommentLikeDislikeDTO> toggleCommentLikeOrDislike(
             @PathVariable Integer commentId,
             @PathVariable String action,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
 //        PostComment postComment = postCommentService.getPostCommentByCommentId(commentId);
 //        User user = userService.findUserById(userId);
@@ -189,7 +190,7 @@ public class CommunityControllerV1 {
     @PostMapping("/api/v1/auth/community/posts/create")
     public ResponseEntity<PostDTO> postCreate(
             @ModelAttribute PostUpdateDTO postUpdateDTO,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
 //        try {
 //            User user = userService.findUserById(userId);
@@ -223,7 +224,7 @@ public class CommunityControllerV1 {
     public ResponseEntity<String> postUpdate(
             @PathVariable String postId,
             @ModelAttribute PostUpdateDTO postUpdateDTO,
-            @JwtToken Long userId
+            @AuthUser AuthUserInfo user
     ) {
 //        try {
 //            Post post = postService.getPost(Integer.valueOf(postId));

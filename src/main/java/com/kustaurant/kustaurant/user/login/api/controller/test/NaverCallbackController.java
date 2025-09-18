@@ -19,7 +19,18 @@ import java.net.URL;
 @RequiredArgsConstructor
 public class NaverCallbackController {
 
-    /** 로컬에서 테스트하는용 컨트롤러 입니다 */
+    /** 로컬에서 테스트하는용 컨트롤러 입니다
+     *
+     * 1. https://nid.naver.com/oauth2.0/authorize
+     *   ?response_type=code
+     *   &client_id = YOUR_CLIENT_ID
+     *   &redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Ftest%2Fcallback
+     *   &state=abc123   // 임의 난수. 세션에 저장해 두고 콜백 때 동일성 검증
+     *
+     *   위와 같은 url을 서버에 키고 입력하면 아래 콜백 엔드포인트로 access,refresh token을 네이버에서 보내줌.
+     *
+     *   2. db에 저장된 providerId, 위의 accessToken을 포함 서버 login api로 요청을 보내면 서버에서 발급해준 토큰을 확인할 수 있음
+     * */
 
     @Value("${NAVER_CLIENT_ID}")
     private String clientId;

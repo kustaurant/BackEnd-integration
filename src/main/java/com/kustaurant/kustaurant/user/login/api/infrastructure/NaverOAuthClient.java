@@ -17,7 +17,6 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class NaverOAuthClient {
     //액세스 토큰을 사용해 네이버 유저 정보를 불러오는 서비스이다.
-
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
 
