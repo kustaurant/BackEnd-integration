@@ -1,9 +1,13 @@
 package com.kustaurant.kustaurant.restaurant.query.draw;
 
+import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.ChartCond;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -34,8 +38,7 @@ public class DrawController {
     @GetMapping("/web/api/recommend")
     public ResponseEntity<List<RestaurantCoreInfoDto>> getRestaurantListForCuisine(
             @RequestParam(value = "cuisine", defaultValue = "전체") String cuisine,
-            @RequestParam(value = "location",defaultValue = "전체") String location,
-            @RequestParam(value = "evaluation",defaultValue = "전체") String evaluation
+            @RequestParam(value = "location",defaultValue = "전체") String location
     ) {
         String[] cuisinesArray = cuisine.split("-");
         List<String> cuisinesList = Arrays.asList(cuisinesArray);
@@ -47,8 +50,14 @@ public class DrawController {
                 item="카페/디저트";
             }
         }
-        List<RestaurantCoreInfoDto> restaurants = restaurantDrawService.draw(cuisinesList,
-                List.of(location));
+        if (cuisinesList.contains("전체")) {
+            cuisinesList = null;
+        }
+        List<String> locations = location == null || location.equals("전체") ? null : List.of(location);
+
+        ChartCondition condition = new ChartCondition(cuisinesList, null, locations,
+                TierFilter.ALL, Pageable.ofSize(40));
+        List<RestaurantCoreInfoDto> restaurants = restaurantDrawService.draw(condition);
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 

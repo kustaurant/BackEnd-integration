@@ -7,5 +7,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface RestaurantChartRepository {
 
-    Page<RestaurantCoreInfoDto> getChartRestaurantsByCondition(ChartCondition condition, Pageable pageable, Long userId);
+    Page<Long> getRestaurantIdsWithPage(ChartCondition condition);
 }

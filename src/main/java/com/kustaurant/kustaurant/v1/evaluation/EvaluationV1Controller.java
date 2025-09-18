@@ -22,6 +22,7 @@ import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.v1.evaluation.response.RestaurantCommentDTO;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +59,7 @@ public class EvaluationV1Controller {
     @GetMapping("/auth/restaurants/{restaurantId}/evaluation")
     public ResponseEntity<EvaluationDTO> getPreEvaluationInfo(
             @PathVariable Integer restaurantId,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         EvaluationDTO dto = evaluationQueryService.getPreEvaluation(user.id(), (long) restaurantId);
         return new ResponseEntity<>(dto, HttpStatus.OK);
@@ -70,7 +71,7 @@ public class EvaluationV1Controller {
             @PathVariable Integer restaurantId,
             EvaluationDTO evaluationDTO,
             @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 필수 파라미터 체크
         if (evaluationDTO.getEvaluationScore() == null || evaluationDTO.getEvaluationScore().equals(0d)) {
@@ -92,7 +93,7 @@ public class EvaluationV1Controller {
             @RequestParam(defaultValue = "popularity")
             String sort,
             @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // sort 파라미터 체크
         if (!sort.equals("popularity") && !sort.equals("latest")) {
@@ -112,7 +113,7 @@ public class EvaluationV1Controller {
             @PathVariable Integer commentId,
             @RequestBody String commentBody,
             @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         int evaluationId = commentId - EVALUATION_ID_OFFSET;
         // 댓글 내용 없는 경우 예외 처리
@@ -135,7 +136,7 @@ public class EvaluationV1Controller {
     public ResponseEntity<Void> deleteComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 대댓글인지 평가 코멘트 댓글인지 판단
         if (isSubComment(commentId)) { // 평가에 대한 댓글인 경우
@@ -152,7 +153,7 @@ public class EvaluationV1Controller {
     public ResponseEntity<Void> reportComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 현재 신고하기 기능이 없음.
         throw new ApiStatusException(ErrorCode.SERVICE_UNAVAILABLE);
@@ -163,7 +164,7 @@ public class EvaluationV1Controller {
     public ResponseEntity<RestaurantCommentDTO> likeComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 평가인 경우
         if (!isSubComment(commentId)) { // 평가 댓글인 경우
@@ -183,7 +184,7 @@ public class EvaluationV1Controller {
     public ResponseEntity<RestaurantCommentDTO> dislikeComment(
             @PathVariable Integer restaurantId,
             @PathVariable Integer commentId,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 평가인 경우
         if (!isSubComment(commentId)) { // 평가 댓글인 경우

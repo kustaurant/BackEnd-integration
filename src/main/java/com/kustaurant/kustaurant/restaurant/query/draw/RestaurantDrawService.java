@@ -3,7 +3,9 @@ package com.kustaurant.kustaurant.restaurant.query.draw;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
+import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCoreInfoRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ public class RestaurantDrawService {
     private final int TARGET_SIZE = 30;
 
     private final RestaurantDrawRepository restaurantDrawRepository;
+    private final RestaurantCoreInfoRepository restaurantCoreInfoRepository;
 
     Random rand = new Random();
 
@@ -24,14 +27,12 @@ public class RestaurantDrawService {
         return restaurantDrawRepository.getById(restaurantId);
     }
 
-    public List<RestaurantCoreInfoDto> draw(List<String> cuisines, List<String> positions) {
-        if (cuisines.contains("전체")) {
-            cuisines = null;
-        }
-        if (positions.contains("전체")) {
-            positions = null;
-        }
-        List<RestaurantCoreInfoDto> restaurants = restaurantDrawRepository.draw(cuisines, positions);
+    public List<RestaurantCoreInfoDto> draw(ChartCondition condition) {
+        // 정렬해서 페이지에 맞는 식당 id만 읽어오기
+        List<Long> ids = restaurantDrawRepository.getRestaurantIds(condition);
+        // 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
+        List<RestaurantCoreInfoDto> restaurants = restaurantCoreInfoRepository.getRestaurantTiers(
+                ids, null);
 
         // 조건에 맞는 식당이 없을 경우 404 에러 반환
         if (restaurants.isEmpty()) {

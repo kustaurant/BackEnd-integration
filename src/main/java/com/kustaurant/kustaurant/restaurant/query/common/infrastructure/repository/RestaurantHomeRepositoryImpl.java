@@ -1,12 +1,11 @@
-package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query;
+package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository;
 
 import static com.kustaurant.kustaurant.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
-import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.query.RestaurantCommonExpressions.restaurantActive;
+import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions.restaurantActive;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.*;
 
-import com.querydsl.core.types.dsl.CaseBuilder;
+import com.kustaurant.kustaurant.restaurant.query.home.RestaurantHomeRepository;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +13,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RestaurantHomeQuery {
+public class RestaurantHomeRepositoryImpl implements RestaurantHomeRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    @Override
     public List<Long> getTopRestaurantIds(int size) {
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
@@ -28,6 +28,7 @@ public class RestaurantHomeQuery {
                 .fetch();
     }
 
+    @Override
     public List<Long> getRandomRestaurantIds(int size) {
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)

@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface RestaurantSearchRepository {
 
-    List<RestaurantCoreInfoDto> search(String[] kwArr, Long userId, int size);
+    List<Long> searchRestaurantIds(String[] kwArr, int size);
 }
