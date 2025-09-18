@@ -31,6 +31,10 @@ spring:
       flush-mode: on-save
       namespace: spring:session
       repository-type: indexed
+#
+alert:
+  discord:
+    webhook: ${ALERT_DISCORD_WEBHOOK}
 
 # logging level
 logging.level.com.kustaurant: trace

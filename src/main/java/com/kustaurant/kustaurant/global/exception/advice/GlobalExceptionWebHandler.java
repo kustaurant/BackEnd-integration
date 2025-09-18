@@ -1,9 +1,12 @@
 package com.kustaurant.kustaurant.global.exception.advice;
 
+import com.kustaurant.kustaurant.common.discordAlert.DiscordNotifier;
 import com.kustaurant.kustaurant.global.exception.WebErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
@@ -16,8 +19,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Slf4j
+@RequiredArgsConstructor
 @ControllerAdvice(annotations = Controller.class)
 public class GlobalExceptionWebHandler {
+    private final DiscordNotifier discordNotifier;
 
     @ExceptionHandler(DataNotFoundException.class)
     public String handleDataNotFoundException(
@@ -42,19 +47,34 @@ public class GlobalExceptionWebHandler {
         return new WebErrorResponse("BAD_REQUEST", msg);
     }
 
+    /** AccessDenied는 Security 체인에게 맡김 */
+    @ExceptionHandler(AccessDeniedException.class)
+    public void rethrowAccessDenied(AccessDeniedException e) throws AccessDeniedException {
+        throw e;
+    }
+
     @ExceptionHandler(Exception.class)
     public String handleException(
-            Exception e,
-            HttpServletRequest req,
-            Model model
-    ) throws Exception {
-        // AccessDeniedHandler의 경우는 spring security filter chain이 처리하도록 다시 던짐.
-        if (e instanceof AccessDeniedException) {
-            throw e;
-        }
-
+            Exception e, HttpServletRequest req, Model model
+    ) {
         log.error("[Exception] {} {}: {}", req.getMethod(), req.getRequestURI(), e.getMessage(), e);
+        notifyIf5xx(e, req, HttpStatus.INTERNAL_SERVER_ERROR);
+
         model.addAttribute("message", "잠시 후 다시 시도해주세요.");
         return "error/error";
+    }
+
+    private void notifyIf5xx(Exception ex,
+                             HttpServletRequest req,
+                             HttpStatus status
+    ) {
+        if (!status.is5xxServerError()) return;
+        String traceId = MDC.get("traceId");
+        discordNotifier.send5xx(
+                ex,
+                req,
+                (traceId == null ? "-" : traceId),
+                status.value()
+        );
     }
 }

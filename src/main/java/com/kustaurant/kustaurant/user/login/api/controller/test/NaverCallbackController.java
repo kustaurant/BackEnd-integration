@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.auth.jwt.core.test;
+package com.kustaurant.kustaurant.user.login.api.controller.test;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
