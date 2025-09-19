@@ -49,6 +49,11 @@ public class DiscordNotifier {
     // 실제 비동기 전송
     @Async("alertExecutor")
     public void send5xxAsync(Exception e, RequestSnapshot snap, String traceId, String env, int status) {
+        if (webhookUrl == null || webhookUrl.isBlank()) {
+            log.warn("[Discord] webhook URL 미설정으로 알림을 건너뜁니다. (alert.discord.webhook 비어있음)");
+            return;
+        }
+
         String key = env + "|" + snap.uri() + "|" + e.getClass().getSimpleName() + "|" + status;
         if (!limiter.allow(key)) return;
 
@@ -82,7 +87,7 @@ public class DiscordNotifier {
 
         ObjectNode emb = root.putArray("embeds").addObject();
         emb.put("title", e.getClass().getSimpleName());
-        emb.put("description", safeMessage(e));
+        emb.put("description", truncate(safeMessage(e), 1000));
         emb.put("timestamp", OffsetDateTime.now().toString());
         emb.put("color", 15158332);
 

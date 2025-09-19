@@ -40,11 +40,13 @@ limits_config:
   ingestion_burst_size_mb: 16
   reject_old_samples: true
   reject_old_samples_max_age: 72h
-
-# 보존기간/삭제 활성화
-table_manager:
-  retention_deletes_enabled: true
   retention_period: 72h
+
+# 보존기간/삭제: boltdb-shipper에서는 compactor가 담당
+compactor:
+  working_directory: /loki/boltdb-shipper-compactor
+  shared_store: filesystem
+  compaction_interval: 5m
 
 # 로그 알람을 Loki Ruler로 쓸 때만 켜세요.
 # Alertmanager를 grafana/alertmanager로 띄운 경우 주소를 그쪽으로 변경
