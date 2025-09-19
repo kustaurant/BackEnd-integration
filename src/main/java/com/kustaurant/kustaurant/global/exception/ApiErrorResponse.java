@@ -39,8 +39,7 @@ public record ApiErrorResponse(
     }
 
     /** Bean Validation 오류가 있을 때 */
-    public static ApiErrorResponse of(ErrorCode ec,
-                                      BindingResult br) {
+    public static ApiErrorResponse of(ErrorCode ec, BindingResult br) {
 
         List<SpecifiedError> details = br.getFieldErrors()
                 .stream()

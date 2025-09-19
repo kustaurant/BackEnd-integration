@@ -56,6 +56,9 @@ jobs:
       NAVER_CLIENT_SECRET : secreat
       APPLE_CLIENT_ID : kustaurant
       APPLE_PUBLIC_KEYS_URL : https://appleid.apple.com/auth/keys
+      ALERT_DISCORD_WEBHOOK: ${{ secrets.ALERT_DISCORD_WEBHOOK }}
+      GRAFANA_ADMIN_USER: ${{ secrets.GRAFANA_ADMIN_USER }}
+      GRAFANA_ADMIN_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
 
     steps:
       - name: Checkout
