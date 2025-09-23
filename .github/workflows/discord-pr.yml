@@ -1,0 +1,132 @@
+name: Discord PR & Merge Alerts
+
+on:
+  pull_request:
+    types: [opened]
+    branches: [develop, main]
+  push:
+    # develop, main 으로 push (보통 merge 후 결과)
+    branches: [develop, main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    env:
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      REPO: ${{ github.repository }}
+      ACTOR: ${{ github.actor }}
+      EVENT: ${{ github.event_name }}
+      DEFAULT_COLOR: "5814783"      # 임베드 색 (선택)
+      GREEN: "5763719"
+      RED: "15548997"
+      YELLOW: "16776960"
+
+    steps:
+      - name: Ensure curl & jq
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+
+      # === PR 이벤트 알림 ===
+      - name: Notify on PR events
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          PR_NUMBER="${{ github.event.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_STATE="${{ github.event.pull_request.state }}"         # open/closed
+          PR_MERGED="${{ github.event.pull_request.merged }}"       # true/false
+          PR_BASE_REF="${{ github.event.pull_request.base.ref }}"   # develop/main
+          PR_HEAD_REF="${{ github.event.pull_request.head.ref }}"
+          ACTION="${{ github.event.action }}"                       # opened/reopened/synchronize/closed
+          SENDER="${{ github.triggering_actor }}"
+          COLOR="$DEFAULT_COLOR"
+          STATUS_TEXT="PR ${ACTION}"
+
+          if [ "$ACTION" = "closed" ] && [ "$PR_MERGED" = "true" ]; then
+            COLOR="$GREEN"
+            STATUS_TEXT="PR merged"
+          elif [ "$ACTION" = "closed" ]; then
+            COLOR="$RED"
+            STATUS_TEXT="PR closed (not merged)"
+          elif [ "$ACTION" = "synchronize" ]; then
+            COLOR="$YELLOW"
+            STATUS_TEXT="PR updated (push to branch)"
+          fi
+
+          # 본문 길이 과하면 잘라주기(Discord 제한 대비)
+          SHORT_BODY=$(echo "${PR_BODY:-"(no description)"}" | head -c 1800)
+
+          jq -n --arg repo "$REPO" \
+                --arg actor "$ACTOR" \
+                --arg sender "$SENDER" \
+                --arg title "$PR_TITLE" \
+                --arg url "$PR_URL" \
+                --arg prnum "$PR_NUMBER" \
+                --arg base "$PR_BASE_REF" \
+                --arg head "$PR_HEAD_REF" \
+                --arg status "$STATUS_TEXT" \
+                --arg body "$SHORT_BODY" \
+                --arg color "$COLOR" \
+                '{
+                  content: null,
+                  embeds: [{
+                    title: ("[" + $repo + "] " + $status + " • #" + $prnum),
+                    url: $url,
+                    description: $title,
+                    color: ($color|tonumber),
+                    fields: [
+                      {name: "base → head", value: ("`" + $base + "` ← `" + $head + "`"), inline: true},
+                      {name: "by", value: ("`" + $sender + "`"), inline: true},
+                      {name: "details", value: ( "```" + $body + "```" ), inline: false}
+                    ],
+                    timestamp: (now | todate)
+                  }]
+                }' \
+          | curl -sS -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK"
+
+      # === push(merge 결과) 알림 ===
+      - name: Notify on push to develop/main
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          COMMITS_URL="${{ github.event.compare }}"
+          HEAD="${{ github.sha }}"
+          Pusher="${{ github.triggering_actor }}"
+          MSG_TITLE="Push to ${BRANCH}"
+          COLOR="$GREEN"
+
+          # 최근 커밋 메시지 10개 요약
+          SUMMARY=$(jq -r '.commits[] | "- " + .message' <<< '${{ toJson(github.event) }}' | head -n 10)
+          [ -z "$SUMMARY" ] && SUMMARY="- (no commit messages)"
+
+          jq -n --arg repo "$REPO" \
+                --arg title "$MSG_TITLE" \
+                --arg branch "$BRANCH" \
+                --arg head "$HEAD" \
+                --arg actor "$ACTOR" \
+                --arg pusher "$Pusher" \
+                --arg compare "$COMMITS_URL" \
+                --arg summary "$SUMMARY" \
+                --arg color "$COLOR" \
+                '{
+                  content: null,
+                  embeds: [{
+                    title: ("[" + $repo + "] " + $title),
+                    url: $compare,
+                    color: ($color|tonumber),
+                    fields: [
+                      {name: "branch", value: ("`" + $branch + "`"), inline: true},
+                      {name: "by", value: ("`" + $pusher + "`"), inline: true},
+                      {name: "head", value: ("`" + $head + "`"), inline: false},
+                      {name: "commits", value: ( "```" + $summary + "```" ), inline: false}
+                    ],
+                    timestamp: (now | todate)
+                  }]
+                }' \
+          | curl -sS -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK"

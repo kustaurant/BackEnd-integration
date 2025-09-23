@@ -1,0 +1,79 @@
+<div>
+    <!-- 댓글 좋아요/싫어요 영역 -->
+    <div class="like-div"
+         th:attr="data-reaction=${restaurantComment.commentLikeStatus == 1 ? 'LIKE' : (restaurantComment.commentLikeStatus == -1 ? 'DISLIKE' : 'NONE')}">
+        <button type="button"
+                class="comment-up"
+                onclick="commentLike(this)"
+                th:data-id="${restaurantComment.commentId}"
+                th:data-parent-id="${restaurantComment.commentId}">
+            <img th:if="${restaurantComment.commentLikeStatus == 1}" src="/img/community/up-green.png">
+            <img th:unless="${restaurantComment.commentLikeStatus == 1}" src="/img/community/up.png">
+        </button>
+        <span th:text="${restaurantComment.commentLikeCount - restaurantComment.commentDislikeCount}"></span>
+        <button class="comment-down" type="button"
+                onclick="commentDislike(this)"
+                th:data-id="${restaurantComment.commentId}"
+                th:data-parent-id="${restaurantComment.commentId}">
+            <img th:if="${restaurantComment.commentLikeStatus == -1}" src="/img/community/down-red.png">
+            <img th:unless="${restaurantComment.commentLikeStatus == -1}" src="/img/community/down.png">
+        </button>
+    </div>
+    <!-- 댓글 본문 영역 -->
+    <div class="body-div">
+        <div class="evaluation-star-div">
+            <img th:src="${restaurantComment.evaluation.getStarImgUrl()}"/>
+            <span th:text="${restaurantComment.commentScore}"></span>
+        </div>
+        <div class="nick-date-div">
+            <img th:src="${restaurantComment.getCommentIconImgUrl()}">
+            <span class="nick-span" th:text="${restaurantComment.writerNickname}"></span>
+            <span class="date-span" th:text="${restaurantComment.timeAgo}"></span>
+            <!-- Button trigger modal -->
+            <button type="button" th:if="${restaurantComment.isCommentMine}" th:data-id="${restaurantComment.commentId}" class="delete-button btn btn-primary" onclick="deleteComment(this)" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                삭제
+            </button>
+        </div>
+        <div class="real-comment-container">
+            <img th:if="${restaurantComment.commentImgUrl != null}" th:src="${restaurantComment.commentImgUrl}"/>
+            <span th:text="${restaurantComment.commentBody}"></span>
+        </div>
+    </div>
+</div>
+<!-- 대댓글 부분 -->
+<ul id="subCommentList">
+    <li th:if="${restaurantComment.commentReplies ne null}" th:each="reply, iterStat : ${restaurantComment?.commentReplies}" th:style="${iterStat.last ? 'border-radius: 0 0 7px 7px;' : ''}">
+        <div class="reply-img-container">
+            <img src="/img/restaurant/reply.svg"/>
+        </div>
+        <div class="like-div"
+             th:attr="data-reaction=${reply.commentLikeStatus == 1 ? 'LIKE' : (reply.commentLikeStatus == -1 ? 'DISLIKE' : 'NONE')}">
+            <button class="comment-up" type="button" onclick="commentLike(this)"
+                    th:data-id="${reply.commentId}" th:data-parent-id="${restaurantComment.commentId}">
+                <img th:if="${reply.commentLikeStatus == 1}" src="/img/community/up-green.png">
+                <img th:unless="${reply.commentLikeStatus == 1}" src="/img/community/up.png">
+            </button>
+            <span th:text="${reply.commentLikeCount - reply.commentDislikeCount}"></span>
+            <button class="comment-down" type="button" onclick="commentDislike(this)"
+                    th:data-id="${reply.commentId}" th:data-parent-id="${restaurantComment.commentId}">
+                <img th:if="${reply.commentLikeStatus == -1}" src="/img/community/down-red.png">
+                <img th:unless="${reply.commentLikeStatus == -1}" src="/img/community/down.png">
+            </button>
+        </div>
+
+        <div class="body-div">
+            <div class="nick-date-div">
+                <img th:src="${reply.getCommentIconImgUrl()}">
+                <span class="nick-span" th:text="${reply.commentNickname}"></span>
+                <span class="date-span" th:text="${reply.timeAgo}"></span>
+                <!-- Button trigger modal -->
+                <button type="button" th:if="${reply.isCommentMine}" th:data-id="${reply.commentId}" class="delete-button btn btn-primary" onclick="deleteComment(this)" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    삭제
+                </button>
+            </div>
+            <div class="real-comment-container">
+                <span th:text="${reply.commentBody}"></span>
+            </div>
+        </div>
+    </li>
+</ul>

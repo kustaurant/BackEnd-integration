@@ -39,5 +39,42 @@ out/
 ### log ###
 *.log
 
-### yml ###
-*.yml
+### env ###
+.env
+.env.*
+**/.env
+**/.env.*
+
+### Cluade ###
+.CLAUDE.md.swp
+CLAUDE.md
+plan.md
+
+### monitoring ###
+monitoring/grafana/grafana.db
+monitoring/grafana/data/
+monitoring/grafana/plugins/
+monitoring/grafana/png/
+monitoring/grafana/pdf/
+monitoring/grafana/csv/
+monitoring/grafana/grafana-apiserver/
+monitoring/grafana/*-storage/
+monitoring/grafana/backup-*/
+
+monitoring/loki/data/
+monitoring/loki/chunks/
+monitoring/loki/wal/
+monitoring/loki/index/
+monitoring/loki/boltdb-shipper/
+monitoring/loki/compactor/
+
+monitoring/prometheus-data/
+monitoring/prometheus/wal/
+monitoring/prometheus/snapshots/
+
+monitoring/promtail/positions.yaml
+monitoring/promtail/positions.yml
+monitoring/promtail/*.pos
+
+monitoring/**/certs/
+monitoring/**/secrets/

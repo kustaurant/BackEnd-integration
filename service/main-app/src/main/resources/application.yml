@@ -1,0 +1,95 @@
+spring:
+  config:
+    import:
+      - optional:file:service/main-app/.env[.properties]
+      - "optional:auth.yml"
+      - "optional:.env"
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: "10MB"
+      max-request-size: "10MB"
+
+  thymeleaf:
+    encoding: "UTF-8"
+
+  jpa:
+    hibernate.ddl-auto: validate
+  cloud:
+    aws:
+      region:
+        static: "ap-northeast-2"
+      credentials:
+        access-key: "${AWS_ACCESS_KEY}"
+        secret-key: "${AWS_SECRET_KEY}"
+      s3:
+        bucket: kustaurant
+
+  session:
+    redis:
+      flush-mode: on-save
+      namespace: spring:session
+      repository-type: indexed
+
+# monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  metrics:
+    tags:
+      application: kustaurant
+
+# discord-alert
+alert:
+  discord:
+    webhook: ${ALERT_DISCORD_WEBHOOK}
+
+# logging level
+logging.level.com.kustaurant: trace
+
+# custom setting
+restaurant:
+  initialDisplayMenuCount: 2
+  rating:
+    policy:
+      prior_weight: 5
+      evaluation:
+        recency_lambda: 0.05
+        recency_boost_gamma: 0.5
+        min_decay: 0.3
+        reaction_divisor: 10
+        reaction_scale: 0.5
+        evaluator_k: 5
+        completeness_weight:
+          score: 0.5
+          comment: 0.25
+          situation: 0.1
+          image: 0.15
+      restaurant:
+        popularity_scale:
+          visit: 4
+          favorite: 2
+          evaluation: 2
+        popularity_weight:
+          visits: 0.1
+          favorites: 0.2
+          evaluations: 0.7
+      tier:
+        levels:
+          1:
+            min_score: 4.0
+            max_ratio: 0.20
+          2:
+            min_score: 3.5
+            max_ratio: 0.20
+          3:
+            min_score: 3.0
+            max_ratio: 0.20
+          4:
+            min_score: 2.5
+            max_ratio: 0.20

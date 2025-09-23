@@ -1,0 +1,180 @@
+@import "../variables.css";
+.tox-tinymce {
+    border: solid 1px #dddfe4;
+    border-radius: 0!important;
+
+}.top-banner h1 {
+    margin: 0;
+    text-align: center;
+    line-height: 29px;
+    font-size: 24px;
+    font-weight: 700;
+    color: black;
+}
+
+.top-banner h1 {
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+    line-height: 21px;
+}
+
+
+button {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.top-banner button img {
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    transition: all 0.2s;
+}
+
+div > form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+}
+
+
+main > div {
+    background: white;
+    color: black;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15);
+    padding: 16px;
+    position: relative;
+}
+
+form > select {
+    position: relative;
+    padding: 9px 30px 8px 15px;
+    border-radius: 4px;
+    line-height: 17px;
+    font-size: 14px;
+    border: 1px solid #dddfe4;
+    appearance: none;
+    background-size: 5px 5px, 5px 5px;
+    background: white linear-gradient(45deg, transparent 50%, #98a0a7 50%), linear-gradient(135deg, #98a0a7 50%, transparent 50%) no-repeat calc(100% - 15px) calc(1em + 2px), calc(100% - 10px) calc(1em + 2px);
+    outline: none;
+    width: fit-content;
+    color: black;
+}
+
+.post-body {
+    margin-top: 8px;
+}
+
+.post-body-inner {
+    height: 70vh;
+}
+
+main div input {
+    box-sizing: border-box;
+    border: 1px solid #dddfe4;
+    padding: 10px 32px 9px 16px;
+    background: none;
+    line-height: 17px;
+    font-size: 14px;
+    outline: none;
+}
+
+.post-body-inner {
+    /*border: solid 1px #dddfe4;*/
+    overflow: hidden;
+}
+
+.toolbar {
+    border: solid 1px #dddfe4;
+    background-color: #f8f9fa
+}
+
+.toolbar > button {
+    margin: 10px 17px 10px
+}
+
+.toolbar > button > img {
+    width: 20px;
+    height: 20px;
+}
+
+.post-body-inner > .post-content {
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 10px;
+    resize: none;
+}
+
+.post-content:focus {
+    outline: none;
+}
+
+html {
+    display: flex;
+    justify-content: center;
+}
+
+body {
+    background-color: #f9f6f3;
+}
+
+/* PC */
+@media only screen and (min-width: 1024px) {
+    body {
+        width: var(--pc-outer-container-width);
+        max-width: var(--max-width);
+    }
+}
+
+/* TABLET */
+@media only screen and (max-width: 1023px) {
+    body {
+        min-width: var(--min-width);
+        width: 100%;
+    }
+}
+
+
+.top-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--main-color);
+    padding: 0 16px;
+    height: 56px;
+}
+
+#back-button, #complete-button {
+    color: rgb(255, 255, 255);
+
+    padding-top: 10px;
+    background: none;
+    width: 24px;
+    height: 24px;
+    transform: translateY(-50%);
+    border: none;
+
+}
+
+.top-banner h1 {
+    flex-grow: 1;
+    text-align: center;
+    margin: 0;
+    color: rgb(255, 255, 255);
+    font-size: 18px;
+}
+
+
+
+body{
+    caret-color: transparent;
+}
+textarea, input{
+    caret-color: black;
+}

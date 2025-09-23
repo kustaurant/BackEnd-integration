@@ -1,0 +1,403 @@
+/* 여기 수정 */
+@import "../variables.css";
+/* ------------------- 화면 구성 ----------------- */
+
+/* TABLET */
+@media only screen and (max-width: 1023px) {
+    #mainContents {
+        margin: 10px auto;
+        padding: 0 var(--mobile-outer-container-side-width);
+        min-width: var(--min-width);
+        width: 100%;
+    }
+    .gray-border-circular{
+        padding: 10px;
+    }
+    #phoneNumber{
+        padding: 5px;
+    }
+    #phoneNumberComment{
+        padding-left: 10px;
+    }
+    #nickname{
+        padding: 5px;
+    }
+    #area1Top p{
+        width: 120px;
+    }
+    #nicknameComment{
+        padding-left: 10px;
+    }
+}
+/* PC */
+@media only screen and (min-width: 1024px) {
+    #mainContents {
+        width: var(--pc-outer-container-width);
+        max-width: var(--max-width);
+        margin: 10px auto;
+    }
+    .gray-border-circular{
+        padding: 50px;
+    }
+    #area1Top p{
+        width: 180px;
+    }
+    #phoneNumberComment{
+        padding-left: 200px;
+    }
+    #nicknameComment{
+        padding-left: 200px;
+    }
+}
+/* ------------------- 화면 구성 ----------------- */
+.hr{
+    margin: 0;
+    text-align: center;
+}
+#navBar{
+    overflow-x: auto;
+    overflow-x: hidden;
+    white-space: nowrap;
+    margin-top: 110px;
+    text-align: center;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    border-top: 1px solid rgba(128, 128, 128, 0.3);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+}
+#navBar div{
+    display: inline-block;
+}
+.navbar-title{
+    cursor: pointer;
+}
+.navbar-title p{
+    margin: 10px 20px;
+}
+.selected{
+    color: #0a3622;
+    border-bottom: 2px solid #0a3622;
+}
+.hidden{
+    display: none;
+}
+.gray-border-circular{
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 5px;
+}
+/*----------------- 내정보 영역(Area1) ---------------*/
+.margin25px{
+    margin-bottom:50px;
+}
+#area1Top p{
+    color: black;
+    margin: 10px;
+}
+#area1Contents div{
+    margin-bottom: 15px;
+}
+#profileImgArea{
+    display: flex;
+    max-width: 800px;
+}
+#profileimg{
+    width: 150px;
+    height: 150px;
+    background-color: lightgray;
+    border-radius: 5px;
+}
+#emailArea {
+    display: flex;
+    align-items: center;
+    max-width: 800px;
+}
+#emailArea > span {
+    flex: 1;
+}
+
+#phoneNumberArea{
+    display: flex;
+    max-width: 800px;
+}
+#phoneNumber{
+    width: 60%;
+    border-radius: 5px;
+    margin-right: 15px;
+    flex: 1;
+}
+#phoneNumberComment{
+    width: 100%;
+    color: gray;
+    font-size: 12px;
+}
+
+#nicknameArea{
+    display: flex;
+    max-width: 800px;
+}
+#nickname{
+    width: 60%;
+    border-radius: 5px;
+    margin-right: 15px;
+    flex: 1;
+}
+#nicknameComment{
+    width: 100%;
+    color: gray;
+    font-size: 12px;
+}
+#saveBtnArea{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+#saveBtn{
+    border: none;
+    border-radius: 5px;
+    width: 90px;
+    height: 40px;
+    font-size: 15px;
+}
+#countInfo p{
+    margin: 15px 0;
+    font-size: 16px;
+    color: #555;
+}
+
+/*----------------- 로그아웃 버튼 ---------------*/
+
+#logoutBtn{
+    border: none;
+    border-radius: 5px;
+    background-color: var(--main-color);
+    color: #FFF;
+
+    width: 100%;
+    height: 42px;
+}
+
+/*----------------- 내가 작성한 게시글 영역(Area5) ---------------*/
+
+.postul {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-left: 0;
+    border-top: 1px solid white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 새로운 3-영역 레이아웃 */
+.postli-new {
+    width: 100%;
+    display: flex;
+    height: auto;
+    min-height: 77px;
+    align-items: stretch;
+    padding: 12px;
+    line-height: 18px;
+    font-size: 14px;
+    background: white;
+    border-top: 1px solid #ebeef1;
+    position: relative;
+    gap: 16px;
+}
+
+.recommend-tab{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: gray;
+    white-space: nowrap;
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.recommend-tab img{
+    width: 14px;
+    height: 14px;
+}
+
+/* 첫번째 영역: 이미지 */
+.post-image-section {
+    flex-shrink: 0;
+    width: 80px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.postImage {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.no-image-placeholder {
+    width: 80px;
+    height: 60px;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+}
+
+/* 두번째 영역: 제목과 메타데이터 */
+.post-info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.post-title {
+    line-height: 1.4;
+}
+
+.post-meta {
+    display: flex;
+    align-items: center;
+    color: #8b99a6;
+    font-size: 12px;
+    gap: 8px;
+}
+
+.post-meta .category {
+    padding-left: 0 !important;
+}
+
+.post-meta .createdAt::before {
+    display: inline-block;
+    vertical-align: middle;
+    border-left: 1px solid #ebeef1;
+    height: 12px;
+    content: "";
+    margin-right: 8px;
+}
+
+/* 세번째 영역: 본문 내용 요약 */
+.post-body-section {
+    flex-shrink: 0;
+    width: 200px;
+    display: flex;
+    align-items: center;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.post-body-section span {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.postLink {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-decoration: none;
+    color: black;
+    display: inline-block;
+    font-weight: 600;
+    overflow: hidden;
+}
+
+.comment-count{
+    color: #d51f0f !important;
+    margin-left: 2px;
+    margin-bottom: 2px;
+}
+
+/* 반응형 대응 */
+@media only screen and (max-width: 768px) {
+    .postli-new {
+        flex-direction: column;
+        height: auto;
+        gap: 12px;
+    }
+    
+    .post-image-section {
+        width: 100%;
+        height: 120px;
+    }
+    
+    .postImage, .no-image-placeholder {
+        width: 100%;
+        height: 120px;
+    }
+    
+    .post-body-section {
+        width: 100%;
+    }
+}
+
+/* 기존 스타일 유지 (다른 부분에서 사용될 수 있음) */
+.postli {
+    width: 100%;
+    display: flex;
+    height: 77px;
+    align-items: center;
+    padding: 8px;
+    line-height: 18px;
+    font-size: 14px;
+    background: white;
+    border-top: 1px solid #ebeef1;
+    position: relative;
+}
+
+.postBox{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+    overflow: hidden;
+    padding-right: 12px;
+}
+
+.underLink{
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    color: #8b99a6;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+    height: 24px;
+}
+.underLink > span{
+    float: left;
+    padding-left: 8px;
+    line-height: 24px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+.category{
+    padding-left: 0 !important;
+}
+.createdAt::before, .author::before{
+    display: inline-block;
+    vertical-align: middle;
+    border-left: 1px solid #ebeef1;
+    height: 12px;
+    content: "";
+    margin-right: 8px;
+}
+#author{
+    flex: 1;
+    overflow: hidden;
+}

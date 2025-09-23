@@ -1,70 +1,31 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.2.1'
-	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.springframework.boot' version '3.5.6'
+	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.kustaurant'
-// 배포 버젼 (여기서 번경해야 버젼 바뀜)
-version = '0.0.6-SNAPSHOT'
-// 배포 자바 버젼 ( 서버컴퓨터의 자바버전)
-java {
-	sourceCompatibility = '17'
-}
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
+
+	java {
+		toolchain { languageVersion = JavaLanguageVersion.of(21) }
 	}
-}
 
-repositories {
-	mavenCentral()
-}
+	configurations {
+		compileOnly {
+			extendsFrom configurations.annotationProcessor
+		}
+	}
 
-dependencies {
+	jar {
+		enabled = false
+	}
 
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
-
-	implementation 'org.springframework.boot:spring-boot-starter-web-services'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-	testImplementation 'org.springframework.security:spring-security-test'
-	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	implementation 'org.jsoup:jsoup:1.17.2'
-
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	runtimeOnly 'mysql:mysql-connector-java:8.0.33'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.junit.jupiter:junit-jupiter'
-
-
-	implementation 'com.google.code.gson:gson:2.8.9'
-
-	// swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
-
-	//jwt
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-
-	// crawling
-	implementation "org.seleniumhq.selenium:selenium-java:4.20.0"
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
+	repositories {
+		mavenCentral()
+	}
 }
