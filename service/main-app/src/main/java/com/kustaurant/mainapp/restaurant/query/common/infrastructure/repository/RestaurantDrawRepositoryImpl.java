@@ -1,16 +1,16 @@
 package com.kustaurant.mainapp.restaurant.query.common.infrastructure.repository;
 
+import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.mainapp.global.exception.ErrorCode.RESTAURANT_NOT_FOUND;
-import static com.kustaurant.mainapp.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
 import static com.kustaurant.mainapp.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions.*;
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 
 import com.kustaurant.mainapp.global.exception.exception.DataNotFoundException;
 import com.kustaurant.mainapp.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.mainapp.restaurant.query.draw.RestaurantDrawRepository;
 import com.kustaurant.mainapp.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
-import com.kustaurant.mainapp.restaurant.restaurant.infrastructure.repository.RestaurantJpaRepository;
+import com.kustaurant.mainapp.restaurant.restaurant.infrastructure.mapper.RestaurantMapper;
+import com.kustaurant.jpa.restaurant.repository.RestaurantJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class RestaurantDrawRepositoryImpl implements RestaurantDrawRepository {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Restaurant getById(Long id) {
         return restaurantJpaRepository.findByRestaurantIdAndStatus(id, "ACTIVE")
-                .map(RestaurantEntity::toModel)
+                .map(RestaurantMapper::toModel)
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND, id, "식당"));
     }
 

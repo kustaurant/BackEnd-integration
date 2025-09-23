@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.mainapp.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.*;
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 
 @Repository
 @RequiredArgsConstructor

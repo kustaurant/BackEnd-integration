@@ -1,4 +1,4 @@
-package com.kustaurant.mainapp.common.infrastructure;
+package com.kustaurant.jpa.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

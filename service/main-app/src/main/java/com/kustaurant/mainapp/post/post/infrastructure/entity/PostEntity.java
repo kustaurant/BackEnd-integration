@@ -1,21 +1,16 @@
 package com.kustaurant.mainapp.post.post.infrastructure.entity;
 
-import com.kustaurant.mainapp.common.infrastructure.BaseTimeEntity;
+import com.kustaurant.jpa.common.entity.BaseTimeEntity;
 import com.kustaurant.mainapp.post.post.domain.Post;
 import com.kustaurant.mainapp.post.post.domain.enums.PostCategory;
 import com.kustaurant.mainapp.post.post.domain.enums.PostStatus;
 import jakarta.persistence.*;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter

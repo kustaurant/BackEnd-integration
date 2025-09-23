@@ -1,12 +1,12 @@
 package com.kustaurant.mainapp.restaurant.restaurant.infrastructure.repository.query;
 
+import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantMenuEntity.restaurantMenuEntity;
 import static com.kustaurant.mainapp.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
 import static com.kustaurant.mainapp.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity.restaurantSituationRelationEntity;
 import static com.kustaurant.mainapp.evaluation.evaluation.infrastructure.entity.QSituationEntity.situationEntity;
-import static com.kustaurant.mainapp.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantMenuEntity.restaurantMenuEntity;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
 import static java.util.Objects.isNull;

@@ -2,8 +2,9 @@ package com.kustaurant.mainapp.restaurant.restaurant.infrastructure.repository;
 
 import static com.kustaurant.mainapp.global.exception.ErrorCode.*;
 
+import com.kustaurant.jpa.restaurant.repository.RestaurantJpaRepository;
 import com.kustaurant.mainapp.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
+import com.kustaurant.mainapp.restaurant.restaurant.infrastructure.mapper.RestaurantMapper;
 import com.kustaurant.mainapp.restaurant.restaurant.service.port.RestaurantRepository;
 import com.kustaurant.mainapp.global.exception.exception.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
 
     @Override
     public Restaurant getByIdAndStatus(Long id, String status) {
-        return jpa.findByRestaurantIdAndStatus(id, status).map(RestaurantEntity::toModel)
+        return jpa.findByRestaurantIdAndStatus(id, status).map(RestaurantMapper::toModel)
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_NOT_FOUND, "요청한 restaurant가 존재하지 않습니다. 요청 정보 - id: " + id + ", status: " + status));
     }
 

@@ -1,8 +1,8 @@
 package com.kustaurant.mainapp.restaurant.query.common.infrastructure.repository;
 
-import static com.kustaurant.mainapp.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.mainapp.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions.restaurantActive;
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.*;
 
 import com.kustaurant.mainapp.restaurant.query.home.RestaurantHomeRepository;
 import com.querydsl.core.types.dsl.Expressions;

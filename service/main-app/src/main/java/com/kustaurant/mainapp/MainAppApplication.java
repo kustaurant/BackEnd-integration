@@ -11,7 +11,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         @Server(url = "/", description = "Default Server URL")
 })
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+        "com.kustaurant.mainapp",
+        "com.kustaurant.jpa",
+        "com.kustaurant.redis"
+})
 @ConfigurationPropertiesScan
 public class MainAppApplication {
 

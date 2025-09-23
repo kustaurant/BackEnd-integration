@@ -1,6 +1,6 @@
-package com.kustaurant.mainapp.restaurant.restaurant.infrastructure.repository;
+package com.kustaurant.jpa.restaurant.repository;
 
-import com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.RestaurantEntity;
+import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface RestaurantJpaRepository extends JpaRepository<RestaurantEntity, Long> {

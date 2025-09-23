@@ -2,11 +2,11 @@ version = '0.0.1'
 description = 'data-processor'
 
 dependencies {
+    implementation project(':common:jpa')
+    implementation project(':common:redis')
+
     // web
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    // lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -18,8 +18,4 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     // ai
     implementation 'org.springframework.ai:spring-ai-starter-model-openai:1.0.0'
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
 }

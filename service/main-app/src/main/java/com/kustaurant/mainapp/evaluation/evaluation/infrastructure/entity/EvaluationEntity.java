@@ -1,6 +1,6 @@
 package com.kustaurant.mainapp.evaluation.evaluation.infrastructure.entity;
 
-import com.kustaurant.mainapp.common.infrastructure.BaseTimeEntity;
+import com.kustaurant.jpa.common.entity.BaseTimeEntity;
 import com.kustaurant.mainapp.evaluation.evaluation.domain.Evaluation;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.annotations.DynamicUpdate;

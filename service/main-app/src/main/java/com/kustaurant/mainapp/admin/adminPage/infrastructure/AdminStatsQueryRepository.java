@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.mainapp.post.comment.infrastructure.entity.QPostCommentEntity.postCommentEntity;
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.mainapp.admin.report.QReportEntity.reportEntity;
 import static com.kustaurant.mainapp.admin.feedback.infrastructure.QFeedbackEntity.feedbackEntity;
 import static com.kustaurant.mainapp.post.post.infrastructure.entity.QPostEntity.postEntity;

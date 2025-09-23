@@ -1,7 +1,7 @@
 package com.kustaurant.mainapp.evaluation.comment.infrastructure.entity;
 
 import com.kustaurant.mainapp.common.enums.Status;
-import com.kustaurant.mainapp.common.infrastructure.BaseTimeEntity;
+import com.kustaurant.jpa.common.entity.BaseTimeEntity;
 import com.kustaurant.mainapp.evaluation.comment.domain.EvalComment;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

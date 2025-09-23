@@ -1,12 +1,12 @@
 package com.kustaurant.mainapp.restaurant.query.common.infrastructure.repository;
 
+import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
 import static com.kustaurant.mainapp.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
 import static com.kustaurant.mainapp.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity.restaurantSituationRelationEntity;
 import static com.kustaurant.mainapp.evaluation.evaluation.infrastructure.entity.QSituationEntity.situationEntity;
-import static com.kustaurant.mainapp.rating.infrastructure.jpa.entity.QRatingEntity.ratingEntity;
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.mainapp.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions.situationMatches;
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
 import static java.util.Objects.isNull;
@@ -21,7 +21,6 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

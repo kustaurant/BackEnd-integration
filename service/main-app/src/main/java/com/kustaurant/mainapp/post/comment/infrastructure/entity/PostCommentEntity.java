@@ -1,6 +1,6 @@
 package com.kustaurant.mainapp.post.comment.infrastructure.entity;
 
-import com.kustaurant.mainapp.common.infrastructure.BaseTimeEntity;
+import com.kustaurant.jpa.common.entity.BaseTimeEntity;
 import com.kustaurant.mainapp.post.comment.domain.PostComment;
 import com.kustaurant.mainapp.post.comment.domain.PostCommentStatus;
 import jakarta.persistence.*;

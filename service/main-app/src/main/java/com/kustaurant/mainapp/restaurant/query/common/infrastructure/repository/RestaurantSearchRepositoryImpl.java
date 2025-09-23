@@ -1,7 +1,8 @@
 package com.kustaurant.mainapp.restaurant.query.common.infrastructure.repository;
 
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.*;
-import static com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.QRestaurantMenuEntity.restaurantMenuEntity;
+
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantMenuEntity.restaurantMenuEntity;
 
 import com.kustaurant.mainapp.restaurant.query.search.RestaurantSearchRepository;
 import com.querydsl.core.BooleanBuilder;

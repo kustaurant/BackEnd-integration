@@ -1,7 +1,7 @@
 
 package com.kustaurant.mainapp.user.user.infrastructure;
 
-import com.kustaurant.mainapp.common.infrastructure.BaseTimeEntity;
+import com.kustaurant.jpa.common.entity.BaseTimeEntity;
 import com.kustaurant.mainapp.user.login.api.domain.LoginApi;
 import com.kustaurant.mainapp.user.mypage.infrastructure.UserStatsEntity;
 import com.kustaurant.mainapp.user.user.domain.User;

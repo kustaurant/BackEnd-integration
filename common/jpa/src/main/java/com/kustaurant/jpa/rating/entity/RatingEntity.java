@@ -1,6 +1,5 @@
-package com.kustaurant.mainapp.rating.infrastructure.jpa.entity;
+package com.kustaurant.jpa.rating.entity;
 
-import com.kustaurant.mainapp.rating.domain.model.Rating;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -28,14 +27,4 @@ public class RatingEntity {
     private boolean isTemp;
     @Column(nullable = false)
     private LocalDateTime ratedAt;
-
-    public static RatingEntity from(Rating rating) {
-        return new RatingEntity(
-                rating.restaurantId(),
-                rating.score(),
-                rating.tier().getValue(),
-                rating.isTemp(),
-                rating.ratedAt()
-        );
-    }
 }

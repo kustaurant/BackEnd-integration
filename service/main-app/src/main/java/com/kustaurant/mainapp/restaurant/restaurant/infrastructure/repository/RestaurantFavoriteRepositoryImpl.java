@@ -2,10 +2,11 @@ package com.kustaurant.mainapp.restaurant.restaurant.infrastructure.repository;
 
 import static com.kustaurant.mainapp.global.exception.ErrorCode.*;
 
+import com.kustaurant.jpa.restaurant.repository.RestaurantFavoriteJpaRepository;
+import com.kustaurant.mainapp.restaurant.restaurant.infrastructure.mapper.RestaurantFavoriteMapper;
 import com.kustaurant.mainapp.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.mainapp.restaurant.restaurant.domain.RestaurantFavorite;
 import com.kustaurant.mainapp.global.exception.exception.DataNotFoundException;
-import com.kustaurant.mainapp.restaurant.restaurant.infrastructure.entity.RestaurantFavoriteEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,15 +25,15 @@ public class RestaurantFavoriteRepositoryImpl implements RestaurantFavoriteRepos
     @Override
     public RestaurantFavorite findByUserIdAndRestaurantId(Long userId, Long restaurantId) {
         return jpaRepository.findByUserIdAndRestaurantId(userId, restaurantId)
-                .map(RestaurantFavoriteEntity::toModel)
+                .map(RestaurantFavoriteMapper::toModel)
                 .orElseThrow(() -> new DataNotFoundException(RESTAURANT_FAVORITE_NOT_FOUND, "요청한 restaurantFavorite이 존재하지 않습니다. 요청 정보 - userId: " + userId + ", restaurantId: " + restaurantId));
     }
 
     @Override
     @Transactional
     public RestaurantFavorite save(RestaurantFavorite restaurantFavorite) {
-        return jpaRepository.save(
-                RestaurantFavoriteEntity.from(restaurantFavorite)).toModel();
+        return RestaurantFavoriteMapper.toModel(
+                jpaRepository.save(RestaurantFavoriteMapper.from(restaurantFavorite)));
     }
 
     @Override
