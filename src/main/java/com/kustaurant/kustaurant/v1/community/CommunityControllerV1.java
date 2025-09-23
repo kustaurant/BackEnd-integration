@@ -6,7 +6,6 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.ApiStatusException;
 import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
-import com.kustaurant.kustaurant.post.community.controller.response.PostDetailResponse;
 import com.kustaurant.kustaurant.post.community.controller.response.PostListResponse;
 import com.kustaurant.kustaurant.post.community.service.PostQueryService;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
@@ -20,7 +19,6 @@ import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.v1.community.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,7 +50,7 @@ public class CommunityControllerV1 {
     ) {
         PostCategory category = PostCategory.from(postCategory);
         SortOption sortOption = mapSort(sort);
-        Page<PostListResponse> v2 = postQueryService.getPostList(page, category, sortOption);
+        Page<PostListResponse> v2 = postQueryService.getPostPagingList(page, category, sortOption);
 
         return ResponseEntity.ok(compatMapper.toLegacyPostList(v2.getContent()));
     }

@@ -21,6 +21,7 @@ public interface PostJpaRepository extends JpaRepository<PostEntity, Long> {
     Page<PostEntity> findAll(Pageable pageable);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
     @Query("update PostEntity p set p.postVisitCount = p.postVisitCount + 1 where p.postId = :id")
     void incrementViewCount(@Param("id") long id);
 }

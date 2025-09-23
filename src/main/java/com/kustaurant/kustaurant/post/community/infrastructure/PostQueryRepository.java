@@ -55,7 +55,7 @@ public class PostQueryRepository {
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // 1. 게시글 목록 페이징(기본값 10개) 나열
-    public Page<PostListProjection> findPostList(PostCategory category, SortOption sort, Pageable pageable) {
+    public Page<PostListProjection> findPostPagingList(PostCategory category, SortOption sort, Pageable pageable) {
         // 전체 좋아요 수 계산
         Expression<Long> likeCount = JPAExpressions
                 .select(reaction.id.userId.count())

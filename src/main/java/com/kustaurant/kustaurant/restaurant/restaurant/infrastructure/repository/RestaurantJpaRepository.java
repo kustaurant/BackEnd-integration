@@ -17,6 +17,7 @@ public interface RestaurantJpaRepository extends JpaRepository<RestaurantEntity,
     Optional<RestaurantEntity> findByRestaurantIdAndStatus(Long id, String status);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
     @Query("update RestaurantEntity r set r.visitCount = r.visitCount + 1 where r.restaurantId = :id")
     int incrementViews(@Param("id") long id);
 }

@@ -1,0 +1,80 @@
+package com.kustaurant.kustaurant.restaurant.query.common.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.Getter;
+
+import java.util.List;
+import java.util.Set;
+
+import static com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants.positionPostprocessing;
+
+@Getter
+public class RestaurantBaseInfoDto {
+    protected Long restaurantId;
+    protected Integer restaurantRanking;
+    protected String restaurantName;
+    protected String restaurantCuisine;
+    protected String restaurantPosition;
+    protected String restaurantImgUrl;
+    protected Integer mainTier;
+    protected Double longitude;
+    protected Double latitude;
+    protected String partnershipInfo;
+    protected Double restaurantScore;
+    @JsonIgnore protected List<String> situations;
+    @JsonIgnore protected String restaurantType;
+
+    @QueryProjection
+    public RestaurantBaseInfoDto(
+            Long restaurantId, String restaurantName, String restaurantCuisine, String restaurantPosition,
+            String restaurantImgUrl, Integer mainTier, Double longitude, Double latitude,
+            String partnershipInfo, Double score, Set<String> situations, String restaurantType
+    ) {
+        this.restaurantId = restaurantId;
+        this.restaurantName = restaurantName;
+        this.restaurantCuisine = restaurantCuisine;
+        this.restaurantPosition = positionPostprocessing(restaurantPosition);
+        this.restaurantImgUrl = restaurantImgUrl;
+        this.mainTier = mainTier;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.partnershipInfo = partnershipInfo;
+        this.restaurantScore = score;
+        this.situations = situations.stream().toList();
+        this.restaurantType = restaurantType;
+    }
+
+    protected RestaurantBaseInfoDto(RestaurantBaseInfoDto src) {
+        this.restaurantId = src.restaurantId;
+        this.restaurantRanking = src.restaurantRanking;
+        this.restaurantName = src.restaurantName;
+        this.restaurantCuisine = src.restaurantCuisine;
+        this.restaurantPosition = src.restaurantPosition;
+        this.restaurantImgUrl = src.restaurantImgUrl;
+        this.mainTier = src.mainTier;
+        this.longitude = src.longitude;
+        this.latitude = src.latitude;
+        this.partnershipInfo = src.partnershipInfo;
+        this.restaurantScore = src.restaurantScore;
+        this.situations = src.situations;
+        this.restaurantType = src.restaurantType;
+    }
+
+    public String getTierImgUrl() {
+        return RestaurantConstants.getTierImgUrl(mainTier);
+    }
+
+    public String getCuisineImgUrl() {
+        return RestaurantConstants.getCuisineImgUrl(restaurantCuisine);
+    }
+
+    public void assembleRanking(int ranking) {
+        if (mainTier != null && mainTier > 0) {
+            this.restaurantRanking = ranking;
+        }
+    }
+
+
+}
