@@ -41,6 +41,9 @@ out/
 
 ### env ###
 .env
+.env.*
+**/.env
+**/.env.*
 
 ### Cluade ###
 .CLAUDE.md.swp

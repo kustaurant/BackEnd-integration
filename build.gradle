@@ -1,152 +1,31 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.2.1'
-	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.springframework.boot' version '3.5.6'
+	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.kustaurant'
-version = '2.0.0'
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
+
+	java {
+		toolchain { languageVersion = JavaLanguageVersion.of(21) }
 	}
-}
-// jar 제외하고 bootjar 로만 실행파일생성
-jar {
-	enabled = false
-}
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
+	configurations {
+		compileOnly {
+			extendsFrom configurations.annotationProcessor
+		}
 	}
-}
 
-repositories {
-	mavenCentral()
-}
-
-dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
-
-	implementation 'org.springframework.boot:spring-boot-starter-web-services'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-	testImplementation 'org.springframework.security:spring-security-test'
-
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	implementation 'org.jsoup:jsoup:1.17.2'
-	//로컬캐시
-	implementation "org.springframework.boot:spring-boot-starter-cache"
-	implementation "com.github.ben-manes.caffeine:caffeine:3.1.8"
-	//s3 및 spring‑cloud‑aws,AWS SDK v2 모듈 전체 버전 관리
-	implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1')
-	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
-	// QueryDSL
-	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
-	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
-	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
-
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testCompileOnly 'org.projectlombok:lombok'
-
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.junit.jupiter:junit-jupiter'
-
-	implementation 'com.google.code.gson:gson'
-	// swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
-	//jwt
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
-	// crawling
-	// implementation "org.seleniumhq.selenium:selenium-java:4.20.0"
-	//flyway
-	implementation 'org.flywaydb:flyway-mysql'
-	//env
-	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
-	//webclient
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	//redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.session:spring-session-data-redis'
-	//testContainer
-	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-	testImplementation "org.testcontainers:junit-jupiter:1.19.7"
-	testImplementation "org.testcontainers:mysql:1.19.7"
-	//mapStruct
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-	//monitoring
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'io.micrometer:micrometer-registry-prometheus'
-}
-
-
-// 1) 소스셋 분리
-sourceSets {
-	test { // 소형 테스트
-		java.srcDirs('src/test/java')
-		resources.srcDirs('src/test/resources')
+	jar {
+		enabled = false
 	}
-	integrationTest { // 중형/통합 테스트
-		java.srcDirs('src/integrationTest/java')
-		resources.srcDirs('src/integrationTest/resources')
-		compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
-		runtimeClasspath += output + compileClasspath
+
+	repositories {
+		mavenCentral()
 	}
-}
-
-// 2) 의존성 구성 (integrationTest가 test 의존성 상속)
-configurations {
-	integrationTestImplementation.extendsFrom testImplementation
-	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-}
-
-// 3) 실행 task 분리
-tasks.register('smallTest', Test) {
-	description = 'Run unit (small) tests'
-	group = 'verification'
-	testClassesDirs = sourceSets.test.output.classesDirs
-	classpath = sourceSets.test.runtimeClasspath
-	useJUnitPlatform()
-	reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/smallTest")
-	reports.html.outputLocation     = layout.buildDirectory.dir("reports/tests/smallTest")
-}
-
-tasks.register('middleTest', Test) {
-	description = 'Run integration (middle) tests'
-	group = 'verification'
-	testClassesDirs = sourceSets.integrationTest.output.classesDirs
-	classpath = sourceSets.integrationTest.runtimeClasspath
-	useJUnitPlatform()
-	reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/middleTest")
-	reports.html.outputLocation     = layout.buildDirectory.dir("reports/tests/middleTest")
-}
-
-// 기본 test는 비활성화(선택)
-tasks.named('test') { enabled = false }
-
-// check 시 둘 다 돌리고 싶으면
-tasks.named('check') {
-	dependsOn tasks.named('smallTest'), tasks.named('middleTest')
-}
-
-tasks.named('processIntegrationTestResources', Copy) {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

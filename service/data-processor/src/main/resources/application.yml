@@ -1,0 +1,17 @@
+server.port: 8081
+
+spring:
+  application.name: DataProcessor
+  config:
+    import:
+      - optional:file:service/data-processor/.env[.properties]
+      - classpath:config/ai.yml
+
+streams:
+  ai-analysis-start: ${STREAMS_AI_ANALYSIS_START_KEY}
+  ai-analysis-dlq: ${STREAMS_AI_ANALYSIS_DLQ_KEY}
+  group: ${STREAMS_GROUP}
+
+logging:
+  level:
+    org.springframework.ai.retry: ERROR

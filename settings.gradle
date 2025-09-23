@@ -1,1 +1,4 @@
 rootProject.name = 'kustaurant'
+
+include 'service:main-app'
+include 'service:data-processor'

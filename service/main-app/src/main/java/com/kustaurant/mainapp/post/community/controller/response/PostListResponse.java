@@ -1,0 +1,49 @@
+package com.kustaurant.mainapp.post.community.controller.response;
+
+import com.kustaurant.mainapp.common.util.TimeAgoResolver;
+import com.kustaurant.mainapp.post.post.domain.enums.PostCategory;
+import com.kustaurant.mainapp.post.community.infrastructure.projection.PostListProjection;
+import com.kustaurant.mainapp.common.util.UserIconResolver;
+import org.jsoup.Jsoup;
+
+public record PostListResponse(
+        Long postId,
+        PostCategory category,
+        String title,
+        String body,
+        Long writerId,
+        String writerNickname,
+        String writerIconUrl,
+        String photoUrl,
+        String timeAgo,
+        long totalLikes,
+        long commentCount
+) {
+    public static PostListResponse from(PostListProjection p) {
+        String excerpt = summarize(p.body(), 30);
+        String userIconUrl = UserIconResolver.resolve(p.writerEvalCount());
+        String timeAgo = TimeAgoResolver.toKor(p.createdAt());
+
+        return new PostListResponse(
+                p.postId(),
+                p.category(),
+                p.title(),
+                excerpt,
+                p.writerId(),
+                p.writerNickName(),
+                userIconUrl,
+                p.photoUrl(),
+                timeAgo,
+                p.totalLikes(),
+                p.commentCount()
+        );
+    }
+
+    private static String summarize(String htmlOrText, int maxLen) {
+        if (htmlOrText == null || htmlOrText.isEmpty()) return "";
+        // HTML 제거
+        String text = Jsoup.parse(htmlOrText).text();
+        if (text.length() <= maxLen) return text;
+        return text.substring(0, maxLen) + "…";
+    }
+}
