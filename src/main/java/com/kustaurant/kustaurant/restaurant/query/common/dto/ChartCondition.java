@@ -14,7 +14,7 @@ public record ChartCondition(
 ) {
     // 캐시 키 추가를 위한 기본1개 + 덕지덕지 로직2개
     public String cacheKey() {
-        return String.join(
+        return String.join("|",
                 "tier=" + tierFilter,
                 "cuisines=" + norm(cuisines),
                 "situations=" + norm(situations),

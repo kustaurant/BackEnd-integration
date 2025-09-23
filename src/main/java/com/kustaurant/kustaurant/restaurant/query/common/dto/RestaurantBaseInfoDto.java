@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants.positionPostprocessing;
+import static com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants.restaurantImgUrlPostProcessing;
 
 @Getter
 public class RestaurantBaseInfoDto {
@@ -36,13 +37,13 @@ public class RestaurantBaseInfoDto {
         this.restaurantName = restaurantName;
         this.restaurantCuisine = restaurantCuisine;
         this.restaurantPosition = positionPostprocessing(restaurantPosition);
-        this.restaurantImgUrl = restaurantImgUrl;
+        this.restaurantImgUrl = restaurantImgUrlPostProcessing(restaurantImgUrl);
         this.mainTier = mainTier;
         this.longitude = longitude;
         this.latitude = latitude;
         this.partnershipInfo = partnershipInfo;
         this.restaurantScore = score;
-        this.situations = situations.stream().toList();
+        this.situations = (situations == null) ? List.of() : List.copyOf(situations);
         this.restaurantType = restaurantType;
     }
 
@@ -63,10 +64,12 @@ public class RestaurantBaseInfoDto {
     }
 
     public String getTierImgUrl() {
+        if (mainTier == null || mainTier <= 0) return null;
         return RestaurantConstants.getTierImgUrl(mainTier);
     }
 
     public String getCuisineImgUrl() {
+        if (restaurantCuisine == null || restaurantCuisine.isBlank()) return null;
         return RestaurantConstants.getCuisineImgUrl(restaurantCuisine);
     }
 

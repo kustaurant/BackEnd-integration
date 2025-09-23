@@ -21,6 +21,7 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,7 @@ public class RestaurantCoreInfoRepository {
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<RestaurantBaseInfoDto> getRestaurantTiersBase(List<Long> ids) {
-        return queryFactory
+        Map<Long, RestaurantBaseInfoDto> map = queryFactory
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .leftJoin(restaurantSituationRelationEntity)
@@ -43,7 +44,7 @@ public class RestaurantCoreInfoRepository {
                 .leftJoin(situationEntity)
                 .on(situationIdEq(restaurantSituationRelationEntity.situationId))
                 .where(restaurantEntity.restaurantId.in(ids))
-                .transform(groupBy(restaurantEntity.restaurantId).list(
+                .transform(groupBy(restaurantEntity.restaurantId).as(
                         new QRestaurantBaseInfoDto(
                                 restaurantEntity.restaurantId,
                                 restaurantEntity.restaurantName,
@@ -59,6 +60,11 @@ public class RestaurantCoreInfoRepository {
                                 restaurantEntity.restaurantType
                         )
                 ));
+
+        return ids.stream()
+                .map(map::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)

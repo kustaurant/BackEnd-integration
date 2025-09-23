@@ -74,7 +74,7 @@ class EvalCommentReactionServiceTest {
         Long otherUserId=2L;
         Long evalCommentId=1L;
         EvaluationCommentReactionEntity existing =
-                new EvaluationCommentReactionEntity(otherUserId, evalCommentId, ReactionType.LIKE);
+                new EvaluationCommentReactionEntity(evalCommentId, otherUserId, ReactionType.LIKE);
         when(reactionRepo.findByUserIdAndEvalCommentId(otherUserId, evalCommentId))
                 .thenReturn(Optional.of(existing));
 
@@ -103,7 +103,8 @@ class EvalCommentReactionServiceTest {
         Long otherUserId=2L;
         Long evalCommentId=1L;
 
-        EvaluationCommentReactionEntity existing = new EvaluationCommentReactionEntity(otherUserId, evalCommentId, ReactionType.LIKE);
+        EvaluationCommentReactionEntity existing = new EvaluationCommentReactionEntity(evalCommentId, otherUserId, ReactionType.LIKE);
+
         when(reactionRepo.findByUserIdAndEvalCommentId(otherUserId, evalCommentId)).thenReturn(Optional.of(existing));
 
         EvalComment stored = commentRepo.findById(evalCommentId).orElseThrow();

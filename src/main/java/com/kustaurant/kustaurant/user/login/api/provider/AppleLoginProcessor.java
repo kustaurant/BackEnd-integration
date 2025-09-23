@@ -36,6 +36,7 @@ public class AppleLoginProcessor implements LoginProcessor {
         // 탈퇴 상태였다면 재회원가입
         if (user.isDeleted()) {
             user.revive(null, new Nickname(nextAppleNickname()));
+            user = userRepo.save(user);
         }
         return user;
     }
