@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.evaluation.comment.controller.port.EvalCommentReactionService;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentReactionResponse;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommUserReactionEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvaluationCommentReactionEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
 import com.kustaurant.kustaurant.evaluation.comment.service.port.EvalCommentRepository;
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
@@ -29,7 +29,7 @@ public class EvalCommUserReactionServiceImpl implements EvalCommentReactionServi
     public EvalCommentReactionResponse setEvalCommentReaction(Long userId, Long evalCommentId, @Nullable ReactionType cmd) {
 
         EvalComment evalComment = evalCommentRepo.findById(evalCommentId).orElseThrow(() -> new DataNotFoundException(ErrorCode.COMMENT_NOT_FOUND));
-        Optional<EvalCommUserReactionEntity> existingOpt = userReactionRepo.findByUserIdAndEvalCommentId(userId, evalCommentId);
+        Optional<EvaluationCommentReactionEntity> existingOpt = userReactionRepo.findByUserIdAndEvalCommentId(userId, evalCommentId);
         var existing = existingOpt.orElse(null);
 
         if (cmd == null) { // 해제
@@ -40,7 +40,7 @@ public class EvalCommUserReactionServiceImpl implements EvalCommentReactionServi
             }
         } else if (existing == null) { // 신규 설정
             try {
-                userReactionRepo.save(new EvalCommUserReactionEntity(evalCommentId, userId, cmd));
+                userReactionRepo.save(new EvaluationCommentReactionEntity(evalCommentId, userId, cmd));
                 if (cmd == ReactionType.LIKE) evalComment.adjustLikeCount(+1);
                 else evalComment.adjustDislikeCount(+1);
             } catch (DataIntegrityViolationException e) {

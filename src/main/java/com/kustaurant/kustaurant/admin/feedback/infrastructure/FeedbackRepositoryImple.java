@@ -11,16 +11,16 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class FeedbackRepositoryImple implements FeedbackRepository {
-    private final FeedbackJpaRepository feedbackJpaRepository;
+    private final FeedbackJpaRepository jpa;
 
     @Override
     public List<Feedback> findAllByUserId(Long userId) {
-        return feedbackJpaRepository.findAllByUserId(userId)
+        return jpa.findAllByUserId(userId)
                 .stream().map(FeedbackEntity::toModel).collect(Collectors.toList());
     }
 
     @Override
     public void save(Feedback feedback) {
-        feedbackJpaRepository.save(FeedbackEntity.from(feedback.getWriter(), feedback));
+        jpa.save(FeedbackEntity.from(feedback.getWriter(), feedback));
     }
 }

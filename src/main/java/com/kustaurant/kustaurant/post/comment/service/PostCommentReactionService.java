@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.COMMENT_NOT_FOUND;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class PostCommentReactionService {
     private final PostCommentRepository postCommentRepository;

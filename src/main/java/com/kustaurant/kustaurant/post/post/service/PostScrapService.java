@@ -5,7 +5,6 @@ import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundExceptio
 import com.kustaurant.kustaurant.post.post.controller.response.PostScrapResponse;
 import com.kustaurant.kustaurant.post.post.domain.PostReactionId;
 import com.kustaurant.kustaurant.post.post.domain.PostScrap;
-import com.kustaurant.kustaurant.post.post.domain.enums.ScrapStatus;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import com.kustaurant.kustaurant.user.mypage.service.UserStatsService;
@@ -13,11 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 @Service
 public class PostScrapService {

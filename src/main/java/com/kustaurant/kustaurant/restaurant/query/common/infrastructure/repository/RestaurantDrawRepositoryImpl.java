@@ -15,6 +15,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class RestaurantDrawRepositoryImpl implements RestaurantDrawRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Restaurant getById(Long id) {
         return restaurantJpaRepository.findByRestaurantIdAndStatus(id, "ACTIVE")
                 .map(RestaurantEntity::toModel)
@@ -31,6 +34,7 @@ public class RestaurantDrawRepositoryImpl implements RestaurantDrawRepository {
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Long> getRestaurantIds(ChartCondition condition) {
 
         return queryFactory.select(restaurantEntity.restaurantId)

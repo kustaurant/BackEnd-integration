@@ -16,20 +16,17 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class RankingService {
     private final RankingRepository repo;
     private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     public List<UserRankResponse> getTop100(RankingSortOption sort) {
         return switch (sort) {
-            case CUMULATIVE -> repo.findTop100CumulativeRows()
-                    .stream().map(UserRankResponse::from).toList();
+            case CUMULATIVE -> repo.findTop100CumulativeRows().stream().map(UserRankResponse::from).toList();
 
             case SEASONAL -> {
                 var range = SeasonRange.current(KST);
-                yield repo.findTop100SeasonalRows(
-                                ts(range.startInclusive()), ts(range.endExclusive()))
+                yield repo.findTop100SeasonalRows(ts(range.startInclusive()), ts(range.endExclusive()))
                         .stream().map(UserRankResponse::from).toList();
             }
         };
@@ -37,13 +34,11 @@ public class RankingService {
 
     public Optional<UserRankResponse> getMyRank(RankingSortOption sort, Long userId) {
         return switch (sort) {
-            case CUMULATIVE -> repo.findMyCumulativeRow(userId)
-                    .stream().findFirst().map(UserRankResponse::from);
+            case CUMULATIVE -> repo.findMyCumulativeRow(userId).stream().findFirst().map(UserRankResponse::from);
 
             case SEASONAL -> {
                 var range = SeasonRange.current(KST);
-                yield repo.findMySeasonalRow(
-                                userId, ts(range.startInclusive()), ts(range.endExclusive()))
+                yield repo.findMySeasonalRow(userId, ts(range.startInclusive()), ts(range.endExclusive()))
                         .stream().findFirst().map(UserRankResponse::from);
             }
         };

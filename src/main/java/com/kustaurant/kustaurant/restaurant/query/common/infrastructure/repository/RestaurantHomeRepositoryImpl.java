@@ -10,6 +10,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -18,6 +20,7 @@ public class RestaurantHomeRepositoryImpl implements RestaurantHomeRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Long> getTopRestaurantIds(int size) {
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
@@ -29,6 +32,7 @@ public class RestaurantHomeRepositoryImpl implements RestaurantHomeRepository {
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Long> getRandomRestaurantIds(int size) {
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)

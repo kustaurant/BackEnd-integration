@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -34,6 +36,7 @@ public interface RankingRepository extends JpaRepository<UserEntity, Long> {
         WHERE r.userRank <= 100
         ORDER BY r.evaluationCount DESC, r.userId ASC
         """, nativeQuery = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     List<UserRankProjection> findTop100CumulativeRows();
 
     // 시즌 Top100 (동률 포함)
@@ -63,6 +66,7 @@ public interface RankingRepository extends JpaRepository<UserEntity, Long> {
         WHERE r.userRank <= 100
         ORDER BY r.evaluationCount DESC, r.userId ASC
         """, nativeQuery = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     List<UserRankProjection> findTop100SeasonalRows(@Param("start") Timestamp start, @Param("end")   Timestamp end);
 
     // 내 누적 랭크 (Top100 안에 들면만)
@@ -84,6 +88,7 @@ public interface RankingRepository extends JpaRepository<UserEntity, Long> {
         JOIN users_tbl u ON u.user_id = r.userId
         WHERE r.userId = :uid
         """, nativeQuery = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     Optional<UserRankProjection> findMyCumulativeRow(@Param("uid") Long uid);
 
     // 내 시즌 랭크 (Top100 안에 들면만)
@@ -110,5 +115,6 @@ public interface RankingRepository extends JpaRepository<UserEntity, Long> {
         JOIN users_tbl u ON u.user_id = r.userId
         WHERE r.userId = :uid
         """, nativeQuery = true)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     Optional<UserRankProjection> findMySeasonalRow(@Param("uid") Long uid, @Param("start") Timestamp start, @Param("end") Timestamp end);
 }

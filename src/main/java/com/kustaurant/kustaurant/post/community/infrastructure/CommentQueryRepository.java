@@ -14,6 +14,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class CommentQueryRepository {
     private static final QUserEntity user = QUserEntity.userEntity;
     private static final QUserStatsEntity userStats = QUserStatsEntity.userStatsEntity;
 
+    @Transactional(readOnly = true)
     public List<PostCommentProjection> findComments(Long postId, Long currentUserId) {
         Expression<Long> likeCount = JPAExpressions.select(reaction.id.userId.count())
                 .from(reaction)

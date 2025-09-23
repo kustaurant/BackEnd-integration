@@ -26,16 +26,16 @@ public class AppleLoginProcessor implements LoginProcessor {
         Claims claims = appleClient.verifyAppleIdentityToken(cmd.token());
         String appleId = claims.getSubject();
 
-        // 회원 조회 or 신규 생성
+        // 회원 조회, 신규 생성
         User user = userRepo.findByProviderId(appleId)
                 .orElseGet(() -> {
                     Nickname nick = new Nickname(nextAppleNickname());
-                    return userRepo.save(User.createFromApple(appleId, nick)); // 도메인 정적 팩토리 직접 호출
+                    return userRepo.save(User.createFromApple(appleId, nick));
                 });
 
         // 탈퇴 상태였다면 재회원가입
         if (user.isDeleted()) {
-            user.revive(null, new Nickname(nextAppleNickname()));        // 도메인 메서드 직접 호출
+            user.revive(null, new Nickname(nextAppleNickname()));
         }
         return user;
     }

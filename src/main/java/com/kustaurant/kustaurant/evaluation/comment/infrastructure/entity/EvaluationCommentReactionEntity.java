@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "evaluation_comment_reaction")
-public class EvalCommUserReactionEntity {
+public class EvaluationCommentReactionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class EvalCommUserReactionEntity {
     private ReactionType reaction;
 
 
-    public EvalCommUserReactionEntity(Long evalCommentId, Long userId, ReactionType reaction) {
+    public EvaluationCommentReactionEntity(Long evalCommentId, Long userId, ReactionType reaction) {
         this.evalCommentId = evalCommentId;
         this.userId = userId;
         this.reaction = reaction;

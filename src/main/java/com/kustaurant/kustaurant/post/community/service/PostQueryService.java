@@ -30,7 +30,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class PostQueryService {
     private final PostQueryRepository postQueryRepo;
     private final PhotoQueryRepository photoQueryRepo;

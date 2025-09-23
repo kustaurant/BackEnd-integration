@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -33,6 +35,7 @@ public class RestaurantCoreInfoRepository {
      * 식당 id들에 대해 식당 요약 정보(RestaurantCoreInfoDto)를 반환함.
      * 기본적인 식당 정보 + (userId가 존재하면) 평가 여부 + 즐찾 여부 등
      */
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<RestaurantCoreInfoDto> getRestaurantTiers(List<Long> restaurantIds, Long userId) {
         Map<Long, RestaurantCoreInfoDto> map = queryFactory
                 .from(restaurantEntity)

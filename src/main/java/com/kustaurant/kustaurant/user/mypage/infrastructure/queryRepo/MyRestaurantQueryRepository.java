@@ -9,6 +9,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +21,7 @@ public class MyRestaurantQueryRepository {
     private static final QRestaurantFavoriteEntity favorite = QRestaurantFavoriteEntity.restaurantFavoriteEntity;
     private static final QRestaurantEntity restaurant = QRestaurantEntity.restaurantEntity;
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<MyRestaurantResponse> findMyFavoritesRestaurants(Long userId) {
 
         return factory.select(Projections.constructor(

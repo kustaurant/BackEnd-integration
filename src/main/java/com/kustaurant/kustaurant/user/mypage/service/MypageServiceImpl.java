@@ -25,7 +25,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class MypageServiceImpl implements MypageService {
     private final UserRepository userRepository;
     private final UserProfileValidator validator;
@@ -41,7 +40,6 @@ public class MypageServiceImpl implements MypageService {
     }
 
     // 2. 마이페이지 프로필 정보(변경)화면에서 로직을 검증하고 업데이트 하거나 결과를 반환
-    @Transactional
     public ProfileUpdateResponse updateUserProfile(Long userId, ProfileUpdateRequest req) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         boolean changed = false;
@@ -119,6 +117,8 @@ public class MypageServiceImpl implements MypageService {
                 .collect(Collectors.toList());
     }
 
+
+    // 웹 마이페이지 전용
     public MypageDataView getMypageWebData(Long userId) {
         List<MyRestaurantResponse> myFavoriterestaurants = this.getUserFavoriteRestaurantList(userId);
         List<MyRatedRestaurantResponse> myRatedRestaurants = this.getUserEvaluateRestaurantList(userId);

@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PostReactionService {
     private final PostReactionRepository reactionRepo;
     public PostReactionResponse setPostReaction(Long postId, Long userId, ReactionType cmd) {

@@ -15,26 +15,26 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class EvalCommentRepositoryImpl implements EvalCommentRepository {
-    private final EvalCommentJpaRepository jpaRepository;
+    private final EvalCommentJpaRepository jpa;
 
     @Override
     public EvalComment save(EvalComment evalComment) {
-        return jpaRepository.save(EvalCommentEntity.from(evalComment)).toModel();
+        return jpa.save(EvalCommentEntity.from(evalComment)).toModel();
     }
 
     @Override
     public Optional<EvalComment> findById(Long id) {
-        return jpaRepository.findById(id).map(EvalCommentEntity::toModel);
+        return jpa.findById(id).map(EvalCommentEntity::toModel);
     }
 
     @Override
     public Optional<EvalComment> findByIdAndRestaurantId(Long evalCommentId, Long restaurantId) {
-        return jpaRepository.findByIdAndRestaurantId(evalCommentId, restaurantId).map(EvalCommentEntity::toModel);
+        return jpa.findByIdAndRestaurantId(evalCommentId, restaurantId).map(EvalCommentEntity::toModel);
     }
 
     @Override
     public List<EvalComment> findAllByEvaluationIdIn(List<Long> evalIds) {
-        return jpaRepository.findAllByEvaluationIdInAndStatus(evalIds, Status.ACTIVE).stream().map(EvalCommentEntity::toModel).collect(Collectors.toList());
+        return jpa.findAllByEvaluationIdInAndStatus(evalIds, Status.ACTIVE).stream().map(EvalCommentEntity::toModel).collect(Collectors.toList());
     }
 
 }

@@ -52,18 +52,6 @@ public class UserRepositoryImpl implements UserRepository {
         return jpaRepo.countByLoginApi(loginApi);
     }
 
-
-    @Override
-    public Map<Long, UserSummary> getUserDTOMapByIds(List<Long> ids) {
-        return jpaRepo.findAllById(ids).stream()
-                .collect(Collectors.toMap(
-                        UserEntity::getId,
-                        e-> UserSummary.from(e.toModel()),
-                        (a,b)->a,
-                        LinkedHashMap::new
-                ));
-    }
-
     @Override
     public List<User> findByIdIn(List<Long> ids) {
         return jpaRepo.findByIdIn(ids).stream().map(UserEntity::toModel).collect(Collectors.toList());

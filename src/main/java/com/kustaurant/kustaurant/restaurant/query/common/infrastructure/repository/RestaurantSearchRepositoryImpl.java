@@ -11,6 +11,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -18,6 +20,7 @@ public class RestaurantSearchRepositoryImpl implements RestaurantSearchRepositor
 
     private final JPAQueryFactory queryFactory;
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<Long> searchRestaurantIds(String[] kwArr, int size) {
         BooleanBuilder andBuilder = new BooleanBuilder();
         for (String kw : kwArr) {

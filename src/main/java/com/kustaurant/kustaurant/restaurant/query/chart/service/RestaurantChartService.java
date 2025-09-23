@@ -38,8 +38,7 @@ public class RestaurantChartService {
         // 1 정렬해서 페이지에 맞는 식당 id만 읽어오기
         Page<Long> ids = restaurantChartRepository.getRestaurantIdsWithPage(condition);
         // 2 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
-        List<RestaurantCoreInfoDto> content = restaurantCoreInfoRepository.getRestaurantTiers(
-                ids.getContent(), userId);
+        List<RestaurantCoreInfoDto> content = restaurantCoreInfoRepository.getRestaurantTiers(ids.getContent(), userId);
         // 3 순위 정보 채우기
         setRanking(condition, content);
 

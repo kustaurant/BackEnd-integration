@@ -36,9 +36,6 @@ public class EvaluationCommandService {
         }
     }
 
-    /**
-     * 평가 새로 생성
-     */
     private void createEvaluation(Long userId, Long restaurantId, EvaluationDTO dto) {
         // 평가 생성
         Evaluation created = Evaluation.create(userId, restaurantId, dto);
@@ -53,9 +50,6 @@ public class EvaluationCommandService {
         );
     }
 
-    /**
-     * 재평가
-     */
     private void reEvaluate(Long userId, Long restaurantId, EvaluationDTO dto) {
         evaluationQueryRepository
                 .findActiveByUserAndRestaurant(userId, restaurantId)

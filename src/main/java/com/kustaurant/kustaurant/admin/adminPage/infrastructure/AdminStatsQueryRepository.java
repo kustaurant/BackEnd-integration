@@ -5,6 +5,8 @@ import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentEntity.postCommentEntity;
 import static com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.entity.QRestaurantEntity.restaurantEntity;
@@ -21,6 +23,7 @@ public class AdminStatsQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public AdminStatsResponse getAdminStats() {
         // 각각의 카운트를 병렬로 조회
         Long totalRestaurants = queryFactory
