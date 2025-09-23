@@ -11,7 +11,6 @@ import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ViewCountService {
     private final StringRedisTemplate redis;
     private final PostRepository postRepo;

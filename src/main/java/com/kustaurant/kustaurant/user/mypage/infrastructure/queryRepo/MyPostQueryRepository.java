@@ -16,6 +16,8 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -71,7 +73,8 @@ public class MyPostQueryRepository {
                 .where(cr2.id.postCommentId.eq(c.postCommentId)
                         .and(cr2.reaction.eq(ReactionType.LIKE)));
     }
-    //-----
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<MyPostsResponse> findMyPostsByUserId(Long userId) {
         return factory.select(Projections.constructor(
                 MyPostsResponse.class,
@@ -91,6 +94,7 @@ public class MyPostQueryRepository {
                 .fetch();
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<MyPostsResponse> findMyScrappedPostsByUserId(Long userId) {
         return factory.select(Projections.constructor(
                         MyPostsResponse.class,
@@ -111,6 +115,7 @@ public class MyPostQueryRepository {
                 .fetch();
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<MyPostCommentResponse> findMyPostCommentsByUserId(Long userId) {
         return factory.select(Projections.constructor(
                 MyPostCommentResponse.class,

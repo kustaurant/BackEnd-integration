@@ -8,6 +8,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +22,7 @@ public class AdminUserQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PagedUserResponse getNewUsers(Pageable pageable) {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
 
@@ -59,6 +62,7 @@ public class AdminUserQueryRepository {
         );
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PagedUserResponse getAllUsers(Pageable pageable) {
         List<UserListResponse> users = queryFactory
                 .select(Projections.constructor(UserListResponse.class,
@@ -94,6 +98,7 @@ public class AdminUserQueryRepository {
         );
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Long getNewUsersCount() {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
         

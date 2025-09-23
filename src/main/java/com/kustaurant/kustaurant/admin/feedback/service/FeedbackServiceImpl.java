@@ -16,7 +16,6 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public void create(Long userId, FeedbackRequest req) {
-
         Feedback feedback=Feedback.from(userId, req, clockHolder);
         feedbackRepository.save(feedback);
     }

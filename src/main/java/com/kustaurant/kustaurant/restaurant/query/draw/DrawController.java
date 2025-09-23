@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.restaurant.query.draw;
 
-import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.ChartCond;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;

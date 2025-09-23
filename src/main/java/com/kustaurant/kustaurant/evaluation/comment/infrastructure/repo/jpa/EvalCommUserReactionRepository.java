@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa;
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommUserReactionEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvaluationCommentReactionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public interface EvalCommUserReactionRepository extends JpaRepository<EvalCommUserReactionEntity, Long> {
+public interface EvalCommUserReactionRepository extends JpaRepository<EvaluationCommentReactionEntity, Long> {
 
-    @Query("select l from EvalCommUserReactionEntity l "
+    @Query("select l from EvaluationCommentReactionEntity l "
             + "where l.userId = :userId and l.evalCommentId = :evalCommentId")
-    Optional<EvalCommUserReactionEntity> findByUserIdAndEvalCommentId(
+    Optional<EvaluationCommentReactionEntity> findByUserIdAndEvalCommentId(
             @Param("userId") Long userId,
             @Param("evalCommentId") Long evalCommentId
     );
@@ -24,7 +24,7 @@ public interface EvalCommUserReactionRepository extends JpaRepository<EvalCommUs
 
     @Query("""
         select new map(r.evalCommentId as commentId, r.reaction as type)
-        from EvalCommUserReactionEntity r
+        from EvaluationCommentReactionEntity r
         where r.userId   = :userId
           and r.evalCommentId in :commentIds
     """)

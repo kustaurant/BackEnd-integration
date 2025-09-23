@@ -36,7 +36,7 @@ public class CommunityController {
             @Valid @ModelAttribute PostListRequest req,
             Model model
     ) {
-        Page<PostListResponse> paging = postQueryService.getPostList(req.page(), req.category(), req.sort());
+        Page<PostListResponse> paging = postQueryService.getPostPagingList(req.page(), req.category(), req.sort());
 
         model.addAttribute("currentPage", "community");
         model.addAttribute("postCategory", req.category());

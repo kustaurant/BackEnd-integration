@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.restaurant.query.chart.service;
 
 import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantChartRepository;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantBaseInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCoreInfoRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.MapConstants;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
@@ -12,6 +13,7 @@ import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -28,25 +31,44 @@ public class RestaurantChartService {
 
     private final RestaurantChartRepository restaurantChartRepository;
     private final RestaurantCoreInfoRepository restaurantCoreInfoRepository;
+
     private final ChartRankingAssembler chartRankingAssembler;
 
     // 조건에 맞는 식당 리스트를 반환
-    public Page<RestaurantCoreInfoDto> findByConditions(
-            ChartCondition condition, @Nullable Long userId
-    ) {
-        // 조건에 맞는 식당 데이터 가져오기
-        // 1 정렬해서 페이지에 맞는 식당 id만 읽어오기
+    @Cacheable(
+            cacheNames = "restaurantChartPage",
+            key = "#condition.cacheKey()",
+            unless = "#result == null || #result.getContent().isEmpty()"
+    )
+    public Page<RestaurantBaseInfoDto> findBasePage(ChartCondition condition) {
         Page<Long> ids = restaurantChartRepository.getRestaurantIdsWithPage(condition);
-        // 2 식당 데이터(+ 평가 여부, 즐찾 여부, 상황 리스트) 가져오기
-        List<RestaurantCoreInfoDto> content = restaurantCoreInfoRepository.getRestaurantTiers(
-                ids.getContent(), userId);
-        // 3 순위 정보 채우기
-        setRanking(condition, content);
+        List<RestaurantBaseInfoDto> content = restaurantCoreInfoRepository.getRestaurantTiersBase(ids.getContent());
 
+        setRanking(condition, content); // 기존 로직: ranking 주입
         return new PageImpl<>(content, condition.pageable(), ids.getTotalElements());
     }
 
-    private void setRanking(ChartCondition condition, List<RestaurantCoreInfoDto> content) {
+    public Page<RestaurantCoreInfoDto> findByConditions(ChartCondition condition, Long userId) {
+        Page<RestaurantBaseInfoDto> basePage = findBasePage(condition);
+
+        List<Long> ids = basePage.getContent().stream().map(RestaurantBaseInfoDto::getRestaurantId).toList();
+
+        Set<Long> eval = (userId == null) ? Set.of() : restaurantCoreInfoRepository.findUserEvaluatedIds(userId, ids);
+        Set<Long> fav  = (userId == null) ? Set.of() : restaurantCoreInfoRepository.findUserFavoriteIds(userId, ids);
+
+        List<RestaurantCoreInfoDto> merged = basePage.getContent().stream()
+                .map(b -> new RestaurantCoreInfoDto(
+                        b,
+                        eval.contains(b.getRestaurantId()),
+                        fav.contains(b.getRestaurantId())
+                        )
+                )
+                .toList();
+
+        return new PageImpl<>(merged, basePage.getPageable(), basePage.getTotalElements());
+    }
+
+    private void setRanking(ChartCondition condition, List<RestaurantBaseInfoDto> content) {
         if (condition.pageable() != null) {
             Pageable pageable = condition.pageable();
             int startRanking = pageable.getPageSize() * pageable.getPageNumber() + 1;

@@ -11,17 +11,22 @@ import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
 import static java.util.Objects.isNull;
 
+import com.kustaurant.kustaurant.restaurant.query.common.dto.QRestaurantBaseInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.QRestaurantCoreInfoDto;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantBaseInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -29,10 +34,60 @@ public class RestaurantCoreInfoRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    /**
-     * 식당 id들에 대해 식당 요약 정보(RestaurantCoreInfoDto)를 반환함.
-     * 기본적인 식당 정보 + (userId가 존재하면) 평가 여부 + 즐찾 여부 등
-     */
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public List<RestaurantBaseInfoDto> getRestaurantTiersBase(List<Long> ids) {
+        Map<Long, RestaurantBaseInfoDto> map = queryFactory
+                .from(restaurantEntity)
+                .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
+                .leftJoin(restaurantSituationRelationEntity)
+                .on(situationMatches(restaurantSituationRelationEntity, restaurantEntity.restaurantId))
+                .leftJoin(situationEntity)
+                .on(situationIdEq(restaurantSituationRelationEntity.situationId))
+                .where(restaurantEntity.restaurantId.in(ids))
+                .transform(groupBy(restaurantEntity.restaurantId).as(
+                        new QRestaurantBaseInfoDto(
+                                restaurantEntity.restaurantId,
+                                restaurantEntity.restaurantName,
+                                restaurantEntity.restaurantCuisine,
+                                restaurantEntity.restaurantPosition,
+                                restaurantEntity.restaurantImgUrl,
+                                ratingEntity.tier,
+                                restaurantEntity.longitude,
+                                restaurantEntity.latitude,
+                                restaurantEntity.partnershipInfo,
+                                ratingEntity.score,
+                                set(situationEntity.situationName),
+                                restaurantEntity.restaurantType
+                        )
+                ));
+
+        return ids.stream()
+                .map(map::get)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public Set<Long> findUserEvaluatedIds(Long userId, List<Long> restaurantIds) {
+        return new HashSet<>(queryFactory
+                .select(evaluationEntity.restaurantId)
+                .from(evaluationEntity)
+                .where(evaluationEntity.userId.eq(userId),
+                        evaluationEntity.restaurantId.in(restaurantIds))
+                .fetch());
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public Set<Long> findUserFavoriteIds(Long userId, List<Long> restaurantIds) {
+        return new HashSet<>(queryFactory
+                .select(restaurantFavoriteEntity.restaurantId)
+                .from(restaurantFavoriteEntity)
+                .where(restaurantFavoriteEntity.userId.eq(userId),
+                        restaurantFavoriteEntity.restaurantId.in(restaurantIds))
+                .fetch());
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<RestaurantCoreInfoDto> getRestaurantTiers(List<Long> restaurantIds, Long userId) {
         Map<Long, RestaurantCoreInfoDto> map = queryFactory
                 .from(restaurantEntity)
@@ -56,14 +111,14 @@ public class RestaurantCoreInfoRepository {
                                         restaurantEntity.restaurantPosition,
                                         restaurantEntity.restaurantImgUrl,
                                         ratingEntity.tier,
-                                        evaluationEntity.isNotNull(),
-                                        restaurantFavoriteEntity.isNotNull(),
                                         restaurantEntity.longitude,
                                         restaurantEntity.latitude,
                                         restaurantEntity.partnershipInfo,
                                         ratingEntity.score,
                                         set(situationEntity.situationName),
-                                        restaurantEntity.restaurantType
+                                        restaurantEntity.restaurantType,
+                                        evaluationEntity.isNotNull(),
+                                        restaurantFavoriteEntity.isNotNull()
                                 )
                         )
                 );

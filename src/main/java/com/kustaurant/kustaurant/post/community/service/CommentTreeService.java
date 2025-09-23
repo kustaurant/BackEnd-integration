@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class CommentTreeService {
     private final CommentQueryRepository commentQueryRepository;
 

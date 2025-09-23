@@ -20,7 +20,6 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class PostCommentService {
     private final PostCommentRepository postCommentRepository;

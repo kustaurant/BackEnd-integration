@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ReviewQueryService {
     private final EvaluationQueryRepository evalQueryRepo;
     private final EvalCommentRepository evalCommentRepo;
@@ -65,8 +64,7 @@ public class ReviewQueryService {
 
         /* 6) “내가 평가에 누른 리액션” 한 방 조회 */
         Map<Long, ReactionType> myEvalReact =
-                (currentUserId == null) ? Map.of()
-                        : evalReactionRepo.toMap(currentUserId, evalIds);
+                (currentUserId == null) ? Map.of() : evalReactionRepo.toMap(currentUserId, evalIds);
 
         /* 7) “내가 댓글에 누른 리액션” 한 방 조회 */
         Map<Long, ReactionType> myCommReact;
@@ -76,8 +74,8 @@ public class ReviewQueryService {
                     .map(EvalComment::getId)
                     .toList();
 
-            myCommReact = (currentUserId == null || commentIds.isEmpty()) ? Map.of()
-                    : evalCommReactionRepo.toMap(currentUserId, commentIds);
+            myCommReact = (currentUserId == null || commentIds.isEmpty()) ?
+                    Map.of() : evalCommReactionRepo.toMap(currentUserId, commentIds);
         }
 
 

@@ -10,12 +10,9 @@ import com.kustaurant.kustaurant.post.community.infrastructure.PhotoQueryReposit
 import com.kustaurant.kustaurant.post.community.infrastructure.projection.PostDetailProjection;
 import com.kustaurant.kustaurant.post.post.controller.response.PostResponse;
 import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.kustaurant.post.post.domain.PostPhoto;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
 import com.kustaurant.kustaurant.post.community.infrastructure.PostQueryRepository;
 import com.kustaurant.kustaurant.post.community.infrastructure.projection.PostListProjection;
-import com.kustaurant.kustaurant.post.post.service.ImageExtractor;
-import com.kustaurant.kustaurant.post.post.service.port.PostPhotoRepository;
 import com.kustaurant.kustaurant.post.post.service.port.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,14 +20,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class PostQueryService {
     private final PostQueryRepository postQueryRepo;
     private final PhotoQueryRepository photoQueryRepo;
@@ -47,9 +42,9 @@ public class PostQueryService {
         return PostResponse.from(post, photoUrls);
     }
 
-    public Page<PostListResponse> getPostList(int page, PostCategory category, SortOption sort) {
+    public Page<PostListResponse> getPostPagingList(int page, PostCategory category, SortOption sort) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
-        Page<PostListProjection> projections = postQueryRepo.findPostList(category,sort,pageable);
+        Page<PostListProjection> projections = postQueryRepo.findPostPagingList(category,sort,pageable);
 
         return projections.map(PostListResponse::from);
     }

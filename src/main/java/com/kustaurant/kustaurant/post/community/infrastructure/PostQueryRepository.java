@@ -32,6 +32,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -51,8 +53,9 @@ public class PostQueryRepository {
 
     private final QPostPhotoEntity thumbnailPhoto = new QPostPhotoEntity("ph2");
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // 1. 게시글 목록 페이징(기본값 10개) 나열
-    public Page<PostListProjection> findPostList(PostCategory category, SortOption sort, Pageable pageable) {
+    public Page<PostListProjection> findPostPagingList(PostCategory category, SortOption sort, Pageable pageable) {
         // 전체 좋아요 수 계산
         Expression<Long> likeCount = JPAExpressions
                 .select(reaction.id.userId.count())
@@ -130,6 +133,7 @@ public class PostQueryRepository {
     }
 
     // 2. 게시글 1개의 상세 페이지 조회(~댓글까지)
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Optional<PostDetailProjection> findPostDetail(Long postId, Long currentUserId) {
         Expression<Long> likeCount = JPAExpressions
                 .select(reaction.id.userId.count())
@@ -188,6 +192,7 @@ public class PostQueryRepository {
     }
 
     // 3. 포스트 검색
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Page<PostListProjection> searchLatest(String keyword, Pageable pageable) {
         // 1) ID만 최신순으로 페이징 (post 단독 + 인덱스 타서 가볍게)
         BooleanExpression cond = buildSearchCond(keyword);

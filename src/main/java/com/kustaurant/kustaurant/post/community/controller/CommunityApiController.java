@@ -11,7 +11,6 @@ import com.kustaurant.kustaurant.post.community.controller.request.PostListReque
 import com.kustaurant.kustaurant.post.community.controller.response.PostListResponse;
 import com.kustaurant.kustaurant.post.community.controller.response.PostDetailResponse;
 import com.kustaurant.kustaurant.post.community.service.PostQueryService;
-import com.kustaurant.kustaurant.post.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -55,7 +54,7 @@ public class CommunityApiController {
     public ResponseEntity<List<PostListResponse>> community(
             @Valid @ParameterObject PostListRequest req
     ) {
-        Page<PostListResponse> paging = postQueryService.getPostList(req.page(), req.category(), req.sort());
+        Page<PostListResponse> paging = postQueryService.getPostPagingList(req.page(), req.category(), req.sort());
 
         return ResponseEntity.ok(paging.getContent());
     }

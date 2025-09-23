@@ -8,6 +8,8 @@ import com.kustaurant.kustaurant.post.post.infrastructure.jpa.PostScrapJpaReposi
 import com.kustaurant.kustaurant.post.post.service.port.PostScrapRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 

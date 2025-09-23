@@ -7,6 +7,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +21,7 @@ public class AdminFeedbackQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PagedFeedbackResponse getAllFeedbacks(Pageable pageable) {
         List<FeedbackListResponse> feedbacks = queryFactory
                 .select(Projections.constructor(FeedbackListResponse.class,

@@ -18,11 +18,11 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository {
 
-    private final EvaluationQueryJpaRepository jpaRepository;
+    private final EvaluationQueryJpaRepository jpa;
 
     @Override
     public Evaluation findActiveById(Long id) {
-        return jpaRepository.findByIdAndStatus(id, "ACTIVE")
+        return jpa.findByIdAndStatus(id, "ACTIVE")
                 .map(EvaluationEntity::toModel)
                 .orElseThrow(() -> new DataNotFoundException(EVALUATION_NOT_FOUND, id, "평가"));
     }
@@ -32,7 +32,7 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
         if (userId == null || restaurantId == null) {
             return false;
         }
-        return jpaRepository.existsByUserIdAndRestaurantId(userId, restaurantId);
+        return jpa.existsByUserIdAndRestaurantId(userId, restaurantId);
     }
 
     @Override
@@ -40,23 +40,23 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
         if (restaurantId == null || evaluationId == null) {
             return false;
         }
-        return jpaRepository.existsByRestaurantIdAndId(restaurantId, evaluationId);
+        return jpa.existsByRestaurantIdAndId(restaurantId, evaluationId);
     }
 
     @Override
     public Optional<Evaluation> findActiveByUserAndRestaurant(Long userId, Long restaurantId) {
-        return jpaRepository.findByUserIdAndRestaurantIdAndStatus(userId, restaurantId, "ACTIVE")
+        return jpa.findByUserIdAndRestaurantIdAndStatus(userId, restaurantId, "ACTIVE")
                 .map(EvaluationEntity::toModel);
     }
 
     @Override
     public int countByStatus(String status) {
-        return jpaRepository.countByStatus(status);
+        return jpa.countByStatus(status);
     }
 
     @Override
     public List<Evaluation> findByRestaurantIdOrderByCreatedAtDesc(Long restaurantId) {
-        return jpaRepository.findByRestaurantIdAndStatusOrderByCreatedAtDesc(restaurantId, "ACTIVE")
+        return jpa.findByRestaurantIdAndStatusOrderByCreatedAtDesc(restaurantId, "ACTIVE")
                 .stream()
                 .map(EvaluationEntity::toModel)
                 .toList();
@@ -64,7 +64,7 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
 
     @Override
     public List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Long restaurantId) {
-        return jpaRepository.findByRestaurantIdAndStatusOrderByLikeCountDesc(restaurantId, "ACTIVE")
+        return jpa.findByRestaurantIdAndStatusOrderByLikeCountDesc(restaurantId, "ACTIVE")
                 .stream()
                 .map(EvaluationEntity::toModel)
                 .toList();

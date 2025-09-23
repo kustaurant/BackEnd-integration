@@ -16,8 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
      * 조건(condition)을 만족하는 식당 id들을 반환
      */
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Page<Long> getRestaurantIdsWithPage(ChartCondition condition) {
 
         JPAQuery<Long> query = queryFactory.select(restaurantEntity.restaurantId)

@@ -6,59 +6,26 @@ import com.kustaurant.kustaurant.user.user.domain.PhoneNumber;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     Optional<UserEntity> findById(Long userId);
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     Optional<UserEntity> findByProviderId(String providerId);
-
-    @Query("""
-           SELECT  u
-           FROM    UserEntity u
-           WHERE   EXISTS (
-                     SELECT 1
-                     FROM   EvaluationEntity e
-                     WHERE  e.userId = u.id
-                   )
-           ORDER BY (
-                     SELECT COUNT(e2)
-                     FROM   EvaluationEntity e2
-                     WHERE  e2.userId = u.id
-                   ) DESC
-           """)
-    List<UserEntity> findUsersWithEvaluationCountDescending();
-
-
-    /* 2) 특정 연·분기 기준 평가 개수 내림차순 */
-    @Query("""
-           SELECT  u
-           FROM    UserEntity u
-           WHERE   EXISTS (
-                     SELECT 1
-                     FROM   EvaluationEntity e
-                     WHERE  e.userId = u.id
-                       AND  FUNCTION('YEAR',    e.createdAt) = :year
-                       AND  FUNCTION('QUARTER', e.createdAt) = :quarter
-                   )
-           ORDER BY (
-                     SELECT COUNT(e2)
-                     FROM   EvaluationEntity e2
-                     WHERE  e2.userId = u.id
-                       AND  FUNCTION('YEAR',    e2.createdAt) = :year
-                       AND  FUNCTION('QUARTER', e2.createdAt) = :quarter
-                   ) DESC
-           """)
-    List<UserEntity> findUsersByEvaluationCountForQuarter(@Param("year") int year,
-                                                          @Param("quarter") int quarter);
 
 
     int countByLoginApi(LoginApi loginApi);
 
     List<UserEntity> findByIdIn(List<Long> ids);
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     boolean existsByNickname(Nickname nickname);
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     boolean existsByPhoneNumber(PhoneNumber phoneNumber);
 }

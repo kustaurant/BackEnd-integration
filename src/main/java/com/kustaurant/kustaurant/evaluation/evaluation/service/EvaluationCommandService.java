@@ -36,38 +36,23 @@ public class EvaluationCommandService {
         }
     }
 
-    /**
-     * 평가 새로 생성
-     */
     private void createEvaluation(Long userId, Long restaurantId, EvaluationDTO dto) {
-        // 평가 생성
         Evaluation created = Evaluation.create(userId, restaurantId, dto);
-
-        // 저장
         evaluationCommandRepository.create(created);
 
-        // 식당 평가 관련 데이터 갱신
         restaurantEvaluationService.afterEvaluationCreated(
                 restaurantId,
                 dto.getEvaluationSituations()
         );
     }
 
-    /**
-     * 재평가
-     */
     private void reEvaluate(Long userId, Long restaurantId, EvaluationDTO dto) {
         evaluationQueryRepository
                 .findActiveByUserAndRestaurant(userId, restaurantId)
                 .ifPresent(evaluation -> { // 항상 존재함.
                     List<Long> oldSituations = new ArrayList<>(evaluation.getSituationIds());
-
-                    // 재평가
                     evaluation.reEvaluate(dto);
-
-                    // 업데이트
                     evaluationCommandRepository.reEvaluate(evaluation);
-
                     // 식당 평가 관련 데이터 갱신
                     restaurantEvaluationService.afterReEvaluated(
                             restaurantId,

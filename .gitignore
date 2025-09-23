@@ -47,8 +47,7 @@ out/
 CLAUDE.md
 plan.md
 
-### monitoring
-# ===== Grafana (runtime) =====
+### monitoring ###
 monitoring/grafana/grafana.db
 monitoring/grafana/data/
 monitoring/grafana/plugins/

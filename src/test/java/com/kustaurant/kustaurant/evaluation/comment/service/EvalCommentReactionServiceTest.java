@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.common.enums.Status;
 import com.kustaurant.kustaurant.evaluation.comment.controller.response.EvalCommentReactionResponse;
 import com.kustaurant.kustaurant.evaluation.comment.domain.EvalComment;
-import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvalCommUserReactionEntity;
+import com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.EvaluationCommentReactionEntity;
 import com.kustaurant.kustaurant.evaluation.comment.infrastructure.repo.jpa.EvalCommUserReactionRepository;
 import com.kustaurant.kustaurant.mock.evaluation.FakeEvalCommentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,8 +73,8 @@ class EvalCommentReactionServiceTest {
         // g 기존 LIKE 리액션 하나 존재
         Long otherUserId=2L;
         Long evalCommentId=1L;
-        EvalCommUserReactionEntity existing =
-                new EvalCommUserReactionEntity(otherUserId, evalCommentId, ReactionType.LIKE);
+        EvaluationCommentReactionEntity existing =
+                new EvaluationCommentReactionEntity(evalCommentId, otherUserId, ReactionType.LIKE);
         when(reactionRepo.findByUserIdAndEvalCommentId(otherUserId, evalCommentId))
                 .thenReturn(Optional.of(existing));
 
@@ -103,7 +103,8 @@ class EvalCommentReactionServiceTest {
         Long otherUserId=2L;
         Long evalCommentId=1L;
 
-        EvalCommUserReactionEntity existing = new EvalCommUserReactionEntity(otherUserId, evalCommentId, ReactionType.LIKE);
+        EvaluationCommentReactionEntity existing = new EvaluationCommentReactionEntity(evalCommentId, otherUserId, ReactionType.LIKE);
+
         when(reactionRepo.findByUserIdAndEvalCommentId(otherUserId, evalCommentId)).thenReturn(Optional.of(existing));
 
         EvalComment stored = commentRepo.findById(evalCommentId).orElseThrow();

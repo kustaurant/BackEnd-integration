@@ -10,6 +10,8 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ public class MyEvaluationQueryRepository{
     private static final QRestaurantEntity restaurant = QRestaurantEntity.restaurantEntity;
     private static final QSituationEntity situation = QSituationEntity.situationEntity;
 
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<MyRatedRestaurantResponse> findByUserId(Long userId) {
 
         // -------- 1. 메인 정보 (Evaluation + Restaurant) --------
