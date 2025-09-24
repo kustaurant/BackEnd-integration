@@ -51,30 +51,30 @@ CLAUDE.md
 plan.md
 
 ### monitoring ###
-monitoring/grafana/grafana.db
-monitoring/grafana/data/
-monitoring/grafana/plugins/
-monitoring/grafana/png/
-monitoring/grafana/pdf/
-monitoring/grafana/csv/
-monitoring/grafana/grafana-apiserver/
-monitoring/grafana/*-storage/
-monitoring/grafana/backup-*/
+infra/monitoring/grafana/grafana.db
+infra/monitoring/grafana/data/
+infra/monitoring/grafana/plugins/
+infra/monitoring/grafana/png/
+infra/monitoring/grafana/pdf/
+infra/monitoring/grafana/csv/
+infra/monitoring/grafana/grafana-apiserver/
+infra/monitoring/grafana/*-storage/
+infra/monitoring/grafana/backup-*/
 
-monitoring/loki/data/
-monitoring/loki/chunks/
-monitoring/loki/wal/
-monitoring/loki/index/
-monitoring/loki/boltdb-shipper/
-monitoring/loki/compactor/
+infra/monitoring/loki/data/
+infra/monitoring/loki/chunks/
+infra/monitoring/loki/wal/
+infra/monitoring/loki/index/
+infra/monitoring/loki/boltdb-shipper/
+infra/monitoring/loki/compactor/
 
 monitoring/prometheus-data/
 monitoring/prometheus/wal/
 monitoring/prometheus/snapshots/
 
-monitoring/promtail/positions.yaml
-monitoring/promtail/positions.yml
-monitoring/promtail/*.pos
+infra/monitoring/promtail/positions.yaml
+infra/monitoring/promtail/positions.yml
+infra/monitoring/promtail/*.pos
 
-monitoring/**/certs/
-monitoring/**/secrets/
+infra/monitoring/**/certs/
+infra/monitoring/**/secrets/
