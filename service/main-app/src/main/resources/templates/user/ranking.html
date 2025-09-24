@@ -120,11 +120,11 @@
         <div class="ranking-sort-section" style="text-align: center; margin-bottom: 30px;">
             <div class="sort-buttons">
                 <button type="button" class="sort-btn" data-sort="CUMULATIVE" 
-                        th:classappend="${sort == T(com.kustaurant.kustaurant.user.rank.domain.RankingSortOption).CUMULATIVE ? ' active' : ''}">
+                        th:classappend="${sort == T(com.kustaurant.mainapp.user.rank.domain.RankingSortOption).CUMULATIVE ? ' active' : ''}">
                     누적순
                 </button>
                 <button type="button" class="sort-btn" data-sort="SEASONAL"
-                        th:classappend="${sort == T(com.kustaurant.kustaurant.user.rank.domain.RankingSortOption).SEASONAL ? ' active' : ''}">
+                        th:classappend="${sort == T(com.kustaurant.mainapp.user.rank.domain.RankingSortOption).SEASONAL ? ' active' : ''}">
                     시즌별
                 </button>
             </div>

@@ -1,13 +1,11 @@
 package com.kustaurant.mainapp.user.user.service.port;
 
-import com.kustaurant.mainapp.common.dto.UserSummary;
 import com.kustaurant.mainapp.user.login.api.domain.LoginApi;
 import com.kustaurant.mainapp.user.user.domain.User;
 import com.kustaurant.mainapp.user.user.domain.Nickname;
 import com.kustaurant.mainapp.user.user.domain.PhoneNumber;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface UserRepository {

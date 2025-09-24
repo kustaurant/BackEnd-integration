@@ -1,28 +1,28 @@
 package com.kustaurant;
 
-import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
-import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationCommandService;
-import com.kustaurant.kustaurant.global.exception.exception.user.NoProfileChangeException;
-import com.kustaurant.kustaurant.post.comment.controller.request.PostCommentRequest;
-import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
-import com.kustaurant.kustaurant.post.post.controller.request.PostRequest;
-import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
-import com.kustaurant.kustaurant.post.post.service.PostService;
-import com.kustaurant.kustaurant.post.post.service.PostScrapService;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
-import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
-import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
-import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
-import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRatedRestaurantResponse;
-import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
-import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
-import com.kustaurant.kustaurant.user.user.domain.User;
-import com.kustaurant.kustaurant.user.user.domain.UserRole;
-import com.kustaurant.kustaurant.user.user.domain.UserStatus;
-import com.kustaurant.kustaurant.user.user.domain.Nickname;
-import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
+import com.kustaurant.mainapp.evaluation.evaluation.domain.EvaluationDTO;
+import com.kustaurant.mainapp.evaluation.evaluation.service.EvaluationCommandService;
+import com.kustaurant.mainapp.global.exception.exception.user.NoProfileChangeException;
+import com.kustaurant.mainapp.post.comment.controller.request.PostCommentRequest;
+import com.kustaurant.mainapp.post.comment.service.PostCommentService;
+import com.kustaurant.mainapp.post.post.controller.request.PostRequest;
+import com.kustaurant.mainapp.post.post.domain.Post;
+import com.kustaurant.mainapp.post.post.domain.enums.PostCategory;
+import com.kustaurant.mainapp.post.post.service.PostService;
+import com.kustaurant.mainapp.post.post.service.PostScrapService;
+import com.kustaurant.mainapp.restaurant.restaurant.service.RestaurantFavoriteService;
+import com.kustaurant.mainapp.restaurant.restaurant.constants.RestaurantConstants;
+import com.kustaurant.mainapp.user.login.api.domain.LoginApi;
+import com.kustaurant.mainapp.user.mypage.controller.port.MypageService;
+import com.kustaurant.mainapp.user.mypage.controller.request.ProfileUpdateRequest;
+import com.kustaurant.mainapp.user.mypage.controller.response.api.MyRatedRestaurantResponse;
+import com.kustaurant.mainapp.user.mypage.controller.response.api.MyRestaurantResponse;
+import com.kustaurant.mainapp.user.mypage.domain.UserStats;
+import com.kustaurant.mainapp.user.user.domain.User;
+import com.kustaurant.mainapp.user.user.domain.UserRole;
+import com.kustaurant.mainapp.user.user.domain.UserStatus;
+import com.kustaurant.mainapp.user.user.domain.Nickname;
+import com.kustaurant.mainapp.user.user.service.port.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = com.kustaurant.kustaurant.RestaurantTierApplication.class)
+@SpringBootTest(classes = com.kustaurant.mainapp.MainAppApplication.class)
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
@@ -55,7 +55,8 @@ class MypageServiceIT {
 
     @Autowired UserRepository userRepo;
 
-    @MockBean StringRedisTemplate stringRedisTemplate;
+    @MockBean
+    StringRedisTemplate stringRedisTemplate;
     @MockBean FindByIndexNameSessionRepository<Session> sessionRepository;
 
     private User user1;
