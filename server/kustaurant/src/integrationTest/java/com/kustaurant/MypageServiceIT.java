@@ -2,13 +2,13 @@ package com.kustaurant;
 
 import com.kustaurant.kustaurant.KustaurantApplication;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
-import com.kustaurant.mainapp.evaluation.evaluation.service.EvaluationCommandService;
-import com.kustaurant.mainapp.global.exception.exception.user.NoProfileChangeException;
+import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationCommandService;
+import com.kustaurant.kustaurant.global.exception.exception.user.NoProfileChangeException;
 import com.kustaurant.kustaurant.post.comment.controller.request.PostCommentRequest;
 import com.kustaurant.kustaurant.post.comment.service.PostCommentService;
 import com.kustaurant.kustaurant.post.post.controller.request.PostRequest;
 import com.kustaurant.kustaurant.post.post.domain.Post;
-import com.kustaurant.mainapp.post.post.domain.enums.PostCategory;
+import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
 import com.kustaurant.kustaurant.post.post.service.PostService;
 import com.kustaurant.kustaurant.post.post.service.PostScrapService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
@@ -16,11 +16,11 @@ import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConst
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
-import com.kustaurant.mainapp.user.mypage.controller.response.api.MyRatedRestaurantResponse;
-import com.kustaurant.mainapp.user.mypage.controller.response.api.MyRestaurantResponse;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRatedRestaurantResponse;
+import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
 import com.kustaurant.kustaurant.user.mypage.domain.UserStats;
-import com.kustaurant.mainapp.user.user.domain.User;
-import com.kustaurant.mainapp.user.user.domain.UserRole;
+import com.kustaurant.kustaurant.user.user.domain.User;
+import com.kustaurant.kustaurant.user.user.domain.UserRole;
 import com.kustaurant.kustaurant.user.user.domain.UserStatus;
 import com.kustaurant.kustaurant.user.user.domain.Nickname;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
@@ -56,8 +56,7 @@ class MypageServiceIT {
 
     @Autowired UserRepository userRepo;
 
-    @MockBean
-    StringRedisTemplate stringRedisTemplate;
+    @MockBean StringRedisTemplate stringRedisTemplate;
     @MockBean FindByIndexNameSessionRepository<Session> sessionRepository;
 
     private User user1;
