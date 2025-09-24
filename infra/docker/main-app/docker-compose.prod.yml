@@ -1,0 +1,10 @@
+services:
+  main-app:
+    container_name: kustaurant-main-app
+    image: ${DOCKERHUB_USERNAME}:latest
+    ports:
+      - "8080:8080"
+    restart: always
+
+  nginx:
+    container_name: kustaurant-nginx
