@@ -87,7 +87,7 @@ jobs:
           files: build/test-results/middleTest/TEST-*.xml
           check_name: 🚀 중형(통합) 테스트 결과
           check_run: false
-
+#        작동 시간이 길어지고, 테스트 결과 표출과 리포트 남기기는 같이 적용이 안됨. 둘중 하나만 적용됨
 #      - name: Publish Test Report
 #        if: always()
 #        uses: dorny/test-reporter@v1

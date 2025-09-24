@@ -1,6 +1,8 @@
 rootProject.name = 'kustaurant'
 
-include 'service:main-app'
-include 'service:data-processor'
+include 'common'
 include 'common:jpa'
-include 'common:redis'
+
+include 'server'
+include 'server:kustaurant'
+include 'server:crawling'

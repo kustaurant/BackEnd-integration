@@ -6,6 +6,10 @@ plugins {
 
 group = 'com.kustaurant'
 
+allprojects {
+	repositories { mavenCentral() }
+}
+
 subprojects {
 	apply plugin: 'java'
 	apply plugin: 'org.springframework.boot'
@@ -17,20 +21,18 @@ subprojects {
 
 	configurations {
 		compileOnly {
-			extendsFrom configurations.annotationProcessor
+			extendsFrom annotationProcessor
 		}
 	}
 
-	repositories {
-		mavenCentral()
-	}
-
 	dependencies {
+		// lombok
 		compileOnly 'org.projectlombok:lombok'
 		annotationProcessor 'org.projectlombok:lombok'
-
 		testCompileOnly 'org.projectlombok:lombok'
-		testAnnotationProcessor 'org.projectlombok:lombok'
+		// test
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	}
 
 	tasks.named('test') {
