@@ -101,8 +101,8 @@ jobs:
           envs: ENV_FILE,DOCKER_COMPOSE_ENV_FILE
           script: |
             set -e
-            mkdir -p /home/ubuntu/kustaurant-docker
-            cd /home/ubuntu/kustaurant-docker
+            mkdir -p /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
+            cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
             umask 077
             cat > .env <<EOF
             ${ENV_FILE}
