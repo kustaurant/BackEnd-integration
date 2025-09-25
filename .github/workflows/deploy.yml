@@ -86,8 +86,7 @@ jobs:
 
       - name: 확인용 리스트
         run: |
-          ls -al
-          ls -al infra/kustaurant || true
+          ls -al infra/docker/kustaurant || true
 
       - name: env 파일 업데이트
         uses: appleboy/ssh-action@v1.2.0
