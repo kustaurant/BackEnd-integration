@@ -42,13 +42,13 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Build Server:Kustaurant module
+      - name: 쿠스토랑 모듈 빌드(테스트 제외)
         run: ./gradlew :server:kustaurant:clean :server:kustaurant:assemble --no-daemon
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
+      - name: 도커 허브 로그인
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -120,9 +120,6 @@ jobs:
           strip_components: 3
           overwrite: true
 
-      - name: 서버에서 Docker 로그인
-        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
       - name: docker 이미지 pull 및 docker compose 실행
         uses: appleboy/ssh-action@v1.2.0
         env:
@@ -136,7 +133,7 @@ jobs:
           script: |
             set -e
             cd /home/ubuntu/kustaurant-docker
-            docker login -u "$DOCKERHUB_USERNAME" --password-stdin <<<'$DOCKERHUB_TOKEN'
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
             sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
             sudo docker image prune -f
