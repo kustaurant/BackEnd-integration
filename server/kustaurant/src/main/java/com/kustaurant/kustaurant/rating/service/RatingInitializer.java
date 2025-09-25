@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-@Profile("local")
+@Profile({"local", "prod"})
 @Component
 @RequiredArgsConstructor
 public class RatingInitializer {
