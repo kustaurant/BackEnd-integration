@@ -116,12 +116,19 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
-          source: |
-            ./infra/docker/kustaurant/docker-compose*.yml
-            ./infra/monitoring
-          target: /home/ubuntu/kustaurant-docker
+          source: "./infra/docker/kustaurant/docker-compose*.yml"
+          target: "/home/ubuntu/kustaurant-docker"
           overwrite: true
-          debug: true
+
+      - name: monitoring 파일 업데이트
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+          source: "./infra/monitoring"
+          target: "/home/ubuntu/kustaurant-docker"
+          overwrite: true
 
       - name: docker 이미지 pull 및 docker compose 실행
         uses: appleboy/ssh-action@v1.2.0
