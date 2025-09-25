@@ -144,7 +144,6 @@ jobs:
             set -e
             cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
             echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
-            sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml down
-            sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+            sudo docker compose -p kustaurant -f docker-compose.yml -f docker-compose.prod.yml pull
+            sudo docker compose -p kustaurant -f docker-compose.yml -f docker-compose.prod.yml up -d
             sudo docker image prune -f

@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: local
   config:
     import:
       - "optional:file:server/kustaurant/.env[.properties]"
