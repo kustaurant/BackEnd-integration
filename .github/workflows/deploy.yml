@@ -80,10 +80,6 @@ jobs:
     if: needs.detect-changes.outputs.kustaurant == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
       - name: env 파일 업데이트
         uses: appleboy/ssh-action@v1.2.0
         env:
@@ -112,8 +108,8 @@ jobs:
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
           source: |
-            infra/kustaurant/docker-compose.yml
-            infra/kustaurant/docker-compose.prod.yml
+            infra/docker/kustaurant/docker-compose.yml
+            infra/docker/kustaurant/docker-compose.prod.yml
           target: "/home/ubuntu/kustaurant-docker/"
 
       - name: docker 이미지 pull 및 docker compose 실행
