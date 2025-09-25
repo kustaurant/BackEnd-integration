@@ -80,6 +80,10 @@ jobs:
     if: needs.detect-changes.outputs.kustaurant == 'true'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: env 파일 업데이트
         uses: appleboy/ssh-action@v1.2.0
         env:
@@ -97,6 +101,7 @@ jobs:
             umask 077
             cat > .env <<EOF
             ${ENV_FILE}
+            
             ${DOCKER_COMPOSE_ENV_FILE}
             EOF
 
