@@ -130,6 +130,6 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/kustaurant-docker
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-            docker image prune -f
+            sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+            sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+            sudo docker image prune -f
