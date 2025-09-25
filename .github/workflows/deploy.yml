@@ -101,8 +101,8 @@ jobs:
           envs: ENV_FILE,DOCKER_COMPOSE_ENV_FILE
           script: |
             set -e
-            mkdir -p /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
-            cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
+            mkdir -p /home/ubuntu/kustaurant-docker
+            cd /home/ubuntu/kustaurant-docker
             umask 077
             cat > .env <<EOF
             ${ENV_FILE}
@@ -110,23 +110,13 @@ jobs:
             ${DOCKER_COMPOSE_ENV_FILE}
             EOF
 
-      - name: docker-compose 파일 업데이트
+      - name: infra 파일 업데이트
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
-          source: "./infra/docker/kustaurant/docker-compose*.yml"
-          target: "/home/ubuntu/kustaurant-docker"
-          overwrite: true
-
-      - name: monitoring 파일 업데이트
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{ secrets.LIGHTSAIL_USERNAME }}
-          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
-          source: "./infra/monitoring"
+          source: "./infra"
           target: "/home/ubuntu/kustaurant-docker"
           overwrite: true
 
