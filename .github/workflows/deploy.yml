@@ -84,7 +84,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: 확인용 리스트
+      - name: docker compose 파일 확인용
         run: |
           ls -al infra/docker/kustaurant || true
 
@@ -115,9 +115,7 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
-          source: |
-            infra/docker/kustaurant/docker-compose.yml
-            infra/docker/kustaurant/docker-compose.prod.yml
+          source: "./infra/docker/kustaurant/docker-compose*.yml"
           target: "/home/ubuntu/kustaurant-docker/"
 
       - name: docker 이미지 pull 및 docker compose 실행
