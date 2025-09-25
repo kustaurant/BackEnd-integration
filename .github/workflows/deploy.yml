@@ -127,12 +127,16 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         env:
           SPRING_PROFILES_ACTIVE: prod
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN:    ${{ secrets.DOCKERHUB_TOKEN }}
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
           script: |
+            set -e
             cd /home/ubuntu/kustaurant-docker
+            docker login -u "$DOCKERHUB_USERNAME" --password-stdin <<<'$DOCKERHUB_TOKEN'
             sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
             sudo docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
             sudo docker image prune -f
