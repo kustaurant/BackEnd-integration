@@ -1,4 +1,4 @@
-name: CICD
+name: 자동 CI/CD
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   detect-changes:
-    name: 1 변경사항 감지
+    name: 🔍 변경사항 감지
     runs-on: ubuntu-latest
     outputs:
       kustaurant: ${{ steps.paths.outputs.kustaurant }}
@@ -28,7 +28,7 @@ jobs:
               - 'common/**'
 
   kustaurant-build-push:
-    name: 2 변경된 경우 빌드 및 푸쉬
+    name: 🛠️ 변경된 경우 빌드 및 푸쉬
     needs: detect-changes
     if: |
       needs.detect-changes.outputs.kustaurant == 'true'
@@ -63,7 +63,7 @@ jobs:
             type=raw,value=latest
             type=sha,format=long
 
-      - name: 3 도커 이미지 빌드 및 푸쉬
+      - name: 도커 이미지 빌드 및 푸쉬
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -75,7 +75,7 @@ jobs:
           cache-to: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/kustaurant:buildcache,mode=max
 
   deploy:
-    name: 도커 이미지 불러와서 실행
+    name: 🚀 도커 컴포즈 배포
     needs: kustaurant-build-push
     if: needs.detect-changes.outputs.kustaurant == 'true'
     runs-on: ubuntu-latest
@@ -89,6 +89,7 @@ jobs:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+          envs: ENV_FILE,DOCKER_COMPOSE_ENV_FILE
           script: |
             set -e
             mkdir -p /home/ubuntu/kustaurant-docker
