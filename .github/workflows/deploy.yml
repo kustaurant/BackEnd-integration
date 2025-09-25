@@ -102,6 +102,8 @@ jobs:
           script: |
             set -e
             sudo mkdir -p /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/kustaurant-docker/infra/docker
+            sudo chmod -R 755 /home/ubuntu/kustaurant-docker/infra/docker
             cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
             umask 077
             cat > .env <<EOF
