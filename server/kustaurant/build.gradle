@@ -1,3 +1,14 @@
+plugins {
+    id 'idea'
+}
+
+idea {
+    module {
+        testSourceDirs    += file('src/integrationTest/java')
+        testResourceDirs  += file('src/integrationTest/resources')
+    }
+}
+
 version = '2.0.0'
 description = 'kustaurant'
 
@@ -49,7 +60,7 @@ dependencies {
     // implementation "org.seleniumhq.selenium:selenium-java:4.20.0"
     //flyway
     implementation 'org.flywaydb:flyway-mysql'
-    //env
+    //.env
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
     //webclient
 //    implementation 'org.springframework.boot:spring-boot-starter-webflux'
