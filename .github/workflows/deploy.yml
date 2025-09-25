@@ -1,4 +1,4 @@
-name: Build And Deploy If Changed
+name: 변경된 모듈 배포
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   detect-changes:
+    name: 변경사항 감지
     runs-on: ubuntu-latest
     outputs:
       kustaurant: ${{ steps.paths.outputs.kustaurant }}
@@ -26,6 +27,7 @@ jobs:
               - 'common/**'
 
   kustaurant-build-push:
+    name: 변경된 경우 빌드 및 푸쉬
     needs: detect-changes
     if: |
       needs.detect-changes.outputs.kustaurant == 'true'
@@ -72,6 +74,7 @@ jobs:
           cache-to: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/kustaurant:buildcache,mode=max
 
   deploy:
+    name: 도커 이미지 불러와서 실행하기
     needs: kustaurant-build-push
     if: needs.detect-changes.outputs.kustaurant == 'true'
     runs-on: ubuntu-latest
@@ -108,6 +111,8 @@ jobs:
 
       - name: docker 이미지 pull 및 docker compose 실행
         uses: appleboy/ssh-action@v1.2.0
+        enf:
+          SPRING_PROFILES_ACTIVE: prod
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
