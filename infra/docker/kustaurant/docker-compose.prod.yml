@@ -8,4 +8,4 @@ services:
       - .env
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-    restart: unless-stopped
+#    restart: unless-stopped
