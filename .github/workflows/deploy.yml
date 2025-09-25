@@ -120,6 +120,9 @@ jobs:
           strip_components: 3
           overwrite: true
 
+      - name: 서버에서 Docker 로그인
+        run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
       - name: docker 이미지 pull 및 docker compose 실행
         uses: appleboy/ssh-action@v1.2.0
         env:
