@@ -12,6 +12,10 @@ idea {
 version = '2.0.0'
 description = 'kustaurant'
 
+jar {
+    enabled = false
+}
+
 dependencies {
     implementation project(':common:jpa')
 

@@ -1,10 +1,9 @@
 services:
-  main-app:
-    container_name: kustaurant-main-app
-    image: ${DOCKERHUB_USERNAME}:latest
+  boot:
+    container_name: kustaurant-boot
+    image: docker.io/dingwoon/kustaurant:${DEPLOY_TAG:-latest}
     ports:
       - "8080:8080"
-    restart: always
-
-  nginx:
-    container_name: kustaurant-nginx
+    env_file:
+      - .env
+    restart: unless-stopped
