@@ -1,5 +1,5 @@
 version = '0.0.1'
-description = 'crawling'
+description = 'crawler'
 
 dependencies {
     implementation project(':common:jpa')
