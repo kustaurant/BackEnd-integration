@@ -7,10 +7,6 @@ on:
   push:
     branches: [ "main" ]
 
-permissions:
-  contents: read
-  actions: write
-
 jobs:
   detect-changes:
     name: 변경사항 감지
@@ -116,7 +112,7 @@ jobs:
 
       - name: docker 이미지 pull 및 docker compose 실행
         uses: appleboy/ssh-action@v1.2.0
-        enf:
+        env:
           SPRING_PROFILES_ACTIVE: prod
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
