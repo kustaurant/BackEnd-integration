@@ -105,6 +105,8 @@ jobs:
             cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
             umask 077
             cat > .env <<EOF
+            SPRING_PROFILES_ACTIVE=prod
+            
             ${ENV_FILE}
             
             ${DOCKER_COMPOSE_ENV_FILE}
@@ -123,7 +125,6 @@ jobs:
       - name: docker 이미지 pull 및 docker compose 실행
         uses: appleboy/ssh-action@v1.2.0
         env:
-          SPRING_PROFILES_ACTIVE: prod
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN:    ${{ secrets.DOCKERHUB_TOKEN }}
         with:
