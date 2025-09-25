@@ -101,8 +101,8 @@ jobs:
           envs: ENV_FILE,DOCKER_COMPOSE_ENV_FILE
           script: |
             set -e
-            mkdir -p /home/ubuntu/kustaurant-docker
-            cd /home/ubuntu/kustaurant-docker
+            mkdir -p /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
+            cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
             umask 077
             cat > .env <<EOF
             ${ENV_FILE}
@@ -134,8 +134,8 @@ jobs:
             set -e
             cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
             echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            sudo docker compose -p kustaurant -f docker-compose.yml -f docker-compose.prod.yml pull
-            sudo docker compose \
-            --env-file /home/ubuntu/kustaurant-docker/.env \
+            sudo docker compose -p kustaurant \
+            -f docker-compose.yml -f docker-compose.prod.yml pull
+            sudo docker compose -p kustaurant \
             -f docker-compose.yml -f docker-compose.prod.yml up -d
             sudo docker image prune -f
