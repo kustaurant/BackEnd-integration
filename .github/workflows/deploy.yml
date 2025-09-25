@@ -136,7 +136,7 @@ jobs:
             # 그라파나 쓰기 권한
             # sudo chown -R 472:0 /home/ubuntu/kustaurant-docker/infra/monitoring/grafana
             # sudo chmod -R 775 /home/ubuntu/kustaurant-docker/infra/monitoring/grafana
-            sudo chmod -R 775 /home/ubuntu/kustaurant-docker/infra/monitoring/grafana
+            sudo chmod -R 777 /home/ubuntu/kustaurant-docker/infra/monitoring/grafana
             # 디렉터리 이동
             cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
             # docker hub 로그인
