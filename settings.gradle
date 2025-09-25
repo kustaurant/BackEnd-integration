@@ -1,1 +1,8 @@
 rootProject.name = 'kustaurant'
+
+include 'common'
+include 'common:jpa'
+
+include 'server'
+include 'server:kustaurant'
+include 'server:crawler'

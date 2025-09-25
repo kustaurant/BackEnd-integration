@@ -1,0 +1,18 @@
+spring:
+  ai:
+    retry:
+      on-http-codes: 429
+      backoff:
+        initial-interval: 1000
+        multiplier: 3
+      max-attempts: 20
+    openai:
+      api-key: ${OPEN_AI_KEY}
+      chat:
+        options:
+          # Open AI model: https://platform.openai.com/docs/models
+          model: ${OPEN_AI_MODEL}
+          temperature: 1.0
+      embedding:
+        options:
+          model: text-embedding-ada-002
