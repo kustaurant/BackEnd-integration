@@ -133,10 +133,17 @@ jobs:
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
           script: |
             set -e
+            # 그라파나 쓰기 권한
+            sudo chown -R 472:0 /home/ubuntu/kustaurant-docker/infra/monitoring/grafana-data
+            sudo chmod -R 775 /home/ubuntu/kustaurant-docker/infra/monitoring/grafana-data
+            # 디렉터리 이동
             cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
+            # docker hub 로그인
             echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            # 도커 컴포즈
             sudo docker compose -p kustaurant \
             -f docker-compose.yml -f docker-compose.prod.yml pull
             sudo docker compose -p kustaurant \
             -f docker-compose.yml -f docker-compose.prod.yml up -d
+            # 미사용(이전) 이미지 정리
             sudo docker image prune -f
