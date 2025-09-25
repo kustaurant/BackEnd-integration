@@ -3,7 +3,7 @@ spring:
     active: local
   config:
     import:
-#      - optional:file:server/kustaurant/.env[.properties]
+      - "optional:file:server/kustaurant/.env[.properties]"
       - "optional:auth.yml"
       - "optional:.env"
   servlet:
