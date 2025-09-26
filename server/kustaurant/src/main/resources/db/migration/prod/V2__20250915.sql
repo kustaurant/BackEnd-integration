@@ -164,7 +164,7 @@ CREATE TABLE user_stats_tbl (
                                     FOREIGN KEY (user_id)
                                         REFERENCES users_tbl(user_id)
                                         ON DELETE CASCADE
-)
+);
 
 -- v8
 ALTER TABLE restaurant_comments_tbl

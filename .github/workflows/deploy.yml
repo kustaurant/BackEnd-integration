@@ -1,53 +1,159 @@
-name: Github-actions 자동 배포
+name: 자동 CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
-  Deploy:
+  detect-changes:
+    name: 🔍 변경사항 감지
     runs-on: ubuntu-latest
-
+    outputs:
+      kustaurant: ${{ steps.paths.outputs.kustaurant }}
+      crawler: ${{ steps.paths.outputs.crawler }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: paths
+        with:
+          filters: |
+            kustaurant:
+              - 'server/kustaurant/**'
+              - 'common/**'
+            crawler:
+              - 'server/crawler/**'
+              - 'common/**'
 
-      - name: SSH로 LightSail 인스턴스 접속해서 원격에서 최신 코드 pull 받고 빌드 -> 빌드 파일 실행 하기
-        uses: appleboy/ssh-action@v1
-        env:
-          ENV_FILE: ${{ secrets.ENV_FILE }}
+  kustaurant-build-push:
+    name: 🛠️ 변경된 경우 빌드 및 푸쉬
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.kustaurant == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: 쿠스토랑 모듈 빌드(테스트 제외)
+        run: ./gradlew :server:kustaurant:clean :server:kustaurant:assemble --no-daemon
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 도커 허브 로그인
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/kustaurant
+          tags: |
+            type=raw,value=latest
+            type=sha,format=long
+
+      - name: 도커 이미지 빌드 및 푸쉬
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: server/kustaurant/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/kustaurant:buildcache
+          cache-to: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/kustaurant:buildcache,mode=max
+
+  deploy:
+    name: 🚀 도커 컴포즈 배포
+    needs: kustaurant-build-push
+    if: needs.detect-changes.outputs.kustaurant == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 파일 확인용
+        run: |
+          ls -al infra/docker/kustaurant || true
+          ls -al infra/monitoring || true
+
+      - name: 디렉터리 생성 및 권한 설정
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
           username: ${{ secrets.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
-          envs: ENV_FILE
           script: |
             set -e
-            set -x
+            sudo mkdir -p /home/ubuntu/kustaurant-docker/infra
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/kustaurant-docker/infra
+            sudo chmod -R 755 /home/ubuntu/kustaurant-docker/infra
+
+      - name: env 파일 업데이트
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          ENV_FILE: ${{ secrets.KUSTAURANT_ENV_FILE }}
+          DOCKER_COMPOSE_ENV_FILE: ${{ secrets.KUSTAURANT_DOCKER_COMPOSE_ENV_FILE }}
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+          envs: ENV_FILE,DOCKER_COMPOSE_ENV_FILE
+          script: |
+            set -e
+            mkdir -p /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
+            cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
+            umask 077
+            cat > .env <<EOF
+            SPRING_PROFILES_ACTIVE=prod
             
-            cd /home/ubuntu/BackEnd-integration
-            git checkout main
-
-            # 최신 코드 가져오기
-            git pull origin main
-
-            # .env 파일 복원
-            echo "$ENV_FILE" | base64 -d > .env
-
-            # 빌드 수행
-            chmod +x ./gradlew
-            ./gradlew clean build
+            ${ENV_FILE}
             
-            sudo fuser -k -n tcp 8080 || true
-            
-            # build.gradle에서 version 추출
-            VERSION=$(grep '^version' build.gradle | sed -E "s/version *= *'([^']+)'/\1/")
-            JAR=build/libs/RestaurantTier-$VERSION.jar
+            ${DOCKER_COMPOSE_ENV_FILE}
+            EOF
 
-            # 빌드 파일 실행
-            LOG=$HOME/logs/kustaurant.log
-            export SPRING_PROFILES_ACTIVE=prod
-            mkdir -p $HOME/logs
+      - name: infra 파일 업데이트
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+          source: "./infra"
+          target: "/home/ubuntu/kustaurant-docker"
+          overwrite: true
 
-            nohup java -jar  $JAR > $LOG 2>&1 &
+      - name: docker 이미지 pull 및 docker compose 실행
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN:    ${{ secrets.DOCKERHUB_TOKEN }}
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+          script: |
+            set -e
+            # 그라파나 쓰기 권한
+            # sudo chown -R 472:0 /home/ubuntu/kustaurant-docker/infra/monitoring/grafana
+            # sudo chmod -R 775 /home/ubuntu/kustaurant-docker/infra/monitoring/grafana
+            sudo chmod -R 777 /home/ubuntu/kustaurant-docker/infra/monitoring/**
+            # 디렉터리 이동
+            cd /home/ubuntu/kustaurant-docker/infra/docker/kustaurant
+            # docker hub 로그인
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            # 도커 컴포즈
+            sudo docker compose -p kustaurant \
+            -f docker-compose.yml -f docker-compose.prod.yml pull
+            sudo docker compose -p kustaurant \
+            -f docker-compose.yml -f docker-compose.prod.yml up -d
+            # 미사용(이전) 이미지 정리
+            sudo docker image prune -f

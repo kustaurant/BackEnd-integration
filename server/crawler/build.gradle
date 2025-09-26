@@ -1,5 +1,16 @@
+plugins {
+    id 'idea'
+    id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
 version = '0.0.1'
 description = 'crawler'
+
+jar {
+    enabled = false
+}
 
 dependencies {
     implementation project(':common:jpa')

@@ -99,8 +99,8 @@ public class ReviewQueryService {
                     return new ReviewsResponse(
                             ev.getId(),                                  // evalId
                             ev.getEvaluationScore(),                               // evalScore
-                            UserIconResolver.resolve(writer.getEvalCount()),
-                            writer.getNickname().toString(),
+                            UserIconResolver.resolve(Objects.isNull(writer) ? 0 : writer.getEvalCount()),
+                            Objects.isNull(writer) ? "탈퇴한 회원" : writer.getNickname().toString(),
                             TimeAgoResolver.toKor(ev.getCreatedAt()),
                             ev.getCommentImgUrl(),                              // evalImgUrl
                             ev.getCommentBody(),                                // evalBody
