@@ -9,6 +9,7 @@ import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.ent
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QSituationEntity.situationEntity;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
+import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
 import static java.util.Objects.isNull;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.QRestaurantMenu;
@@ -63,7 +64,7 @@ public class RestaurantDetailQuery {
                                         set(situationEntity.situationName),
                                         restaurantEntity.partnershipInfo,
                                         Expressions.constant(getEvaluationCount(restaurantId)),
-                                        ratingEntity.score.coalesce(0.0),
+                                        numberTemplate(Double.class, "ROUND({0}, 1)", ratingEntity.score.coalesce(0.0)),
                                         evaluationEntity.isNotNull(),
                                         restaurantFavoriteEntity.isNotNull(),
                                         Expressions.constant(getFavoriteCount(restaurantId)),
