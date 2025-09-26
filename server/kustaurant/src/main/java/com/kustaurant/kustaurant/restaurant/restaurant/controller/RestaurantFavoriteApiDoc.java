@@ -10,10 +10,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 
-public interface FavoriteApiDoc {
+@Tag(name = "restaurant-reaction-controller")
+public interface RestaurantFavoriteApiDoc {
 
     @Operation(summary = "즐겨찾기 추가", description = "즐겨찾기 버튼을 누른 후의 즐겨찾기 상태와 수를 반환합니다.\n\n" +
             "[즐겨찾기 상태]\n\n" +

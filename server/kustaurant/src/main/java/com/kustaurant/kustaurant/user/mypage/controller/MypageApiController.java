@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Tag(name = "user-mypage-controller")
 public class MypageApiController {
     private final MypageService mypageService;
 
@@ -29,9 +31,9 @@ public class MypageApiController {
     @Operation(
             summary = "\"마이페이지 화면\" 로드에 필요한 정보 불러오기",
             description = "마이페이지 화면에 필요한 정보들이 반환됩니다. " +
-                    "로그인하지 않은 회원도 접속 가능하기 때문에 엔드포인트에 /auth가 포함되지 않습니다. " +
-                    "로그인하지 않은 회원인 경우 기본적인 빈 객체가 반환됩니다." +
-                    "웹과 response객체를 같이 쓰다 보니 앱에서 사용하지 않는 값이 있습니다. 그 값들은 무시하시면 됩니다."
+                    "\n\n로그인하지 않은 회원도 접속 가능하기 때문에 엔드포인트에 /auth가 포함되지 않습니다. " +
+                    "\n\n로그인하지 않은 회원인 경우 기본적인 빈 객체가 반환됩니다. " +
+                    "\n\n웹과 response객체를 같이 쓰다 보니 앱에서 사용하지 않는 값이 있습니다. 그 값들은 무시하시면 됩니다."
     )
     @GetMapping("/v2/mypage")
     public ResponseEntity<ProfileResponse> getMypageView(
@@ -67,7 +69,7 @@ public class MypageApiController {
     @Operation(
             summary = "마이페이지 프로필 변경하기",
             description = "유저의 닉네임,전화번호를 변경합니다. (프로필 사진 미구현)" +
-                    "닉네임 또는 전화번호 중 하나만 변경요청 가능하므로 "
+                    "닉네임 또는 전화번호 중 하나만 변경요청 가능합니다 "
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "요청에 변경된 값이 없습니다 or" +

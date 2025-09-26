@@ -22,6 +22,7 @@ import com.kustaurant.kustaurant.global.exception.exception.ParamException;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.v1.evaluation.response.RestaurantCommentDTO;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Hidden
 @Slf4j
 @RestController
 @RequiredArgsConstructor

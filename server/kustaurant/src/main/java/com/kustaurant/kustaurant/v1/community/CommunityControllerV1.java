@@ -17,6 +17,7 @@ import com.kustaurant.kustaurant.user.rank.domain.RankingSortOption;
 import com.kustaurant.kustaurant.user.rank.service.RankingService;
 import com.kustaurant.kustaurant.user.user.controller.port.UserService;
 import com.kustaurant.kustaurant.v1.community.dto.*;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
+@Hidden
 @RestController
 @RequiredArgsConstructor
 public class CommunityControllerV1 {

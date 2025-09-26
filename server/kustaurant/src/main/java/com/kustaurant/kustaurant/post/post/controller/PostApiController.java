@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Tag(name = "community-post-controller")
 public class PostApiController {
     private final PostService postService;
     private final PostQueryService postQueryService;
@@ -57,6 +59,7 @@ public class PostApiController {
     }
 
     // 2. 게시글 수정 요청
+    @Operation(summary = "게시글 수정 요청", description = "수정하기 위한 게시글을 조회해서 반환합니다")
     @GetMapping("/v2/auth/community/posts/{postId}")
     public ResponseEntity<PostResponse> updatePost(
             @PathVariable @Parameter Long postId,
@@ -66,7 +69,7 @@ public class PostApiController {
     }
 
     // 3. 게시글 수정 완성
-    @Operation(summary = "게시글 수정", description = "게시글 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 수정합니다.\n\n" +
+    @Operation(summary = "게시글 수정 완료", description = "게시글 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 수정합니다.\n\n" +
             "- 요청 형식 보충 설명\n\n" +
             "   - title: 필수\n\n" +
             "   - category: 필수.\n\n" +
@@ -110,7 +113,7 @@ public class PostApiController {
     @Operation(summary = "게시글 작성 중 이미지 업로드", description = "게시글 작성화면에서 이미지를 업로드합니다")
     @PostMapping("/v2/auth/community/posts/image")
     public ResponseEntity<?> imageUpload(
-            @RequestParam("image") MultipartFile imageFile
+            @RequestPart("image") MultipartFile imageFile
     ) {
         try {
             String imageUrl = S3Service.storeImage(imageFile);

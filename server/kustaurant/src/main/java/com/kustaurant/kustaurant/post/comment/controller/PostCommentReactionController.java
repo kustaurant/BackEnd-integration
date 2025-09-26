@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
-public class PostCommReactionController {
+public class PostCommentReactionController {
     private final PostCommentReactionService reactionService;
 
     //1. 게시글 댓글 좋아요
