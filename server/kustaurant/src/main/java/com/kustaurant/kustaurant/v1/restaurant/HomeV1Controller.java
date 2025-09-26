@@ -11,7 +11,6 @@ import com.kustaurant.kustaurant.restaurant.query.home.RestaurantHomeService;
 import com.kustaurant.kustaurant.restaurant.query.search.RestaurantSearchService;
 import com.kustaurant.kustaurant.v1.restaurant.response.RestaurantTierDTO;
 import com.kustaurant.kustaurant.v1.restaurant.response.RestaurantListsResponse;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.Explode;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Hidden
 @RestController
 @RequiredArgsConstructor
 public class HomeV1Controller {

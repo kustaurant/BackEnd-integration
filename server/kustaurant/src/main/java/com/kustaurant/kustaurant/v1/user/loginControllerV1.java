@@ -12,14 +12,12 @@ import com.kustaurant.kustaurant.v1.common.ErrorResponse;
 import com.kustaurant.kustaurant.v1.user.dto.AppleLoginRequest;
 import com.kustaurant.kustaurant.v1.user.dto.NaverLoginRequest;
 import com.kustaurant.kustaurant.v1.user.dto.V1TokenResponse;
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-@Hidden
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor

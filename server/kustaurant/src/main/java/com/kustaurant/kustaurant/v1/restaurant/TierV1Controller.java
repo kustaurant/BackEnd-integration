@@ -9,8 +9,6 @@ import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoD
 import com.kustaurant.kustaurant.v1.restaurant.response.RestaurantTierDTO;
 import com.kustaurant.kustaurant.v1.restaurant.response.RestaurantTierMapDTO;
 import java.util.List;
-
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
