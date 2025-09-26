@@ -11,6 +11,7 @@ import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.*;
 import com.kustaurant.kustaurant.v1.mypage.dto.*;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Hidden
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")

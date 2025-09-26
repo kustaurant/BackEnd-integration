@@ -14,9 +14,16 @@ import io.swagger.v3.oas.annotations.enums.ParameterStyle;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
+@Tag(
+        name = "restaurant v1 tier controller",
+        description = "구 앤드포인트 호환용 컨트롤러 :: v2작업시 필요할 수 있어 남겨둡니다."
+)
 public interface TierV1Doc {
+
     @Operation(
             summary = "티어표 리스트 불러오기",
             description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +

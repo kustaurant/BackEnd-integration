@@ -31,6 +31,12 @@ spring:
       namespace: spring:session
       repository-type: indexed
 
+# swagger
+springdoc:
+  swagger-ui:
+    tagsSorter: alpha   # 태그 이름 알파벳 정렬
+    operationsSorter: alpha
+
 # monitoring
 management:
   endpoints:
