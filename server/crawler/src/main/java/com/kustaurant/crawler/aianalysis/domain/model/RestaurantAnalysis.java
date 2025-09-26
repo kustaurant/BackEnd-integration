@@ -18,7 +18,7 @@ public class RestaurantAnalysis {
     private double avgScore;
     private Map<String, Integer> situationCounts;
 
-    public static RestaurantAnalysis of(List<ReviewAnalysis> analyses) {
+    public static RestaurantAnalysis from(List<ReviewAnalysis> analyses) {
         int total = analyses.size();
         int pos = 0, neg = 0, sum = 0;
         Map<String, Integer> map = new HashMap<>();
@@ -29,9 +29,9 @@ public class RestaurantAnalysis {
                 neg++;
             }
             sum += r.score();
-            for (String s : r.situations()) {
-                map.merge(s, 1, Integer::sum);
-            }
+//            for (String s : r.situations()) {
+//                map.merge(s, 1, Integer::sum);
+//            }
         }
         return new RestaurantAnalysis(total, pos, neg, sum, sum * 1d / total, map);
     }

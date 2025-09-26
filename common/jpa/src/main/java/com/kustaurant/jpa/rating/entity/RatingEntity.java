@@ -19,12 +19,33 @@ public class RatingEntity {
     @Id
     @Column(name = "restaurant_id")
     private long restaurantId;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
     private double score;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "INT DEFAULT -1")
     private int tier;
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isTemp;
-    @Column(nullable = false)
+    @Column
     private LocalDateTime ratedAt;
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private int aiReviewCount;
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private int aiPositiveCount;
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private int aiNegativeCount;
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private int aiScoreSum;
+    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    private double aiAvgScore;
+    @Column
+    private LocalDateTime aiProcessedAt;
+
+    public RatingEntity(long restaurantId, double score, int tier, boolean isTemp,
+            LocalDateTime ratedAt) {
+        this.restaurantId = restaurantId;
+        this.score = score;
+        this.tier = tier;
+        this.isTemp = isTemp;
+        this.ratedAt = ratedAt;
+    }
 }

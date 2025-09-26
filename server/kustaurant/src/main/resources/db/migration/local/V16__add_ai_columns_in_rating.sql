@@ -1,0 +1,12 @@
+ALTER TABLE restaurant_rating
+    ADD COLUMN ai_review_count INT NOT NULL DEFAULT 0,
+    ADD COLUMN ai_positive_count INT NOT NULL DEFAULT 0,
+    ADD COLUMN ai_negative_count INT NOT NULL DEFAULT 0,
+    ADD COLUMN ai_score_sum INT NOT NULL DEFAULT 0,
+    ADD COLUMN ai_avg_score DOUBLE NOT NULL DEFAULT 0.0,
+    ADD COLUMN ai_processed_at DATETIME(6) NULL;
+
+ALTER TABLE restaurant_rating
+    MODIFY COLUMN score DOUBLE NOT NULL DEFAULT 0.0,
+    MODIFY COLUMN tier INT NOT NULL DEFAULT -1,
+    MODIFY COLUMN rated_at DATETIME(6) NULL;

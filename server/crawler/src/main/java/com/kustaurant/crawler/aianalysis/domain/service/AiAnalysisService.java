@@ -27,7 +27,7 @@ public class AiAnalysisService {
     public RestaurantAnalysis analyzeReviews(List<Review> reviews, List<String> situations) {
         List<ReviewAnalysis> analyses = parallelCall(reviews, situations);
 
-        return RestaurantAnalysis.of(analyses);
+        return RestaurantAnalysis.from(analyses);
     }
 
     private List<ReviewAnalysis> parallelCall(List<Review> reviews,

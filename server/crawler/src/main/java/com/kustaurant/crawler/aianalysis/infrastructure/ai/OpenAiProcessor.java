@@ -25,15 +25,15 @@ public class OpenAiProcessor implements AiProcessor {
         String scoreJson = openAiChatModel.call(
                 OpenAiPrompts.getMainScorePrompt(List.of(1, 2, 3, 4, 5), review.body())
         ).getResult().getOutput().getText();
-        String situationsJson = openAiChatModel.call(
-                OpenAiPrompts.getSituationPrompt(situations, review.body())
-        ).getResult().getOutput().getText();
+//        String situationsJson = openAiChatModel.call(
+//                OpenAiPrompts.getSituationPrompt(situations, review.body())
+//        ).getResult().getOutput().getText();
 
         ScoreResponse scoreRes = JsonUtils.deserialize(scoreJson, ScoreResponse.class);
-        SituationsResponse situationsRes = JsonUtils.deserialize(situationsJson, SituationsResponse.class);
+//        SituationsResponse situationsRes = JsonUtils.deserialize(situationsJson, SituationsResponse.class);
 
         return Optional.of(new ReviewAnalysis(
-                review, scoreRes.score(), scoreRes.sentiment(), situationsRes.situations()
+                review, scoreRes.score(), scoreRes.sentiment(), null
         ));
     }
 }
