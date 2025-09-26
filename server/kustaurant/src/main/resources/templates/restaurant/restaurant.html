@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C47HQ74QCF"></script>
+
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-C47HQ74QCF');
+    </script>
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T2CX8XG3');
+    </script>
+
+    <!-- End Google Tag Manager -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title th:text="${'쿠스토랑 - ' + restaurantDto.getRestaurantName()}"></title>
+    <meta charset="UTF-8"/>
+
+    <!--  csrf token  -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+    <!-- 아이콘 라이브러리-->
+    <script src="https://kit.fontawesome.com/0c60714712.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- 탭 관련 라이브러리 / 순서 지켜야함 -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/library/vendors.min.css">
+    <link rel="stylesheet" href="/css/library/style.min.css">
+    <link rel="stylesheet" href="/css/library/responsive.min.css">
+    <link rel="stylesheet" href="/css/library/restaurant.css">
+    <link rel="stylesheet" type="text/css" href="/css/restaurant/restaurant-style.css"/>
+
+    <!-- 파비콘 -->
+    <link rel="icon" type="image/x-icon" href="/img/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
+
+    <!-- js   -->
+    <script type="text/javascript" src="/js/library/jquery.js"></script>
+    <script type="text/javascript" src="/js/library/vendors.min.js"></script>
+    <script type="text/javascript" src="/js/library/main.js"></script>
+
+    <!-- Thymeleaf를 통해 서버 측에서 전달된 데이터를 JavaScript 파일에 전달 -->
+    <script th:inline="javascript">
+        const restaurantMenus = /*[[${menus}]]*/ [];
+        const initialDisplayMenuCount = /*[[${initialDisplayMenuCount}]]*/ [];
+    </script>
+
+    <script type="text/javascript" src="/js/restaurant/restaurantScript.js" defer></script>
+    <script type="text/javascript" src="/js/restaurant/restaurantMenuScript.js" defer></script>
+    <script type="text/javascript" src="/js/restaurant/restaurantFavoriteScript.js" defer></script>
+    <script type="text/javascript" src="/js/evaluation/EvaluationReviewScript.js" defer></script>
+    <script type="text/javascript" src="https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js"
+            charset="utf-8">
+    </script>
+    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=gifrujmoep"></script>
+</head>
+
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T2CX8XG3" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<header th:replace="~{common/navbar-new :: navbarFragment}"></header>
+
+<div class="outer-container" id="outerContainer">
+
+    <div class="inner-container">
+        <div class="basic-info left-justified">
+            <img th:if="${restaurantDto.restaurantImgUrl != 'no_img'}" th:id="mainImg" th:src="${restaurantDto.restaurantImgUrl}">
+            <img th:if="${restaurantDto.restaurantImgUrl == 'no_img'}" th:id="mainImg" src="/img/restaurant/no_img.png">
+            <div class="texts left-justified">
+                <div id="restaurantNameOuter">
+                    <div id="restaurantName" th:text="${restaurantDto.restaurantName}"></div>
+                    <div id="favoriteContainer">
+                        <img id="favoriteImg" th:class="${restaurantDto.isFavorite} ? 'after-favorite' : 'before-favorite'"
+                             th:src="${restaurantDto.isFavorite} ? 'https://s-lol-web.op.gg/images/icon/icon-bookmark-on-w.svg?v=1702977255104' : 'https://s-lol-web.op.gg/images/icon/icon-bookmark.svg?v=1702977255104'">
+                    </div>
+                </div>
+                <span id="restaurantType" th:text="${restaurantDto.restaurantType}"></span>
+                <span id="restaurantAddress" th:text="${restaurantDto.restaurantAddress}"></span>
+                <span id="restaurantTel" th:text="${restaurantDto.restaurantTel}"></span>
+                <a id="naverMapLink" target="_blank" th:href="${restaurantDto.naverMapUrl}">네이버 지도로 이동하기</a>
+            </div>
+        </div>
+        <div>
+            <div class="cuisine-tier-info left-justified" id="tierInfoContainer">
+                <span th:class="'cuisine-tier tier' + ${restaurantDto.mainTier}">
+                    <img class="tier-cuisine-img" th:src="${restaurantDto.restaurantCuisineImgUrl}">
+                    <span th:text="${restaurantDto.restaurantCuisine} + ' '"></span>
+                    <span th:text="${restaurantDto.mainTier} + '티어'" th:if="${restaurantDto.mainTier != -1}"></span>
+                    <span th:if="${restaurantDto.mainTier == -1}">- 평가 데이터가 부족합니다.</span>
+                </span>
+            </div>
+            <div class="situation-tier-info left-justified">
+                <span th:each="situation : ${restaurantDto.situationList}" class="situation-tier tier-1">
+                    <img class="tier-situation-img" th:src="'https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/situation/'+${situation}+'.png'">
+                    <span th:text="${situation} + ' '"></span>
+                </span>
+            </div>
+        </div>
+        <div class="stats-info">
+            <div class="stat-data" style="margin-right: 10px;">
+                <div class="stat-name">페이지 방문 횟수</div>
+                <div id="statVisitors" class="stat-value" th:text="${restaurantDto.visitCount}"></div>
+            </div>
+            <div class="stat-data">
+                <div class="stat-name">평가 데이터 개수</div>
+                <div id="statDatas" class="stat-value" th:text="${restaurantDto.evaluationCount} + '개'"></div>
+            </div>
+            <div class="stat-data">
+                <div class="stat-name">즐겨찾기 수</div>
+                <div id="favoriteCount" class="stat-value" th:text="${restaurantDto.favoriteCount} + '개'"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="inner-container" th:if="${restaurantDto.partnershipInfo}">
+        <div class="stat-name" th:text="'제휴 정보 - ' + ${restaurantDto.partnershipInfo}"></div>
+    </div>
+
+
+    <div id="menuContainer" class="inner-container" th:if="${#lists.size(restaurantDto.restaurantMenuList) > 0 && restaurantDto.restaurantMenuList[0].menuName != 'no_menu'}">
+        <div id="menuTopDiv" style="height:110px; width:100%; position: absolute; top: -110px; left: 0; visibility: hidden;"></div>
+        <div class="section-title">메뉴</div>
+        <div id="menuInfoContainer">
+            <ul class="menu-ul" id="menuUL">
+                <li th:each="menu, iterStat : ${restaurantDto.restaurantMenuList}" th:if="${iterStat.index < initialDisplayMenuCount}">
+                    <img th:if="${(menu.naverType eq 'type1' or menu.naverType eq 'type3') and menu.menuImgUrl != 'icon'}" th:src="${menu.menuImgUrl}" alt="menu img">
+                    <img th:if="${(menu.naverType eq 'type1' or menu.naverType eq 'type3') and menu.menuImgUrl == 'icon'}" src="/img/favicon.png" alt="menu img">
+                    <div class="menu-text-container">
+                        <div class="menu-name" th:text="${menu.menuName}"></div>
+                        <div class="menu-price">
+                            <em th:text="${menu.menuPrice.substring(0, menu.menuPrice.length())}"></em>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div id="menuUnfoldButton" class="unfold-button" th:if="${#lists.size(restaurantDto.restaurantMenuList) > 3}">펼치기</div>
+    </div>
+    <div id="mapContainer" class="inner-container">
+        <div id="mapTopDiv" style="height:110px; width:100%; position: absolute; top: -110px; left: 0; visibility: hidden;"></div>
+        <div id="map"></div>
+        <div id="mapUnfoldButton" class="unfold-button">펼치기</div>
+    </div>
+
+    <a class="inner-container evaluation-button button" id="evaluationButton"
+       th:href="@{/evaluation/{restuarantId}(restuarantId=${restaurantDto.restaurantId})}"
+       th:text="${evaluationButton}"></a>
+
+    <!-- 댓글 정렬 -->
+    <div class="comment-container">
+        <div class="sort-toggle-buttons">
+            <button id="button1" class="active">인기순</button>
+            <button id="button2">최신순</button>
+        </div>
+    </div>
+
+    <!-- 댓글 부분 -->
+    <div class="comment-list-container">
+        <ul id="commentList"></ul>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">댓글 삭제</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    정말 댓글을 삭제하시겠습니까?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="cancel btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button id="deleteAgreeButton" type="button" class="sure btn btn-primary" data-bs-dismiss="modal">삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:replace="~{common/footer::footerFragment}">
+
+</footer>
+
+<script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
+<script type="text/javascript">
+    if(!wcs_add) var wcs_add = {};
+    wcs_add["wa"] = "14b5af05d120a20";
+    if(window.wcs) {
+        wcs_do();
+    }
+</script>
+</body>
+<!-- 자바스크립트 데이터 전달용 태그 -->
+<div id="restaurantInfo"
+     th:attr="data-name=${restaurantDto.restaurantName}, data-latitude=${restaurantDto.latitude}, data-longitude=${restaurantDto.longitude}">
+</div>
+</html>

@@ -1,0 +1,180 @@
+<!--상단 탭-->
+<header th:fragment="navbarFragment" class="sticky-active" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css">
+    <link rel="stylesheet" href="/css/topSearch-style.css">
+    <link rel="stylesheet" href="/css/newNavbar-style.css">
+    <script type="text/javascript" src="/js/topSearchScript.js" defer></script>
+    <script type="text/javascript" src="/js/newNavbarScript.js" defer></script>
+    <!--    <script src="/js/feedbackScript.js" defer></script>-->
+
+    <style>
+        #myPage {
+            width: 30px;
+            height: 30px;
+        }
+        .active > a{
+
+        }
+    </style>
+    <!-- 검색창 부분 -->
+    <div id="searchArea" class="top-search-area">
+        <div id="searchBackdrop" class="search-backdrop"></div>
+        <div class="search-front">
+            <div class="search-top">
+                <div id="inputContainer" class="top-input-container">
+                    <img src="/img/home/search.png">
+                    <input id="mainSearchInput" placeholder="검색하세요">
+                    <button id="eraseButtonReal">
+                        <img id="eraseButton" src="/img/home/erase.png">
+                    </button>
+                </div>
+            </div>
+            <div class="search-middle">
+
+            </div>
+            <div id="searchBottom" class="search-bottom">
+                <button type="button" class="search-tip"
+                        data-bs-toggle="tooltip" data-bs-placement="bottom"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title="단어를 띄어쓰기로 구분해서 검색하세요!(검색 예시: '초밥', '닭발 술집', '일식 튀김', '튀김 매운 한식')">
+                    검색 팁
+                </button>
+                <div></div>
+                <span id="feedbackButton" class="feedback-button" onclick="isLogin()">Feedback</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div class="modal fade" id="exampleModalFeedback" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="exampleModalLabelFeedback">Give Feedback</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea id="feedbackTextarea" placeholder="어떤 피드백이든 감사합니다!" spellcheck="false"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="setIsFeedbackWindowOpenFalse()" class="cancel btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button id="feedbackSubmitButton" onclick="submitFeedback()" type="button" class="sure btn btn-primary" data-bs-dismiss="modal">제출</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg header-light header-reverse alt-font"
+         data-header-hover="light" style="background-color: white;opacity: 0.9;">
+        <div class="container-fluid">
+            <!-- 메뉴 부분 -->
+            <div class="col-auto col-lg-2 me-lg-0 me-auto">
+                <a class="navbar-brand" href="/">
+                    <script type="text/javascript" style="display:none">
+                        //<![CDATA[
+                        window.__mirage2 = {petok: "E5U2MX_72TJ6zGrnnrl16NRJf7wB8JKtWT5ha.GflxI-3600-0"};
+                        //]]>
+                    </script>
+                    <script type="text/javascript"
+                            src="https://ajax.cloudflare.com/cdn-cgi/scripts/04b3eb47/cloudflare-static/mirage2.min.js"></script>
+                    <img src="/img/home/main_logo.png" data-at2x="/img/home/main_logo.png" alt="쿠스토랑"
+                         class="default-logo navbar-logo">
+                    <img src="/img/home/main_logo.png" data-at2x="/img/home/main_logo.png" alt="쿠스토랑"
+                         class="alt-logo navbar-logo">
+                    <img src="/img/home/main_logo.png" data-at2x="/img/home/main_logo.png" alt="쿠스토랑"
+                         class="mobile-logo navbar-logo">
+                    <!--                        <img data-cfsrc="images/demo-restaurant-logo-black.png" data-at2x="images/demo-restaurant-logo-black@2x.png" alt="" class="alt-logo" src="images/demo-restaurant-logo-black@2x.png" width="0" height="0">-->
+                    <!--                        <img data-cfsrc="images/demo-restaurant-logo-black.png" data-at2x="images/demo-restaurant-logo-black@2x.png" alt="" class="mobile-logo" src="images/demo-restaurant-logo-black@2x.png" width="0" height="0">-->
+                </a>
+            </div>
+            <!-- 메뉴바 -->
+            <div id="topMenuBar" class="col-auto menu-order position-static">
+                <!-- 검색 버튼 -->
+                <button id="searchButton2" onclick="openSearchWindow()">
+                    <img src="/img/home/search.png" alt="쿠스토랑 검색">
+                </button>
+                <button id="topMenuButton" class="navbar-toggler float-start collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav" aria-controls="#navbarNav-clone" aria-label="Toggle navigation"
+                        data-target="#navbarNav-clone" aria-expanded="false">
+                    <span class="navbar-toggler-line"></span>
+                    <span class="navbar-toggler-line"></span>
+                    <span class="navbar-toggler-line"></span>
+                    <span class="navbar-toggler-line"></span>
+                </button>
+                <div class="collapse navbar-collapse alt-font" id="navbarNav">
+                    <ul class="navbar-nav ls-1px pb-0" style="gap:10px;">
+                        <li class="nav-item" th:classappend="${currentPage == 'home' ? 'active' : ''}"><a href="/"
+                                                                                                          class="nav-link">홈</a>
+                        </li>
+                        <li class="nav-item" th:classappend="${currentPage == 'recommend' ? 'active' : ''}"><a
+                                href="/recommend" class="nav-link">뽑기</a></li>
+                        <li class="nav-item" th:classappend="${currentPage == 'tier' ? 'active' : ''}"><a href="/tier"
+                                                                                                          class="nav-link">티어</a>
+                        </li>
+                        <li class="nav-item" th:classappend="${currentPage == 'ranking' ? 'active' : ''}"><a
+                                href="/ranking" class="nav-link">랭킹</a></li>
+                        <li class="nav-item" th:classappend="${currentPage == 'community' ? 'active' : ''}"><a
+                                href="/community" class="nav-link">커뮤니티</a></li>
+
+                        <li class="nav-item d-lg-none" sec:authorize="isAuthenticated()">
+                            <a class="nav-link" href="/user/myPage">마이페이지</a>
+                        </li>
+                        <li class="nav-item d-lg-none">
+                            <a sec:authorize="isAnonymous()" href="/user/login" class="nav-link">로그인</a>
+                            <form sec:authorize="isAuthenticated()" action="/user/logout" method="post" style="display: inline;">
+                                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                <button type="submit" class="nav-link" style="background: none; border: none; color: inherit; padding: 0;">
+                                    로그아웃
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-auto col-lg-2 text-end d-none d-sm-flex">
+                <!-- 우측 상단 아이콘 모음 !-->
+                <div class="header-icon">
+                    <div class="header-button" style="display: flex; justify-content:center; align-items: center">
+                        <!-- 검색 버튼 -->
+                        <button id="searchButton1" onclick="openSearchWindow()">
+                            <img src="/img/home/search.png" alt="쿠스토랑 검색">
+                            <!--<p>Type '/' to search</p>-->
+                        </button>
+                        <!--마이 페이지 버튼-->
+                        <button id="myPageToggleButton" class="my-page-button d-none d-lg-block" sec:authorize="isAuthenticated()">
+                            <img id="myPage" src="/img/home/account.png" alt="쿠스토랑 마이페이지">
+                        </button>
+
+                        <div id="myPageToggleDiv" class="my-menu-div" style="display: none;">
+
+                            <a href="/user/myPage">마이 페이지</a>
+
+                            <form id="logoutForm" action="/user/logout" method="post" style="display: inline;">
+                                <!-- CSRF 토큰 필드 -->
+                                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                <button type="submit" style="background: none; border: none; color: inherit; padding: 0; cursor: pointer;">
+                                    로그아웃
+                                </button>
+                            </form>
+                        </div>
+                        <div id="myPageToggleBackdrop"></div>
+                        <!-- 로그인 버튼 !-->
+                        <a href="/user/login" sec:authorize="isAnonymous()"
+                           class="login-button d-none d-lg-block btn btn-dark-gray btn-medium btn-box-shadow left-icon btn-switch-text">
+                            <span>
+                                <span class="btn-double-text alt-font" data-text="로그인">로그인</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+</header>

@@ -1,0 +1,11 @@
+services:
+  boot:
+    container_name: kustaurant-boot
+    image: docker.io/dingwoon/kustaurant:latest
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+#    restart: unless-stopped

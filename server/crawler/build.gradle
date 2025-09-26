@@ -1,0 +1,31 @@
+plugins {
+    id 'idea'
+    id 'java'
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
+}
+
+version = '0.0.1'
+description = 'crawler'
+
+jar {
+    enabled = false
+}
+
+dependencies {
+    implementation project(':common:jpa')
+
+    // web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // test
+//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // playwright (crawler)
+    implementation 'com.microsoft.playwright:playwright:1.49.0'
+    // test container
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    // ai
+    implementation 'org.springframework.ai:spring-ai-starter-model-openai:1.0.0'
+}

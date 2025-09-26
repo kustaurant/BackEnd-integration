@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C47HQ74QCF"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-C47HQ74QCF');
+    </script>
+    <!-- Google Tag Manager -->
+    <script>(function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({
+            'gtm.start':
+                new Date().getTime(), event: 'gtm.js'
+        });
+        var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src =
+            'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-T2CX8XG3');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <title>쿠스토랑 - 뽑기</title>
+
+
+    <!-- 아이콘 관련 라이브러리 -->
+    <script src="https://kit.fontawesome.com/0c60714712.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- 탭 관련 라이브러리 / 순서 지켜야함 -->
+
+    <link rel="stylesheet" href="/css/library/vendors.min.css">
+    <link rel="stylesheet" href="/css/library/style.min.css">
+    <link rel="stylesheet" href="/css/library/responsive.min.css">
+    <link rel="stylesheet" href="/css/library/restaurant.css">
+    <link rel="stylesheet" type="text/css" href="/css/recommend-style.css">
+    <!-- 파비콘 -->
+    <link rel="icon" type="image/x-icon" href="/img/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
+    <!-- js   -->
+    <script type="text/javascript" src="/js/library/jquery.js"></script>
+    <script type="text/javascript" src="/js/library/vendors.min.js"></script>
+    <script type="text/javascript" src="/js/library/main.js"></script>
+    <script src="/js/restaurant/recommendScript.js" defer></script>
+
+</head>
+
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T2CX8XG3"
+            height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<!--상단 탭 fragment 붙여넣기-->
+<header th:replace="~{common/navbar-new :: navbarFragment}"></header>
+<!--뽑기 첫번쨰 body-->
+<!--홈화면 배너-->
+<section
+        class="mt-0 top-banner mb-1 age-title-big-typography cover-background p-0 md-background-position-left-center"
+        style="background-image: url('/img/home/background.jpg');">
+    <div class="container">
+        <div class="row align-items-center justify-content-center small-screen">
+            <div class="col-lg-6 col-md-8 position-relative text-center page-title-extra-large appear anime-child anime-complete alt-font"
+                 data-anime="{ &quot;el&quot;: &quot;childs&quot;, &quot;translateY&quot;: [30, 0], &quot;opacity&quot;: [0,1], &quot;duration&quot;: 600, &quot;delay&quot;: 0, &quot;staggervalue&quot;: 200, &quot;easing&quot;: &quot;easeOutQuad&quot; }">
+                <h1 class="alt-font text-dark-gray text-uppercase ls-minus-1px mb-0">랜덤 맛집 뽑기</h1>
+                <h2 class="m-auto fw-600 text-uppercase mb-0 firstSectionComment">랜덤으로 한 맛집을 추천받을 수 있습니다</h2>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="mainContents" class="alt-font">
+    <div class="dropdown">
+        <button class="btn btn-lg dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+            <span>지역 : 전체</span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li class="dropdown-item">
+                전체
+            </li>
+            <li class="dropdown-item">
+                건입~중문
+            </li>
+            <li class="dropdown-item">
+                중문~어대
+            </li>
+            <li class="dropdown-item">
+                후문
+            </li>
+            <li class="dropdown-item">
+                정문
+            </li>
+            <li class="dropdown-item">
+                구의역
+            </li>
+        </ul>
+    </div>
+    <div id="recommendPage">
+        <div class="option-area">
+            <div class="row option">
+                <!-- 음식 이미지 버튼 모아둔 그리드   -->
+                <div class="container fluid icon-grid">
+                    <div class="row mt-2 p-2">
+                        <div class="cell col-3 col-lg-custom" th:each="cuisine : ${cuisines}">
+                            <button class="cell-button col-12" th:attr="data-cuisine=${cuisine}">
+                                <img class="img col-12" th:src="@{/img/recommend/아이콘/{cuisine}-선택.png(cuisine=${cuisine})}"
+                                     th:alt="'쿠스토랑 건대 맛집 ' + ${cuisine}">
+                            </button>
+                            <div class="mobile-cuisine-name">
+                                <span th:text="${cuisine}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="btn-area">
+        <button id="recommendBtn" class="btn-style">뽑기</button>
+    </div>
+
+
+    <div id="resultPage" class="hidden">
+        <hr>
+        <p id="processingTitle" class="title">
+            맛집을 고르는 중...
+            <img class="title-icon" src="/img/recommend/wondering.png" alt="wondering_img">
+        </p>
+        <hr>
+        <div class="result-img-slideBar">
+
+            <div class="result-animation-list result-animation">
+                <div class="result-img-list"></div>
+                <div class="result-img-list"></div>
+            </div>
+            <div id="SelectedBox"></div>
+            <hr>
+        </div>
+
+    </div>
+
+    <div id="resultInfoPage" class="hidden">
+        <div class="resultImgContainer">
+            <div class="image-container">
+                <a id="storeHref" href="">
+                    <img id="resultImg" src="/" alt="이미지가 들어올 예정입니다">
+                </a>
+            </div>
+            <div id="storeInfo">
+            </div>
+        </div>
+
+    </div>
+
+    <div class="btn-area">
+        <button id="restartBtn" class="btn-style2 hidden alt-font">재설정</button>
+        <button id="restartDirectBtn" class="btn-style2 hidden alt-font">다시 뽑기</button>
+    </div>
+
+
+
+</div>
+
+
+<footer th:replace="~{common/footer :: footerFragment}"></footer>
+
+<script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
+<script type="text/javascript">
+    if(!wcs_add) var wcs_add = {};
+    wcs_add["wa"] = "14b5af05d120a20";
+    if(window.wcs) {
+        wcs_do();
+    }
+</script>
+
+</body>
+
+
+
+</html>
