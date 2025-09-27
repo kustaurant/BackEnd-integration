@@ -4,6 +4,8 @@ import com.kustaurant.crawler.global.util.JsonUtils;
 import com.kustaurant.crawler.infrastructure.messaging.MessageSubscriber;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.stream.MapRecord;
@@ -18,6 +20,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class RedisStreamsSubscriber implements MessageSubscriber {
+
+    private final ExecutorService workerPool = Executors.newFixedThreadPool(1);
 
     private final StreamMessageListenerContainer<String, MapRecord<String, String, String>> listenerContainer;
     private final StringRedisTemplate redisTemplate;
@@ -45,22 +49,25 @@ public class RedisStreamsSubscriber implements MessageSubscriber {
                 org.springframework.data.redis.connection.stream.Consumer.from(group, consumerName),
                 StreamOffset.create(topic, ReadOffset.lastConsumed()),
                 (MapRecord<String, String, String> message) -> {
-                    try {
-                        String payload = message.getValue().get("payload");
-                        RecordId id = message.getId();
-                        log.info("[Stream Id: {}] 메시지 수신됨. 내용: {}", id, payload);
+                    workerPool.submit(() -> { // 스레드 풀로 넘김
+                        try {
+                            String payload = message.getValue().get("payload");
+                            RecordId id = message.getId();
+                            log.info("[Stream Id: {}] 메시지 수신됨. 내용: {}", id, payload);
 
-                        // 비즈니스 로직 처리
-                        handler.accept(JsonUtils.deserialize(payload, type));
+                            // 비즈니스 로직 처리
+                            handler.accept(JsonUtils.deserialize(payload, type));
 
-                        // ack
-                        redisTemplate.opsForStream().acknowledge(
-                                topic, group, id
-                        );
-                    } catch (Exception e) {
-                        log.error("[Stream Id: {}] id crawling 메시지 처리 과정에서 에러 발생", message.getId(),
-                                e);
-                    }
+                            // ack
+                            redisTemplate.opsForStream().acknowledge(
+                                    topic, group, id
+                            );
+                        } catch (Exception e) {
+                            log.error("[Stream Id: {}] id crawling 메시지 처리 과정에서 에러 발생",
+                                    message.getId(),
+                                    e);
+                        }
+                    });
                 }
         );
 

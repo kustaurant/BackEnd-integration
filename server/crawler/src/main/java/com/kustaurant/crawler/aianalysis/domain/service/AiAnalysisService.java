@@ -5,6 +5,7 @@ import com.kustaurant.crawler.aianalysis.domain.model.Review;
 import com.kustaurant.crawler.aianalysis.domain.model.ReviewAnalysis;
 import com.kustaurant.crawler.aianalysis.domain.service.port.AiProcessor;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -19,8 +20,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AiAnalysisService {
 
-    private static final int maxConcurrency = 50;
+    private static final int MAX_CONCURRENCY = 30;
+    private static final int MAX_REVIEWS = 100;
     private static final Duration perRequestTimeout = Duration.ofSeconds(10);
+    private static final Semaphore semaphore = new Semaphore(MAX_CONCURRENCY);
 
     private final AiProcessor aiProcessor;
 
@@ -32,16 +35,15 @@ public class AiAnalysisService {
 
     private List<ReviewAnalysis> parallelCall(List<Review> reviews,
             List<String> situations) {
+        reviews = reviews.subList(0, Math.min(reviews.size(), MAX_REVIEWS));
         // 각 리뷰 AI 분석
         try (var exec = Executors.newVirtualThreadPerTaskExecutor()) {
-            var semaphore = new Semaphore(maxConcurrency);
-
             List<CompletableFuture<Optional<ReviewAnalysis>>> futures = reviews.stream()
                     .map(review -> CompletableFuture.supplyAsync(() -> {
                                         try {
                                             semaphore.acquire();
                                             // 실제 작업
-                                            return aiProcessor.analyzeReview(review, situations);
+                                            return analyzeMultiple(review, situations);
                                         } catch (InterruptedException e) {
                                             Thread.currentThread().interrupt();
                                             throw new RuntimeException(e);
@@ -51,7 +53,7 @@ public class AiAnalysisService {
                                     }, exec)
 //                                    .orTimeout(perRequestTimeout.toMillis(), TimeUnit.MILLISECONDS)
                                     // 실패 시 대체값/로그
-                                    .exceptionally(ex -> ReviewAnalysis.error(review.body(), ex.getMessage()))
+                                    .exceptionally(ex -> ReviewAnalysis.error(review.body(), ex))
                     )
                     .toList();
 
@@ -64,5 +66,18 @@ public class AiAnalysisService {
                     .flatMap(Optional::stream)
                     .toList();
         }
+    }
+
+    private Optional<ReviewAnalysis> analyzeMultiple(
+            Review review, List<String> situations
+    ) {
+        List<Optional<ReviewAnalysis>> results = new ArrayList<>();
+
+        // 각 리뷰 별 3회 질의
+        results.add(aiProcessor.analyzeReview(review, situations));
+        results.add(aiProcessor.analyzeReview(review, situations));
+        results.add(aiProcessor.analyzeReview(review, situations));
+
+        return ReviewAnalysis.from(review, results);
     }
 }

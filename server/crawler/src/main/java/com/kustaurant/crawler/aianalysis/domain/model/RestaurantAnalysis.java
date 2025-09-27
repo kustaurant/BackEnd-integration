@@ -14,13 +14,14 @@ public class RestaurantAnalysis {
     private int reviewCount;
     private int positiveCount;
     private int negativeCount;
-    private int scoreSum;
+    private double scoreSum;
     private double avgScore;
     private Map<String, Integer> situationCounts;
 
     public static RestaurantAnalysis from(List<ReviewAnalysis> analyses) {
         int total = analyses.size();
-        int pos = 0, neg = 0, sum = 0;
+        int pos = 0, neg = 0;
+        double sum = 0;
         Map<String, Integer> map = new HashMap<>();
         for (ReviewAnalysis r : analyses) {
             if (r.sentiment() == Sentiment.POSITIVE) {
@@ -33,6 +34,7 @@ public class RestaurantAnalysis {
 //                map.merge(s, 1, Integer::sum);
 //            }
         }
-        return new RestaurantAnalysis(total, pos, neg, sum, sum * 1d / total, map);
+        double avg = total == 0 ? 0 : sum / total;
+        return new RestaurantAnalysis(total, pos, neg, sum, avg, map);
     }
 }

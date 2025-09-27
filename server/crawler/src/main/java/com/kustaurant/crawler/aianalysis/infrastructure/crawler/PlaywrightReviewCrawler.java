@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PlaywrightReviewCrawler implements ReviewCrawler {
 
+    private static final int MAX_MORE_CLICK_COUNT = 20;
+
     @Override
     public List<String> crawlReviews(String url) {
         List<String> reviews;
@@ -34,9 +36,11 @@ public class PlaywrightReviewCrawler implements ReviewCrawler {
             clickTabByName(entryFrame, "리뷰");
             // 리뷰 끝까지 스크롤
             String moreBtnSelector = "a.fvwqf";
-            while (existsTargetSelector(entryFrame, moreBtnSelector)) {
+            int count = 0;
+            while (existsTargetSelector(entryFrame, moreBtnSelector) && count < MAX_MORE_CLICK_COUNT) {
                 scrollerUntilTargetSelector(entryFrame, moreBtnSelector);
                 clickBySelector(entryFrame, moreBtnSelector);
+                count++;
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
