@@ -19,3 +19,29 @@ scrape_configs:
         target_label: 'compose_service'
       - source_labels: ['__meta_docker_container_log_stream']
         target_label: 'stream'
+
+  - job_name: kustaurant
+    static_configs:
+      - targets: [ localhost ]
+        labels:
+          job: kustaurant
+          app: kustaurant
+          env: prod
+          __path__: /var/log/kustaurant/*.log
+    pipeline_stages:
+      - json:
+          expressions:
+            ts: timestamp
+            level: level
+            logger: logger_name
+            msg: message
+            thread: thread_name
+            app: app
+            env: env
+      - timestamp:
+          source: ts
+          format: RFC3339
+      - labels:
+          level:
+          app:
+          env:

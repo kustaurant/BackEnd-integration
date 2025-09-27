@@ -1,0 +1,57 @@
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+  <!-- 공통 속성 -->
+  <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="kustaurant"/>
+  <springProperty scope="context" name="ENV" source="spring.profiles.active" defaultValue="local"/>
+
+  <!-- 콘솔: 기본 패턴 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>
+        <pattern>
+          %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx
+        </pattern>
+      </pattern>
+    </encoder>
+  </appender>
+
+  <!-- prod: 파일 로깅 -->
+  <springProfile name="prod">
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>/var/log/${APP_NAME}/app.log</file>
+      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>/var/log/${APP_NAME}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+        <maxHistory>14</maxHistory>
+        <totalSizeCap>5GB</totalSizeCap>
+      </rollingPolicy>
+      <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+        <providers>
+          <timestamp/>
+          <logLevel/>
+          <loggerName/>
+          <threadName/>
+          <message/>
+          <arguments/>
+          <stackTrace/>
+          <mdc/>
+          <!-- 고정 라벨 -->
+          <customFields>{"app":"${APP_NAME}","env":"prod"}</customFields>
+        </providers>
+      </encoder>
+    </appender>
+
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </root>
+  </springProfile>
+
+  <!-- prod 이외: 콘솔만 -->
+  <springProfile name="!prod">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+</configuration>
