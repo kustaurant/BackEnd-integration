@@ -11,16 +11,18 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+@Tag(name = "restaurant-controller")
 public interface RestaurantApiDoc {
 
     @Operation(
-            summary = "식당 상세 화면 정보 불러오기 (로그인/비로그인 공용),(조회수 기능 포함)",
+            summary = "식당 상세 화면 정보 불러오기(조회수 기능 포함)",
             description = """
         식당 하나에 대한 상세 정보가 반환됩니다. 
         (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)
