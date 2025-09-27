@@ -11,11 +11,13 @@ import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDet
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class RestaurantController {
@@ -39,18 +41,13 @@ public class RestaurantController {
         String viewerKey = viewerKeyProvider.resolveViewerKey(user, req, res);
         viewCountService.countOncePerHour(ViewResourceType.POST, restaurantId, viewerKey);
 
-        model.addAttribute("initialDisplayMenuCount", initialDisplayMenuCount);
-
-        // 식당 정보
-        RestaurantDetail detailDto = restaurantQueryService.getRestaurantDetail(restaurantId,
-                user.id());
-
-        model.addAttribute("restaurantDto", detailDto);
+        RestaurantDetail detailDto = restaurantQueryService.getRestaurantDetail(restaurantId, user.id());
         boolean hasEvaluated = detailDto.getIsEvaluated();
         String evaluationButton = hasEvaluated ? "다시 평가하기" : " 평가하기";
-        model.addAttribute("evaluationButton", evaluationButton);
 
-        // 메뉴 정보
+        model.addAttribute("restaurantDto", detailDto);
+        model.addAttribute("initialDisplayMenuCount", initialDisplayMenuCount);
+        model.addAttribute("evaluationButton", evaluationButton);
         model.addAttribute("menus", detailDto.getRestaurantMenuList());
 
         return "restaurant/restaurant";

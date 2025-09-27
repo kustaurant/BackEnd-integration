@@ -130,31 +130,44 @@
         <div class="stat-name" th:text="'제휴 정보 - ' + ${restaurantDto.partnershipInfo}"></div>
     </div>
 
-
-    <div id="menuContainer" class="inner-container" th:if="${#lists.size(restaurantDto.restaurantMenuList) > 0 && restaurantDto.restaurantMenuList[0].menuName != 'no_menu'}">
+    <div id="menuContainer" class="inner-container" th:if="${restaurantDto != null}">
         <div id="menuTopDiv" style="height:110px; width:100%; position: absolute; top: -110px; left: 0; visibility: hidden;"></div>
         <div class="section-title">메뉴</div>
-        <div id="menuInfoContainer">
+
+        <!-- 메뉴가 없을 때 -->
+        <div th:if="${#lists.isEmpty(restaurantDto.restaurantMenuList.?[menuId != null])}">
+            <div class="text-gray-500" style="padding: 8px 0;">메뉴 정보 없음</div>
+        </div>
+
+        <!-- 메뉴가 있을 때 -->
+        <div id="menuInfoContainer" th:unless="${#lists.isEmpty(restaurantDto.restaurantMenuList.?[menuId != null])}">
             <ul class="menu-ul" id="menuUL">
-                <li th:each="menu, iterStat : ${restaurantDto.restaurantMenuList}" th:if="${iterStat.index < initialDisplayMenuCount}">
-                    <img th:if="${(menu.naverType eq 'type1' or menu.naverType eq 'type3') and menu.menuImgUrl != 'icon'}" th:src="${menu.menuImgUrl}" alt="menu img">
-                    <img th:if="${(menu.naverType eq 'type1' or menu.naverType eq 'type3') and menu.menuImgUrl == 'icon'}" src="/img/favicon.png" alt="menu img">
+                <!-- 유효한 메뉴(id != null)만 대상으로, 초기 노출 개수 제한 -->
+                <li th:each="menu, iterStat : ${restaurantDto.restaurantMenuList.?[menuId != null]}"
+                    th:if="${iterStat.index} < ${initialDisplayMenuCount}">
+                    <img th:if="${(menu.naverType == 'type1' or menu.naverType == 'type3') and menu.menuImgUrl != 'icon'}"
+                         th:src="${menu.menuImgUrl}" alt="menu img">
+                    <img th:if="${(menu.naverType == 'type1' or menu.naverType == 'type3') and menu.menuImgUrl == 'icon'}"
+                         src="/img/favicon.png" alt="menu img">
+
                     <div class="menu-text-container">
                         <div class="menu-name" th:text="${menu.menuName}"></div>
                         <div class="menu-price">
-                            <em th:text="${menu.menuPrice.substring(0, menu.menuPrice.length())}"></em>
+                            <!-- null 안전 처리 -->
+                            <em th:text="${menu.menuPrice ?: ''}"></em>
                         </div>
                     </div>
                 </li>
             </ul>
         </div>
-        <div id="menuUnfoldButton" class="unfold-button" th:if="${#lists.size(restaurantDto.restaurantMenuList) > 3}">펼치기</div>
+
+        <!-- 펼치기 버튼: 유효한 메뉴가 3개 초과일 때만 -->
+        <div id="menuUnfoldButton" class="unfold-button"
+             th:if="${#lists.size(restaurantDto.restaurantMenuList.?[menuId != null]) > 3}">
+            펼치기
+        </div>
     </div>
-    <div id="mapContainer" class="inner-container">
-        <div id="mapTopDiv" style="height:110px; width:100%; position: absolute; top: -110px; left: 0; visibility: hidden;"></div>
-        <div id="map"></div>
-        <div id="mapUnfoldButton" class="unfold-button">펼치기</div>
-    </div>
+
 
     <a class="inner-container evaluation-button button" id="evaluationButton"
        th:href="@{/evaluation/{restuarantId}(restuarantId=${restaurantDto.restaurantId})}"
