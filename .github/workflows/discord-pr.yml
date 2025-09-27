@@ -98,13 +98,13 @@ jobs:
         run: |
           set -euo pipefail
           BRANCH="${{ github.ref_name }}"
-          COMMITS_JSON='${{ toJson(github.event.commits) }}'
-          
-          # 최근 커밋 메시지 10개
-          SUMMARY="$(printf '%s' "$COMMITS_JSON" \
-            | jq -r '.[] | "- " + (.message // "(no message)")' \
+
+          # 커밋 메시지는 이벤트 페이로드(JSON 파일)에서 직접 추출 → 쉘 인용 문제 0%
+          SUMMARY="$(jq -r '.commits[] | "- " + (.message // "(no message)")' "$GITHUB_EVENT_PATH" \
             | head -n 10)"
-          
+          # 디스코드 임베드 길이 여유 (코드블럭 포함 2,000자 제한 대비)
+          SUMMARY="$(printf '%s' "$SUMMARY" | head -c 1800)"
+
           jq -n \
             --arg repo "$REPO" \
             --arg title "Push to ${BRANCH}" \
@@ -130,3 +130,4 @@ jobs:
               }]
             }' \
           | curl -sS -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK"
+
