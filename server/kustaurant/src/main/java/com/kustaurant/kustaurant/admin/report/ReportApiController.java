@@ -31,7 +31,7 @@ public class ReportApiController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "신고에 성공했습니다.", content = {@Content(schema = @Schema(implementation = Void.class))}),
     })
-    @PostMapping("/api/v2/auth/restaurants/{restaurantId}/comments/{commentId}/report")
+    @PostMapping("/api/v2/report")
     public ResponseEntity<Void> reportComment(
             @PathVariable Long restaurantId,
             @PathVariable Integer commentId,
