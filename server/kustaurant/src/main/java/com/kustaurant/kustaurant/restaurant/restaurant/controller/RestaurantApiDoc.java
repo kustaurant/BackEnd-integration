@@ -74,6 +74,4 @@ public interface RestaurantApiDoc {
             @Parameter(hidden = true) HttpServletRequest req,
             @Parameter(hidden = true) HttpServletResponse res
     );
-
-
 }
