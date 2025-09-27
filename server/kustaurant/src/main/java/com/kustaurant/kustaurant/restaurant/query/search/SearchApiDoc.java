@@ -11,13 +11,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
-
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@Tag(name = "restaurant-search-controller")
 public interface SearchApiDoc {
 
     @Operation(summary = "검색하기", description = "리스트 순서대로 출력해주시면 됩니다! 빈 배열인 경우 해당하는 식당이 없다는 화면을 보여주시면 됩니다!\n\n" +

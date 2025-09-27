@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class HomeApiController implements HomeApiDoc {
+public class HomeApiController {
     private final HomeBannerApiService homeBannerApiService;
     private final RestaurantHomeService restaurantHomeService;
 

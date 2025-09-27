@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -36,7 +35,6 @@ import java.util.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@Tag(name = "community-controller")
 public class CommunityApiController {
     private final PostQueryService postQueryService;
 
@@ -63,7 +61,7 @@ public class CommunityApiController {
 
     // 2. 커뮤니티 게시글 상세 화면
     @Operation(
-            summary = "게시글 상세 화면 (조회수 기능 포함)",
+            summary = "게시글 상세 화면(로그인/비로그인 공용),(조회수 기능 포함)",
             description = """
                     **로그인 상태**: 인증 정보가 있으면 사용자 컨텍스트로 동작합니다.
                     **비로그인 상태**: 비로그인 사용자는 `X-Device-Id` 헤더로 기기 식별자를 보내주세요.

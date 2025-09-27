@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,14 +21,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@Tag(name = "community-post-reaction-controller")
 public class PostReactionApiController {
     private final PostScrapService postScrapService;
     private final PostReactionService postReactionService;
 
     // 1. 게시글 좋아요/싫어요
     @PutMapping("/v2/auth/community/{postId}/reaction")
-    @Operation(summary = "게시글 좋아요/싫어요",
+    @Operation(summary = "게시글 좋아요/싫어요 토글",
             description = "게시글 ID를 입력받아 좋아요/싫어요 토글. " +
                     "\n\n유저의 반응상태(LIKE,DISLIKE,null)와 현재 게시글의 좋아요/싫어요 수를 반환합니다. ")
     @ApiResponses(value = {
@@ -38,7 +36,7 @@ public class PostReactionApiController {
     })
     public ResponseEntity<PostReactionResponse> setPostReaction(
             @PathVariable Long postId,
-            @Parameter(description = "목표 반응 상태(좋아요=LIKE, 싫어요=DISLIKE, 해제=값 전달x). 미전달 시 해제")
+            @Parameter(description = "목표 반응 상태(좋아요=LIKE,싫어요=DISLIKE,취소=값 전달x). 미전달 시 해제")
             @RequestParam(required = false) ReactionType cmd,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {

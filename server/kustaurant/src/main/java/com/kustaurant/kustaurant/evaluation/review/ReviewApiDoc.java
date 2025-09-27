@@ -12,17 +12,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
-
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@Tag(name = "evaluation-review-controller")
 public interface ReviewApiDoc {
 
-    @Operation(summary = "리뷰(평가, 평가-댓글) 불러오기",
+    @Operation(summary = "평가 댓글 불러오기",
             description = "인기순: POPULARITY, 최신순: LATEST \n\n 기본값: 인기순")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 리스트입니다.", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ReviewsResponse.class)))}),

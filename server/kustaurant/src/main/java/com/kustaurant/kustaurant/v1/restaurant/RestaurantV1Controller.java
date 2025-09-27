@@ -8,7 +8,6 @@ import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDet
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.v1.restaurant.response.FavoriteResponseDTO;
 import com.kustaurant.kustaurant.v1.restaurant.response.RestaurantDetailDTO;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Hidden
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
