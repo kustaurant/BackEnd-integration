@@ -114,4 +114,5 @@ public class GlobalExceptionRestHandler {
                 status.value()
         );
     }
+
 }
