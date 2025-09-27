@@ -32,7 +32,7 @@ scrape_configs:
     pipeline_stages:
       - json:
           expressions:
-            ts: '@timestamp'
+            ts: '["@timestamp"]'
             level: level
             logger: logger_name
             msg: message
