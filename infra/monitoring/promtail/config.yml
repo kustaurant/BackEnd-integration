@@ -28,20 +28,17 @@ scrape_configs:
           app: kustaurant
           env: prod
           __path__: /var/log/kustaurant/*.log
-#    pipeline_stages:
-#      - json:
-#          expressions:
-#            ts: timestamp
-#            level: level
-#            logger: logger_name
-#            msg: message
-#            thread: thread_name
-#            app: app
-#            env: env
-#      - timestamp:
-#          source: ts
-#          format: RFC3339
-#      - labels:
-#          level:
-#          app:
-#          env:
+
+    pipeline_stages:
+      - json:
+          expressions:
+            ts: '@timestamp'
+            level: level
+            logger: logger_name
+            msg: message
+            thread: thread_name
+      - timestamp:
+          source: ts
+          format: RFC3339Nano
+      - labels:
+          level:
