@@ -1,6 +1,7 @@
 package com.kustaurant.jpa.restaurant.repository;
 
 import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,4 +20,6 @@ public interface RestaurantJpaRepository extends JpaRepository<RestaurantEntity,
     @Transactional
     @Query("update RestaurantEntity r set r.visitCount = r.visitCount + 1 where r.restaurantId = :id")
     int incrementViews(@Param("id") long id);
+
+    List<RestaurantEntity> findByStatus(String status);
 }

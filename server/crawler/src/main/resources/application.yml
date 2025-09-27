@@ -4,7 +4,7 @@ spring:
   application.name: DataProcessor
   config:
     import:
-      - "optional:file:server/crawling/.env[.properties]"
+      - "optional:file:server/crawler/.env[.properties]"
       - "classpath:config/ai.yml"
 
 streams:
