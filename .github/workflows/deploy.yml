@@ -2,9 +2,7 @@ name: 자동 CI/CD
 
 on:
   push:
-    branches: [ "develop" ]
-  push:
-    branches: [ "main" ]
+    branches: [ main, develop ]
 
 jobs:
   detect-changes:
