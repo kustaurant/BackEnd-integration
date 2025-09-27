@@ -7,5 +7,7 @@ services:
     env_file:
       - .env
     environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - /var/log/kustaurant:/var/log/kustaurant
 #    restart: unless-stopped
