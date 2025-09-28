@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.user.mypage.controller.port;
 
-import com.kustaurant.kustaurant.admin.notice.domain.Notice;
+import com.kustaurant.kustaurant.admin.notice.Notice;
 import com.kustaurant.kustaurant.user.mypage.controller.request.ProfileUpdateRequest;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.*;
 import com.kustaurant.kustaurant.user.mypage.controller.response.web.MypageDataView;

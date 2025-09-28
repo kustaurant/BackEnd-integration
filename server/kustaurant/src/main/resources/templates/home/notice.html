@@ -36,8 +36,8 @@
   </section>
   <div class="cardlist">
     <div th:each="noticelist:${notices}" class="notice-card">
-      <a th:href="${noticelist.noticeHref}" target="_blank">
-        <p th:text="${noticelist.noticeTitle}" class="notice-title"></p>
+      <a th:href="${noticelist.href}" target="_blank">
+        <p th:text="${noticelist.title}" class="notice-title"></p>
         <p th:text="${noticelist.createdAt}" class="notice-created-at"></p>
       </a>
     </div>
