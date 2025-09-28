@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin.notice.infrastructure;
+package com.kustaurant.kustaurant.admin.notice;
 
 import jakarta.persistence.*;
 import lombok.Getter;

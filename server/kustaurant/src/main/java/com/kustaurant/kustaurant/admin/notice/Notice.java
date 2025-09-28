@@ -1,6 +1,5 @@
-package com.kustaurant.kustaurant.admin.notice.domain;
+package com.kustaurant.kustaurant.admin.notice;
 
-import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
