@@ -58,8 +58,7 @@ public class RedisStreamsSubscriber implements MessageSubscriber {
                                 topic, group, id
                         );
                     } catch (Exception e) {
-                        log.error("[Stream Id: {}] id crawling 메시지 처리 과정에서 에러 발생", message.getId(),
-                                e);
+                        log.error("[Stream Id: {}] id crawling 메시지 처리 과정에서 에러 발생", message.getId(), e);
                     }
                 }
         );

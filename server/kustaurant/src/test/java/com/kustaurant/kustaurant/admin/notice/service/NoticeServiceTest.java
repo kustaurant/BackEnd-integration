@@ -1,8 +1,9 @@
 package com.kustaurant.kustaurant.admin.notice.service;
 
-import com.kustaurant.kustaurant.admin.notice.domain.Notice;
-import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeEntity;
-import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeRepository;
+import com.kustaurant.kustaurant.admin.notice.Notice;
+import com.kustaurant.kustaurant.admin.notice.NoticeEntity;
+import com.kustaurant.kustaurant.admin.notice.NoticeRepository;
+import com.kustaurant.kustaurant.admin.notice.NoticeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

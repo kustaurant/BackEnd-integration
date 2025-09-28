@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin.notice.infrastructure;
+package com.kustaurant.kustaurant.admin.notice;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Propagation;

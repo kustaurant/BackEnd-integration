@@ -2,10 +2,10 @@ package com.kustaurant.kustaurant.user.mypage.service;
 
 import com.kustaurant.kustaurant.global.exception.exception.user.NoProfileChangeException;
 import com.kustaurant.kustaurant.global.exception.exception.user.UserNotFoundException;
-import com.kustaurant.kustaurant.admin.notice.domain.Notice;
+import com.kustaurant.kustaurant.admin.notice.Notice;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyPostsResponse;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.ProfileResponse;
-import com.kustaurant.kustaurant.admin.notice.infrastructure.NoticeRepository;
+import com.kustaurant.kustaurant.admin.notice.NoticeRepository;
 
 import java.util.stream.Collectors;
 

@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.user.mypage.controller;
 
-import com.kustaurant.kustaurant.admin.notice.domain.Notice;
+import com.kustaurant.kustaurant.admin.notice.Notice;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.user.mypage.controller.port.MypageService;

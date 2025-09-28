@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.v1.mypage;
 
-import com.kustaurant.kustaurant.admin.notice.domain.Notice;
+import com.kustaurant.kustaurant.admin.notice.Notice;
 import com.kustaurant.kustaurant.v1.mypage.dto.EvaluatedRestaurantInfoDTO;
 import com.kustaurant.kustaurant.v1.mypage.dto.FavoriteRestaurantInfoDTO;
 import com.kustaurant.kustaurant.v1.mypage.dto.MypagePostCommentDTO;

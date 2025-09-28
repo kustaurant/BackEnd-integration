@@ -49,7 +49,11 @@ management:
   metrics:
     tags:
       application: kustaurant
-
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
 # discord-alert
 alert:
   discord:
