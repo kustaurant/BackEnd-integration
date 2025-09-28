@@ -545,6 +545,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "prometheus",
         "uid": "prom-main"
       },
@@ -631,7 +632,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(.99,sum(rate(http_server_requests_seconds_bucket{application=\"$app_name\", uri!=\"/actuator/prometheus\"}[1m])) by(uri, le))",
+          "expr": "histogram_quantile(\r\n  0.99,\r\n  sum by (uri, le) (\r\n    rate(http_server_requests_seconds_bucket{\r\n      job=\"kustaurant-api-host\"\r\n    }[$__rate_interval])\r\n  )\r\n)",
           "interval": "",
           "legendFormat": "{{uri}}",
           "range": true,
@@ -643,6 +644,7 @@
     },
     {
       "datasource": {
+        "default": true,
         "type": "prometheus",
         "uid": "prom-main"
       },
@@ -729,7 +731,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(.95,sum(rate(http_server_requests_seconds_bucket{application=\"$app_name\", uri!=\"/actuator/prometheus\"}[1m])) by(uri, le))",
+          "expr": "histogram_quantile(\r\n  0.95,\r\n  sum by (uri, le) (\r\n    rate(http_server_requests_seconds_bucket{\r\n      job=\"kustaurant-api-host\",\r\n      }[$__rate_interval]\r\n    )\r\n  )\r\n)\r\n",
           "interval": "",
           "legendFormat": "{{uri}}",
           "range": true,
@@ -839,6 +841,7 @@
     },
     {
       "datasource": {
+        "default": false,
         "type": "loki",
         "uid": "loki-main"
       },
@@ -970,7 +973,7 @@
             "uid": "loki-main"
           },
           "editorMode": "code",
-          "expr": "sum by(type) (rate({compose_service=~\"app-.*\"} | pattern `<date> <time> <_>=<trace_id> <_>=<span_id> <_>=<trace_flags> <type> <_> --- <msg>` | type != \"\" |= \"$log_keyword\" [1m]))",
+          "expr": "sum by (type) (\r\n  count_over_time(\r\n    {job=\"kustaurant\"}\r\n    | json\r\n    | level != \"\"\r\n    | label_format type=level\r\n  [1m])\r\n)",
           "legendFormat": "{{type}}",
           "queryType": "range",
           "refId": "A"
@@ -1065,10 +1068,9 @@
     "list": [
       {
         "current": {
-          "isNone": true,
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "kustaurant",
+          "value": "kustaurant"
         },
         "datasource": {
           "type": "prometheus",
@@ -1115,13 +1117,13 @@
     ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Spring Boot Observability",
   "uid": "dLsDQIUnzb",
-  "version": 1,
+  "version": 3,
   "weekStart": ""
 }
