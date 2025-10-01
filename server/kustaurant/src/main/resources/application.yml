@@ -72,9 +72,9 @@ restaurant:
           image: 0.15
       restaurant:
         popularity_scale:
-          visit: 4
-          favorite: 2
-          evaluation: 2
+          visit: 16
+          favorite: 4
+          evaluation: 8
         popularity_weight:
           visits: 0.1
           favorites: 0.2

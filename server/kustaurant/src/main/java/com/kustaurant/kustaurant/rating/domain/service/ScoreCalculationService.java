@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.rating.domain.service;
 
+import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
 import com.kustaurant.kustaurant.rating.domain.model.AdjustedEvaluation;
 import com.kustaurant.kustaurant.rating.domain.model.EvaluationWithContext;
 import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy;
@@ -19,12 +20,12 @@ public class ScoreCalculationService {
     private final int MIN_EVALUATION_COUNT = 3;
 
     private final RatingPolicy policy;
+    private final ClockHolder clockHolder;
 
     public RatingScore calculate(
             RestaurantStats stats,
             List<EvaluationWithContext> evaluations,
-            double globalAvg,
-            LocalDateTime date
+            double globalAvg
     ) {
         if (evaluations == null) {
             evaluations = List.of();
@@ -40,7 +41,7 @@ public class ScoreCalculationService {
 
         // 각 평가를 조정해서 누적
         for (EvaluationWithContext evaluation : evaluations) {
-            AdjustedEvaluation adj = evaluation.getAdjustedScore(policy.evaluation(), globalAvg, date);
+            AdjustedEvaluation adj = evaluation.getAdjustedScore(policy.evaluation(), globalAvg, clockHolder.now());
             numerator += adj.adjustedScore() * adj.weight();
             weightSum += adj.weight();
         }
@@ -63,12 +64,11 @@ public class ScoreCalculationService {
     public List<RatingScore> calculateScores(
             List<RestaurantStats> statsList,
             Map<Long, List<EvaluationWithContext>> evalMap,
-            double globalAvg,
-            LocalDateTime date
+            double globalAvg
     ) {
         List<RatingScore> scores = new ArrayList<>(statsList.size());
         for (RestaurantStats stats : statsList) {
-            RatingScore score = calculate(stats, evalMap.get(stats.restaurantId()), globalAvg, date);
+            RatingScore score = calculate(stats, evalMap.get(stats.restaurantId()), globalAvg);
             scores.add(score);
         }
         return scores;
