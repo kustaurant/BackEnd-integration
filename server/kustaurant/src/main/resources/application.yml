@@ -74,21 +74,21 @@ restaurant:
         min_decay: 0.3
         reaction_divisor: 10
         reaction_scale: 0.5
-        evaluator_k: 5
+        evaluator_k: 3
         completeness_weight:
-          score: 0.5
-          comment: 0.25
-          situation: 0.1
-          image: 0.15
+          score: 0.7
+          comment: 0.2
+          situation: 0.05
+          image: 0.05
       restaurant:
         popularity_scale:
-          visit: 4
-          favorite: 2
-          evaluation: 2
+          visit: 16
+          favorite: 4
+          evaluation: 7
         popularity_weight:
           visits: 0.1
-          favorites: 0.2
-          evaluations: 0.7
+          favorites: 0.6
+          evaluations: 0.3
       tier:
         levels:
           1:

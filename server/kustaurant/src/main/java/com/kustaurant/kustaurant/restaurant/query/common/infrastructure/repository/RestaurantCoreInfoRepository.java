@@ -9,6 +9,7 @@ import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.ent
 import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions.situationMatches;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
+import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
 import static java.util.Objects.isNull;
 
 import com.kustaurant.kustaurant.restaurant.query.common.dto.QRestaurantBaseInfoDto;
@@ -113,7 +114,7 @@ public class RestaurantCoreInfoRepository {
                                         restaurantEntity.longitude,
                                         restaurantEntity.latitude,
                                         restaurantEntity.partnershipInfo,
-                                        ratingEntity.score,
+                                        numberTemplate(Double.class, "ROUND({0}, 2)", ratingEntity.score.coalesce(0.0)),
                                         set(situationEntity.situationName),
                                         restaurantEntity.restaurantType,
                                         evaluationEntity.isNotNull(),

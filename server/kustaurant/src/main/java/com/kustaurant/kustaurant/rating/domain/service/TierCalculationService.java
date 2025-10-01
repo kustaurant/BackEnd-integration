@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.rating.domain.service;
 
+import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
 import com.kustaurant.kustaurant.rating.domain.model.Rating;
 import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy;
 import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.TierPolicy;
@@ -18,21 +19,21 @@ import org.springframework.stereotype.Service;
 public class TierCalculationService {
 
     private final RatingPolicy policy;
+    private final ClockHolder clockHolder;
 
-    public List<Rating> calculate(List<RatingScore> scores, LocalDateTime now) {
+    public List<Rating> calculate(List<RatingScore> scores) {
         // 점수 기준으로 내림차순 정렬
         scores.sort(Comparator.comparingDouble(RatingScore::score).reversed());
         // 티어가 있는 평가 개수
         int tierCount = countExistTiers(scores);
         // 티어 할당
-        return assignTier(policy.tier(), scores, tierCount, now);
+        return assignTier(policy.tier(), scores, tierCount);
     }
 
     private List<Rating> assignTier(
             TierPolicy tierP,
             List<RatingScore> sorted,
-            int tierCount,
-            LocalDateTime now
+            int tierCount
     ) {
         List<Rating> result = new ArrayList<>(sorted.size());
 
@@ -46,11 +47,11 @@ public class TierCalculationService {
 
         for (RatingScore score : sorted) {
             if (score.score() == 0) {
-                result.add(new Rating(score.restaurantId(), score.score(), Tier.NONE, false, now));
+                result.add(new Rating(score.restaurantId(), score.score(), Tier.NONE, false, clockHolder.now()));
                 continue;
             }
             if (tier == 5) {
-                result.add(new Rating(score.restaurantId(), score.score(), Tier.FIVE, false, now));
+                result.add(new Rating(score.restaurantId(), score.score(), Tier.FIVE, false, clockHolder.now()));
                 continue;
             }
             while (tier < 5 && (score.score() < minScore || (count >= maxCount && score.score() != lastScoreInTier))) {
@@ -67,7 +68,7 @@ public class TierCalculationService {
 
             Tier assignedTier = tier == 5 ? Tier.FIVE : Tier.find(tier);
 
-            result.add(new Rating(score.restaurantId(), score.score(), assignedTier, false, now));
+            result.add(new Rating(score.restaurantId(), score.score(), assignedTier, false, clockHolder.now()));
 
             if (assignedTier != Tier.FIVE) {
                 count++;
