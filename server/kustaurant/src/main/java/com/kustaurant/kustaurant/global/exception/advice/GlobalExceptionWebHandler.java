@@ -25,12 +25,13 @@ public class GlobalExceptionWebHandler {
     private final DiscordNotifier discordNotifier;
 
     @ExceptionHandler(DataNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleDataNotFoundException(
             DataNotFoundException e,
             HttpServletRequest req,
             Model model
     ) {
-        log.error("[DataNotFoundException] {} {}: {}", req.getMethod(), req.getRequestURI(), e.getMessage(), e);
+        log.warn("[DataNotFoundException] {} {}: {}", req.getMethod(), req.getRequestURI(), e.getMessage(), e);
         model.addAttribute("message", "존재하지 않습니다.");
         return "error/not_found";
     }

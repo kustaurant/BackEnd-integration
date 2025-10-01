@@ -1,8 +1,11 @@
 package com.kustaurant.kustaurant.global.exception.exception;
 
 import com.kustaurant.kustaurant.global.exception.ErrorCode;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 // 사용자 정의 예외
+@ResponseStatus(HttpStatus.NOT_FOUND)
 public class DataNotFoundException extends BusinessException {
     public DataNotFoundException(ErrorCode errorCode) {
         super(errorCode);

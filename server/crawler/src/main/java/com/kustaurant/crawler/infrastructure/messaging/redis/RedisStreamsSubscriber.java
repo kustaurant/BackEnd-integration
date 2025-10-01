@@ -58,19 +58,16 @@ public class RedisStreamsSubscriber implements MessageSubscriber {
                             // 비즈니스 로직 처리
                             handler.accept(JsonUtils.deserialize(payload, type));
 
-                            // ack
-                            redisTemplate.opsForStream().acknowledge(
-                                    topic, group, id
-                            );
+                        // ack
+                        redisTemplate.opsForStream().acknowledge(
+                                topic, group, id
+                        );
                         } catch (Exception e) {
-                            log.error("[Stream Id: {}] id crawling 메시지 처리 과정에서 에러 발생",
-                                    message.getId(),
-                                    e);
+                            log.error("[Stream Id: {}] id crawling 메시지 처리 과정에서 에러 발생", message.getId(), e);
                         }
                     });
                 }
         );
-
         subscriptions.put(key(topic, group, consumerName), sub);
     }
 

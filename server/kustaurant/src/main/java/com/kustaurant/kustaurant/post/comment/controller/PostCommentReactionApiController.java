@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,15 +21,16 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class PostCommReactionApiController {
+@Tag(name = "community-post-comment-reaction-controller")
+public class PostCommentReactionApiController {
     private final PostCommentReactionService reactionService;
 
     // 1. 댓글 좋아요/싫어요
     @PutMapping("/v2/auth/community/comments/{commentId}/reaction")
-    @Operation(summary = "커뮤니티 포스트 댓글 좋아요/싫어요",
+    @Operation(summary = "게시글-댓글 좋아요/싫어요",
             description = "입력된 댓글 ID에 대한 좋아요/싫어요 설정" +
-                    "\n reaction=LIKE → 좋아요 설정" +
-                    "\n reaction=DISLIKE → 싫어요 설정" +
+                    "\n reaction=LIKE → 좋아요 설정, " +
+                    "\n reaction=DISLIKE → 싫어요 설정, " +
                     "\n reaction 파라미터 미전달 → 해제 ")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "처리 완료", content = @Content(schema = @Schema(implementation = PostCommReactionResponse.class))),

@@ -10,15 +10,19 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+@Tag(
+        name = "evaluation-reaction-controller"
+)
 public interface EvaluationReactionApiDoc {
 
     @Operation(
-            summary = "평가 좋아요/싫어요 토글",
+            summary = "평가 좋아요/싫어요",
             description = "반응을 누른 후의 좋아요 수/싫어요 수 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "추천 후의 추천/비추천 수를 반환해줍니다.", content = {@Content(schema = @Schema(implementation = EvalReactionResponse.class))}),

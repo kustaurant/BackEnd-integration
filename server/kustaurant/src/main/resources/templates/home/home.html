@@ -286,9 +286,6 @@
                         <div class="swiper swiper-dark-pagination swiper-line-pagination-style-01 magic-cursor swiper-initialized swiper-horizontal swiper-backface-hidden">
                             <div class="swiper-wrapper">
                                 <!-- Dynamic restaurant slides -->
-                                <div>
-
-                                </div>
                                 <div th:each="restaurant, iterStat : ${restaurants}" class="swiper-slide">
                                     <div class="services-box-style-01 hover-box last-paragraph-no-margin">
                                         <!--슬라이더 이미지 -->
@@ -307,8 +304,8 @@
                                             <div class="w-100">
                                                     <span class="d-inline-block align-middle"
                                                           th:text="${restaurant.restaurantType}">Type</span>
-<!--                                                <span class="d-inline-block align-middle ms-10px me-10px fs-12 opacity-5"-->
-<!--                                                      th:if="${restaurant.restaurantScore > 0}">◍</span>-->
+                                                <span class="d-inline-block align-middle ms-10px me-10px fs-12 opacity-5"
+                                                      th:if="${restaurant.restaurantScore > 0}">◍</span>
 <!--                                                <span class="d-inline-block align-middle"-->
 <!--                                                      th:if="${restaurant.restaurantScore > 0}"-->
 <!--                                                      th:text="${restaurant.restaurantScore} + '/10'"></span>-->

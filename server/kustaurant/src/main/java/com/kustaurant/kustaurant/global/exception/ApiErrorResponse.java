@@ -17,7 +17,7 @@ public record ApiErrorResponse(
 ) {
 
     /** 필드 검증 오류 DTO */
-    public record SpecifiedError(String field, String value, String reason) {
+    public static record SpecifiedError(String field, String value, String reason) {
         static SpecifiedError of(FieldError e) {
             return new SpecifiedError(
                     e.getField(),
@@ -34,7 +34,7 @@ public record ApiErrorResponse(
                 ec.getStatus().value(),
                 ec.getCode(),
                 ec.getMessage(),
-                null
+                List.of()
         );
     }
 

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class FavoriteApiController implements FavoriteApiDoc {
+public class RestaurantFavoriteApiController implements RestaurantFavoriteApiDoc {
 
     private final RestaurantFavoriteService restaurantFavoriteService;
 

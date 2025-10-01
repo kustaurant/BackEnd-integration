@@ -1,7 +1,5 @@
-package com.kustaurant.kustaurant.admin.notice.controller;
+package com.kustaurant.kustaurant.admin.notice;
 
-import com.kustaurant.kustaurant.admin.notice.domain.Notice;
-import com.kustaurant.kustaurant.admin.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

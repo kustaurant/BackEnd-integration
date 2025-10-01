@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,12 +25,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class EvalCommentApiController {
+@Tag(name = "evaluation-comment-controller")
+public class EvaluationCommentApiController {
     private final EvalCommCommandService evalCommCommandService;
     private final UserService userService;
 
     // 1. 평가에 댓글 달기
-    @Operation(summary = "평가에 댓글 달기", description = "작성한 평가 댓글을 반환합니다.")
+    @Operation(summary = "평가에 댓글(평가-댓글) 달기", description = "작성한 평가-댓글을 반환합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "댓글 생성 성공", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = EvalCommentResponse.class))}),
             @ApiResponse(responseCode = "400", description = "댓글은 1000자 이하여야함. 해당 식당에 해당 comment Id를 가진 comment가 없음", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))}),
@@ -51,7 +53,7 @@ public class EvalCommentApiController {
     }
 
     // 2. 평가 댓글 삭제하기
-    @Operation(summary = "리뷰 댓글 및 대댓글 삭제하기", description = "리뷰 댓글 및 대댓글 삭제하기")
+    @Operation(summary = "평가-댓글 삭제하기", description = "평가 댓글 삭제하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "삭제에 성공.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))}),
             @ApiResponse(responseCode = "400", description = "restaurantId 식당에 해당 comment Id를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),

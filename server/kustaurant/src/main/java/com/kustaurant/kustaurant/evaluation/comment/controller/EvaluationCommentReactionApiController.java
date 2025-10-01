@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,16 +20,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class EvalCommentReactionApiController {
+@Tag(name = "evaluation-comment-reaction-controller")
+public class EvaluationCommentReactionApiController {
     private final EvalCommentReactionService evalCommUserReactionService;
 
     // 1. 평가 댓글 좋아요/싫어요
     @Operation(
-            summary = "평가 댓글 좋아요/싫어요 등록/제거",
+            summary = "평가-댓글 좋아요/싫어요",
             description = "반응을 누른 후의 좋아요 수/싫어요 수 반환" +
                     "\n reaction=LIKE  → 좋아요 설정" +
                     "\n reaction=DISLIKE → 싫어요 설정" +
-                    "\n (reaction 파라미터 미전달) → 반응 해제")
+                    "\n (reaction 파라미터 미전달) → 반응 해제(누른 좋아요/싫어요 해제)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "추천 후의 추천/비추천 수, 사용자가 누른값={LIKE,DISLIKE,null} 반환", content = {@Content(schema = @Schema(implementation = EvalCommentReactionResponse.class))}),
             @ApiResponse(responseCode = "400", description = "해당 식당에 해당 comment Id를 가진 comment가 없는 경우 400을 반환합니다.", content = {@Content(schema = @Schema(implementation = ApiErrorResponse.class))}),

@@ -22,7 +22,7 @@ public class EvaluationReactionService {
     private final EvaluationCommandRepository evaluationCommandRepository;
     private final EvalUserReactionRepository evaluationLikeRepository;
 
-    // 평가 좋아요/싫어요 토글
+    // 평가 좋아요/싫어요
     @Transactional
     public EvalReactionResponse setEvaluationReaction(Long userId, Long evaluationId, ReactionType cmd) {
         Evaluation evaluation = evaluationQueryRepository.findActiveById(evaluationId);
