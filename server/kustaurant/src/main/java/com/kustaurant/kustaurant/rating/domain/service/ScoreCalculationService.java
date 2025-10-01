@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.rating.domain.service;
 
+import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
 import com.kustaurant.kustaurant.rating.domain.model.AdjustedEvaluation;
 import com.kustaurant.kustaurant.rating.domain.model.EvaluationWithContext;
 import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy;
@@ -19,12 +20,13 @@ public class ScoreCalculationService {
     private final int MIN_EVALUATION_COUNT = 3;
 
     private final RatingPolicy policy;
+    private final ClockHolder clockHolder;
 
     public RatingScore calculate(
             RestaurantStats stats,
             List<EvaluationWithContext> evaluations,
             double globalAvg,
-            LocalDateTime date
+            LocalDateTime time
     ) {
         if (evaluations == null) {
             evaluations = List.of();
@@ -40,7 +42,7 @@ public class ScoreCalculationService {
 
         // 각 평가를 조정해서 누적
         for (EvaluationWithContext evaluation : evaluations) {
-            AdjustedEvaluation adj = evaluation.getAdjustedScore(policy.evaluation(), globalAvg, date);
+            AdjustedEvaluation adj = evaluation.getAdjustedScore(policy.evaluation(), globalAvg, time);
             numerator += adj.adjustedScore() * adj.weight();
             weightSum += adj.weight();
         }
@@ -52,10 +54,11 @@ public class ScoreCalculationService {
         double coreScore = numerator / weightSum;
 
         // 식당의 인기도를 구함
-        double popularity = stats.adjustPopularity(policy.restaurant(), coreScore);
+//        double popularity = stats.adjustPopularity(policy.restaurant(), coreScore);
 
         // 가중 평균한 값에 인기도를 곱해서 최종 점수를 구함
-        double finalScore = coreScore * popularity;
+//        double finalScore = coreScore * popularity;
+        double finalScore = coreScore;
 
         return new RatingScore(stats.restaurantId(), finalScore);
     }
@@ -63,12 +66,11 @@ public class ScoreCalculationService {
     public List<RatingScore> calculateScores(
             List<RestaurantStats> statsList,
             Map<Long, List<EvaluationWithContext>> evalMap,
-            double globalAvg,
-            LocalDateTime date
+            double globalAvg
     ) {
         List<RatingScore> scores = new ArrayList<>(statsList.size());
         for (RestaurantStats stats : statsList) {
-            RatingScore score = calculate(stats, evalMap.get(stats.restaurantId()), globalAvg, date);
+            RatingScore score = calculate(stats, evalMap.get(stats.restaurantId()), globalAvg, clockHolder.now());
             scores.add(score);
         }
         return scores;
