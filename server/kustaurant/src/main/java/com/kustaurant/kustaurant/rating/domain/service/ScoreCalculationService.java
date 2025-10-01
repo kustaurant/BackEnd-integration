@@ -11,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScoreCalculationService {
@@ -27,7 +25,8 @@ public class ScoreCalculationService {
     public RatingScore calculate(
             RestaurantStats stats,
             List<EvaluationWithContext> evaluations,
-            double globalAvg
+            double globalAvg,
+            LocalDateTime time
     ) {
         if (evaluations == null) {
             evaluations = List.of();
@@ -43,7 +42,7 @@ public class ScoreCalculationService {
 
         // 각 평가를 조정해서 누적
         for (EvaluationWithContext evaluation : evaluations) {
-            AdjustedEvaluation adj = evaluation.getAdjustedScore(policy.evaluation(), globalAvg, clockHolder.now());
+            AdjustedEvaluation adj = evaluation.getAdjustedScore(policy.evaluation(), globalAvg, time);
             numerator += adj.adjustedScore() * adj.weight();
             weightSum += adj.weight();
         }
@@ -55,12 +54,11 @@ public class ScoreCalculationService {
         double coreScore = numerator / weightSum;
 
         // 식당의 인기도를 구함
-        double popularity = stats.adjustPopularity(policy.restaurant(), coreScore);
+//        double popularity = stats.adjustPopularity(policy.restaurant(), coreScore);
 
         // 가중 평균한 값에 인기도를 곱해서 최종 점수를 구함
-        double finalScore = coreScore * popularity;
-
-        log.info("id:{} / numerator: {} / weightSum: {} / coreScore: {} / popularity: {}", stats.restaurantId(), numerator, weightSum, coreScore, popularity);
+//        double finalScore = coreScore * popularity;
+        double finalScore = coreScore;
 
         return new RatingScore(stats.restaurantId(), finalScore);
     }
@@ -72,7 +70,7 @@ public class ScoreCalculationService {
     ) {
         List<RatingScore> scores = new ArrayList<>(statsList.size());
         for (RestaurantStats stats : statsList) {
-            RatingScore score = calculate(stats, evalMap.get(stats.restaurantId()), globalAvg);
+            RatingScore score = calculate(stats, evalMap.get(stats.restaurantId()), globalAvg, clockHolder.now());
             scores.add(score);
         }
         return scores;
