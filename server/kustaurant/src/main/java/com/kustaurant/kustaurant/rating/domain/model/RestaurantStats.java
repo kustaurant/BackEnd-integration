@@ -4,7 +4,9 @@ import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.RestaurantPoli
 import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.RestaurantPolicy.PopularityScale;
 import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.RestaurantPolicy.PopularityWeight;
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public record RestaurantStats(
         long restaurantId,
         int visitCount,
@@ -27,6 +29,7 @@ public record RestaurantStats(
                 + weight.favorites() * (1 + Math.tanh(Math.log1p(favoriteCount) / scale.favorite()))
                 + weight.evaluations() * (1 + Math.tanh(Math.log1p(evaluationCount) / scale.evaluation())))
                 / (weight.visits() + weight.favorites() + weight.evaluations());
+        log.info("popularity: {}", popularity);
 
         return score * popularity;
     }

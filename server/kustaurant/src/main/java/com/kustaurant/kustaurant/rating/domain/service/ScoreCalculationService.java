@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScoreCalculationService {
@@ -57,6 +59,8 @@ public class ScoreCalculationService {
 
         // 가중 평균한 값에 인기도를 곱해서 최종 점수를 구함
         double finalScore = coreScore * popularity;
+
+        log.info("id:{} / numerator: {} / weightSum: {} / coreScore: {} / popularity: {}", stats.restaurantId(), numerator, weightSum, coreScore, popularity);
 
         return new RatingScore(stats.restaurantId(), finalScore);
     }

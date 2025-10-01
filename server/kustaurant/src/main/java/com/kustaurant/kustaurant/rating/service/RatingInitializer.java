@@ -13,7 +13,7 @@ public class RatingInitializer {
 
     private final RatingOrchestrationService ratingOrchestrationService;
 
-//    @EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     public void ratingInit() {
         ratingOrchestrationService.calculateAllRatings();
     }

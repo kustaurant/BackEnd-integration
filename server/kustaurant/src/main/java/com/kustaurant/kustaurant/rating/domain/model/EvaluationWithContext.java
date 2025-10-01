@@ -59,8 +59,8 @@ public record EvaluationWithContext(
         // 유저의 평가 개수
         double reliability = policy.getEvaluationReliabilityW(userEvalCount);
 
-        double adjustedScore = base * completeness * recencyBoost * reaction;
-        double weight = reliability * decay;
+        double adjustedScore = base * reaction;
+        double weight = reliability * completeness;
 
         return new AdjustedEvaluation(adjustedScore, weight);
     }
@@ -68,7 +68,7 @@ public record EvaluationWithContext(
     private double getCorrectedScore(double globalAvg) {
         double corrected = score - userAvgScore + globalAvg;
         corrected = Math.max(1.0, Math.min(5.0, corrected));
-        return corrected / 5.0;
+        return corrected;
     }
 
     private double getCompleteness(EvaluationPolicy policy) {
