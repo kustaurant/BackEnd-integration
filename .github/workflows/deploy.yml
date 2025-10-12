@@ -3,6 +3,9 @@ name: 자동 CI/CD
 on:
   push:
     branches: [ main ]
+  pull_request:
+    types: [opened]
+    branches: [develop, main]
 
 jobs:
   detect-changes:

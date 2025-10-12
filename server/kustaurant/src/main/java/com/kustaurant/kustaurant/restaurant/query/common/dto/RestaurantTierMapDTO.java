@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Schema(description = "restaurant tier map entity")
 public class RestaurantTierMapDTO {
+
     @Schema(description = "지도의 최소 줌입니다. (활용이 힘들다면 말씀해주세요.")
     Integer minZoom = MapConstants.MIN_ZOOM;
 
