@@ -1,5 +1,7 @@
 package com.kustaurant.kustaurant.post.community.controller.response;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.kustaurant.kustaurant.common.dto.UserSummary;
 import com.kustaurant.kustaurant.common.util.TimeAgoResolver;
 import com.kustaurant.kustaurant.post.post.domain.enums.PostCategory;
 import com.kustaurant.kustaurant.post.community.infrastructure.projection.PostListProjection;
@@ -11,9 +13,7 @@ public record PostListResponse(
         PostCategory category,
         String title,
         String body,
-        Long writerId,
-        String writerNickname,
-        String writerIconUrl,
+        @JsonUnwrapped(prefix = "writer") UserSummary writer,
         String photoUrl,
         String timeAgo,
         long totalLikes,
@@ -23,15 +23,14 @@ public record PostListResponse(
         String excerpt = summarize(p.body(), 30);
         String userIconUrl = UserIconResolver.resolve(p.writerEvalCount());
         String timeAgo = TimeAgoResolver.toKor(p.createdAt());
+        UserSummary writer = new UserSummary(p.writerId(), p.writerNickName(), p.writerEvalCount(),userIconUrl);
 
         return new PostListResponse(
                 p.postId(),
                 p.category(),
                 p.title(),
                 excerpt,
-                p.writerId(),
-                p.writerNickName(),
-                userIconUrl,
+                writer,
                 p.photoUrl(),
                 timeAgo,
                 p.totalLikes(),
