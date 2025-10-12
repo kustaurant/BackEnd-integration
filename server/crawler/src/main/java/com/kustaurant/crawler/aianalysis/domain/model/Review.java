@@ -4,7 +4,7 @@ public record Review(
         String body
 ) {
 
-    private static final int MIN_REVIEW_LENGTH = 10;
+    private static final int MIN_REVIEW_LENGTH = 20;
 
     public Review(String body) {
         if (!isValid(body)) {

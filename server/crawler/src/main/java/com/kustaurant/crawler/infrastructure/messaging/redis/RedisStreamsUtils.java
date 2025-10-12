@@ -4,6 +4,7 @@ import io.lettuce.core.RedisBusyException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.stereotype.Component;
@@ -16,13 +17,15 @@ public class RedisStreamsUtils {
     private final RedisConnectionFactory cf;
 
     public void createStreamAndGroupIfNotExists(String key, String group) {
-        var conn = cf.getConnection();
-        var sc = conn.streamCommands();
-        try {
-            sc.xGroupCreate(
-                    key.getBytes(),
+        try (RedisConnection conn = cf.getConnection()) {
+            byte[] k = key.getBytes();
+            // 기존 스트림 관련 삭제
+            conn.keyCommands().del(k);
+            // 그룹 생성
+            conn.streamCommands().xGroupCreate(
+                    k,
                     group,
-                    ReadOffset.from("0"), // 0: 처음 메시지부터 읽기, $: 연결된 이후 메시지 부터 읽기
+                    ReadOffset.latest(), // 0: 처음 메시지부터 읽기, $: 연결된 이후 메시지 부터 읽기
                     true // 없을 경우 스트림을 만듦
             );
         } catch (DataAccessException e) {

@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.rating.domain.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.kustaurant.kustaurant.common.clockHolder.SystemClockHolder;
 import com.kustaurant.kustaurant.rating.domain.model.Rating;
 import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy;
 import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.TierPolicy;
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.Test;
 class TierCalculationServiceTest {
 
     private TierCalculationService service;
-    private LocalDateTime now;
 
     @BeforeEach
     void setUp() {
@@ -32,8 +32,7 @@ class TierCalculationServiceTest {
         TierPolicy tierPolicy = new TierPolicy(levels);
         RatingPolicy policy = new RatingPolicy(0, null, null, tierPolicy);
 
-        service = new TierCalculationService(policy);
-        now = LocalDateTime.now();
+        service = new TierCalculationService(policy, new SystemClockHolder());
     }
 
     // 헬퍼 메서드
@@ -85,7 +84,7 @@ class TierCalculationServiceTest {
                 9, Tier.FIVE, 10, Tier.FIVE
         );
 
-        assertTiers(service.calculate(input, now), expect);
+        assertTiers(service.calculate(input), expect);
     }
 
     @Test
@@ -106,7 +105,7 @@ class TierCalculationServiceTest {
                 15, Tier.FOUR
         );
 
-        assertTiers(service.calculate(input, now), expect);
+        assertTiers(service.calculate(input), expect);
     }
 
     @Test
@@ -128,7 +127,7 @@ class TierCalculationServiceTest {
                 27, Tier.FIVE
         );
 
-        assertTiers(service.calculate(input, now), expect);
+        assertTiers(service.calculate(input), expect);
     }
 
     @Test
@@ -154,7 +153,7 @@ class TierCalculationServiceTest {
                 29, Tier.FOUR, 30, Tier.FIVE
         );
 
-        List<Rating> ratings = service.calculate(input, now);
+        List<Rating> ratings = service.calculate(input);
         System.out.println(ratings);
         assertTiers(ratings, expect);
     }
@@ -177,6 +176,6 @@ class TierCalculationServiceTest {
                 35, Tier.FIVE
         );
 
-        assertTiers(service.calculate(input, now), expect);
+        assertTiers(service.calculate(input), expect);
     }
 }
