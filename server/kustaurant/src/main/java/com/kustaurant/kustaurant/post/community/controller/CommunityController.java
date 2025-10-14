@@ -67,13 +67,15 @@ public class CommunityController {
     @GetMapping("/community/search")
     public String search(
             Model model,
-            @RequestParam(value = "page", defaultValue = "0") int page,
+            @Valid @ModelAttribute PostListRequest req,
             @RequestParam(value = "kw", defaultValue = "") String kw
     ) {
-        Page<PostListResponse> paging = postQueryService.searchLatest(page, kw);
+        Page<PostListResponse> paging = postQueryService.searchLatest(req.page(), kw);
 
         model.addAttribute("paging", paging);
+        model.addAttribute("postCategory", req.category());
         model.addAttribute("postSearchKw", kw);
+        model.addAttribute("sort", req.sort());
         model.addAttribute("postList", paging.getContent());
         return "community/community";
     }
