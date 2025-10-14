@@ -70,7 +70,7 @@ public class CommunityController {
             @Valid @ModelAttribute PostListRequest req,
             @RequestParam(value = "kw", defaultValue = "") String kw
     ) {
-        Page<PostListResponse> paging = postQueryService.searchLatest(req.page(), kw);
+        Page<PostListResponse> paging = postQueryService.searchLatest(req.page(), req.category(), kw);
 
         model.addAttribute("paging", paging);
         model.addAttribute("postCategory", req.category());
