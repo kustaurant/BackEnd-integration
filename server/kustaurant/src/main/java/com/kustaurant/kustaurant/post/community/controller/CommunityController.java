@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequiredArgsConstructor
 public class CommunityController {
+
     private final PostQueryService postQueryService;
 
     private final ViewerKeyProvider viewerKeyProvider;
