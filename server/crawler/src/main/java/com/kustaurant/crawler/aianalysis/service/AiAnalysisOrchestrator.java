@@ -29,6 +29,7 @@ public class AiAnalysisOrchestrator {
             List<Review> reviews = crawlingService.crawl(req.url());
             if (reviews.isEmpty()) {
                 log.info("크롤링된 리뷰가 없습니다. 요청: {}", req);
+                return;
             }
             // AI 전처리
             RestaurantAnalysis result = aiAnalysisService.analyzeReviews(reviews, req.situations());
