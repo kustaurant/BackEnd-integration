@@ -18,6 +18,8 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: paths
         with:
+          base: ${{ github.event.before }}
+          ref:  ${{ github.sha }}
           filters: |
             kustaurant:
               - 'server/kustaurant/**'
