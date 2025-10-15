@@ -43,7 +43,7 @@ public class HomeV1Controller {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         List<RestaurantCoreInfoDto> topRestaurantsByRatingDTOs = restaurantHomeService.getTopRestaurants(
-                user.id()); // 점수 높은 순으로 총 16개
+                user.id());
         // 로그인 여부에 따라 랜덤 식당 또는 추천 식당을 반환하는 서비스 메서드를 호출합니다.
         List<RestaurantCoreInfoDto> restaurantsForMeDTOs = restaurantHomeService.getRecommendedOrRandomRestaurants(user.id());
         // 홈화면의 배너 이미지
