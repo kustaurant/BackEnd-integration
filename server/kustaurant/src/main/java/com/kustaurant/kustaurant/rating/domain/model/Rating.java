@@ -9,7 +9,8 @@ public record Rating(
         double score,
         Tier tier,
         boolean isTemp,
-        LocalDateTime ratedAt
+        LocalDateTime ratedAt,
+        double normalizedScore
 ) {
 
 }

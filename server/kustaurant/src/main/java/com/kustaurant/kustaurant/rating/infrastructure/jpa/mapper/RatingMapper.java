@@ -11,7 +11,8 @@ public class RatingMapper {
                 rating.score(),
                 rating.tier().getValue(),
                 rating.isTemp(),
-                rating.ratedAt()
+                rating.ratedAt(),
+                rating.normalizedScore()
         );
     }
 }

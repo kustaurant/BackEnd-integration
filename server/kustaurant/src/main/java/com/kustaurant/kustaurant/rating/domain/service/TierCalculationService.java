@@ -47,11 +47,11 @@ public class TierCalculationService {
 
         for (RatingScore score : sorted) {
             if (score.score() == 0) {
-                result.add(new Rating(score.restaurantId(), score.score(), Tier.NONE, false, clockHolder.now()));
+                result.add(new Rating(score.restaurantId(), score.score(), Tier.NONE, false, clockHolder.now(), 0));
                 continue;
             }
             if (tier == 5) {
-                result.add(new Rating(score.restaurantId(), score.score(), Tier.FIVE, false, clockHolder.now()));
+                result.add(new Rating(score.restaurantId(), score.score(), Tier.FIVE, false, clockHolder.now(), 0));
                 continue;
             }
             while (tier < 5 && (score.score() < minScore || (count >= maxCount && score.score() != lastScoreInTier))) {
@@ -68,7 +68,7 @@ public class TierCalculationService {
 
             Tier assignedTier = tier == 5 ? Tier.FIVE : Tier.find(tier);
 
-            result.add(new Rating(score.restaurantId(), score.score(), assignedTier, false, clockHolder.now()));
+            result.add(new Rating(score.restaurantId(), score.score(), assignedTier, false, clockHolder.now(), 0));
 
             if (assignedTier != Tier.FIVE) {
                 count++;

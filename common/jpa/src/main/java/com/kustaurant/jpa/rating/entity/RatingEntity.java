@@ -65,12 +65,13 @@ public class RatingEntity {
     private LocalDateTime aiProcessedAt;
 
     public RatingEntity(long restaurantId, double score, int tier, boolean isTemp,
-            LocalDateTime ratedAt) {
+            LocalDateTime ratedAt, double normalizedScore) {
         this.restaurantId = restaurantId;
         this.score = score;
         this.tier = tier;
         this.isTemp = isTemp;
         this.ratedAt = ratedAt;
+        this.normalizedScore = normalizedScore;
     }
 
     public static RatingEntity of(
@@ -86,6 +87,15 @@ public class RatingEntity {
                 .aiAvgScore(aiAvgScore)
                 .aiProcessedAt(aiProcessedAt)
                 .build();
+    }
+
+    public void updateRatingData(
+            double score, int tier, boolean isTemp, LocalDateTime ratedAt, double normalizedScore) {
+        this.score = score;
+        this.tier = tier;
+        this.isTemp = isTemp;
+        this.ratedAt = ratedAt;
+        this.normalizedScore = normalizedScore;
     }
 
     public void updateAiData(

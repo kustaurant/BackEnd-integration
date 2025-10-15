@@ -22,11 +22,19 @@ public class RatingCrawlerRepoImpl implements RatingCrawlerRepo {
 
     @Override
     public void upsertRating(long restaurantId, RestaurantAnalysis analysis) {
-        update(restaurantId, analysis);
-        try {
+        Optional<RatingEntity> optional = ratingJpaRepository.findByIdForUpdate(restaurantId);
+        if (optional.isPresent()) {
+            RatingEntity ratingEntity = optional.get();
+            ratingEntity.updateAiData(
+                    analysis.getReviewCount(),
+                    analysis.getPositiveCount(),
+                    analysis.getNegativeCount(),
+                    analysis.getScoreSum(),
+                    analysis.getAvgScore(),
+                    LocalDateTime.now(clock)
+            );
+        } else {
             save(restaurantId, analysis);
-        } catch (DataIntegrityViolationException e) {
-            update(restaurantId, analysis);
         }
     }
 
@@ -41,20 +49,5 @@ public class RatingCrawlerRepoImpl implements RatingCrawlerRepo {
                 LocalDateTime.now(clock)
         );
         ratingJpaRepository.save(entity);
-    }
-
-    private void update(long restaurantId, RestaurantAnalysis analysis) {
-        Optional<RatingEntity> optional = ratingJpaRepository.findByIdForUpdate(restaurantId);
-        if (optional.isPresent()) { // 존재할 경우 dirty check 이용
-            RatingEntity ratingEntity = optional.get();
-            ratingEntity.updateAiData(
-                    analysis.getReviewCount(),
-                    analysis.getPositiveCount(),
-                    analysis.getNegativeCount(),
-                    analysis.getScoreSum(),
-                    analysis.getAvgScore(),
-                    LocalDateTime.now(clock)
-            );
-        }
     }
 }
