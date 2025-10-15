@@ -193,9 +193,9 @@ public class PostQueryRepository {
 
     // 3. 포스트 검색
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public Page<PostListProjection> searchLatest(String keyword, Pageable pageable) {
+    public Page<PostListProjection> searchLatest(String keyword, PostCategory categoryCond, Pageable pageable) {
         // 1) ID만 최신순으로 페이징 (post 단독 + 인덱스 타서 가볍게)
-        BooleanExpression cond = buildSearchCond(keyword);
+        BooleanExpression cond = buildSearchCond(keyword, categoryCond);
 
         List<Long> ids = queryFactory
                 .select(post.postId)
@@ -324,7 +324,7 @@ public class PostQueryRepository {
         return new PageImpl<>(ordered, pageable, total);
     }
 
-    private BooleanExpression buildSearchCond(String keyword) {
+    private BooleanExpression buildSearchCond(String keyword, PostCategory category) {
         BooleanExpression cond = post.status.eq(PostStatus.ACTIVE);
         if (keyword != null && !keyword.isBlank()) {
             String kw = keyword.trim();
@@ -332,6 +332,9 @@ public class PostQueryRepository {
                     post.postTitle.containsIgnoreCase(kw)
                             .or(post.postBody.containsIgnoreCase(kw))
             );
+        }
+        if (category != null && category != PostCategory.ALL) {
+            cond = cond.and(post.postCategory.eq(category));
         }
         return cond;
     }

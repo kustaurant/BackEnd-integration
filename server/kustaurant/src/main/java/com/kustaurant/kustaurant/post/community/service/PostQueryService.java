@@ -58,12 +58,12 @@ public class PostQueryService {
         return PostDetailResponse.from(projection, photos, comments, currentUserId);
     }
 
-    public Page<PostListResponse> searchLatest(int page, String kw) {
+    public Page<PostListResponse> searchLatest(int page, PostCategory category, String kw) {
         // createdAt DESC, 동일 시각 안정성 위해 postId DESC 보조키 추가
         Sort sort = Sort.by(Sort.Order.desc("createdAt")).and(Sort.by(Sort.Order.desc("postId")));
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, sort);
 
-        Page<PostListProjection> projPage = postQueryRepo.searchLatest(kw, pageable);
+        Page<PostListProjection> projPage = postQueryRepo.searchLatest(kw, category, pageable);
         return projPage.map(PostListResponse::from);
     }
 }
