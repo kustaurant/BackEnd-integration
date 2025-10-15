@@ -75,7 +75,7 @@ jobs:
 
   deploy:
     name: 🚀 도커 컴포즈 배포
-    needs: kustaurant-build-push
+    needs: [detect-changes, kustaurant-build-push]
     if: needs.detect-changes.outputs.kustaurant == 'true'
     runs-on: ubuntu-latest
     steps:

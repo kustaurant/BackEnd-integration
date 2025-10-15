@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class PostQueryRepository {
+
     private final JPAQueryFactory queryFactory;
     private static final QPostEntity post = QPostEntity.postEntity;
     private static final QPostPhotoEntity photo = QPostPhotoEntity.postPhotoEntity;
