@@ -47,7 +47,6 @@ public class PostReactionApiController {
     }
 
     // 2. 게시글 스크랩
-    @PostMapping("/v2/auth/community/{postId}/scraps")
     @Operation(summary = "게시글 스크랩",
             description = "게시글 ID를 입력받아 스크랩을 생성하거나 해제합니다. " +
                     "\n\nstatus와 현재 게시글의 스크랩 수를 반환합니다. " +
@@ -57,6 +56,7 @@ public class PostReactionApiController {
             @ApiResponse(responseCode = "200", description = "게시글 스크랩 처리가 완료되었습니다", content = @Content(schema = @Schema(implementation = PostScrapResponse.class))),
             @ApiResponse(responseCode = "404", description = "해당 ID의 게시글이 존재하지 않습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
+    @PostMapping("/v2/auth/community/{postId}/scraps")
     public ResponseEntity<PostScrapResponse> setPostScrap(
             @PathVariable Long postId,
             @Parameter(description = "true=스크랩, false=해제", required = true, example = "true")

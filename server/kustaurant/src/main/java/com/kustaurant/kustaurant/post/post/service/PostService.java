@@ -15,6 +15,7 @@ import com.kustaurant.kustaurant.user.mypage.service.UserStatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -73,6 +74,7 @@ public class PostService {
         return postRepository.save(update);
     }
 
+    @Transactional
     public void delete(Long postId, Long userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new DataNotFoundException(POST_NOT_FOUND, postId, "게시글"));

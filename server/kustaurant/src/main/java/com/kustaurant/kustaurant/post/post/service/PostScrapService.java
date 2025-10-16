@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class PostScrapService {
 
     private final UserStatsService userStatsService;
 
+    @Transactional
     public PostScrapResponse toggleScrapWithCount(Long postId, Long userId, boolean cmd) {
         postRepository.findById(postId).orElseThrow(
                 ()-> new DataNotFoundException(ErrorCode.POST_NOT_FOUND)
