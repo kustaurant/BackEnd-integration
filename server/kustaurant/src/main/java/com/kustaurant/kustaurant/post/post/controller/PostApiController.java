@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,15 +42,15 @@ public class PostApiController {
     @Operation(summary = "게시글 생성", description = "게시글 제목, 카테고리, 내용, 이미지를 입력받아 게시글을 생성합니다.\n\n" +
             "- 요청 형식 보충 설명\n\n" +
             "   - title: 필수\n\n" +
-            "   - category: 필수.\n\n" +
+            "   - category: (FREE, COLUMN, SUGGESTION)중 하나이며, ALL필드는 생성시 사용되지 않음 \n\n" +
             "   - content: 필수.\n\n")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글이 생성되었습니다", content = @Content(schema = @Schema(implementation = PostDetailResponse.class))),
             @ApiResponse(responseCode = "500", description = "게시글 생성에 오류가 발생했습니다.", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @PostMapping("/v2/auth/community/posts/create")
+    @PostMapping("/v2/auth/community/posts")
     public ResponseEntity<PostResponse> postCreate(
-            @RequestBody PostRequest req,
+            @Valid @RequestBody PostRequest req,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         Post post = postService.create(req, user.id());
@@ -96,7 +97,7 @@ public class PostApiController {
             @ApiResponse(responseCode = "403", description = "해당 게시글을 삭제할 권한이 없습니다.", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "서버 오류로 인해 삭제에 실패하였습니다.", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
-    @DeleteMapping("/v2/auth/community/{postId}")
+    @DeleteMapping("/v2/auth/community/posts/{postId}")
     public ResponseEntity<Void> postDelete(
             @PathVariable Long postId,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
