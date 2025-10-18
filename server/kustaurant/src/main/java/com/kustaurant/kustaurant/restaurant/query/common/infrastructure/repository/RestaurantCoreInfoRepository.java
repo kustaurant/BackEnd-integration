@@ -55,7 +55,7 @@ public class RestaurantCoreInfoRepository {
                                 restaurantEntity.longitude,
                                 restaurantEntity.latitude,
                                 restaurantEntity.partnershipInfo,
-                                ratingEntity.score,
+                                ratingEntity.finalScore,
                                 set(situationEntity.situationName),
                                 restaurantEntity.restaurantType
                         )
@@ -114,7 +114,7 @@ public class RestaurantCoreInfoRepository {
                                         restaurantEntity.longitude,
                                         restaurantEntity.latitude,
                                         restaurantEntity.partnershipInfo,
-                                        numberTemplate(Double.class, "ROUND({0}, 2)", ratingEntity.score.coalesce(0.0)),
+                                        numberTemplate(Double.class, "ROUND({0}, 2)", ratingEntity.finalScore.coalesce(0.0)),
                                         set(situationEntity.situationName),
                                         restaurantEntity.restaurantType,
                                         evaluationEntity.isNotNull(),

@@ -44,9 +44,10 @@ public class RestaurantDrawRepositoryImpl implements RestaurantDrawRepository {
                         cuisinesIn(condition.cuisines(), restaurantEntity),
                         positionsIn(condition.positions(), restaurantEntity),
                         hasSituation(condition.situations(), restaurantEntity),
-                        restaurantActive(restaurantEntity)
+                        restaurantActive(restaurantEntity),
+                        ratingEntity.isTemp.not()
                 )
-                .orderBy(ratingEntity.score.desc())
+                .orderBy(ratingEntity.finalScore.desc())
                 .fetch();
     }
 }

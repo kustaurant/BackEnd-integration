@@ -25,8 +25,9 @@ public class RestaurantHomeRepositoryImpl implements RestaurantHomeRepository {
         return queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
-                .where(restaurantActive(restaurantEntity))
-                .orderBy(ratingEntity.score.desc())
+                .where(restaurantActive(restaurantEntity),
+                        ratingEntity.isTemp.not())
+                .orderBy(ratingEntity.finalScore.desc())
                 .limit(size)
                 .fetch();
     }

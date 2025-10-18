@@ -1,7 +1,7 @@
-package com.kustaurant.crawler.aianalysis.infrastructure.messaging;
+package com.kustaurant.crawler.aianalysis.messaging;
 
 import com.kustaurant.crawler.aianalysis.service.AiAnalysisOrchestrator;
-import com.kustaurant.crawler.aianalysis.infrastructure.messaging.dto.AiAnalysisRequest;
+import com.kustaurant.crawler.aianalysis.messaging.dto.AiAnalysisRequest;
 import com.kustaurant.crawler.infrastructure.messaging.MessageSubscriber;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

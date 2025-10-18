@@ -2,14 +2,12 @@ package com.kustaurant.kustaurant.rating.domain.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
 import com.kustaurant.kustaurant.common.clockHolder.SystemClockHolder;
 import com.kustaurant.kustaurant.rating.domain.model.Rating;
-import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy;
-import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.TierPolicy;
-import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.TierPolicy.TierLevel;
-import com.kustaurant.kustaurant.rating.domain.model.RatingScore;
-import com.kustaurant.kustaurant.rating.domain.model.Tier;
-import java.time.LocalDateTime;
+import com.kustaurant.kustaurant.rating.domain.vo.Tier;
+import com.kustaurant.kustaurant.rating.domain.vo.TierPolicyProp;
+import com.kustaurant.kustaurant.rating.domain.vo.TierPolicyProp.TierLevel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +17,7 @@ import org.junit.jupiter.api.Test;
 class TierCalculationServiceTest {
 
     private TierCalculationService service;
+    private ClockHolder clockHolder;
 
     @BeforeEach
     void setUp() {
@@ -29,18 +28,18 @@ class TierCalculationServiceTest {
                 3, new TierLevel(3.0, 0.2),
                 4, new TierLevel(2.5, 0.2)
         );
-        TierPolicy tierPolicy = new TierPolicy(levels);
-        RatingPolicy policy = new RatingPolicy(0, null, null, tierPolicy);
+        TierPolicyProp tierPolicyProp = new TierPolicyProp(levels);
 
-        service = new TierCalculationService(policy, new SystemClockHolder());
+        service = new TierCalculationService(tierPolicyProp, new SystemClockHolder());
+        clockHolder = new SystemClockHolder();
     }
 
     // 헬퍼 메서드
-    private List<RatingScore> scores(Object... tuples) {
+    private List<Rating> scores(Object... tuples) {
         // 가변인자 형태: (id, score, id, score, …)
-        List<RatingScore> list = new ArrayList<>(tuples.length / 2);
+        List<Rating> list = new ArrayList<>(tuples.length / 2);
         for (int i = 0; i < tuples.length; i += 2) {
-            list.add(new RatingScore((Integer) tuples[i], (Double) tuples[i + 1]));
+            list.add(new Rating((Integer) tuples[i], false, (Double) tuples[i + 1], 0.0, (Double) tuples[i + 1], clockHolder.now()));
         }
         return list;
     }
@@ -51,10 +50,10 @@ class TierCalculationServiceTest {
         expected.forEach((id, tier) ->
                 assertThat(
                         actual.stream()
-                                .filter(r -> r.restaurantId() == id)
+                                .filter(r -> r.getRestaurantId() == id)
                                 .findFirst()
                                 .orElseThrow()
-                                .tier()
+                                .getTier()
                 )
                         .as("restaurantId=%s", id)
                         .isEqualTo(tier)
@@ -63,7 +62,7 @@ class TierCalculationServiceTest {
 
     @Test
     void 일반적인_티어_분포_상황() {
-        List<RatingScore> input = scores(
+        List<Rating> input = scores(
                 1, 4.6,
                 2, 4.4,   // Tier 1 (2개)
                 3, 4.1,
@@ -89,7 +88,7 @@ class TierCalculationServiceTest {
 
     @Test
     void 점수_0점인_경우는_Tier_가_없음() {
-        List<RatingScore> input = scores(
+        List<Rating> input = scores(
                 11, 4.2,
                 12, 0.0,   // NONE
                 13, 3.8,
@@ -110,7 +109,7 @@ class TierCalculationServiceTest {
 
     @Test
     void 점수_조건에_충족하지_않아서_티어1이_없는_경우() {
-        List<RatingScore> input = scores(
+        List<Rating> input = scores(
                 21, 3.9,
                 22, 3.8,
                 23, 3.6,
@@ -132,7 +131,7 @@ class TierCalculationServiceTest {
 
     @Test
     void 점수_조건에_충족하지_않아서_중간_티어가_없고_티어_비율을_넘었는데_동점인_경우() {
-        List<RatingScore> input = scores(
+        List<Rating> input = scores(
                 21, 4.0,
                 22, 3.1,
                 23, 3.1,
@@ -160,7 +159,7 @@ class TierCalculationServiceTest {
 
     @Test
     void 중간에_티어를_많이_건너뛴_경우() {
-        List<RatingScore> input = scores(
+        List<Rating> input = scores(
                 31, 4.7,
                 32, 2.3,
                 33, 2.2,

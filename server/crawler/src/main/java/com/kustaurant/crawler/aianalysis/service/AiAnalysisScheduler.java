@@ -8,19 +8,19 @@ import com.kustaurant.crawler.global.util.JsonUtils;
 import com.kustaurant.crawler.infrastructure.messaging.MessagePublisher;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AiAnalysisInitializer {
+public class AiAnalysisScheduler {
 
     private final RestaurantCrawlerRepo restaurantCrawlerRepo;
     private final MessagePublisher<String> messagePublisher;
     private final MessagingProps messagingProps;
 
-    @EventListener(ApplicationReadyEvent.class)
+    // 매주 토요일 새벽 4시에 진행
+    @Scheduled(cron = "0 0 4 * * SAT", zone = "Asia/Seoul")
     public void crawlingInit() {
         List<RestaurantCrawlingInfo> infos = restaurantCrawlerRepo.getRestaurantsForCrawling();
         infos = infos.subList(2, infos.size());

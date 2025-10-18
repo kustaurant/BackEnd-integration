@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.rating.service.port;
 
-import com.kustaurant.kustaurant.rating.domain.model.EvaluationWithContext;
+import com.kustaurant.kustaurant.rating.domain.vo.EvaluationWithContext;
 import java.util.List;
 import java.util.Map;
 
