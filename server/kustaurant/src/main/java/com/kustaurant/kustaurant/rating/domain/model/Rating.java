@@ -16,26 +16,28 @@ public class Rating {
     private Tier tier;
     private boolean isTemp;
     private LocalDateTime ratedAt;
-    private double normalizedScore;
+    private double finalScore;
+    private double aiScore;
 
-    public Rating(long restaurantId, boolean isTemp, double selfScore, double finalScore, LocalDateTime now) {
+    public Rating(long restaurantId, boolean isTemp, double selfScore, double aiScore, double finalScore, LocalDateTime now) {
         this.restaurantId = restaurantId;
         this.isTemp = isTemp;
         this.score = selfScore;
         this.ratedAt = now;
-        this.normalizedScore = finalScore;
+        this.finalScore = finalScore;
+        this.aiScore = aiScore;
     }
 
-    public static Rating combined(long id, double selfScore, double finalScore, LocalDateTime now) {
-        return new Rating(id, false, selfScore, finalScore, now);
+    public static Rating combined(long id, double selfScore, double aiScore, double finalScore, LocalDateTime now) {
+        return new Rating(id, false, selfScore, aiScore, finalScore, now);
     }
 
-    public static Rating aiOnly(long id, double finalScore, LocalDateTime now) {
-        return new Rating(id, true, 0.0, finalScore, now);
+    public static Rating aiOnly(long id, double aiScore, double finalScore, LocalDateTime now) {
+        return new Rating(id, true, 0.0, aiScore, finalScore, now);
     }
 
     public static Rating none(long id, LocalDateTime now) {
-        return new Rating(id, false, 0.0, 0.0, now);
+        return new Rating(id, false, 0.0, 0.0, 0.0, now);
     }
 
     public void changeTier(Tier tier) {

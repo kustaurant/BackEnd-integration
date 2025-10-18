@@ -12,7 +12,8 @@ public class RatingMapper {
                 rating.getTier().getValue(),
                 rating.isTemp(),
                 rating.getRatedAt(),
-                rating.getNormalizedScore()
+                rating.getFinalScore(),
+                rating.getAiScore()
         );
     }
 }

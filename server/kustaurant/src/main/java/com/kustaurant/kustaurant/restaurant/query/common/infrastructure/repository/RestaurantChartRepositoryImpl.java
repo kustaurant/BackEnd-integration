@@ -44,7 +44,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                         restaurantActive(restaurantEntity),
                         tierFilterProcess(ratingEntity, condition)
                 )
-                .orderBy(ratingEntity.score.desc());
+                .orderBy(ratingEntity.finalScore.desc());
         // pageable unpaged 처리
         Pageable pageable = condition.pageable();
         if (pageable == null) {

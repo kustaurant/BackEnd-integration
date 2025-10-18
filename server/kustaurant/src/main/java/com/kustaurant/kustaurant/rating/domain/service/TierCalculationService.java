@@ -20,7 +20,7 @@ public class TierCalculationService {
 
     public List<Rating> calculate(List<Rating> scores) {
         // 점수 기준으로 내림차순 정렬
-        scores.sort(Comparator.comparingDouble(Rating::getNormalizedScore).reversed());
+        scores.sort(Comparator.comparingDouble(Rating::getFinalScore).reversed());
         // 티어가 있는 평가 개수
         int tierCount = countExistTiers(scores);
         // 티어 할당
@@ -43,7 +43,7 @@ public class TierCalculationService {
         double minScore = level.minScore();
 
         for (Rating score : sorted) {
-            if (score.getNormalizedScore() == 0) {
+            if (score.getFinalScore() == 0) {
                 score.changeTier(Tier.NONE);
                 result.add(score);
                 continue;
@@ -53,7 +53,7 @@ public class TierCalculationService {
                 result.add(score);
                 continue;
             }
-            while (tier < 5 && (score.getNormalizedScore() < minScore || (count >= maxCount && score.getNormalizedScore() != lastScoreInTier))) {
+            while (tier < 5 && (score.getFinalScore() < minScore || (count >= maxCount && score.getFinalScore() != lastScoreInTier))) {
                 tier++;
                 if (tier == 5) {
                     break;
@@ -72,7 +72,7 @@ public class TierCalculationService {
 
             if (assignedTier != Tier.FIVE) {
                 count++;
-                lastScoreInTier = score.getNormalizedScore();
+                lastScoreInTier = score.getFinalScore();
             }
         }
         return result;
@@ -81,7 +81,7 @@ public class TierCalculationService {
     private int countExistTiers(List<Rating> scores) {
         int existTierCount = 0;
         for (Rating score : scores) {
-            if (score.getNormalizedScore() == 0) {
+            if (score.getFinalScore() == 0) {
                 return existTierCount;
             }
             existTierCount++;

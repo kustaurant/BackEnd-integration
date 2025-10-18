@@ -50,7 +50,7 @@ public class RatingRepositoryImpl implements RatingRepository {
         for (Rating r : rating) {
             if (existedMap.containsKey(r.getRestaurantId())) {
                 existedMap.get(r.getRestaurantId()).updateRatingData(
-                        r.getScore(), r.getTier().getValue(), r.isTemp(), r.getRatedAt(), r.getNormalizedScore()
+                        r.getScore(), r.getAiScore(), r.getTier().getValue(), r.isTemp(), r.getRatedAt(), r.getFinalScore()
                 );
             } else {
                 created.add(RatingMapper.from(r));

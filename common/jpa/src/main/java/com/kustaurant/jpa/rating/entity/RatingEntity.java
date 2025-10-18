@@ -24,7 +24,7 @@ public class RatingEntity {
 
     @Builder.Default
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
-    private double score = 0;
+    private double selfScore = 0;
 
     @Builder.Default
     @Column(nullable = false, columnDefinition = "INT DEFAULT -1")
@@ -39,7 +39,7 @@ public class RatingEntity {
 
     @Builder.Default
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
-    private double normalizedScore = 0;
+    private double finalScore = 0;
 
     @Builder.Default
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
@@ -61,17 +61,23 @@ public class RatingEntity {
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
     private double aiAvgScore = 0;
 
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    private double aiAdjustedScore = 0;
+
     @Column
     private LocalDateTime aiProcessedAt;
 
-    public RatingEntity(long restaurantId, double score, int tier, boolean isTemp,
-            LocalDateTime ratedAt, double normalizedScore) {
+    public RatingEntity(long restaurantId, double selfScore, int tier, boolean isTemp,
+            LocalDateTime ratedAt, double finalScore, double aiScore
+    ) {
         this.restaurantId = restaurantId;
-        this.score = score;
+        this.selfScore = selfScore;
         this.tier = tier;
         this.isTemp = isTemp;
         this.ratedAt = ratedAt;
-        this.normalizedScore = normalizedScore;
+        this.finalScore = finalScore;
+        this.aiAdjustedScore = aiScore;
     }
 
     public static RatingEntity of(
@@ -90,12 +96,13 @@ public class RatingEntity {
     }
 
     public void updateRatingData(
-            double score, int tier, boolean isTemp, LocalDateTime ratedAt, double normalizedScore) {
-        this.score = score;
+            double selfScore, double aiScore, int tier, boolean isTemp, LocalDateTime ratedAt, double finalScore) {
+        this.selfScore = selfScore;
+        this.aiAdjustedScore = aiScore;
         this.tier = tier;
         this.isTemp = isTemp;
         this.ratedAt = ratedAt;
-        this.normalizedScore = normalizedScore;
+        this.finalScore = finalScore;
     }
 
     public void updateAiData(

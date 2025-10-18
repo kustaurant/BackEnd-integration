@@ -56,11 +56,11 @@ public class ScoreCalculationService {
 
         if (enough) {
             double finalScore = aiExists ? policy.calculateFinalScore(evalCnt, selfScore, aiScore) : selfScore;
-            return Rating.combined(restaurantId, selfScore, finalScore, now);
+            return Rating.combined(restaurantId, selfScore, aiScore, finalScore, now);
         }
         if (aiExists) {
             double finalScore = evalCnt > 0 ? policy.calculateFinalScore(evalCnt, selfScore, aiScore) : aiScore;
-            return Rating.aiOnly(restaurantId, finalScore, now);
+            return Rating.aiOnly(restaurantId, aiScore, finalScore, now);
         }
         return Rating.none(restaurantId, now);
     }

@@ -57,9 +57,10 @@ class ScoreCalculationServiceTest {
         // then
         assertThat(computed.getRestaurantId()).isEqualTo(rid);
         assertThat(computed.getScore()).isEqualTo(selfScore);
-        assertThat(computed.getNormalizedScore()).isEqualTo(finalScore);
+        assertThat(computed.getFinalScore()).isEqualTo(finalScore);
         assertThat(computed.isTemp()).isFalse();
         assertThat(computed.getRatedAt()).isEqualTo(now);
+        assertThat(computed.getAiScore()).isEqualTo(aiScore);
         verify(scorePolicy).calculateFinalScore(anyInt(), anyDouble(), anyDouble());
     }
 
@@ -85,9 +86,10 @@ class ScoreCalculationServiceTest {
         // then
         assertThat(computed.getRestaurantId()).isEqualTo(rid);
         assertThat(computed.getScore()).isEqualTo(selfScore);
-        assertThat(computed.getNormalizedScore()).isEqualTo(selfScore);
+        assertThat(computed.getFinalScore()).isEqualTo(selfScore);
         assertThat(computed.isTemp()).isFalse();
         assertThat(computed.getRatedAt()).isEqualTo(now);
+        assertThat(computed.getAiScore()).isEqualTo(0.0);
         verify(scorePolicy, never()).calculateFinalScore(anyInt(), anyDouble(), anyDouble());
     }
 
@@ -115,9 +117,10 @@ class ScoreCalculationServiceTest {
         // then
         assertThat(computed.getRestaurantId()).isEqualTo(rid);
         assertThat(computed.getScore()).isEqualTo(0.0);
-        assertThat(computed.getNormalizedScore()).isEqualTo(finalScore);
+        assertThat(computed.getFinalScore()).isEqualTo(finalScore);
         assertThat(computed.isTemp()).isTrue();
         assertThat(computed.getRatedAt()).isEqualTo(now);
+        assertThat(computed.getAiScore()).isEqualTo(aiScore);
         verify(scorePolicy).calculateFinalScore(anyInt(), anyDouble(), anyDouble());
     }
 
@@ -142,9 +145,10 @@ class ScoreCalculationServiceTest {
         // then
         assertThat(computed.getRestaurantId()).isEqualTo(rid);
         assertThat(computed.getScore()).isEqualTo(0.0);
-        assertThat(computed.getNormalizedScore()).isEqualTo(aiScore);
+        assertThat(computed.getFinalScore()).isEqualTo(aiScore);
         assertThat(computed.isTemp()).isTrue();
         assertThat(computed.getRatedAt()).isEqualTo(now);
+        assertThat(computed.getAiScore()).isEqualTo(aiScore);
         verify(scorePolicy, never()).calculateFinalScore(anyInt(), anyDouble(), anyDouble());
     }
 
@@ -170,9 +174,10 @@ class ScoreCalculationServiceTest {
         // then
         assertThat(computed.getRestaurantId()).isEqualTo(rid);
         assertThat(computed.getScore()).isEqualTo(0.0);
-        assertThat(computed.getNormalizedScore()).isEqualTo(0.0);
+        assertThat(computed.getFinalScore()).isEqualTo(0.0);
         assertThat(computed.isTemp()).isFalse();
         assertThat(computed.getRatedAt()).isEqualTo(now);
+        assertThat(computed.getAiScore()).isEqualTo(0.0);
         verify(scorePolicy, never()).calculateFinalScore(anyInt(), anyDouble(), anyDouble());
     }
 
@@ -197,9 +202,10 @@ class ScoreCalculationServiceTest {
         // then
         assertThat(computed.getRestaurantId()).isEqualTo(rid);
         assertThat(computed.getScore()).isEqualTo(0.0);
-        assertThat(computed.getNormalizedScore()).isEqualTo(0.0);
+        assertThat(computed.getFinalScore()).isEqualTo(0.0);
         assertThat(computed.isTemp()).isFalse();
         assertThat(computed.getRatedAt()).isEqualTo(now);
+        assertThat(computed.getAiScore()).isEqualTo(0.0);
         verify(scorePolicy, never()).calculateFinalScore(anyInt(), anyDouble(), anyDouble());
     }
 }

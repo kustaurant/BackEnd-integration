@@ -39,7 +39,7 @@ class TierCalculationServiceTest {
         // 가변인자 형태: (id, score, id, score, …)
         List<Rating> list = new ArrayList<>(tuples.length / 2);
         for (int i = 0; i < tuples.length; i += 2) {
-            list.add(new Rating((Integer) tuples[i], false, (Double) tuples[i + 1], (Double) tuples[i + 1], clockHolder.now()));
+            list.add(new Rating((Integer) tuples[i], false, (Double) tuples[i + 1], 0.0, (Double) tuples[i + 1], clockHolder.now()));
         }
         return list;
     }

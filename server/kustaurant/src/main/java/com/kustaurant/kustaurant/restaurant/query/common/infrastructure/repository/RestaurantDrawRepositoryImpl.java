@@ -46,7 +46,7 @@ public class RestaurantDrawRepositoryImpl implements RestaurantDrawRepository {
                         hasSituation(condition.situations(), restaurantEntity),
                         restaurantActive(restaurantEntity)
                 )
-                .orderBy(ratingEntity.score.desc())
+                .orderBy(ratingEntity.finalScore.desc())
                 .fetch();
     }
 }
