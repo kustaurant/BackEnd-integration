@@ -1,0 +1,5 @@
+spring:
+  data:
+    redis:
+      host: ${REDIS_PROD_HOST}
+      port: ${REDIS_PROD_PORT}

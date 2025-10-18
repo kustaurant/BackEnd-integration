@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.aianalysis.infrastructure.messaging;
+package com.kustaurant.crawler.aianalysis.messaging;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Profile;

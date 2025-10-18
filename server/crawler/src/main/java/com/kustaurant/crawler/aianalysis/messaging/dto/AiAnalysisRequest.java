@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.aianalysis.infrastructure.messaging.dto;
+package com.kustaurant.crawler.aianalysis.messaging.dto;
 
 import java.util.List;
 

@@ -2,12 +2,9 @@ package com.kustaurant.kustaurant.rating.domain.service;
 
 import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
 import com.kustaurant.kustaurant.rating.domain.model.Rating;
-import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy;
-import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.TierPolicy;
-import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy.TierPolicy.TierLevel;
-import com.kustaurant.kustaurant.rating.domain.model.RatingScore;
-import com.kustaurant.kustaurant.rating.domain.model.Tier;
-import java.time.LocalDateTime;
+import com.kustaurant.kustaurant.rating.domain.vo.Tier;
+import com.kustaurant.kustaurant.rating.domain.vo.TierPolicyProp;
+import com.kustaurant.kustaurant.rating.domain.vo.TierPolicyProp.TierLevel;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -18,21 +15,21 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TierCalculationService {
 
-    private final RatingPolicy policy;
+    private final TierPolicyProp policy;
     private final ClockHolder clockHolder;
 
-    public List<Rating> calculate(List<RatingScore> scores) {
+    public List<Rating> calculate(List<Rating> scores) {
         // 점수 기준으로 내림차순 정렬
-        scores.sort(Comparator.comparingDouble(RatingScore::score).reversed());
+        scores.sort(Comparator.comparingDouble(Rating::getFinalScore).reversed());
         // 티어가 있는 평가 개수
         int tierCount = countExistTiers(scores);
         // 티어 할당
-        return assignTier(policy.tier(), scores, tierCount);
+        return assignTier(policy, scores, tierCount);
     }
 
     private List<Rating> assignTier(
-            TierPolicy tierP,
-            List<RatingScore> sorted,
+            TierPolicyProp tierP,
+            List<Rating> sorted,
             int tierCount
     ) {
         List<Rating> result = new ArrayList<>(sorted.size());
@@ -45,16 +42,18 @@ public class TierCalculationService {
         int maxCount = (int) Math.ceil(tierCount * level.maxRatio());
         double minScore = level.minScore();
 
-        for (RatingScore score : sorted) {
-            if (score.score() == 0) {
-                result.add(new Rating(score.restaurantId(), score.score(), Tier.NONE, false, clockHolder.now()));
+        for (Rating score : sorted) {
+            if (score.getFinalScore() == 0) {
+                score.changeTier(Tier.NONE);
+                result.add(score);
                 continue;
             }
             if (tier == 5) {
-                result.add(new Rating(score.restaurantId(), score.score(), Tier.FIVE, false, clockHolder.now()));
+                score.changeTier(Tier.FIVE);
+                result.add(score);
                 continue;
             }
-            while (tier < 5 && (score.score() < minScore || (count >= maxCount && score.score() != lastScoreInTier))) {
+            while (tier < 5 && (score.getFinalScore() < minScore || (count >= maxCount && score.getFinalScore() != lastScoreInTier))) {
                 tier++;
                 if (tier == 5) {
                     break;
@@ -68,20 +67,21 @@ public class TierCalculationService {
 
             Tier assignedTier = tier == 5 ? Tier.FIVE : Tier.find(tier);
 
-            result.add(new Rating(score.restaurantId(), score.score(), assignedTier, false, clockHolder.now()));
+            score.changeTier(assignedTier);
+            result.add(score);
 
             if (assignedTier != Tier.FIVE) {
                 count++;
-                lastScoreInTier = score.score();
+                lastScoreInTier = score.getFinalScore();
             }
         }
         return result;
     }
 
-    private int countExistTiers(List<RatingScore> scores) {
+    private int countExistTiers(List<Rating> scores) {
         int existTierCount = 0;
-        for (RatingScore score : scores) {
-            if (score.score() == 0) {
+        for (Rating score : scores) {
+            if (score.getFinalScore() == 0) {
                 return existTierCount;
             }
             existTierCount++;

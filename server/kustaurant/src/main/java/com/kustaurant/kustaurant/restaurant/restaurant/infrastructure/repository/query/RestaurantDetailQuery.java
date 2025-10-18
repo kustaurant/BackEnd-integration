@@ -64,7 +64,7 @@ public class RestaurantDetailQuery {
                                         set(situationEntity.situationName),
                                         restaurantEntity.partnershipInfo,
                                         Expressions.constant(getEvaluationCount(restaurantId)),
-                                        numberTemplate(Double.class, "ROUND({0}, 2)", ratingEntity.score.coalesce(0.0)),
+                                        numberTemplate(Double.class, "ROUND({0}, 2)", ratingEntity.finalScore.coalesce(0.0)),
                                         evaluationEntity.isNotNull(),
                                         restaurantFavoriteEntity.isNotNull(),
                                         Expressions.constant(getFavoriteCount(restaurantId)),

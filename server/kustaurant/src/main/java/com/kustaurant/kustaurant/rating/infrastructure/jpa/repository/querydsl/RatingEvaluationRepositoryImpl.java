@@ -6,8 +6,8 @@ import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.ent
 
 import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity;
-import com.kustaurant.kustaurant.rating.domain.model.EvaluationWithContext;
-import com.kustaurant.kustaurant.rating.domain.model.QEvaluationWithContext;
+import com.kustaurant.kustaurant.rating.domain.vo.EvaluationWithContext;
+import com.kustaurant.kustaurant.rating.domain.vo.QEvaluationWithContext;
 import com.kustaurant.kustaurant.rating.service.port.RatingEvaluationRepository;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.BooleanExpression;

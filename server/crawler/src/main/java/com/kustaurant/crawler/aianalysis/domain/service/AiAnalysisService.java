@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AiAnalysisService {
 
-    private static final int MAX_CONCURRENCY = 30;
-    private static final int MAX_REVIEWS = 100;
+    private static final int MAX_CONCURRENCY = 10;
+    private static final int MAX_REVIEWS = 33;
     private static final Duration perRequestTimeout = Duration.ofSeconds(10);
     private static final Semaphore semaphore = new Semaphore(MAX_CONCURRENCY);
 

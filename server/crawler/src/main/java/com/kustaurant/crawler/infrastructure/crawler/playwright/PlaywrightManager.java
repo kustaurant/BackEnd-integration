@@ -15,7 +15,7 @@ import java.util.List;
 public class PlaywrightManager {
 
     private static final double DEFAULT_TIMEOUT_MILLIS = 10_000;
-    private static final boolean HEADLESS_MODE = false;
+    private static final boolean HEADLESS_MODE = true;
 
     private static Playwright pw;
     private static Browser browser;
@@ -44,9 +44,7 @@ public class PlaywrightManager {
                     .setIsMobile(false)
                     .setHasTouch(false)
                     .setLocale("ko-KR")
-                    .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
-                            "AppleWebKit/537.36 (KHTML, like Gecko) " +
-                            "Chrome/123.0.0.0 Safari/537.36"));
+                    .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Whale/4.33.325.17 Safari/537.36"));
             page = ctx.newPage();
             page.setDefaultTimeout(DEFAULT_TIMEOUT_MILLIS);
             threadContext.set(ctx);
