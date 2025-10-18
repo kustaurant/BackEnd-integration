@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 public record ScorePolicyProp(
         @Min(0) int priorWeight,
         @Valid EvaluationProp evaluation,
+        @Valid AiProp ai,
         @Valid RestaurantProp restaurant
 ) {
     public record EvaluationProp(
@@ -56,7 +57,8 @@ public record ScorePolicyProp(
     }
 
     public record AiProp(
-
+            @DecimalMin("0.1") @DecimalMax("0.9") double l0,
+            @DecimalMin("0.1") @DecimalMax("0.9") double l1
     ) {}
 
     public record RestaurantProp(

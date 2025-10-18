@@ -79,7 +79,8 @@ restaurant:
             situation: 0.05
             image: 0.05
         ai:
-
+          l0: 0.2
+          l1: 0.6
         restaurant:
           min_evaluation_cnt: 4
           many_evaluation_cnt: 10
