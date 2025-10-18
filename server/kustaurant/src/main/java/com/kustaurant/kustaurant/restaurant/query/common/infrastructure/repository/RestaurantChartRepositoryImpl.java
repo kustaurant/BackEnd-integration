@@ -9,6 +9,7 @@ import com.kustaurant.jpa.rating.entity.QRatingEntity;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantChartRepository;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -44,7 +45,15 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                         restaurantActive(restaurantEntity),
                         tierFilterProcess(ratingEntity, condition)
                 )
-                .orderBy(ratingEntity.finalScore.desc());
+                .orderBy(
+                        // 티어가 있는 것이 먼저 오고, 티어 기준 오름차순 정렬
+                        new CaseBuilder()
+                                .when(ratingEntity.tier.lt(0)).then(1)
+                                .otherwise(0)
+                                .asc(),
+                        ratingEntity.tier.asc(),
+                        ratingEntity.finalScore.desc()
+                );
         // pageable unpaged 처리
         Pageable pageable = condition.pageable();
         if (pageable == null) {

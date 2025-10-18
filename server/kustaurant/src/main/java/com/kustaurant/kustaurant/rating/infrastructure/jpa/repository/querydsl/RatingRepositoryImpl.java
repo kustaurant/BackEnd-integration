@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.rating.infrastructure.jpa.repository.querydsl;
 
 import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
 import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
 
@@ -141,7 +142,7 @@ public class RatingRepositoryImpl implements RatingRepository {
                             Expressions.nullExpression(), Expressions.nullExpression(),
                             Expressions.nullExpression(), Expressions.nullExpression()
                     ))
-                    .from(rFrom)
+                    .from(restaurantEntity)
                     .limit(1)
                     .fetchOne();
         }
