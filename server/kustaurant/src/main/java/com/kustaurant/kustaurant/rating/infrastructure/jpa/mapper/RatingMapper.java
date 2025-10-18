@@ -7,12 +7,12 @@ public class RatingMapper {
 
     public static RatingEntity from(Rating rating) {
         return new RatingEntity(
-                rating.restaurantId(),
-                rating.score(),
-                rating.tier().getValue(),
+                rating.getRestaurantId(),
+                rating.getScore(),
+                rating.getTier().getValue(),
                 rating.isTemp(),
-                rating.ratedAt(),
-                rating.normalizedScore()
+                rating.getRatedAt(),
+                rating.getNormalizedScore()
         );
     }
 }

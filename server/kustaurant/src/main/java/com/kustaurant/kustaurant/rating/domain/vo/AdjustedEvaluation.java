@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.rating.domain.model;
+package com.kustaurant.kustaurant.rating.domain.vo;
 
 public record AdjustedEvaluation(
         double adjustedScore,

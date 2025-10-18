@@ -1,78 +1,67 @@
 package com.kustaurant.kustaurant.rating.domain.service;
 
 import com.kustaurant.kustaurant.common.clockHolder.ClockHolder;
-import com.kustaurant.kustaurant.rating.domain.model.AdjustedEvaluation;
-import com.kustaurant.kustaurant.rating.domain.model.EvaluationWithContext;
-import com.kustaurant.kustaurant.rating.domain.model.RatingPolicy;
-import com.kustaurant.kustaurant.rating.domain.model.RatingScore;
-import com.kustaurant.kustaurant.rating.domain.model.RestaurantStats;
+import com.kustaurant.kustaurant.rating.domain.model.Rating;
+import com.kustaurant.kustaurant.rating.domain.model.AiEvaluation;
+import com.kustaurant.kustaurant.rating.domain.vo.EvaluationWithContext;
+import com.kustaurant.kustaurant.rating.domain.vo.GlobalStats;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class ScoreCalculationService {
 
-    private final int MIN_EVALUATION_COUNT = 3;
-
-    private final RatingPolicy policy;
+    private final ScorePolicy policy;
     private final ClockHolder clockHolder;
 
-    public RatingScore calculate(
-            RestaurantStats stats,
-            List<EvaluationWithContext> evaluations,
-            double globalAvg,
-            LocalDateTime time
+    public List<Rating> calculateScores(
+            List<Long> ids,
+            Map<Long, List<EvaluationWithContext>> selfEvalMap,
+            Map<Long, AiEvaluation> aiEvalMap,
+            GlobalStats globalStats
     ) {
-        if (evaluations == null) {
-            evaluations = List.of();
-        }
-
-        // 평가 개수 미달인 경우 0점 처리
-        if (stats.evaluationCount() < MIN_EVALUATION_COUNT) {
-            return new RatingScore(stats.restaurantId(), 0);
-        }
-
-        double numerator = policy.priorWeight() * globalAvg;
-        double weightSum = policy.priorWeight();
-
-        // 각 평가를 조정해서 누적
-        for (EvaluationWithContext evaluation : evaluations) {
-            AdjustedEvaluation adj = evaluation.getAdjustedScore(policy.evaluation(), globalAvg, time);
-            numerator += adj.adjustedScore() * adj.weight();
-            weightSum += adj.weight();
-        }
-
-        // 누적 평가 점수를 가중 평균
-        if (weightSum == 0) {
-            return new RatingScore(stats.restaurantId(), 0);
-        }
-        double coreScore = numerator / weightSum;
-
-        // 식당의 인기도를 구함
-//        double popularity = stats.adjustPopularity(policy.restaurant(), coreScore);
-
-        // 가중 평균한 값에 인기도를 곱해서 최종 점수를 구함
-//        double finalScore = coreScore * popularity;
-        double finalScore = coreScore;
-
-        return new RatingScore(stats.restaurantId(), finalScore);
-    }
-
-    public List<RatingScore> calculateScores(
-            List<RestaurantStats> statsList,
-            Map<Long, List<EvaluationWithContext>> evalMap,
-            double globalAvg
-    ) {
-        List<RatingScore> scores = new ArrayList<>(statsList.size());
-        for (RestaurantStats stats : statsList) {
-            RatingScore score = calculate(stats, evalMap.get(stats.restaurantId()), globalAvg, clockHolder.now());
+        List<Rating> scores = new ArrayList<>(ids.size());
+        LocalDateTime now = clockHolder.now();
+        for (long rid : ids) {
+            List<EvaluationWithContext> selfEval = selfEvalMap.getOrDefault(rid, Collections.emptyList());
+            AiEvaluation aiEval = aiEvalMap.getOrDefault(rid, null);
+            Rating score = compute(rid, globalStats, selfEval, aiEval, now);
             scores.add(score);
         }
         return scores;
+    }
+
+    /** 각 식당에 대한 점수 계산 */
+    public Rating compute(
+            long restaurantId,
+            GlobalStats globalStats,
+            List<EvaluationWithContext> evaluations,
+            @Nullable AiEvaluation aiEval,
+            LocalDateTime now
+    ) {
+        int evalCnt = evaluations.size();
+
+        double selfScore = policy.calculateSelfScore(globalStats, evaluations, evalCnt);
+        double aiScore = policy.calculateAiScore(globalStats, aiEval);
+
+        boolean enough = policy.hasEnoughEvaluations(evalCnt);
+        boolean aiExists = aiScore > 0.0;
+
+        if (enough) {
+            double finalScore = aiExists ? policy.calculateFinalScore(evalCnt, selfScore, aiScore) : selfScore;
+            return Rating.combined(restaurantId, selfScore, finalScore, now);
+        }
+        if (aiExists) {
+            double finalScore = evalCnt > 0 ? policy.calculateFinalScore(evalCnt, selfScore, aiScore) : aiScore;
+            return Rating.aiOnly(restaurantId, finalScore, now);
+        }
+        return Rating.none(restaurantId, now);
     }
 }

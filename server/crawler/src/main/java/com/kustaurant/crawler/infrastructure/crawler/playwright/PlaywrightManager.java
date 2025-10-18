@@ -15,7 +15,7 @@ import java.util.List;
 public class PlaywrightManager {
 
     private static final double DEFAULT_TIMEOUT_MILLIS = 10_000;
-    private static final boolean HEADLESS_MODE = false;
+    private static final boolean HEADLESS_MODE = true;
 
     private static Playwright pw;
     private static Browser browser;

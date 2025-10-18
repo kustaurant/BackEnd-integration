@@ -31,8 +31,10 @@ public class AiAnalysisOrchestrator {
                 log.info("크롤링된 리뷰가 없습니다. 요청: {}", req);
                 return;
             }
+            log.info("식당 ID {} 크롤링 완료. 리뷰 수: {}", req.restaurantId(), reviews.size());
             // AI 전처리
             RestaurantAnalysis result = aiAnalysisService.analyzeReviews(reviews, req.situations());
+            log.info("식당 ID {} AI 처리 완료.", req.restaurantId());
             ratingCrawlerRepo.upsertRating(req.restaurantId(), result);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
