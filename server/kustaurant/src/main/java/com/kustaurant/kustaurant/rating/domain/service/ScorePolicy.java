@@ -7,8 +7,10 @@ import com.kustaurant.kustaurant.rating.domain.vo.GlobalStats;
 import com.kustaurant.kustaurant.rating.domain.vo.ScorePolicyProp;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScorePolicy {
@@ -55,7 +57,7 @@ public class ScorePolicy {
         // 감성 신호 z-score
         double zPos = (stdPos > 0) ? (aiEval.positiveRatio() - meanPos) / stdPos : 0.0;
         double zNeg = (stdNeg > 0) ? (aiEval.negativeRatio() - meanNeg) / stdNeg : 0.0;
-        double zSent = (zPos - zNeg) / Math.sqrt(2);
+        double zSent = (zPos - zNeg) / 2;
 
         // 별점 신호 z-score
         double zRate = (stdAi > 0) ? (aiEval.aiScoreAvg() - meanAi) / stdAi : 0.0;
@@ -63,10 +65,11 @@ public class ScorePolicy {
         // coverage 기반 z-score 가중 평균
         double coverage = clamp01(aiEval.getCoverage());
         double wSent = clamp(L0 + L1 * coverage, L0, L0 + L1);
-        double zMix = zSent * wSent + zRate * (1 - wSent);
+        double zMix = (zSent * wSent + zRate * (1 - wSent)) / 3.5;
 
         // 자체 평가 분포에 맞게 점수화
         double aiScore = meanSelf + stdSelf * zMix;
+
         return clamp(aiScore, 1.0, 5.0);
     }
 
