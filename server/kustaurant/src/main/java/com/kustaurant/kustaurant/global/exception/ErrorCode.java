@@ -15,6 +15,7 @@ public enum ErrorCode {
     IMAGE_UPLOAD_FAIL     (HttpStatus.INTERNAL_SERVER_ERROR, "COMMON-004", "이미지 업로드에 실패했습니다."),
     GONE (HttpStatus.GONE, "COMMON-005", "더 이상 지원하지 않는 기능입니다."),
     SERVICE_UNAVAILABLE (HttpStatus.SERVICE_UNAVAILABLE, "COMMON-006", "해당 기능 점검중입니다."),
+    MISSING_REQUEST_HEADER(HttpStatus.BAD_REQUEST, "COMMON-007", "필수 요청 헤더가 누락되었습니다."),
 
     /* ──── USER ──── */
     USER_NOT_FOUND        (HttpStatus.NOT_FOUND,            "USER-001",   "유저를 찾을 수 없습니다."),

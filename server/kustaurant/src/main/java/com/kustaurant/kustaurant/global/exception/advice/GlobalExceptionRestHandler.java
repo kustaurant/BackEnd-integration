@@ -10,10 +10,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -69,7 +71,7 @@ public class GlobalExceptionRestHandler {
 
     /**   4. ArgumentResolver 용 (@AuthUser) (4xx)   */
     @ExceptionHandler(JwtAuthException.class)
-    public ResponseEntity<ApiErrorResponse> handleJwtAuth(JwtAuthException ex) {
+    protected ResponseEntity<ApiErrorResponse> handleJwtAuth(JwtAuthException ex) {
         ErrorCode ec = ex.getErrorCode();
         return ResponseEntity
                 .status(ec.getStatus())
@@ -78,7 +80,7 @@ public class GlobalExceptionRestHandler {
 
     /**   5. 로그인 외부 호출 api 실패 예외(5xx)   */
     @ExceptionHandler(ProviderApiException.class)
-    public ResponseEntity<ApiErrorResponse> handleProviderFail(
+    protected ResponseEntity<ApiErrorResponse> handleProviderFail(
             ProviderApiException ex, HttpServletRequest req
     ) {
         HttpStatus status = ErrorCode.PROVIDER_API_FAIL.getStatus();
@@ -86,7 +88,21 @@ public class GlobalExceptionRestHandler {
         return ResponseEntity.status(status).body(ApiErrorResponse.of(ErrorCode.PROVIDER_API_FAIL));
     }
 
-    /**   6. 그 외 모든 예외   */
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    protected ResponseEntity<ApiErrorResponse> handleMissingRequestHeader(
+            MissingRequestHeaderException ex, HttpServletRequest req
+    ) {
+        HttpStatus status = HttpHeaders.AUTHORIZATION.equalsIgnoreCase(ex.getHeaderName())
+                ? HttpStatus.UNAUTHORIZED : HttpStatus.BAD_REQUEST;
+
+        log.warn("[MissingHeader] {} {} header='{}'", req.getMethod(), req.getRequestURI(), ex.getHeaderName());
+
+        return ResponseEntity.status(status).body(ApiErrorResponse.of(
+                status == HttpStatus.UNAUTHORIZED ?
+                        ErrorCode.UNAUTHORIZED : ErrorCode.MISSING_REQUEST_HEADER));
+    }
+
+    /**   7. 그 외 모든 예외   */
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ApiErrorResponse> handleUnhandled(
             Exception ex, HttpServletRequest req
@@ -104,14 +120,9 @@ public class GlobalExceptionRestHandler {
                              HttpStatus status
     ) {
         if (!status.is5xxServerError()) return;
-
         String traceId = MDC.get("traceId");
-        // ✅ 상태코드와 API 메시지를 함께 전달
-        discordNotifier.send5xx(
-                ex,
-                req,
-                (traceId == null ? "-" : traceId),
-                status.value()
-        );
+
+        // 상태코드와 API 메시지를 함께 전달
+        discordNotifier.send5xx(ex, req, (traceId == null ? "-" : traceId), status.value());
     }
 }
