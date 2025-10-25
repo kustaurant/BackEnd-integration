@@ -13,6 +13,7 @@ import com.kustaurant.kustaurant.user.mypage.service.UserStatsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class PostCommentService {
 
     private final UserStatsService userStatsService;
 
+    @Transactional
     public PostComment create(Long postId, PostCommentRequest req, Long userId) {
         postRepository.findById(postId).orElseThrow(()->new DataNotFoundException(POST_NOT_FOUND));
         if (req.parentCommentId() != null) {
@@ -37,6 +39,7 @@ public class PostCommentService {
         return postCommentRepository.save(PostComment.create(postId, req, userId));
     }
 
+    @Transactional
     public PostCommentDeleteResponse delete(Long commentId, Long userId) {
         // 댓글 조회 및 권한 검증
         PostComment comment = postCommentRepository.findByIdForUpdate(commentId)
