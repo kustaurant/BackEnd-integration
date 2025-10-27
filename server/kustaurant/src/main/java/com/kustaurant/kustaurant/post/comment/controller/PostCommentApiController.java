@@ -34,13 +34,13 @@ public class PostCommentApiController {
     private final UserService userService;
 
     // 1. 댓글 or 대댓글 생성
-    @PostMapping("/v2/auth/posts/{postId}/comments")
     @Operation(summary = "게시글의 댓글/대댓글 생성 (생성한 댓글 반환)",
             description = "게시글 ID와 내용을 입력받아 댓글을 생성합니다. 대댓글의 경우 부모 댓글의 id를 파라미터로 받아야 합니다. 생성한 댓글을 반환합니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "댓글 혹은 대댓글 생성이 완료", content = {@Content(schema = @Schema(implementation = PostCommentResponse.class))}),
             @ApiResponse(responseCode = "404", description = "해당 postId의 게시글을 찾을 수 없습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
+    @PostMapping("/v2/auth/posts/{postId}/comments")
     public ResponseEntity<PostCommentResponse> postCommentCreateReturnCommentList(
             @PathVariable Long postId,
             @Valid @RequestBody PostCommentRequest req,
