@@ -32,6 +32,7 @@ public record PostCommentResponse(
     public static PostCommentResponse from(PostComment comment, User user) {
         return PostCommentResponse.builder()
                 .commentId(comment.getId())
+                .parentCommentId(comment.getParentCommentId())
                 .body(comment.getBody())
                 .status(comment.getStatus().name())
                 .createdAt(comment.getCreatedAt())

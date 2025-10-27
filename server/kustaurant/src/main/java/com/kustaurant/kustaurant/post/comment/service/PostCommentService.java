@@ -30,6 +30,7 @@ public class PostCommentService {
     @Transactional
     public PostComment create(Long postId, PostCommentRequest req, Long userId) {
         postRepository.findById(postId).orElseThrow(()->new DataNotFoundException(POST_NOT_FOUND));
+
         if (req.parentCommentId() != null) {
             postCommentRepository.findById(req.parentCommentId())
                     .orElseThrow(() -> new DataNotFoundException(COMMENT_NOT_FOUND, "부모 댓글을 찾을 수 없습니다."));

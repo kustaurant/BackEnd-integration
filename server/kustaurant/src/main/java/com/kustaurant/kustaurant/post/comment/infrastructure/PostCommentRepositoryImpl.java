@@ -34,8 +34,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
         // 신규 댓글 (id가 null)
         if (comment.getId() == null) {
             PostCommentEntity entity = PostCommentEntity.from(comment);
-            jpa.save(entity);
-            return entity.toModel();
+            return jpa.save(entity).toModel();
         }
 
         // 기존 댓글 수정
@@ -44,7 +43,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
 
         // 댓글 내용과 상태 업데이트
         PostCommentEntity updatedEntity = PostCommentEntity.builder()
-                .parentCommentId(comment.getId())
+                .postCommentId(entity.getPostCommentId())
                 .commentBody(comment.getBody())
                 .status(comment.getStatus())
                 .postId(entity.getPostId())
@@ -52,6 +51,7 @@ public class PostCommentRepositoryImpl implements PostCommentRepository {
                 .userId(entity.getUserId())
                 .build();
         updatedEntity = jpa.save(updatedEntity);
+
         return updatedEntity.toModel();
     }
 

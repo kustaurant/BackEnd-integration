@@ -34,6 +34,7 @@ public class PostService {
 
     private final UserStatsService userStatsService;
 
+    @Transactional
     public Post create(PostRequest req, Long userId) {
         Post savedPost = postRepository.save(Post.create(userId, req));
 
