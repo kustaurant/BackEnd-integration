@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,7 +70,7 @@ public class RestaurantChartController {
             @AuthUser AuthUserInfo user,
             HttpServletRequest request
     ) {
-        Slice<RestaurantCoreInfoDto> data = restaurantChartService.findByConditions(condition, user.id());
+        Page<RestaurantCoreInfoDto> data = restaurantChartService.findByConditions(condition, user.id());
 
         List<String> cuisines = condition.cuisines();
         List<Long> situations = condition.situations();

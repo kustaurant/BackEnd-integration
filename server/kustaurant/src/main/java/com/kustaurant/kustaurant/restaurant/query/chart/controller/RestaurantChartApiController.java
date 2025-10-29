@@ -10,7 +10,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDT
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,9 +35,9 @@ public class RestaurantChartApiController implements RestaurantChartApiDoc {
             @ChartCond ChartCondition condition,
             @AuthUser AuthUserInfo user
     ) {
-        Slice<RestaurantCoreInfoDto> slice = restaurantChartService.findByConditions(condition, user.id());
+        Page<RestaurantCoreInfoDto> restaurants = restaurantChartService.findByConditions(condition, user.id());
 
-        RestaurantChartResponse result = new RestaurantChartResponse(slice.getContent(), slice.hasNext());
+        RestaurantChartResponse result = new RestaurantChartResponse(restaurants.getContent(), restaurants.hasNext());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

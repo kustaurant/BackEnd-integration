@@ -13,6 +13,8 @@ import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -32,7 +34,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
      */
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public Slice<Long> getRestaurantIdsWithPage(ChartCondition condition) {
+    public Page<Long> getRestaurantIdsWithPage(ChartCondition condition) {
         Pageable pageable = condition.pageable() != null ? condition.pageable() : Pageable.unpaged();
 
         int pageSize = pageable.isPaged() ? pageable.getPageSize() : Integer.MAX_VALUE;
@@ -59,16 +61,20 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                         ratingEntity.finalScore.desc()
                 )
                 .offset(offset)
-                .limit(pageSize + 1) // 다음 페이지 여부 판단용으로 1개 더 가져옴
+                .limit(pageSize)
                 .fetch();
 
-        boolean hasNext = false;
-        if (contents.size() > pageSize) {
-            hasNext = true;
-            contents = contents.subList(0, pageSize); // 1개 초과분 제거
-        }
+        Long total = queryFactory
+                .select(restaurantEntity.restaurantId.countDistinct())
+                .from(restaurantEntity)
+                .where( cuisinesIn(condition.cuisines(), restaurantEntity),
+                        positionsIn(condition.positions(), restaurantEntity),
+                        restaurantCommonExpressions.hasSituation(condition.situations(),
+                                restaurantEntity), restaurantActive(restaurantEntity)
+                )
+                .fetchOne();
 
-        return new SliceImpl<>(contents, pageable, hasNext);
+        return new PageImpl<>(contents, pageable, total == null ? 0 : total);
     }
 
     private BooleanExpression tierFilterProcess(QRatingEntity ratingEntity, ChartCondition condition) {
