@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.constants;
+package com.kustaurant.kustaurant.restaurant.query.chart.constants;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

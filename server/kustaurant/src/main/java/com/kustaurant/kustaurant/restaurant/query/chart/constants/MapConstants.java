@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.restaurant.restaurant.constants;
+package com.kustaurant.kustaurant.restaurant.query.chart.constants;
 
 import java.util.List;
 

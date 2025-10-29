@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.domain;
 
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
+import com.kustaurant.kustaurant.evaluation.evaluation.constants.StarComment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class EvaluationDTO {
     @Schema(description = "리뷰 멘트", example = "오 좀 맛있는데?")
     private String evaluationComment;
     @Schema(description = "별점 멘트", example = "")
-    private List<RestaurantConstants.StarComment> starComments;
+    private List<StarComment> starComments;
     @Schema(description = "새로운 이미지", example = "평가하기나 다시평가하기를 할 때 새로 등록한 이미지가 있을 경우에만 사용하는 필드입니다.")
     private MultipartFile newImage;
 

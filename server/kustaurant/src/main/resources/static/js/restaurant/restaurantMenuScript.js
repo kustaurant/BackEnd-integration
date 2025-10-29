@@ -65,7 +65,7 @@ if (unfoldButton) {
   }
   unfoldButton.addEventListener('click', function() {
     const windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-    const thisText = this.textContent;
+    const thisText = this.textContent.trim();
     const menuContainer = document.getElementById('menuContainer');
     if (thisText === '펼치기') {
       fillMenuInfo(restaurantMenus, -1); // 모든 메뉴 표시

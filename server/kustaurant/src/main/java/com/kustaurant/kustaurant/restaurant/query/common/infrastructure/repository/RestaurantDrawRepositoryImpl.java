@@ -24,6 +24,7 @@ public class RestaurantDrawRepositoryImpl implements RestaurantDrawRepository {
 
     private final RestaurantJpaRepository restaurantJpaRepository;
     private final JPAQueryFactory queryFactory;
+    private final RestaurantCommonExpressions restaurantCommonExpressions;
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -43,7 +44,7 @@ public class RestaurantDrawRepositoryImpl implements RestaurantDrawRepository {
                 .where(
                         cuisinesIn(condition.cuisines(), restaurantEntity),
                         positionsIn(condition.positions(), restaurantEntity),
-                        hasSituation(condition.situations(), restaurantEntity),
+                        restaurantCommonExpressions.hasSituation(condition.situations(), restaurantEntity),
                         restaurantActive(restaurantEntity),
                         ratingEntity.isTemp.not()
                 )

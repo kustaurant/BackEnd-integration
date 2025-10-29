@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RestaurantChartRepositoryImpl implements RestaurantChartRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final RestaurantCommonExpressions restaurantCommonExpressions;
 
     /**
      * 조건(condition)을 만족하는 식당 id들을 반환
@@ -41,7 +42,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                 .where(
                         cuisinesIn(condition.cuisines(), restaurantEntity),
                         positionsIn(condition.positions(), restaurantEntity),
-                        hasSituation(condition.situations(), restaurantEntity),
+                        restaurantCommonExpressions.hasSituation(condition.situations(), restaurantEntity),
                         restaurantActive(restaurantEntity),
                         tierFilterProcess(ratingEntity, condition)
                 )
@@ -72,7 +73,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                 .where(
                         cuisinesIn(condition.cuisines(), restaurantEntity),
                         positionsIn(condition.positions(), restaurantEntity),
-                        hasSituation(condition.situations(), restaurantEntity),
+                        restaurantCommonExpressions.hasSituation(condition.situations(), restaurantEntity),
                         restaurantActive(restaurantEntity)
                 )
                 .fetchOne();
