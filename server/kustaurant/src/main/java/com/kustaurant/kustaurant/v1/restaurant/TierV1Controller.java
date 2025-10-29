@@ -10,11 +10,9 @@ import com.kustaurant.kustaurant.v1.restaurant.response.RestaurantTierDTO;
 import com.kustaurant.kustaurant.v1.restaurant.response.RestaurantTierMapDTO;
 import java.util.List;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +32,7 @@ public class TierV1Controller implements TierV1Doc {
             @ChartCond ChartCondition condition,
             @AuthUser AuthUserInfo user
     ) {
-        Slice<RestaurantCoreInfoDto> restaurants = restaurantChartService.findByConditions(condition, user.id());
+        Page<RestaurantCoreInfoDto> restaurants = restaurantChartService.findByConditions(condition, user.id());
 
         return new ResponseEntity<>(restaurants.stream().map(RestaurantTierDTO::fromV2).toList(), HttpStatus.OK);
     }
@@ -44,7 +42,7 @@ public class TierV1Controller implements TierV1Doc {
             @ChartCond ChartCondition condition,
             @AuthUser AuthUserInfo user
     ) {
-        Slice<RestaurantCoreInfoDto> restaurants = restaurantChartService.findByConditions(condition, user.id());
+        Page<RestaurantCoreInfoDto> restaurants = restaurantChartService.findByConditions(condition, user.id());
 
         return new ResponseEntity<>(restaurants.stream().map(RestaurantTierDTO::fromV2).toList(), HttpStatus.OK);
     }
