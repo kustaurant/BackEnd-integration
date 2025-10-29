@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RestaurantQueryService {
+public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final RestaurantDetailRepository restaurantDetailRepository;

@@ -59,7 +59,7 @@ public record EvaluationWithContext(
     }
 
     private double getCorrectedScore(double globalAvg) {
-        double corrected = score - userAvgScore + globalAvg;
+        double corrected = userEvalCount == 1 ? (globalAvg + score) / 2 : score - userAvgScore + globalAvg;
         corrected = Math.max(1.0, Math.min(5.0, corrected));
         return corrected;
     }

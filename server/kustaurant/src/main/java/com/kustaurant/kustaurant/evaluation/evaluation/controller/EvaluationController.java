@@ -7,7 +7,7 @@ import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationQuerySe
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantQueryService;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 public class EvaluationController {
-    private final RestaurantQueryService restaurantQueryService;
+    private final RestaurantService restaurantService;
 
     private final EvaluationQueryService evaluationQueryService;
     private final EvaluationCommandService evaluationCommandService;
@@ -39,7 +39,7 @@ public class EvaluationController {
             @PathVariable Long restaurantId
     ) {
         // 식당 정보
-        Restaurant restaurant = restaurantQueryService.getActiveDomain(restaurantId);
+        Restaurant restaurant = restaurantService.getActiveDomain(restaurantId);
         model.addAttribute("restaurant", restaurant);
         // 이전 평가 정보
         EvaluationDTO preEval = evaluationQueryService.getPreEvaluation(user.id(), restaurantId);

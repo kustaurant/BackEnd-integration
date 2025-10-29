@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.restaurant.query.chart.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import com.kustaurant.kustaurant.restaurant.query.chart.controller.dto.RestaurantChartResponse;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.ChartCond;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.RestaurantChartService;
@@ -15,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * @author Ding
@@ -32,13 +31,14 @@ public class RestaurantChartApiController implements RestaurantChartApiDoc {
     private final RestaurantChartService restaurantChartService;
 
     @GetMapping(value = "/v2/tier")
-    public ResponseEntity<List<RestaurantCoreInfoDto>> getTierChartList(
+    public ResponseEntity<RestaurantChartResponse> getTierChartList(
             @ChartCond ChartCondition condition,
             @AuthUser AuthUserInfo user
     ) {
         Page<RestaurantCoreInfoDto> restaurants = restaurantChartService.findByConditions(condition, user.id());
 
-        return new ResponseEntity<>(restaurants.getContent(), HttpStatus.OK);
+        RestaurantChartResponse result = new RestaurantChartResponse(restaurants.getContent(), restaurants.hasNext());
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/v2/tier/map")

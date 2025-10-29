@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.query.common.dto;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.MapConstants;
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.Coordinate;
+import com.kustaurant.kustaurant.restaurant.query.chart.constants.MapConstants;
+import com.kustaurant.kustaurant.restaurant.query.chart.constants.Coordinate;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

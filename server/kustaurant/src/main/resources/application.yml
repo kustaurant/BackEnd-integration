@@ -64,6 +64,7 @@ logging.level.com.kustaurant: trace
 
 # custom setting
 restaurant:
+  situation_min_count: 3
   initialDisplayMenuCount: 2
   rating:
     policy:
