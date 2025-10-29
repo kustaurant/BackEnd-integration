@@ -14,3 +14,19 @@ datasources:
     access: proxy
     url: http://loki:3100
     editable: true
+
+  - name: Kustaurant MySQL (RO)
+    type: mysql
+    access: proxy
+    url: ${MYSQL_HOST}:${MYSQL_PORT}
+    user: ${MYSQL_GRAFANA_USER}
+    secureJsonData:
+      password: ${MYSQL_GRAFANA_PASS}
+    jsonData:
+      database: performance_schema
+      tlsAuth: false
+      tlsAuthWithCACert: false
+      timeInterval: 1s
+      maxOpenConns: 10
+      maxIdleConns: 2
+      connMaxLifetime: 14400

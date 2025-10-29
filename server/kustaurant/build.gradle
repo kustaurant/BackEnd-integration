@@ -9,7 +9,7 @@ idea {
     }
 }
 
-version = '2.0.4'
+version = '2.1.1-SNAPSHOT'
 description = 'kustaurant'
 
 jar {
@@ -48,9 +48,7 @@ dependencies {
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-//    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     runtimeOnly 'com.mysql:mysql-connector-j'
-//    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     implementation 'com.google.code.gson:gson'
@@ -61,14 +59,11 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
-    // crawling
-    // implementation "org.seleniumhq.selenium:selenium-java:4.20.0"
+    testImplementation("org.springframework.security:spring-security-test")
     //flyway
     implementation 'org.flywaydb:flyway-mysql'
     //.env
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
-    //webclient
-//    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     //redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.session:spring-session-data-redis'

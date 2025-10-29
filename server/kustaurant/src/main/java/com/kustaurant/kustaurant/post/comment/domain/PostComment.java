@@ -33,7 +33,7 @@ public class PostComment {
                 .status(PostCommentStatus.ACTIVE)
                 .writerId(userId)
                 .postId(postId)
-                .parentCommentId(req.parentCommentId()==null?null:req.parentCommentId())
+                .parentCommentId(req.parentCommentId() != null ? req.parentCommentId() : null)
                 .build();
     }
 
