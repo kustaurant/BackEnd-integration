@@ -47,7 +47,6 @@ public record ChartCondition(
         );
     }
 
-
     public boolean needAll() {
         return tierFilter == TierFilter.ALL;
     }

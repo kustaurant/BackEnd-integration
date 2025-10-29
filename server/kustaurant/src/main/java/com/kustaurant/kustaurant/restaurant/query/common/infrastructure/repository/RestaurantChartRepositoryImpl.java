@@ -10,13 +10,12 @@ import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantC
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +32,13 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
      */
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public Page<Long> getRestaurantIdsWithPage(ChartCondition condition) {
+    public Slice<Long> getRestaurantIdsWithPage(ChartCondition condition) {
+        Pageable pageable = condition.pageable() != null ? condition.pageable() : Pageable.unpaged();
 
-        JPAQuery<Long> query = queryFactory.select(restaurantEntity.restaurantId)
+        int pageSize = pageable.isPaged() ? pageable.getPageSize() : Integer.MAX_VALUE;
+        long offset = pageable.isPaged() ? pageable.getOffset() : 0;
+
+        List<Long> contents = queryFactory.select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity)
                 .on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
@@ -54,31 +57,18 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                                 .asc(),
                         ratingEntity.tier.asc(),
                         ratingEntity.finalScore.desc()
-                );
-        // pageable unpaged 처리
-        Pageable pageable = condition.pageable();
-        if (pageable == null) {
-            pageable = Pageable.unpaged();
-        }
-        if (pageable.isPaged()) {
-            query.offset(pageable.getOffset())
-                    .limit(pageable.getPageSize());
-        }
-
-        List<Long> content = query.fetch();
-
-        Long total = queryFactory
-                .select(restaurantEntity.restaurantId.countDistinct())
-                .from(restaurantEntity)
-                .where(
-                        cuisinesIn(condition.cuisines(), restaurantEntity),
-                        positionsIn(condition.positions(), restaurantEntity),
-                        restaurantCommonExpressions.hasSituation(condition.situations(), restaurantEntity),
-                        restaurantActive(restaurantEntity)
                 )
-                .fetchOne();
+                .offset(offset)
+                .limit(pageSize + 1) // 다음 페이지 여부 판단용으로 1개 더 가져옴
+                .fetch();
 
-        return new PageImpl<>(content, pageable, total == null ? 0 : total);
+        boolean hasNext = false;
+        if (contents.size() > pageSize) {
+            hasNext = true;
+            contents = contents.subList(0, pageSize); // 1개 초과분 제거
+        }
+
+        return new SliceImpl<>(contents, pageable, hasNext);
     }
 
     private BooleanExpression tierFilterProcess(QRatingEntity ratingEntity, ChartCondition condition) {

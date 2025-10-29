@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +31,7 @@ public class RestaurantChartController {
     private final RestaurantChartService restaurantChartService;
 
     public static final Integer TIER_PAGE_SIZE = 30;
+
     // 티어표 지도 중앙 좌표
     // 인덱스 0번.전체 | 1번.건입~중문 | 2번.중문~어대 | 3번.후문 | 4번.정문 | 5번.구의역
     private float[] latitudeArray = {37.542318f, 37.541518f, 37.545520f, 37.545750f, 37.538512f, 37.537962f};
@@ -69,7 +70,7 @@ public class RestaurantChartController {
             @AuthUser AuthUserInfo user,
             HttpServletRequest request
     ) {
-        Page<RestaurantCoreInfoDto> data = restaurantChartService.findByConditions(condition, user.id());
+        Slice<RestaurantCoreInfoDto> data = restaurantChartService.findByConditions(condition, user.id());
 
         List<String> cuisines = condition.cuisines();
         List<Long> situations = condition.situations();

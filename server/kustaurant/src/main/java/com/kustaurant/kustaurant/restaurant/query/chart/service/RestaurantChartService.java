@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -40,16 +40,16 @@ public class RestaurantChartService {
             key = "#condition.cacheKey()",
             unless = "#result == null || #result.getContent().isEmpty()"
     )
-    public Page<RestaurantBaseInfoDto> findBasePage(ChartCondition condition) {
-        Page<Long> ids = restaurantChartRepository.getRestaurantIdsWithPage(condition);
+    public Slice<RestaurantBaseInfoDto> findBasePage(ChartCondition condition) {
+        Slice<Long> ids = restaurantChartRepository.getRestaurantIdsWithPage(condition);
         List<RestaurantBaseInfoDto> content = restaurantCoreInfoRepository.getRestaurantTiersBase(ids.getContent());
 
         setRanking(condition, content); // 기존 로직: ranking 주입
-        return new PageImpl<>(content, condition.pageable(), ids.getTotalElements());
+        return new SliceImpl<>(content, condition.pageable(), ids.hasNext());
     }
 
-    public Page<RestaurantCoreInfoDto> findByConditions(ChartCondition condition, Long userId) {
-        Page<RestaurantBaseInfoDto> basePage = findBasePage(condition);
+    public Slice<RestaurantCoreInfoDto> findByConditions(ChartCondition condition, Long userId) {
+        Slice<RestaurantBaseInfoDto> basePage = findBasePage(condition);
 
         List<Long> ids = basePage.getContent().stream().map(RestaurantBaseInfoDto::getRestaurantId).toList();
 
@@ -65,7 +65,7 @@ public class RestaurantChartService {
                 )
                 .toList();
 
-        return new PageImpl<>(merged, basePage.getPageable(), basePage.getTotalElements());
+        return new SliceImpl<>(merged, basePage.getPageable(), basePage.hasNext());
     }
 
     private void setRanking(ChartCondition condition, List<RestaurantBaseInfoDto> content) {
