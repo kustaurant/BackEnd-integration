@@ -41,7 +41,8 @@ public interface RestaurantChartApiDoc {
             "   - x: not null\n\n" +
             "   - y: not null\n\n" +
             "   - partnershipInfo: **null일 수 있습니다.**\n\n" +
-            "   - restaurantScore: **null일 수 있습니다.**",
+            "   - restaurantScore: **null일 수 있습니다.**\n\n" +
+            "   - hasNext: 다음 페이지가 있을 경우 true를 반환합니다.",
             parameters = {
                     @Parameter(
                             name = "cuisines", in = ParameterIn.QUERY,
@@ -78,7 +79,7 @@ public interface RestaurantChartApiDoc {
             }
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantCoreInfoDto.class)))}),
+            @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = RestaurantChartResponse.class)))}),
             @ApiResponse(responseCode = "400", description = "요청 파라미터가 잘못됨.")
     })
     @GetMapping(value = "/v2/tier")
