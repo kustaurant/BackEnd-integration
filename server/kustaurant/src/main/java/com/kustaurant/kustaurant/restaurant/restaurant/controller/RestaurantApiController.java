@@ -5,7 +5,7 @@ import com.kustaurant.kustaurant.common.view.ViewResourceType;
 import com.kustaurant.kustaurant.common.view.ViewerKeyProvider;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantQueryService;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class RestaurantApiController implements RestaurantApiDoc {
-    private final RestaurantQueryService restaurantQueryService;
+    private final RestaurantService restaurantService;
 
     private final ViewerKeyProvider viewerKeyProvider;
     private final ViewCountService viewCountService;
@@ -42,7 +42,7 @@ public class RestaurantApiController implements RestaurantApiDoc {
         viewCountService.countOncePerHour(ViewResourceType.POST, restaurantId, viewerKey);
 
         return new ResponseEntity<>(
-                restaurantQueryService.getRestaurantDetail(restaurantId, user.id()),
+                restaurantService.getRestaurantDetail(restaurantId, user.id()),
                 HttpStatus.OK
         );
     }

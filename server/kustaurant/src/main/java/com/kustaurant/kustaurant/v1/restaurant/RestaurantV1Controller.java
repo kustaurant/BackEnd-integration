@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.v1.restaurant;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantFavoriteService;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantQueryService;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantFavoriteRepository;
 import com.kustaurant.kustaurant.v1.restaurant.response.FavoriteResponseDTO;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class RestaurantV1Controller {
 
-    private final RestaurantQueryService restaurantQueryService;
+    private final RestaurantService restaurantService;
     private final RestaurantFavoriteService restaurantFavoriteService;
     private final RestaurantFavoriteRepository favoriteRepository;
 
@@ -38,7 +38,7 @@ public class RestaurantV1Controller {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 식당 데이터 DTO로 변환하기
-        RestaurantDetail detail = restaurantQueryService.getRestaurantDetail((long) restaurantId, user.id());
+        RestaurantDetail detail = restaurantService.getRestaurantDetail((long) restaurantId, user.id());
 
         return new ResponseEntity<>(RestaurantDetailDTO.fromV2(detail), HttpStatus.OK);
     }
@@ -50,7 +50,7 @@ public class RestaurantV1Controller {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ) {
         // 식당 데이터 DTO로 변환하기
-        RestaurantDetail detail = restaurantQueryService.getRestaurantDetail((long) restaurantId, user.id());
+        RestaurantDetail detail = restaurantService.getRestaurantDetail((long) restaurantId, user.id());
 
         return new ResponseEntity<>(RestaurantDetailDTO.fromV2(detail), HttpStatus.OK);
     }
