@@ -40,41 +40,32 @@ function mainImgResize() {
 }
 
 // 네이버 지도 펼쳤다 접기
-document.getElementById('mapUnfoldButton').addEventListener('click', function() {
-    const thisText = this.textContent;
-    const mapDiv = document.getElementById('map');
-    const mapContainer = document.getElementById('mapContainer');
-    const width = parseFloat(getComputedStyle(this).width);
+let mapUnfoldButton = document.getElementById('mapUnfoldButton');
+if (mapUnfoldButton) {
+    mapUnfoldButton.addEventListener('click', function () {
+        const thisText = this.textContent;
+        const mapDiv = document.getElementById('map');
+        const mapContainer = document.getElementById('mapContainer');
+        const width = parseFloat(getComputedStyle(this).width);
 
-    if (thisText === '펼치기') {
-        this.textContent = '접기';
-        let newHeight = width * 0.6;
-        if (newHeight < 400) {
-            newHeight = 400;
+        if (thisText === '펼치기') {
+            this.textContent = '접기';
+            let newHeight = width * 0.6;
+            if (newHeight < 400) {
+                newHeight = 400;
+            }
+            resize(width, newHeight);
+            // 지도가 가장 위로 오도록 화면 스크롤
+            document.getElementById('mapTopDiv').scrollIntoView(
+                {behavior: 'smooth', block: 'start'});
+            //window.scrollBy(0, -110);
+        } else {
+            this.textContent = '펼치기';
+            resize(width, 150);
         }
-        resize(width, newHeight);
-        // 지도가 가장 위로 오도록 화면 스크롤
-        document.getElementById('mapTopDiv').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        //window.scrollBy(0, -110);
-    } else {
-        this.textContent = '펼치기';
-        resize(width, 150);
-    }
-});
+    });
+}
 function resize(width, height){
     var Size = new naver.maps.Size(width, height);
     map.setSize(Size);
 }
-
-// 댓글 입력 창 글자 제한
-const commentTextArea = document.getElementById('commentInput');
-const maxLength = 1000;
-commentTextArea.addEventListener("input", function() {
-    var remainingCharacters = maxLength - commentTextArea.value.length;
-    //document.getElementById("remainingCharacters").textContent = remainingCharacters;
-
-    // 최대 길이 초과 시 잘라냄
-    if (commentTextArea.value.length > maxLength) {
-        commentTextArea.value = commentTextArea.value.substring(0, maxLength);
-    }
-});

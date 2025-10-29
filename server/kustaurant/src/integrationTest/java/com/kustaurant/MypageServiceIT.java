@@ -1,6 +1,7 @@
 package com.kustaurant;
 
 import com.kustaurant.kustaurant.KustaurantApplication;
+import com.kustaurant.kustaurant.evaluation.evaluation.constants.StarComment;
 import com.kustaurant.kustaurant.evaluation.evaluation.domain.EvaluationDTO;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.EvaluationCommandService;
 import com.kustaurant.kustaurant.global.exception.exception.user.NoProfileChangeException;
@@ -187,7 +188,7 @@ class MypageServiceIT {
                         List.of(1L, 3L, 7L),
                         "http://test.com/img1.png",
                         "맛있어요!",
-                        List.of(new RestaurantConstants.StarComment(6, "신선해요")),
+                        List.of(new StarComment(6, "신선해요")),
                         null
                 );
         evaluationService.evaluate(user1.getId(), 1L, dto1);
@@ -197,7 +198,7 @@ class MypageServiceIT {
                         List.of(),
                         null,
                         "맛없네요!",
-                        List.of(new RestaurantConstants.StarComment(1, "신선하지 않네요")),
+                        List.of(new StarComment(1, "신선하지 않네요")),
                         null
                 );
         evaluationService.evaluate(user1.getId(), 2L, dto2);

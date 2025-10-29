@@ -1,8 +1,8 @@
 package com.kustaurant.kustaurant.v1.restaurant.response;
 
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTO.ZoomAndRestaurants;
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.Coordinate;
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.MapConstants;
+import com.kustaurant.kustaurant.restaurant.query.chart.constants.Coordinate;
+import com.kustaurant.kustaurant.restaurant.query.chart.constants.MapConstants;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;

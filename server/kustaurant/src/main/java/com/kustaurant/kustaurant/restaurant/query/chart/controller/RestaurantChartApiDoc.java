@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.restaurant.query.chart.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import com.kustaurant.kustaurant.restaurant.query.chart.controller.dto.RestaurantChartResponse;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.ChartCond;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
@@ -16,7 +17,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import java.util.List;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -82,7 +82,7 @@ public interface RestaurantChartApiDoc {
             @ApiResponse(responseCode = "400", description = "요청 파라미터가 잘못됨.")
     })
     @GetMapping(value = "/v2/tier")
-    ResponseEntity<List<RestaurantCoreInfoDto>> getTierChartList(
+    ResponseEntity<RestaurantChartResponse> getTierChartList(
             @Parameter(hidden = true) @ChartCond ChartCondition condition,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     );

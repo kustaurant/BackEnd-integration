@@ -31,6 +31,7 @@ public class RestaurantChartController {
     private final RestaurantChartService restaurantChartService;
 
     public static final Integer TIER_PAGE_SIZE = 30;
+
     // 티어표 지도 중앙 좌표
     // 인덱스 0번.전체 | 1번.건입~중문 | 2번.중문~어대 | 3번.후문 | 4번.정문 | 5번.구의역
     private float[] latitudeArray = {37.542318f, 37.541518f, 37.545520f, 37.545750f, 37.538512f, 37.537962f};

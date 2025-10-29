@@ -12,8 +12,8 @@ import static com.querydsl.core.group.GroupBy.set;
 import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
 import static java.util.Objects.isNull;
 
+import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.QRestaurantMenu;
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.QRestaurantDetail;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 public class RestaurantDetailQuery {
 
     private final JPAQueryFactory queryFactory;
+    private final RestaurantCommonExpressions restaurantCommonExpressions;
 
     public Optional<RestaurantDetail> getRestaurantDetails(Long restaurantId, Long userId) {
         JPAQuery<?> q = queryFactory
@@ -41,7 +42,7 @@ public class RestaurantDetailQuery {
                 .leftJoin(restaurantMenuEntity)
                 .on(menuRestaurantIdEq(restaurantEntity.restaurantId))
                 .leftJoin(restaurantSituationRelationEntity)
-                .on(situationMatches(restaurantEntity.restaurantId))
+                .on(restaurantCommonExpressions.situationMatches(restaurantSituationRelationEntity, restaurantEntity.restaurantId))
                 .leftJoin(situationEntity)
                 .on(situationIdEq(restaurantSituationRelationEntity.situationId))
                 .leftJoin(evaluationEntity)
@@ -137,13 +138,5 @@ public class RestaurantDetailQuery {
 
     private BooleanExpression situationIdEq(NumberPath<Long> situationId) {
         return isNull(situationId) ? Expressions.FALSE : situationEntity.situationId.eq(situationId);
-    }
-
-    /**
-     * 식당의 상황 리스트 조건
-     */
-    private BooleanExpression situationMatches(NumberPath<Long> restaurantId) {
-        return restaurantSituationRelationEntity.restaurantId.eq(restaurantId)
-                .and(restaurantSituationRelationEntity.dataCount.goe(RestaurantConstants.SITUATION_GOE));
     }
 }

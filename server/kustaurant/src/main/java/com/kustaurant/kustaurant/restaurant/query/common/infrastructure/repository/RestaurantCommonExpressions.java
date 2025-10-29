@@ -13,16 +13,25 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-public abstract class RestaurantCommonExpressions {
+@Component
+public class RestaurantCommonExpressions {
+
+    private final Integer SITUATION_MIN_COUNT;
+
+    public RestaurantCommonExpressions(@Value("${restaurant.situation_min_count}") Integer situationMinCount) {
+        this.SITUATION_MIN_COUNT = situationMinCount;
+    }
 
     /**
      * 식당의 상황 리스트 조건
      */
-    public static BooleanExpression situationMatches(
+    public BooleanExpression situationMatches(
             QRestaurantSituationRelationEntity rs, NumberPath<Long> restaurantId) {
         return rs.restaurantId.eq(restaurantId)
-                .and(rs.dataCount.goe(RestaurantConstants.SITUATION_GOE));
+                .and(rs.dataCount.goe(SITUATION_MIN_COUNT));
     }
 
     public static BooleanExpression restaurantActive(
@@ -40,7 +49,7 @@ public abstract class RestaurantCommonExpressions {
                 .where(e.restaurantId.eq(restaurantId));
     }
 
-    public static BooleanExpression hasSituation(List<Long> situations, QRestaurantEntity r) {
+    public BooleanExpression hasSituation(List<Long> situations, QRestaurantEntity r) {
         if (isNull(situations) || situations.isEmpty()) {
             return null;
         }

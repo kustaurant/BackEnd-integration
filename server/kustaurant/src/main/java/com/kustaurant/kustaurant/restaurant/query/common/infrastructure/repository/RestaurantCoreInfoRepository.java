@@ -6,7 +6,6 @@ import static com.kustaurant.jpa.restaurant.entity.QRestaurantFavoriteEntity.res
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity.restaurantSituationRelationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QSituationEntity.situationEntity;
-import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions.situationMatches;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
 import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
@@ -33,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RestaurantCoreInfoRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final RestaurantCommonExpressions restaurantCommonExpressions;
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<RestaurantBaseInfoDto> getRestaurantTiersBase(List<Long> ids) {
@@ -40,7 +40,7 @@ public class RestaurantCoreInfoRepository {
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .leftJoin(restaurantSituationRelationEntity)
-                .on(situationMatches(restaurantSituationRelationEntity, restaurantEntity.restaurantId))
+                .on(restaurantCommonExpressions.situationMatches(restaurantSituationRelationEntity, restaurantEntity.restaurantId))
                 .leftJoin(situationEntity)
                 .on(situationIdEq(restaurantSituationRelationEntity.situationId))
                 .where(restaurantEntity.restaurantId.in(ids))
@@ -93,7 +93,7 @@ public class RestaurantCoreInfoRepository {
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .leftJoin(restaurantSituationRelationEntity)
-                .on(situationMatches(restaurantSituationRelationEntity,
+                .on(restaurantCommonExpressions.situationMatches(restaurantSituationRelationEntity,
                         restaurantEntity.restaurantId))
                 .leftJoin(situationEntity)
                 .on(situationIdEq(restaurantSituationRelationEntity.situationId))

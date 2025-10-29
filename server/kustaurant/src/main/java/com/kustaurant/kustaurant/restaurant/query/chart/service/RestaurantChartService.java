@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantC
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantBaseInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCoreInfoRepository;
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.MapConstants;
+import com.kustaurant.kustaurant.restaurant.query.chart.constants.MapConstants;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTO;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
