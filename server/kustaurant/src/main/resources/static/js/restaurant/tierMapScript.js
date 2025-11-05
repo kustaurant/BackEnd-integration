@@ -1,5 +1,4 @@
 // 데이터 세팅
-console.log(mapData);
 var tieredRestaurants = mapData.tieredRestaurants;
 var nonTieredRestaurants  = mapData.nonTieredRestaurants;
 var favoriteRestaurants = mapData.favoriteRestaurants;
