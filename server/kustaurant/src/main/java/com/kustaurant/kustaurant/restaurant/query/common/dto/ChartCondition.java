@@ -60,4 +60,10 @@ public record ChartCondition(
         WITHOUT_TIER,
         ALL
     }
+
+    public ChartCondition removePaging() {
+        return new ChartCondition(
+                cuisines, situations, positions, tierFilter, Pageable.unpaged()
+        );
+    }
 }

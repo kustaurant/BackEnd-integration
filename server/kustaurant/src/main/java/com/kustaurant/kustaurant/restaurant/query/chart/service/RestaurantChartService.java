@@ -44,7 +44,9 @@ public class RestaurantChartService {
         Page<Long> ids = restaurantChartRepository.getRestaurantIdsWithPage(condition);
         List<RestaurantBaseInfoDto> content = restaurantCoreInfoRepository.getRestaurantTiersBase(ids.getContent());
 
-        setRanking(condition, content); // 기존 로직: ranking 주입
+        if (condition.pageable().isPaged()) {
+            setRanking(condition, content); // 기존 로직: ranking 주입
+        }
         return new PageImpl<>(content, condition.pageable(), ids.getTotalElements());
     }
 
@@ -80,6 +82,8 @@ public class RestaurantChartService {
     public RestaurantTierMapDTO getRestaurantTierMapDto(
             ChartCondition condition, @Nullable Long userId
     ) {
+        // 페이징 제거
+        condition = condition.removePaging();
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
         List<RestaurantCoreInfoDto> tieredRestaurantCoreInfos = findByConditions(
                 condition.changeTierFilter(TierFilter.WITH_TIER), userId).toList();
