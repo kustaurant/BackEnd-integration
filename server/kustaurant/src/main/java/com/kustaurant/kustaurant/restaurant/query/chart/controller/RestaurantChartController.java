@@ -10,8 +10,8 @@ import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.Chart
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.RestaurantChartService;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTO;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -87,18 +87,8 @@ public class RestaurantChartController {
         model.addAttribute("queryString", getQueryStringWithoutPage(request));
 
         // 지도 정보 넣어주기
-        model.addAttribute("restaurantList", data);
-        List<RestaurantCoreInfoDto> favorites = new ArrayList<>();
-        for (RestaurantCoreInfoDto d : data) {
-            if (d.getIsFavorite()) {
-                favorites.add(d);
-            }
-        }
-        model.addAttribute("favoriteRestaurantList", favorites);
-        model.addAttribute("mapLatitude", latitudeArray[0]);
-        model.addAttribute("mapLongitude", longitudeArray[0]);
-        model.addAttribute("mapZoom", zoomArray[0]);
-        model.addAttribute("locationIndex", 0);
+        RestaurantTierMapDTO mapData = restaurantChartService.getRestaurantTierMapDto(condition, user.id());
+        model.addAttribute("mapData", mapData);
 
         return "restaurant/tier";
     }

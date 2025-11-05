@@ -64,7 +64,7 @@
     <script type="text/javascript" src="https://static.nid.naver.com/js/naverLogin_implicit-1.0.3.js"
             charset="utf-8">
     </script>
-    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=gifrujmoep"></script>
+    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=u11upwlala"></script>
 </head>
 
 <body>
@@ -166,6 +166,12 @@
              th:if="${#lists.size(restaurantDto.restaurantMenuList.?[menuId != null]) > 3}">
             펼치기
         </div>
+    </div>
+
+    <div id="mapContainer" class="inner-container">
+        <div id="mapTopDiv" style="height:110px; width:100%; position: absolute; top: -110px; left: 0; visibility: hidden;"></div>
+        <div id="map"></div>
+        <div id="mapUnfoldButton" class="unfold-button">펼치기</div>
     </div>
 
 
