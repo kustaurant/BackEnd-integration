@@ -43,9 +43,9 @@
     <script type="text/javascript" src="/js/library/jquery.js"></script>
     <script type="text/javascript" src="/js/library/vendors.min.js"></script>
     <script type="text/javascript" src="/js/library/main.js"></script>
+    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=u11upwlala"></script>
     <script src="/js/tierScript.js" defer></script>
     <script src="/js/restaurant/tierMapScript.js" defer></script>
-    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=gifrujmoep"></script>
 
 </head>
 <body>
@@ -353,8 +353,7 @@
      data-locationIndex=${locationIndex}">
 </div>
 <script th:inline="javascript">
-    const restaurantDataList = /*[[${restaurantList}]]*/ [];
-    const favoriteRestaurantDataList = /*[[${favoriteRestaurantList}]]*/ [];
+  const mapData = /*[[${mapData}]]*/ {};
 </script>
 
 </html>
