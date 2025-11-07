@@ -7,7 +7,6 @@ import com.kustaurant.crawler.aianalysis.service.port.RestaurantCrawlingInfo;
 import com.kustaurant.crawler.global.util.JsonUtils;
 import com.kustaurant.crawler.infrastructure.messaging.MessagePublisher;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -25,8 +24,7 @@ public class AiAnalysisScheduler {
     public void crawlingInit() {
         List<RestaurantCrawlingInfo> infos = restaurantCrawlerRepo.getRestaurantsForCrawling();
         for (RestaurantCrawlingInfo info : infos) {
-            AiAnalysisRequest req = new AiAnalysisRequest(
-                    UUID.randomUUID().toString(), info.restaurantId(), info.url(), List.of());
+            AiAnalysisRequest req = new AiAnalysisRequest(info.restaurantId(), info.url(), List.of());
             messagePublisher.publish(messagingProps.aiAnalysisStart(), JsonUtils.serialize(req));
         }
     }

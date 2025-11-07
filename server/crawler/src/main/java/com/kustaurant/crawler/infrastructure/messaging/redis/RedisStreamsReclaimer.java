@@ -144,7 +144,7 @@ public class RedisStreamsReclaimer<T> {
             try {
                 long deliveries = getDeliveries(topic, group, id.getValue());
                 if (deliveries > maxRetries) {
-                    moveToDlqAndAck(ops, rec, deliveries, "max-retries-exceeded");
+//                    moveToDlqAndAck(ops, rec, deliveries, "max-retries-exceeded");
                     continue;
                 }
                 log.info("[{}][{}][{}] retry start. retry count={}, message={}", topic, group, consumerName, deliveries, payload);
