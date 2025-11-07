@@ -1,6 +1,5 @@
 package com.kustaurant.kustaurant.restaurant.query.common.dto;
 
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -21,12 +20,12 @@ public class RestaurantCoreInfoDto extends RestaurantBaseInfoDto{
     @QueryProjection
     public RestaurantCoreInfoDto(
             Long restaurantId, String restaurantName, String restaurantCuisine, String restaurantPosition,
-            String restaurantImgUrl, Integer mainTier, Double longitude, Double latitude,
+            String restaurantImgUrl, Integer mainTier, Boolean isTempTier, Double longitude, Double latitude,
             String partnershipInfo, Double score, java.util.Set<String> situations, String restaurantType,
             Boolean isEvaluated, Boolean isFavorite
     ) {
         super(restaurantId, restaurantName, restaurantCuisine, restaurantPosition,
-                restaurantImgUrl, mainTier, longitude, latitude, partnershipInfo,
+                restaurantImgUrl, mainTier, isTempTier, longitude, latitude, partnershipInfo,
                 score, situations, restaurantType);
         this.isEvaluated = isEvaluated;
         this.isFavorite = isFavorite;

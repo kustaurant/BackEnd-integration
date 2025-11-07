@@ -76,12 +76,20 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
     }
 
     private BooleanExpression tierFilterProcess(QRatingEntity ratingEntity, ChartCondition condition) {
+        BooleanExpression base = null;
+        if (!condition.aiTier()) {
+            base = ratingEntity.isTemp.eq(false);
+        }
         if (condition.needAll()) {
-            return null;
+            return base;
         }
         if (condition.needOnlyTier()) {
-            return ratingEntity.tier.gt(0);
+            return append(base, ratingEntity.tier.gt(0));
         }
-        return ratingEntity.tier.lt(0);
+        return append(base, ratingEntity.tier.lt(0));
+    }
+
+    private BooleanExpression append(BooleanExpression base, BooleanExpression extra) {
+        return base == null ? extra : base.and(extra);
     }
 }

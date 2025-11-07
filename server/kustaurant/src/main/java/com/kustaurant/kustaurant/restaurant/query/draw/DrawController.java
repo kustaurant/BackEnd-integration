@@ -55,7 +55,7 @@ public class DrawController {
         List<String> locations = location == null || location.equals("전체") ? null : List.of(location);
 
         ChartCondition condition = new ChartCondition(cuisinesList, null, locations,
-                TierFilter.ALL, Pageable.ofSize(40));
+                TierFilter.ALL, Pageable.ofSize(40), false);
         List<RestaurantCoreInfoDto> restaurants = restaurantDrawService.draw(condition);
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
