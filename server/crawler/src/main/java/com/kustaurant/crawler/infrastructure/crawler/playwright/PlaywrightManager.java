@@ -9,7 +9,6 @@ import java.util.List;
 
 /**
  * 브라우저를 동시에 여러 개 키면 메모리 사용량이 급증하기 때문에 싱글톤 방식으로 Manager에서 관리함.
- *
  * 그리고 스레드 당 최대 하나의 페이지를 할당하기 위해 ThreadLocal을 사용함.
  */
 public class PlaywrightManager {
