@@ -286,7 +286,7 @@ jobs:
             # docker hub 로그인
             echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             # 도커 컴포즈
-            sudo docker compose -p crawler f docker-compose.prod.yml pull
+            sudo docker compose -p crawler -f docker-compose.prod.yml pull
             sudo docker compose -p crawler -f docker-compose.prod.yml up -d
             # 미사용(이전) 이미지 정리
             sudo docker image prune -f
