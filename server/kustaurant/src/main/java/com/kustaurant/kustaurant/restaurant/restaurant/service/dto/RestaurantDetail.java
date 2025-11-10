@@ -24,6 +24,8 @@ public class RestaurantDetail {
     private String restaurantImgUrl;
     @Schema(description = "식당 티어", example = "1")
     private Integer mainTier;
+    @Schema(description = "임시 티어인지 여부 (true일 경우 임시 티어임.)", example = "false")
+    protected Boolean isTempTier;
     @Schema(description = "식당 음식 종류", example = "한식")
     private String restaurantCuisine;
     @Schema(description = "식당 음식 종류 이미지 URL", example = "https://kustaurant.com/img/home/%EA%B3%A0%EA%B8%B0.png")
@@ -74,6 +76,7 @@ public class RestaurantDetail {
             Long restaurantId,
             String restaurantImgUrl,
             Integer mainTier,
+            Boolean isTempTier,
             String restaurantCuisine,
             String restaurantPosition,
             String restaurantName,
@@ -97,6 +100,7 @@ public class RestaurantDetail {
                     restaurantId,
                     restaurantImgUrlPostProcessing(restaurantImgUrl),
                     mainTier,
+                    isTempTier,
                     restaurantCuisine,
                     getCuisineImgUrl(restaurantCuisine),
                     positionPostprocessing(restaurantPosition),

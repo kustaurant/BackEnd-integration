@@ -95,7 +95,8 @@
         </div>
         <div>
             <div class="cuisine-tier-info left-justified" id="tierInfoContainer">
-                <span th:class="'cuisine-tier tier' + ${restaurantDto.mainTier}">
+                <span th:class="'cuisine-tier tier' + ${restaurantDto.mainTier} +
+                    (${restaurantDto.isTempTier} ? ' temp-tier' : '')">
                     <img class="tier-cuisine-img" th:src="${restaurantDto.restaurantCuisineImgUrl}">
                     <span th:text="${restaurantDto.restaurantCuisine} + ' '"></span>
                     <span th:text="${restaurantDto.mainTier} + '티어'" th:if="${restaurantDto.mainTier != -1}"></span>
