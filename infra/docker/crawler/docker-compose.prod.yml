@@ -1,0 +1,12 @@
+services:
+  boot:
+    container_name: crawler-boot
+    image: docker.io/dingwoon/crawler:latest
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - /var/log/crawler:/var/log/crawler

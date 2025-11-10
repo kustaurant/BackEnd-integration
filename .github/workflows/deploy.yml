@@ -29,7 +29,7 @@ jobs:
               - 'common/**'
 
   kustaurant-build-push:
-    name: 🛠️ 변경된 경우 빌드 및 푸쉬
+    name: 🛠️ 변경된 경우 Kustaurant 빌드 및 푸쉬
     needs: detect-changes
     if: |
       needs.detect-changes.outputs.kustaurant == 'true'
@@ -56,7 +56,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker meta
-        id: meta
+        id: meta-kustaurant
         uses: docker/metadata-action@v5
         with:
           images: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/kustaurant
@@ -70,13 +70,60 @@ jobs:
           context: .
           file: server/kustaurant/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-kustaurant.outputs.tags }}
+          labels: ${{ steps.meta-kustaurant.outputs.labels }}
           cache-from: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/kustaurant:buildcache
           cache-to: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/kustaurant:buildcache,mode=max
 
-  deploy:
-    name: 🚀 도커 컴포즈 배포
+  crawler-build-push:
+    name: 🛠️ 변경된 경우 Crawler 빌드 및 푸쉬
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.crawler == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: 쿠스토랑 모듈 빌드(테스트 제외)
+        run: ./gradlew :server:crawler:clean :server:crawler:assemble --no-daemon
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 도커 허브 로그인
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta-crawler
+        uses: docker/metadata-action@v5
+        with:
+          images: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/crawler
+          tags: |
+            type=raw,value=latest
+            type=sha,format=long
+
+      - name: 도커 이미지 빌드 및 푸쉬
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: server/crawler/Dockerfile
+          push: true
+          tags: ${{ steps.meta-crawler.outputs.tags }}
+          labels: ${{ steps.meta-crawler.outputs.labels }}
+          cache-from: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/crawler:buildcache
+          cache-to: type=registry,ref=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/crawler:buildcache,mode=max
+
+  kustaurant-deploy:
+    name: 🚀 Kustaurant 도커 컴포즈 배포
     needs: [detect-changes, kustaurant-build-push]
     if: needs.detect-changes.outputs.kustaurant == 'true'
     runs-on: ubuntu-latest
@@ -159,5 +206,85 @@ jobs:
             -f docker-compose.yml -f docker-compose.prod.yml pull
             sudo docker compose -p kustaurant \
             -f docker-compose.yml -f docker-compose.prod.yml up -d
+            # 미사용(이전) 이미지 정리
+            sudo docker image prune -f
+
+  crawler-deploy:
+    name: 🚀 Crawler 도커 컴포즈 배포
+    needs: [ detect-changes, crawler-build-push ]
+    if: needs.detect-changes.outputs.crawler == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 파일 확인용
+        run: |
+          ls -al infra/docker/crawler || true
+
+      - name: 디렉터리 생성 및 권한 설정
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+          script: |
+            set -e
+            sudo mkdir -p /home/ubuntu/crawler-docker/infra
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/crawler-docker/infra
+            sudo chmod -R 755 /home/ubuntu/crawler-docker/infra
+
+      - name: env 파일 업데이트
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          ENV_FILE: ${{ secrets.CRAWLER_ENV_FILE }}
+          DOCKER_COMPOSE_ENV_FILE: ${{ secrets.CRAWLER_DOCKER_COMPOSE_ENV_FILE }}
+        with:
+          host: ${{ secrets.CRAWLER_LIGHTSAIL_HOST }}
+          username: ${{ secrets.CRAWLER_LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+          envs: ENV_FILE,DOCKER_COMPOSE_ENV_FILE
+          script: |
+            set -e
+            mkdir -p /home/ubuntu/kustaurant-docker/infra/docker/crawler
+            cd /home/ubuntu/kustaurant-docker/infra/docker/crawler
+            umask 077
+            cat > .env <<EOF
+            SPRING_PROFILES_ACTIVE=prod
+
+            ${ENV_FILE}
+
+            ${DOCKER_COMPOSE_ENV_FILE}
+            EOF
+
+      - name: infra 파일 업데이트
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.CRAWLER_LIGHTSAIL_HOST }}
+          username: ${{ secrets.CRAWLER_LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+          source: "./infra"
+          target: "/home/ubuntu/crawler-docker"
+          overwrite: true
+
+      - name: docker 이미지 pull 및 docker compose 실행
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        with:
+          host: ${{ secrets.CRAWLER_LIGHTSAIL_HOST }}
+          username: ${{ secrets.CRAWLER_LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
+          script: |
+            set -e
+            # 디렉터리 이동
+            cd /home/ubuntu/kustaurant-docker/infra/docker/crawler
+            # docker hub 로그인
+            echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            # 도커 컴포즈
+            sudo docker compose -p crawler f docker-compose.prod.yml pull
+            sudo docker compose -p crawler -f docker-compose.prod.yml up -d
             # 미사용(이전) 이미지 정리
             sudo docker image prune -f

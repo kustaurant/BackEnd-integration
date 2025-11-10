@@ -1,9 +1,9 @@
 name: Discord PR & Merge Alerts
 
 on:
-  pull_request:
-    types: [opened]
-    branches: [develop, main]
+#  pull_request:
+#    types: [opened]
+#    branches: [develop, main]
   push:
     # develop, main 으로 push (보통 merge 후 결과)
     branches: [develop, main]
