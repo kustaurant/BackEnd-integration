@@ -282,7 +282,7 @@ jobs:
           script: |
             set -e
             # 디렉터리 이동
-            cd /home/ubuntu/kustaurant-docker/infra/docker/crawler
+            cd /home/ubuntu/crawler-docker/infra/docker/crawler
             # docker hub 로그인
             echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             # 도커 컴포즈
