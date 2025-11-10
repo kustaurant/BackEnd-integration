@@ -249,8 +249,8 @@ jobs:
           envs: ENV_FILE,DOCKER_COMPOSE_ENV_FILE
           script: |
             set -e
-            mkdir -p /home/ubuntu/kustaurant-docker/infra/docker/crawler
-            cd /home/ubuntu/kustaurant-docker/infra/docker/crawler
+            mkdir -p /home/ubuntu/crawler-docker/infra/docker/crawler
+            cd /home/ubuntu/crawler-docker/infra/docker/crawler
             umask 077
             cat > .env <<EOF
             SPRING_PROFILES_ACTIVE=prod
