@@ -29,7 +29,7 @@ public class AiAnalysisInitializer {
 
         try {
             List<RestaurantCrawlingInfo> infos = restaurantCrawlerRepo.getRestaurantsForCrawling();
-            infos = infos.subList(0, Math.min(100, infos.size()));
+//            infos = infos.subList(0, Math.min(100, infos.size()));
             for (RestaurantCrawlingInfo info : infos) {
                 AiAnalysisRequest req = new AiAnalysisRequest(info.restaurantId(), info.url(), List.of());
                 messagePublisher.publish(messagingProps.aiAnalysisStart(),
