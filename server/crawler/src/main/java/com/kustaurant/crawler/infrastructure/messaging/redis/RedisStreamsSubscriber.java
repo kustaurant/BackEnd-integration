@@ -54,7 +54,7 @@ public class RedisStreamsSubscriber implements MessageSubscriber {
                             AiAnalysisSubscriber.readLock().lock();
                             String payload = message.getValue().get("payload");
                             RecordId id = message.getId();
-                            log.info("[Stream Id: {}] 메시지 수신됨. 내용: {}", id, payload);
+                            log.info("[Stream Id: {}] message received. content: {}", id, payload);
 
                             // 비즈니스 로직 처리
                             handler.accept(JsonUtils.deserialize(payload, type));
@@ -62,7 +62,7 @@ public class RedisStreamsSubscriber implements MessageSubscriber {
                             // ack
                             redisTemplate.opsForStream().acknowledge(topic, group, id);
                         } catch (Exception e) {
-                            log.warn("[Stream Id: {}] id crawling 메시지 처리 과정에서 에러 발생", message.getId(), e);
+                            log.warn("[Stream Id: {}] error occur when process a streams message.", message.getId(), e);
                         } finally {
                             AiAnalysisSubscriber.readLock().unlock();
                         }

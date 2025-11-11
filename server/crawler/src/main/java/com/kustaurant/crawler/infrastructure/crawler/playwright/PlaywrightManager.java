@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class PlaywrightManager {
 
-    private static final double DEFAULT_TIMEOUT_MILLIS = 10_000;
+    private static final double DEFAULT_TIMEOUT_MILLIS = 60_000;
     private static final boolean HEADLESS_MODE = true;
 
     private static Playwright pw;
@@ -43,7 +43,7 @@ public class PlaywrightManager {
                     .setIsMobile(false)
                     .setHasTouch(false)
                     .setLocale("ko-KR")
-                    .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Whale/4.33.325.17 Safari/537.36"));
+                    .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Whale/4.34.340.19 Safari/537.36"));
             page = ctx.newPage();
             page.setDefaultTimeout(DEFAULT_TIMEOUT_MILLIS);
             threadContext.set(ctx);
@@ -60,9 +60,14 @@ public class PlaywrightManager {
         if (pw == null) {
             createPlaywright();
         }
-        browser = pw.chromium().launch(new BrowserType.LaunchOptions()
-                .setHeadless(HEADLESS_MODE)
-                .setArgs(List.of("--disable-blink-features=AutomationControlled")));
+        browser = pw.chromium().launch(
+                new BrowserType.LaunchOptions()
+                        .setHeadless(HEADLESS_MODE)
+                        .setArgs(List.of(
+                                "--disable-blink-features=AutomationControlled",
+                                "--disable-dev-shm-usage",
+                                "--no-sandbox"
+                        )));
     }
 
     public static void shutdown() {

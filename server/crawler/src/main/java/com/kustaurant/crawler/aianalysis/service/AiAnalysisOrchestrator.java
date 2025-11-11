@@ -28,12 +28,12 @@ public class AiAnalysisOrchestrator {
         // 리뷰 크롤링
         List<Review> reviews = crawlingService.crawl(req.url());
         if (reviews.isEmpty()) {
-            throw new AiAnalysisException("크롤링된 리뷰가 없습니다. 요청: " + req);
+            throw new AiAnalysisException("No crawled review. / request: " + req);
         }
-        log.info("식당 ID {} 크롤링 완료. 리뷰 수: {}", req.restaurantId(), reviews.size());
+        log.info("restaurant ID {} crawling complete. review counts: {}", req.restaurantId(), reviews.size());
         // AI 전처리
         RestaurantAnalysis result = aiAnalysisService.analyzeReviews(reviews, req.situations());
-        log.info("식당 ID {} AI 처리 완료.", req.restaurantId());
+        log.info("restaurant ID {} AI processing complete.", req.restaurantId());
         ratingCrawlerRepo.upsertRating(req.restaurantId(), result);
     }
 }
