@@ -1,84 +1,77 @@
 $(document).ready(function () {
-    // --------------- 클릭된 종류 버튼 효과 ----------------------------
-    // 현재 URL에서 쿼리 스트링 추출
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    let cuisineParam = urlParams.get('cuisines');
-    if (!cuisineParam) cuisineParam = 'ALL';
-    let situationParam = urlParams.get('situations');
-    if (!situationParam) situationParam = 'ALL';
-    let locationParam = urlParams.get('locations');
-    if (!locationParam) locationParam = 'ALL';
+    // [[ AI TIER 표시 ]]
+    const PARAM_AI = 'ai';
+    aiTier();
 
-    document.querySelectorAll('.category').forEach(btn => {
-        btn.addEventListener('click', function() {
+    // --------------- 클릭된 종류 버튼 효과 ----------------------------
+    const PARAMS = ["cuisines", "situations", "locations", "ai"];
+
+    function getList(sp, key) {
+        const v = sp.get(key);
+        if (!v) return [];
+        return v.split(",").map(s => s.trim()).filter(Boolean);
+    }
+
+    function setList(sp, key, arr) {
+        // page 제거
+        sp.delete('page');
+        // ALL(or 빈 배열) == 조건 제거
+        if (!arr || arr.length === 0 || arr.includes("ALL")) {
+            sp.delete(key);
+        } else {
+            sp.set(key, arr.join(","));
+        }
+    }
+
+    function normalizeAi(sp) {
+        if (sp.get("ai") !== "true") sp.delete("ai");
+    }
+
+    function toggle(list, value, { exclusiveJH = false } = {}) {
+        // cuisines 전용: JH는 단독
+        if (exclusiveJH && value === "JH") return ["JH"];
+        // ALL 선택은 제거(=조건 없음)
+        if (value === "ALL") return [];
+        const has = list.includes(value);
+        if (has) return list.filter(x => x !== value);
+        // 기존에 ALL이나 JH가 있으면 교체
+        if (exclusiveJH && list.includes("JH")) return [value];
+        if (list.includes("ALL")) return [value];
+        return [...list, value];
+    }
+
+    document.querySelectorAll(".category").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const url = new URL(window.location.href);
+            const sp = url.searchParams;
+
+            // 현재 상태 읽기
+            let cuisines = getList(sp, "cuisines");
+            let situations = getList(sp, "situations");
+            let locations = getList(sp, "locations");
+
             if (btn.dataset.cuisine) {
-                let cuisineList = cuisineParam.split(',').map(item => item.trim());
-                const newCuisine = btn.dataset.cuisine
-                if (newCuisine === 'ALL') {
-                    cuisineList = ['ALL']
-                } else if (newCuisine === 'JH') {
-                    cuisineList = ['JH']
-                } else {
-                    if (btn.classList.contains('unselected')) {
-                        if (cuisineList.includes('ALL') || cuisineList.includes('JH')) {
-                            cuisineList = [newCuisine];
-                        } else {
-                            cuisineList.push(newCuisine)
-                        }
-                    } else if (btn.classList.contains('selected')) {
-                        cuisineList = cuisineList.filter(item => item !== newCuisine);
-                    }
-                }
-                if (cuisineList.length === 0) {
-                    cuisineList = ['ALL']
-                }
-                var apiUrl = `/tier?cuisines=${cuisineList.join(',')}&situations=${situationParam}&locations=${locationParam}`;
-                window.location.href = apiUrl;
+                const v = btn.dataset.cuisine;
+                cuisines = toggle(cuisines, v, { exclusiveJH: true });
+                setList(sp, "cuisines", cuisines);
+
             } else if (btn.dataset.situation) {
-                let situationList = situationParam.split(',').map(item => item.trim());
-                const newSituation = btn.dataset.situation
-                if (newSituation === 'ALL') {
-                    situationList = ['ALL']
-                } else {
-                    if (btn.classList.contains('unselected')) {
-                        if (situationList.includes('ALL')) {
-                            situationList = [newSituation];
-                        } else {
-                            situationList.push(newSituation)
-                        }
-                    } else if (btn.classList.contains('selected')) {
-                        situationList = situationList.filter(item => item !== newSituation);
-                    }
-                }
-                if (situationList.length === 0) {
-                    situationList = ['ALL']
-                }
-                var apiUrl = `/tier?cuisines=${cuisineParam}&situations=${situationList.join(',')}&locations=${locationParam}`;
-                window.location.href = apiUrl;
+                const v = btn.dataset.situation;
+                situations = toggle(situations, v);
+                setList(sp, "situations", situations);
+
             } else if (btn.dataset.location) {
-                let locationList = locationParam.split(',').map(item => item.trim());
-                const newLocation = btn.dataset.location
-                if (newLocation === 'ALL') {
-                    locationList = ['ALL']
-                } else {
-                    if (btn.classList.contains('unselected')) {
-                        if (locationList.includes('ALL')) {
-                            locationList = [newLocation];
-                        } else {
-                            locationList.push(newLocation)
-                        }
-                    } else if (btn.classList.contains('selected')) {
-                        locationList = locationList.filter(item => item !== newLocation);
-                    }
-                }
-                if (locationList.length === 0) {
-                    locationList = ['ALL']
-                }
-                var apiUrl = `/tier?cuisines=${cuisineParam}&situations=${situationParam}&locations=${locationList.join(',')}`;
-                window.location.href = apiUrl;
+                const v = btn.dataset.location;
+                locations = toggle(locations, v);
+                setList(sp, "locations", locations);
             }
-        })
+
+            // ai 정리: true만 유지
+            normalizeAi(sp);
+
+            // 최종 이동
+            window.location.href = url.toString();
+        });
     });
 
 // pc에서도 카테고리의 가로 스크롤을 마우스 드래그로 할 수 있게 해주는 부분
@@ -130,5 +123,26 @@ $(document).ready(function () {
             });
         });
     }
-});
 
+    function aiTier() {
+        // [[ AI TIER 표시 ]]
+        const checkbox = document.getElementById('aiTierCheckbox');
+        // 체크박스 이벤트 리스너
+        checkbox.addEventListener('change', function () {
+            const next = new URL(window.location.href);
+            const params = next.searchParams;
+
+            // page 제거 -> 0 페이지로 이동하도록
+            params.delete('page');
+
+            // aiTier 토글
+            if (this.checked) {
+                params.set(PARAM_AI, 'true');
+            } else {
+                params.delete(PARAM_AI);
+            }
+
+            window.location.href = next.toString();
+        });
+    }
+});

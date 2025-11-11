@@ -57,6 +57,7 @@ public class RestaurantDetailQuery {
                                         restaurantEntity.restaurantId,
                                         restaurantEntity.restaurantImgUrl,
                                         ratingEntity.tier.coalesce(0),
+                                        ratingEntity.isTemp,
                                         restaurantEntity.restaurantCuisine,
                                         restaurantEntity.restaurantPosition,
                                         restaurantEntity.restaurantName,

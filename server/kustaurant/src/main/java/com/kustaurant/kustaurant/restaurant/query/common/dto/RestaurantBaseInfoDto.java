@@ -20,6 +20,7 @@ public class RestaurantBaseInfoDto {
     protected String restaurantPosition;
     protected String restaurantImgUrl;
     protected Integer mainTier;
+    protected Boolean isTempTier;
     protected Double longitude;
     protected Double latitude;
     protected String partnershipInfo;
@@ -30,7 +31,7 @@ public class RestaurantBaseInfoDto {
     @QueryProjection
     public RestaurantBaseInfoDto(
             Long restaurantId, String restaurantName, String restaurantCuisine, String restaurantPosition,
-            String restaurantImgUrl, Integer mainTier, Double longitude, Double latitude,
+            String restaurantImgUrl, Integer mainTier, Boolean isTempTier, Double longitude, Double latitude,
             String partnershipInfo, Double score, Set<String> situations, String restaurantType
     ) {
         this.restaurantId = restaurantId;
@@ -39,6 +40,7 @@ public class RestaurantBaseInfoDto {
         this.restaurantPosition = positionPostprocessing(restaurantPosition);
         this.restaurantImgUrl = restaurantImgUrlPostProcessing(restaurantImgUrl);
         this.mainTier = mainTier;
+        this.isTempTier = isTempTier;
         this.longitude = longitude;
         this.latitude = latitude;
         this.partnershipInfo = partnershipInfo;
@@ -55,6 +57,7 @@ public class RestaurantBaseInfoDto {
         this.restaurantPosition = src.restaurantPosition;
         this.restaurantImgUrl = src.restaurantImgUrl;
         this.mainTier = src.mainTier;
+        this.isTempTier = src.isTempTier;
         this.longitude = src.longitude;
         this.latitude = src.latitude;
         this.partnershipInfo = src.partnershipInfo;
@@ -78,6 +81,4 @@ public class RestaurantBaseInfoDto {
             this.restaurantRanking = ranking;
         }
     }
-
-
 }

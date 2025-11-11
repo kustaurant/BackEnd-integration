@@ -1,5 +1,6 @@
 package com.kustaurant.crawler.aianalysis.domain.model;
 
+import com.kustaurant.crawler.global.exception.AiAnalysisException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,9 @@ public class RestaurantAnalysis {
 
     public static RestaurantAnalysis from(List<ReviewAnalysis> analyses) {
         int total = analyses.size();
+
+        if (total == 0) throw new AiAnalysisException("분석된 AI 리뷰가 없습니다.");
+
         int pos = 0, neg = 0;
         double sum = 0;
         Map<String, Integer> map = new HashMap<>();

@@ -254,7 +254,7 @@ div.basic-info > div.texts > span {
     display: inline-block;
     margin: 5px 10px 5px 0;
     padding: 7px 10px;
-    border-radius: 5px;
+    border-radius: 7px;
     color: #fff;
     font-size: 17px;
     line-height: 18px;
@@ -264,6 +264,47 @@ div.basic-info > div.texts > span {
     width: 20px;
     height: 20px;
 }
+.temp-tier {
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background:
+        linear-gradient(#444, #444) padding-box,  /* 안쪽 배경색 */
+        conic-gradient(
+            #ff6b6b, #ffd93d, #6bcB77, #4d96ff, #b175ff, #ff6b6b
+        ) border-box;
+    box-shadow: 0 0 6px rgba(77,150,255,.35);
+    overflow: visible;
+    --gap: 10px;
+}
+/* 말풍선 박스 */
+.temp-tier::after {
+    content: "AI가 분석한 임시 티어입니다.";
+    position: absolute;
+    top: 50%;
+    left: calc(100% + var(--gap));   /* 배지의 오른쪽 기준으로 고정 */
+    transform: translateY(-50%);
+    white-space: nowrap;
+    background: #333;
+    color: #fff;
+    font-size: 12px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    z-index: 1;
+}
+/* 말풍선 꼬리 */
+.temp-tier::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: calc(100% + var(--gap) - 4px); /* 말풍선의 왼쪽 모서리와 정확히 맞춤 */
+    transform: translateY(-50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: #333;
+    z-index: 0; /* 말풍선 박스 아래쪽으로 */
+}
+
 /* Situation Tier */
 .situation-tier-info {
     display: flex;

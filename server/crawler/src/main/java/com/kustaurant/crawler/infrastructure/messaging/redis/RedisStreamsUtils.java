@@ -1,6 +1,12 @@
 package com.kustaurant.crawler.infrastructure.messaging.redis;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import io.lettuce.core.RedisBusyException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -36,5 +42,28 @@ public class RedisStreamsUtils {
                 throw e;
             }
         }
+    }
+
+    public static Object decodeRec(Object o) {
+        if (o == null) return null;
+        if (o instanceof byte[] b) return new String(b, UTF_8);     // Bulk → String으로
+        if (o instanceof List<?> list) {                            // 멀티 벌크 재귀 변환
+            List<Object> out = new ArrayList<>(list.size());
+            for (Object el : list) out.add(decodeRec(el));
+            return out;
+        }
+        // 이미 String/Long 등으로 들어올 수도 있음
+        return o;
+    }
+
+    public static List<?> asList(Object o) {
+        if (o == null) return List.of();
+        if (o instanceof List<?> l) return l;
+        throw new IllegalStateException("Expected array, got: " + o.getClass());
+    }
+
+    public static String asString(Object o) {
+        if (o == null) return null;
+        return (o instanceof String s) ? s : String.valueOf(o);
     }
 }

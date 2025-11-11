@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class AiAnalysisService {
 
     private static final int MAX_CONCURRENCY = 10;
     private static final int MAX_REVIEWS = 33;
-    private static final Duration perRequestTimeout = Duration.ofSeconds(10);
+    private static final Duration perRequestTimeout = Duration.ofSeconds(30);
     private static final Semaphore semaphore = new Semaphore(MAX_CONCURRENCY);
 
     private final AiProcessor aiProcessor;
@@ -51,7 +52,7 @@ public class AiAnalysisService {
                                             semaphore.release();
                                         }
                                     }, exec)
-//                                    .orTimeout(perRequestTimeout.toMillis(), TimeUnit.MILLISECONDS)
+                                    .orTimeout(perRequestTimeout.toMillis(), TimeUnit.MILLISECONDS)
                                     // 실패 시 대체값/로그
                                     .exceptionally(ex -> ReviewAnalysis.error(review.body(), ex))
                     )

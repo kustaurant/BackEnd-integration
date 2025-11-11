@@ -20,7 +20,7 @@ body {
 }
 /* TABLET */
 @media only screen and (max-width: 1023px) {
-    .category-background, main, .search-area, .rank-description {
+    .category-background, main, .info-area, .rank-description {
         padding: 0 var(--mobile-outer-container-side-width);
         margin: 10px 0;
         min-width: var(--min-width);
@@ -31,7 +31,7 @@ body {
 }
 /* PC */
 @media only screen and (min-width: 1024px) {
-    .category-background, main, .search-area, .rank-description {
+    .category-background, main, .info-area, .rank-description {
         width: var(--pc-outer-container-width);
         max-width: var(--max-width);
         margin: 10px auto;
@@ -163,47 +163,104 @@ div.category-list a.unselected:hover {
 }
 
 /* ---------검색---------- */
-.search-area {
+.info-area {
     display: flex;
     align-items: center;
     justify-content: right;
 }
-.search-container {
+.info-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
 }
-.search-container > span {
+.info-container span {
     display: block;
     font-size: 14px;
     white-space: nowrap;
-    padding-bottom: 5px;
-    padding-right: 6px;
 }
-.search-container > input {
-    width: 210px;
-    caret-color: black;
-    color: #333;
-    border-radius: 4px;
-    border: #444 solid 1px;
-    padding: 4px;
-    margin: 3px 0 8px 0;
-    font-size: 15px;
-    line-height: 22px;
+.info-container > .ai-tier {
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    user-select: none;
+    position: relative;
+    padding-top: 10px;
+}
+.ai-tier .ai-checkbox-container {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    cursor: pointer;
+    gap: 5px;
+}
+.ai-checkbox-container input[type="checkbox"] {
+    cursor: pointer;
+    vertical-align: middle;
+}
+.ai-checkbox-container span {
+    line-height: 1;
+}
+/* ✅ 물음표 동그라미 */
+.ai-tooltip-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #888;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+}
+/* ✅ 말풍선 */
+.ai-tooltip {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.ai-tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 8px 20px 8px 10px;
+    position: absolute;
+    z-index: 1;
+    top: 120%;
+    right: -10px;
+    transform: none;
+    transition: opacity 0.2s;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+/* 삼각형 꼬리 */
+.ai-tooltip-text::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    right: 13px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+}
+/* hover 시 말풍선 표시 */
+.ai-tooltip:hover .ai-tooltip-text {
+    visibility: visible;
+    opacity: 1;
 }
 @media only screen and (max-width: 410px) {
-    .search-container > span {
+    .info-container span {
         font-size: 12px;
     }
-    .search-container > input {
-        width: 180px;
-        font-size: 13px;
-        line-height: 18px;
-    }
-}
-
-#spinner {
-    margin-right: 20px;
 }
 
 /* 순위 설명 */
@@ -339,14 +396,69 @@ tbody > tr > td > div{
     flex-direction: column;
     align-items: flex-start;
 }
-/* media query 적용 */
+/* ========= 티어 이미지 ========= */
 .td-tier-img {
+    display: block;
     width: 36px;
     height: 36px;
     object-fit: cover;
-    margin-right: 10px;
     border-radius: 7px;
+    background: #fff;
 }
+.ai-temp-img {
+    border: #ccc 1px solid;
+}
+/* 티어 이미지 래퍼 */
+.tier-img-wrap {
+    position: relative;
+    display: inline-block;
+    padding: 2px;
+    border-radius: 8px;
+    background: transparent;
+    margin-right: 10px;
+}
+/* 임시 티어: 무지개 강조 테두리 */
+.ai-temp {
+    background: conic-gradient(
+        #ff6b6b, #ffd93d, #6bcB77, #4d96ff, #b175ff, #ff6b6b
+    );
+    box-shadow: 0 0 6px rgba(77,150,255,.35);
+}
+/* 툴팁 */
+.ai-temp-tt {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: calc(100% + 6px);
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 1.35;
+    color: #fff;
+    background-color: #333!important;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .18s ease;
+    z-index: 20;
+}
+/* 말풍선 꼬리 */
+.ai-temp-tt::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: #333;
+}
+/* hover 시 표시 */
+.ai-temp:hover .ai-temp-tt {
+    visibility: visible;
+    opacity: 1;
+}
+/* ============================= */
 .td-cuisine-img {
     width: 34px;
     height: 34px;
@@ -467,7 +579,6 @@ tbody > tr > td > div{
         width: 32px;
         height: 32px;
         object-fit: cover;
-        margin-right: 10px;
     }
     .td-cuisine-img {
         width: 32px;
@@ -499,7 +610,6 @@ tbody > tr > td > div{
         width: 30px;
         height: 30px;
         object-fit: cover;
-        margin-right: 10px;
     }
     .td-cuisine-img {
         width: 30px;
@@ -563,15 +673,6 @@ tbody > tr > td > div{
         display: none;
     }
 }
-
-
-/* 티어표 이미지 */
-tbody > tr > td > div > img {
-    height: 40px;
-    width: 40px;
-    margin-right: 14px;
-}
-
 
 /* 식당 이름에 링크 스타일 제거*/
 .restaurant-link {
