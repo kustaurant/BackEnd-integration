@@ -1,8 +1,5 @@
-
 package com.kustaurant.kustaurant.restaurant.query.chart.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
@@ -32,37 +29,7 @@ public class RestaurantChartController {
 
     public static final Integer TIER_PAGE_SIZE = 30;
 
-    // 티어표 지도 중앙 좌표
-    // 인덱스 0번.전체 | 1번.건입~중문 | 2번.중문~어대 | 3번.후문 | 4번.정문 | 5번.구의역
-    private float[] latitudeArray = {37.542318f, 37.541518f, 37.545520f, 37.545750f, 37.538512f, 37.537962f};
-    private float[] longitudeArray = {127.076467f, 127.069190f, 127.069550f, 127.076875f, 127.077239f, 127.085855f};
-    private int[] zoomArray = {15, 15, 15, 15, 15, 16};
-    private int getPositionIndex(String position) {
-        if (position.equals("전체"))
-            return 0;
-        if (position.equals("건입~중문"))
-            return 1;
-        if (position.equals("중문~어대"))
-            return 2;
-        if (position.equals("후문"))
-            return 3;
-        if (position.equals("정문"))
-            return 4;
-        if (position.equals("구의역"))
-            return 5;
-        return 0;
-    }
-    public String convertObjectToJson(Object object) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // 티어표 화면 리팩토링
+    // 티어표 화면
     @GetMapping("/tier")
     public String tier(
             Model model,
@@ -85,6 +52,7 @@ public class RestaurantChartController {
         model.addAttribute("evaluationsCount", evaluationQueryRepository.countByStatus("ACTIVE"));
         model.addAttribute("paging", data);
         model.addAttribute("queryString", getQueryStringWithoutPage(request));
+        model.addAttribute("aiTier", condition.aiTier());
 
         // 지도 정보 넣어주기
         RestaurantTierMapDTO mapData = restaurantChartService.getRestaurantTierMapDto(condition, user.id());

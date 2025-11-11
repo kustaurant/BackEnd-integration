@@ -23,10 +23,8 @@ public class AiAnalysisScheduler {
     @Scheduled(cron = "0 0 4 * * SAT", zone = "Asia/Seoul")
     public void crawlingInit() {
         List<RestaurantCrawlingInfo> infos = restaurantCrawlerRepo.getRestaurantsForCrawling();
-        infos = infos.subList(2, infos.size());
         for (RestaurantCrawlingInfo info : infos) {
-            AiAnalysisRequest req = new AiAnalysisRequest(info.restaurantId(),
-                    info.url(), List.of());
+            AiAnalysisRequest req = new AiAnalysisRequest(info.restaurantId(), info.url(), List.of());
             messagePublisher.publish(messagingProps.aiAnalysisStart(), JsonUtils.serialize(req));
         }
     }

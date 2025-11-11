@@ -1,5 +1,6 @@
 package com.kustaurant.crawler.aianalysis.service;
 
+import com.kustaurant.crawler.aianalysis.messaging.AiAnalysisSubscriber;
 import com.kustaurant.crawler.aianalysis.messaging.MessagingProps;
 import com.kustaurant.crawler.aianalysis.messaging.dto.AiAnalysisRequest;
 import com.kustaurant.crawler.aianalysis.service.port.RestaurantCrawlerRepo;
@@ -21,13 +22,21 @@ public class AiAnalysisInitializer {
     private final MessagingProps messagingProps;
 
     @EventListener(ApplicationReadyEvent.class)
-    public void crawlingInit() {
-        List<RestaurantCrawlingInfo> infos = restaurantCrawlerRepo.getRestaurantsForCrawling();
-        infos = infos.subList(2, infos.size());
-        for (RestaurantCrawlingInfo info : infos) {
-            AiAnalysisRequest req = new AiAnalysisRequest(info.restaurantId(),
-                    info.url(), List.of());
-            messagePublisher.publish(messagingProps.aiAnalysisStart(), JsonUtils.serialize(req));
+    public void crawlingInit() throws InterruptedException {
+        // 기존 큐 검사 작업 먼저 진행하기 위해.
+        Thread.sleep(1000);
+        AiAnalysisSubscriber.readLock().lock();
+
+        try {
+            List<RestaurantCrawlingInfo> infos = restaurantCrawlerRepo.getRestaurantsForCrawling();
+//            infos = infos.subList(0, Math.min(100, infos.size()));
+            for (RestaurantCrawlingInfo info : infos) {
+                AiAnalysisRequest req = new AiAnalysisRequest(info.restaurantId(), info.url(), List.of());
+                messagePublisher.publish(messagingProps.aiAnalysisStart(),
+                        JsonUtils.serialize(req));
+            }
+        } finally {
+            AiAnalysisSubscriber.readLock().unlock();
         }
     }
 }

@@ -6,6 +6,7 @@ import com.kustaurant.crawler.aianalysis.domain.service.AiAnalysisService;
 import com.kustaurant.crawler.aianalysis.domain.service.CrawlingService;
 import com.kustaurant.crawler.aianalysis.messaging.dto.AiAnalysisRequest;
 import com.kustaurant.crawler.aianalysis.service.port.RatingCrawlerRepo;
+import com.kustaurant.crawler.global.exception.AiAnalysisException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,19 +26,14 @@ public class AiAnalysisOrchestrator {
     @Transactional
     public void execute(AiAnalysisRequest req) {
         // 리뷰 크롤링
-        try {
-            List<Review> reviews = crawlingService.crawl(req.url());
-            if (reviews.isEmpty()) {
-                log.info("크롤링된 리뷰가 없습니다. 요청: {}", req);
-                return;
-            }
-            log.info("식당 ID {} 크롤링 완료. 리뷰 수: {}", req.restaurantId(), reviews.size());
-            // AI 전처리
-            RestaurantAnalysis result = aiAnalysisService.analyzeReviews(reviews, req.situations());
-            log.info("식당 ID {} AI 처리 완료.", req.restaurantId());
-            ratingCrawlerRepo.upsertRating(req.restaurantId(), result);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        List<Review> reviews = crawlingService.crawl(req.url());
+        if (reviews.isEmpty()) {
+            throw new AiAnalysisException("No crawled review. / request: " + req);
         }
+        log.info("restaurant ID {} crawling complete. review counts: {}", req.restaurantId(), reviews.size());
+        // AI 전처리
+        RestaurantAnalysis result = aiAnalysisService.analyzeReviews(reviews, req.situations());
+        log.info("restaurant ID {} AI processing complete.", req.restaurantId());
+        ratingCrawlerRepo.upsertRating(req.restaurantId(), result);
     }
 }

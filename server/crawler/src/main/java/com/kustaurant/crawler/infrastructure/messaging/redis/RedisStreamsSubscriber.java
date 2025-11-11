@@ -1,7 +1,9 @@
 package com.kustaurant.crawler.infrastructure.messaging.redis;
 
+import com.kustaurant.crawler.aianalysis.messaging.AiAnalysisSubscriber;
 import com.kustaurant.crawler.global.util.JsonUtils;
 import com.kustaurant.crawler.infrastructure.messaging.MessageSubscriber;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -22,10 +24,8 @@ import org.springframework.stereotype.Component;
 public class RedisStreamsSubscriber implements MessageSubscriber {
 
     private final ExecutorService workerPool = Executors.newFixedThreadPool(1);
-
     private final StreamMessageListenerContainer<String, MapRecord<String, String, String>> listenerContainer;
     private final StringRedisTemplate redisTemplate;
-
     private final ConcurrentMap<String, Subscription> subscriptions = new ConcurrentHashMap<>();
 
     public RedisStreamsSubscriber(
@@ -41,9 +41,9 @@ public class RedisStreamsSubscriber implements MessageSubscriber {
     }
 
     @Override
-    public <T> void subscribe(String topic, String group, String consumerName, Class<T> type,
-            Consumer<T> handler) {
-
+    public <T> void subscribe(
+            String topic, String group, String consumerName, Class<T> type, Consumer<T> handler
+    ) {
         // 구독 시작
         Subscription sub = listenerContainer.receive(
                 org.springframework.data.redis.connection.stream.Consumer.from(group, consumerName),
@@ -51,19 +51,20 @@ public class RedisStreamsSubscriber implements MessageSubscriber {
                 (MapRecord<String, String, String> message) -> {
                     workerPool.submit(() -> { // 스레드 풀로 넘김
                         try {
+                            AiAnalysisSubscriber.readLock().lock();
                             String payload = message.getValue().get("payload");
                             RecordId id = message.getId();
-                            log.info("[Stream Id: {}] 메시지 수신됨. 내용: {}", id, payload);
+                            log.info("[Stream Id: {}] message received. content: {}", id, payload);
 
                             // 비즈니스 로직 처리
                             handler.accept(JsonUtils.deserialize(payload, type));
 
-                        // ack
-                        redisTemplate.opsForStream().acknowledge(
-                                topic, group, id
-                        );
+                            // ack
+                            redisTemplate.opsForStream().acknowledge(topic, group, id);
                         } catch (Exception e) {
-                            log.error("[Stream Id: {}] id crawling 메시지 처리 과정에서 에러 발생", message.getId(), e);
+                            log.warn("[Stream Id: {}] error occur when process a streams message.", message.getId(), e);
+                        } finally {
+                            AiAnalysisSubscriber.readLock().unlock();
                         }
                     });
                 }

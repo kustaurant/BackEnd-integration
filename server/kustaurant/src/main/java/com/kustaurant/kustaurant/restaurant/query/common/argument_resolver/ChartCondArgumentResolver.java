@@ -40,8 +40,14 @@ public class ChartCondArgumentResolver implements HandlerMethodArgumentResolver 
         List<Long> situations = parseSituations(webRequest);
         List<String> cuisines = parseCuisines(webRequest);
         List<String> locations = parseLocations(webRequest);
+        boolean aiTier = parseAiTier(webRequest);
 
-        return new ChartCondition(cuisines, situations, locations, TierFilter.ALL, pageable);
+        return new ChartCondition(cuisines, situations, locations, TierFilter.ALL, pageable, aiTier);
+    }
+
+    private boolean parseAiTier(NativeWebRequest webRequest) {
+        String aiParam = webRequest.getParameter("ai");
+        return aiParam != null && aiParam.equals("true");
     }
 
     private Pageable parsePageable(NativeWebRequest webRequest) {

@@ -38,6 +38,7 @@ public interface RestaurantApiDoc {
           - restaurantId: not null
           - restaurantImgUrl: not null
           - mainTier: not null
+          - isTempTier: not null
           - restaurantCuisine: not null
           - restaurantCuisineImgUrl: not null
           - restaurantPosition: not null

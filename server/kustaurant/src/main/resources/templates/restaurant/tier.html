@@ -242,19 +242,30 @@
         <button id="mapCloseButton">닫기</button>
     </div>
 </div>
-<div class="search-area">
+<div class="info-area">
     <div class="map-open-button-outer">
         <button id="mapOpenButton">
             <img src="/img/tier/map.png">
             <span>지도에서 보기</span>
         </button>
     </div>
-    <div class="search-container">
-<!--        <div id="spinner" style="display: none" class="spinner-border text-success" role="status">-->
-<!--            <span class="visually-hidden">Loading...</span>-->
-<!--        </div>-->
+    <div class="info-container">
         <span>평가를 비롯한 여러 지표를 통해 티어가 산출됩니다.</span>
-<!--        <input id="searchInput" type="text" spellcheck="false">-->
+        <div class="ai-tier">
+            <label class="ai-checkbox-container">
+                <input type="checkbox" id="aiTierCheckbox" th:checked="${aiTier}"/>
+                <span>AI 기반 임식 티어 포함</span>
+            </label>
+            <div class="ai-tooltip">
+                <div class="ai-tooltip-icon">?</div>
+                <div class="ai-tooltip-text">
+                    체크하시면,<br>
+                    평가 데이터가 부족해 티어를 확인할 수 없는 식당도<br>
+                    AI가 분석한 임시 티어가 적용되어<br>
+                    티어표에 함께 표시됩니다.
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <main id="tierChartMain">
@@ -303,7 +314,17 @@
                     </div>
                 </td>
                 <td th:if="${!isJH}" class="td-center" style="min-width: 42px">
-                    <img th:if="${restaurantTierData.mainTier > 0}" class="td-tier-img" th:src="${restaurantTierData.getTierImgUrl()}">
+                    <div th:if="${restaurantTierData.mainTier > 0}"
+                         class="tier-img-wrap"
+                         th:classappend="${restaurantTierData.isTempTier} ? ' ai-temp'">
+                        <img class="td-tier-img" th:classappend="${restaurantTierData.isTempTier} ? ' ai-temp-img'"
+                             th:src="${restaurantTierData.getTierImgUrl()}" alt="tier"/>
+
+                        <!-- 임시 티어일 때만 툴팁 노출 -->
+                        <div class="ai-temp-tt" th:if="${restaurantTierData.isTempTier}">
+                            AI가 분석한 임시 티어입니다.
+                        </div>
+                    </div>
                     <span th:if="${restaurantTierData.mainTier < 1}" style="padding-right: 10px;">-</span>
                 </td>
                 <td style="min-width: 46px">

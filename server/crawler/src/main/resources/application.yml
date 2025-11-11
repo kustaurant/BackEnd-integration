@@ -1,7 +1,7 @@
 server.port: 8081
 
 spring:
-  application.name: DataProcessor
+  application.name: crawler
   config:
     import:
       - "optional:file:server/crawler/.env[.properties]"

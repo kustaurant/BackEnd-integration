@@ -10,7 +10,8 @@ public record ChartCondition(
         List<Long> situations,
         List<String> positions,
         TierFilter tierFilter,
-        Pageable pageable
+        Pageable pageable,
+        boolean aiTier
 ) {
     // 캐시 키 추가를 위한 기본1개 + 덕지덕지 로직2개
     public String cacheKey() {
@@ -43,7 +44,7 @@ public record ChartCondition(
 
     public ChartCondition changeTierFilter(TierFilter newFilter) {
         return new ChartCondition(
-                cuisines, situations, positions, newFilter, pageable
+                cuisines, situations, positions, newFilter, pageable, aiTier
         );
     }
 
@@ -63,7 +64,7 @@ public record ChartCondition(
 
     public ChartCondition removePaging() {
         return new ChartCondition(
-                cuisines, situations, positions, tierFilter, Pageable.unpaged()
+                cuisines, situations, positions, tierFilter, Pageable.unpaged(), aiTier
         );
     }
 }

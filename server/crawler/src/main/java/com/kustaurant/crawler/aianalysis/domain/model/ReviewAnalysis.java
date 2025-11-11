@@ -18,7 +18,7 @@ public record ReviewAnalysis(
 ) {
 
     public static Optional<ReviewAnalysis> error(String body, Throwable ex) {
-        log.error(body, ex);
+        log.warn(body, ex);
         return Optional.empty();
     }
 
