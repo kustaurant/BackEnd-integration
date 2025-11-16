@@ -11,9 +11,9 @@ import java.util.Optional;
 public interface RestaurantFavoriteJpaRepository extends JpaRepository<RestaurantFavoriteEntity, Integer> {
     Optional<RestaurantFavoriteEntity> findByUserIdAndRestaurantId(Long userId, Long restaurantId);
 
-    long countByRestaurantIdAndStatus(Long restaurantId, String status);
+    Long countByRestaurantIdAndStatus(Long restaurantId, String status);
 
-    long deleteByUserIdAndRestaurantId(Long userId, Long restaurantId);
+    Long deleteByUserIdAndRestaurantId(Long userId, Long restaurantId);
 
     @Query("""
         SELECT rf FROM RestaurantFavoriteEntity rf
