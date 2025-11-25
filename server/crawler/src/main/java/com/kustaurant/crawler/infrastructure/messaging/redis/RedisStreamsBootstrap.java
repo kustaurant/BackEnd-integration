@@ -1,6 +1,6 @@
 package com.kustaurant.crawler.infrastructure.messaging.redis;
 
-import com.kustaurant.crawler.aianalysis.messaging.MessagingProps;
+import com.kustaurant.crawler.aianalysis.adapter.in.messaging.MessagingProps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;

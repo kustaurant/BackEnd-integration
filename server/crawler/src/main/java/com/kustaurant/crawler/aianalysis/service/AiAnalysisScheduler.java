@@ -1,7 +1,7 @@
 package com.kustaurant.crawler.aianalysis.service;
 
-import com.kustaurant.crawler.aianalysis.messaging.MessagingProps;
-import com.kustaurant.crawler.aianalysis.messaging.dto.AiAnalysisRequest;
+import com.kustaurant.crawler.aianalysis.adapter.in.messaging.MessagingProps;
+import com.kustaurant.crawler.aianalysis.adapter.in.messaging.dto.AiAnalysisRequest;
 import com.kustaurant.crawler.aianalysis.service.port.RestaurantCrawlerRepo;
 import com.kustaurant.crawler.aianalysis.service.port.RestaurantCrawlingInfo;
 import com.kustaurant.crawler.global.util.JsonUtils;

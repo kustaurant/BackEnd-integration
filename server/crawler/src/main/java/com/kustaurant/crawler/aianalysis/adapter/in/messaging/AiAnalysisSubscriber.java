@@ -1,7 +1,7 @@
-package com.kustaurant.crawler.aianalysis.messaging;
+package com.kustaurant.crawler.aianalysis.adapter.in.messaging;
 
 import com.kustaurant.crawler.aianalysis.service.AiAnalysisOrchestrator;
-import com.kustaurant.crawler.aianalysis.messaging.dto.AiAnalysisRequest;
+import com.kustaurant.crawler.aianalysis.adapter.in.messaging.dto.AiAnalysisRequest;
 import com.kustaurant.crawler.infrastructure.messaging.MessageSubscriber;
 import com.kustaurant.crawler.infrastructure.messaging.redis.RedisStreamsReclaimer;
 import java.util.UUID;

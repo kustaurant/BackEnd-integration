@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.aianalysis.infrastructure.ai.dto;
+package com.kustaurant.crawler.aianalysis.adapter.out.ai.dto;
 
 import com.kustaurant.crawler.aianalysis.domain.model.Sentiment;
 

@@ -1,9 +1,8 @@
 package com.kustaurant.crawler.infrastructure.messaging.redis;
 
-import com.kustaurant.crawler.aianalysis.messaging.AiAnalysisSubscriber;
+import com.kustaurant.crawler.aianalysis.adapter.in.messaging.AiAnalysisSubscriber;
 import com.kustaurant.crawler.global.util.JsonUtils;
 import com.kustaurant.crawler.infrastructure.messaging.MessageSubscriber;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;

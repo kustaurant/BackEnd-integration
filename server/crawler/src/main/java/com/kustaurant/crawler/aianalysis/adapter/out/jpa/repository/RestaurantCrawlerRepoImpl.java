@@ -1,8 +1,7 @@
-package com.kustaurant.crawler.aianalysis.infrastructure.repository;
+package com.kustaurant.crawler.aianalysis.adapter.out.jpa.repository;
 
 import com.kustaurant.crawler.aianalysis.service.port.RestaurantCrawlerRepo;
 import com.kustaurant.crawler.aianalysis.service.port.RestaurantCrawlingInfo;
-import com.kustaurant.crawler.global.config.TimeConfig;
 import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
 import com.kustaurant.jpa.restaurant.repository.RestaurantJpaRepository;
 import java.time.Clock;
@@ -20,11 +19,12 @@ public class RestaurantCrawlerRepoImpl implements RestaurantCrawlerRepo {
 
     @Override
     public List<RestaurantCrawlingInfo> getRestaurantsForCrawling() {
-        return restaurantJpaRepository
-                .findByStatusAndAiProcessedAtBefore("ACTIVE", LocalDateTime.now(clock).minusMonths(1))
-                .stream()
-                .map(RestaurantCrawlerRepoImpl::mapToDto)
-                .toList();
+//        return restaurantJpaRepository
+//                .findByStatusAndAiProcessedAtBefore("ACTIVE", LocalDateTime.now(clock).minusMonths(1))
+//                .stream()
+//                .map(RestaurantCrawlerRepoImpl::mapToDto)
+//                .toList();
+        return List.of();
     }
 
     private static RestaurantCrawlingInfo mapToDto(RestaurantEntity entity) {

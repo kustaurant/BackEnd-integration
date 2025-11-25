@@ -1,10 +1,9 @@
-package com.kustaurant.crawler.aianalysis.infrastructure.ai;
+package com.kustaurant.crawler.aianalysis.adapter.out.ai;
 
 import com.kustaurant.crawler.aianalysis.domain.model.Review;
 import com.kustaurant.crawler.aianalysis.domain.model.ReviewAnalysis;
 import com.kustaurant.crawler.aianalysis.domain.service.port.AiProcessor;
-import com.kustaurant.crawler.aianalysis.infrastructure.ai.dto.ScoreResponse;
-import com.kustaurant.crawler.aianalysis.infrastructure.ai.dto.SituationsResponse;
+import com.kustaurant.crawler.aianalysis.adapter.out.ai.dto.ScoreResponse;
 import com.kustaurant.crawler.global.util.JsonUtils;
 import java.util.List;
 import java.util.Optional;

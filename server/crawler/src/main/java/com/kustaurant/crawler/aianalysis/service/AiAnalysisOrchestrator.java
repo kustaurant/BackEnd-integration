@@ -4,7 +4,7 @@ import com.kustaurant.crawler.aianalysis.domain.model.RestaurantAnalysis;
 import com.kustaurant.crawler.aianalysis.domain.model.Review;
 import com.kustaurant.crawler.aianalysis.domain.service.AiAnalysisService;
 import com.kustaurant.crawler.aianalysis.domain.service.CrawlingService;
-import com.kustaurant.crawler.aianalysis.messaging.dto.AiAnalysisRequest;
+import com.kustaurant.crawler.aianalysis.adapter.in.messaging.dto.AiAnalysisRequest;
 import com.kustaurant.crawler.aianalysis.service.port.RatingCrawlerRepo;
 import com.kustaurant.crawler.global.exception.AiAnalysisException;
 import java.util.List;

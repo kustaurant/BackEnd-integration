@@ -21,11 +21,4 @@ public interface RestaurantJpaRepository extends JpaRepository<RestaurantEntity,
     @Transactional
     @Query("update RestaurantEntity r set r.visitCount = r.visitCount + 1 where r.restaurantId = :id")
     int incrementViews(@Param("id") long id);
-
-    @Query("select r from RestaurantEntity r "
-            + "inner join RatingEntity ra on r.restaurantId = ra.restaurantId "
-            + "where r.status = :status "
-            + "and (ra.aiProcessedAt is null or ra.aiProcessedAt < :threshold)")
-    List<RestaurantEntity> findByStatusAndAiProcessedAtBefore(
-            @Param("status") String status, @Param("threshold") LocalDateTime threshold);
 }

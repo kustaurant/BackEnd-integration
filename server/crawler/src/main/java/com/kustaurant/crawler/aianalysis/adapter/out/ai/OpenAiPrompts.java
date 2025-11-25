@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.aianalysis.infrastructure.ai;
+package com.kustaurant.crawler.aianalysis.adapter.out.ai;
 
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.kustaurant.crawler.aianalysis.domain.model.Sentiment;

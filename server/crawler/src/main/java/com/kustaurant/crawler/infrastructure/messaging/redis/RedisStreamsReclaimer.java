@@ -2,7 +2,7 @@ package com.kustaurant.crawler.infrastructure.messaging.redis;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.kustaurant.crawler.aianalysis.messaging.AiAnalysisSubscriber;
+import com.kustaurant.crawler.aianalysis.adapter.in.messaging.AiAnalysisSubscriber;
 import com.kustaurant.crawler.global.util.JsonUtils;
 import io.lettuce.core.StreamMessage;
 import io.lettuce.core.XAutoClaimArgs;

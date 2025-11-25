@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.aianalysis.infrastructure.crawler;
+package com.kustaurant.crawler.aianalysis.adapter.out.crawler;
 
 import static com.kustaurant.crawler.infrastructure.crawler.playwright.PlaywrightManager.closeResourcesByThread;
 import static com.kustaurant.crawler.infrastructure.crawler.playwright.PlaywrightManager.getPage;
