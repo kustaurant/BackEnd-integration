@@ -1,5 +1,6 @@
 package com.kustaurant.crawler.aianalysis.adapter.out.jpa.entity;
 
+import com.kustaurant.crawler.aianalysis.domain.model.JobStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.aianalysis.adapter.out.jpa.entity;
+package com.kustaurant.crawler.aianalysis.domain.model;
 
 public enum JobStatus {
     PENDING,
