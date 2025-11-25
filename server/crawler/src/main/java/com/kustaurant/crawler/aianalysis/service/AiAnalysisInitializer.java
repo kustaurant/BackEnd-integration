@@ -21,7 +21,7 @@ public class AiAnalysisInitializer {
     private final MessagePublisher<String> messagePublisher;
     private final MessagingProps messagingProps;
 
-    @EventListener(ApplicationReadyEvent.class)
+//    @EventListener(ApplicationReadyEvent.class)
     public void crawlingInit() throws InterruptedException {
         // 기존 큐 검사 작업 먼저 진행하기 위해.
         Thread.sleep(1000);

@@ -1,0 +1,115 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "default": false,
+        "type": "loki",
+        "uid": "loki-main"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": false,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki-main"
+          },
+          "editorMode": "code",
+          "expr": "{job=\"crawler\"}\r\n| json\r\n| line_format `{{ __timestamp__ | date \"2006-01-02T15:04:05.000Z07:00\" }} [{{ .level }}] [{{ .thread_name }}] {{ .logger_name }} : {{ .message | replace \"\\n\" \"\\n\" }}`",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Log of Spring Crawler",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "loki",
+        "uid": "loki-main"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 2,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": false,
+        "sortOrder": "Descending",
+        "wrapLogMessage": false
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "loki-main"
+          },
+          "editorMode": "code",
+          "expr": "{job=\"crawler\", level=\"ERROR\"} \r\n| json \r\n| line_format `{{ __timestamp__ | date \"2006-01-02T15:04:05.000Z07:00\" }} [{{ .level }}] [{{ .thread_name }}] {{ .logger_name }} : {{ .message | replace \"\\n\" \"\\n\" }}{{ if eq .level \"ERROR\" }}\\n{{ .stack_trace | replace \"\\n\" \"\\n\" }}{{ end }}`",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Log of Spring Cralwer",
+      "type": "logs"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Cralwer Observability",
+  "uid": "af55ou30yu3nkb",
+  "version": 6,
+  "weekStart": ""
+}
