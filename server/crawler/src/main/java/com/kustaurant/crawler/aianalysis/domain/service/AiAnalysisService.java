@@ -3,7 +3,7 @@ package com.kustaurant.crawler.aianalysis.domain.service;
 import com.kustaurant.crawler.aianalysis.domain.model.RestaurantAnalysis;
 import com.kustaurant.crawler.aianalysis.domain.model.Review;
 import com.kustaurant.crawler.aianalysis.domain.model.ReviewAnalysis;
-import com.kustaurant.crawler.aianalysis.domain.service.port.AiProcessor;
+import com.kustaurant.crawler.aianalysis.adapter.out.ai.AiProcessor;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

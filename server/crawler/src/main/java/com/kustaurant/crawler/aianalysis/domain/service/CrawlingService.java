@@ -1,7 +1,7 @@
 package com.kustaurant.crawler.aianalysis.domain.service;
 
 import com.kustaurant.crawler.aianalysis.domain.model.Review;
-import com.kustaurant.crawler.aianalysis.domain.service.port.ReviewCrawler;
+import com.kustaurant.crawler.aianalysis.adapter.out.crawler.ReviewCrawler;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

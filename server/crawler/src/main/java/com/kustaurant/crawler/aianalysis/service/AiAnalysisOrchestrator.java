@@ -5,7 +5,6 @@ import com.kustaurant.crawler.aianalysis.domain.model.Review;
 import com.kustaurant.crawler.aianalysis.domain.service.AiAnalysisService;
 import com.kustaurant.crawler.aianalysis.domain.service.CrawlingService;
 import com.kustaurant.crawler.aianalysis.adapter.in.messaging.dto.AiAnalysisRequest;
-import com.kustaurant.crawler.aianalysis.service.port.RatingCrawlerRepo;
 import com.kustaurant.crawler.global.exception.AiAnalysisException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ public class AiAnalysisOrchestrator {
     private final CrawlingService crawlingService;
     private final AiAnalysisService aiAnalysisService;
 
-    private final RatingCrawlerRepo ratingCrawlerRepo;
 
     @Transactional
     public void execute(AiAnalysisRequest req) {
@@ -34,6 +32,6 @@ public class AiAnalysisOrchestrator {
         // AI 전처리
         RestaurantAnalysis result = aiAnalysisService.analyzeReviews(reviews, req.situations());
         log.info("restaurant ID {} AI processing complete.", req.restaurantId());
-        ratingCrawlerRepo.upsertRating(req.restaurantId(), result);
+//        ratingCrawlerRepo.upsertRating(req.restaurantId(), result);
     }
 }
