@@ -16,3 +16,12 @@ streams:
 logging:
   level:
     org.springframework.ai.retry: ERROR
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    prometheus:
+      enabled: true

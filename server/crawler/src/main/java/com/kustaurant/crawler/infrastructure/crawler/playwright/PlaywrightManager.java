@@ -5,19 +5,36 @@ import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PlaywrightManager {
 
     private static final double DEFAULT_TIMEOUT_MILLIS = 60_000;
     private static final boolean HEADLESS_MODE = true;
+
+    private static final AtomicInteger ACTIVE_BROWSERS = new AtomicInteger(0);
+
+    public PlaywrightManager(MeterRegistry registry) {
+        Gauge.builder("playwright_active_browsers", ACTIVE_BROWSERS, AtomicInteger::get)
+                .description("현재 실행 중인 Playwright 브라우저 수")
+                .register(registry);
+    }
     
-    public static <T> T crawl(Function<Page, T> function) {
+    public <T> T crawl(Function<Page, T> function) {
+        ACTIVE_BROWSERS.incrementAndGet();
+
         try (Playwright pw = createPlaywright()) {
             Browser browser = createBrowser(pw);
             Page page = createPage(browser);
             return function.apply(page);
+        } finally {
+            ACTIVE_BROWSERS.decrementAndGet();
         }
     }
 

@@ -20,11 +20,13 @@ public class PlaywrightReviewCrawler implements ReviewCrawler {
 
     private static final int MAX_MORE_CLICK_COUNT = 20;
 
+    private final PlaywrightManager playwrightManager;
+
     @Override
     public List<String> crawlReviews(String url) {
         List<String> reviews = new ArrayList<>();
 
-        return PlaywrightManager.crawl(page -> {
+        return playwrightManager.crawl(page -> {
             // 사이트 이동
             page.navigate(url);
             // iframe#entryIframe 으로 이동
