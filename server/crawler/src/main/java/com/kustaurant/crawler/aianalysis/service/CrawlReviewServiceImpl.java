@@ -8,7 +8,7 @@ import com.kustaurant.crawler.aianalysis.adapter.out.messaging.MessagingProps;
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.AiAnalysisJobRepo;
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.RestaurantCrawlerRepo;
 import com.kustaurant.crawler.aianalysis.domain.model.AiAnalysisJob;
-import com.kustaurant.crawler.aianalysis.domain.model.Review;
+import com.kustaurant.crawler.aianalysis.domain.model.AiAnalysisReview;
 import com.kustaurant.crawler.aianalysis.service.port.CrawlReviewService;
 import com.kustaurant.crawler.global.util.JsonUtils;
 import java.time.Clock;
@@ -37,13 +37,13 @@ public class CrawlReviewServiceImpl implements CrawlReviewService {
         AiAnalysisJob job = jobRepo.findJob(req.jobId());
 
         try {
-            List<Review> reviews = getReviews(
+            List<String> reviews = getReviews(
                     restaurantRepo.getRestaurantUrl(job.getRestaurantId()));
 
             job.startJob(reviews.size(), LocalDateTime.now(clock));
 
             publisher.publish(props.aiAnalysisReview(), reviews.stream()
-                    .map(r -> new AiAnalysisReq(req.jobId(), job.getRestaurantId(), r.body()))
+                    .map(r -> new AiAnalysisReq(req.jobId(), job.getRestaurantId(), r))
                     .map(JsonUtils::serialize)
                     .toList());
         } catch (Exception e) {
@@ -54,12 +54,11 @@ public class CrawlReviewServiceImpl implements CrawlReviewService {
         }
     }
 
-    private List<Review> getReviews(String url) {
+    private List<String> getReviews(String url) {
         return reviewCrawler
                 .crawlReviews(url)
                 .stream()
-                .filter(Review::isValid)
-                .map(Review::new)
+                .filter(AiAnalysisReview::isValid)
                 .toList();
     }
 }

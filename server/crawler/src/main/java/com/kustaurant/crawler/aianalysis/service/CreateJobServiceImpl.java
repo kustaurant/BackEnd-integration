@@ -5,7 +5,7 @@ import com.kustaurant.crawler.aianalysis.adapter.out.messaging.MessagePublisher;
 import com.kustaurant.crawler.aianalysis.adapter.out.messaging.MessagingProps;
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.AiAnalysisJobRepo;
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.RestaurantCrawlerRepo;
-import com.kustaurant.crawler.aianalysis.adapter.out.persistence.dto.RestaurantCrawlingInfo;
+import com.kustaurant.crawler.aianalysis.adapter.out.persistence.RestaurantCrawlingInfo;
 import com.kustaurant.crawler.aianalysis.domain.model.AiAnalysisJob;
 import com.kustaurant.crawler.aianalysis.service.port.CreateJobService;
 import com.kustaurant.crawler.global.util.JsonUtils;

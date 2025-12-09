@@ -1,5 +1,6 @@
 package com.kustaurant.crawler.aianalysis.adapter.out.persistence.jpa.entity;
 
+import com.kustaurant.crawler.aianalysis.domain.model.AiAnalysisReview;
 import com.kustaurant.crawler.aianalysis.domain.model.Sentiment;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,4 +52,30 @@ public class AiAnalysisReviewEntity {
     @Column(name = "updated_at", nullable = false,
             columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
+
+    public static AiAnalysisReviewEntity from(AiAnalysisReview aiAnalysisReview) {
+        return AiAnalysisReviewEntity.builder()
+                .id(aiAnalysisReview.getId())
+                .jobId(aiAnalysisReview.getJobId())
+                .restaurantId(aiAnalysisReview.getRestaurantId())
+                .sentiment(aiAnalysisReview.getSentiment())
+                .score(aiAnalysisReview.getScore())
+                .analyzedText(aiAnalysisReview.getAnalyzedText())
+                .createdAt(aiAnalysisReview.getCreatedAt())
+                .updatedAt(aiAnalysisReview.getUpdatedAt())
+                .build();
+    }
+
+    public AiAnalysisReview toModel() {
+        return AiAnalysisReview.builder()
+                .id(this.id)
+                .jobId(this.jobId)
+                .restaurantId(this.restaurantId)
+                .sentiment(this.sentiment)
+                .score(this.score)
+                .analyzedText(this.analyzedText)
+                .createdAt(this.createdAt)
+                .updatedAt(this.updatedAt)
+                .build();
+    }
 }

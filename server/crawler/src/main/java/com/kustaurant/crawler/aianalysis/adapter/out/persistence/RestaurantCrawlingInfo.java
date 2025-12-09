@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.aianalysis.adapter.out.persistence.dto;
+package com.kustaurant.crawler.aianalysis.adapter.out.persistence;
 
 public record RestaurantCrawlingInfo(
         long restaurantId,

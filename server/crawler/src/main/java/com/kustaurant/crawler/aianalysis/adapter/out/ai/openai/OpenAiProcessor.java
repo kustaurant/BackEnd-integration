@@ -2,8 +2,7 @@ package com.kustaurant.crawler.aianalysis.adapter.out.ai.openai;
 
 import com.kustaurant.crawler.aianalysis.adapter.out.ai.AiProcessor;
 import com.kustaurant.crawler.aianalysis.adapter.out.ai.openai.dto.ScoreResponse;
-import com.kustaurant.crawler.aianalysis.domain.model.Review;
-import com.kustaurant.crawler.aianalysis.domain.model.ReviewAnalysis;
+import com.kustaurant.crawler.aianalysis.adapter.out.ai.ReviewAnalysis;
 import com.kustaurant.crawler.global.util.JsonUtils;
 import java.util.List;
 import java.util.Optional;
@@ -20,9 +19,9 @@ public class OpenAiProcessor implements AiProcessor {
     private final OpenAiChatModel openAiChatModel;
 
     @Override
-    public Optional<ReviewAnalysis> analyzeReview(Review review, List<String> situations) {
+    public Optional<ReviewAnalysis> analyzeReview(String review) {
         String scoreJson = openAiChatModel.call(
-                OpenAiPrompts.getMainScorePrompt(List.of(1, 2, 3, 4, 5), review.body())
+                OpenAiPrompts.getMainScorePrompt(List.of(1, 2, 3, 4, 5), review)
         ).getResult().getOutput().getText();
 
         ScoreResponse scoreRes = JsonUtils.deserialize(scoreJson, ScoreResponse.class);

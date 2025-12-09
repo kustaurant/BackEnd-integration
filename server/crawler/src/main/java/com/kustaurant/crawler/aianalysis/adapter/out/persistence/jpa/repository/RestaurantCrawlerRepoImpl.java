@@ -1,7 +1,7 @@
 package com.kustaurant.crawler.aianalysis.adapter.out.persistence.jpa.repository;
 
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.RestaurantCrawlerRepo;
-import com.kustaurant.crawler.aianalysis.adapter.out.persistence.dto.RestaurantCrawlingInfo;
+import com.kustaurant.crawler.aianalysis.adapter.out.persistence.RestaurantCrawlingInfo;
 import com.kustaurant.crawler.aianalysis.domain.model.JobStatus;
 import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
 import com.kustaurant.jpa.restaurant.repository.RestaurantJpaRepository;

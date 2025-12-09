@@ -44,4 +44,17 @@ public class AiAnalysisJob {
         status = JobStatus.FAILED;
         updatedAt = now;
     }
+
+    public boolean complete() {
+        // 아직 모든 리뷰가 처리되지 않음
+        if (this.totalReviews > this.processedReviews + this.failedReviews) {
+            return false;
+        }
+
+        boolean isComplete = this.processedReviews * 1.0 / this.totalReviews >= 0.8;
+
+        this.status = isComplete ? JobStatus.DONE : JobStatus.FAILED;
+
+        return isComplete;
+    }
 }

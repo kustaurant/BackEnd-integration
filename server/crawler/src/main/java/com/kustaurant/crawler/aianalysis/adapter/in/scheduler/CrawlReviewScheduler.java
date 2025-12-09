@@ -39,7 +39,7 @@ public class CrawlReviewScheduler {
 
     private final String consumerName = UUID.randomUUID().toString();
 
-    @Scheduled(fixedRate = 7_000)
+    @Scheduled(fixedRate = 5_000)
     public void execute() {
         if (!canStartNextJob()) return;
 
