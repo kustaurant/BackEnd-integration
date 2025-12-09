@@ -53,7 +53,7 @@ public class AnalyzeReviewServiceImpl implements AnalyzeReviewService {
 
         // job 이 끝난 경우 식당 분석 Summary 생성
         AiAnalysisJob job = aiAnalysisJobRepo.findJob(jobId);
-        if (job.complete()) {
+        if (job.complete(LocalDateTime.now(clock))) {
             AiSummary summary = aiSummaryRepo.findByRestaurantId(restaurantId)
                     .orElse(AiSummary.create(restaurantId, LocalDateTime.now(clock)));
             List<AiAnalysisReview> reviews = aiAnalysisReviewRepo.findAllByJobId(jobId);
