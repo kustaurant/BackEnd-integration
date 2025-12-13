@@ -11,3 +11,17 @@ services:
     environment:
       - LOKI_HOST=${LOKI_HOST}
     restart: unless-stopped
+
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: crawler-node-exporter
+    ports:
+      - "9100:9100"
+    pid: host
+    volumes:
+      - /:/host:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    command:
+      - '--path.rootfs=/host'
+    restart: unless-stopped

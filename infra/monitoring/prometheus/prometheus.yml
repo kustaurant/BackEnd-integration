@@ -16,3 +16,7 @@ scrape_configs:
     scrape_interval: 1s
     static_configs:
       - targets: ['${CRAWLER_HOST}']
+
+  - job_name: 'crawler-node-exporter'
+    static_configs:
+      - targets: [ '${CRAWLER_NODE_EXPORTER}' ]
