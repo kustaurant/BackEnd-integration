@@ -37,8 +37,7 @@ public class CrawlReviewServiceImpl implements CrawlReviewService {
         AiAnalysisJob job = jobRepo.findJob(req.jobId());
 
         try {
-            List<String> reviews = getReviews(
-                    restaurantRepo.getRestaurantUrl(job.getRestaurantId()));
+            List<String> reviews = getReviewsByCrawling(restaurantRepo.getRestaurantUrl(job.getRestaurantId()));
 
             job.startJob(reviews.size(), LocalDateTime.now(clock));
 
@@ -54,7 +53,7 @@ public class CrawlReviewServiceImpl implements CrawlReviewService {
         }
     }
 
-    private List<String> getReviews(String url) {
+    private List<String> getReviewsByCrawling(String url) {
         return reviewCrawler
                 .crawlReviews(url)
                 .stream()

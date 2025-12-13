@@ -8,6 +8,8 @@ import lombok.Getter;
 @Builder
 public class AiAnalysisJob {
 
+    private static final int MIN_REVIEW_COUNT = 10;
+
     private Long id;
     private Long restaurantId;
     private JobStatus status;
@@ -32,8 +34,8 @@ public class AiAnalysisJob {
     public void startJob(int totalReviews, LocalDateTime now) {
         if (status != JobStatus.PENDING)
             throw new IllegalStateException("Job is not pending. Job Id: " + id +  ", Status: " + status);
-        if (totalReviews <= 0)
-            throw new IllegalArgumentException("Total reviews must be greater than 0.");
+        if (totalReviews <= MIN_REVIEW_COUNT)
+            throw new IllegalArgumentException("Total reviews must be greater than " + MIN_REVIEW_COUNT + ".");
         this.totalReviews = totalReviews;
         startedAt = now;
         updatedAt = now;
