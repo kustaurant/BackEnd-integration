@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Profile;
  * @param aiAnalysisDlq
  * @param group - 현재 프로세스의 컨슈머 그룹명
  */
-@Profile("!test")
 @ConfigurationProperties(prefix = "streams")
 public record MessagingProps(
         String aiAnalysisCrawling,

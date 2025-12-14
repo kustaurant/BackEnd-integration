@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlaywrightManager {
 
-    private static final double DEFAULT_TIMEOUT_MILLIS = 60_000;
+    private static final double DEFAULT_TIMEOUT_MILLIS = 20_000;
     private static final boolean HEADLESS_MODE = true;
 
     private static final AtomicInteger ACTIVE_BROWSERS = new AtomicInteger(0);
@@ -44,7 +44,7 @@ public class PlaywrightManager {
                 .setIsMobile(false)
                 .setHasTouch(false)
                 .setLocale("ko-KR")
-                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Whale/4.34.340.19 Safari/537.36"));
+                .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0"));
 
         Page page = ctx.newPage();
         page.setDefaultTimeout(DEFAULT_TIMEOUT_MILLIS);

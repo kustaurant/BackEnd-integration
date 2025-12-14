@@ -33,16 +33,26 @@ public class AiAnalysisJob {
 
     public void startJob(int totalReviews, LocalDateTime now) {
         if (status != JobStatus.PENDING)
-            throw new IllegalStateException("Job is not pending. Job Id: " + id +  ", Status: " + status);
+            throw new IllegalStateException(
+                    String.format("Job is not pending. Job Id: %d, Status: %s", id, status));
         if (totalReviews <= MIN_REVIEW_COUNT)
-            throw new IllegalArgumentException("Total reviews must be greater than " + MIN_REVIEW_COUNT + ".");
+            throw new IllegalArgumentException(
+                    String.format("Total reviews must be greater than %d. current reviews: %d",
+                            MIN_REVIEW_COUNT, totalReviews));
         this.totalReviews = totalReviews;
         startedAt = now;
         updatedAt = now;
         status = JobStatus.RUNNING;
     }
 
-    public void failJob(LocalDateTime now) {
+    public void doneJob(LocalDateTime now) {
+        status = JobStatus.DONE;
+        completedAt = now;
+        updatedAt = now;
+    }
+
+    public void failJob(String failMsg, LocalDateTime now) {
+        errorMessage = failMsg;
         status = JobStatus.FAILED;
         updatedAt = now;
     }
@@ -55,8 +65,10 @@ public class AiAnalysisJob {
 
         boolean isComplete = this.processedReviews * 1.0 / this.totalReviews >= 0.8;
 
-        this.status = isComplete ? JobStatus.DONE : JobStatus.FAILED;
-        this.completedAt = now;
+        if (isComplete)
+            doneJob(now);
+        else
+            failJob("The proportion of successfully analyzed reviews is below the threshold.", now);
 
         return isComplete;
     }

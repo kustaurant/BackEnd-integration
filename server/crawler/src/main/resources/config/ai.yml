@@ -5,7 +5,7 @@ spring:
       backoff:
         initial-interval: 1000
         multiplier: 3
-      max-attempts: 20
+      max-attempts: 3
     openai:
       api-key: ${OPEN_AI_KEY}
       chat:

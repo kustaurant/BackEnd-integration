@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.global.config.jpa;
+package com.kustaurant.jpa.common;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

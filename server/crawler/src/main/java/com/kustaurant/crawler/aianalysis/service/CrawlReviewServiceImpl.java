@@ -46,8 +46,8 @@ public class CrawlReviewServiceImpl implements CrawlReviewService {
                     .map(JsonUtils::serialize)
                     .toList());
         } catch (Exception e) {
-            job.failJob(LocalDateTime.now(clock));
-            log.warn("crawling and publishing failed. payload={}", req, e);
+            job.failJob(e.getMessage(), LocalDateTime.now(clock));
+//            log.warn("crawling and publishing failed. payload={}", req, e);
         } finally {
             jobRepo.save(job);
         }

@@ -30,7 +30,7 @@ public class CrawlReviewScheduler {
             MAX_CONCURRENT_JOBS, MAX_CONCURRENT_JOBS,
             0L, TimeUnit.MILLISECONDS,
             new SynchronousQueue<>(),
-            (r, executor) -> log.warn("all threads in thread pool are busy — job skipped")
+            (r, executor) -> log.warn("[CrawlReviewScheduler] all threads in thread pool are busy — job skipped")
     );
 
     private final CrawlReviewService crawlReviewService;
