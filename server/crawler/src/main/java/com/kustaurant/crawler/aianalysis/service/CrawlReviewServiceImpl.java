@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CrawlReviewServiceImpl implements CrawlReviewService {
 
+    private final int MAX_REVIEWS = 50;
+
     private final AiAnalysisJobRepo jobRepo;
     private final RestaurantCrawlerRepo restaurantRepo;
     private final ReviewCrawler reviewCrawler;
@@ -58,6 +60,7 @@ public class CrawlReviewServiceImpl implements CrawlReviewService {
                 .crawlReviews(url)
                 .stream()
                 .filter(AiAnalysisReview::isValid)
+                .limit(MAX_REVIEWS)
                 .toList();
     }
 }

@@ -11,6 +11,7 @@ public class AiAnalysisJob {
     private static final int MIN_REVIEW_COUNT = 10;
 
     private Long id;
+    private Long version;
     private Long restaurantId;
     private JobStatus status;
     private int totalReviews;
@@ -29,6 +30,11 @@ public class AiAnalysisJob {
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
+    }
+
+    public void updateReviewCount(boolean success) {
+        if (success) processedReviews++;
+        else failedReviews++;
     }
 
     public void startJob(int totalReviews, LocalDateTime now) {

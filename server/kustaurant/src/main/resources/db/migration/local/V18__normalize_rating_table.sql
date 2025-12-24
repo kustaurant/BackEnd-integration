@@ -12,6 +12,8 @@ DROP COLUMN ai_processed_at;
 CREATE TABLE ai_analysis_job (
     id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 
+    version           BIGINT NOT NULL DEFAULT 0,
+
     restaurant_id     BIGINT UNSIGNED NOT NULL,
 
     status ENUM('PENDING', 'RUNNING', 'DONE', 'FAILED') NOT NULL DEFAULT 'PENDING',

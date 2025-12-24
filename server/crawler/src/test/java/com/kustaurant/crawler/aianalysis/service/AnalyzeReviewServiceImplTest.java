@@ -59,7 +59,7 @@ class AnalyzeReviewServiceImplTest {
         long jobId = aiAnalysisJobRepo.save(job);
 
         List<Future<?>> futures = new ArrayList<>();
-        int count = 100;
+        int count = 200;
         for (int i = 0; i < count; i++) {
             futures.add(WORKER_POOL.submit(() -> analyzeReviewService.analyzeAndSave(
                     new AiAnalysisReq(jobId, restaurantId, "너무 너무 맛있어요. 근데 조금 아쉽기도 하고. 근데 좋았습니다."))));

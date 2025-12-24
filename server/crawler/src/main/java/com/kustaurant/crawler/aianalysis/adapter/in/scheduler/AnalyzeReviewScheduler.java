@@ -27,9 +27,8 @@ public class AnalyzeReviewScheduler {
     private static final ExecutorService WORKER_POOL = new ThreadPoolExecutor(
             MAX_CONCURRENT_JOBS, MAX_CONCURRENT_JOBS,
             0L, TimeUnit.MILLISECONDS,
-            new SynchronousQueue<>()
-//            ,
-//            (r, executor) -> log.warn("[AnalyzeReviewScheduler] all threads in thread pool are busy — job skipped")
+            new SynchronousQueue<>(),
+            new ThreadPoolExecutor.DiscardPolicy()
     );
 
     private final MessageReader messageReader;

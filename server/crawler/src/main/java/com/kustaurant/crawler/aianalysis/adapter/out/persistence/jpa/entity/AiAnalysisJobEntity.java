@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,9 @@ public class AiAnalysisJobEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    private Long version;
 
     @Column(name = "restaurant_id", nullable = false)
     private Long restaurantId;
@@ -64,6 +68,7 @@ public class AiAnalysisJobEntity {
     public static AiAnalysisJobEntity from(AiAnalysisJob domain) {
         return AiAnalysisJobEntity.builder()
                 .id(domain.getId())
+                .version(domain.getVersion())
                 .restaurantId(domain.getRestaurantId())
                 .status(domain.getStatus())
                 .totalReviews(domain.getTotalReviews())
@@ -80,6 +85,7 @@ public class AiAnalysisJobEntity {
     public AiAnalysisJob toModel() {
         return AiAnalysisJob.builder()
                 .id(this.id)
+                .version(this.version)
                 .restaurantId(this.restaurantId)
                 .status(this.status)
                 .totalReviews(this.totalReviews)
