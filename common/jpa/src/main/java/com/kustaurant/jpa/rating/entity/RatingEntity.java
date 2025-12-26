@@ -51,4 +51,14 @@ public class RatingEntity {
         this.ratedAt = ratedAt;
         this.finalScore = finalScore;
     }
+
+    public void updateRatingData(
+            double selfScore, int tier, boolean isTemp, LocalDateTime ratedAt, double finalScore
+    ) {
+        this.selfScore = selfScore;
+        this.tier = tier;
+        this.isTemp = isTemp;
+        this.ratedAt = ratedAt;
+        this.finalScore = finalScore;
+    }
 }

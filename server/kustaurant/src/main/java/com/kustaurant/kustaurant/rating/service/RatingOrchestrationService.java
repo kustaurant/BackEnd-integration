@@ -6,6 +6,7 @@ import com.kustaurant.kustaurant.rating.domain.service.ScoreCalculationService;
 import com.kustaurant.kustaurant.rating.domain.vo.EvaluationWithContext;
 import com.kustaurant.kustaurant.rating.domain.service.TierCalculationService;
 import com.kustaurant.kustaurant.rating.domain.vo.GlobalStats;
+import com.kustaurant.kustaurant.rating.domain.vo.Tier;
 import com.kustaurant.kustaurant.rating.service.port.AiSummaryRepository;
 import com.kustaurant.kustaurant.rating.service.port.RatingEvaluationRepository;
 import com.kustaurant.kustaurant.rating.service.port.RatingRepository;

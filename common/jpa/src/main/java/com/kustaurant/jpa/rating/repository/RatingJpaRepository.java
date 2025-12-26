@@ -11,11 +11,4 @@ import org.springframework.data.repository.query.Param;
 
 public interface RatingJpaRepository extends JpaRepository<RatingEntity, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select r from RatingEntity r where r.restaurantId in :ids")
-    List<RatingEntity> findAllByIdInForUpdate(@Param("ids") List<Long> ids);
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("select r from RatingEntity r where r.restaurantId = :id")
-    Optional<RatingEntity> findByIdForUpdate(@Param("id") long id);
 }
