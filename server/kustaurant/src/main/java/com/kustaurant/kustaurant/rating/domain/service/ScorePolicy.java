@@ -65,7 +65,7 @@ public class ScorePolicy {
         // coverage 기반 z-score 가중 평균
         double coverage = clamp01(aiEval.getCoverage());
         double wSent = clamp(L0 + L1 * coverage, L0, L0 + L1);
-        double zMix = (zSent * wSent + zRate * (1 - wSent)) / 3.5;
+        double zMix = (zSent * wSent + zRate * (1 - wSent)) / 5;
 
         // 자체 평가 분포에 맞게 점수화
         double aiScore = meanSelf + stdSelf * zMix;

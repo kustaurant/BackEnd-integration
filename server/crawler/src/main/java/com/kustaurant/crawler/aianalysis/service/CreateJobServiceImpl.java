@@ -29,7 +29,7 @@ public class CreateJobServiceImpl implements CreateJobService {
         List<RestaurantCrawlingInfo> infos = restaurantCrawlerRepo.getRestaurantsForCrawling();
         LocalDateTime now = LocalDateTime.now(clock);
 
-        for (RestaurantCrawlingInfo info : infos.subList(0, Math.min(infos.size(), 20))) {
+        for (RestaurantCrawlingInfo info : infos) {
             createJobTxService.createJob(info, now);
         }
 

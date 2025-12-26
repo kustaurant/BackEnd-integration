@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AnalyzeReviewScheduler {
 
-    private static final int MAX_CONCURRENT_JOBS = 10;
+    private static final int MAX_CONCURRENT_JOBS = 20;
 
     private static final ExecutorService WORKER_POOL = new ThreadPoolExecutor(
             MAX_CONCURRENT_JOBS, MAX_CONCURRENT_JOBS,
