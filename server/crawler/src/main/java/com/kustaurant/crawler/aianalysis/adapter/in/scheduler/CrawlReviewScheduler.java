@@ -70,6 +70,10 @@ public class CrawlReviewScheduler {
         double usage = SystemMemoryUtils.getSystemMemoryUsage();
         long available = SystemMemoryUtils.getAvailableMemory();
 
-        return usage <= MAX_MEMORY_USAGE || available >= MIN_AVAILABLE_MEMORY_BYTES;
+        boolean canStart = usage <= MAX_MEMORY_USAGE || available >= MIN_AVAILABLE_MEMORY_BYTES;
+        if (!canStart) {
+            log.info("memory usage: {}%, available: {}bytes", usage, available);
+        }
+        return canStart;
     }
 }
