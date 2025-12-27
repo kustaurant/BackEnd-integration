@@ -7,12 +7,13 @@ services:
     restart: always
 
   prometheus:
-    image: prom/prometheus:v2.54.1
+    build: ../../monitoring/prometheus
     container_name: kustaurant-prometheus
     ports:
-      - "9090:9090"  # 로컬/외부 접근 허용 (보안그룹 유의)
-    volumes:
-      - ../../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - "9090:9090"
+    environment:
+      - CRAWLER_HOST=${CRAWLER_HOST}
+      - CRAWLER_NODE_EXPORTER=${CRAWLER_NODE_EXPORTER}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
