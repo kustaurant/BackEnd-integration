@@ -1013,7 +1013,7 @@
             "uid": "loki-main"
           },
           "editorMode": "code",
-          "expr": "{job=\"kustaurant\"} \r\n| json \r\n| line_format `{{ index . \"@timestamp\" }} {{ .level }} [{{ .thread_name }}] {{ .logger_name }} : {{ .message | replace \"\\n\" \"\\n\" }}`",
+          "expr": "{job=\"kustaurant\"} \r\n| json \r\n| line_format `{{ __timestamp__ | date \"2006-01-02T15:04:05.000Z07:00\" }} [{{ .level }}] [{{ .thread_name }}] {{ .logger_name }} : {{ .message | replace \"\\n\" \"\\n\" }}`",
           "hide": false,
           "queryType": "range",
           "refId": "A"
@@ -1052,7 +1052,7 @@
             "uid": "loki-main"
           },
           "editorMode": "code",
-          "expr": "{job=\"kustaurant\", level=\"ERROR\"} | json | line_format `{{ index . \"@timestamp\" }} {{ .level }} [{{ .thread_name }}] {{ .logger_name }} : {{ .message | replace \"\\n\" \"\\n\" }}{{ if eq .level \"ERROR\" }}\\n{{ .stack_trace | replace \"\\n\" \"\\n\" }}{{ end }}`",
+          "expr": "{job=\"kustaurant\", level=\"ERROR\"}\r\n| json \r\n| line_format `{{ __timestamp__ | date \"2006-01-02T15:04:05.000Z07:00\" }} [{{ .level }}] [{{ .thread_name }}] {{ .logger_name }} : {{ .message | replace \"\\n\" \"\\n\" }}{{ if eq .level \"ERROR\" }}\\n{{ .stack_trace | replace \"\\n\" \"\\n\" }}{{ end }}`",
           "queryType": "range",
           "refId": "A"
         }
@@ -1124,6 +1124,6 @@
   "timezone": "",
   "title": "Spring Boot Observability",
   "uid": "dLsDQIUnzb",
-  "version": 3,
+  "version": 9,
   "weekStart": ""
 }
