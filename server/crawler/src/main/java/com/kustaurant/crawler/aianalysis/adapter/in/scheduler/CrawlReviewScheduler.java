@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
 public class CrawlReviewScheduler {
 
     private static final int MAX_CONCURRENT_JOBS = 5;
-    private static final double MAX_MEMORY_USAGE = 0.7;
-    private static final long MIN_AVAILABLE_MEMORY_BYTES = 300_000_000L;
+    private static final double MAX_MEMORY_USAGE = 0.8;
+    private static final long MIN_AVAILABLE_MEMORY_BYTES = 150_000_000L;
 
     private final ExecutorService WORKER_POOL = new ThreadPoolExecutor(
             MAX_CONCURRENT_JOBS, MAX_CONCURRENT_JOBS,
