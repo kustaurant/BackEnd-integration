@@ -24,7 +24,7 @@ public class AnalyzeReviewScheduler {
 
     private static final int MAX_CONCURRENT_JOBS = 20;
 
-    private static final ExecutorService WORKER_POOL = new ThreadPoolExecutor(
+    private final ExecutorService WORKER_POOL = new ThreadPoolExecutor(
             MAX_CONCURRENT_JOBS, MAX_CONCURRENT_JOBS,
             0L, TimeUnit.MILLISECONDS,
             new SynchronousQueue<>(),

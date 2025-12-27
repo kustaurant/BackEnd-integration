@@ -20,6 +20,8 @@ public class AiAnalysisReviewRepoImpl implements AiAnalysisReviewRepo {
 
     @Override
     public List<AiAnalysisReview> findAllByJobId(long jobId) {
-        return jpaRepo.findByJobId(jobId);
+        return jpaRepo.findByJobId(jobId).stream()
+                .map(AiAnalysisReviewEntity::toModel)
+                .toList();
     }
 }

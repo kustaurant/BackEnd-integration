@@ -1,4 +1,4 @@
-package com.kustaurant.jpa.restaurant.repository;
+package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository;
 
 import com.kustaurant.jpa.restaurant.entity.RestaurantFavoriteEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

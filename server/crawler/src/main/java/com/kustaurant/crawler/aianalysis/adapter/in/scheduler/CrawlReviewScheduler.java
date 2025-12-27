@@ -26,7 +26,7 @@ public class CrawlReviewScheduler {
     private static final double MAX_MEMORY_USAGE = 0.7;
     private static final long MIN_AVAILABLE_MEMORY_BYTES = 300_000_000L;
 
-    private static final ExecutorService WORKER_POOL = new ThreadPoolExecutor(
+    private final ExecutorService WORKER_POOL = new ThreadPoolExecutor(
             MAX_CONCURRENT_JOBS, MAX_CONCURRENT_JOBS,
             0L, TimeUnit.MILLISECONDS,
             new SynchronousQueue<>(),
@@ -39,7 +39,7 @@ public class CrawlReviewScheduler {
 
     private final String consumerName = UUID.randomUUID().toString();
 
-    @Scheduled(fixedRate = 5_000)
+    @Scheduled(fixedRate = 10_000)
     public void execute() {
         if (!canStartNextJob()) return;
 

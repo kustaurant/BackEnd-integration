@@ -44,6 +44,8 @@ public class RedisStreamsReader implements MessageReader {
         MapRecord<String, Object, Object> record = messages.get(0);
         String payloadJson = (String) record.getValue().get("payload");
         if (payloadJson == null || payloadJson.isBlank()) {
+            ack(topic, group, record.getId());
+            log.warn("skip blank payload message. recordId={}", record.getId());
             return Optional.empty();
         }
         T payload = JsonUtils.deserialize(payloadJson, type);

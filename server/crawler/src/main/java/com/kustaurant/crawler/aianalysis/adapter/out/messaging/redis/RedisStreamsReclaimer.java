@@ -70,7 +70,7 @@ public class RedisStreamsReclaimer<T> {
         this.handler = handler;
     }
 
-    @Scheduled(fixedDelayString = "30000") // 30초마다
+//    @Scheduled(fixedDelayString = "30000") // 30초마다
     public void start() {
         if (!running.compareAndSet(false, true)) return;
 

@@ -27,17 +27,22 @@ public class OpenAiProcessor implements AiProcessor {
 
     @Override
     public Optional<ReviewAnalysis> analyzeReview(String review) {
-        ChatResponse res = openAiChatModel.call(
-                OpenAiPrompts.getMainScorePrompt(List.of(1, 2, 3, 4, 5), review)
-        );
-        manageRateLimit(res.getMetadata().getRateLimit());
-        String scoreJson = res.getResult().getOutput().getText();
+        try {
+            ChatResponse res = openAiChatModel.call(
+                    OpenAiPrompts.getMainScorePrompt(List.of(1, 2, 3, 4, 5), review)
+            );
+            manageRateLimit(res.getMetadata().getRateLimit());
+            String scoreJson = res.getResult().getOutput().getText();
 
-        ScoreResponse scoreRes = JsonUtils.deserialize(scoreJson, ScoreResponse.class);
+            ScoreResponse scoreRes = JsonUtils.deserialize(scoreJson, ScoreResponse.class);
 
-        return Optional.of(new ReviewAnalysis(
-                review, scoreRes.score(), scoreRes.sentiment(), null
-        ));
+            return Optional.of(new ReviewAnalysis(
+                    review, scoreRes.score(), scoreRes.sentiment(), null
+            ));
+        } catch (Exception e) {
+            log.warn("error occured in OpenAiProcessor-analyzeReview", e);
+            return Optional.empty();
+        }
     }
 
     private void manageRateLimit(RateLimit rateLimit) {

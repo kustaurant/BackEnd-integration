@@ -30,9 +30,11 @@ public class PlaywrightManager {
         ACTIVE_BROWSERS.incrementAndGet();
 
         try (Playwright pw = createPlaywright()) {
-            Browser browser = createBrowser(pw);
-            Page page = createPage(browser);
-            return function.apply(page);
+            try (Browser browser = createBrowser(pw)) {
+                try (Page page = createPage(browser)) {
+                    return function.apply(page);
+                }
+            }
         } finally {
             ACTIVE_BROWSERS.decrementAndGet();
         }

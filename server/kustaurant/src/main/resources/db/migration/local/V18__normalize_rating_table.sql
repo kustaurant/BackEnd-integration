@@ -18,7 +18,7 @@ CREATE TABLE ai_analysis_job (
 
     status ENUM('PENDING', 'RUNNING', 'DONE', 'FAILED') NOT NULL DEFAULT 'PENDING',
 
-    total_reviews     INT         NOT NULL,          -- 이번 Job에서 처리해야 할 리뷰 개수
+    total_reviews     INT         NOT NULL DEFAULT 0,-- 이번 Job에서 처리해야 할 리뷰 개수
     processed_reviews INT         NOT NULL DEFAULT 0,-- 처리 완료된 리뷰 개수
     failed_reviews    INT         NOT NULL DEFAULT 0,-- 실패한 리뷰 개수
 
