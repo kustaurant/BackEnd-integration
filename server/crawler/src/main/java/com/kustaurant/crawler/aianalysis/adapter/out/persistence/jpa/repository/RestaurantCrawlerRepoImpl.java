@@ -21,7 +21,7 @@ public class RestaurantCrawlerRepoImpl implements RestaurantCrawlerRepo {
     public List<RestaurantCrawlingInfo> getRestaurantsForCrawling() {
         List<RestaurantEntity> restaurants = restaurantJpaRepo.findRestaurantsForCrawling(
                 "ACTIVE",
-                LocalDateTime.now(clock).minusMinutes(1),
+                LocalDateTime.now(clock).minusMonths(1),
                 JobStatus.getEndStatus()
         );
 
