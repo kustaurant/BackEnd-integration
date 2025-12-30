@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CrawlReviewScheduler {
 
-    private static final int MAX_CONCURRENT_JOBS = 5;
+    private static final int MAX_CONCURRENT_JOBS = 1;
     private static final double MAX_MEMORY_USAGE = 0.8;
     private static final long MIN_AVAILABLE_MEMORY_BYTES = 150_000_000L;
 

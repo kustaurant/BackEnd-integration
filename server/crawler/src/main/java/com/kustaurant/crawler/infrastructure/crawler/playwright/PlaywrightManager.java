@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlaywrightManager {
 
-    private static final double DEFAULT_TIMEOUT_MILLIS = 20_000;
+    private static final double DEFAULT_TIMEOUT_MILLIS = 10_000;
     private static final boolean HEADLESS_MODE = true;
 
     private static final AtomicInteger ACTIVE_BROWSERS = new AtomicInteger(0);

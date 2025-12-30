@@ -221,7 +221,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "playwright_active_browsers",
+          "expr": "playwright_active_browsers{job=\"crawler-host\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -236,41 +236,50 @@
             "type": "prometheus",
             "uid": "prom-main"
           },
+          "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "sum(jvm_memory_used_bytes{area=\"heap\"}) / 1024 / 1024",
+          "expr": "sum(jvm_memory_used_bytes{area=\"heap\", job=\"crawler-host\"}) / 1024 / 1024",
+          "fullMetaSearch": false,
           "hide": false,
+          "includeNullMetadata": true,
           "instant": false,
           "interval": "",
           "legendFormat": "heap used (MB)",
           "range": true,
-          "refId": "B"
+          "refId": "B",
+          "useBackend": false
         },
         {
           "datasource": {
             "type": "prometheus",
             "uid": "prom-main"
           },
+          "disableTextWrap": false,
           "editorMode": "code",
-          "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100",
+          "expr": "(node_memory_MemTotal_bytes{job=\"crawler-node-exporter\"} - node_memory_MemAvailable_bytes{job=\"crawler-node-exporter\"}) / node_memory_MemTotal_bytes{job=\"crawler-node-exporter\"} * 100",
+          "fullMetaSearch": false,
           "hide": false,
+          "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "system memory used (%)",
           "range": true,
-          "refId": "C"
+          "refId": "C",
+          "useBackend": false
         }
       ],
       "title": "Active Browsers & Memory Info",
       "type": "timeseries"
     }
   ],
+  "refresh": "",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-15m",
-    "to": "now"
+    "from": "2025-12-30T05:01:21.741Z",
+    "to": "2025-12-30T05:31:21.741Z"
   },
   "timepicker": {},
   "timezone": "browser",
