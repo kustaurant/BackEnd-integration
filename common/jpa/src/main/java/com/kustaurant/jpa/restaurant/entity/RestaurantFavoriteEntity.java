@@ -30,5 +30,4 @@ public class RestaurantFavoriteEntity extends BaseTimeEntity {
     private Long restaurantId;
 
     private String status;
-
 }
