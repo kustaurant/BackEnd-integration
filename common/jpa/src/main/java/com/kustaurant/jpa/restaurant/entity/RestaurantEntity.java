@@ -18,6 +18,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @JsonIgnoreProperties({"createdAt", "updatedAt"})
 @Table(name = "restaurant")
 public class RestaurantEntity extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long restaurantId;
@@ -38,5 +39,4 @@ public class RestaurantEntity extends BaseTimeEntity {
     private String partnershipInfo;
 
     private String status;
-
 }
