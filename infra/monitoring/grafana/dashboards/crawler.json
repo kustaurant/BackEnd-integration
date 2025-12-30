@@ -278,8 +278,8 @@
     "list": []
   },
   "time": {
-    "from": "2025-12-30T05:01:21.741Z",
-    "to": "2025-12-30T05:31:21.741Z"
+    "from": "now-15m",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
