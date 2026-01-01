@@ -36,11 +36,11 @@ public class RestaurantChartService {
     private final ChartRankingAssembler chartRankingAssembler;
 
     // 조건에 맞는 식당 리스트를 반환
-//    @Cacheable(
-//            cacheNames = "restaurantChartPage",
-//            key = "#condition.cacheKey()",
-//            unless = "#result == null || #result.getContent().isEmpty()"
-//    )
+    @Cacheable(
+            cacheNames = "restaurantChartPage",
+            key = "#condition.cacheKey()",
+            unless = "#result == null || #result.getContent().isEmpty()"
+    )
     @Observed(name = "tier.service.findBasePage")
     public Page<RestaurantBaseInfoDto> findBasePage(ChartCondition condition) {
         Page<Long> ids = restaurantChartRepository.getRestaurantIdsWithPage(condition);
