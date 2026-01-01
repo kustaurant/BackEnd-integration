@@ -8,6 +8,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoD
 import com.kustaurant.kustaurant.restaurant.query.chart.service.RestaurantChartService;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTO;
+import io.micrometer.observation.annotation.Observed;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @Controller
 @Slf4j
 public class RestaurantChartController {
+
     private final EvaluationQueryRepository evaluationQueryRepository;
     private final RestaurantChartService restaurantChartService;
 
@@ -31,6 +33,7 @@ public class RestaurantChartController {
 
     // 티어표 화면
     @GetMapping("/tier")
+    @Observed(name = "tier.controller")
     public String tier(
             Model model,
             @ChartCond ChartCondition condition,

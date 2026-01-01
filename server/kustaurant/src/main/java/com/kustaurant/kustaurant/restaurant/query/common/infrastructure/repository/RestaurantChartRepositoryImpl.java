@@ -11,6 +11,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.micrometer.observation.annotation.Observed;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
      */
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    @Observed(name = "tier.repository.getRestaurantIdsWithPage")
     public Page<Long> getRestaurantIdsWithPage(ChartCondition condition) {
         Pageable pageable = condition.pageable() != null ? condition.pageable() : Pageable.unpaged();
 

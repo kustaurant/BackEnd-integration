@@ -20,6 +20,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import io.micrometer.observation.annotation.Observed;
 import java.util.*;
 
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class RestaurantCoreInfoRepository {
     private final RestaurantCommonExpressions restaurantCommonExpressions;
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    @Observed(name = "tier.repository.getRestaurantTiersBase")
     public List<RestaurantBaseInfoDto> getRestaurantTiersBase(List<Long> ids) {
         Map<Long, RestaurantBaseInfoDto> map = queryFactory
                 .from(restaurantEntity)
