@@ -32,7 +32,8 @@ public class AiAnalysisJob {
                 .build();
     }
 
-    public void updateReviewCount(boolean success) {
+    public void updateReviewCount(boolean success, LocalDateTime now) {
+        updatedAt = now;
         if (success) processedReviews++;
         else failedReviews++;
     }
