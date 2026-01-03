@@ -53,10 +53,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                 )
                 .orderBy(
                         // 티어가 있는 것이 먼저 오고, 티어 기준 오름차순 정렬
-                        new CaseBuilder()
-                                .when(ratingEntity.tier.lt(0)).then(1)
-                                .otherwise(0)
-                                .asc(),
+                        ratingEntity.hasTier.desc(),
                         ratingEntity.tier.asc(),
                         ratingEntity.finalScore.desc()
                 )

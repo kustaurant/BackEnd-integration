@@ -70,6 +70,7 @@ public class RestaurantCoreInfoRepository {
                 .toList();
     }
 
+    @Observed
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Set<Long> findUserEvaluatedIds(Long userId, List<Long> restaurantIds) {
         return new HashSet<>(queryFactory
@@ -80,6 +81,7 @@ public class RestaurantCoreInfoRepository {
                 .fetch());
     }
 
+    @Observed
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Set<Long> findUserFavoriteIds(Long userId, List<Long> restaurantIds) {
         return new HashSet<>(queryFactory

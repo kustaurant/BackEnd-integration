@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.common.view;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import io.micrometer.observation.annotation.Observed;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ public class ViewerKeyProvider {
     private static final String DEVICE_ID_HEADER = "X-Device-Id";
     private static final String RETURN_DEVICE_ID_HEADER = "X-Anonymous-Id";
 
+    @Observed
     public String resolveViewerKey(@Nullable AuthUserInfo user, HttpServletRequest req, HttpServletResponse res) {
 
         // 로그인 한 사용자
