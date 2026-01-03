@@ -62,13 +62,15 @@ public class AnalyzeReviewTxService {
             log.info("failed to analyze review");
         }
 
+        LocalDateTime now = LocalDateTime.now(clock);
+
         AiAnalysisJob job = aiAnalysisJobRepo.findJob(jobId);
-        job.updateReviewCount(success);
+        job.updateReviewCount(success, now);
 
         // job 이 끝난 경우 식당 분석 Summary 생성
-        if (job.complete(LocalDateTime.now(clock))) {
+        if (job.complete(now)) {
             AiSummary summary = aiSummaryRepo.findByRestaurantId(restaurantId)
-                    .orElse(AiSummary.create(restaurantId, LocalDateTime.now(clock)));
+                    .orElse(AiSummary.create(restaurantId, now));
             List<AiAnalysisReview> reviews = aiAnalysisReviewRepo.findAllByJobId(jobId);
 
             aiSummaryService.summarize(jobId, summary, reviews);

@@ -30,3 +30,8 @@ logging:
     dateformat: "yyyy-MM-dd HH:mm:ss.SSS,Asia/Seoul"
   file:
     name: "logs/kustaurant.log"
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans

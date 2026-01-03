@@ -21,6 +21,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.micrometer.observation.annotation.Observed;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class RestaurantDetailQuery {
     private final JPAQueryFactory queryFactory;
     private final RestaurantCommonExpressions restaurantCommonExpressions;
 
+    @Observed
     public Optional<RestaurantDetail> getRestaurantDetails(Long restaurantId, Long userId) {
         JPAQuery<?> q = queryFactory
                 .from(restaurantEntity)

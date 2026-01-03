@@ -32,6 +32,10 @@ public class RatingEntity {
 
     @Builder.Default
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean hasTier = false;
+
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isTemp = false;
 
     @Column
@@ -41,12 +45,17 @@ public class RatingEntity {
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
     private double finalScore = 0;
 
+    private boolean hasTier(int tier) {
+        return tier >= 0;
+    }
+
     public RatingEntity(long restaurantId, double selfScore, int tier, boolean isTemp,
             LocalDateTime ratedAt, double finalScore
     ) {
         this.restaurantId = restaurantId;
         this.selfScore = selfScore;
         this.tier = tier;
+        this.hasTier = hasTier(tier);
         this.isTemp = isTemp;
         this.ratedAt = ratedAt;
         this.finalScore = finalScore;
@@ -57,6 +66,7 @@ public class RatingEntity {
     ) {
         this.selfScore = selfScore;
         this.tier = tier;
+        this.hasTier = hasTier(tier);
         this.isTemp = isTemp;
         this.ratedAt = ratedAt;
         this.finalScore = finalScore;

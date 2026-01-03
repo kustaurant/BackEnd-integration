@@ -8,10 +8,13 @@ import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoD
 import com.kustaurant.kustaurant.restaurant.query.chart.service.RestaurantChartService;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTO;
+import io.micrometer.observation.annotation.Observed;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +22,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @RequiredArgsConstructor
 @Controller
 @Slf4j
 public class RestaurantChartController {
+
     private final EvaluationQueryRepository evaluationQueryRepository;
     private final RestaurantChartService restaurantChartService;
 
@@ -31,6 +36,7 @@ public class RestaurantChartController {
 
     // 티어표 화면
     @GetMapping("/tier")
+    @Observed(name = "tier.controller")
     public String tier(
             Model model,
             @ChartCond ChartCondition condition,
@@ -54,11 +60,18 @@ public class RestaurantChartController {
         model.addAttribute("queryString", getQueryStringWithoutPage(request));
         model.addAttribute("aiTier", condition.aiTier());
 
-        // 지도 정보 넣어주기
-        RestaurantTierMapDTO mapData = restaurantChartService.getRestaurantTierMapDto(condition, user.id());
-        model.addAttribute("mapData", mapData);
-
         return "restaurant/tier";
+    }
+
+    @GetMapping("/web/api/tier/map")
+    @Observed(name = "tier.controller")
+    @ResponseBody
+    public ResponseEntity<RestaurantTierMapDTO> tierMapInfo(
+            @ChartCond ChartCondition condition,
+            @AuthUser AuthUserInfo user
+    ) {
+        RestaurantTierMapDTO mapInfo = restaurantChartService.getRestaurantTierMapDto(condition, user.id());
+        return new ResponseEntity<>(mapInfo, HttpStatus.OK);
     }
 
     private String getQueryStringWithoutPage(HttpServletRequest request) {
