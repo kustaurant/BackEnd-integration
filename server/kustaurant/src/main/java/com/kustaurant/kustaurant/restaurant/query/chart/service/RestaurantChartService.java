@@ -10,6 +10,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDT
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
+import io.micrometer.observation.annotation.Observed;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ public class RestaurantChartService {
             key = "#condition.cacheKey()",
             unless = "#result == null || #result.getContent().isEmpty()"
     )
+    @Observed(name = "tier.service.findBasePage")
     public Page<RestaurantBaseInfoDto> findBasePage(ChartCondition condition) {
         Page<Long> ids = restaurantChartRepository.getRestaurantIdsWithPage(condition);
         List<RestaurantBaseInfoDto> content = restaurantCoreInfoRepository.getRestaurantTiersBase(ids.getContent());
@@ -50,6 +52,7 @@ public class RestaurantChartService {
         return new PageImpl<>(content, condition.pageable(), ids.getTotalElements());
     }
 
+    @Observed(name = "tier.service.findByConditions")
     public Page<RestaurantCoreInfoDto> findByConditions(ChartCondition condition, Long userId) {
         Page<RestaurantBaseInfoDto> basePage = findBasePage(condition);
 
@@ -79,6 +82,7 @@ public class RestaurantChartService {
     }
 
     // 지도 식당 데이터 반환
+    @Observed(name = "tier.service.getRestaurantTierMapDto")
     public RestaurantTierMapDTO getRestaurantTierMapDto(
             ChartCondition condition, @Nullable Long userId
     ) {

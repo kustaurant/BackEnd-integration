@@ -8,6 +8,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
+import io.micrometer.observation.annotation.Observed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class RestaurantController {
     @Value("${restaurant.initialDisplayMenuCount}")
     private int initialDisplayMenuCount;
 
+    @Observed
     @GetMapping("/restaurants/{restaurantId}")
     public String restaurant(
             Model model,
