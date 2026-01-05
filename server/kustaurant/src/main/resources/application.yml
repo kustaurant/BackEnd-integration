@@ -1,4 +1,5 @@
 spring:
+  application.name: kustaurant
   config:
     import:
       - "optional:file:server/kustaurant/.env[.properties]"
@@ -54,6 +55,14 @@ management:
         http:
           server:
             requests: true
+  # tracing
+  tracing:
+    sampling:
+      probability: 0.1
+  observations:
+    annotations:
+      enabled: true
+
 # discord-alert
 alert:
   discord:

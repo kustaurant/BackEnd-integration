@@ -7,6 +7,7 @@ import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundExceptio
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository.query.RestaurantDetailQuery;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetailRepository;
+import io.micrometer.observation.annotation.Observed;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -18,6 +19,7 @@ public class RestaurantDetailRepositoryImpl implements RestaurantDetailRepositor
     private final RestaurantDetailQuery restaurantDetailQuery;
 
     @Override
+    @Observed
     public RestaurantDetail getRestaurantDetail(Long restaurantId, Long userId) {
         if (isNull(restaurantId)) {
             throw new IllegalArgumentException("restaurantId is null");
