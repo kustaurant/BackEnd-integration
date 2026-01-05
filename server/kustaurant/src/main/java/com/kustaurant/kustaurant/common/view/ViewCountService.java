@@ -18,7 +18,6 @@ public class ViewCountService {
 
     private static final String FORMAT_KEY = "%s::view::v1:%s:%s";
 
-    @Observed
     public static String buildDedupKey(ViewResourceType type, long id, String viewerKey) {
         return FORMAT_KEY.formatted(type.key(), type.slot(id), viewerKey);
     }

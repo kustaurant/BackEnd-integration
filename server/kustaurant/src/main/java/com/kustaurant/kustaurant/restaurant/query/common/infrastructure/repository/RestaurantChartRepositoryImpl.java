@@ -53,9 +53,9 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                 )
                 .orderBy(
                         // 티어가 있는 것이 먼저 오고, 티어 기준 오름차순 정렬
-                        ratingEntity.hasTier.desc(),
-                        ratingEntity.tier.asc(),
-                        ratingEntity.finalScore.desc()
+                        ratingEntity.hasTier.coalesce(false).desc(),
+                        ratingEntity.tier.coalesce(-1).asc(),
+                        ratingEntity.finalScore.coalesce(0.0).desc()
                 )
                 .offset(offset)
                 .limit(pageSize)
