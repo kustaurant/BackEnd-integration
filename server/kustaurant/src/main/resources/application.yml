@@ -56,12 +56,12 @@ management:
           server:
             requests: true
   # tracing
-  tracing:
-    sampling:
-      probability: 0.1
-  observations:
-    annotations:
-      enabled: true
+#  tracing:
+#    sampling:
+#      probability: 0.1
+#  observations:
+#    annotations:
+#      enabled: true
 
 # discord-alert
 alert:

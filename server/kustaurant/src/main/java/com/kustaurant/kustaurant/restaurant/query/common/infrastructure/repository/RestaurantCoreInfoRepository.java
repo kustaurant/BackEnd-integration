@@ -36,7 +36,7 @@ public class RestaurantCoreInfoRepository {
     private final RestaurantCommonExpressions restaurantCommonExpressions;
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    @Observed(name = "tier.repository.getRestaurantTiersBase")
+    @Observed
     public List<RestaurantBaseInfoDto> getRestaurantTiersBase(List<Long> ids) {
         Map<Long, RestaurantBaseInfoDto> map = queryFactory
                 .from(restaurantEntity)

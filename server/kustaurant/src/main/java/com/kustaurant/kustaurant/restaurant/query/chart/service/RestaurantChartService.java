@@ -41,7 +41,7 @@ public class RestaurantChartService {
             key = "#condition.cacheKey()",
             unless = "#result == null || #result.getContent().isEmpty()"
     )
-    @Observed(name = "tier.service.findBasePage")
+    @Observed
     public Page<RestaurantBaseInfoDto> findBasePage(ChartCondition condition) {
         Page<Long> ids = restaurantChartRepository.getRestaurantIdsWithPage(condition);
         List<RestaurantBaseInfoDto> content = restaurantCoreInfoRepository.getRestaurantTiersBase(ids.getContent());
@@ -52,7 +52,7 @@ public class RestaurantChartService {
         return new PageImpl<>(content, condition.pageable(), ids.getTotalElements());
     }
 
-    @Observed(name = "tier.service.findByConditions")
+    @Observed
     public Page<RestaurantCoreInfoDto> findByConditions(ChartCondition condition, Long userId) {
         Page<RestaurantBaseInfoDto> basePage = findBasePage(condition);
 
@@ -82,7 +82,7 @@ public class RestaurantChartService {
     }
 
     // 지도 식당 데이터 반환
-    @Observed(name = "tier.service.getRestaurantTierMapDto")
+    @Observed
     public RestaurantTierMapDTO getRestaurantTierMapDto(
             ChartCondition condition, @Nullable Long userId
     ) {

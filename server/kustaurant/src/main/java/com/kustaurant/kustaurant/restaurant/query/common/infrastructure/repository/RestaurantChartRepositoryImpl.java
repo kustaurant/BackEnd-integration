@@ -8,20 +8,21 @@ import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.r
 import com.kustaurant.jpa.rating.entity.QRatingEntity;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantChartRepository;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.micrometer.observation.annotation.Observed;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class RestaurantChartRepositoryImpl implements RestaurantChartRepository {
 
@@ -33,7 +34,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
      */
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    @Observed(name = "tier.repository.getRestaurantIdsWithPage")
+    @Observed
     public Page<Long> getRestaurantIdsWithPage(ChartCondition condition) {
         Pageable pageable = condition.pageable() != null ? condition.pageable() : Pageable.unpaged();
 
@@ -53,9 +54,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                 )
                 .orderBy(
                         // 티어가 있는 것이 먼저 오고, 티어 기준 오름차순 정렬
-                        ratingEntity.hasTier.coalesce(false).desc(),
-                        ratingEntity.tier.coalesce(-1).asc(),
-                        ratingEntity.finalScore.coalesce(0.0).desc()
+                        orderByProcess(ratingEntity, condition)
                 )
                 .offset(offset)
                 .limit(pageSize)
@@ -64,28 +63,56 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
         Long total = queryFactory
                 .select(restaurantEntity.restaurantId.countDistinct())
                 .from(restaurantEntity)
+                .leftJoin(ratingEntity)
+                .on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .where( cuisinesIn(condition.cuisines(), restaurantEntity),
                         positionsIn(condition.positions(), restaurantEntity),
-                        restaurantCommonExpressions.hasSituation(condition.situations(),
-                                restaurantEntity), restaurantActive(restaurantEntity)
+                        restaurantCommonExpressions.hasSituation(condition.situations(), restaurantEntity),
+                        restaurantActive(restaurantEntity),
+                        tierFilterProcess(ratingEntity, condition)
                 )
                 .fetchOne();
 
         return new PageImpl<>(contents, pageable, total == null ? 0 : total);
     }
 
+    private static OrderSpecifier[] orderByProcess(QRatingEntity ratingEntity, ChartCondition condition) {
+        List<OrderSpecifier<?>> orders = new ArrayList<>();
+
+        orders.add(ratingEntity.hasTier.coalesce(false).desc());
+        if (!condition.aiTier()) {
+            orders.add(ratingEntity.isTemp.coalesce(true).asc());
+        }
+        orders.add(ratingEntity.tier.coalesce(-1).asc());
+        orders.add(ratingEntity.finalScore.coalesce(0.0).desc());
+
+        return orders.toArray(OrderSpecifier[]::new);
+    }
+
     private BooleanExpression tierFilterProcess(QRatingEntity ratingEntity, ChartCondition condition) {
         BooleanExpression base = null;
-        if (!condition.aiTier()) {
-            base = ratingEntity.isTemp.eq(false);
-        }
+        // 1 전체
         if (condition.needAll()) {
             return base;
         }
+        // 2 티어가 있는 것만
         if (condition.needOnlyTier()) {
-            return append(base, ratingEntity.tier.gt(0));
+            base = append(base, ratingEntity.tier.coalesce(-1).gt(0));
+            // 2-1 자체 티어만
+            if (!condition.aiTier()) {
+                return append(base, ratingEntity.isTemp.coalesce(true).eq(false));
+            }
+            // 2-2 AI 티어 포함
+            return base;
         }
-        return append(base, ratingEntity.tier.lt(0));
+        // 3 티어가 없는 것만
+        base = append(base, ratingEntity.tier.coalesce(-1).lt(0));
+        // 3-1 자체 티어가 없는 것(AI 티어 포함)
+        if (!condition.aiTier()) {
+            return base.or(ratingEntity.isTemp.coalesce(true).eq(true));
+        }
+        // 3-2 자체 티어와 AI 티어 모두 없는 것
+        return base;
     }
 
     private BooleanExpression append(BooleanExpression base, BooleanExpression extra) {

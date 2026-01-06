@@ -317,7 +317,7 @@
                     </div>
                 </td>
                 <td th:if="${!isJH}" class="td-center" style="min-width: 42px">
-                    <div th:if="${restaurantTierData.mainTier > 0}"
+                    <div th:if="${restaurantTierData.mainTier > 0 && (aiTier || (!aiTier && !restaurantTierData.isTempTier))}"
                          class="tier-img-wrap"
                          th:classappend="${restaurantTierData.isTempTier} ? ' ai-temp'">
                         <img class="td-tier-img" th:classappend="${restaurantTierData.isTempTier} ? ' ai-temp-img'"
@@ -328,7 +328,7 @@
                             AI가 분석한 임시 티어입니다.
                         </div>
                     </div>
-                    <span th:if="${restaurantTierData.mainTier < 1}" style="padding-right: 10px;">-</span>
+                    <span th:if="${restaurantTierData.mainTier < 0 || (!aiTier && restaurantTierData.isTempTier)}" style="padding-right: 10px;">-</span>
                 </td>
                 <td style="min-width: 46px">
                     <div class="td-cuisine-outer">

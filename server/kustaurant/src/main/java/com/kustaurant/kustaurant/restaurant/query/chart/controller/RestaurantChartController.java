@@ -36,7 +36,7 @@ public class RestaurantChartController {
 
     // 티어표 화면
     @GetMapping("/tier")
-    @Observed(name = "tier.controller")
+    @Observed
     public String tier(
             Model model,
             @ChartCond ChartCondition condition,
@@ -64,7 +64,7 @@ public class RestaurantChartController {
     }
 
     @GetMapping("/web/api/tier/map")
-    @Observed(name = "tier.controller")
+    @Observed
     @ResponseBody
     public ResponseEntity<RestaurantTierMapDTO> tierMapInfo(
             @ChartCond ChartCondition condition,

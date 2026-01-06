@@ -3,8 +3,14 @@ const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttrib
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
+    const currentParams = new URLSearchParams(window.location.search);
+    const aiTierValue = currentParams.get(PARAM_AI);
+    const apiUrl = new URL('/web/api/tier/map', window.location.origin);
+    if (aiTierValue !== null) {
+      apiUrl.searchParams.append(PARAM_AI, aiTierValue);
+    }
     // 1) 로딩 후 데이터 받아오기
-    const res = await fetch('/web/api/tier/map', {
+    const res = await fetch(apiUrl.toString(), {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
