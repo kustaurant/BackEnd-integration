@@ -4,7 +4,11 @@
 </p>
 <p align="middle" >건국대학교 대표 맛집 확인서비스</p>
 <p align="middle" ><strong>'티어'</strong> 로 맛집확인, <strong>'뽑기'</strong> 로 맛집추천, <strong>'제휴서비스'</strong> 로 혜택맛집을 한눈에 알아보자!</p>
-<a href="https://kustaurant.com/" target="_blank"><p align="middle" >쿠스토랑 웹사이트 바로가기</p></a>
+<p align="center">
+  <a href="https://kustaurant.com/" target="_blank">
+    쿠스토랑 웹사이트 바로가기
+  </a>
+</p>
 <div align="center">
     <a href="https://play.google.com/store/apps/details?id=com.kust.kustaurant">
         <img src="https://github.com/user-attachments/assets/9c5549f2-4a3b-4b32-8577-3399a3016c9c" width="100">
@@ -45,3 +49,66 @@ web은 기존 클래스 명으로, 모바일은 클래스마다 api를 붙여 �
 |<img src="https://github.com/user-attachments/assets/b9478ab7-b1b6-4313-bbc8-38e195364dde" alt="dingwoonee" width="100" height="100">|<img src="https://github.com/user-attachments/assets/b41b6c42-76fd-4b9a-99eb-7676b64ef9e3" alt="kyung-bo" width="100" height="100">|<img src="https://github.com/user-attachments/assets/ac8cfcf7-8fc5-4232-8c0a-8492399feb56" alt="jae-hyeong" width="100" height="100">|
 |[DingWoonee](https://github.com/DingWoonee)|[Wcwdfu](https://github.com/Wcwdfu)|[JaehyeongIm](https://github.com/JaehyeongIm)|
 <br>    
+
+## 🏗️ System Architecture
+<details>
+  <summary>  Architecture</summary>
+<img width="1593" height="959" alt="image" src="https://github.com/user-attachments/assets/aeaacbea-6f27-4787-bf79-3373d2bbcddc" />
+</details>
+
+
+## 🛠 Tech Stack
+<details>
+  <summary>  Backend</summary>
+
+- Java: JDK 21 (LTS)
+- Spring Boot: 3.5.6
+- Spring Data JPA
+- QueryDSL
+- Spring Security
+- Thymeleaf
+</details>
+
+<details>
+  <summary>  Database</summary>
+
+**Database**
+- MySQL
+- Flyway (Schema Migration)
+
+**Cache & Messaging**
+- Redis
+</details>
+
+<details>
+  <summary>  Frontend</summary>
+
+- Thymeleaf (Server-Side Rendering)
+- Vanilla JavaScript (ES6+)
+</details>
+
+<details>
+  <summary>  Crawling / Automation</summary>
+
+
+- Playwright
+</details>
+
+<details>
+  <summary>  Observability & Monitoring</summary>
+
+- Prometheus
+- Grafana
+- Loki
+- Promtail
+</details>
+
+<details>
+  <summary>  Infrastructure & DevOps</summary>
+
+- Docker
+- Docker Compose
+- AWS S3: Object Storage
+- AWS Lightsail: Application Hosting
+- GitHub Actions: CI/CD Pipeline
+</details>
