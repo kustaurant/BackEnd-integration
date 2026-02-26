@@ -64,3 +64,54 @@ function loadRestaurants(page = 0) {
             document.getElementById('restaurants-tbody').innerHTML = '<tr><td colspan="8">데이터 로드 실패</td></tr>';
         });
 }
+
+function getPartnershipStatusText(status) {
+    const map = {
+        'MATCHED': '매칭됨',
+        'UNMATCHED': '미매칭'
+    };
+    return map[status] || status;
+}
+
+function getPartnershipStatusClass(status) {
+    const map = {
+        'MATCHED': 'matched',
+        'UNMATCHED': 'unmatched'
+    };
+    return map[status] || 'unknown';
+}
+
+function renderPartnershipTable(partnerships) {
+    const tbody = document.getElementById('partnerships-tbody');
+    tbody.innerHTML = '';
+
+    if(!partnerships||partnerships.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8">제휴 정보가 없습니다.</td>';
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    partnerships.forEach(p => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+      <td>${p.id ?? '-'}</td>
+      <td>${p.restaurantId ?? '-'}</td>
+      <td>${p.partnerName ?? '-'}</td>
+      <td>${p.benefit ?? '-'}</td>
+      <td>
+        <span class="partnership-status ${getPartnershipStatusClass(p.status)}">
+          ${getPartnershipStatusText(p.status)}
+        </span>
+      </td>
+      <td>${p.sourceAccount ?? '-'}</td>
+      <td>${p.createdAt ? formatDateTime(p.createdAt) : '-'}</td>
+      <td>${p.updatedAt ? formatDateTime(p.updatedAt) : '-'}</td>
+    `;
+
+        fragment.appendChild(tr);
+    });
+
+    tbody.appendChild(fragment);
+}

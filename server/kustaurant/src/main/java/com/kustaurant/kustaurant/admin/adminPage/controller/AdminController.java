@@ -2,11 +2,9 @@ package com.kustaurant.kustaurant.admin.adminPage.controller;
 
 import com.kustaurant.kustaurant.admin.adminPage.controller.request.HomeModalUpdateRequest;
 import com.kustaurant.kustaurant.admin.adminPage.controller.request.ModalPreviewRequest;
-import com.kustaurant.kustaurant.admin.adminPage.controller.response.AdminStatsResponse;
-import com.kustaurant.kustaurant.admin.adminPage.controller.response.HomeModalResponse;
-import com.kustaurant.kustaurant.admin.adminPage.controller.response.PagedFeedbackResponse;
-import com.kustaurant.kustaurant.admin.adminPage.controller.response.PagedRestaurantResponse;
-import com.kustaurant.kustaurant.admin.adminPage.controller.response.PagedUserResponse;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.*;
+import com.kustaurant.kustaurant.admin.crawl.controller.PagedPartnershipResponse;
+import com.kustaurant.kustaurant.admin.crawl.controller.PagedRestaurantResponse;
 import com.kustaurant.kustaurant.admin.adminPage.service.AdminService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
@@ -81,10 +79,22 @@ public class AdminController {
     @ResponseBody
     public ResponseEntity<PagedRestaurantResponse> getAllRestaurants(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        
-        Pageable pageable = PageRequest.of(page, Math.min(size, 20)); // 최대 20개로 제한
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, Math.min(size, 20));
         PagedRestaurantResponse response = adminService.getAllRestaurants(pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
+    @GetMapping("/admin/api/partnerships")
+    @ResponseBody
+    public ResponseEntity<PagedPartnershipResponse> getAllPartnerships(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, Math.min(size, 20));
+        PagedPartnershipResponse response = adminService.getAllPartnerships(pageable);
         return ResponseEntity.ok(response);
     }
 

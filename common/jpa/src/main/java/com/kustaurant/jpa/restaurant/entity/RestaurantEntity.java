@@ -38,5 +38,4 @@ public class RestaurantEntity extends BaseTimeEntity {
     private String partnershipInfo;
 
     private String status;
-
 }

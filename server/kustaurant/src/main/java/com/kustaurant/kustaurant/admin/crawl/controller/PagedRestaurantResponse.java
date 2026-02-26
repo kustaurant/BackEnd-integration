@@ -1,8 +1,6 @@
-package com.kustaurant.kustaurant.admin.adminPage.controller.response;
+package com.kustaurant.kustaurant.admin.crawl.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.RestaurantListResponse;
 
 import java.util.List;
 
@@ -14,6 +12,4 @@ public record PagedRestaurantResponse(
         Integer pageSize,
         Boolean hasNext,
         Boolean hasPrevious
-) {
-
-}
+) {}

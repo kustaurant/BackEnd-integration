@@ -10,6 +10,8 @@ import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundExceptio
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class RestaurantRepositoryImpl implements RestaurantRepository {
@@ -25,5 +27,10 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     @Override
     public void increaseVisitCount(Long restaurantId) {
         jpa.incrementViews(restaurantId);
+    }
+
+    @Override
+    public Optional<Long> findIdByPhoneNumber(String phoneNumber) {
+        return jpa.findIdByPhoneNumber(phoneNumber);
     }
 }

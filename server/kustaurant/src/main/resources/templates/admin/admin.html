@@ -141,7 +141,7 @@
                 <section class="restaurant-management">
                     <div class="section-header">
                         <h2>음식점 관리</h2>
-                        <span id="restaurants-total">총 18개</span>
+                        <span id="restaurants-total"> </span>
                     </div>
                     <div class="action-buttons">
                         <button>음식점 추가</button>
@@ -150,7 +150,7 @@
                     </div>
                     <table id="restaurants-table">
                         <thead>
-                            <tr><th>ID</th><th>이름</th><th>주소</th><th>위치</th><th>타입</th><th>평가수</th><th>상태</th><th>등록일</th></tr>
+                        <tr><th>ID</th><th>이름</th><th>주소</th><th>위치</th><th>타입</th><th>평가수</th><th>상태</th><th>등록일</th></tr>
                         </thead>
                         <tbody id="restaurants-tbody">
                             <!-- 데이터는 JavaScript로 동적 생성 -->
@@ -167,6 +167,20 @@
                         <button id="insta-crawl">인스타 제휴 음식점 정보 채우기</button>
                         <button id="sync-crawl">월간 음식점 정보 싱크</button>
                     </div>
+                    <div class = "partnership-result">
+                        <h3>파트너쉽 현황</h3>
+                        <span id="partnerships-total"></span>
+                    </div>
+
+                    <table id="partnerships-table">
+                        <thead>
+                        <tr><th>ID</th><th>음식점ID</th><th>제휴업체명</th><th>타겟</th><th>혜택</th><th>상태</th><th>출처</th><th>등록일</th><th>수정일</th></tr>
+                        </thead>
+                        <tbody id="partnerships-tbody">
+                        <!-- 데이터는 JavaScript로 동적 생성 -->
+                        </tbody>
+                    </table>
+
                     <div class="sync-result">
                         <h3>최근 싱크로 변경된 음식점</h3>
                         <ul>
