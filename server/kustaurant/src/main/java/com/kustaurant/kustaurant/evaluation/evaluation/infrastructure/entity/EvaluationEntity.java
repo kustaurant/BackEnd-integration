@@ -119,7 +119,7 @@ public class EvaluationEntity extends BaseTimeEntity {
                 .build();
     }
 
-    public String getStarImgUrl() {
+    public String getStarImgUrl() { // web에서 사용중
         String[] scoreSplit = evaluationScore.toString().split("\\.");
         if (scoreSplit.length > 1) {
             return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/star/star" + scoreSplit[0] + scoreSplit[1] + ".svg";
