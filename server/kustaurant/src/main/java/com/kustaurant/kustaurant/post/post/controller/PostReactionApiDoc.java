@@ -4,10 +4,8 @@ import com.kustaurant.kustaurant.common.enums.ReactionType;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;
-import com.kustaurant.kustaurant.post.post.controller.response.PostScrapResponse;
 import com.kustaurant.kustaurant.post.post.controller.response.PostReactionResponse;
-import com.kustaurant.kustaurant.post.post.service.PostReactionService;
-import com.kustaurant.kustaurant.post.post.service.PostScrapService;
+import com.kustaurant.kustaurant.post.post.controller.response.PostScrapResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,29 +13,30 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@RestController
-@RequiredArgsConstructor
-@RequestMapping("/api")
-public class PostReactionApiController implements PostReactionApiDoc {
-    private final PostScrapService postScrapService;
-    private final PostReactionService postReactionService;
+@Tag(name = "community-post-reaction-controller")
+public interface PostReactionApiDoc {
 
-    // 1. 게시글 좋아요/싫어요
     @PutMapping("/v2/auth/community/{postId}/reaction")
-    public ResponseEntity<PostReactionResponse> setPostReaction(
+    @Operation(summary = "게시글 좋아요/싫어요",
+            description = "게시글 ID를 입력받아 좋아요/싫어요 토글. " +
+                    "\n\n유저의 반응상태(LIKE,DISLIKE,null)와 현재 게시글의 좋아요/싫어요 수를 반환합니다. ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 좋아요 처리가 완료되었습니다", content = @Content(schema = @Schema(implementation = PostReactionResponse.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID의 게시글이 존재하지 않습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    ResponseEntity<PostReactionResponse> setPostReaction(
             @PathVariable Long postId,
+            @Parameter(description = "목표 반응 상태(좋아요=LIKE, 싫어요=DISLIKE, 해제=값 전달x). 미전달 시 해제")
             @RequestParam(required = false) ReactionType cmd,
-            @AuthUser AuthUserInfo user
-    ) {
-        PostReactionResponse response = postReactionService.setPostReaction(postId, user.id(), cmd);
-        return ResponseEntity.ok(response);
-    }
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
+    );
 
-    // 2. 게시글 스크랩
     @Operation(summary = "게시글 스크랩",
             description = "게시글 ID를 입력받아 스크랩을 생성하거나 해제합니다. " +
                     "\n\nstatus와 현재 게시글의 스크랩 수를 반환합니다. " +
@@ -48,12 +47,10 @@ public class PostReactionApiController implements PostReactionApiDoc {
             @ApiResponse(responseCode = "404", description = "해당 ID의 게시글이 존재하지 않습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PostMapping("/v2/auth/community/{postId}/scraps")
-    public ResponseEntity<PostScrapResponse> setPostScrap(
+    ResponseEntity<PostScrapResponse> setPostScrap(
             @PathVariable Long postId,
+            @Parameter(description = "true=스크랩, false=해제", required = true, example = "true")
             @RequestParam boolean scrapped,
-            @AuthUser AuthUserInfo user
-    ) {
-        PostScrapResponse scrapToggleDTO = postScrapService.toggleScrapWithCount(postId, user.id(), scrapped);
-        return ResponseEntity.ok(scrapToggleDTO);
-    }
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
+    );
 }

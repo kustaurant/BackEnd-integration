@@ -6,6 +6,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,6 +35,6 @@ public interface EvaluationReactionApiDoc {
     ResponseEntity<EvalReactionResponse> setEvaluationReactionApi(
             @PathVariable Long evaluationId,
             @RequestParam(required = false) ReactionType reaction,
-            @AuthUser AuthUserInfo user
+            @Parameter(hidden = true) @AuthUser AuthUserInfo user
     );
 }
