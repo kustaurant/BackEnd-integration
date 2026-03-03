@@ -36,8 +36,17 @@ public class ReviewQueryService {
 
         /* 2) 평가(리뷰) 목록 – 작성자·댓글을 fetch-join 하지 않는다 */
         List<Evaluation> evals = switch (sort) {
-            case LATEST     -> evalQueryRepo.findByRestaurantIdOrderByCreatedAtDesc(restaurantId);
-            case POPULARITY -> evalQueryRepo.findByRestaurantIdOrderByLikeCountDesc(restaurantId);
+            case LATEST -> evalQueryRepo.findByRestaurantIdOrderByCreatedAtDesc(restaurantId);
+            case POPULARITY -> {
+                List<Evaluation> popularEvals = new ArrayList<>(
+                        evalQueryRepo.findActiveByRestaurantId(restaurantId)
+                );
+                popularEvals.sort(
+                        Comparator.comparingInt(Evaluation::reactionScore).reversed()
+                                .thenComparing(Evaluation::hasReviewContent, Comparator.reverseOrder())
+                );
+                yield popularEvals;
+            }
         };
 
         if (evals.isEmpty()) return List.of();

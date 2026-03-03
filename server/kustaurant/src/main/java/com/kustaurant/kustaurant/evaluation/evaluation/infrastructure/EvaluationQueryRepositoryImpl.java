@@ -63,8 +63,8 @@ public class EvaluationQueryRepositoryImpl implements EvaluationQueryRepository 
     }
 
     @Override
-    public List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Long restaurantId) {
-        return jpa.findByRestaurantIdAndStatusOrderByLikeCountDesc(restaurantId, "ACTIVE")
+    public List<Evaluation> findActiveByRestaurantId(Long restaurantId) {
+        return jpa.findByRestaurantIdAndStatus(restaurantId, "ACTIVE")
                 .stream()
                 .map(EvaluationEntity::toModel)
                 .toList();

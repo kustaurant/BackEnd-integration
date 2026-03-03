@@ -29,6 +29,6 @@ public interface EvaluationQueryJpaRepository extends Repository<EvaluationEntit
     List<EvaluationEntity> findByRestaurantIdAndStatusOrderByCreatedAtDesc(Long restaurantId, String status);
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    List<EvaluationEntity> findByRestaurantIdAndStatusOrderByLikeCountDesc(Long restaurantId, String status);
+    List<EvaluationEntity> findByRestaurantIdAndStatus(Long restaurantId, String status);
 
 }
