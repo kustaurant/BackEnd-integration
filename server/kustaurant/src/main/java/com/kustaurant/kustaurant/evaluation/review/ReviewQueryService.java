@@ -36,8 +36,17 @@ public class ReviewQueryService {
 
         /* 2) 평가(리뷰) 목록 – 작성자·댓글을 fetch-join 하지 않는다 */
         List<Evaluation> evals = switch (sort) {
-            case LATEST     -> evalQueryRepo.findByRestaurantIdOrderByCreatedAtDesc(restaurantId);
-            case POPULARITY -> evalQueryRepo.findByRestaurantIdOrderByLikeCountDesc(restaurantId);
+            case LATEST -> evalQueryRepo.findByRestaurantIdOrderByCreatedAtDesc(restaurantId);
+            case POPULARITY -> {
+                List<Evaluation> popularEvals = new ArrayList<>(
+                        evalQueryRepo.findActiveByRestaurantId(restaurantId)
+                );
+                popularEvals.sort(
+                        Comparator.comparingInt(ReviewQueryService::reactionScore).reversed()
+                                .thenComparing(ReviewQueryService::hasReviewContent, Comparator.reverseOrder())
+                );
+                yield popularEvals;
+            }
         };
 
         if (evals.isEmpty()) return List.of();
@@ -114,5 +123,17 @@ public class ReviewQueryService {
                     );
                 })
                 .toList();
+    }
+
+    private static boolean hasReviewContent(Evaluation evaluation) {
+        return hasText(evaluation.getCommentBody()) || hasText(evaluation.getCommentImgUrl());
+    }
+
+    private static int reactionScore(Evaluation evaluation) {
+        return evaluation.getLikeCount() - evaluation.getDislikeCount();
+    }
+
+    private static boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }

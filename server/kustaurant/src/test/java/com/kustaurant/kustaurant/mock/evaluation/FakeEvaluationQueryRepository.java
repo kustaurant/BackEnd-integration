@@ -39,7 +39,7 @@ public class FakeEvaluationQueryRepository implements EvaluationQueryRepository 
     }
 
     @Override
-    public List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Long restaurantId) {
+    public List<Evaluation> findActiveByRestaurantId(Long restaurantId) {
         return List.of();
     }
 }
