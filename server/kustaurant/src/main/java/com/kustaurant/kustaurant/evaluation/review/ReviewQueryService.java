@@ -42,8 +42,8 @@ public class ReviewQueryService {
                         evalQueryRepo.findActiveByRestaurantId(restaurantId)
                 );
                 popularEvals.sort(
-                        Comparator.comparingInt(ReviewQueryService::reactionScore).reversed()
-                                .thenComparing(ReviewQueryService::hasReviewContent, Comparator.reverseOrder())
+                        Comparator.comparingInt(Evaluation::reactionScore).reversed()
+                                .thenComparing(Evaluation::hasReviewContent, Comparator.reverseOrder())
                 );
                 yield popularEvals;
             }
@@ -123,17 +123,5 @@ public class ReviewQueryService {
                     );
                 })
                 .toList();
-    }
-
-    private static boolean hasReviewContent(Evaluation evaluation) {
-        return hasText(evaluation.getCommentBody()) || hasText(evaluation.getCommentImgUrl());
-    }
-
-    private static int reactionScore(Evaluation evaluation) {
-        return evaluation.getLikeCount() - evaluation.getDislikeCount();
-    }
-
-    private static boolean hasText(String value) {
-        return value != null && !value.isBlank();
     }
 }

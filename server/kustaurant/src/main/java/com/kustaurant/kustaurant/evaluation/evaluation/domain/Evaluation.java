@@ -52,7 +52,20 @@ public class Evaluation {
     public void adjustLikeCount(int num) {
         this.likeCount += num;
     }
+
     public void adjustDislikeCount(int num) {
         this.dislikeCount += num;
+    }
+
+    public boolean hasReviewContent() {
+        return hasText(this.commentBody) || hasText(this.commentImgUrl);
+    }
+
+    public int reactionScore() {
+        return this.likeCount - this.dislikeCount;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }
