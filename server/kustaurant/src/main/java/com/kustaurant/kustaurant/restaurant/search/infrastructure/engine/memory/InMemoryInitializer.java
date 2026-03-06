@@ -22,7 +22,7 @@ public class InMemoryInitializer {
     public void init() {
         log.info("식당 검색 인덱스 초기화 실행");
         List<RestaurantForEngine> docs = restaurantSearchRepository.getRestaurantForEngine();
-        inMemorySearchEngine.build(docs);
+        InMemorySearchEngineManager.build(docs);
         log.info("식당 검색 인덱스 초기화 완료");
     }
 }

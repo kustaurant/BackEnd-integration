@@ -1,6 +1,5 @@
-package com.kustaurant.kustaurant.restaurant.search.infrastructure.engine;
+package com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.memory;
 
-import com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.memory.InMemorySearchEngine;
 import com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.response.SearchResult;
 import com.kustaurant.kustaurant.restaurant.search.infrastructure.persistence.response.RestaurantForEngine;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,14 +11,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class RestaurantSearchEngineTest {
+class InMemorySearchEngineTest {
 
     private InMemorySearchEngine searchEngine;
 
     @BeforeEach
     void setUp() {
         searchEngine = new InMemorySearchEngine();
-        searchEngine.build(sampleDocs());
+        InMemorySearchEngineManager.build(sampleDocs());
     }
 
     @Test

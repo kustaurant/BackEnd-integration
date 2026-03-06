@@ -2,136 +2,21 @@ package com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.memory
 
 import com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.RestaurantSearchEngine;
 import com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.response.SearchResult;
-import com.kustaurant.kustaurant.restaurant.search.infrastructure.persistence.response.RestaurantForEngine;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.regex.Pattern;
+
+import static com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.memory.InMemorySearchEngineManager.*;
 
 @Component
 public class InMemorySearchEngine implements RestaurantSearchEngine {
 
-    // ====== 가중치 (원하는대로 조절) ======
+    // ====== 가중치 ======
     private static final int W_TITLE = 100;
     private static final int W_CATEGORY = 30;
     private static final int W_MENU = 10;
-
-    // ====== 토큰 분리 규칙 ======
-    private static final Pattern MULTI_SPACE = Pattern.compile("\\s+");
-    private static final Pattern PUNCT = Pattern.compile("[\\p{Punct}]+"); // 단순히 특수문자 제거
-
-    // ====== 역인덱스: token -> restaurantIds (sorted unique) ======
-    private final Map<String, long[]> titleIndex = new HashMap<>();
-    private final Map<String, long[]> categoryIndex = new HashMap<>();
-    private final Map<String, long[]> menuIndex = new HashMap<>();
-
-    // ====== 원문 캐시 (하이라이트 / 메뉴명 반환용) ======
-    private final Map<Long, String> titleById = new HashMap<>();
-    private final Map<Long, String> categoryById = new HashMap<>();
-    private final Map<Long, List<String>> menusById = new HashMap<>();
-
-    // ====== 전처리용 임시: token -> LongListBuilder ======
-    private static class LongListBuilder {
-        long[] a = new long[8];
-        int size = 0;
-
-        void add(long v) {
-            if (size == a.length) a = Arrays.copyOf(a, a.length * 2);
-            a[size++] = v;
-        }
-
-        long[] toSortedUniqueArray() {
-            long[] out = Arrays.copyOf(a, size);
-            Arrays.sort(out);
-            // unique
-            int w = 0;
-            for (int i = 0; i < out.length; i++) {
-                if (i == 0 || out[i] != out[i - 1]) out[w++] = out[i];
-            }
-            return Arrays.copyOf(out, w);
-        }
-    }
-
-    // ====== 빌드(전처리) ======
-    public void build(List<RestaurantForEngine> docs) {
-        // 임시 인덱스 빌더
-        Map<String, LongListBuilder> tTmp = new HashMap<>();
-        Map<String, LongListBuilder> cTmp = new HashMap<>();
-        Map<String, LongListBuilder> mTmp = new HashMap<>();
-
-        for (RestaurantForEngine d : docs) {
-            titleById.put(d.id(), d.name());
-            categoryById.put(d.id(), d.cuisine());
-            menusById.put(d.id(), d.menus() == null ? List.of() : d.menus());
-
-            // title tokens
-            for (String tok : tokenizeForIndex(d.name())) {
-                tTmp.computeIfAbsent(tok, k -> new LongListBuilder()).add(d.id());
-            }
-            // category tokens
-            for (String tok : tokenizeForIndex(d.cuisine())) {
-                cTmp.computeIfAbsent(tok, k -> new LongListBuilder()).add(d.id());
-            }
-            // menu tokens
-            if (d.menus() != null) {
-                for (String menu : d.menus()) {
-                    for (String tok : tokenizeForIndex(menu)) {
-                        mTmp.computeIfAbsent(tok, k -> new LongListBuilder()).add(d.id());
-                    }
-                }
-            }
-        }
-
-        // finalize: sorted unique long[]
-        finalizeIndex(tTmp, titleIndex);
-        finalizeIndex(cTmp, categoryIndex);
-        finalizeIndex(mTmp, menuIndex);
-    }
-
-    private static void finalizeIndex(Map<String, LongListBuilder> tmp, Map<String, long[]> target) {
-        target.clear();
-        for (Map.Entry<String, LongListBuilder> e : tmp.entrySet()) {
-            target.put(e.getKey(), e.getValue().toSortedUniqueArray());
-        }
-    }
-
-    /**
-     * 인덱스용 토큰화:
-     * - normalize 후 공백 split
-     */
-    private static List<String> tokenizeForIndex(String s) {
-        String norm = normalize(s);
-        if (norm.isEmpty()) return List.of();
-
-        String[] base = MULTI_SPACE.split(norm);
-        Set<String> out = new LinkedHashSet<>();
-
-        for (String b : base) {
-            if (b.isEmpty()) continue;
-
-            out.add(b);
-
-            int len = b.length();
-
-            for (int gram = 1; gram <= len; gram++) {
-                for (int i = 0; i <= len - gram; i++) {
-                    out.add(b.substring(i, i + gram));
-                }
-            }
-        }
-
-        return new ArrayList<>(out);
-    }
-
-    private static String normalize(String s) {
-        if (s == null) return "";
-        String x = s.trim().toLowerCase(Locale.ROOT);
-        x = PUNCT.matcher(x).replaceAll(" ");  // 특수문자는 공백
-        x = MULTI_SPACE.matcher(x).replaceAll(" ");
-        return x;
-    }
 
     // ====== 검색 ======
     @Override
@@ -183,11 +68,9 @@ public class InMemorySearchEngine implements RestaurantSearchEngine {
             ids = new ArrayList<>(ids.subList(start, end));
         }
 
-        // 4) TopK에 대해서만 매칭정보 구성 (하이라이트/메뉴명 추출)
+        // 4) 매칭정보 구성 (하이라이트/메뉴명 추출)
         HashMap<Long, SearchResult.MatchInfo> infoMap = new HashMap<>(ids.size() * 2);
 
-        // 하이라이트는 "공백 토큰"만으로도 충분히 보기 좋음.
-        // (2-gram까지 하이라이트에 쓰면 너무 과하게 칠해질 수 있음)
         List<String> highlightTokens = normalizeQueryTokensForHighlight(kwArr);
 
         for (long id : ids) {
@@ -244,9 +127,6 @@ public class InMemorySearchEngine implements RestaurantSearchEngine {
         }
     }
 
-    /**
-     * 하이라이트용 쿼리 토큰: normalize 후 공백 split만 사용(2-gram 제외)
-     */
     private static List<String> normalizeQueryTokensForHighlight(String[] queryTokens) {
         List<String> out = new ArrayList<>();
 
