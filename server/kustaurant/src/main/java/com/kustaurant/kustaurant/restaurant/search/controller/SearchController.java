@@ -1,8 +1,9 @@
-package com.kustaurant.kustaurant.restaurant.query.search;
+package com.kustaurant.kustaurant.restaurant.search.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
+import com.kustaurant.kustaurant.restaurant.search.service.RestaurantSearchV2Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final RestaurantSearchService restaurantSearchService;
+    private final RestaurantSearchV2Service restaurantSearchV2Service;
 
     // 검색 결과 화면
     @GetMapping("/search")
@@ -32,7 +33,7 @@ public class SearchController {
         }
 
         String[] kwList = kw.split(" "); // 검색어 공백 단위로 끊음
-        List<RestaurantCoreInfoDto> result = restaurantSearchService.search(kwList, user.id());
+        List<RestaurantCoreInfoDto> result = restaurantSearchV2Service.search(kwList, user.id());
 
         model.addAttribute("searchResult", result);
 
