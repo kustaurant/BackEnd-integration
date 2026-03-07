@@ -56,6 +56,7 @@ public class PostService {
         return savedPost;
     }
 
+    @Transactional
     public Post update(Long postId, PostRequest req,Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(
                 () -> new DataNotFoundException(POST_NOT_FOUND));
