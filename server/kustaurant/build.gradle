@@ -9,7 +9,7 @@ idea {
     }
 }
 
-version = '2.4.5-SNAPSHOT'
+version = '2.5.0-SNAPSHOT'
 description = 'kustaurant'
 
 jar {
@@ -83,7 +83,7 @@ dependencies {
 
     // tracing
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+//    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 }
 
 sourceSets {

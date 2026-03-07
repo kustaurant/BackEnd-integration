@@ -1,7 +1,8 @@
-package com.kustaurant.kustaurant.restaurant.query.search;
+package com.kustaurant.kustaurant.restaurant.search.service;
 
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCoreInfoRepository;
+import com.kustaurant.kustaurant.restaurant.search.infrastructure.persistence.RestaurantSearchRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class RestaurantSearchService {
+public class RestaurantSearchV2Service {
 
     private final int SEARCH_MAX_SIZE = 50;
 
