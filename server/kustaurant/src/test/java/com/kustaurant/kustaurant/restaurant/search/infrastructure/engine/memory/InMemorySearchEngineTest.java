@@ -17,8 +17,9 @@ class InMemorySearchEngineTest {
 
     @BeforeEach
     void setUp() {
-        searchEngine = new InMemorySearchEngine();
-        InMemorySearchEngineManager.build(sampleDocs());
+        InMemorySearchEngineManager searchEngineManager = new InMemorySearchEngineManager();
+        searchEngine = new InMemorySearchEngine(searchEngineManager);
+        searchEngineManager.build(sampleDocs());
     }
 
     @Test

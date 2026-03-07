@@ -2,33 +2,36 @@ package com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.memory
 
 import com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.RestaurantSearchEngine;
 import com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.response.SearchResult;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-import static com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.memory.InMemorySearchEngineManager.*;
-
 @Component
+@RequiredArgsConstructor
 public class InMemorySearchEngine implements RestaurantSearchEngine {
 
-    // ====== 가중치 ======
+    // 검색 매칭 시 필드별 가중치
     private static final int W_TITLE = 100;
     private static final int W_CATEGORY = 30;
     private static final int W_MENU = 10;
 
-    // ====== 검색 ======
+    private final InMemorySearchEngineManager searchEngineManager;
+
     @Override
     public SearchResult searchRestaurantIds(String[] kwArr, Pageable pageable) {
         if (kwArr == null || kwArr.length == 0) {
             return new SearchResult(new PageImpl<>(List.of(), pageable, 0), Map.of());
         }
 
-        // 1) 쿼리 토큰 정규화 + 토큰 확장(인덱스와 동일 규칙을 쓰면 매칭 잘 됨)
+        InMemorySearchEngineManager.Snapshot snapshot = searchEngineManager.snapshot();
+
+        // 1) 검색어 토큰 정규화 + 토큰 확장
         LinkedHashSet<String> qTokSet = new LinkedHashSet<>();
         for (String qt : kwArr) {
-            for (String tok : tokenizeQuery(qt)) {
+            for (String tok : InMemorySearchTextProcessor.tokenizeQuery(qt)) {
                 if (!tok.isEmpty()) qTokSet.add(tok);
             }
         }
@@ -39,9 +42,9 @@ public class InMemorySearchEngine implements RestaurantSearchEngine {
         HashMap<Long, Byte> mask = new HashMap<>(2048); // 1=TITLE,2=CATEGORY,4=MENU
 
         for (String qt : qTokSet) {
-            addMatches(titleIndex.get(qt), score, mask, W_TITLE, (byte) 1);
-            addMatches(categoryIndex.get(qt), score, mask, W_CATEGORY, (byte) 2);
-            addMatches(menuIndex.get(qt), score, mask, W_MENU, (byte) 4);
+            addMatches(snapshot.titlePostings(qt), score, mask, W_TITLE, (byte) 1);
+            addMatches(snapshot.categoryPostings(qt), score, mask, W_CATEGORY, (byte) 2);
+            addMatches(snapshot.menuPostings(qt), score, mask, W_MENU, (byte) 4);
         }
 
         if (score.isEmpty()) return new SearchResult(new PageImpl<>(List.of(), pageable, 0), Map.of());
@@ -59,7 +62,7 @@ public class InMemorySearchEngine implements RestaurantSearchEngine {
         int page = pageable.getPageNumber(); // 1-base
         int size = pageable.getPageSize();
 
-        int start = (page - 1) * size;
+        int start = page * size;
         int end = Math.min(start + size, ids.size());
 
         if (start >= ids.size()) {
@@ -68,10 +71,10 @@ public class InMemorySearchEngine implements RestaurantSearchEngine {
             ids = new ArrayList<>(ids.subList(start, end));
         }
 
-        // 4) 매칭정보 구성 (하이라이트/메뉴명 추출)
+        // 4) 매칭 정보 구성 (하이라이트/메뉴명 추출)
         HashMap<Long, SearchResult.MatchInfo> infoMap = new HashMap<>(ids.size() * 2);
 
-        List<String> highlightTokens = normalizeQueryTokensForHighlight(kwArr);
+        List<String> highlightTokens = InMemorySearchTextProcessor.normalizeQueryTokensForHighlight(kwArr);
 
         for (long id : ids) {
             byte m = mask.getOrDefault(id, (byte) 0);
@@ -83,15 +86,15 @@ public class InMemorySearchEngine implements RestaurantSearchEngine {
             List<SearchResult.Range> titleRanges = List.of();
             List<SearchResult.Range> categoryRanges = List.of();
             if ((m & 1) != 0) {
-                titleRanges = buildHighlightRanges(titleById.get(id), highlightTokens);
+                titleRanges = buildHighlightRanges(snapshot.title(id), highlightTokens);
             }
             if ((m & 2) != 0) {
-                categoryRanges = buildHighlightRanges(categoryById.get(id), highlightTokens);
+                categoryRanges = buildHighlightRanges(snapshot.category(id), highlightTokens);
             }
 
             List<String> matchedMenus = List.of();
             if ((m & 4) != 0) {
-                matchedMenus = findMatchedMenus(menusById.get(id), highlightTokens);
+                matchedMenus = findMatchedMenus(snapshot.menus(id), highlightTokens);
             }
 
             infoMap.put(id, new SearchResult.MatchInfo(fields, titleRanges, categoryRanges, matchedMenus));
@@ -100,26 +103,11 @@ public class InMemorySearchEngine implements RestaurantSearchEngine {
         return new SearchResult(new PageImpl<>(ids, pageable, total), infoMap);
     }
 
-    private static List<String> tokenizeQuery(String s) {
-        String norm = normalize(s);
-        if (norm.isEmpty()) return List.of();
-
-        String[] parts = MULTI_SPACE.split(norm);
-        List<String> out = new ArrayList<>();
-
-        for (String p : parts) {
-            if (!p.isEmpty()) {
-                out.add(p);
-            }
-        }
-        return out;
-    }
-
-    private static void addMatches(long[] postings,
-                                   HashMap<Long, Integer> score,
-                                   HashMap<Long, Byte> mask,
-                                   int weight,
-                                   byte bit) {
+    private void addMatches(long[] postings,
+                            HashMap<Long, Integer> score,
+                            HashMap<Long, Byte> mask,
+                            int weight,
+                            byte bit) {
         if (postings == null) return;
         for (long id : postings) {
             score.merge(id, weight, Integer::sum);
@@ -127,32 +115,11 @@ public class InMemorySearchEngine implements RestaurantSearchEngine {
         }
     }
 
-    private static List<String> normalizeQueryTokensForHighlight(String[] queryTokens) {
-        List<String> out = new ArrayList<>();
-
-        for (String qt : queryTokens) {
-            String norm = normalize(qt);
-            if (norm.isEmpty()) continue;
-
-            String[] parts = MULTI_SPACE.split(norm);
-            for (String p : parts) {
-                if (!p.isEmpty()) out.add(p);
-            }
-        }
-
-        LinkedHashSet<String> set = new LinkedHashSet<>(out);
-        ArrayList<String> uniq = new ArrayList<>(set);
-        uniq.sort((a, b) -> Integer.compare(b.length(), a.length()));
-        return uniq;
-    }
-
-    /**
-     * 원문 문자열에서 query token들이 등장하는 모든 위치를 range로 반환 (겹치면 merge)
-     */
-    private static List<SearchResult.Range> buildHighlightRanges(String original, List<String> tokens) {
+    // 원문 문자열에서 query token이 등장하는 모든 위치를 range로 반환한다.
+    private List<SearchResult.Range> buildHighlightRanges(String original, List<String> tokens) {
         if (original == null || original.isEmpty() || tokens.isEmpty()) return List.of();
 
-        String norm = normalize(original);
+        String norm = InMemorySearchTextProcessor.normalize(original);
 
         ArrayList<SearchResult.Range> ranges = new ArrayList<>();
         for (String t : tokens) {
@@ -166,7 +133,7 @@ public class InMemorySearchEngine implements RestaurantSearchEngine {
         }
         if (ranges.isEmpty()) return List.of();
 
-        // merge overlaps
+        // 겹치는 구간을 병합한다.
         ranges.sort(Comparator.comparingInt(r -> r.start));
         ArrayList<SearchResult.Range> merged = new ArrayList<>();
         int cs = ranges.get(0).start;
@@ -186,22 +153,23 @@ public class InMemorySearchEngine implements RestaurantSearchEngine {
         return merged;
     }
 
-    /**
-     * 메뉴 리스트에서 쿼리 토큰이 포함된 "메뉴명"을 반환
-     */
-    private static List<String> findMatchedMenus(List<String> menus, List<String> tokens) {
+    // 메뉴 리스트에서 query token을 포함한 원본 메뉴명을 반환한다.
+    private List<String> findMatchedMenus(List<String> menus, List<String> tokens) {
         if (menus == null || menus.isEmpty() || tokens.isEmpty()) return List.of();
 
         LinkedHashSet<String> matched = new LinkedHashSet<>();
         for (String menu : menus) {
             if (menu == null) continue;
-            String normMenu = normalize(menu);
+            String normMenu = InMemorySearchTextProcessor.normalize(menu);
             boolean ok = false;
             for (String t : tokens) {
                 if (t.isEmpty()) continue;
-                if (normMenu.contains(t)) { ok = true; break; }
+                if (normMenu.contains(t)) {
+                    ok = true;
+                    break;
+                }
             }
-            if (ok) matched.add(menu); // 원문 메뉴명 그대로
+            if (ok) matched.add(menu);
         }
         return new ArrayList<>(matched);
     }

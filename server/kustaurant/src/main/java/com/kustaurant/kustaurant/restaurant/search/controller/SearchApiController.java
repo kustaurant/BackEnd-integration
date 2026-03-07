@@ -39,7 +39,7 @@ public class SearchApiController implements SearchApiDoc{
             String kw, int page, int size, AuthUserInfo user
     ) {
         String[] kwList = preprocessKeyword(kw);
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page - 1, size);
 
         return ResponseEntity.ok(restaurantSearchV3Service.search(kwList, user.id(), pageable));
     }

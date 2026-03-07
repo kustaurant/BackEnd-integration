@@ -16,13 +16,13 @@ import java.util.List;
 public class InMemoryInitializer {
 
     private final RestaurantSearchRepository restaurantSearchRepository;
-    private final InMemorySearchEngine inMemorySearchEngine;
+    private final InMemorySearchEngineManager  inMemorySearchEngineManager;
 
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
         log.info("식당 검색 인덱스 초기화 실행");
         List<RestaurantForEngine> docs = restaurantSearchRepository.getRestaurantForEngine();
-        InMemorySearchEngineManager.build(docs);
+        inMemorySearchEngineManager.build(docs);
         log.info("식당 검색 인덱스 초기화 완료");
     }
 }
