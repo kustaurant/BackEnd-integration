@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.method.ParameterValidationResult;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,5 +55,28 @@ public record ApiErrorResponse(
                 details
         );
     }
-}
 
+    /** Controller method parameter validation 오류가 있을 때 */
+    public static ApiErrorResponse of(ErrorCode ec, List<ParameterValidationResult> pvr) {
+        List<SpecifiedError> details = pvr.stream()
+                .flatMap(result -> toSpecifiedErrors(result).stream())
+                .collect(Collectors.toList());
+
+        return new ApiErrorResponse(
+                ec.getStatus().value(),
+                ec.getCode(),
+                ec.getMessage(),
+                details
+        );
+    }
+
+    private static List<SpecifiedError> toSpecifiedErrors(ParameterValidationResult result) {
+        String field = result.getMethodParameter().getParameterName();
+        String value = String.valueOf(result.getArgument());
+
+        return result.getResolvableErrors()
+                .stream()
+                .map(error -> new SpecifiedError(field, value, error.getDefaultMessage()))
+                .collect(Collectors.toList());
+    }
+}

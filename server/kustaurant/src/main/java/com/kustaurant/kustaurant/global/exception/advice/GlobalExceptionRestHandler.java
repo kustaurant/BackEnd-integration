@@ -19,6 +19,7 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,6 +38,18 @@ public class GlobalExceptionRestHandler {
         );
 
         return ResponseEntity.status(ErrorCode.INVALID_INPUT_VALUE.getStatus()).body(errorResponse);
+    }
+        
+    /**   Controller Method(handler) Parameter Validation 오류   */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    protected ResponseEntity<ApiErrorResponse> handleHandlerMethodValidation(
+            HandlerMethodValidationException ex
+    ) {
+        ApiErrorResponse errorResponse = ApiErrorResponse.of(
+                ErrorCode.INVALID_INPUT_VALUE,
+                ex.getParameterValidationResults()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     /**   2. 지원되지 않는 HTTP 메서드(405)   */

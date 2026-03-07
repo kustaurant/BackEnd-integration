@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.restaurant.search.controller;
 
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.search.service.response.RestaurantSearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -74,12 +77,13 @@ public interface SearchApiDoc {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "요청,응답 좋음", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = RestaurantSearchResponse.class))}),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))}),
     })
     @GetMapping("/api/v3/search")
     ResponseEntity<RestaurantSearchResponse> searchV3(
-            @RequestParam(value = "kw", defaultValue = "") String kw,
-            @Parameter(description = "페이지는 1부터 시작하고 디폴트는 1입니다.") @RequestParam(defaultValue = "1", required = false) int page,
-            @Parameter(description = "size 디폴트는 30입니다.") @RequestParam(defaultValue = "30", required = false) int size,
+            @NotBlank @RequestParam(value = "kw", defaultValue = "") String kw,
+            @Parameter(description = "페이지는 1부터 시작하고 디폴트는 1입니다.") @Min(1) @RequestParam(defaultValue = "1", required = false) int page,
+            @Parameter(description = "size 디폴트는 30입니다.") @Min(1) @RequestParam(defaultValue = "30", required = false) int size,
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     );
 }
