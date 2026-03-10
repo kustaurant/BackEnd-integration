@@ -229,8 +229,8 @@ jobs:
       - name: 디렉터리 생성 및 권한 설정
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{ secrets.LIGHTSAIL_USERNAME }}
+          host: ${{ secrets.CRAWLER_LIGHTSAIL_HOST }}
+          username: ${{ secrets.CRAWLER_LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
           script: |
             set -e
@@ -287,7 +287,9 @@ jobs:
             # docker hub 로그인
             echo ${{ secrets.DOCKERHUB_TOKEN }} | sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             # 도커 컴포즈
-            sudo docker compose -p crawler -f docker-compose.prod.yml pull
-            sudo docker compose -p crawler -f docker-compose.prod.yml up -d
+            sudo docker compose -p kustaurant \
+            -f docker-compose.yml -f docker-compose.prod.yml pull
+            sudo docker compose -p kustaurant \
+            -f docker-compose.yml -f docker-compose.prod.yml up -d
             # 미사용(이전) 이미지 정리
             sudo docker image prune -f

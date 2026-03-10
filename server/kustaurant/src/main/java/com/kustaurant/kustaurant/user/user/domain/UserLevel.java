@@ -22,8 +22,8 @@ public enum UserLevel {
                 .findFirst().orElse(NEWBIE);
     }
 
-    /* 확장자 고정—여기선 .svg 하나만 */
+    /* 확장자 고정—여기선 .png 하나만 */
     public String iconPath() {
-        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/%s.svg".formatted(key);
+        return "https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/%s.png".formatted(key);
     }
 }

@@ -9,8 +9,4 @@ import java.util.Map;
 public interface RatingRepository {
 
     void saveAll(List<Rating> rating);
-
-    Map<Long, AiEvaluation> getAiEvaluations();
-
-    GlobalStats getGlobalStats();
 }

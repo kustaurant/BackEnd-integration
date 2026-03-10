@@ -18,5 +18,5 @@ public interface EvaluationQueryRepository {
     int countByStatus(String status);
 
     List<Evaluation> findByRestaurantIdOrderByCreatedAtDesc(Long restaurantId);
-    List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Long restaurantId);
+    List<Evaluation> findActiveByRestaurantId(Long restaurantId);
 }

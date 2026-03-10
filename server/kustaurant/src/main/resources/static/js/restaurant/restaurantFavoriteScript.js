@@ -1,5 +1,5 @@
-const beforeImgUrl = 'https://s-lol-web.op.gg/images/icon/icon-bookmark.svg?v=1702977255104';
-const afterImgUrl = 'https://s-lol-web.op.gg/images/icon/icon-bookmark-on-w.svg?v=1702977255104';
+const beforeImgUrl = 'https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/icon-bookmark.svg';
+const afterImgUrl = 'https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/icon-bookmark-on-w.svg';
 const favoriteImg = document.getElementById('favoriteImg');
 // favorite 버튼 이벤트리스너 등록
 favoriteImg.addEventListener("click", () => {

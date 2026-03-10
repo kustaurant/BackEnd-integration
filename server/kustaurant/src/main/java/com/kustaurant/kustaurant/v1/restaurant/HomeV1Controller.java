@@ -8,7 +8,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoD
 import com.kustaurant.kustaurant.restaurant.query.draw.RestaurantDrawService;
 import com.kustaurant.kustaurant.restaurant.query.home.HomeBannerApiService;
 import com.kustaurant.kustaurant.restaurant.query.home.RestaurantHomeService;
-import com.kustaurant.kustaurant.restaurant.query.search.RestaurantSearchService;
+import com.kustaurant.kustaurant.restaurant.search.service.RestaurantSearchV2Service;
 import com.kustaurant.kustaurant.v1.restaurant.response.RestaurantTierDTO;
 import com.kustaurant.kustaurant.v1.restaurant.response.RestaurantListsResponse;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -35,7 +35,7 @@ public class HomeV1Controller {
 
     private final HomeBannerApiService homeBannerApiService;
     private final RestaurantHomeService restaurantHomeService;
-    private final RestaurantSearchService restaurantSearchService;
+    private final RestaurantSearchV2Service restaurantSearchV2Service;
     private final RestaurantDrawService drawService;
 
     @GetMapping("/api/v1/home")
@@ -65,7 +65,7 @@ public class HomeV1Controller {
         }
         String[] kwList = kw.split(" ");
 
-        return ResponseEntity.ok(restaurantSearchService
+        return ResponseEntity.ok(restaurantSearchV2Service
                 .search(kwList, user.id()).stream().map(RestaurantTierDTO::fromV2).toList());
     }
 

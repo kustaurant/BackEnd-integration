@@ -45,7 +45,6 @@ public record PostCommentResponse(
                 .isCommentMine(true)
                 .replyCount(0)
                 .repliesList(null)
-                .user(null)
                 .build();
     }
 }

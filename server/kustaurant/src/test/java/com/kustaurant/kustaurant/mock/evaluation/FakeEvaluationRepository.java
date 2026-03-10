@@ -66,7 +66,7 @@ public class FakeEvaluationRepository implements EvaluationQueryRepository, Eval
     }
 
     @Override
-    public List<Evaluation> findByRestaurantIdOrderByLikeCountDesc(Long restaurantId) {
+    public List<Evaluation> findActiveByRestaurantId(Long restaurantId) {
         return data.values().stream()
                 .filter(ev -> ev.getRestaurantId().equals(restaurantId))
                 .sorted(Comparator.comparing(Evaluation::getLikeCount).reversed())

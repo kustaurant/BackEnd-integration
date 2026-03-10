@@ -8,10 +8,20 @@ spring:
       - "classpath:config/ai.yml"
 
 streams:
-  ai-analysis-start: ${STREAMS_AI_ANALYSIS_START_KEY}
+  ai-analysis-crawling: ${STREAMS_AI_ANALYSIS_CRAWLING_KEY}
+  ai-analysis-review: ${STREAMS_AI_ANALYSIS_REVIEW_KEY}
   ai-analysis-dlq: ${STREAMS_AI_ANALYSIS_DLQ_KEY}
   group: ${STREAMS_GROUP}
 
 logging:
   level:
     org.springframework.ai.retry: ERROR
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    prometheus:
+      enabled: true

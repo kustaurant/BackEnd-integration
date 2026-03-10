@@ -28,6 +28,7 @@ public interface RestaurantChartApiDoc {
     @Operation(
             summary = "티어표 리스트 불러오기",
             description = "파라미터로 받는 page(1부터 카운트)의 limit개의 식당 리스트를 반환합니다. 현재는 파라미터와 무관한 데이터를 반환합니다. (mainTier가 -1인 것은 티어가 아직 매겨지지 않은 식당입니다.)\n\n" +
+            "isTempTier는 ai 파라미터를 true로 설정한 경우에 AI 임시티어를 구분하기 위함 필드입니다.\n\n" +
             "- 반환 값 보충 설명\n\n" +
             "   - restaurantId: not null\n\n" +
             "   - restaurantRanking: **null일 수 있습니다.**\n\n" +
@@ -36,6 +37,7 @@ public interface RestaurantChartApiDoc {
             "   - restaurantPosition: not null\n\n" +
             "   - restaurantImgUrl: not null\n\n" +
             "   - mainTier: not null\n\n" +
+            "   - isTempTier: not null\n\n" +
             "   - isEvaluated: not null\n\n" +
             "   - isFavorite: not null\n\n" +
             "   - x: not null\n\n" +
@@ -75,6 +77,11 @@ public interface RestaurantChartApiDoc {
                             name = "limit", in = ParameterIn.QUERY,
                             description = "한 페이지의 항목 개수.",
                             schema = @Schema(type = "integer", defaultValue = "30", minimum = "1", maximum = "100")
+                    ),
+                    @Parameter(
+                            name = "ai", in = ParameterIn.QUERY,
+                            description = "AI 임시 티어 포함 여부. true로 설정할 경우 임시 티어가 포함된 결과가 반환됩니다.",
+                            schema = @Schema(type = "boolean", defaultValue = "false")
                     )
             }
     )
@@ -142,6 +149,11 @@ public interface RestaurantChartApiDoc {
                             example = "L1,L2,L3",
                             style = ParameterStyle.FORM, explode = Explode.FALSE,
                             array = @ArraySchema(schema = @Schema(type = "string"))
+                    ),
+                    @Parameter(
+                            name = "ai", in = ParameterIn.QUERY,
+                            description = "AI 임시 티어 포함 여부. true로 설정할 경우 임시 티어가 포함된 결과가 반환됩니다.",
+                            schema = @Schema(type = "boolean", defaultValue = "false")
                     )
             }
     )

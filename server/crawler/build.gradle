@@ -32,6 +32,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     // log
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+    // observability
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    testImplementation 'com.h2database:h2'
 }
 
 tasks.register('installPlaywright', JavaExec) {

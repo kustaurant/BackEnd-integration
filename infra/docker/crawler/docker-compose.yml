@@ -1,0 +1,27 @@
+services:
+  promtail:
+    image: grafana/promtail:2.9.6
+    container_name: crawler-promtail
+    env_file:
+      - .env
+    command: -config.expand-env=true -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml:ro
+      - ${LOG_DIR}:/var/log:ro
+    environment:
+      - LOKI_HOST=${LOKI_HOST}
+    restart: unless-stopped
+
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: crawler-node-exporter
+    ports:
+      - "9100:9100"
+    pid: host
+    volumes:
+      - /:/host:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    command:
+      - '--path.rootfs=/host'
+    restart: unless-stopped

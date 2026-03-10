@@ -6,6 +6,8 @@ import com.kustaurant.kustaurant.rating.domain.service.ScoreCalculationService;
 import com.kustaurant.kustaurant.rating.domain.vo.EvaluationWithContext;
 import com.kustaurant.kustaurant.rating.domain.service.TierCalculationService;
 import com.kustaurant.kustaurant.rating.domain.vo.GlobalStats;
+import com.kustaurant.kustaurant.rating.domain.vo.Tier;
+import com.kustaurant.kustaurant.rating.service.port.AiSummaryRepository;
 import com.kustaurant.kustaurant.rating.service.port.RatingEvaluationRepository;
 import com.kustaurant.kustaurant.rating.service.port.RatingRepository;
 import com.kustaurant.kustaurant.rating.service.port.RatingRestaurantRepository;
@@ -30,6 +32,7 @@ public class RatingOrchestrationService {
     private final ScoreCalculationService scoreCalculationService;
     private final TierCalculationService tierCalculationService;
     private final RatingRepository ratingRepository;
+    private final AiSummaryRepository aiSummaryRepository;
 
     @Transactional
     public void calculateAllRatings() {
@@ -43,8 +46,8 @@ public class RatingOrchestrationService {
 
     private List<Rating> calculateScores(List<Long> ids) {
         Map<Long, List<EvaluationWithContext>> selfEvalMap = ratingEvaluationRepository.getEvaluationsByRestaurantIds(ids);
-        Map<Long, AiEvaluation> aiEvalMap = ratingRepository.getAiEvaluations();
-        GlobalStats globalStats = ratingRepository.getGlobalStats();
+        Map<Long, AiEvaluation> aiEvalMap = aiSummaryRepository.getAiEvaluations();
+        GlobalStats globalStats = aiSummaryRepository.getGlobalStats();
 
         List<Rating> scores = scoreCalculationService.calculateScores(ids, selfEvalMap, aiEvalMap, globalStats);
         log.info("점수 계산 완료");

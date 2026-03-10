@@ -2,7 +2,6 @@ package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repositor
 
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.*;
 
-import com.kustaurant.jpa.restaurant.repository.RestaurantJpaRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.mapper.RestaurantMapper;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;

@@ -84,7 +84,7 @@
                     <div id="restaurantName" th:text="${restaurantDto.restaurantName}"></div>
                     <div id="favoriteContainer">
                         <img id="favoriteImg" th:class="${restaurantDto.isFavorite} ? 'after-favorite' : 'before-favorite'"
-                             th:src="${restaurantDto.isFavorite} ? 'https://s-lol-web.op.gg/images/icon/icon-bookmark-on-w.svg?v=1702977255104' : 'https://s-lol-web.op.gg/images/icon/icon-bookmark.svg?v=1702977255104'">
+                             th:src="${restaurantDto.isFavorite} ? 'https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/icon-bookmark-on-w.svg' : 'https://kustaurant.s3.ap-northeast-2.amazonaws.com/common/icon-bookmark.svg'">
                     </div>
                 </div>
                 <span id="restaurantType" th:text="${restaurantDto.restaurantType}"></span>

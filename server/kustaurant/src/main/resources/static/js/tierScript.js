@@ -1,6 +1,7 @@
+// [[ AI TIER 표시 ]]
+const PARAM_AI = 'ai';
+
 $(document).ready(function () {
-    // [[ AI TIER 표시 ]]
-    const PARAM_AI = 'ai';
     aiTier();
 
     // --------------- 클릭된 종류 버튼 효과 ----------------------------

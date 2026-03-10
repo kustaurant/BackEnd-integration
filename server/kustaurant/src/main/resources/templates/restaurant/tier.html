@@ -25,11 +25,14 @@
     <!--    <link rel="stylesheet" type="text/css" href="/css/navbar-style.css">-->
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
+    <!--  csrf token  -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
     <!-- 아이콘  -->
-    <script src="https://kit.fontawesome.com/0c60714712.js" crossorigin="anonymous"></script>
+<!--    <script src="https://kit.fontawesome.com/0c60714712.js" crossorigin="anonymous"></script>-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <!-- 탭 관련 라이브러리 / 순서 지켜야함 -->
-
     <link rel="stylesheet" href="/css/library/vendors.min.css">
     <link rel="stylesheet" href="/css/library/style.min.css">
     <link rel="stylesheet" href="/css/library/responsive.min.css">
@@ -40,10 +43,10 @@
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.png">
 
     <!-- js   -->
-    <script type="text/javascript" src="/js/library/jquery.js"></script>
-    <script type="text/javascript" src="/js/library/vendors.min.js"></script>
-    <script type="text/javascript" src="/js/library/main.js"></script>
-    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=u11upwlala"></script>
+    <script type="text/javascript" src="/js/library/jquery.js" defer></script>
+    <script type="text/javascript" src="/js/library/vendors.min.js" defer></script>
+    <script type="text/javascript" src="/js/library/main.js" defer></script>
+    <script src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=u11upwlala" defer></script>
     <script src="/js/tierScript.js" defer></script>
     <script src="/js/restaurant/tierMapScript.js" defer></script>
 
@@ -254,7 +257,7 @@
         <div class="ai-tier">
             <label class="ai-checkbox-container">
                 <input type="checkbox" id="aiTierCheckbox" th:checked="${aiTier}"/>
-                <span>AI 기반 임식 티어 포함</span>
+                <span>AI 기반 임시 티어 포함</span>
             </label>
             <div class="ai-tooltip">
                 <div class="ai-tooltip-icon">?</div>
@@ -314,7 +317,7 @@
                     </div>
                 </td>
                 <td th:if="${!isJH}" class="td-center" style="min-width: 42px">
-                    <div th:if="${restaurantTierData.mainTier > 0}"
+                    <div th:if="${restaurantTierData.mainTier > 0 && (aiTier || (!aiTier && !restaurantTierData.isTempTier))}"
                          class="tier-img-wrap"
                          th:classappend="${restaurantTierData.isTempTier} ? ' ai-temp'">
                         <img class="td-tier-img" th:classappend="${restaurantTierData.isTempTier} ? ' ai-temp-img'"
@@ -325,7 +328,7 @@
                             AI가 분석한 임시 티어입니다.
                         </div>
                     </div>
-                    <span th:if="${restaurantTierData.mainTier < 1}" style="padding-right: 10px;">-</span>
+                    <span th:if="${restaurantTierData.mainTier < 0 || (!aiTier && restaurantTierData.isTempTier)}" style="padding-right: 10px;">-</span>
                 </td>
                 <td style="min-width: 46px">
                     <div class="td-cuisine-outer">
@@ -366,15 +369,5 @@
 <!--footer-->
 <footer th:replace="~{common/footer::footerFragment}">
 </footer>
-<!-- 자바스크립트 데이터 전달용 태그 -->
-<div id="mapInfo"
-     th:attr="data-latitude=${mapLatitude},
-     data-longitude=${mapLongitude},
-     data-zoom=${mapZoom},
-     data-locationIndex=${locationIndex}">
-</div>
-<script th:inline="javascript">
-  const mapData = /*[[${mapData}]]*/ {};
-</script>
 
 </html>

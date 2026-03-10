@@ -10,7 +10,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.restaurant.query.draw.RestaurantDrawRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.mapper.RestaurantMapper;
-import com.kustaurant.jpa.restaurant.repository.RestaurantJpaRepository;
+import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository.RestaurantJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

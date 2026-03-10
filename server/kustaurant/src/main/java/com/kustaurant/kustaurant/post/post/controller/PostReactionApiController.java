@@ -22,25 +22,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@Tag(name = "community-post-reaction-controller")
-public class PostReactionApiController {
+public class PostReactionApiController implements PostReactionApiDoc {
     private final PostScrapService postScrapService;
     private final PostReactionService postReactionService;
 
     // 1. 게시글 좋아요/싫어요
     @PutMapping("/v2/auth/community/{postId}/reaction")
-    @Operation(summary = "게시글 좋아요/싫어요",
-            description = "게시글 ID를 입력받아 좋아요/싫어요 토글. " +
-                    "\n\n유저의 반응상태(LIKE,DISLIKE,null)와 현재 게시글의 좋아요/싫어요 수를 반환합니다. ")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 좋아요 처리가 완료되었습니다", content = @Content(schema = @Schema(implementation = PostReactionResponse.class))),
-            @ApiResponse(responseCode = "404", description = "해당 ID의 게시글이 존재하지 않습니다", content = @Content(schema = @Schema(implementation = ApiErrorResponse.class)))
-    })
     public ResponseEntity<PostReactionResponse> setPostReaction(
             @PathVariable Long postId,
-            @Parameter(description = "목표 반응 상태(좋아요=LIKE, 싫어요=DISLIKE, 해제=값 전달x). 미전달 시 해제")
             @RequestParam(required = false) ReactionType cmd,
-            @Parameter(hidden = true) @AuthUser AuthUserInfo user
+            @AuthUser AuthUserInfo user
     ) {
         PostReactionResponse response = postReactionService.setPostReaction(postId, user.id(), cmd);
         return ResponseEntity.ok(response);
@@ -59,9 +50,8 @@ public class PostReactionApiController {
     @PostMapping("/v2/auth/community/{postId}/scraps")
     public ResponseEntity<PostScrapResponse> setPostScrap(
             @PathVariable Long postId,
-            @Parameter(description = "true=스크랩, false=해제", required = true, example = "true")
             @RequestParam boolean scrapped,
-            @Parameter(hidden = true) @AuthUser AuthUserInfo user
+            @AuthUser AuthUserInfo user
     ) {
         PostScrapResponse scrapToggleDTO = postScrapService.toggleScrapWithCount(postId, user.id(), scrapped);
         return ResponseEntity.ok(scrapToggleDTO);
