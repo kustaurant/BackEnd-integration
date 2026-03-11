@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.admin.crawl.service;
 
 import com.kustaurant.jpa.restaurant.IGPost;
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
+import com.kustaurant.kustaurant.admin.crawl.IgRawSaveResult;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IGCrawlerClient;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IgCrawlRawEntity;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IgCrawlRawRepository;
@@ -17,15 +18,16 @@ public class IgCrawlRawSaveService {
     private final IGCrawlerClient crawlerClient;
     private final IgCrawlRawRepository rawRepo;
 
-    public int crawlAndReplaceAll(String accountName, PartnershipTarget target) {
+    public IgRawSaveResult crawlAndReplaceAll(String accountName, PartnershipTarget target) {
         List<IGPost> posts = crawlerClient.crawl(accountName);
-        if (posts == null || posts.isEmpty()) return 0;
-        return replaceAll(accountName, target, posts);
+        if (posts == null || posts.isEmpty()) return new IgRawSaveResult(0,0);
+        int savedCnt = replaceAll(accountName, target, posts);
+
+        return new IgRawSaveResult(posts.size(), savedCnt);
     }
 
     @Transactional
     protected int replaceAll(String accountName, PartnershipTarget target, List<IGPost> posts) {
-
         // 1) 기존 raw 전부 삭제
         rawRepo.deleteBySourceAccount(accountName);
 

@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
 import com.kustaurant.kustaurant.admin.crawl.controller.PagedRestaurantResponse;
-import com.kustaurant.kustaurant.admin.crawl.controller.PartnershipListResponse;
+import com.kustaurant.kustaurant.admin.crawl.PartnershipListResponse;
 import com.kustaurant.kustaurant.admin.adminPage.controller.response.RestaurantListResponse;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
@@ -77,7 +77,7 @@ public class AdminRestaurantQueryRepository {
                 .select(Projections.constructor(PartnershipListResponse.class,
                         restaurantPartnershipEntity.id,
                         restaurantPartnershipEntity.restaurantId,
-                        restaurantPartnershipEntity.partnerName,
+                        restaurantPartnershipEntity.restaurantName,
                         restaurantPartnershipEntity.target.stringValue(),
                         restaurantPartnershipEntity.benefit,
                         restaurantPartnershipEntity.matchStatus.stringValue(),

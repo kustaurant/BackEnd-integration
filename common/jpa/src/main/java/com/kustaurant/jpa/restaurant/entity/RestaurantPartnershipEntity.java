@@ -8,6 +8,7 @@ import lombok.*;
 
 @Getter
 @Entity
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,8 +21,8 @@ public class RestaurantPartnershipEntity extends BaseTimeEntity {
     @Column(name = "restaurant_id")
     private Long restaurantId; // NULL 허용
 
-    @Column(name = "partner_name", nullable = false, length = 255)
-    private String partnerName;
+    @Column(name = "restaurant_name", nullable = false, length = 255)
+    private String restaurantName;
 
     @Column(name = "benefit", nullable = false, length = 255)
     private String benefit;

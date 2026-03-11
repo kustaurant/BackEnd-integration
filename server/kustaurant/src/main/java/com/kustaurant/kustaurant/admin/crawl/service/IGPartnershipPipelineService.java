@@ -1,10 +1,15 @@
 package com.kustaurant.kustaurant.admin.crawl.service;
 
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
+import com.kustaurant.kustaurant.admin.crawl.IgImportResult;
+import com.kustaurant.kustaurant.admin.crawl.IgRawSaveResult;
+import com.kustaurant.kustaurant.admin.crawl.controller.IgCrawlResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class IGPartnershipPipelineService {
@@ -13,10 +18,18 @@ public class IGPartnershipPipelineService {
     private final IGPartnershipImportService importService;
 
     @Transactional
-    public int crawlAndImport(String accountName, PartnershipTarget target) {
-        int rawCount = rawSaveService.crawlAndReplaceAll(accountName, target);
-        if (rawCount == 0) return 0;
+    public IgCrawlResponse crawlAndImport(String accountName, PartnershipTarget target) {
+        log.info("22");
+        IgRawSaveResult rawResult = rawSaveService.crawlAndReplaceAll(accountName, target);
+        if (rawResult.rawSavedCount() == 0) return new IgCrawlResponse(rawResult.crawledPages(), 0, 0, 0);
+        log.info("33");
 
-        return importService.importFromRaw(accountName, target);
+        IgImportResult importResult = importService.importFromRaw(accountName, target);
+        return new IgCrawlResponse(
+                rawResult.crawledPages(),
+                rawResult.rawSavedCount(),
+                importResult.matchedRestaurantCount(),
+                importResult.unmatchedRestaurantCount()
+        );
     }
 }

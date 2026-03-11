@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>kustaurant 어드민 페이지</title>
+
     <link rel="stylesheet" href="/css/admin/admin-styles.css">
-    <!-- 분리된 JavaScript 파일들 -->
+
+    <!-- JavaScript 파일들 -->
     <script src="/js/admin/utils.js" defer></script>
+    <script src="/js/admin/admin-modal-loader.js" defer></script>
     <script src="/js/admin/admin-users.js" defer></script>
     <script src="/js/admin/admin-restaurants.js" defer></script>
     <script src="/js/admin/admin-feedbacks.js" defer></script>
@@ -174,7 +177,10 @@
 
                     <table id="partnerships-table">
                         <thead>
-                        <tr><th>ID</th><th>음식점ID</th><th>제휴업체명</th><th>타겟</th><th>혜택</th><th>상태</th><th>출처</th><th>등록일</th><th>수정일</th></tr>
+                        <tr>
+                            <th>ID</th><th>음식점ID</th><th>제휴업체명</th><th>타겟</th>
+                            <th>혜택</th><th>상태</th><th>출처</th><th>등록일</th><th>수정일</th><th>수정</th>
+                        </tr>
                         </thead>
                         <tbody id="partnerships-tbody">
                         <!-- 데이터는 JavaScript로 동적 생성 -->

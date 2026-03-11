@@ -1,4 +1,4 @@
--- 여기부터 prod V4
+-- 여기부터 prod V7
 CREATE TABLE ig_crawl_raw (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     source_account VARCHAR(64) NOT NULL COMMENT '크롤링한 인스타 계정',
@@ -20,7 +20,7 @@ CREATE INDEX idx_ig_crawl_raw_target ON ig_crawl_raw (target);
 CREATE TABLE restaurant_partnership (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     restaurant_id BIGINT NULL,
-    partner_name VARCHAR(255) NOT NULL,
+    restaurant_name VARCHAR(255) NOT NULL,
     benefit VARCHAR(255) NOT NULL,
     location_text VARCHAR(255) NOT NULL,
     contact_phone VARCHAR(32),
@@ -29,5 +29,6 @@ CREATE TABLE restaurant_partnership (
     match_status VARCHAR(32) NOT NULL,
     target VARCHAR(32) NOT NULL,
     created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL
+    updated_at DATETIME NOT NULL,
+    CONSTRAINT uk_restaurant_partnership_post_url UNIQUE (post_url)
 );

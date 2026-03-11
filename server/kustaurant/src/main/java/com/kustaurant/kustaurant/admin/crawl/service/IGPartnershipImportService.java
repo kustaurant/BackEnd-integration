@@ -3,16 +3,20 @@ package com.kustaurant.kustaurant.admin.crawl.service;
 import com.kustaurant.jpa.restaurant.entity.RestaurantPartnershipEntity;
 import com.kustaurant.jpa.restaurant.enums.MatchStatus;
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
+import com.kustaurant.kustaurant.admin.crawl.IgImportResult;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IgCrawlRawEntity;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IgCrawlRawRepository;
 import com.kustaurant.kustaurant.restaurant.partnership.RestaurantPartnershipJpaRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class IGPartnershipImportService {
@@ -23,13 +27,11 @@ public class IGPartnershipImportService {
     private final PhoneNumberNormalizer phoneNumberNormalizer;
 
     @Transactional
-    public int importFromRaw(String accountName, PartnershipTarget target) {
+    public IgImportResult importFromRaw(String accountName, PartnershipTarget target) {
 
         // 1. raw 조회
         List<IgCrawlRawEntity> raws = rawRepo.findBySourceAccount(accountName);
-        if (raws.isEmpty()) {
-            return 0;
-        }
+        if (raws.isEmpty()) return new IgImportResult(0, 0);
 
         // 2. 기존 partnership postUrl 조회 (중복 skip)
         List<String> postUrls = raws.stream()
@@ -70,6 +72,9 @@ public class IGPartnershipImportService {
         // 5. partnership 생성
         List<RestaurantPartnershipEntity> toSave = new ArrayList<>();
 
+        int matchedCount = 0;
+        int unmatchedCount = 0;
+
         for (IgCrawlRawEntity raw : raws) {
             String postUrl = raw.getPostUrl();
 
@@ -91,9 +96,12 @@ public class IGPartnershipImportService {
                 }
             }
 
+            if (matchStatus == MatchStatus.MATCHED) matchedCount++;
+            else unmatchedCount++;
+
             toSave.add(RestaurantPartnershipEntity.builder()
                     .restaurantId(restaurantId)
-                    .partnerName(raw.getRestaurantName())
+                    .restaurantName(raw.getRestaurantName())
                     .benefit(raw.getBenefit())
                     .locationText(raw.getLocation())
                     .contactPhone(normalizedPhone)
@@ -104,7 +112,12 @@ public class IGPartnershipImportService {
                     .build());
         }
 
-        partnershipRepo.saveAll(toSave);
-        return toSave.size();
+        try {
+            partnershipRepo.saveAll(toSave);
+        } catch (DataIntegrityViolationException e) {
+            log.warn("duplicate postUrl ignored");
+        }
+
+        return new IgImportResult(matchedCount, unmatchedCount);
     }
 }

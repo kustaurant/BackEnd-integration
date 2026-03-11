@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin.crawl.controller;
+package com.kustaurant.kustaurant.admin.crawl;
 
 import java.time.LocalDateTime;
 

@@ -1,0 +1,41 @@
+<div id="crawl-modal" class="admin-modal hidden">
+    <div class="admin-modal-overlay"></div>
+
+    <div class="admin-modal-content">
+        <div class="admin-modal-header">
+            <h3>인스타 제휴 크롤링 실행</h3>
+            <button type="button" id="crawl-modal-close" class="modal-close-btn">×</button>
+        </div>
+
+        <div class="admin-modal-body">
+            <div class="form-group">
+                <label for="crawl-account">인스타 계정</label>
+                <input type="text" id="crawl-account" placeholder="ex) kustaurant_official">
+            </div>
+
+            <div class="form-group">
+                <label for="crawl-target">타겟 단과대</label>
+                <select id="crawl-target">
+                    <option value="">선택하세요</option>
+                    <option value="ALL">전체</option>
+                    <option value="ENGINEERING">공과대학</option>
+                    <option value="SCIENCE">이과대학</option>
+                    <option value="VETERINARY">수의과대학</option>
+                    <option value="EDUCATION">사범대학</option>
+                    <option value="ART_DESIGN">예술디자인대학</option>
+                    <option value="LIFE_SCIENCE">생명과학대학</option>
+                    <option value="CONVERGENCE">융합과학기술원</option>
+                </select>
+            </div>
+
+            <p class="crawl-help-text">
+                입력한 계정을 기준으로 크롤링 후 자동 매칭까지 수행합니다.
+            </p>
+        </div>
+
+        <div class="admin-modal-footer">
+            <button type="button" id="crawl-cancel-btn">취소</button>
+            <button type="button" id="crawl-submit-btn">크롤링 실행</button>
+        </div>
+    </div>
+</div>
