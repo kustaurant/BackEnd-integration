@@ -4,9 +4,12 @@ import com.kustaurant.jpa.common.entity.BaseTimeEntity;
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "ig_crawl_raw")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class IgCrawlRawEntity extends BaseTimeEntity {
     @Id
@@ -69,9 +72,5 @@ public class IgCrawlRawEntity extends BaseTimeEntity {
             PartnershipTarget target
     ) {
         return new IgCrawlRawEntity(sourceAccount, shortCode, postUrl, restaurantName, benefit, location, phoneNumber, target);
-    }
-
-    public void updatePostUrl(String newUrl) {
-        this.postUrl = newUrl;
     }
 }

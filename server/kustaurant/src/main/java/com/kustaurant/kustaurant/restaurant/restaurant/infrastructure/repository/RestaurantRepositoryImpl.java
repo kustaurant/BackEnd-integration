@@ -9,7 +9,8 @@ import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundExceptio
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.Collection;
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,8 +29,10 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
         jpa.incrementViews(restaurantId);
     }
 
-    @Override
-    public Optional<Long> findIdByPhoneNumber(String phoneNumber) {
-        return jpa.findIdByPhoneNumber(phoneNumber);
+    @Override // autoCrawl 전용
+    public List<RestaurantPhoneMatch> findIdsByPhoneNumbers(Collection<String> phoneNumbers) {
+        return jpa.findIdsByPhoneNumbers(phoneNumbers).stream()
+                .map(p -> new RestaurantPhoneMatch(p.getId(), p.getPhoneNumber()))
+                .toList();
     }
 }
