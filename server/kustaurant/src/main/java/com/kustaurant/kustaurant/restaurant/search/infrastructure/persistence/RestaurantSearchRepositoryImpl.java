@@ -92,6 +92,7 @@ public class RestaurantSearchRepositoryImpl implements RestaurantSearchRepositor
                 .transform(groupBy(restaurantEntity.restaurantId).as(
                         com.querydsl.core.types.Projections.constructor(
                                 RestaurantForSearch.class,
+                                restaurantEntity.restaurantId,
                                 restaurantEntity.restaurantName,
                                 restaurantEntity.restaurantCuisine,
                                 restaurantEntity.restaurantPosition,
