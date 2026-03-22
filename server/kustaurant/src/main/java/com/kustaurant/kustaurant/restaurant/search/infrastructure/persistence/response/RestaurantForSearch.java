@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.search.infrastructure.persistence.response;
 
 public record RestaurantForSearch(
+        long id,
         String name,
         String cuisine,
         String position,

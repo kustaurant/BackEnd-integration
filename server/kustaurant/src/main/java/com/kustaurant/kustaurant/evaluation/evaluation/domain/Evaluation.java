@@ -1,10 +1,12 @@
 package com.kustaurant.kustaurant.evaluation.evaluation.domain;
 
+import java.util.Collections;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Builder(toBuilder = true)
 @Getter
@@ -33,7 +35,8 @@ public class Evaluation {
                 .createdAt(LocalDateTime.now())
                 .commentBody(dto.getEvaluationComment())
                 .commentImgUrl(dto.getEvaluationImgUrl())
-                .situationIds(dto.getEvaluationSituations())
+                .situationIds(Optional.ofNullable(dto.getEvaluationSituations())
+                        .orElse(Collections.emptyList()))
                 .userId(userId)
                 .restaurantId(restaurantId)
                 .likeCount(0)

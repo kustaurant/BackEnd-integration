@@ -3,10 +3,7 @@ package com.kustaurant.kustaurant.evaluation.evaluation.domain;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.EvaluationConstants;
 import com.kustaurant.kustaurant.evaluation.evaluation.constants.StarComment;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -16,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "evaluation data dto entity")
+@ToString
 public class EvaluationDTO {
     @Schema(description = "메인 별점", example = "4.5")
     private Double evaluationScore;
