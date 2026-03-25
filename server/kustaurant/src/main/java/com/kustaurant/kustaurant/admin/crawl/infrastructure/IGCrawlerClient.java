@@ -1,6 +1,8 @@
 package com.kustaurant.kustaurant.admin.crawl.infrastructure;
 
 import com.kustaurant.jpa.restaurant.IGPost;
+import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
+import com.kustaurant.kustaurant.admin.crawl.controller.IgCrawlRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,12 +29,12 @@ public class IGCrawlerClient {
                 .build();
     }
 
-    public List<IGPost> crawl(String username) {
+    public List<IGPost> crawl(String accountName, PartnershipTarget target) {
         try{
-            log.info("crawler 서버 호출 시작 username={}", username);
+            log.info("crawler 서버 호출 시작 accountName={}", accountName);
             return webClient.post()
                     .uri("/api/ig/crawl")
-                    .bodyValue(Map.of("userName", username))
+                    .bodyValue(new IgCrawlRequest(accountName, target))
                     .retrieve()
                     .onStatus(
                             HttpStatusCode::isError,

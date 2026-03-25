@@ -33,12 +33,12 @@ public class Crawler {
         }
     }
 
-    public List<IGPost> crawl(String username) {
+    public List<IGPost> crawl(CrawlRequest req) {
         List<IGPost> results = new ArrayList<>();
 
         boolean firstRun = !Files.exists(STATE_PATH);
         log.info("===== Instagram Crawler START(JSON) =====");
-        log.info("username = {}", username);
+        log.info("accountName = {}", req.accountName());
 
         // JSON에서 뽑은 raw 포스트들 버퍼
         List<RawPost> rawPosts = Collections.synchronizedList(new ArrayList<>());
@@ -83,7 +83,7 @@ public class Crawler {
             // **피드 JSON 응답 가로채는 리스너 등록**
             attachFeedJsonListener(page, rawPosts);
 
-            String profileUrl = INSTAGRAM_BASE_URL + "/" + username + "/";
+            String profileUrl = INSTAGRAM_BASE_URL + "/" + req.accountName() + "/";
             log.info("Navigate profile: {}", profileUrl);
 
             page.navigate(profileUrl, new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));

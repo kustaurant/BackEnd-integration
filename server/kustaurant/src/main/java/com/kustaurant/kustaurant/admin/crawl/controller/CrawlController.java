@@ -37,7 +37,6 @@ public class CrawlController {
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
     @PostMapping("/ig/run")
     public IgCrawlResponse runPipeline(@Valid @RequestBody IgCrawlRequest req) {
-        log.info("컨트롤러까지 도달은했다");
         return pipelineService.crawlAndImport(
                 req.accountName(),
                 req.target()

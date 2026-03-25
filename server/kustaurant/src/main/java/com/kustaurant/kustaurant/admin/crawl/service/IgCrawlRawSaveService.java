@@ -19,7 +19,7 @@ public class IgCrawlRawSaveService {
     private final IgCrawlRawRepository rawRepo;
 
     public IgRawSaveResult crawlAndReplaceAll(String accountName, PartnershipTarget target) {
-        List<IGPost> posts = crawlerClient.crawl(accountName);
+        List<IGPost> posts = crawlerClient.crawl(accountName, target);
         if (posts == null || posts.isEmpty()) return new IgRawSaveResult(0,0);
         int savedCnt = replaceAll(accountName, target, posts);
 

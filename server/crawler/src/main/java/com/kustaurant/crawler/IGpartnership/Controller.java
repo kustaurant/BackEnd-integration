@@ -17,6 +17,6 @@ public class Controller {
 
     @PostMapping("/crawl")
     public List<IGPost> crawl(@RequestBody CrawlRequest req) {
-        return crawler.crawl(req.userName());
+        return crawler.crawl(req);
     }
 }
