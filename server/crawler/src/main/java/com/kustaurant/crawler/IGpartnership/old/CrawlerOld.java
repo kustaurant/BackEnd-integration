@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kustaurant.jpa.restaurant.IGPost;
 import com.microsoft.playwright.*;
-import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitUntilState;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
@@ -17,21 +17,16 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class Crawler {
+public class CrawlerOld {
     private static final String INSTAGRAM_BASE_URL = "https://www.instagram.com";
     private static final Path STATE_PATH = Paths.get(System.getProperty("user.dir"), "ig_state.json");
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    /** feed json에서 뽑은 raw 데이터 */
-    private static class RawPost {
-        final String code;
-        final String caption;
+    @Value("${instagram.username}")
+    String id;
 
-        RawPost(String code, String caption) {
-            this.code = code;
-            this.caption = caption;
-        }
-    }
+    @Value("${instagram.password}")
+    String pw;
 
     public List<IGPost> crawl(CrawlRequest req) {
         List<IGPost> results = new ArrayList<>();
@@ -245,35 +240,58 @@ public class Crawler {
      * 최초 1회 로그인해서 storageState 저장
      */
     private void doLoginAndSaveState(BrowserContext context) {
-        String id = System.getenv("IG_USERNAME");
-        String pw = System.getenv("IG_PASSWORD");
+        log.info("step0: entered doLoginAndSaveState");
+        log.info("id = {}", id);
+        log.info("pw exists = {}", pw != null && !pw.isBlank());
 
-        if (id == null || pw == null) {
-            log.warn("IG_USERNAME / IG_PASSWORD not found. Manual login mode.");
-            Page p = context.newPage();
-            p.navigate(INSTAGRAM_BASE_URL + "/accounts/login/");
-            log.warn("Login manually within 60 seconds...");
-            p.waitForTimeout(60000);
-
-            context.storageState(new BrowserContext.StorageStateOptions()
-                    .setPath(STATE_PATH));
-            p.close();
-            return;
+        if (id == null || id.isBlank() || pw == null || pw.isBlank()) {
+            throw new IllegalStateException("instagram.username / instagram.password 값이 비어 있음");
         }
 
         Page loginPage = context.newPage();
-        loginPage.navigate(INSTAGRAM_BASE_URL + "/accounts/login/",
-                new Page.NavigateOptions().setWaitUntil(WaitUntilState.NETWORKIDLE));
 
-        loginPage.locator("input[name='username']").fill(id);
-        loginPage.locator("input[name='password']").fill(pw);
+        loginPage.navigate(INSTAGRAM_BASE_URL + "/accounts/login/",
+                new Page.NavigateOptions().setWaitUntil(WaitUntilState.DOMCONTENTLOADED));
+
+        loginPage.waitForTimeout(5000);
+
+        log.info("url = {}", loginPage.url());
+        log.info("title = {}", loginPage.title());
+//
+//        List<String> inputs = (List<String>) loginPage.locator("input").evaluateAll(
+//                "els => els.map(e => e.outerHTML)"
+//        );
+//        log.info("all inputs = {}", inputs);
+
+        Locator usernameInput = loginPage.locator(
+                "input[name='email'], input[autocomplete*='username'], input[type='text']"
+        ).first();
+
+        Locator passwordInput = loginPage.locator(
+                "input[name='pass'], input[autocomplete*='password'], input[type='password']"
+        ).first();
+
+        log.info("username candidate count = {}", loginPage.locator(
+                "input[name='username'], input[autocomplete='username'], input[aria-label*='사용자'], input[aria-label*='username'], input[type='text']"
+        ).count());
+
+        log.info("password candidate count = {}", loginPage.locator(
+                "input[name='password'], input[name='enc_password'], input[autocomplete='current-password'], input[aria-label*='비밀번호'], input[aria-label*='password'], input[type='password']"
+        ).count());
+
+        usernameInput.waitFor(new Locator.WaitForOptions().setTimeout(10000));
+        passwordInput.waitFor(new Locator.WaitForOptions().setTimeout(10000));
+
+        usernameInput.fill(id);
+        passwordInput.fill(pw);
+
         loginPage.keyboard().press("Enter");
 
-        loginPage.waitForLoadState(LoadState.NETWORKIDLE);
-        loginPage.waitForTimeout(5000);
+        loginPage.waitForTimeout(7000);
 
         context.storageState(new BrowserContext.StorageStateOptions()
                 .setPath(STATE_PATH));
+
         loginPage.close();
     }
 
