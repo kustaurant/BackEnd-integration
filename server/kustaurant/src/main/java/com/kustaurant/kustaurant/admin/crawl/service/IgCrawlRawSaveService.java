@@ -2,7 +2,7 @@ package com.kustaurant.kustaurant.admin.crawl.service;
 
 import com.kustaurant.jpa.restaurant.IGPost;
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
-import com.kustaurant.kustaurant.admin.crawl.IgRawSaveResult;
+import com.kustaurant.kustaurant.admin.crawl.controller.command.IgRawSaveResult;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IGCrawlerClient;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IgCrawlRawEntity;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IgCrawlRawRepository;

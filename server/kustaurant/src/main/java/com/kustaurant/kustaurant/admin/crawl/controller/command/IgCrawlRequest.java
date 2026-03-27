@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin.crawl.controller;
+package com.kustaurant.kustaurant.admin.crawl.controller.command;
 
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
 import jakarta.validation.constraints.NotNull;

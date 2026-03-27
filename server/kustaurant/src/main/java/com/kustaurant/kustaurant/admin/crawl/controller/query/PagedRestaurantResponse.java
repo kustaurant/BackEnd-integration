@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin.crawl.controller;
+package com.kustaurant.kustaurant.admin.crawl.controller.query;
 
 import com.kustaurant.kustaurant.admin.adminPage.controller.response.RestaurantListResponse;
 

@@ -316,6 +316,12 @@ h2 {
 }
 
 /*---*/
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -338,6 +344,13 @@ h2 {
     color: #065f46;
     font-weight: 600;
     font-size: 0.95em;
+    white-space: nowrap;
+}
+
+.admin-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .admin-table tr:last-child td {
@@ -346,6 +359,16 @@ h2 {
 
 .admin-table tr:hover {
     background: #f0fdf4;
+}
+
+.partnership-status.unmatched {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.partnership-status.matched {
+    color: #16a34a;
+    font-weight: 600;
 }
 
 /*---*/

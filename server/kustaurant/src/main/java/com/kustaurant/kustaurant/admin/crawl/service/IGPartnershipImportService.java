@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.admin.crawl.service;
 import com.kustaurant.jpa.restaurant.entity.RestaurantPartnershipEntity;
 import com.kustaurant.jpa.restaurant.enums.MatchStatus;
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
-import com.kustaurant.kustaurant.admin.crawl.IgImportResult;
+import com.kustaurant.kustaurant.admin.crawl.controller.command.IgImportResult;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IgCrawlRawEntity;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IgCrawlRawRepository;
 import com.kustaurant.kustaurant.restaurant.partnership.RestaurantPartnershipJpaRepository;

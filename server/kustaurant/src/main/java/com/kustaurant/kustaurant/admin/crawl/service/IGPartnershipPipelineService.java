@@ -1,9 +1,9 @@
 package com.kustaurant.kustaurant.admin.crawl.service;
 
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
-import com.kustaurant.kustaurant.admin.crawl.IgImportResult;
-import com.kustaurant.kustaurant.admin.crawl.IgRawSaveResult;
-import com.kustaurant.kustaurant.admin.crawl.controller.IgCrawlResponse;
+import com.kustaurant.kustaurant.admin.crawl.controller.command.IgImportResult;
+import com.kustaurant.kustaurant.admin.crawl.controller.command.IgRawSaveResult;
+import com.kustaurant.kustaurant.admin.crawl.controller.command.IgCrawlResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -3,7 +3,7 @@ package com.kustaurant.kustaurant.admin.adminPage.controller;
 import com.kustaurant.kustaurant.admin.adminPage.controller.request.HomeModalUpdateRequest;
 import com.kustaurant.kustaurant.admin.adminPage.controller.request.ModalPreviewRequest;
 import com.kustaurant.kustaurant.admin.adminPage.controller.response.*;
-import com.kustaurant.kustaurant.admin.crawl.controller.PagedRestaurantResponse;
+import com.kustaurant.kustaurant.admin.crawl.controller.query.PagedRestaurantResponse;
 import com.kustaurant.kustaurant.admin.adminPage.service.AdminService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;

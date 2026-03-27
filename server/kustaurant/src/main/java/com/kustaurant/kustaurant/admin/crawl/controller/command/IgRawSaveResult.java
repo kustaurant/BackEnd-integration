@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin.crawl;
+package com.kustaurant.kustaurant.admin.crawl.controller.command;
 
 public record IgRawSaveResult(
         int crawledPages,

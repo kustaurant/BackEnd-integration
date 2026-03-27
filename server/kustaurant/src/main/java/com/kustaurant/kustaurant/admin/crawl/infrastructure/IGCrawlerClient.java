@@ -2,8 +2,7 @@ package com.kustaurant.kustaurant.admin.crawl.infrastructure;
 
 import com.kustaurant.jpa.restaurant.IGPost;
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
-import com.kustaurant.kustaurant.admin.crawl.controller.IgCrawlRequest;
-import lombok.RequiredArgsConstructor;
+import com.kustaurant.kustaurant.admin.crawl.controller.command.IgCrawlRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -13,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Component

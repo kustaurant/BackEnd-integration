@@ -1,4 +1,5 @@
 // 음식점 관리 관련 기능들
+console.log("admin js loaded");
 
 function getRestaurantStatusText(status) {
     const statusMap = {
@@ -61,7 +62,7 @@ function loadRestaurants(page = 0) {
 
 function getPartnershipStatusText(status) {
     const map = {
-        'MATCHED': '매칭됨',
+        'MATCHED': '매칭',
         'UNMATCHED': '미매칭'
     };
     return map[status] || status;
@@ -123,13 +124,16 @@ function loadPartnerships(page = 0) {
             return response.json();
         })
         .then(data => {
+
             renderPartnershipTable(data.partnerships);
             renderPagination(data, 'partnerships', loadPartnerships);
-            document.getElementById('partnerships-total').textContent = `총 ${data.totalElements.toLocaleString()}개`;
+            document.getElementById('partnerships-total').textContent =
+                `총 ${data.totalElements.toLocaleString()}개`;
         })
         .catch(error => {
             console.error('파트너십 데이터 로드 실패:', error);
-            document.getElementById('partnerships-tbody').innerHTML = '<tr><td colspan="10">데이터 로드 실패</td></tr>';
+            document.getElementById('partnerships-tbody').innerHTML =
+                '<tr><td colspan="10">데이터 로드 실패</td></tr>';
         });
 }
 
@@ -283,8 +287,6 @@ function openEditModal(p){
     document.getElementById("edit-restaurant-id").value=p.restaurantId ?? ""
     document.getElementById("edit-restaurant-name").value=p.restaurantName ?? ""
     document.getElementById("edit-benefit").value=p.benefit ?? ""
-    document.getElementById("edit-contact-phone").value=p.contactPhone ?? ""
-    document.getElementById("edit-status").value=p.status
 
     document
         .getElementById("partnership-edit-modal")
@@ -301,21 +303,25 @@ function closeEditModal(){
 
 // 수정 API 호출
 function submitPartnershipEdit(){
-
     const id=document.getElementById("edit-partnership-id").value
+    const restaurantId = document.getElementById("edit-restaurant-id").value
 
     const payload={
         restaurantId: document.getElementById("edit-restaurant-id").value || null,
         restaurantName: document.getElementById("edit-restaurant-name").value,
         benefit: document.getElementById("edit-benefit").value,
-        contactPhone: document.getElementById("edit-contact-phone").value,
-        matchStatus: document.getElementById("edit-status").value
+        matchStatus: restaurantId === "" ? "UNMATCHED" : "MATCHED"
     }
+
+    const csrfToken = getCookie("XSRF-TOKEN");
 
     fetch(`/admin/api/partnerships/${id}`,{
         method:"PATCH",
         headers:{
-            "Content-Type":"application/json"
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-XSRF-TOKEN": csrfToken
         },
         body:JSON.stringify(payload)
     })

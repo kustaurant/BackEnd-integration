@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin.crawl;
+package com.kustaurant.kustaurant.admin.crawl.infrastructure;
 
 import com.kustaurant.jpa.restaurant.entity.QRestaurantPartnershipEntity;
 import com.kustaurant.jpa.restaurant.entity.RestaurantPartnershipEntity;

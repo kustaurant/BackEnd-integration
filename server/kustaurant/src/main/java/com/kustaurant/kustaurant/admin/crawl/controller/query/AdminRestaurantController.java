@@ -1,7 +1,9 @@
-package com.kustaurant.kustaurant.admin.crawl;
+package com.kustaurant.kustaurant.admin.crawl.controller.query;
 
 import com.kustaurant.jpa.restaurant.enums.MatchStatus;
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
+import com.kustaurant.kustaurant.admin.crawl.AdminPartnershipService;
+import com.kustaurant.kustaurant.admin.crawl.controller.command.PartnershipUpdateRequest;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +19,10 @@ public class AdminRestaurantController {
 
     private final AdminPartnershipService service;
 
+    //1. 제휴 음식점 조회
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
     @GetMapping
-    public PagedPartnershipResponse  getPartnerships(
+    public PagedPartnershipResponse getPartnerships(
             @RequestParam(required = false) PartnershipTarget target,
             @RequestParam(required = false) MatchStatus matchStatus,
             @RequestParam(required = false) String sourceAccount,
@@ -35,11 +38,19 @@ public class AdminRestaurantController {
         );
     }
 
+    //2. 단일 제휴 정보 조회
+    @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
+    @GetMapping("/{id}")
+    public PartnershipListResponse getPartnership(@PathVariable Long id) {
+        return service.getPartnership(id);
+    }
+
+    //3. 제휴 정보 수정
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
     @PatchMapping("/{id}")
     public void updatePartnership(
             @PathVariable Long id,
-            @RequestBody AdminPartnershipUpdateRequest req
+            @RequestBody PartnershipUpdateRequest req
     ) {
         service.updatePartnership(id, req);
     }
