@@ -1,16 +1,9 @@
-package com.kustaurant.crawler.IGpartnership;
+package com.kustaurant.crawler.IGpartnership.dto;
 
 public record ParsedCaption(
-        String partner,
+        String restaurantName,
         String benefit,
         String location,
         String contact
 ) {
-    public boolean hasRequiredFields() {
-        return hasText(partner) && hasText(benefit);
-    }
-
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
-    }
 }

@@ -1,5 +1,7 @@
-package com.kustaurant.crawler.IGpartnership;
+package com.kustaurant.crawler.IGpartnership.controller;
 
+import com.kustaurant.crawler.IGpartnership.service.Crawler;
+import com.kustaurant.crawler.IGpartnership.dto.CrawlRequest;
 import com.kustaurant.jpa.restaurant.IGPost;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,8 +1,10 @@
-package com.kustaurant.crawler.IGpartnership;
+package com.kustaurant.crawler.IGpartnership.old;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kustaurant.crawler.IGpartnership.dto.CrawlRequest;
+import com.kustaurant.crawler.IGpartnership.dto.RawPost;
 import com.kustaurant.jpa.restaurant.IGPost;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitUntilState;
@@ -120,7 +122,7 @@ public class CrawlerOld {
                         || parsed.benefit() == null || parsed.benefit().isBlank()
                         || parsed.location() == null || parsed.location().isBlank()
                         || parsed.contact() == null || parsed.contact().isBlank()) {
-                    log.info("[{}] 필수 필드 부족 -> skip. partner='{}', benefit='{}', location='{}', phoneNumber='{}'",
+                    log.info("[{}] 필수 필드 부족 -> skip. restaurantName='{}', benefit='{}', location='{}', phoneNumber='{}'",
                             idx, parsed.partner(), parsed.benefit(), parsed.location(), parsed.contact());
                     continue;
                 }

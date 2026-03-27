@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.IGpartnership;
+package com.kustaurant.crawler.IGpartnership.service;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;

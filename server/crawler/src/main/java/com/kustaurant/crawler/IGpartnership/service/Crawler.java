@@ -1,5 +1,10 @@
-package com.kustaurant.crawler.IGpartnership;
+package com.kustaurant.crawler.IGpartnership.service;
 
+import com.kustaurant.crawler.IGpartnership.dto.CrawlRequest;
+import com.kustaurant.crawler.IGpartnership.dto.ParsedCaption;
+import com.kustaurant.crawler.IGpartnership.dto.RawPost;
+import com.kustaurant.crawler.IGpartnership.service.strategy.CaptionStrategyResolver;
+import com.kustaurant.crawler.IGpartnership.service.strategy.PartnershipCaptionStrategy;
 import com.kustaurant.jpa.restaurant.IGPost;
 import com.microsoft.playwright.*;
 import lombok.RequiredArgsConstructor;
@@ -17,15 +22,16 @@ public class Crawler {
     private final IGSessionManager sessionManager;
     private final IGFeedCollector feedCollector;
     private final RawPostDeduplicator deduplicator;
-    private final CaptionParserResolver resolver;
-    private final IGPostFactory postFactory;
+    private final CaptionStrategyResolver strategyResolver;
+    private final IGPostFactory igPostFactory;
 
     public List<IGPost> crawl(CrawlRequest req) {
         log.info("===== Instagram Crawler START(JSON) =====");
         log.info("accountName = {}", req.accountName());
+        log.info("target = {}", req.target());
 
         List<IGPost> results = new ArrayList<>();
-        PartnershipCaptionParser parser = resolver.resolve(req.target());
+        PartnershipCaptionStrategy strategy = strategyResolver.resolve(req.target());
 
         try (Playwright playwright = Playwright.create()) {
             Browser browser = playwright.chromium().launch(
@@ -50,27 +56,27 @@ public class Crawler {
             for (RawPost rawPost : uniquePosts) {
                 idx++;
 
-                String caption = rawPost.caption() != null ? rawPost.caption() : "";
-                log.debug("[{}/{}] code={}", idx, uniquePosts.size(), rawPost.code());
-                log.trace("[{}] caption text = {}", idx, caption);
+                ParsedCaption parsed = strategy.parse(rawPost.caption());
 
-                ParsedCaption parsed = parser.parse(caption);
-
-                if (!parsed.hasRequiredFields()) {
-                    log.info("[{}] 필수 필드 부족 -> skip. partner='{}', benefit='{}', location='{}', phoneNumber='{}'",
-                            idx, parsed.partner(), parsed.benefit(), parsed.location(), parsed.contact());
+                if (!strategy.hasRequiredFields(parsed)) {
+                    log.info("[{}] 필수 필드 부족 -> skip. restaurantName='{}', benefit='{}', location='{}', contact='{}'",
+                            idx,
+                            parsed.restaurantName(),
+                            parsed.benefit(),
+                            parsed.location(),
+                            parsed.contact());
                     continue;
                 }
 
-                postFactory.create(rawPost, parsed)
+                igPostFactory.create(rawPost, parsed)
                         .ifPresent(results::add);
 
-                log.info("[{}] ✅ alliance post added. current results={}", idx, results.size());
+                log.info("[{}] alliance post added. current results={}", idx, results.size());
             }
 
             browser.close();
         } catch (Exception e) {
-            log.error("crawlAndSave JSON version error", e);
+            log.error("crawl error", e);
         }
 
         log.info("===== Instagram Crawler END(JSON) =====");
@@ -78,6 +84,4 @@ public class Crawler {
 
         return results;
     }
-
-
 }

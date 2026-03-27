@@ -1,7 +1,8 @@
-package com.kustaurant.crawler.IGpartnership;
+package com.kustaurant.crawler.IGpartnership.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kustaurant.crawler.IGpartnership.dto.RawPost;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

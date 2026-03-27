@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.IGpartnership.service.parser;
+package com.kustaurant.crawler.IGpartnership.old;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

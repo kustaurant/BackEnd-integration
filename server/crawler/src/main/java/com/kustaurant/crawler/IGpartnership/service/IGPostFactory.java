@@ -1,5 +1,7 @@
-package com.kustaurant.crawler.IGpartnership;
+package com.kustaurant.crawler.IGpartnership.service;
 
+import com.kustaurant.crawler.IGpartnership.dto.ParsedCaption;
+import com.kustaurant.crawler.IGpartnership.dto.RawPost;
 import com.kustaurant.jpa.restaurant.IGPost;
 import org.springframework.stereotype.Component;
 
@@ -18,15 +20,11 @@ public class IGPostFactory {
             return Optional.empty();
         }
 
-        if (!parsed.hasRequiredFields()) {
-            return Optional.empty();
-        }
-
         String postUrl = INSTAGRAM_BASE_URL + "/p/" + rawPost.code() + "/";
 
         return Optional.of(new IGPost(
                 postUrl,
-                parsed.partner(),
+                parsed.restaurantName(),
                 parsed.benefit(),
                 parsed.location(),
                 parsed.contact()

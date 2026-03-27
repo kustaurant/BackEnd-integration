@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.IGpartnership;
+package com.kustaurant.crawler.IGpartnership.dto;
 
 public record RawPost(
         String code,

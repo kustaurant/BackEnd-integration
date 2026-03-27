@@ -1,5 +1,6 @@
-package com.kustaurant.crawler.IGpartnership;
+package com.kustaurant.crawler.IGpartnership.service;
 
+import com.kustaurant.crawler.IGpartnership.dto.RawPost;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitUntilState;

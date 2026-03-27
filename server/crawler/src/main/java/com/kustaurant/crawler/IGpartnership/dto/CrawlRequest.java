@@ -1,4 +1,4 @@
-package com.kustaurant.crawler.IGpartnership;
+package com.kustaurant.crawler.IGpartnership.dto;
 
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
 
