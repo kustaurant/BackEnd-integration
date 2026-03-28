@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.restaurant.restaurant.service;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetailV2;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetailRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;
 import io.micrometer.observation.annotation.Observed;
@@ -22,5 +23,10 @@ public class RestaurantService {
     @Observed
     public RestaurantDetail getRestaurantDetail(Long restaurantId, Long userId) {
         return restaurantDetailRepository.getRestaurantDetail(restaurantId, userId);
+    }
+
+    @Observed
+    public RestaurantDetailV2 getRestaurantDetailV2(Long restaurantId, Long userId) {
+        return restaurantDetailRepository.getRestaurantDetailV2(restaurantId, userId);
     }
 }

@@ -4,8 +4,10 @@ import com.kustaurant.kustaurant.common.discordAlert.DiscordNotifier;
 import com.kustaurant.kustaurant.global.exception.WebErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,13 +57,22 @@ public class GlobalExceptionWebHandler {
         throw e;
     }
 
+    @ExceptionHandler({
+            AsyncRequestNotUsableException.class,
+            ClientAbortException.class
+    })
+    public void handleClientAbort(Exception e, HttpServletRequest req) {
+        log.warn("[ClientAbort] {} {}: {}", req.getMethod(), req.getRequestURI(), e.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public String handleException(
-            Exception e, HttpServletRequest req, Model model
+            Exception e, HttpServletRequest req, HttpServletResponse res, Model model
     ) {
         log.error("[Exception] {} {}: {}", req.getMethod(), req.getRequestURI(), e.getMessage(), e);
-        notifyIf5xx(e, req, HttpStatus.INTERNAL_SERVER_ERROR);
+        if (res.isCommitted()) return null;
 
+        notifyIf5xx(e, req, HttpStatus.INTERNAL_SERVER_ERROR);
         model.addAttribute("message", "잠시 후 다시 시도해주세요.");
         return "error/error";
     }
