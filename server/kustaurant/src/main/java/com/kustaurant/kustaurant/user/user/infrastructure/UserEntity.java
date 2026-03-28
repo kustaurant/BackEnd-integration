@@ -110,8 +110,17 @@ public class UserEntity extends BaseTimeEntity {
                 .providerId(providerId)
                 .loginApi(loginApi)
                 .createdAt(getCreatedAt())
+                .updatedAt(getUpdatedAt())
                 .status(status)
                 .stats(stats.toModel())
                 .build();
+    }
+
+    public void changePhoneNumber(PhoneNumber phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void changeNickname(Nickname nickname) {
+        this.nickname = nickname;
     }
 }

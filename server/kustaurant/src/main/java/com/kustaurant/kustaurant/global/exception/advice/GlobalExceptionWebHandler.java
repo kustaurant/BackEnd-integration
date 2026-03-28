@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.global.exception.advice;
 import com.kustaurant.kustaurant.common.discordAlert.DiscordNotifier;
 import com.kustaurant.kustaurant.global.exception.WebErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
+import com.kustaurant.kustaurant.global.exception.exception.user.NicknameCooldownException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,13 @@ public class GlobalExceptionWebHandler {
                 .orElse("입력값이 올바르지 않습니다.");
 
         return new WebErrorResponse("BAD_REQUEST", msg);
+    }
+
+    @ExceptionHandler(NicknameCooldownException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public WebErrorResponse handleNicknameCooldown(NicknameCooldownException e) {
+        return new WebErrorResponse("NICKNAME_COOLDOWN", e.getMessage());
     }
 
     /** AccessDenied는 Security 체인에게 맡김 */
