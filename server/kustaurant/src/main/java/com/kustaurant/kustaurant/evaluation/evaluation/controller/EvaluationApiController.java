@@ -48,6 +48,9 @@ public class EvaluationApiController implements EvaluationApiDoc {
         if (evaluationDTO.getEvaluationSituations() == null) {
             evaluationDTO.setEvaluationSituations(new ArrayList<>());
         }
+        if (evaluationDTO.getStarComments() == null) {
+            evaluationDTO.setStarComments(new ArrayList<>());
+        }
         log.info("[evaluation] user id: {}, data: {}", user.id(), evaluationDTO);
 
         // 평가 데이터 저장 또는 업데이트
