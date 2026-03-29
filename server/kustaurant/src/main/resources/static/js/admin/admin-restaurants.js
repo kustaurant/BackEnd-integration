@@ -81,7 +81,7 @@ function renderPartnershipTable(partnerships) {
     tbody.innerHTML = '';
 
     if (!partnerships || partnerships.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10">제휴 정보가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11">제휴 정보가 없습니다.</td></tr>';
         return;
     }
 
@@ -89,31 +89,134 @@ function renderPartnershipTable(partnerships) {
 
     partnerships.forEach(p => {
         const tr = document.createElement('tr');
+        tr.classList.add('partnership-row');
+        tr.dataset.id = p.id;
 
         tr.innerHTML = `
+            <td>
+                <button class="toggle-candidates-btn" data-id="${p.id}">후보보기</button>
+            </td>
             <td>${p.id ?? '-'}</td>
             <td>${p.restaurantId ?? '-'}</td>
             <td>${p.restaurantName ?? '-'}</td>
             <td>${p.target ?? '-'}</td>
-            <td>${truncateText(p.benefit ?? '-',30)}</td>
+            <td>${truncateText(p.benefit ?? '-', 30)}</td>
             <td>
-            <span class="partnership-status ${getPartnershipStatusClass(p.status)}">
-            ${getPartnershipStatusText(p.status)}
-            </span>
+                <span class="partnership-status ${getPartnershipStatusClass(p.status)}">
+                    ${getPartnershipStatusText(p.status)}
+                </span>
             </td>
             <td>${p.url ?? '-'}</td>
-            <td>${p.createdAt ? formatDateTime(p.createdAt) : '-'}</td>
-            <td>${p.updatedAt ? formatDateTime(p.updatedAt) : '-'}</td>
+            <td>${p.createdAt ? formatDateOnly(p.createdAt) : '-'}</td>
+            <td>${p.updatedAt ? formatDateOnly(p.updatedAt) : '-'}</td>
             <td>
-            <button class="edit-partnership-btn" data-id="${p.id}">수정</button>
+                <button class="edit-partnership-btn" data-id="${p.id}">수정</button>
+            </td>
+        `;
+
+        const detailTr = document.createElement('tr');
+        detailTr.classList.add('candidate-detail-row');
+        detailTr.dataset.id = p.id;
+        detailTr.style.display = 'none';
+        detailTr.innerHTML = `
+            <td colspan="11">
+                <div class="candidate-detail-box">후보를 불러오는 중...</div>
             </td>
         `;
 
         fragment.appendChild(tr);
+        fragment.appendChild(detailTr);
     });
 
     tbody.appendChild(fragment);
 }
+
+
+async function togglePartnershipCandidates(partnershipId, buttonEl) {
+    const detailRow = document.querySelector(`.candidate-detail-row[data-id="${partnershipId}"]`);
+    if (!detailRow) return;
+
+    const box = detailRow.querySelector('.candidate-detail-box');
+
+    if (detailRow.style.display !== 'none') {
+        detailRow.style.display = 'none';
+        buttonEl.textContent = '후보보기';
+        return;
+    }
+
+    detailRow.style.display = '';
+    buttonEl.textContent = '접기';
+
+    if (detailRow.dataset.loaded === 'true') {
+        return;
+    }
+
+    box.innerHTML = '후보를 불러오는 중...';
+
+    try {
+        const response = await fetch(`/admin/api/partnerships/${partnershipId}/candidates`);
+        if (!response.ok) {
+            throw new Error('candidate load failed');
+        }
+
+        const data = await response.json();
+        renderCandidateDetail(box, data);
+        detailRow.dataset.loaded = 'true';
+    } catch (error) {
+        console.error('후보 조회 실패:', error);
+        box.innerHTML = '<div class="candidate-empty">후보 조회 실패</div>';
+    }
+}
+
+
+function renderCandidateDetail(container, data) {
+    const candidates = data.candidates || [];
+
+    if (candidates.length === 0) {
+        container.innerHTML = `
+            <div class="candidate-wrapper">
+                <div><strong>원본 업체명:</strong> ${data.rawRestaurantName ?? '-'}</div>
+                <div><strong>원본 위치:</strong> ${data.rawLocationText ?? '-'}</div>
+                <div class="candidate-empty">후보가 없습니다.</div>
+            </div>
+        `;
+        return;
+    }
+
+    const itemsHtml = candidates.map((c, index) => `
+        <div class="candidate-item">
+            <div class="candidate-action">
+                <button 
+                    class="apply-candidate-btn"
+                    data-partnership-id="${data.partnershipId}"
+                    data-restaurant-id="${c.restaurantId}"
+                    data-restaurant-name="${c.restaurantName ?? ''}"
+                    data-benefit="${data.benefit ?? ''}"
+                >
+                    이 후보로 적용
+                </button>
+            </div>
+            <div class="candidate-main">
+                <div class="candidate-rank">${index + 1}순위</div>
+                <div><strong>ID:</strong> ${c.restaurantId ?? '-'}</div>
+                <div><strong>이름:</strong> ${c.restaurantName ?? '-'}</div>
+                <div><strong>주소:</strong> ${c.address ?? '-'}</div>
+                <div><strong>전화번호:</strong> ${c.phoneNumber ?? '-'}</div>
+            </div>
+        </div>
+    `).join('');
+
+    container.innerHTML = `
+        <div class="candidate-wrapper">
+            <div><strong>원본 업체명:</strong> ${data.rawRestaurantName ?? '-'}</div>
+            <div><strong>원본 위치:</strong> ${data.rawLocationText ?? '-'}</div>
+            <div class="candidate-list">
+                ${itemsHtml}
+            </div>
+        </div>
+    `;
+}
+
 
 function loadPartnerships(page = 0) {
     fetch(`/admin/api/partnerships?page=${page}&size=20`)
@@ -266,19 +369,45 @@ async function initCrawlModal() {
 }
 
 // 수정 버튼 클릭 이벤트
-document.addEventListener("click", e=>{
+document.addEventListener("click", async e => {
 
-    if(e.target.classList.contains("edit-partnership-btn")){
-
-        const id=e.target.dataset.id
+    if (e.target.classList.contains("edit-partnership-btn")) {
+        const id = e.target.dataset.id;
 
         fetch(`/admin/api/partnerships/${id}`)
-            .then(r=>r.json())
-            .then(openEditModal)
+            .then(r => r.json())
+            .then(openEditModal);
 
+        return;
     }
 
-})
+    if (e.target.classList.contains("toggle-candidates-btn")) {
+        const id = e.target.dataset.id;
+        await togglePartnershipCandidates(id, e.target);
+        return;
+    }
+
+    if (e.target.classList.contains("apply-candidate-btn")) {
+        applyCandidateToEditModal(e.target);
+        return;
+    }
+});
+
+
+function applyCandidateToEditModal(button) {
+    const partnershipId = button.dataset.partnershipId;
+    const restaurantId = button.dataset.restaurantId;
+    const restaurantName = button.dataset.restaurantName;
+    const benefit = button.dataset.benefit ?? "";
+
+    document.getElementById("edit-partnership-id").value = partnershipId;
+    document.getElementById("edit-restaurant-id").value = restaurantId ?? "";
+    document.getElementById("edit-restaurant-name").value = restaurantName ?? "";
+    document.getElementById("edit-benefit").value = benefit;
+
+    document.getElementById("partnership-edit-modal").classList.remove("hidden");
+}
+
 
 // 제휴 수정 모달 열기
 function openEditModal(p){

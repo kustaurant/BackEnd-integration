@@ -2,8 +2,10 @@ package com.kustaurant.kustaurant.admin.crawl.controller.query;
 
 import com.kustaurant.jpa.restaurant.enums.MatchStatus;
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
-import com.kustaurant.kustaurant.admin.crawl.AdminPartnershipService;
+import com.kustaurant.kustaurant.admin.crawl.service.matching.AdminPartnershipService;
 import com.kustaurant.kustaurant.admin.crawl.controller.command.PartnershipUpdateRequest;
+import com.kustaurant.kustaurant.admin.crawl.dto.PartnershipCandidateResponse;
+import com.kustaurant.kustaurant.admin.crawl.service.queryTop3.PartnershipCandidateQueryService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminRestaurantController {
 
     private final AdminPartnershipService service;
+    private final PartnershipCandidateQueryService queryService;
 
     //1. 제휴 음식점 조회
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
@@ -53,5 +56,11 @@ public class AdminRestaurantController {
             @RequestBody PartnershipUpdateRequest req
     ) {
         service.updatePartnership(id, req);
+    }
+
+    //4. partnership 데이터 중 유사 top3 식당 조회
+    @GetMapping("/{partnershipId}/candidates")
+    public PartnershipCandidateResponse getCandidates(@PathVariable Long partnershipId) {
+        return queryService.getCandidates(partnershipId);
     }
 }

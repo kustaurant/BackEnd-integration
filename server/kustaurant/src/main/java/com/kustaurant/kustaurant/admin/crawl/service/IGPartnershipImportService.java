@@ -4,8 +4,13 @@ import com.kustaurant.jpa.restaurant.entity.RestaurantPartnershipEntity;
 import com.kustaurant.jpa.restaurant.enums.MatchStatus;
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
 import com.kustaurant.kustaurant.admin.crawl.controller.command.IgImportResult;
+import com.kustaurant.kustaurant.admin.crawl.dto.NameMatchDecision;
+import com.kustaurant.kustaurant.admin.crawl.dto.RestaurantPhoneMatch;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IgCrawlRawEntity;
 import com.kustaurant.kustaurant.admin.crawl.infrastructure.IgCrawlRawRepository;
+import com.kustaurant.kustaurant.admin.crawl.service.matching.PhoneNumberNormalizer;
+import com.kustaurant.kustaurant.admin.crawl.service.matching.RestaurantNameMatchService;
+import com.kustaurant.kustaurant.restaurant.partnership.RestaurantCandidateRepository;
 import com.kustaurant.kustaurant.restaurant.partnership.RestaurantPartnershipJpaRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +28,10 @@ public class IGPartnershipImportService {
 
     private final IgCrawlRawRepository rawRepo;
     private final RestaurantRepository restaurantRepo;
+    private final RestaurantCandidateRepository candidateRepo;
     private final RestaurantPartnershipJpaRepository partnershipRepo;
     private final PhoneNumberNormalizer phoneNumberNormalizer;
+    private final RestaurantNameMatchService restaurantNameMatchService;
 
     @Transactional
     public IgImportResult importFromRaw(String accountName, PartnershipTarget target) {
@@ -49,9 +56,7 @@ public class IGPartnershipImportService {
         for (IgCrawlRawEntity raw : raws) {
             String normalizedPhone = phoneNumberNormalizer.normalize(raw.getPhoneNumber());
 
-            if (normalizedPhone == null || normalizedPhone.isBlank()) {
-                continue;
-            }
+            if (normalizedPhone == null || normalizedPhone.isBlank()) continue;
 
             normalizedPhones.add(normalizedPhone);
             rawIdToNormalizedPhone.put(raw.getId(), normalizedPhone);
@@ -61,10 +66,9 @@ public class IGPartnershipImportService {
         Map<String, Long> phoneToRestaurantId = new HashMap<>();
 
         if (!normalizedPhones.isEmpty()) {
-            List<RestaurantRepository.RestaurantPhoneMatch> matches =
-                    restaurantRepo.findIdsByPhoneNumbers(normalizedPhones);
+            List<RestaurantPhoneMatch> matches = candidateRepo.findIdsByPhoneNumbers(normalizedPhones);
 
-            for (RestaurantRepository.RestaurantPhoneMatch match : matches) {
+            for (RestaurantPhoneMatch match : matches) {
                 phoneToRestaurantId.put(match.phoneNumber(), match.id());
             }
         }
@@ -79,20 +83,34 @@ public class IGPartnershipImportService {
             String postUrl = raw.getPostUrl();
 
             // 이미 저장된 postUrl이면 skip
-            if (postUrl == null || postUrl.isBlank() || existingPostUrls.contains(postUrl)) {
-                continue;
-            }
+            if (postUrl == null || postUrl.isBlank() || existingPostUrls.contains(postUrl)) continue;
 
             String normalizedPhone = rawIdToNormalizedPhone.get(raw.getId());
 
             Long restaurantId = null;
             MatchStatus matchStatus = MatchStatus.UNMATCHED;
 
+            // 1. 전화번호 exact match
             if (normalizedPhone != null) {
                 restaurantId = phoneToRestaurantId.get(normalizedPhone);
-
                 if (restaurantId != null) {
                     matchStatus = MatchStatus.MATCHED;
+                    log.info("전화번호 매칭 성공 rawId={}, restaurantId={}", raw.getId(), restaurantId);
+                }
+            }
+
+            // 2. 전화번호 실패 시 이름+주소 매칭
+            if (restaurantId == null) {
+                NameMatchDecision decision = restaurantNameMatchService.match(raw);
+
+                if (decision.isMatched()) {
+                    restaurantId = decision.restaurantId();
+                    matchStatus = MatchStatus.MATCHED;
+                    log.info("이름/주소 매칭 성공 rawId={}, restaurantId={}, reason={}",
+                            raw.getId(), restaurantId, decision.reason());
+                } else {
+                    log.info("이름/주소 매칭 실패 rawId={}, restaurantId={}, reason={}",
+                            raw.getId(), restaurantId, decision.reason());
                 }
             }
 

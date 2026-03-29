@@ -28,11 +28,4 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     public void increaseVisitCount(Long restaurantId) {
         jpa.incrementViews(restaurantId);
     }
-
-    @Override // autoCrawl 전용
-    public List<RestaurantPhoneMatch> findIdsByPhoneNumbers(Collection<String> phoneNumbers) {
-        return jpa.findIdsByPhoneNumbers(phoneNumbers).stream()
-                .map(p -> new RestaurantPhoneMatch(p.getId(), p.getPhoneNumber()))
-                .toList();
-    }
 }

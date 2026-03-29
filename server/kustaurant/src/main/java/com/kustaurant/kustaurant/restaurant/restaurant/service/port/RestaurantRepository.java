@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.service.port;
 
+import com.kustaurant.kustaurant.admin.crawl.dto.RestaurantMatchCandidate;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
 
 import java.util.Collection;
@@ -10,12 +11,4 @@ public interface RestaurantRepository {
 
     Restaurant getByIdAndStatus(Long id, String status);
     void increaseVisitCount(Long restaurantId);
-
-    // insta crawl용
-    List<RestaurantPhoneMatch> findIdsByPhoneNumbers(Collection<String> phoneNumbers);
-
-    record RestaurantPhoneMatch(
-            Long id,
-            String phoneNumber
-    ) {}
 }

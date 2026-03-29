@@ -68,10 +68,7 @@ public class Crawler {
                     continue;
                 }
 
-                igPostFactory.create(rawPost, parsed)
-                        .ifPresent(results::add);
-
-                log.info("[{}] alliance post added. current results={}", idx, results.size());
+                igPostFactory.create(rawPost, parsed).ifPresent(results::add);
             }
 
             browser.close();

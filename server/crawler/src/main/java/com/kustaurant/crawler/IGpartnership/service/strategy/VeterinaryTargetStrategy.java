@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 
 @Component
 public class VeterinaryTargetStrategy implements PartnershipCaptionStrategy {
+    private static final Pattern EMOJI_NAME_PATTERN =
+            Pattern.compile("🟢\\s*(.*?)\\s*🟢");
 
     private static final Pattern PARTNER_PATTERN =
             Pattern.compile("제휴업체\\s*(.*?)\\s*을\\s*소개합니다");
@@ -26,15 +28,16 @@ public class VeterinaryTargetStrategy implements PartnershipCaptionStrategy {
 
     @Override
     public ParsedCaption parse(String caption) {
-        if (caption == null) {
-            caption = "";
-        }
+        if (caption == null) caption = "";
 
-        String restaurantName = clean(findGroup(PARTNER_PATTERN, caption));
+        String restaurantName = findGroup(EMOJI_NAME_PATTERN, caption);
+
+        if (restaurantName.isBlank()) restaurantName = findGroup(PARTNER_PATTERN, caption);
+
         String benefit = clean(findGroup(BENEFIT_PATTERN, caption));
         String location = clean(findGroup(LOCATION_PATTERN, caption));
 
-        return new ParsedCaption(restaurantName, benefit, location, "");
+        return new ParsedCaption(clean(restaurantName), benefit, location, "");
     }
 
     @Override
@@ -55,6 +58,11 @@ public class VeterinaryTargetStrategy implements PartnershipCaptionStrategy {
 
     private String clean(String value) {
         if (value == null) return "";
+
+        value = value.replaceAll("[\\p{So}\\p{Cn}]", "");
+
+        value = value.replaceAll("^[^가-힣a-zA-Z0-9]+", "");
+        value = value.replaceAll("[^가-힣a-zA-Z0-9]+$", "");
 
         return value.replaceAll("\\s+", " ").trim();
     }

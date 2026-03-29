@@ -1,4 +1,4 @@
-package com.kustaurant.kustaurant.admin.crawl;
+package com.kustaurant.kustaurant.admin.crawl.service.matching;
 
 import com.kustaurant.jpa.restaurant.entity.RestaurantPartnershipEntity;
 import com.kustaurant.jpa.restaurant.enums.MatchStatus;

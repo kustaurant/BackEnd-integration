@@ -19,10 +19,10 @@ public class IGPartnershipPipelineService {
 
     @Transactional
     public IgCrawlResponse crawlAndImport(String accountName, PartnershipTarget target) {
-        log.info("22");
         IgRawSaveResult rawResult = rawSaveService.crawlAndReplaceAll(accountName, target);
-        if (rawResult.rawSavedCount() == 0) return new IgCrawlResponse(rawResult.crawledPages(), 0, 0, 0);
-        log.info("33");
+        if (rawResult.rawSavedCount() == 0) {
+            return new IgCrawlResponse(rawResult.crawledPages(), 0, 0, 0);
+        }
 
         IgImportResult importResult = importService.importFromRaw(accountName, target);
         return new IgCrawlResponse(

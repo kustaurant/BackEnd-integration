@@ -30,6 +30,7 @@ public class IgCrawlRawSaveService {
     protected int replaceAll(String accountName, PartnershipTarget target, List<IGPost> posts) {
         // 1) 기존 raw 전부 삭제
         rawRepo.deleteBySourceAccount(accountName);
+        rawRepo.flush();
 
         // 2) URL 기준 중복 제거
         Map<String, IGPost> unique = new LinkedHashMap<>();
@@ -39,7 +40,10 @@ public class IgCrawlRawSaveService {
             String postUrl = p.postUrl();
             if (postUrl == null || postUrl.isBlank()) continue;
 
-            unique.putIfAbsent(postUrl, p);
+            String code = extractShortCode(postUrl);
+            if (code == null || code.isBlank()) continue;
+
+            unique.putIfAbsent(code, p);
         }
 
         if (unique.isEmpty()) return 0;
