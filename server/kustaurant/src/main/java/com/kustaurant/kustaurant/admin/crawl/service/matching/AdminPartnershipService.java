@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AdminPartnershipService {
-    private final AdminPartnershipQueryRepository repo;
+    private final AdminPartnershipQueryRepository queryRepo;
     private final RestaurantPartnershipJpaRepository jpaRepo;
 
     // 전체 조회
@@ -31,7 +31,7 @@ public class AdminPartnershipService {
             String keyword,
             Pageable pageable
     ) {
-        Page<RestaurantPartnershipEntity> page = repo.searchPartnerships(
+        Page<RestaurantPartnershipEntity> page = queryRepo.searchPartnerships(
                 target, matchStatus, sourceAccount, keyword, pageable
         );
 
@@ -72,6 +72,7 @@ public class AdminPartnershipService {
         );
     }
 
+    // 단건 업데이트
     @Transactional
     public void updatePartnership(Long id, PartnershipUpdateRequest req) {
         RestaurantPartnershipEntity entity = jpaRepo.findById(id).orElseThrow();
@@ -84,5 +85,30 @@ public class AdminPartnershipService {
         if (req.locationText() != null) entity.setLocationText(req.locationText());
 
         entity.setMatchStatus(entity.getRestaurantId() == null ? MatchStatus.UNMATCHED : MatchStatus.MATCHED);
+    }
+
+    // 데이터 삭제
+    @Transactional
+    public long deletePartnerships(String target) {
+        if (target == null || target.isBlank()) {
+            throw new IllegalArgumentException("삭제 대상 target이 비어있습니다.");
+        }
+
+        if ("ALLDATA".equals(target)) {
+            long count = jpaRepo.count();
+            jpaRepo.deleteAllInBatch();
+            return count;
+        }
+
+        PartnershipTarget partnershipTarget;
+        try {
+            partnershipTarget = PartnershipTarget.valueOf(target);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("올바르지 않은 target 값입니다: " + target);
+        }
+
+        long count = jpaRepo.countByTarget(partnershipTarget);
+        jpaRepo.deleteAllByTarget(partnershipTarget);
+        return count;
     }
 }

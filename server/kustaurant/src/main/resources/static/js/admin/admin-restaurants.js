@@ -417,17 +417,11 @@ function openEditModal(p){
     document.getElementById("edit-restaurant-name").value=p.restaurantName ?? ""
     document.getElementById("edit-benefit").value=p.benefit ?? ""
 
-    document
-        .getElementById("partnership-edit-modal")
-        .classList.remove("hidden")
-
+    document.getElementById("partnership-edit-modal").classList.remove("hidden")
 }
 // 제휴 수정 모달 닫기
 function closeEditModal(){
-    document
-        .getElementById("partnership-edit-modal")
-        .classList.add("hidden")
-
+    document.getElementById("partnership-edit-modal").classList.add("hidden")
 }
 
 // 수정 API 호출
@@ -468,6 +462,60 @@ function submitPartnershipEdit(){
 
 }
 
+// 삭제 모달들 열고 닫기
+function openDeletePartnershipModal() {
+    document.getElementById("delete-partnership-modal")?.classList.remove("hidden");
+}
+function closeDeletePartnershipModal() {
+    document.getElementById("delete-partnership-modal")?.classList.add("hidden");
+}
+
+
+function deletePartnerships() {
+    const csrfToken = getCookie("XSRF-TOKEN");
+    const target = document.getElementById("delete-partnership-target")?.value;
+
+    console.log("csrfToken =", csrfToken);
+    console.log("target =", target);
+
+    if (!target) {
+        alert("삭제 대상을 선택하세요.");
+        return;
+    }
+
+    const label = target === "ALLDATA" ? "전체" :
+        document.getElementById("delete-partnership-target")
+        ?.selectedOptions?.[0]?.textContent ?? target;
+
+    if (!confirm(`정말 [${label}] 제휴데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+        return;
+    }
+
+    fetch("/admin/api/partnerships", {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-XSRF-TOKEN": csrfToken
+        },
+        body: JSON.stringify({ target })
+    })
+        .then(r => {
+            if (!r.ok) throw new Error("delete failed");
+            return r.json();
+        })
+        .then(data => {
+            alert(`삭제 완료: ${data.deletedCount}건`);
+            closeDeletePartnershipModal();
+            loadPartnerships(0);
+        })
+        .catch(error => {
+            console.error("제휴데이터 삭제 실패:", error);
+            alert("삭제 실패");
+        });
+}
+
 // 이벤트 연결
 document.addEventListener("DOMContentLoaded",async()=>{
     await preloadAdminModals()
@@ -478,4 +526,10 @@ document.addEventListener("DOMContentLoaded",async()=>{
     document.getElementById("edit-submit-btn")?.addEventListener("click",submitPartnershipEdit)
     document.getElementById("edit-cancel-btn")?.addEventListener("click",closeEditModal)
     document.getElementById("edit-modal-close")?.addEventListener("click",closeEditModal)
+
+    document.getElementById("delete-partnerships-btn")?.addEventListener("click", openDeletePartnershipModal);
+    document.getElementById("delete-partnership-submit-btn")?.addEventListener("click", deletePartnerships);
+    document.getElementById("delete-partnership-cancel-btn")?.addEventListener("click", closeDeletePartnershipModal);
+    document.getElementById("delete-partnership-modal-close")?.addEventListener("click", closeDeletePartnershipModal);
+    document.querySelector("#delete-partnership-modal .admin-modal-overlay")?.addEventListener("click", closeDeletePartnershipModal);
 })

@@ -2,6 +2,8 @@ package com.kustaurant.kustaurant.admin.crawl.controller.query;
 
 import com.kustaurant.jpa.restaurant.enums.MatchStatus;
 import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
+import com.kustaurant.kustaurant.admin.crawl.controller.command.PartnershipDeleteRequest;
+import com.kustaurant.kustaurant.admin.crawl.controller.command.PartnershipDeleteResponse;
 import com.kustaurant.kustaurant.admin.crawl.service.matching.AdminPartnershipService;
 import com.kustaurant.kustaurant.admin.crawl.controller.command.PartnershipUpdateRequest;
 import com.kustaurant.kustaurant.admin.crawl.dto.PartnershipCandidateResponse;
@@ -62,5 +64,12 @@ public class AdminRestaurantController {
     @GetMapping("/{partnershipId}/candidates")
     public PartnershipCandidateResponse getCandidates(@PathVariable Long partnershipId) {
         return queryService.getCandidates(partnershipId);
+    }
+
+    //5. 제휴 데이터 삭제
+    @DeleteMapping
+    public PartnershipDeleteResponse deletePartnerships(@RequestBody PartnershipDeleteRequest request) {
+        long deletedCount = service.deletePartnerships(request.target());
+        return new PartnershipDeleteResponse(deletedCount);
     }
 }

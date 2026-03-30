@@ -1,0 +1,40 @@
+<div id="delete-partnership-modal" class="admin-modal hidden">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content">
+        <div class="admin-modal-header">
+            <h2>제휴데이터 삭제</h2>
+            <button id="delete-partnership-modal-close" class="admin-modal-close">×</button>
+        </div>
+
+        <div class="admin-modal-body delete-partnership-body">
+            <div class="delete-partnership-field">
+                <label for="delete-partnership-target">삭제 대상</label>
+                <select id="delete-partnership-target">
+                    <option value="">선택하세요</option>
+                    <option value="ALLDATA">모든데이터</option>
+                    <option value="ALL">재학생전체 (alliance.student.konkuk)</option>
+                    <option value="ENGINEERING">공과대학 (konkuk_engineering)</option>
+                    <option value="LIBERAL">문과대학 (ku_liberal_arts)</option>
+                    <option value="EDUCATION">사범대학 (konkuk_edu_co)</option>
+                    <option value="SOCIAL_SCIENCE">사회과학대학 (alliance_ku_social_sciences)</option>
+                    <option value="LIFE_SCIENCE">생명과학대학 (ku_lifescience_alliance)</option>
+                    <option value="VETERINARY">수의과대학 (ku_vetmed_alliance)</option>
+                    <option value="SCIENCE">이과대학 (kuns_alliance)</option>
+                    <option value="ART_DESIGN">예술디자인대학 (konkuk_artdesign)</option>
+                    <option value="CONVERGENCE">융합과학기술원 (konkuk.kit(X))</option>
+                    <option value="CLUBUNION">동아리연합 (kuclubunion)</option>
+                    <option value="WELFARE">학생복지위원회 (ku_welfare)</option>
+                </select>
+            </div>
+
+            <div class="delete-partnership-notice">
+                <p>선택한 대상의 제휴데이터를 모두 삭제합니다.</p>
+            </div>
+        </div>
+
+        <div class="admin-modal-footer">
+            <button id="delete-partnership-cancel-btn">취소</button>
+            <button id="delete-partnership-submit-btn">삭제</button>
+        </div>
+    </div>
+</div>

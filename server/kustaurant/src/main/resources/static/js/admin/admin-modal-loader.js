@@ -22,4 +22,10 @@ async function preloadAdminModals() {
         'partnership-edit-modal',
         '/admin/partnership-edit-modal.html'
     );
+
+    await appendModalIfNotExists(
+        'delete-partnership-modal',
+        '/admin/partnership-delete-modal.html'
+    );
+
 }
