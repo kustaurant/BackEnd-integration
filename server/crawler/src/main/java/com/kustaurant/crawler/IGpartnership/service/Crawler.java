@@ -26,9 +26,9 @@ public class Crawler {
     private final IGPostFactory igPostFactory;
 
     public List<IGPost> crawl(CrawlRequest req) {
-        log.info("===== Instagram Crawler START(JSON) =====");
-        log.info("accountName = {}", req.accountName());
-        log.info("target = {}", req.target());
+        log.info("===== 인스타그램 크롤링 시작 =====");
+        log.info("계정명 = {}", req.accountName());
+        log.info("TARGET = {}", req.target());
 
         List<IGPost> results = new ArrayList<>();
         PartnershipCaptionStrategy strategy = strategyResolver.resolve(req.target());
@@ -36,7 +36,7 @@ public class Crawler {
         try (Playwright playwright = Playwright.create()) {
             Browser browser = playwright.chromium().launch(
                     new BrowserType.LaunchOptions()
-                            .setHeadless(false)
+                            .setHeadless(true)
                             .setSlowMo(50)
                             .setArgs(List.of(
                                     "--disable-blink-features=AutomationControlled",
@@ -76,8 +76,8 @@ public class Crawler {
             log.error("crawl error", e);
         }
 
-        log.info("===== Instagram Crawler END(JSON) =====");
-        log.info("Total alliance posts = {}", results.size());
+        log.info("===== 인스타그램 크롤링 종료 =====");
+        log.info("전체 제휴 포스트 수 : {}", results.size());
 
         return results;
     }

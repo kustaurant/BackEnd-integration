@@ -96,13 +96,12 @@ public class DiscordAsyncSender {
 
         ArrayNode fields = embed.putArray("fields");
         addField(fields, "method", snapshot.method(), true);
-        addField(fields, "url", snapshot.uri(), true);
+        addField(fields, "url", snapshot.uri(), false);
         addField(fields, "query", maskQuery(snapshot.query()), true);
         addField(fields, "clientIp", snapshot.clientIp(), true);
         addField(fields, "traceId", traceId, true);
         addField(fields, "profiles", env, true);
         addField(fields, "rootCause", rootCauseSummary(e), false);
-        addField(fields, "stack", firstStackLines(e, 4), false);
 
         return root;
     }
@@ -134,16 +133,6 @@ public class DiscordAsyncSender {
         return value
                 .replaceAll("(?i)(token|accessToken|refreshToken|authorization|cookie|password|secret|code)=([^&\\s]+)", "$1=****")
                 .replaceAll("(?i)Bearer\\s+[A-Za-z0-9._\\-]+", "Bearer ****");
-    }
-
-    private String firstStackLines(Exception e, int lines) {
-        StringBuilder sb = new StringBuilder();
-        StackTraceElement[] arr = e.getStackTrace();
-
-        for (int i = 0; i < Math.min(lines, arr.length); i++) {
-            sb.append(arr[i]).append("\n");
-        }
-        return sb.toString();
     }
 
     private String rootCauseSummary(Throwable throwable) {
