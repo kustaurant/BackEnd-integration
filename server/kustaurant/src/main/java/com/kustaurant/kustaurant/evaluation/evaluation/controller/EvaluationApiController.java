@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -42,6 +44,14 @@ public class EvaluationApiController implements EvaluationApiDoc {
         if (evaluationDTO.getEvaluationScore() == null || evaluationDTO.getEvaluationScore().equals(0d)) {
             throw new ParamException("평가 점수가 필요합니다.");
         }
+
+        if (evaluationDTO.getEvaluationSituations() == null) {
+            evaluationDTO.setEvaluationSituations(new ArrayList<>());
+        }
+        if (evaluationDTO.getStarComments() == null) {
+            evaluationDTO.setStarComments(new ArrayList<>());
+        }
+        log.info("[evaluation] user id: {}, data: {}", user.id(), evaluationDTO);
 
         // 평가 데이터 저장 또는 업데이트
         evaluationCommandService.evaluate(user.id(), restaurantId, evaluationDTO);

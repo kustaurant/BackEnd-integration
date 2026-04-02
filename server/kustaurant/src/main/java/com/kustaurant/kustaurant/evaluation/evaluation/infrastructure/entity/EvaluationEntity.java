@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
@@ -77,7 +79,8 @@ public class EvaluationEntity extends BaseTimeEntity {
         entity.dislikeCount = evaluation.getDislikeCount();
         entity.userId = evaluation.getUserId();
         entity.restaurantId = evaluation.getRestaurantId();
-        entity.situationIds = new ArrayList<>(evaluation.getSituationIds());
+        entity.situationIds = new ArrayList<>(
+                Optional.ofNullable(evaluation.getSituationIds()).orElse(new ArrayList<>()));
         return entity;
     }
 

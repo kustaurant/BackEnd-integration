@@ -61,6 +61,11 @@ public class FakeUserRepository implements UserRepository {
     }
 
     @Override
+    public User update(User user) {
+        return null;
+    }
+
+    @Override
     public int countByLoginApi(LoginApi apple) {
         return 0;
     }

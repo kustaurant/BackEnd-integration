@@ -46,6 +46,7 @@ public record RestaurantSearchResponse(
                             .toList();
 
             items.add(new RestaurantSearchItem(
+                    restaurant.id(),
                     restaurant.name(),
                     restaurant.cuisine(),
                     restaurant.position(),
@@ -63,6 +64,7 @@ public record RestaurantSearchResponse(
     }
 
     public record RestaurantSearchItem(
+            long id,
             String name,
             String cuisine,
             String position,

@@ -16,7 +16,7 @@ public interface UserRepository {
 
     Optional<User> findById(Long userId);
     User save(User user);
-
+    User update(User user);
 
     int countByLoginApi(LoginApi apple);
     List<User> findByIdIn(List<Long> ids);

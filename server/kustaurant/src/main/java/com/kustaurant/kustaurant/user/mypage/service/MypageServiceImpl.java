@@ -20,6 +20,7 @@ import com.kustaurant.kustaurant.user.user.domain.PhoneNumber;
 import com.kustaurant.kustaurant.user.user.service.port.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -40,6 +41,7 @@ public class MypageServiceImpl implements MypageService {
         return mypageQueryRepository.getProfile(userId);
     }
 
+    @Transactional
     // 2. 마이페이지 프로필 정보(변경)화면에서 로직을 검증하고 업데이트 하거나 결과를 반환
     public ProfileUpdateResponse updateUserProfile(Long userId, ProfileUpdateRequest req) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
@@ -66,13 +68,13 @@ public class MypageServiceImpl implements MypageService {
             throw new NoProfileChangeException();
         }
 
+        userRepository.update(user);
         return new ProfileUpdateResponse(
                 user.getNickname().getValue(),
                 user.getEmail() != null ? user.getEmail() : null,
                 user.getPhoneNumber() != null ? user.getPhoneNumber().getValue() : null
         );
     }
-
 
     // 3. 유저가 즐겨찾기한 레스토랑 리스트들 반환 (추가한 순서)
     public List<MyRestaurantResponse> getUserFavoriteRestaurantList(Long userId) {

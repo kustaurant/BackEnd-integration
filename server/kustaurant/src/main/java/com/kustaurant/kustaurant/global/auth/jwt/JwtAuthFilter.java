@@ -29,12 +29,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest req,
-            HttpServletResponse res,
-            FilterChain chain
-    ) throws IOException, ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String uri = request.getRequestURI();
 
+        return "/api/v2/token/refresh".equals(uri) || "/api/v2/token/verify".equals(uri);
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+            throws IOException, ServletException
+    {
         String token = getJwtFromRequest(req);
         if (StringUtils.hasText(token)) {
             try {

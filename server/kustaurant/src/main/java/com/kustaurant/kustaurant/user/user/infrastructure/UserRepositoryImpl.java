@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.user.user.infrastructure;
 
+import com.kustaurant.kustaurant.global.exception.exception.user.UserNotFoundException;
 import com.kustaurant.kustaurant.user.login.api.domain.LoginApi;
 import com.kustaurant.kustaurant.user.user.domain.User;
 import com.kustaurant.kustaurant.user.user.domain.Nickname;
@@ -43,6 +44,15 @@ public class UserRepositoryImpl implements UserRepository {
         return jpaRepo.save(UserEntity.from(user)).toModel();
     }
 
+    @Override
+    public User update(User user) {
+        UserEntity entity = jpaRepo.findById(user.getId()).orElseThrow(UserNotFoundException::new);
+
+        entity.changeNickname(user.getNickname());
+        entity.changePhoneNumber(user.getPhoneNumber());
+
+        return entity.toModel();
+    }
 
     @Override
     public int countByLoginApi(LoginApi loginApi) {
