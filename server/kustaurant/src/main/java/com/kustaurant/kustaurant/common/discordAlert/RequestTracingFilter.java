@@ -17,13 +17,14 @@ public class RequestTracingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest req, HttpServletResponse res, FilterChain chain
     ) throws ServletException, IOException {
-        String traceId = UUID.randomUUID().toString().substring(0, 8);
+        String traceId = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
         MDC.put("traceId", traceId);
-        try{
+        res.setHeader("X-Trace-Id", traceId);
+
+        try {
             chain.doFilter(req, res);
         } finally {
             MDC.clear();
         }
-
     }
 }

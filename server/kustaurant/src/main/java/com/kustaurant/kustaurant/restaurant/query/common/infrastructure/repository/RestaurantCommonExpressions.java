@@ -3,6 +3,7 @@ package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.reposit
 import static java.util.Objects.isNull;
 
 import com.kustaurant.jpa.restaurant.entity.QRestaurantEntity;
+import com.kustaurant.jpa.restaurant.entity.QRestaurantPartnershipEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity;
 import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
@@ -73,6 +74,32 @@ public class RestaurantCommonExpressions {
             return r.partnershipInfo.isNotNull().and(r.partnershipInfo.ne(""));
         }
         return r.restaurantCuisine.in(cuisines);
+    }
+
+    public static BooleanExpression cuisinesInV2(List<String> cuisines, QRestaurantEntity r) {
+        if (isNull(cuisines) || cuisines.isEmpty()) return null;
+
+        boolean hasPartnerships = cuisines.contains(Cuisine.JH.name());
+        List<String> normalCuisines = cuisines.stream()
+                .filter(c -> !Cuisine.JH.name().equals(c))
+                .toList();
+        BooleanExpression cuisineCondition = normalCuisines.isEmpty() ? null : r.restaurantCuisine.in(normalCuisines);
+        if (!hasPartnerships) return cuisineCondition;
+
+
+        QRestaurantPartnershipEntity rp = new QRestaurantPartnershipEntity("rpSub");
+
+        BooleanExpression partnershipCondition = JPAExpressions
+                .selectOne()
+                .from(rp)
+                .where(rp.restaurantId.eq(r.restaurantId))
+                .exists();
+
+        if (cuisineCondition == null) {
+            return partnershipCondition;
+        }
+
+        return cuisineCondition.or(partnershipCondition);
     }
 
     public static BooleanExpression positionsIn(List<String> positions, QRestaurantEntity r) {

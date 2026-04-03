@@ -8,6 +8,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetailV2;
 import io.micrometer.observation.annotation.Observed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,7 +44,7 @@ public class RestaurantController {
         String viewerKey = viewerKeyProvider.resolveViewerKey(user, req, res);
         viewCountService.countOncePerHour(ViewResourceType.POST, restaurantId, viewerKey);
 
-        RestaurantDetail detailDto = restaurantService.getRestaurantDetail(restaurantId, user.id());
+        RestaurantDetailV2 detailDto = restaurantService.getRestaurantDetailV2(restaurantId, user.id());
         boolean hasEvaluated = detailDto.getIsEvaluated();
         String evaluationButton = hasEvaluated ? "다시 평가하기" : " 평가하기";
 

@@ -3,11 +3,11 @@ package com.kustaurant.kustaurant.restaurant.query.chart.controller;
 import com.kustaurant.kustaurant.evaluation.evaluation.service.port.EvaluationQueryRepository;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
+import com.kustaurant.kustaurant.restaurant.query.chart.service.RestaurantChartServiceV2;
 import com.kustaurant.kustaurant.restaurant.query.common.argument_resolver.ChartCond;
-import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
-import com.kustaurant.kustaurant.restaurant.query.chart.service.RestaurantChartService;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
-import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTO;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDtoV2;
+import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTOV2;
 import io.micrometer.observation.annotation.Observed;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class RestaurantChartController {
 
     private final EvaluationQueryRepository evaluationQueryRepository;
-    private final RestaurantChartService restaurantChartService;
+    private final RestaurantChartServiceV2 service;
 
     public static final Integer TIER_PAGE_SIZE = 30;
 
@@ -43,7 +43,7 @@ public class RestaurantChartController {
             @AuthUser AuthUserInfo user,
             HttpServletRequest request
     ) {
-        Page<RestaurantCoreInfoDto> data = restaurantChartService.findByConditions(condition, user.id());
+        Page<RestaurantCoreInfoDtoV2> data = service.findByConditions(condition, user.id());
 
         List<String> cuisines = condition.cuisines();
         List<Long> situations = condition.situations();
@@ -66,11 +66,11 @@ public class RestaurantChartController {
     @GetMapping("/web/api/tier/map")
     @Observed
     @ResponseBody
-    public ResponseEntity<RestaurantTierMapDTO> tierMapInfo(
+    public ResponseEntity<RestaurantTierMapDTOV2> tierMapInfo(
             @ChartCond ChartCondition condition,
             @AuthUser AuthUserInfo user
     ) {
-        RestaurantTierMapDTO mapInfo = restaurantChartService.getRestaurantTierMapDto(condition, user.id());
+        RestaurantTierMapDTOV2 mapInfo = service.getRestaurantTierMapDto(condition, user.id());
         return new ResponseEntity<>(mapInfo, HttpStatus.OK);
     }
 

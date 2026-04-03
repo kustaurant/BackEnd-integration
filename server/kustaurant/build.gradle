@@ -9,7 +9,7 @@ idea {
     }
 }
 
-version = '2.5.0-SNAPSHOT'
+version = '2.6.0'
 description = 'kustaurant'
 
 jar {
@@ -35,10 +35,10 @@ dependencies {
 
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     implementation 'org.jsoup:jsoup:1.17.2'
-    //로컬캐시
+    // 로컬캐시
     implementation "org.springframework.boot:spring-boot-starter-cache"
     implementation "com.github.ben-manes.caffeine:caffeine:3.1.8"
-    //s3 및 spring‑cloud‑aws,AWS SDK v2 모듈 전체 버전 관리
+    // s3 및 spring‑cloud‑aws,AWS SDK v2 모듈 전체 버전 관리
     implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1')
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
     // QueryDSL
@@ -55,19 +55,19 @@ dependencies {
     // swagger
     implementation(platform("org.springdoc:springdoc-openapi-bom:2.8.11"))
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui")
-    //jwt
+    // jwt
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
     testImplementation("org.springframework.security:spring-security-test")
-    //flyway
+    // flyway
     implementation 'org.flywaydb:flyway-mysql'
     //.env
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
-    //redis
+    // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.session:spring-session-data-redis'
-    //testContainer
+    // testContainer
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation "org.testcontainers:mysql"
@@ -84,6 +84,9 @@ dependencies {
     // tracing
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 //    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+
+    // WebClient
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 sourceSets {
