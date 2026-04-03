@@ -34,7 +34,7 @@ public class IgCrawlRawEntity extends BaseTimeEntity {
     @Column(name = "location", nullable = false, length = 128)
     private String location;
 
-    @Column(name = "phone_number", nullable = false, length = 16)
+    @Column(name = "phone_number", nullable = true, length = 16)
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
