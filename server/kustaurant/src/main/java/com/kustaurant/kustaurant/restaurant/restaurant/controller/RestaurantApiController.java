@@ -7,6 +7,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUser;
 import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
+import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetailV2;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-/**
- * @author Ding
- * @since 2024.7.10.
- * description: restaurant controller
- */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -47,7 +42,19 @@ public class RestaurantApiController implements RestaurantApiDoc {
         );
     }
 
+    @GetMapping("/v3/restaurants/{restaurantId}")
+    public ResponseEntity<RestaurantDetailV2> getRestaurantDetailWithAuthV2(
+            @PathVariable Long restaurantId,
+            @AuthUser AuthUserInfo user,
+            HttpServletRequest req,
+            HttpServletResponse res
+    ) {
+        String viewerKey = viewerKeyProvider.resolveViewerKey(user, req, res);
+        viewCountService.countOncePerHour(ViewResourceType.POST, restaurantId, viewerKey);
 
-
-
+        return new ResponseEntity<>(
+                restaurantService.getRestaurantDetailV2(restaurantId, user.id()),
+                HttpStatus.OK
+        );
+    }
 }

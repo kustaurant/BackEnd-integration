@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>kustaurant 어드민 페이지</title>
+
     <link rel="stylesheet" href="/css/admin/admin-styles.css">
-    <!-- 분리된 JavaScript 파일들 -->
+
+    <!-- JavaScript 파일들 -->
     <script src="/js/admin/utils.js" defer></script>
+    <script src="/js/admin/admin-modal-loader.js" defer></script>
     <script src="/js/admin/admin-users.js" defer></script>
     <script src="/js/admin/admin-restaurants.js" defer></script>
     <script src="/js/admin/admin-feedbacks.js" defer></script>
@@ -80,7 +83,7 @@
                         <span id="new-users-total">총 0명</span>
                     </div>
                     <div class="users-container">
-                        <table id="new-users-table">
+                        <table id="new-users-table" class="admin-table">
                             <thead>
                                 <tr><th>UserID</th><th>닉네임</th><th>가입일</th><th>로그인 방식</th><th>상태</th></tr>
                             </thead>
@@ -100,7 +103,7 @@
                         <span id="all-users-total">총 0명</span>
                     </div>
                     <div class="users-container">
-                        <table id="all-users-table">
+                        <table id="all-users-table" class="admin-table">
                             <thead>
                                 <tr><th>UserID</th><th>닉네임</th><th>가입일</th><th>로그인 방식</th><th>상태</th><th>최근 접속</th></tr>
                             </thead>
@@ -122,7 +125,7 @@
                         <h2>신고 목록</h2>
                         <span id="reports-total">총 25개</span>
                     </div>
-                    <table id="reports-table">
+                    <table id="reports-table" class="admin-table">
                         <thead>
                             <tr><th>신고 ID</th><th>유형</th><th>내용</th><th>날짜</th><th>UserID</th><th>닉네임</th></tr>
                         </thead>
@@ -141,21 +144,22 @@
                 <section class="restaurant-management">
                     <div class="section-header">
                         <h2>음식점 관리</h2>
-                        <span id="restaurants-total">총 18개</span>
+                        <span id="restaurants-total"> </span>
                     </div>
                     <div class="action-buttons">
                         <button>음식점 추가</button>
                         <button>음식점 삭제</button>
-                        <button>음식점 정보 수정</button>
                     </div>
-                    <table id="restaurants-table">
-                        <thead>
+                    <div class="table-wrapper">
+                        <table id="restaurants-table" class="admin-table">
+                            <thead>
                             <tr><th>ID</th><th>이름</th><th>주소</th><th>위치</th><th>타입</th><th>평가수</th><th>상태</th><th>등록일</th></tr>
-                        </thead>
-                        <tbody id="restaurants-tbody">
-                            <!-- 데이터는 JavaScript로 동적 생성 -->
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="restaurants-tbody">
+                                <!-- 데이터는 JavaScript로 동적 생성 -->
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="pagination" id="restaurants-pagination">
                         <!-- 페이징 버튼은 JavaScript로 동적 생성 -->
                     </div>
@@ -164,9 +168,33 @@
                 <section class="crawling">
                     <h2>자동 크롤링</h2>
                     <div class="crawling-actions">
-                        <button id="insta-crawl">인스타 제휴 음식점 정보 채우기</button>
-                        <button id="sync-crawl">월간 음식점 정보 싱크</button>
+                        <button id="insta-crawl">인스타 제휴 정보 크롤</button>
+                        <button id="sync-crawl">음식점 정보 싱크 크롤</button>
+                        <button id="delete-partnerships-btn">제휴데이터 삭제</button>
                     </div>
+                    <div class="section-header">
+                        <h3>파트너쉽 현황</h3>
+                        <span id="partnerships-total"></span>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="partnerships-table" class="admin-table">
+                            <thead>
+                            <tr>
+                                <th>후보</th><th>ID</th><th>음식점ID</th><th>제휴업체명</th><th>타겟</th>
+                                <th>혜택</th><th>상태</th><th>출처</th><th>등록일</th><th>수정일</th><th>수정</th>
+                            </tr>
+                            </thead>
+                            <tbody id="partnerships-tbody">
+                            <!-- 데이터는 JavaScript로 동적 생성 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination" id="partnerships-pagination">
+                        <!-- 페이징 버튼은 JavaScript로 동적 생성 -->
+                    </div>
+
                     <div class="sync-result">
                         <h3>최근 싱크로 변경된 음식점</h3>
                         <ul>
@@ -184,7 +212,7 @@
                         <h2>피드백</h2>
                         <span id="feedback-total">총 0개</span>
                     </div>
-                    <table id="feedback-table">
+                    <table id="feedback-table" class="admin-table">
                         <thead>
                             <tr><th>ID</th><th>내용</th><th>사용자ID</th><th>닉네임</th><th>작성일</th></tr>
                         </thead>

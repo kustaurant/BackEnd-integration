@@ -46,7 +46,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                 .leftJoin(ratingEntity)
                 .on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
                 .where(
-                        cuisinesIn(condition.cuisines(), restaurantEntity),
+                        cuisinesInV2(condition.cuisines(), restaurantEntity),
                         positionsIn(condition.positions(), restaurantEntity),
                         restaurantCommonExpressions.hasSituation(condition.situations(), restaurantEntity),
                         restaurantActive(restaurantEntity),
@@ -65,7 +65,7 @@ public class RestaurantChartRepositoryImpl implements RestaurantChartRepository 
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity)
                 .on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
-                .where( cuisinesIn(condition.cuisines(), restaurantEntity),
+                .where( cuisinesInV2(condition.cuisines(), restaurantEntity),
                         positionsIn(condition.positions(), restaurantEntity),
                         restaurantCommonExpressions.hasSituation(condition.situations(), restaurantEntity),
                         restaurantActive(restaurantEntity),
