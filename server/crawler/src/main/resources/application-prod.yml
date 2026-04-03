@@ -9,3 +9,7 @@ spring:
     url: ${PROD_DB_URL}
     username: ${PROD_DB_USER}
     password: ${PROD_DB_PASSWORD}
+
+instagram:
+  username: ${IG_USERNAME}
+  password: ${IG_PASSWORD}
