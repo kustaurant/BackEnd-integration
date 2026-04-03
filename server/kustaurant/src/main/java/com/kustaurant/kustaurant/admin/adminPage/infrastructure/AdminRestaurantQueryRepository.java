@@ -1,14 +1,11 @@
 package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
-import com.kustaurant.kustaurant.admin.crawl.controller.query.PagedRestaurantResponse;
-import com.kustaurant.kustaurant.admin.crawl.controller.query.PartnershipListResponse;
+import com.kustaurant.kustaurant.admin.adminPage.controller.response.PagedRestaurantResponse;
 import com.kustaurant.kustaurant.admin.adminPage.controller.response.RestaurantListResponse;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -17,24 +14,23 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantPartnershipEntity.restaurantPartnershipEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.*;
 
 @Repository
 @RequiredArgsConstructor
 public class AdminRestaurantQueryRepository {
 
-    private final JPAQueryFactory qf;
+    private final JPAQueryFactory queryFactory;
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public PagedRestaurantResponse getAllRestaurants(Pageable pageable) {
 
-        Expression<Long> evaluationCount = qf
+        Expression<Long> evaluationCount = queryFactory
                 .select(evaluationEntity.count().coalesce(0L))
                 .from(evaluationEntity)
                 .where(evaluationEntity.restaurantId.eq(restaurantEntity.restaurantId));
 
-        List<RestaurantListResponse> restaurants = qf
+        List<RestaurantListResponse> restaurants = queryFactory
                 .select(Projections.constructor(RestaurantListResponse.class,
                         restaurantEntity.restaurantId,
                         restaurantEntity.restaurantName,
@@ -51,7 +47,7 @@ public class AdminRestaurantQueryRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long totalElements = qf
+        Long totalElements = queryFactory
                 .select(restaurantEntity.count())
                 .from(restaurantEntity)
                 .fetchOne();
@@ -70,39 +66,8 @@ public class AdminRestaurantQueryRepository {
         );
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public Page<PartnershipListResponse> getAllPartnerships(Pageable pageable) {
-
-        List<PartnershipListResponse> content = qf
-                .select(Projections.constructor(PartnershipListResponse.class,
-                        restaurantPartnershipEntity.id,
-                        restaurantPartnershipEntity.restaurantId,
-                        restaurantPartnershipEntity.restaurantName,
-                        restaurantPartnershipEntity.target.stringValue(),
-                        restaurantPartnershipEntity.benefit,
-                        restaurantPartnershipEntity.matchStatus.stringValue(),
-                        restaurantPartnershipEntity.postUrl,
-                        restaurantPartnershipEntity.createdAt,
-                        restaurantPartnershipEntity.updatedAt
-                ))
-                .from(restaurantPartnershipEntity)
-                .orderBy(restaurantPartnershipEntity.createdAt.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        Long totalElements = qf
-                .select(restaurantPartnershipEntity.count())
-                .from(restaurantPartnershipEntity)
-                .fetchOne();
-
-        long total = totalElements != null ? totalElements : 0L;
-
-        return new PageImpl<>(content, pageable, total);
-    }
-
     public Long getTotalRestaurants() {
-        Long count = qf
+        Long count = queryFactory
                 .select(restaurantEntity.count())
                 .from(restaurantEntity)
                 .fetchOne();

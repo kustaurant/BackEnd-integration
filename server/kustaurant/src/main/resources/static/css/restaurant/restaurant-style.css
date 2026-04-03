@@ -343,11 +343,10 @@ div.basic-info > div.texts > span {
     font-size: 12px;
     color: #666;
     text-align: left;
-    white-space: pre-line;
 }
 
 .stat-data > .stat-value {
-    font-size: 13px;
+    font-size: 14px;
     color: #000;
     text-align: left;
 }

@@ -58,7 +58,7 @@ public class SecurityWebConfig {
                         String accept = request.getHeader("Accept");
 
                         boolean isHtmlNav = accept != null && accept.contains("text/html");
-                        boolean isApi     = uri.startsWith("/api/") || uri.startsWith("/web/api/") || uri.startsWith("/admin/api/");
+                        boolean isApi     = uri.startsWith("/api/") || uri.startsWith("/web/api/");
                         boolean isAction  = uri.startsWith("/evaluation/");
                         boolean isLoginFlow = uri.startsWith("/user/") || uri.startsWith("/oauth2/") || uri.startsWith("/login");
 
@@ -77,7 +77,7 @@ public class SecurityWebConfig {
                             String accept = req.getHeader("Accept");
                             String rw = req.getHeader("X-Requested-With");
 
-                            boolean isApi = uri.startsWith("/api/") || uri.startsWith("/web/api/") || uri.startsWith("/admin/api/");
+                            boolean isApi = uri.startsWith("/api/") || uri.startsWith("/web/api/");
                             boolean isAjax = "XMLHttpRequest".equalsIgnoreCase(rw) || (accept != null && accept.contains("application/json"));
 
                             if (isApi || isAjax) {
@@ -92,7 +92,7 @@ public class SecurityWebConfig {
                         .accessDeniedHandler((req, res, ex2) -> {
                             String uri = req.getRequestURI();
                             String accept = req.getHeader("Accept");
-                            boolean isApi = uri.startsWith("/api/") || uri.startsWith("/web/api/") || uri.startsWith("/admin/api/");
+                            boolean isApi = uri.startsWith("/api/") || uri.startsWith("/web/api/");
                             boolean isAjax = accept != null && accept.contains("application/json");
 
                             if (isApi || isAjax) {

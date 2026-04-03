@@ -6,7 +6,6 @@ import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository.query.RestaurantDetailQuery;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
-import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetailV2;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.port.RestaurantDetailRepository;
 import io.micrometer.observation.annotation.Observed;
 import java.util.Optional;
@@ -22,23 +21,16 @@ public class RestaurantDetailRepositoryImpl implements RestaurantDetailRepositor
     @Override
     @Observed
     public RestaurantDetail getRestaurantDetail(Long restaurantId, Long userId) {
-        if (isNull(restaurantId)) throw new IllegalArgumentException("restaurantId is null");
+        if (isNull(restaurantId)) {
+            throw new IllegalArgumentException("restaurantId is null");
+        }
 
-        Optional<RestaurantDetail> optional = restaurantDetailQuery.getRestaurantDetails(restaurantId, userId);
+        Optional<RestaurantDetail> optional = restaurantDetailQuery.getRestaurantDetails(
+                restaurantId, userId);
 
-        if (optional.isEmpty()) throw new DataNotFoundException(ErrorCode.RESTAURANT_NOT_FOUND, restaurantId, "식당");
-
-        return optional.get();
-    }
-
-    @Override
-    @Observed
-    public RestaurantDetailV2 getRestaurantDetailV2(Long restaurantId, Long userId) {
-        if (isNull(restaurantId)) throw new IllegalArgumentException("restaurantId is null");
-
-        Optional<RestaurantDetailV2> optional = restaurantDetailQuery.getRestaurantDetailsV2(restaurantId, userId);
-
-        if (optional.isEmpty()) throw new DataNotFoundException(ErrorCode.RESTAURANT_NOT_FOUND, restaurantId, "식당");
+        if (optional.isEmpty()) {
+            throw new DataNotFoundException(ErrorCode.RESTAURANT_NOT_FOUND, restaurantId, "식당");
+        }
 
         return optional.get();
     }

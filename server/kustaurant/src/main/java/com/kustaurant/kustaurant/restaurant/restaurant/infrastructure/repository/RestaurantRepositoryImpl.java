@@ -9,9 +9,6 @@ import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundExceptio
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-
 @Repository
 @RequiredArgsConstructor
 public class RestaurantRepositoryImpl implements RestaurantRepository {

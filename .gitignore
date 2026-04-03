@@ -82,5 +82,3 @@ infra/monitoring/promtail/*.pos
 
 infra/monitoring/**/certs/
 infra/monitoring/**/secrets/
-
-ig_state.json

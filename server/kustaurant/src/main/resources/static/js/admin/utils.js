@@ -9,20 +9,6 @@ function formatDateTime(dateTimeString) {
            date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
 }
 
-// 날짜 만 포맷팅 함수
-function formatDateOnly(value) {
-    if (!value) return '-';
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '-';
-
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-
-    return `${yyyy}-${mm}-${dd}`;
-}
-
 // 텍스트 줄이기 함수
 function truncateText(text, maxLength) {
     if (!text) return '-';

@@ -342,14 +342,12 @@
                     </div>
                 </td>
             </tr>
-
             <!-- 추가 정보 행 -->
-            <tr th:if="${not #sets.isEmpty(restaurantTierData.partnerships)}" class="tr-partnership">
+            <tr th:if="${isJH}" class="tr-partnership">
                 <td colspan="6">
-                    <p th:each="p : ${restaurantTierData.partnerships}" th:text="'제휴 정보 - ' + ${p}"></p>
+                    <p th:text="'제휴 정보 - ' + ${restaurantTierData.partnershipInfo}">제휴 정보</p>
                 </td>
             </tr>
-
         </th:block>
         </tbody>
     </table>

@@ -16,7 +16,7 @@ public class AlertAsyncConfig {
     @Bean(name="alertExecutor")
     public Executor alertExecutor() {
         ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
-        ex.setCorePoolSize(2);
+        ex.setCorePoolSize(1);
         ex.setMaxPoolSize(4);
         ex.setQueueCapacity(100);
         ex.setThreadNamePrefix("discord-alert-");

@@ -2,7 +2,6 @@ package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repositor
 
 import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,16 +23,4 @@ public interface RestaurantJpaRepository extends JpaRepository<RestaurantEntity,
     int incrementViews(@Param("id") long id);
 
 
-    // 레스토랑 제휴 크롤링 전용
-    @Query("""
-        select r.restaurantId as id, r.restaurantTel as phoneNumber
-        from RestaurantEntity r
-        where r.restaurantTel in :phoneNumbers
-    """)
-    List<RestaurantPhoneProjection> findIdsByPhoneNumbers(@Param("phoneNumbers") Collection<String> phoneNumbers);
-
-    interface RestaurantPhoneProjection {
-        Long getId();
-        String getPhoneNumber();
-    }
 }
