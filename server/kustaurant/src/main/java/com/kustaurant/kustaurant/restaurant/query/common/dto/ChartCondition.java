@@ -3,8 +3,10 @@ package com.kustaurant.kustaurant.restaurant.query.common.dto;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.data.domain.Pageable;
 
+@Hidden
 public record ChartCondition(
         List<String> cuisines,
         List<Long> situations,

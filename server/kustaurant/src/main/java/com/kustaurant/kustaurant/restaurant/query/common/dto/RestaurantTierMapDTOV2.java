@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "restaurant tier map entity")
+@Schema(description = "2026.04.03")
 public class RestaurantTierMapDTOV2 {
     @Schema(description = "지도의 최소 줌입니다. (활용이 힘들다면 말씀해주세요.")
     Integer minZoom = MapConstants.MIN_ZOOM;

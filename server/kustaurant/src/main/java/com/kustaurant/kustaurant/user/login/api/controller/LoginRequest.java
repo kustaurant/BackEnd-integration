@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record LoginRequest(
-        @Schema(description = "로그인 제공자 (NAVER 또는 APPLE)", example = "NAVER")
+        @Schema(description = "로그인 제공자 (NAVER 또는 APPLE)", example = "NAVER or APPLE")
         @NotNull LoginApi provider,   // enum NAVER, APPLE ...
         @Schema(description = "NAVER만 사용, APPLE은 null로 보내주세요")
         String providerId,             // 네이버: 사용  애플: null

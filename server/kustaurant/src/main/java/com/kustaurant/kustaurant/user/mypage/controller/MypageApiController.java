@@ -40,11 +40,8 @@ public class MypageApiController {
             @Parameter(hidden = true) @AuthUser AuthUserInfo user
     ){
         ProfileResponse response;
-        if (user == null) {
-            response = new ProfileResponse(null,0,0,0,0,0,null,null);
-        } else{
-            response = mypageService.getProfile(user.id());
-        }
+        if (user == null) response = new ProfileResponse(null,0,0,0,0,0,null,null);
+        else response = mypageService.getProfile(user.id());
 
         return ResponseEntity.ok(response);
     }
@@ -52,7 +49,7 @@ public class MypageApiController {
 
     //2 마이페이지 프로필 변경 화면 조회
     @Operation(
-            summary = "\"마이페이지 프로필 변경 화면 조회\"",
+            summary = "마이페이지 프로필 변경 화면 조회",
             description = "마이페이지 프로필 변경화면 로드에 정보를 불러옵니다"
     )
     @GetMapping("/v2/mypage/profile")
@@ -92,7 +89,7 @@ public class MypageApiController {
 
     //4 음식점 평가 목록 조회
     @Operation(
-            summary = "\"내가 평가한 음식점 조회\"",
+            summary = "내가 평가한 음식점 조회",
             description = "유저가 평가한 음식점 리스트를 불러옵니다."
     )
     @GetMapping("/v2/auth/mypage/restaurants/evaluated")
@@ -107,7 +104,7 @@ public class MypageApiController {
 
     //5 음식점 즐겨찾기 조회
     @Operation(
-            summary = "\"내가 저장한 음식점 조회\"",
+            summary = "내가 저장한 음식점 조회",
             description = "유저가 즐겨찾기해논 맛집 정보들을 불러옵니다."
     )
     @GetMapping("/v2/auth/mypage/restaurants/favorite")
@@ -122,7 +119,7 @@ public class MypageApiController {
 
     //6 커뮤니티 작성 글 조회
     @Operation(
-            summary = "\"내가 작성한 커뮤니티 글 조회\"",
+            summary = "내가 작성한 커뮤니티 글 조회",
             description = "유저가 작성한 커뮤니티 글 리스트 정보들을 불러옵니다."
     )
     @GetMapping("/v2/auth/mypage/community/posts")
@@ -137,7 +134,7 @@ public class MypageApiController {
 
     //7 커뮤니티 스크랩한 게시글 조회
     @Operation(
-            summary = "\"내가 저장한 커뮤니티 게시글 조회\"",
+            summary = "내가 저장한 커뮤니티 게시글 조회",
             description = "유저가 저장해놓은 커뮤니티 게시글 리스트 정보들을 불러옵니다."
     )
     @GetMapping("/v2/auth/mypage/community/scraps")
@@ -152,7 +149,7 @@ public class MypageApiController {
 
     //8 커뮤니티 작성 댓글 조회
     @Operation(
-            summary = "\"내가 작성한 커뮤니티 댓글 조회\"",
+            summary = "내가 작성한 커뮤니티 댓글 조회",
             description = "유저가 작성한 커뮤니티의 댓글 리스트들을 불러옵니다."
     )
     @GetMapping("/v2/auth/mypage/community/comments")
@@ -167,7 +164,7 @@ public class MypageApiController {
 
     //9 공지사항
     @Operation(
-            summary = "\"공지사항 목록 조회\"",
+            summary = "공지사항 목록 조회",
             description = "공지사항 리스트와 관련 링크들을 불러옵니다. (조회는 웹뷰 방식)"
     )
     @GetMapping("/v2/mypage/notices")
