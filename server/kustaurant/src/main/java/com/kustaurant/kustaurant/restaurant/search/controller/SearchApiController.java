@@ -44,6 +44,17 @@ public class SearchApiController implements SearchApiDoc{
         return ResponseEntity.ok(restaurantSearchV3Service.search(kwList, user.id(), pageable));
     }
 
+    @Override
+    @GetMapping("/api/v4/search")
+    public ResponseEntity<RestaurantSearchResponse> searchV4(
+            String kw, int page, int size, AuthUserInfo user
+    ) {
+        String[] kwList = preprocessKeyword(kw);
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        return ResponseEntity.ok(restaurantSearchV3Service.search(kwList, user.id(), pageable));
+    }
+
     private static String[] preprocessKeyword(String kw) {
         if (kw == null || kw.isEmpty()) {return new String[0];}
         return kw.trim().replaceAll("\\s+", " ").split(" ");

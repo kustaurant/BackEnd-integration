@@ -47,6 +47,7 @@ public class SecurityWebConfig {
 
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**").hasRole("ADMIN")
                         .requestMatchers("/restaurant/**", "/evaluation/**", "/user/myPage", "/community/write","/api/posts/**","/api/comments/**", "/api/images/**").authenticated()
                         .anyRequest().permitAll())
 
@@ -101,7 +102,7 @@ public class SecurityWebConfig {
                                 res.getWriter().write("{\"status\":\"FORBIDDEN\",\"message\":\"권한이 없습니다.\"}");
                                 return;
                             }
-                            res.sendRedirect("/user/login");
+                            res.sendError(403);
                         })
                 )
 

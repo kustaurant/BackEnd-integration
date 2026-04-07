@@ -9,6 +9,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDtoV2;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantTierMapDTOV2;
 import io.micrometer.observation.annotation.Observed;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequiredArgsConstructor
 @Controller
 @Slf4j
+@Hidden
 public class RestaurantChartController {
 
     private final EvaluationQueryRepository evaluationQueryRepository;

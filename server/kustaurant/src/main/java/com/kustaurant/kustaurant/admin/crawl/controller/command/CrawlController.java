@@ -1,15 +1,16 @@
 package com.kustaurant.kustaurant.admin.crawl.controller.command;
 
 import com.kustaurant.kustaurant.admin.crawl.service.IGPartnershipPipelineService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
+@Hidden
 @RequestMapping("/admin/api/crawl")
 public class CrawlController {
     private final IGPartnershipPipelineService pipelineService;

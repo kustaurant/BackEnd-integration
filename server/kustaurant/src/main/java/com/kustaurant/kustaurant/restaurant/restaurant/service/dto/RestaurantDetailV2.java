@@ -15,7 +15,7 @@ import static com.kustaurant.kustaurant.restaurant.restaurant.constants.Restaura
 
 @Getter
 @ToString
-@Schema(description = "restaurant detail information")
+@Schema(description = "2026.04.03")
 @AllArgsConstructor
 public class RestaurantDetailV2 {
 

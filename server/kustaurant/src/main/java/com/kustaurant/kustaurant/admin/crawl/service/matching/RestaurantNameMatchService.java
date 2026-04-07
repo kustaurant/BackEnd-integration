@@ -29,7 +29,6 @@ public class RestaurantNameMatchService {
         List<RestaurantMatchCandidate> candidates = candidateRepo.findMatchCandidatesByIds(candidateIds);
         if (candidates.isEmpty()) return NameMatchDecision.unmatched("후보 상세 조회 결과 없음");
 
-
         List<RestaurantMatchCandidate> addressMatched = candidates.stream()
                 .filter(candidate -> addressNormalizer.isCompatible(raw.getLocation(), candidate.address()))
                 .toList();

@@ -2,6 +2,7 @@ package com.kustaurant.kustaurant.restaurant.search.service.response;
 
 import com.kustaurant.kustaurant.restaurant.search.infrastructure.engine.response.SearchResult;
 import com.kustaurant.kustaurant.restaurant.search.infrastructure.persistence.response.RestaurantForSearch;
+import io.swagger.v3.oas.annotations.Hidden;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,7 @@ public record RestaurantSearchResponse(
         }
     }
 
+    @Hidden
     public record RestaurantSearchItem(
             long id,
             String name,
@@ -80,6 +82,7 @@ public record RestaurantSearchResponse(
             List<String> matchedFields
     ) {
 
+        @Hidden
         public record HighlightRange(
                 int start,
                 int end

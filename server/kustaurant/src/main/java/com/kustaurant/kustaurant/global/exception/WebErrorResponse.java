@@ -1,10 +1,11 @@
 package com.kustaurant.kustaurant.global.exception;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-
+@Hidden
 public record WebErrorResponse (
         @Schema(description = "예외 상황", example = "BAD REQUEST")
         String status,

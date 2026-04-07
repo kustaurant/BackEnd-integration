@@ -8,6 +8,7 @@ import com.kustaurant.kustaurant.global.auth.argumentResolver.AuthUserInfo;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.RestaurantService;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetail;
 import com.kustaurant.kustaurant.restaurant.restaurant.service.dto.RestaurantDetailV2;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
