@@ -49,14 +49,10 @@ public class AddressNormalizer {
         Set<String> a = tokenize(rawLocation);
         Set<String> b = tokenize(restaurantAddress);
 
-        if (a.isEmpty() || b.isEmpty()) {
-            return false;
-        }
+        if (a.isEmpty() || b.isEmpty()) return false;
 
         for (String token : a) {
-            if (b.contains(token)) {
-                return true;
-            }
+            if (b.contains(token)) return true;
         }
         return false;
     }

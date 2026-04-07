@@ -95,12 +95,12 @@ public class DiscordAsyncSender {
         embed.put("color", 15158332);
 
         ArrayNode fields = embed.putArray("fields");
+        addField(fields, "profiles", env, true);
         addField(fields, "method", snapshot.method(), true);
         addField(fields, "url", snapshot.uri(), false);
         addField(fields, "query", maskQuery(snapshot.query()), true);
         addField(fields, "clientIp", snapshot.clientIp(), true);
         addField(fields, "traceId", traceId, true);
-        addField(fields, "profiles", env, true);
         addField(fields, "rootCause", rootCauseSummary(e), false);
 
         return root;
