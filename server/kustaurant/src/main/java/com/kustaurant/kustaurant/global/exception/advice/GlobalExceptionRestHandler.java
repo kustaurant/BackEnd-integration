@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -50,6 +51,22 @@ public class GlobalExceptionRestHandler {
                 ex.getParameterValidationResults()
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<ApiErrorResponse> handleMethodArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest req
+    ) {
+        log.warn(
+                "[TypeMismatch] {} {} param='{}' value='{}'",
+                req.getMethod(),
+                req.getRequestURI(),
+                ex.getName(),
+                ex.getValue()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE));
     }
 
     /**   2. 지원되지 않는 HTTP 메서드(405)   */
