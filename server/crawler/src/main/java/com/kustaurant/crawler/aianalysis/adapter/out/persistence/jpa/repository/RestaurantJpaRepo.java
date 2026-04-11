@@ -1,6 +1,6 @@
 package com.kustaurant.crawler.aianalysis.adapter.out.persistence.jpa.repository;
 
-import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
+import com.kustaurant.restaurant.entity.RestaurantEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

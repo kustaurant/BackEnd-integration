@@ -1,9 +1,9 @@
 package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository;
 
-import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.kustaurant.global.exception.ErrorCode.RESTAURANT_NOT_FOUND;
 import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions.*;
+import static com.kustaurant.rating.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantEntity.restaurantEntity;
 
 import com.kustaurant.kustaurant.global.exception.exception.DataNotFoundException;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;

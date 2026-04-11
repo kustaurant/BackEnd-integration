@@ -1,13 +1,13 @@
 package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository;
 
-import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions.restaurantActive;
 import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions.*;
+import static com.kustaurant.rating.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantEntity.restaurantEntity;
 
-import com.kustaurant.jpa.rating.entity.QRatingEntity;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantChartRepository;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
+import com.kustaurant.rating.entity.QRatingEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;

@@ -1,0 +1,22 @@
+<div id="naver-place-crawl-modal" class="admin-modal hidden">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content naver-place-modal-content">
+        <div class="admin-modal-header">
+            <h3>네이버 식당 URL 실행</h3>
+            <button id="naver-place-crawl-modal-close" class="modal-close-btn" type="button">&times;</button>
+        </div>
+        <div class="admin-modal-body">
+            <div class="form-group">
+                <label for="naver-place-url">네이버 식당 URL</label>
+                <input id="naver-place-url" type="text" placeholder="https://map.naver.com/p/entry/place/..." />
+                <p class="crawl-help-text">URL 분석하기는 분석용 응답만 확인하고, URL로 음식점 추가는 raw 데이터를 저장합니다.</p>
+            </div>
+            <div id="naver-place-crawl-result" class="naver-place-result hidden"></div>
+        </div>
+        <div class="admin-modal-footer">
+            <button id="naver-place-crawl-cancel-btn" type="button">취소</button>
+            <button id="naver-place-analyze-submit-btn" type="button">URL 분석하기</button>
+            <button id="naver-place-crawl-submit-btn" type="button">URL로 음식점 추가</button>
+        </div>
+    </div>
+</div>

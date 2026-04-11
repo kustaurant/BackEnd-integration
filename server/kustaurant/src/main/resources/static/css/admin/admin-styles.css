@@ -395,11 +395,22 @@ button:not(.tab-button):not(.pagination button):hover {
 
 /* 액션 버튼 그룹 */
 .action-buttons {
-    margin-bottom: 16px;
+    margin: 0;
 }
 
-.crawling-actions {
-    margin-bottom: 24px;
+.section-tools {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 10px 0;
+    flex-wrap: wrap;
+}
+
+.table-meta-text {
+    color: #6b7280;
+    font-size: 0.95em;
+    margin-left: auto;
 }
 
 .pagination {
@@ -489,6 +500,11 @@ button:not(.tab-button):not(.pagination button):hover {
     margin: 0;
     border: none;
     padding: 0;
+}
+
+.section-header h2.section-title-accent {
+    border-left: 4px solid #059669;
+    padding-left: 12px;
 }
 
 @media (max-width: 700px) {
@@ -847,6 +863,39 @@ button:not(.tab-button):not(.pagination button):hover {
 .candidate-empty {
     color: #777;
     padding: 8px 0;
+}
+
+.naver-place-modal-content {
+    width: 680px;
+}
+
+.naver-place-result {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid #d1fae5;
+    background: #f0fdf4;
+    border-radius: 10px;
+}
+
+.naver-place-result.hidden {
+    display: none;
+}
+
+.naver-place-result-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 16px;
+    margin-bottom: 16px;
+}
+
+.naver-place-result-menus ul {
+    margin: 10px 0 0;
+    padding-left: 18px;
+}
+
+.naver-place-result-menus li {
+    margin-bottom: 6px;
+    color: #374151;
 }
 
 

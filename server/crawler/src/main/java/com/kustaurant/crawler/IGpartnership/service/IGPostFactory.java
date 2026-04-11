@@ -2,7 +2,7 @@ package com.kustaurant.crawler.IGpartnership.service;
 
 import com.kustaurant.crawler.IGpartnership.dto.ParsedCaption;
 import com.kustaurant.crawler.IGpartnership.dto.RawPost;
-import com.kustaurant.jpa.restaurant.IGPost;
+import com.kustaurant.restaurant.IGPost;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;

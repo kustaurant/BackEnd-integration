@@ -246,6 +246,18 @@ function openCrawlModal() {
     modal.classList.remove('hidden');
 }
 
+function openNaverPlaceModal() {
+    const modal = document.getElementById('naver-place-crawl-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+}
+
+function closeNaverPlaceModal() {
+    const modal = document.getElementById('naver-place-crawl-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+}
+
 function closeCrawlModal() {
     const modal = document.getElementById('crawl-modal');
     if (!modal) return;
@@ -260,6 +272,115 @@ function getCookie(name) {
         return parts.pop().split(';').shift();
     }
     return null;
+}
+
+function renderNaverPlaceCrawlResult(data) {
+    const resultBox = document.getElementById('naver-place-crawl-result');
+    if (!resultBox) return;
+
+    const menus = data.menus || [];
+    const menuHtml = menus.length === 0
+        ? '<li>메뉴 정보 없음</li>'
+        : menus.map(menu => `
+            <li>
+                <strong>${menu.menuName || '-'}</strong>
+                <span>${menu.menuPrice || '-'}</span>
+            </li>
+        `).join('');
+
+    resultBox.innerHTML = `
+        <div class="naver-place-result-summary">
+            <div><strong>Raw ID:</strong> ${data.rawId}</div>
+            <div><strong>식당명:</strong> ${data.placeName || '-'}</div>
+            <div><strong>카테고리:</strong> ${data.category || '-'}</div>
+            <div><strong>도로명 주소:</strong> ${data.restaurantAddress || '-'}</div>
+            <div><strong>전화번호:</strong> ${data.phoneNumber || '-'}</div>
+            <div><strong>좌표:</strong> ${data.latitude || '-'}, ${data.longitude || '-'}</div>
+            <div><strong>메뉴 수:</strong> ${data.menuCount || 0}</div>
+        </div>
+        <div class="naver-place-result-menus">
+            <strong>메뉴 미리보기</strong>
+            <ul>${menuHtml}</ul>
+        </div>
+    `;
+    resultBox.classList.remove('hidden');
+}
+
+function executeNaverPlaceAction(options) {
+    const urlInput = document.getElementById('naver-place-url');
+    const resultBox = document.getElementById('naver-place-crawl-result');
+    const submitBtn = document.getElementById(options.submitButtonId);
+    const placeUrl = urlInput?.value?.trim();
+
+    if (!placeUrl) {
+        alert('크롤링할 네이버 식당 URL을 입력하세요.');
+        return;
+    }
+
+    if (resultBox) {
+        resultBox.classList.add('hidden');
+        resultBox.innerHTML = '';
+    }
+
+    const csrfToken = getCookie('XSRF-TOKEN');
+    submitBtn.disabled = true;
+    submitBtn.textContent = options.runningText;
+
+    fetch(options.endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-XSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ placeUrl })
+    })
+        .then(async response => {
+            const text = await response.text();
+            if (!response.ok) {
+                throw new Error(text || `HTTP ${response.status}`);
+            }
+            return text ? JSON.parse(text) : {};
+        })
+        .then(data => {
+            renderNaverPlaceCrawlResult(data);
+            if (options.reloadRestaurants) {
+                loadRestaurants(0);
+            }
+        })
+        .catch(error => {
+            console.error(options.errorLogText, error);
+            alert(`${options.errorAlertText}: ${error.message}`);
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = options.idleText;
+        });
+}
+
+function runNaverPlaceCrawl() {
+    executeNaverPlaceAction({
+        endpoint: '/admin/api/crawl/naver-place/raw',
+        submitButtonId: 'naver-place-crawl-submit-btn',
+        runningText: '추가 중..',
+        idleText: 'URL로 음식점 추가',
+        errorLogText: '네이버 식당 URL 추가 실패:',
+        errorAlertText: '네이버 식당 URL 추가 실패',
+        reloadRestaurants: true
+    });
+}
+
+function runNaverPlaceAnalyze() {
+    executeNaverPlaceAction({
+        endpoint: '/admin/api/crawl/naver-place/analyze',
+        submitButtonId: 'naver-place-analyze-submit-btn',
+        runningText: '분석 중..',
+        idleText: 'URL 분석하기',
+        errorLogText: '네이버 식당 URL 분석 실패:',
+        errorAlertText: '네이버 식당 URL 분석 실패',
+        reloadRestaurants: false
+    });
 }
 
 function runInstagramCrawl() {
@@ -341,11 +462,21 @@ function runInstagramCrawl() {
 ////////////////////////////
 
 async function initCrawlModal() {
+    const naverPlaceAddBtn = document.getElementById('naver-place-add-btn');
     const instaCrawlBtn = document.getElementById('insta-crawl');
     const crawlModalCloseBtn = document.getElementById('crawl-modal-close');
     const crawlCancelBtn = document.getElementById('crawl-cancel-btn');
     const crawlSubmitBtn = document.getElementById('crawl-submit-btn');
     const crawlModalOverlay = document.querySelector('#crawl-modal .admin-modal-overlay');
+    const naverPlaceModalCloseBtn = document.getElementById('naver-place-crawl-modal-close');
+    const naverPlaceCancelBtn = document.getElementById('naver-place-crawl-cancel-btn');
+    const naverPlaceAnalyzeSubmitBtn = document.getElementById('naver-place-analyze-submit-btn');
+    const naverPlaceSubmitBtn = document.getElementById('naver-place-crawl-submit-btn');
+    const naverPlaceModalOverlay = document.querySelector('#naver-place-crawl-modal .admin-modal-overlay');
+
+    if (naverPlaceAddBtn) {
+        naverPlaceAddBtn.addEventListener('click', openNaverPlaceModal);
+    }
 
     if (instaCrawlBtn) {
         instaCrawlBtn.addEventListener('click', openCrawlModal);
@@ -365,6 +496,26 @@ async function initCrawlModal() {
 
     if (crawlSubmitBtn) {
         crawlSubmitBtn.addEventListener('click', runInstagramCrawl);
+    }
+
+    if (naverPlaceModalCloseBtn) {
+        naverPlaceModalCloseBtn.addEventListener('click', closeNaverPlaceModal);
+    }
+
+    if (naverPlaceCancelBtn) {
+        naverPlaceCancelBtn.addEventListener('click', closeNaverPlaceModal);
+    }
+
+    if (naverPlaceModalOverlay) {
+        naverPlaceModalOverlay.addEventListener('click', closeNaverPlaceModal);
+    }
+
+    if (naverPlaceAnalyzeSubmitBtn) {
+        naverPlaceAnalyzeSubmitBtn.addEventListener('click', runNaverPlaceAnalyze);
+    }
+
+    if (naverPlaceSubmitBtn) {
+        naverPlaceSubmitBtn.addEventListener('click', runNaverPlaceCrawl);
     }
 }
 

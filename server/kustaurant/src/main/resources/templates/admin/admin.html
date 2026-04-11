@@ -21,7 +21,7 @@
     <div class="container">
         <header class="header">
             <h1>kustaurant 어드민 페이지</h1>
-            <p>음식점, 신고, 피드백, 자동 크롤링 관리</p>
+            <p>음식점, 신고, 피드백, 제휴 정보 관리</p>
         </header>
         
         <nav class="tab-navigation">
@@ -143,12 +143,14 @@
             <div id="restaurants-tab" class="tab-content">
                 <section class="restaurant-management">
                     <div class="section-header">
-                        <h2>음식점 관리</h2>
-                        <span id="restaurants-total"> </span>
+                        <h2 class="section-title-accent">음식점 관리</h2>
                     </div>
-                    <div class="action-buttons">
-                        <button>음식점 추가</button>
-                        <button>음식점 삭제</button>
+                    <div class="section-tools">
+                        <div class="action-buttons">
+                            <button id="naver-place-add-btn" type="button">URL로 음식점 추가</button>
+                            <button id="sync-crawl" type="button">음식점 정보 싱크 크롤</button>
+                        </div>
+                        <span id="restaurants-total" class="table-meta-text"></span>
                     </div>
                     <div class="table-wrapper">
                         <table id="restaurants-table" class="admin-table">
@@ -165,18 +167,15 @@
                     </div>
                 </section>
                 
-                <section class="crawling">
-                    <h2>자동 크롤링</h2>
-                    <div class="crawling-actions">
-                        <button id="insta-crawl">인스타 제휴 정보 크롤</button>
-                        <button id="sync-crawl">음식점 정보 싱크 크롤</button>
-                        <button id="delete-partnerships-btn">제휴데이터 삭제</button>
+                <section class="partnership-management">
+                    <h2>제휴 정보 현황</h2>
+                    <div class="section-tools">
+                        <div class="action-buttons">
+                            <button id="insta-crawl">인스타 제휴 정보 크롤</button>
+                            <button id="delete-partnerships-btn">제휴데이터 삭제</button>
+                        </div>
+                        <span id="partnerships-total" class="table-meta-text"></span>
                     </div>
-                    <div class="section-header">
-                        <h3>파트너쉽 현황</h3>
-                        <span id="partnerships-total"></span>
-                    </div>
-
                     <div class="table-wrapper">
                         <table id="partnerships-table" class="admin-table">
                             <thead>
@@ -195,13 +194,6 @@
                         <!-- 페이징 버튼은 JavaScript로 동적 생성 -->
                     </div>
 
-                    <div class="sync-result">
-                        <h3>최근 싱크로 변경된 음식점</h3>
-                        <ul>
-                            <li>맛집3 (신규 추가)</li>
-                            <li>맛집2 (정보 수정)</li>
-                        </ul>
-                    </div>
                 </section>
             </div>
             

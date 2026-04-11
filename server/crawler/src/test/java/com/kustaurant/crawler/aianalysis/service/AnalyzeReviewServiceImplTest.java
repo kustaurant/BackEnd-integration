@@ -1,25 +1,5 @@
 package com.kustaurant.crawler.aianalysis.service;
 
-import com.kustaurant.crawler.aianalysis.adapter.in.scheduler.dto.AiAnalysisReq;
-import com.kustaurant.crawler.aianalysis.adapter.out.persistence.AiAnalysisJobRepo;
-import com.kustaurant.crawler.aianalysis.domain.model.AiAnalysisJob;
-import com.kustaurant.crawler.aianalysis.service.port.AnalyzeReviewService;
-import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;

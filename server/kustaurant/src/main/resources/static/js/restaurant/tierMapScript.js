@@ -38,12 +38,12 @@ function initMap(mapData) {
 
 // 네이버 지도
   var map = new naver.maps.Map('map', {
-    minZoom: 13,
+    minZoom: mapData.minZoom,
   });
 
 // 초기 보이는 영역 조정
-  const southWest = new naver.maps.LatLng(visibleBounds[2], visibleBounds[0]); // 남서쪽(좌하단)
-  const northEast = new naver.maps.LatLng(visibleBounds[3], visibleBounds[1]); // 북동쪽(우상단)
+  const southWest = new naver.maps.LatLng(visibleBounds.minLat, visibleBounds.minLng); // 남서쪽(좌하단)
+  const northEast = new naver.maps.LatLng(visibleBounds.maxLat, visibleBounds.maxLng); // 북동쪽(우상단)
   const bounds = new naver.maps.LatLngBounds(southWest, northEast);
 
 // [[ 지도 열기 버튼 클릭 시 ]]
@@ -352,7 +352,7 @@ function initMap(mapData) {
     removePolygons()
 
     for (const coords of solidPolygonCoordsList) {
-      const path = coords.map(c => new naver.maps.LatLng(c.x, c.y));
+      const path = coords.map(c => new naver.maps.LatLng(c.latitude, c.longitude));
 
       polygons.push(new naver.maps.Polygon({
         map,

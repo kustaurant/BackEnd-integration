@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.admin.adminPage.infrastructure;
 
-import com.kustaurant.kustaurant.admin.crawl.controller.query.PagedRestaurantResponse;
-import com.kustaurant.kustaurant.admin.crawl.controller.query.PartnershipListResponse;
+import com.kustaurant.kustaurant.admin.IGCrawl.controller.query.PagedRestaurantResponse;
+import com.kustaurant.kustaurant.admin.IGCrawl.controller.query.PartnershipListResponse;
 import com.kustaurant.kustaurant.admin.adminPage.controller.response.RestaurantListResponse;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantPartnershipEntity.restaurantPartnershipEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.*;
+import static com.kustaurant.restaurant.entity.QRestaurantEntity.restaurantEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantPartnershipEntity.restaurantPartnershipEntity;
 
 @Repository
 @RequiredArgsConstructor

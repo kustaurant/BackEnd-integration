@@ -3,7 +3,7 @@ package com.kustaurant.crawler.aianalysis.adapter.out.persistence.jpa.repository
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.RestaurantCrawlerRepo;
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.RestaurantCrawlingInfo;
 import com.kustaurant.crawler.aianalysis.domain.model.JobStatus;
-import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
+import com.kustaurant.restaurant.entity.RestaurantEntity;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;

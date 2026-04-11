@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.mapper;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantMenu;
-import com.kustaurant.jpa.restaurant.entity.RestaurantMenuEntity;
+import com.kustaurant.restaurant.entity.RestaurantMenuEntity;
 
 public class RestaurantMenuMapper {
 

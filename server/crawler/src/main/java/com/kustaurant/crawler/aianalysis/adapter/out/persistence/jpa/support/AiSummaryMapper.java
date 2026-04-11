@@ -1,7 +1,7 @@
 package com.kustaurant.crawler.aianalysis.adapter.out.persistence.jpa.support;
 
 import com.kustaurant.crawler.aianalysis.domain.model.AiSummary;
-import com.kustaurant.jpa.rating.entity.AiSummaryEntity;
+import com.kustaurant.rating.entity.AiSummaryEntity;
 
 public class AiSummaryMapper {
 

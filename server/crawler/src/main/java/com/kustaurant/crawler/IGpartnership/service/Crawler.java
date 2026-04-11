@@ -5,7 +5,7 @@ import com.kustaurant.crawler.IGpartnership.dto.ParsedCaption;
 import com.kustaurant.crawler.IGpartnership.dto.RawPost;
 import com.kustaurant.crawler.IGpartnership.service.strategy.CaptionStrategyResolver;
 import com.kustaurant.crawler.IGpartnership.service.strategy.PartnershipCaptionStrategy;
-import com.kustaurant.jpa.restaurant.IGPost;
+import com.kustaurant.restaurant.IGPost;
 import com.microsoft.playwright.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository;
 
-import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
-import java.time.LocalDateTime;
+import com.kustaurant.restaurant.entity.RestaurantEntity;
+
 import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

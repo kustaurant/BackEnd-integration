@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.mapper;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantFavorite;
-import com.kustaurant.jpa.restaurant.entity.RestaurantFavoriteEntity;
+import com.kustaurant.restaurant.entity.RestaurantFavoriteEntity;
 
 public class RestaurantFavoriteMapper {
 
