@@ -15,8 +15,10 @@ import org.springframework.stereotype.Service;
 public class NaverPlaceAnalyzeService {
 
     private final RestaurantCrawlerClient crawlerClient;
+    private final NaverPlaceUrlValidator urlValidator;
 
     public NaverPlaceRawCrawlResponse analyze(String placeUrl) {
+        urlValidator.validateOrThrow(placeUrl);
         NaverPlaceCrawlResult result = crawlerClient.analyzeOne(placeUrl);
         if (result == null) {
             throw new IllegalStateException("analyze result is null");

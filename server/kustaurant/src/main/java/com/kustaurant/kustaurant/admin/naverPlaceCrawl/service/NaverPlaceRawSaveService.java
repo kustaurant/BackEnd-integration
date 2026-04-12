@@ -10,6 +10,7 @@ import com.kustaurant.kustaurant.admin.naverPlaceCrawl.infrastructure.Restaurant
 import com.kustaurant.naverplace.CrawlScopeType;
 import com.kustaurant.naverplace.NaverPlaceCrawlResult;
 import com.kustaurant.naverplace.NaverPlaceMenu;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,15 +23,14 @@ public class NaverPlaceRawSaveService {
     private final RestaurantCrawlerClient crawlerClient;
     private final RestaurantCrawlRawRepository rawRepository;
     private final RestaurantMenuRawRepository menuRawRepository;
+    private final NaverPlaceUrlValidator urlValidator;
 
     @Transactional
     public NaverPlaceRawCrawlResponse crawlAndSave(String placeUrl) {
+        urlValidator.validateOrThrow(placeUrl);
         NaverPlaceCrawlResult result = crawlerClient.crawlOne(placeUrl);
 
-        rawRepository.findBySourceUrl(result.sourceUrl()).ifPresent(existing -> {
-            menuRawRepository.deleteByRestaurantRawId(existing.getId());
-            rawRepository.delete(existing);
-        });
+        deleteExistingRawByPlaceIdOrUrl(result);
 
         RestaurantCrawlRawEntity rawEntity = rawRepository.save(
                 RestaurantCrawlRawEntity.success(
@@ -92,5 +92,29 @@ public class NaverPlaceRawSaveService {
 
     private String defaultIfBlank(String value, String fallback) {
         return value == null || value.isBlank() ? fallback : value;
+    }
+
+    private void deleteExistingRawByPlaceIdOrUrl(NaverPlaceCrawlResult result) {
+        List<RestaurantCrawlRawEntity> targets = new ArrayList<>();
+
+        if (result.sourcePlaceId() != null && !result.sourcePlaceId().isBlank()) {
+            rawRepository.findBySourcePlaceId(result.sourcePlaceId()).ifPresent(targets::add);
+        }
+
+        if (result.sourceUrl() != null && !result.sourceUrl().isBlank()) {
+            rawRepository.findBySourceUrl(result.sourceUrl())
+                    .filter(entity -> targets.stream().noneMatch(t -> t.getId().equals(entity.getId())))
+                    .ifPresent(targets::add);
+        }
+
+        for (RestaurantCrawlRawEntity target : targets) {
+            menuRawRepository.deleteByRestaurantRawId(target.getId());
+            rawRepository.delete(target);
+        }
+
+        // Ensure deletes are committed before next insert to avoid source_place_id unique collision.
+        if (!targets.isEmpty()) {
+            rawRepository.flush();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.kustaurant.kustaurant.global.exception.advice;
 
+import com.kustaurant.kustaurant.admin.naverPlaceCrawl.exception.InvalidNaverPlaceUrlException;
 import com.kustaurant.kustaurant.common.discordAlert.DiscordNotifier;
 import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.BusinessException;
@@ -7,6 +8,7 @@ import com.kustaurant.kustaurant.global.exception.ErrorCode;
 import com.kustaurant.kustaurant.global.exception.exception.auth.JwtAuthException;
 import com.kustaurant.kustaurant.global.exception.exception.user.ProviderApiException;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -133,6 +135,17 @@ public class GlobalExceptionRestHandler {
     }
 
     /**   7. 그 외 모든 예외   */
+    @ExceptionHandler(InvalidNaverPlaceUrlException.class)
+    protected ResponseEntity<ApiErrorResponse> handleInvalidNaverPlaceUrl(InvalidNaverPlaceUrlException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiErrorResponse(
+                        HttpStatus.BAD_REQUEST.value(),
+                        ErrorCode.INVALID_INPUT_VALUE.getCode(),
+                        ex.getMessage(),
+                        List.of()
+                ));
+    }
+
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ApiErrorResponse> handleUnhandled(
             Exception ex, HttpServletRequest req

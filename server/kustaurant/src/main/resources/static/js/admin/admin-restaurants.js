@@ -338,10 +338,18 @@ function executeNaverPlaceAction(options) {
     })
         .then(async response => {
             const text = await response.text();
-            if (!response.ok) {
-                throw new Error(text || `HTTP ${response.status}`);
+            let payload = null;
+            try {
+                payload = text ? JSON.parse(text) : null;
+            } catch (ignored) {
             }
-            return text ? JSON.parse(text) : {};
+
+            if (!response.ok) {
+                const reason = payload?.errors?.[0]?.reason;
+                const message = payload?.message || reason || text || `HTTP ${response.status}`;
+                throw new Error(message);
+            }
+            return payload || {};
         })
         .then(data => {
             renderNaverPlaceCrawlResult(data);
