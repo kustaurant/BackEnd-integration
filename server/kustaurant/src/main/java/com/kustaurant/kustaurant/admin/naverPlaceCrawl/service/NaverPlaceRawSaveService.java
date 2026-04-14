@@ -12,109 +12,78 @@ import com.kustaurant.naverplace.NaverPlaceCrawlResult;
 import com.kustaurant.naverplace.NaverPlaceMenu;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import java.util.Objects;
+import java.util.Optional;
+import lombok.Generated;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 public class NaverPlaceRawSaveService {
+   private final RestaurantCrawlerClient crawlerClient;
+   private final RestaurantCrawlRawRepository rawRepository;
+   private final RestaurantMenuRawRepository menuRawRepository;
+   private final NaverPlaceUrlValidator urlValidator;
 
-    private final RestaurantCrawlerClient crawlerClient;
-    private final RestaurantCrawlRawRepository rawRepository;
-    private final RestaurantMenuRawRepository menuRawRepository;
-    private final NaverPlaceUrlValidator urlValidator;
+   @Transactional
+   public NaverPlaceRawCrawlResponse crawlAndSave(String placeUrl) {
+      this.urlValidator.validateOrThrow(placeUrl);
+      NaverPlaceCrawlResult result = this.crawlerClient.crawlOne(placeUrl);
+      return this.saveResult(result, CrawlScopeType.SINGLE);
+   }
 
-    @Transactional
-    public NaverPlaceRawCrawlResponse crawlAndSave(String placeUrl) {
-        urlValidator.validateOrThrow(placeUrl);
-        NaverPlaceCrawlResult result = crawlerClient.crawlOne(placeUrl);
+   @Transactional
+   public NaverPlaceRawCrawlResponse saveResult(NaverPlaceCrawlResult result, CrawlScopeType crawlScope) {
+      this.deleteExistingRawByPlaceIdOrUrl(result);
+      RestaurantCrawlRawEntity rawEntity = (RestaurantCrawlRawEntity)this.rawRepository.save(RestaurantCrawlRawEntity.success(result.sourcePlaceId(), result.sourceUrl(), this.defaultIfBlank(result.placeName(), "UNKNOWN_PLACE"), result.category(), result.restaurantAddress(), result.phoneNumber(), result.latitude(), result.longitude(), result.imageUrl(), crawlScope));
+      List<NaverPlaceRawMenuResponse> menus = this.saveMenus(rawEntity.getId(), result.menus());
+      return new NaverPlaceRawCrawlResponse(rawEntity.getId(), rawEntity.getSourcePlaceId(), rawEntity.getSourceUrl(), rawEntity.getPlaceName(), rawEntity.getCategory(), rawEntity.getRestaurantAddress(), rawEntity.getPhoneNumber(), rawEntity.getLatitude(), rawEntity.getLongitude(), rawEntity.getImageUrl(), menus.size(), menus);
+   }
 
-        deleteExistingRawByPlaceIdOrUrl(result);
+   private List saveMenus(Long rawId, List menus) {
+      if (menus != null && !menus.isEmpty()) {
+         List<RestaurantMenuCrawlRawEntity> entities = menus.stream().map((menu) -> RestaurantMenuCrawlRawEntity.of(rawId, this.defaultIfBlank(menu.menuName(), "UNKNOWN_MENU"), menu.menuPrice(), menu.menuImageUrl())).toList();
+         this.menuRawRepository.saveAll(entities);
+         return menus.stream().map((menu) -> new NaverPlaceRawMenuResponse(menu.menuName(), menu.menuPrice(), menu.menuImageUrl())).toList();
+      } else {
+         return List.of();
+      }
+   }
 
-        RestaurantCrawlRawEntity rawEntity = rawRepository.save(
-                RestaurantCrawlRawEntity.success(
-                        result.sourcePlaceId(),
-                        result.sourceUrl(),
-                        defaultIfBlank(result.placeName(), "UNKNOWN_PLACE"),
-                        result.category(),
-                        result.restaurantAddress(),
-                        result.phoneNumber(),
-                        result.latitude(),
-                        result.longitude(),
-                        result.imageUrl(),
-                        CrawlScopeType.SINGLE
-                )
-        );
+   private String defaultIfBlank(String value, String fallback) {
+      return value != null && !value.isBlank() ? value : fallback;
+   }
 
-        List<NaverPlaceRawMenuResponse> menus = saveMenus(rawEntity.getId(), result.menus());
+   private void deleteExistingRawByPlaceIdOrUrl(NaverPlaceCrawlResult result) {
+      List<RestaurantCrawlRawEntity> targets = new ArrayList();
+      if (result.sourcePlaceId() != null && !result.sourcePlaceId().isBlank()) {
+         Optional var10000 = this.rawRepository.findBySourcePlaceId(result.sourcePlaceId());
+         Objects.requireNonNull(targets);
+         var10000.ifPresent(targets::add);
+      }
 
-        return new NaverPlaceRawCrawlResponse(
-                rawEntity.getId(),
-                rawEntity.getSourcePlaceId(),
-                rawEntity.getSourceUrl(),
-                rawEntity.getPlaceName(),
-                rawEntity.getCategory(),
-                rawEntity.getRestaurantAddress(),
-                rawEntity.getPhoneNumber(),
-                rawEntity.getLatitude(),
-                rawEntity.getLongitude(),
-                rawEntity.getImageUrl(),
-                menus.size(),
-                menus
-        );
-    }
+      if (result.sourceUrl() != null && !result.sourceUrl().isBlank()) {
+         Optional var5 = this.rawRepository.findBySourceUrl(result.sourceUrl()).filter((entity) -> targets.stream().noneMatch((t) -> t.getId().equals(entity.getId())));
+         Objects.requireNonNull(targets);
+         var5.ifPresent(targets::add);
+      }
 
-    private List<NaverPlaceRawMenuResponse> saveMenus(Long rawId, List<NaverPlaceMenu> menus) {
-        if (menus == null || menus.isEmpty()) {
-            return List.of();
-        }
+      for(RestaurantCrawlRawEntity target : targets) {
+         this.menuRawRepository.deleteByRestaurantRawId(target.getId());
+         this.rawRepository.delete(target);
+      }
 
-        List<RestaurantMenuCrawlRawEntity> entities = menus.stream()
-                .map(menu -> RestaurantMenuCrawlRawEntity.of(
-                        rawId,
-                        defaultIfBlank(menu.menuName(), "UNKNOWN_MENU"),
-                        menu.menuPrice(),
-                        menu.menuImageUrl()
-                ))
-                .toList();
+      if (!targets.isEmpty()) {
+         this.rawRepository.flush();
+      }
 
-        menuRawRepository.saveAll(entities);
+   }
 
-        return menus.stream()
-                .map(menu -> new NaverPlaceRawMenuResponse(
-                        menu.menuName(),
-                        menu.menuPrice(),
-                        menu.menuImageUrl()
-                ))
-                .toList();
-    }
-
-    private String defaultIfBlank(String value, String fallback) {
-        return value == null || value.isBlank() ? fallback : value;
-    }
-
-    private void deleteExistingRawByPlaceIdOrUrl(NaverPlaceCrawlResult result) {
-        List<RestaurantCrawlRawEntity> targets = new ArrayList<>();
-
-        if (result.sourcePlaceId() != null && !result.sourcePlaceId().isBlank()) {
-            rawRepository.findBySourcePlaceId(result.sourcePlaceId()).ifPresent(targets::add);
-        }
-
-        if (result.sourceUrl() != null && !result.sourceUrl().isBlank()) {
-            rawRepository.findBySourceUrl(result.sourceUrl())
-                    .filter(entity -> targets.stream().noneMatch(t -> t.getId().equals(entity.getId())))
-                    .ifPresent(targets::add);
-        }
-
-        for (RestaurantCrawlRawEntity target : targets) {
-            menuRawRepository.deleteByRestaurantRawId(target.getId());
-            rawRepository.delete(target);
-        }
-
-        // Ensure deletes are committed before next insert to avoid source_place_id unique collision.
-        if (!targets.isEmpty()) {
-            rawRepository.flush();
-        }
-    }
+   @Generated
+   public NaverPlaceRawSaveService(final RestaurantCrawlerClient crawlerClient, final RestaurantCrawlRawRepository rawRepository, final RestaurantMenuRawRepository menuRawRepository, final NaverPlaceUrlValidator urlValidator) {
+      this.crawlerClient = crawlerClient;
+      this.rawRepository = rawRepository;
+      this.menuRawRepository = menuRawRepository;
+      this.urlValidator = urlValidator;
+   }
 }

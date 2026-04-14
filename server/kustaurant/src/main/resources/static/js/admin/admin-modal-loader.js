@@ -18,6 +18,11 @@ async function preloadAdminModals() {
     );
 
     await appendModalIfNotExists(
+        'naver-place-sync-modal',
+        '/admin/naver-place-sync-modal.html'
+    );
+
+    await appendModalIfNotExists(
         'crawl-modal',
         '/admin/crawl-modal.html'
     );

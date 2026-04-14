@@ -7,9 +7,16 @@
         </div>
         <div class="admin-modal-body">
             <div class="form-group">
-                <label for="naver-place-url">네이버 식당 URL</label>
-                <input id="naver-place-url" type="text" placeholder="https://map.naver.com/p/entry/place/..." />
-                <p class="crawl-help-text">URL 분석하기는 분석용 응답만 확인하고, URL로 음식점 추가는 raw 데이터를 저장합니다.</p>
+                <label for="naver-place-url">네이버 place ID</label>
+                <input
+                        id="naver-place-url"
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        autocomplete="off"
+                        placeholder="place Id만 입력하세요. 예: 1994067514"
+                />
+                <p class="crawl-help-text">숫자 place ID만 입력하면 요청 시 https://map.naver.com/p/entry/place/{placeId} 형태로 전송됩니다.</p>
             </div>
             <div id="naver-place-crawl-result" class="naver-place-result hidden"></div>
         </div>

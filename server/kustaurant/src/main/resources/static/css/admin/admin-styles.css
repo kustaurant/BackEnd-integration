@@ -813,6 +813,17 @@ button:not(.tab-button):not(.pagination button):hover {
     color: #fff;
 }
 
+#naver-place-analyze-submit-btn,
+#naver-place-sync-test-submit-btn {
+    background: #ea580c;
+    color: #fff;
+}
+
+#naver-place-analyze-submit-btn:hover,
+#naver-place-sync-test-submit-btn:hover {
+    background: #c2410c;
+}
+
 /* 파트너쉽 미매칭 식당들 후보보기 css */
 
 .candidate-detail-row td {
@@ -869,12 +880,30 @@ button:not(.tab-button):not(.pagination button):hover {
     width: 680px;
 }
 
+.naver-place-sync-modal-content {
+    width: 520px;
+}
+
 .naver-place-result {
     margin-top: 20px;
     padding: 16px;
     border: 1px solid #d1fae5;
     background: #f0fdf4;
     border-radius: 10px;
+}
+
+.naver-place-sync-result {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid #d1fae5;
+    background: #f0fdf4;
+    border-radius: 10px;
+    display: grid;
+    gap: 6px;
+}
+
+.naver-place-sync-result.hidden {
+    display: none;
 }
 
 .naver-place-result.hidden {

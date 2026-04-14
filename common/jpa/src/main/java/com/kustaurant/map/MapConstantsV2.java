@@ -12,19 +12,19 @@ public final class MapConstantsV2 {
                     List.of(
                             new CoordinateV2(37.5401732,127.062852),
                             new CoordinateV2(37.5378977,127.0696049),
-                            new CoordinateV2(37.5421627,127.071636),
-                            new CoordinateV2(37.5427753,127.0710213),
-                            new CoordinateV2(37.5422156,127.0707644),
-                            new CoordinateV2(37.5441201,127.0651452)
+                            new CoordinateV2(37.5422127,127.071636), //
+                            new CoordinateV2(37.5428253,127.0710213), //
+                            new CoordinateV2(37.5422656,127.0707644), //
+                            new CoordinateV2(37.5441701,127.0651452) //
                     )
             ),
             new ZonePolygon( // 중문~어대
                     com.kustaurant.map.ZoneType.MIDDLE_TO_PARK,
                     List.of(
-                            new CoordinateV2(37.5421627,127.071636),
-                            new CoordinateV2(37.5427753,127.0710213),
-                            new CoordinateV2(37.5422156,127.0707644),
-                            new CoordinateV2(37.5441201,127.0651452),
+                            new CoordinateV2(37.5422127,127.071636),
+                            new CoordinateV2(37.5428253,127.0710213),
+                            new CoordinateV2(37.5422656,127.0707644),
+                            new CoordinateV2(37.5441701,127.0651452),
                             new CoordinateV2(37.5482696,127.0674957),
                             new CoordinateV2(37.5478196,127.0716092),
                             new CoordinateV2(37.5472574,127.0740324),

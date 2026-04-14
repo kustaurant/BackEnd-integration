@@ -1,0 +1,28 @@
+<div id="naver-place-sync-modal" class="admin-modal hidden">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content naver-place-sync-modal-content">
+        <div class="admin-modal-header">
+            <h3>구역별 음식점 싱크 크롤</h3>
+            <button id="naver-place-sync-modal-close" class="modal-close-btn" type="button">&times;</button>
+        </div>
+        <div class="admin-modal-body">
+            <div class="form-group">
+                <label for="naver-place-sync-scope">크롤링 구역</label>
+                <select id="naver-place-sync-scope">
+                    <option value="ENTRANCE_TO_MIDDLE">건입~중문</option>
+                    <option value="MIDDLE_TO_PARK">중문~어대</option>
+                    <option value="BACK_GATE">후문</option>
+                    <option value="FRONT_GATE">정문</option>
+                    <option value="GUI_STATION">구의역</option>
+                </select>
+                <p class="crawl-help-text">선택한 구역의 식당을 수집해 raw 데이터로 저장합니다.</p>
+            </div>
+            <div id="naver-place-sync-result" class="naver-place-sync-result hidden"></div>
+        </div>
+        <div class="admin-modal-footer">
+            <button id="naver-place-sync-cancel-btn" type="button">취소</button>
+            <button id="naver-place-sync-submit-btn" type="button">구역 크롤 시작</button>
+            <button id="naver-place-sync-test-submit-btn" type="button">테스트 동기 크롤</button>
+        </div>
+    </div>
+</div>
