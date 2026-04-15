@@ -104,7 +104,19 @@ function enforceNaverPlaceIdOnlyInput() {
     });
 }
 
-function executeNaverPlaceAction(options) {
+async function fetchNaverPlaceRawExistence(placeId) {
+    const response = await fetch(`/admin/api/crawl/naver-place/raw/existence/${placeId}`, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+        }
+    });
+    return parseJsonResponse(response);
+}
+
+async function executeNaverPlaceAction(options) {
     const urlInput = document.getElementById("naver-place-url");
     const resultBox = document.getElementById("naver-place-crawl-result");
     const submitBtn = document.getElementById(options.submitButtonId);
@@ -125,6 +137,20 @@ function executeNaverPlaceAction(options) {
         return;
     }
 
+    if (options.confirmOnExistingRaw) {
+        try {
+            const existence = await fetchNaverPlaceRawExistence(placeIdInput);
+            if (existence?.exists) {
+                const zoneLabel = existence.crawlScopeDescription || existence.crawlScope || "알 수 없는";
+                if (!window.confirm(`이미 ${zoneLabel} 구역에 존재합니다. 그래도 진행하시겠습니까?`)) {
+                    return;
+                }
+            }
+        } catch (error) {
+            console.warn("기존 placeId 존재 여부 확인 실패. 확인 없이 진행합니다.", error);
+        }
+    }
+
     if (resultBox) {
         resultBox.classList.add("hidden");
         resultBox.innerHTML = "";
@@ -132,29 +158,27 @@ function executeNaverPlaceAction(options) {
 
     submitBtn.disabled = true;
     submitBtn.textContent = options.runningText;
-    fetch(options.endpoint, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "X-Requested-With": "XMLHttpRequest",
-            "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
-        },
-        body: JSON.stringify({ placeUrl })
-    })
-        .then(parseJsonResponse)
-        .then(data => {
-            renderNaverPlaceCrawlResult(data);
-            if (options.reloadRestaurants) loadRestaurants(0);
-        })
-        .catch(error => {
-            console.error(options.errorLogText, error);
-            alert(`${options.errorAlertText}: ${error.message}`);
-        })
-        .finally(() => {
-            submitBtn.disabled = false;
-            submitBtn.textContent = options.idleText;
+    try {
+        const response = await fetch(options.endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+                "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+            },
+            body: JSON.stringify({ placeUrl })
         });
+        const data = await parseJsonResponse(response);
+        renderNaverPlaceCrawlResult(data);
+        if (options.reloadRestaurants) loadRestaurants(0);
+    } catch (error) {
+        console.error(options.errorLogText, error);
+        alert(`${options.errorAlertText}: ${error.message}`);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = options.idleText;
+    }
 }
 
 function runNaverPlaceCrawl() {
@@ -165,7 +189,8 @@ function runNaverPlaceCrawl() {
         idleText: "URL로 음식점 추가",
         errorLogText: "네이버 식당 URL 추가 실패:",
         errorAlertText: "네이버 식당 URL 추가 실패",
-        reloadRestaurants: true
+        reloadRestaurants: true,
+        confirmOnExistingRaw: true
     });
 }
 
@@ -177,7 +202,8 @@ function runNaverPlaceAnalyze() {
         idleText: "URL 분석하기",
         errorLogText: "네이버 식당 URL 분석 실패:",
         errorAlertText: "네이버 식당 URL 분석 실패",
-        reloadRestaurants: false
+        reloadRestaurants: false,
+        confirmOnExistingRaw: false
     });
 }
 

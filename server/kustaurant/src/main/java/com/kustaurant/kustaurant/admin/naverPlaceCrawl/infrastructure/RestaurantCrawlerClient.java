@@ -33,7 +33,7 @@ public class RestaurantCrawlerClient {
 
     public NaverPlaceCrawlResult crawlOne(String placeUrl) {
         try {
-            log.info("request naver place crawl. placeUrl={}", placeUrl);
+            log.info("네이버 플레이스 단건 크롤 요청. placeUrl={}", placeUrl);
             return webClient.post()
                     .uri("/api/naver-place/crawl-one")
                     .bodyValue(new NaverPlaceCrawlRequest(placeUrl))
@@ -41,18 +41,18 @@ public class RestaurantCrawlerClient {
                     .onStatus(
                             HttpStatusCode::isError,
                             res -> res.bodyToMono(String.class)
-                                    .map(body -> new IllegalStateException("naver place crawl error: " + body))
+                                    .map(body -> new IllegalStateException("네이버 플레이스 단건 크롤 오류: " + body))
                     )
                     .bodyToMono(NaverPlaceCrawlResult.class)
                     .block(Duration.ofSeconds(60));
         } catch (WebClientRequestException e) {
-            throw new IllegalStateException("crawler server is unavailable. check crawler base url and server status.", e);
+            throw new IllegalStateException("크롤러 서버에 연결할 수 없습니다. crawler.base-url과 서버 상태를 확인하세요.", e);
         }
     }
 
     public NaverPlaceCrawlResult analyzeOne(String placeUrl) {
         try {
-            log.info("request naver place analyze. placeUrl={}", placeUrl);
+            log.info("네이버 플레이스 단건 분석 요청. placeUrl={}", placeUrl);
             return webClient.post()
                     .uri("/api/naver-place/analyze-one")
                     .bodyValue(new NaverPlaceCrawlRequest(placeUrl))
@@ -60,18 +60,18 @@ public class RestaurantCrawlerClient {
                     .onStatus(
                             HttpStatusCode::isError,
                             res -> res.bodyToMono(String.class)
-                                    .map(body -> new IllegalStateException("naver place analyze error: " + body))
+                                    .map(body -> new IllegalStateException("네이버 플레이스 단건 분석 오류: " + body))
                     )
                     .bodyToMono(NaverPlaceCrawlResult.class)
                     .block(Duration.ofSeconds(60));
         } catch (WebClientRequestException e) {
-            throw new IllegalStateException("crawler server is unavailable. check crawler base url and server status.", e);
+            throw new IllegalStateException("크롤러 서버에 연결할 수 없습니다. crawler.base-url과 서버 상태를 확인하세요.", e);
         }
     }
 
     public NaverPlaceZoneCrawlResult crawlZone(CrawlScopeType crawlScope) {
         try {
-            log.info("request naver place zone crawl. crawlScope={}", crawlScope);
+            log.info("네이버 플레이스 구역 크롤 요청. crawlScope={}", crawlScope);
             return webClient.post()
                     .uri("/api/naver-place/crawl-zone/test")
                     .bodyValue(new NaverPlaceZoneCrawlRequest(crawlScope))
@@ -79,12 +79,12 @@ public class RestaurantCrawlerClient {
                     .onStatus(
                             HttpStatusCode::isError,
                             res -> res.bodyToMono(String.class)
-                                    .map(body -> new IllegalStateException("naver place zone crawl error: " + body))
+                                    .map(body -> new IllegalStateException("네이버 플레이스 구역 크롤 오류: " + body))
                     )
                     .bodyToMono(NaverPlaceZoneCrawlResult.class)
                     .block(Duration.ofSeconds(180));
         } catch (WebClientRequestException e) {
-            throw new IllegalStateException("crawler server is unavailable. check crawler base url and server status.", e);
+            throw new IllegalStateException("크롤러 서버에 연결할 수 없습니다. crawler.base-url과 서버 상태를 확인하세요.", e);
         }
     }
 
@@ -94,7 +94,7 @@ public class RestaurantCrawlerClient {
 
     public NaverPlaceZoneCrawlJobStartResponse startZoneCrawlJob(CrawlScopeType crawlScope) {
         try {
-            log.info("request naver place zone crawl job start. crawlScope={}", crawlScope);
+            log.info("네이버 플레이스 구역 크롤 작업 시작 요청. crawlScope={}", crawlScope);
             return webClient.post()
                     .uri("/api/naver-place/crawl-zone/jobs")
                     .bodyValue(new NaverPlaceZoneCrawlRequest(crawlScope))
@@ -102,12 +102,12 @@ public class RestaurantCrawlerClient {
                     .onStatus(
                             HttpStatusCode::isError,
                             res -> res.bodyToMono(String.class)
-                                    .map(body -> new IllegalStateException("naver place zone crawl job start error: " + body))
+                                    .map(body -> new IllegalStateException("네이버 플레이스 구역 크롤 작업 시작 오류: " + body))
                     )
                     .bodyToMono(NaverPlaceZoneCrawlJobStartResponse.class)
                     .block(Duration.ofSeconds(20));
         } catch (WebClientRequestException e) {
-            throw new IllegalStateException("crawler server is unavailable. check crawler base url and server status.", e);
+            throw new IllegalStateException("크롤러 서버에 연결할 수 없습니다. crawler.base-url과 서버 상태를 확인하세요.", e);
         }
     }
 
@@ -119,12 +119,12 @@ public class RestaurantCrawlerClient {
                     .onStatus(
                             HttpStatusCode::isError,
                             res -> res.bodyToMono(String.class)
-                                    .map(body -> new IllegalStateException("naver place zone crawl job status error: " + body))
+                                    .map(body -> new IllegalStateException("네이버 플레이스 구역 크롤 작업 상태 조회 오류: " + body))
                     )
                     .bodyToMono(NaverPlaceZoneCrawlJobStatusResponse.class)
                     .block(Duration.ofSeconds(20));
         } catch (WebClientRequestException e) {
-            throw new IllegalStateException("crawler server is unavailable. check crawler base url and server status.", e);
+            throw new IllegalStateException("크롤러 서버에 연결할 수 없습니다. crawler.base-url과 서버 상태를 확인하세요.", e);
         }
     }
 
@@ -136,12 +136,12 @@ public class RestaurantCrawlerClient {
                     .onStatus(
                             HttpStatusCode::isError,
                             res -> res.bodyToMono(String.class)
-                                    .map(body -> new IllegalStateException("naver place zone crawl job result error: " + body))
+                                    .map(body -> new IllegalStateException("네이버 플레이스 구역 크롤 작업 결과 조회 오류: " + body))
                     )
                     .bodyToMono(NaverPlaceZoneCrawlJobResultResponse.class)
                     .block(Duration.ofSeconds(30));
         } catch (WebClientRequestException e) {
-            throw new IllegalStateException("crawler server is unavailable. check crawler base url and server status.", e);
+            throw new IllegalStateException("크롤러 서버에 연결할 수 없습니다. crawler.base-url과 서버 상태를 확인하세요.", e);
         }
     }
 }

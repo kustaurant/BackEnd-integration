@@ -35,7 +35,7 @@ public class NaverPlaceZoneCrawler {
    private static final double DEFAULT_LAT_STEP = 0.0018;
    private static final double DEFAULT_LNG_STEP = 0.0022;
    private static final int DEFAULT_ZOOM = 19;
-   private static final int MAX_PLACE_IDS = 300;
+   private static final int MAX_PLACE_IDS = Integer.MAX_VALUE;
 
    private static final Pattern ENTRY_IFRAME_PLACE_ID_PATTERN = Pattern.compile("/place/(\\d+)");
    private static final String SEARCH_IFRAME_NAME = "searchIframe";
@@ -71,7 +71,7 @@ public class NaverPlaceZoneCrawler {
               DEFAULT_LAT_STEP,
               DEFAULT_LNG_STEP,
               DEFAULT_ZOOM,
-              MAX_PLACE_IDS
+              "UNLIMITED"
       );
 
       Set<String> placeIds = discoverPlaceIds(grids, progress -> {
@@ -89,6 +89,15 @@ public class NaverPlaceZoneCrawler {
       });
 
       log.info(" === 구역 크롤 placeId 수집 완료. scope={}, discoveredPlaceCount={}", crawlScope, placeIds.size());
+
+      long preCrawlWaitMs = 60_000L;
+      log.info("placeId 수집 완료 후 단건 크롤 시작 전 대기. scope={}, waitMs={}", crawlScope, preCrawlWaitMs);
+      try {
+         Thread.sleep(preCrawlWaitMs);
+      } catch (InterruptedException e) {
+         Thread.currentThread().interrupt();
+         log.warn("단건 크롤 시작 전 대기 중 인터럽트 발생. scope={}", crawlScope);
+      }
 
       List<NaverPlaceCrawlResult> results = new ArrayList<>();
       int crawlAttempt = 0;

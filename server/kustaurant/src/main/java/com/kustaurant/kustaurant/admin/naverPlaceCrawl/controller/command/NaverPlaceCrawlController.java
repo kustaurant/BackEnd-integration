@@ -37,6 +37,20 @@ public class NaverPlaceCrawlController {
    }
 
    @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
+   @GetMapping({"/naver-place/raw/existence/{placeId}"})
+   public NaverPlaceRawExistenceResponse getNaverPlaceRawExistence(@PathVariable String placeId) {
+      return this.naverPlaceRawSaveService.findExistingByPlaceId(placeId)
+              .map(entity -> new NaverPlaceRawExistenceResponse(
+                      true,
+                      entity.getSourcePlaceId(),
+                      entity.getCrawlScope(),
+                      entity.getCrawlScope() == null ? null : entity.getCrawlScope().getDescription(),
+                      entity.getPlaceName()
+              ))
+              .orElseGet(() -> new NaverPlaceRawExistenceResponse(false, placeId, null, null, null));
+   }
+
+   @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
    @PostMapping({"/naver-place/analyze"})
    public NaverPlaceRawCrawlResponse analyzeNaverPlaceRaw(@RequestBody @Valid NaverPlaceRawCrawlRequest request) {
       return this.naverPlaceAnalyzeService.analyze(request.placeUrl());
@@ -57,7 +71,7 @@ public class NaverPlaceCrawlController {
    @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
    @GetMapping({"/naver-place/sync-zone/jobs/{jobId}"})
    public NaverPlaceZoneSyncJobStatusResponse getNaverPlaceZoneSyncJobStatus(@PathVariable String jobId) {
-      return (NaverPlaceZoneSyncJobStatusResponse)this.naverPlaceZoneSyncJobService.getStatus(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "zone sync job not found: " + jobId));
+      return this.naverPlaceZoneSyncJobService.getStatus(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "zone sync job not found: " + jobId));
    }
 
    @Generated

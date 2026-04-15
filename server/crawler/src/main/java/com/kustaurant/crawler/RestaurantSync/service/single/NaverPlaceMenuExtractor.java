@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import org.jsoup.nodes.Document;
@@ -17,133 +16,160 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class NaverPlaceMenuExtractor {
+
    private static final int MAX_MENU_COUNT = 50;
 
-   public List extractMenus(Document menuDoc, Page page) {
-      List<NaverPlaceMenu> menus = this.extractMenusFromMenuHtml(menuDoc);
-      return menus.isEmpty() ? this.extractMenusFromLiveDom(page) : menus;
+   public List<NaverPlaceMenu> extractMenus(Document menuDoc, Page page) {
+      List<NaverPlaceMenu> menus = extractMenusFromMenuHtml(menuDoc);
+      return menus.isEmpty() ? extractMenusFromLiveDom(page) : menus;
    }
 
-   private List extractMenusFromLiveDom(Page page) {
-      Optional<Frame> entryFrame = this.findEntryFrame(page);
+   private List<NaverPlaceMenu> extractMenusFromLiveDom(Page page) {
+      Optional<Frame> entryFrame = findEntryFrame(page);
       if (entryFrame.isPresent()) {
-         Frame var10001 = (Frame)entryFrame.get();
-         Objects.requireNonNull(var10001);
-         List<NaverPlaceMenu> fromFrame = this.extractMenusFromLocatorSource(var10001::locator);
+         List<NaverPlaceMenu> fromFrame = extractMenusFromLocatorSource(entryFrame.get()::locator);
          if (!fromFrame.isEmpty()) {
             return fromFrame;
          }
       }
-
-      Objects.requireNonNull(page);
-      return this.extractMenusFromLocatorSource(page::locator);
+      return extractMenusFromLocatorSource(page::locator);
    }
 
-   private List extractMenusFromLocatorSource(Function locatorFactory) {
-      Map<String, NaverPlaceMenu> dedupe = new LinkedHashMap();
+   private List<NaverPlaceMenu> extractMenusFromLocatorSource(Function<String, Locator> locatorFactory) {
+      Map<String, NaverPlaceMenu> dedupe = new LinkedHashMap<>();
 
-      for(String selector : List.of("div.place_section_content li", "div[class*='menu'] li", "ul[class*='menu'] li", "div[role='tabpanel'] li")) {
+      for (String selector : List.of(
+              "div.place_section_content li",
+              "div[class*='menu'] li",
+              "ul[class*='menu'] li",
+              "div[role='tabpanel'] li"
+      )) {
          try {
-            Locator locator = (Locator)locatorFactory.apply(selector);
-            int count = Math.min(locator.count(), 50);
-
-            for(int i = 0; i < count; ++i) {
+            Locator locator = locatorFactory.apply(selector);
+            int count = Math.min(locator.count(), MAX_MENU_COUNT);
+            for (int i = 0; i < count; i++) {
                Locator row = locator.nth(i);
-               String name = this.firstRowText(row, "span.lPzHi", "div.place_bluelink", "strong", "span[class*='name']", "div[class*='title']");
-               String price = this.firstRowText(row, "div.GXS1X", "span[class*='price']", "em", "div[class*='price']");
-               if (!this.isBlank(name) && !this.isNoiseMenu(name)) {
-                  String var10000 = this.normalize(name);
-                  String key = var10000 + "|" + this.normalize(price);
-                  dedupe.putIfAbsent(key, new NaverPlaceMenu(this.normalize(name), this.normalize(price), this.firstRowAttribute(row, "src", "img")));
+               String name = firstRowText(row,
+                       "span.lPzHi",
+                       "div.place_bluelink",
+                       "strong",
+                       "span[class*='name']",
+                       "div[class*='title']");
+               String price = firstRowText(row,
+                       "div.GXS1X",
+                       "span[class*='price']",
+                       "em",
+                       "div[class*='price']");
+               if (!isBlank(name) && !isNoiseMenu(name)) {
+                  String key = normalize(name) + "|" + normalize(price);
+                  dedupe.putIfAbsent(key, new NaverPlaceMenu(
+                          normalize(name),
+                          normalize(price),
+                          firstRowAttribute(row, "src", "img")
+                  ));
                }
             }
-
             if (!dedupe.isEmpty()) {
-               return new ArrayList(dedupe.values());
+               return new ArrayList<>(dedupe.values());
             }
-         } catch (Exception var12) {
+         } catch (Exception ignored) {
          }
       }
 
       return List.of();
    }
 
-   private List extractMenusFromMenuHtml(Document doc) {
+   private List<NaverPlaceMenu> extractMenusFromMenuHtml(Document doc) {
       if (doc == null) {
          return List.of();
-      } else {
-         Map<String, NaverPlaceMenu> dedupe = new LinkedHashMap();
-
-         for(Element row : doc.select("div.place_section_content li, div[class*=menu] li, ul[class*=menu] li, div[role=tabpanel] li")) {
-            String name = this.firstNonBlank(this.text(row, "span.lPzHi"), this.text(row, "div.place_bluelink"), this.text(row, "strong"), this.text(row, "span[class*=name]"), this.text(row, "div[class*=title]"));
-            String price = this.firstNonBlank(this.text(row, "div.GXS1X"), this.text(row, "span[class*=price]"), this.text(row, "em"), this.text(row, "div[class*=price]"));
-            if (!this.isBlank(name) && !this.isNoiseMenu(name)) {
-               String var10000 = this.normalize(name);
-               String key = var10000 + "|" + this.normalize(price);
-               dedupe.putIfAbsent(key, new NaverPlaceMenu(this.normalize(name), this.normalize(price), this.attr(row, "img", "src")));
-            }
-         }
-
-         return new ArrayList(dedupe.values());
       }
+
+      Map<String, NaverPlaceMenu> dedupe = new LinkedHashMap<>();
+      for (Element row : doc.select("div.place_section_content li, div[class*=menu] li, ul[class*=menu] li, div[role=tabpanel] li")) {
+         String name = firstNonBlank(
+                 text(row, "span.lPzHi"),
+                 text(row, "div.place_bluelink"),
+                 text(row, "strong"),
+                 text(row, "span[class*=name]"),
+                 text(row, "div[class*=title]")
+         );
+         String price = firstNonBlank(
+                 text(row, "div.GXS1X"),
+                 text(row, "span[class*=price]"),
+                 text(row, "em"),
+                 text(row, "div[class*=price]")
+         );
+         if (!isBlank(name) && !isNoiseMenu(name)) {
+            String key = normalize(name) + "|" + normalize(price);
+            dedupe.putIfAbsent(key, new NaverPlaceMenu(
+                    normalize(name),
+                    normalize(price),
+                    attr(row, "img", "src")
+            ));
+         }
+      }
+      return new ArrayList<>(dedupe.values());
    }
 
    private boolean isNoiseMenu(String name) {
-      String normalized = this.normalize(name);
-      return normalized.contains("전체 펼침") || normalized.contains("즐겨찾는 서비스") || normalized.contains("정보") || normalized.contains("리뷰") || normalized.contains("사진") || normalized.length() < 2;
+      String normalized = normalize(name);
+      return normalized.contains("전체 메뉴")
+              || normalized.contains("즐겨찾는 서비스")
+              || normalized.contains("정보")
+              || normalized.contains("리뷰")
+              || normalized.contains("사진")
+              || normalized.length() < 2;
    }
 
-   private Optional findEntryFrame(Page page) {
+   private Optional<Frame> findEntryFrame(Page page) {
       try {
-         return page.frames().stream().filter((frame) -> "entryIframe".equals(frame.name())).findFirst();
-      } catch (Exception var3) {
+         return page.frames().stream().filter(frame -> "entryIframe".equals(frame.name())).findFirst();
+      } catch (Exception ignored) {
          return Optional.empty();
       }
    }
 
    private String firstRowText(Locator row, String... selectors) {
-      for(String selector : selectors) {
+      for (String selector : selectors) {
          try {
             Locator locator = row.locator(selector);
-            if (locator.count() != 0) {
+            if (locator.count() > 0) {
                String value = locator.first().innerText();
-               if (!this.isBlank(value)) {
-                  return this.normalize(value);
+               if (!isBlank(value)) {
+                  return normalize(value);
                }
             }
-         } catch (Exception var9) {
+         } catch (Exception ignored) {
          }
       }
-
       return null;
    }
 
    private String firstRowAttribute(Locator row, String attributeName, String selector) {
       try {
          Locator locator = row.locator(selector);
-         return locator.count() == 0 ? null : this.normalize(locator.first().getAttribute(attributeName));
-      } catch (Exception var5) {
+         return locator.count() == 0 ? null : normalize(locator.first().getAttribute(attributeName));
+      } catch (Exception ignored) {
          return null;
       }
    }
 
    private String text(Element root, String css) {
       Element el = root.selectFirst(css);
-      return el == null ? null : this.normalize(el.text());
+      return el == null ? null : normalize(el.text());
    }
 
    private String attr(Element root, String css, String attr) {
       Element el = root.selectFirst(css);
-      return el == null ? null : this.normalize(el.attr(attr));
+      return el == null ? null : normalize(el.attr(attr));
    }
 
    private String firstNonBlank(String... values) {
-      for(String value : values) {
-         if (!this.isBlank(value)) {
-            return this.normalize(value);
+      for (String value : values) {
+         if (!isBlank(value)) {
+            return normalize(value);
          }
       }
-
       return null;
    }
 
