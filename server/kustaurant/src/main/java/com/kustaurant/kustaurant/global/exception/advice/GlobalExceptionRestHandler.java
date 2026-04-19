@@ -1,6 +1,6 @@
 package com.kustaurant.kustaurant.global.exception.advice;
 
-import com.kustaurant.kustaurant.admin.naverPlaceCrawl.exception.InvalidNaverPlaceUrlException;
+import com.kustaurant.kustaurant.admin.RestaurantCrawl.exception.InvalidNaverPlaceUrlException;
 import com.kustaurant.kustaurant.common.discordAlert.DiscordNotifier;
 import com.kustaurant.kustaurant.global.exception.ApiErrorResponse;
 import com.kustaurant.kustaurant.global.exception.exception.BusinessException;

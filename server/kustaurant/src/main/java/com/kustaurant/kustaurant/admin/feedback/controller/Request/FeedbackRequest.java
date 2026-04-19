@@ -3,9 +3,6 @@ package com.kustaurant.kustaurant.admin.feedback.controller.Request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 public record FeedbackRequest(
         @NotBlank(message = "내용이 없습니다.")

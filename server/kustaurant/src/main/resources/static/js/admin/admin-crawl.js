@@ -1,9 +1,9 @@
-let naverPlaceZoneSyncPollTimer = null;
+let naverPlaceZoneCrawlPollTimer = null;
 
-function stopNaverPlaceZoneSyncPolling() {
-    if (naverPlaceZoneSyncPollTimer) {
-        clearTimeout(naverPlaceZoneSyncPollTimer);
-        naverPlaceZoneSyncPollTimer = null;
+function stopNaverPlaceZoneCrawlPolling() {
+    if (naverPlaceZoneCrawlPollTimer) {
+        clearTimeout(naverPlaceZoneCrawlPollTimer);
+        naverPlaceZoneCrawlPollTimer = null;
     }
 }
 
@@ -42,7 +42,7 @@ function openNaverPlaceSyncModal() {
 function closeNaverPlaceSyncModal() {
     const modal = document.getElementById("naver-place-sync-modal");
     if (modal) modal.classList.add("hidden");
-    stopNaverPlaceZoneSyncPolling();
+    stopNaverPlaceZoneCrawlPolling();
 }
 
 function parseJsonResponse(response) {
@@ -75,6 +75,7 @@ function renderNaverPlaceCrawlResult(data) {
             <div><strong>Raw ID:</strong> ${data.rawId}</div>
             <div><strong>식당명:</strong> ${data.placeName || "-"}</div>
             <div><strong>카테고리:</strong> ${data.category || "-"}</div>
+            <div><strong>구역:</strong> ${data.crawlScopeDescription || data.crawlScope || "-"}</div>
             <div><strong>주소:</strong> ${data.restaurantAddress || "-"}</div>
             <div><strong>전화번호:</strong> ${data.phoneNumber || "-"}</div>
             <div><strong>좌표:</strong> ${data.latitude || "-"}, ${data.longitude || "-"}</div>
@@ -93,7 +94,7 @@ function buildNaverPlaceUrlFromId(placeIdInput) {
     if (!/^\d+$/.test(placeId)) {
         return null;
     }
-    return `https://map.naver.com/p/entry/place/${placeId}`;
+    return placeId;
 }
 
 function enforceNaverPlaceIdOnlyInput() {
@@ -126,14 +127,9 @@ async function executeNaverPlaceAction(options) {
         return;
     }
 
-    const placeUrl = buildNaverPlaceUrlFromId(placeIdInput);
-    if (!placeUrl) {
+    const placeId = buildNaverPlaceUrlFromId(placeIdInput);
+    if (!placeId) {
         alert("숫자로만 된 place ID를 입력하세요.");
-        return;
-    }
-
-    if (!placeUrl) {
-        alert("크롤링할 네이버 식당 URL을 입력하세요.");
         return;
     }
 
@@ -167,7 +163,7 @@ async function executeNaverPlaceAction(options) {
                 "X-Requested-With": "XMLHttpRequest",
                 "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
             },
-            body: JSON.stringify({ placeUrl })
+            body: JSON.stringify({ placeId })
         });
         const data = await parseJsonResponse(response);
         renderNaverPlaceCrawlResult(data);
@@ -207,13 +203,14 @@ function runNaverPlaceAnalyze() {
     });
 }
 
-function isZoneSyncJobFinished(status) {
+function isZoneCrawlJobFinished(status) {
     return status === "SUCCESS" || status === "FAILED";
 }
 
-function renderNaverPlaceSyncResult(data) {
+function renderNaverPlaceZoneCrawlResult(data) {
     const resultBox = document.getElementById("naver-place-sync-result");
     if (!resultBox) return;
+    const finalFailedIds = (data.finalFailedPlaceIds || []).join(", ");
     resultBox.innerHTML = `
         <div><strong>상태:</strong> ${data.status || "-"}</div>
         <div><strong>구역:</strong> ${data.crawlScope || "-"}</div>
@@ -226,11 +223,15 @@ function renderNaverPlaceSyncResult(data) {
         <div><strong>현재 placeId:</strong> ${data.currentPlaceId || "-"}</div>
         ${data.errorMessage ? `<div><strong>오류:</strong> ${data.errorMessage}</div>` : ""}
     `;
+    resultBox.innerHTML += `
+        <div><strong>최종 실패 수:</strong> ${data.finalFailedCount || 0}</div>
+        <div><strong>최종 실패 placeId:</strong> ${finalFailedIds || "-"}</div>
+    `;
     resultBox.classList.remove("hidden");
 }
 
-function pollNaverPlaceZoneSyncStatus(jobId, submitBtn) {
-    fetch(`/admin/api/crawl/naver-place/sync-zone/jobs/${jobId}`, {
+function pollNaverPlaceZoneCrawlStatus(jobId, submitBtn) {
+    fetch(`/admin/api/crawl/naver-place/crawl-zone/jobs/${jobId}`, {
         method: "GET",
         headers: {
             "Accept": "application/json",
@@ -240,25 +241,25 @@ function pollNaverPlaceZoneSyncStatus(jobId, submitBtn) {
     })
         .then(parseJsonResponse)
         .then(data => {
-            renderNaverPlaceSyncResult(data);
-            if (isZoneSyncJobFinished(data.status)) {
+            renderNaverPlaceZoneCrawlResult(data);
+            if (isZoneCrawlJobFinished(data.status)) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = "구역 크롤 시작";
-                stopNaverPlaceZoneSyncPolling();
+                stopNaverPlaceZoneCrawlPolling();
                 return;
             }
-            naverPlaceZoneSyncPollTimer = setTimeout(() => pollNaverPlaceZoneSyncStatus(jobId, submitBtn), 2000);
+            naverPlaceZoneCrawlPollTimer = setTimeout(() => pollNaverPlaceZoneCrawlStatus(jobId, submitBtn), 5000);
         })
         .catch(error => {
             console.error("네이버 플레이스 구역 동기화 상태 조회 실패:", error);
             submitBtn.disabled = false;
             submitBtn.textContent = "구역 크롤 시작";
-            stopNaverPlaceZoneSyncPolling();
+            stopNaverPlaceZoneCrawlPolling();
             alert(`구역 동기화 상태 조회 실패: ${error.message}`);
         });
 }
 
-function runNaverPlaceZoneSync() {
+function runNaverPlaceZoneCrawl() {
     const scopeSelect = document.getElementById("naver-place-sync-scope");
     const resultBox = document.getElementById("naver-place-sync-result");
     const submitBtn = document.getElementById("naver-place-sync-submit-btn");
@@ -275,9 +276,9 @@ function runNaverPlaceZoneSync() {
 
     submitBtn.disabled = true;
     submitBtn.textContent = "작업 시작 중..";
-    stopNaverPlaceZoneSyncPolling();
+    stopNaverPlaceZoneCrawlPolling();
 
-    fetch("/admin/api/crawl/naver-place/sync-zone/jobs", {
+    fetch("/admin/api/crawl/naver-place/crawl-zone/jobs", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -291,18 +292,18 @@ function runNaverPlaceZoneSync() {
         .then(data => {
             if (!data.jobId) throw new Error("zone sync job id is missing");
             submitBtn.textContent = "진행 중..";
-            pollNaverPlaceZoneSyncStatus(data.jobId, submitBtn);
+            pollNaverPlaceZoneCrawlStatus(data.jobId, submitBtn);
         })
         .catch(error => {
             console.error("네이버 플레이스 구역 동기화 시작 실패:", error);
             alert(`네이버 플레이스 구역 동기화 시작 실패: ${error.message}`);
             submitBtn.disabled = false;
             submitBtn.textContent = "구역 크롤 시작";
-            stopNaverPlaceZoneSyncPolling();
+            stopNaverPlaceZoneCrawlPolling();
         });
 }
 
-function runNaverPlaceZoneSyncTest() {
+function runNaverPlaceZoneCrawlTest() {
     const scopeSelect = document.getElementById("naver-place-sync-scope");
     const resultBox = document.getElementById("naver-place-sync-result");
     const submitBtn = document.getElementById("naver-place-sync-test-submit-btn");
@@ -320,7 +321,7 @@ function runNaverPlaceZoneSyncTest() {
     submitBtn.disabled = true;
     submitBtn.textContent = "테스트 실행 중...";
 
-    fetch("/admin/api/crawl/naver-place/sync-zone/test", {
+    fetch("/admin/api/crawl/naver-place/crawl-zone/test", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -332,7 +333,7 @@ function runNaverPlaceZoneSyncTest() {
     })
         .then(parseJsonResponse)
         .then(data => {
-            renderNaverPlaceSyncResult(data);
+            renderNaverPlaceZoneCrawlResult(data);
         })
         .catch(error => {
             console.warn("네이버 플레이스 테스트 구역 크롤 경고(알림 미표시):", error);
@@ -437,6 +438,6 @@ async function initCrawlModal() {
     naverPlaceSyncModalCloseBtn?.addEventListener("click", closeNaverPlaceSyncModal);
     naverPlaceSyncCancelBtn?.addEventListener("click", closeNaverPlaceSyncModal);
     naverPlaceSyncModalOverlay?.addEventListener("click", closeNaverPlaceSyncModal);
-    naverPlaceSyncSubmitBtn?.addEventListener("click", runNaverPlaceZoneSync);
-    naverPlaceSyncTestSubmitBtn?.addEventListener("click", runNaverPlaceZoneSyncTest);
+    naverPlaceSyncSubmitBtn?.addEventListener("click", runNaverPlaceZoneCrawl);
+    naverPlaceSyncTestSubmitBtn?.addEventListener("click", runNaverPlaceZoneCrawlTest);
 }
