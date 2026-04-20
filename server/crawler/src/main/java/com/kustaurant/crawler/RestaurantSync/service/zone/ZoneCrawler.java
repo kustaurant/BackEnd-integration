@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ZoneCrawler {
-   private static final double DEFAULT_LAT_STEP = 0.0018;
-   private static final double DEFAULT_LNG_STEP = 0.0022;
+   private static final double DEFAULT_LAT_STEP = 0.0014;
+   private static final double DEFAULT_LNG_STEP = 0.0028;
    private static final int DEFAULT_ZOOM = 19;
    private static final int MAX_PLACE_IDS = Integer.MAX_VALUE;
    private static final long INTER_PLACE_DELAY_MIN_MS = 3_000L;

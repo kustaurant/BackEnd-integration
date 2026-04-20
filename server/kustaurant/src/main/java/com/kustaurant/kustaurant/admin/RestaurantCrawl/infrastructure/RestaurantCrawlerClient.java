@@ -95,7 +95,7 @@ public class RestaurantCrawlerClient {
 
     public CrawlJobIdResponse startZoneCrawlJob(ZoneType crawlScope) {
         try {
-            log.info("네이버플레이스 구역 크롤 작업 시작 요청. crawlScope={}", crawlScope);
+            log.info(" === 네이버플레이스 구역 크롤 작업 시작 요청. crawlScope={}", crawlScope);
             return webClient.post()
                     .uri("/api/naver-place/crawl-zone/jobs")
                     .bodyValue(new ZoneCrawlRequest(crawlScope))

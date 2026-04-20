@@ -7,12 +7,10 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,11 +25,13 @@ public class ZonePlaceIdCollector {
    private static final Pattern ENTRY_IFRAME_PLACE_ID_PATTERN = Pattern.compile("/place/(\\d+)");
    private static final String SEARCH_IFRAME_NAME = "searchIframe";
    private static final String ENTRY_IFRAME_SELECTOR = "iframe#entryIframe";
-   private static final String FOOD_CATEGORY_TEXT = "음식점";
+   private static final String FOOD_CATEGORY_TEXT = "\uC74C\uC2DD\uC810";
 
    private static final String LIST_ITEM_SELECTOR = "li.UEzoS.rTjJo";
-   private static final String LIST_SCROLL_CONTAINER_SELECTOR =
-           "#_pcmap_list_scroll_container, #pcmap_list_scroll_container, .RvFI";
+   private static final String LIST_SCROLL_CONTAINER_SELECTOR = "#_pcmap_list_scroll_container, #pcmap_list_scroll_container, .RvFI";
+   private static final int GRID_DISCOVERY_MAX_ATTEMPTS = 3;
+   private static final long GRID_RETRY_BASE_DELAY_MS = 1_500L;
+   private static final long GRID_RETRY_JITTER_MAX_MS = 1_000L;
 
    private final PlaywrightManager playwrightManager;
 
@@ -91,72 +91,87 @@ public class ZonePlaceIdCollector {
    }
 
    public Set<String> discoverPlaceIdsFromGrid(CrawlGrid grid, int zoom) {
-      return playwrightManager.crawl(page -> {
-         Set<String> collectedIds = new LinkedHashSet<>();
-
-         String mapUrl = String.format(
-                 "https://map.naver.com/p?c=%f,%f,%d,0,0,0,dh",
-                 grid.centerLng(),
-                 grid.centerLat(),
-                 zoom
-         );
-
+      for (int attempt = 1; attempt <= GRID_DISCOVERY_MAX_ATTEMPTS; attempt++) {
          try {
-            log.info(
-                    "구역 크롤 그리드 이동 시작. row={}, col={}, centerLat={}, centerLng={}, mapUrl={}",
-                    grid.row(),
-                    grid.col(),
-                    grid.centerLat(),
-                    grid.centerLng(),
-                    mapUrl
-            );
-
-            page.navigate(mapUrl, new Page.NavigateOptions().setTimeout(30_000));
-            page.waitForLoadState(LoadState.DOMCONTENTLOADED);
-            page.waitForTimeout(3_000);
-
-            moveMapToGridCenter(page, grid, zoom);
-            page.waitForTimeout(1_500);
-
-            clickFoodCategoryButton(page);
-
-            Frame searchFrame = waitForSearchIframe(page, grid);
-            waitForInitialListReady(page, searchFrame);
-            collectPlaceIdsByClickingList(page, searchFrame, collectedIds);
-
-            log.info(
-                    "그리드 목록 placeId 수집 완료. row={}, col={}, collectedCount={}, currentUrl={}",
-                    grid.row(),
-                    grid.col(),
-                    collectedIds.size(),
-                    safePageUrl(page)
-            );
+            return playwrightManager.crawl(page -> discoverPlaceIdsFromGridOnce(page, grid, zoom));
          } catch (Exception e) {
+            boolean retryable = isRetryableSearchIframeFailure(e);
+            boolean hasNextAttempt = attempt < GRID_DISCOVERY_MAX_ATTEMPTS;
             log.warn(
-                    "그리드 목록 placeId 수집 실패. grid({},{}), reason={}, currentUrl={}",
+                    "그리드 목록 placeId 수집 실패. grid({},{}), attempt={}/{}, retryable={}, reason={}",
                     grid.row(),
                     grid.col(),
+                    attempt,
+                    GRID_DISCOVERY_MAX_ATTEMPTS,
+                    retryable && hasNextAttempt,
                     e.getMessage(),
-                    safePageUrl(page),
                     e
             );
-            dumpDebugInfo(page, grid, "discover-failed");
-         }
 
-         return collectedIds;
-      });
+            if (!(retryable && hasNextAttempt)) {
+               return Set.of();
+            }
+
+            sleepMillis(retryDelayMillis(attempt));
+         }
+      }
+
+      return Set.of();
    }
 
-   private void collectPlaceIdsByClickingList(Page page, Frame searchFrame, Set<String> collector) {
+   private Set<String> discoverPlaceIdsFromGridOnce(Page page, CrawlGrid grid, int zoom) {
+      Set<String> collectedIds = new LinkedHashSet<>();
+
+      String mapUrl = String.format(
+              "https://map.naver.com/p?c=%f,%f,%d,0,0,0,dh",
+              grid.centerLng(),
+              grid.centerLat(),
+              zoom
+      );
+
+      log.info(
+              "구역 크롤 그리드 이동 시작. row={}, col={}, centerLat={}, centerLng={}, mapUrl={}",
+              grid.row(),
+              grid.col(),
+              grid.centerLat(),
+              grid.centerLng(),
+              mapUrl
+      );
+
+      page.navigate(mapUrl, new Page.NavigateOptions().setTimeout(30_000));
+      page.waitForLoadState(LoadState.DOMCONTENTLOADED);
+      page.waitForTimeout(2_000);
+
+      moveMapToGridCenter(page, grid, zoom);
+      page.waitForTimeout(1_000);
+
+      clickFoodCategoryButton(page);
+      page.waitForTimeout(2_500);
+
+      waitForSearchIframe(page);
+      collectPlaceIdsByClickingList(page, collectedIds);
+
+      log.info(
+              "그리드 목록 placeId 수집 완료. row={}, col={}, collectedCount={}, currentUrl={}",
+              grid.row(),
+              grid.col(),
+              collectedIds.size(),
+              safePageUrl(page)
+      );
+
+      return collectedIds;
+   }
+
+   private void collectPlaceIdsByClickingList(Page page, Set<String> collector) {
+      Frame searchFrame = getSearchFrameOrThrow(page);
+      waitForInitialListReady(page, searchFrame);
+
       int lastProcessedIndex = 0;
       int stableRounds = 0;
 
-      for (int round = 0; round < 20; round++) {
+      for (int round = 0; round < 30; round++) {
          Locator items = searchFrame.locator(LIST_ITEM_SELECTOR);
          int currentCount = items.count();
-
-         log.debug("검색 리스트 상태. round={}, currentCount={}, lastProcessedIndex={}",
-                 round, currentCount, lastProcessedIndex);
 
          if (currentCount > lastProcessedIndex) {
             for (int i = lastProcessedIndex; i < currentCount; i++) {
@@ -181,8 +196,7 @@ public class ZonePlaceIdCollector {
                              added
                      );
                   });
-
-                  page.waitForTimeout(150);
+                  page.waitForTimeout(120);
                } catch (Exception e) {
                   log.warn("목록 아이템 클릭 실패. index={}, reason={}", i, e.getMessage());
                }
@@ -194,16 +208,11 @@ public class ZonePlaceIdCollector {
             stableRounds++;
          }
 
-         if (stableRounds >= 3) {
-            log.debug("검색 리스트 안정화 감지. stableRounds={}", stableRounds);
+         if (stableRounds >= 3 && isSearchListAtBottom(searchFrame)) {
             break;
          }
 
-         boolean scrolled = scrollSearchListStepByStep(searchFrame);
-         if (!scrolled) {
-            stableRounds++;
-         }
-
+         scrollSearchListStepByStep(searchFrame);
          page.waitForTimeout(700);
       }
    }
@@ -217,18 +226,15 @@ public class ZonePlaceIdCollector {
    }
 
    private void waitForInitialListReady(Page page, Frame searchFrame) {
-      page.waitForTimeout(1000);
+      page.waitForTimeout(1_500);
 
-      for (int i = 0; i < 20; i++) {
+      for (int i = 0; i < 10; i++) {
          int count = searchFrame.locator(LIST_ITEM_SELECTOR).count();
-         if (count >= 1) {
-            log.debug("초기 검색 리스트 로딩 완료. itemCount={}", count);
+         if (count >= 5) {
             return;
          }
          page.waitForTimeout(300);
       }
-
-      log.warn("초기 검색 리스트 로딩 지연. itemCount={}", searchFrame.locator(LIST_ITEM_SELECTOR).count());
    }
 
    private boolean scrollSearchListStepByStep(Frame searchFrame) {
@@ -252,8 +258,24 @@ public class ZonePlaceIdCollector {
       }
    }
 
+   private boolean isSearchListAtBottom(Frame searchFrame) {
+      try {
+         return Boolean.TRUE.equals(searchFrame.evaluate("""
+            (selector) => {
+                const el = document.querySelector(selector);
+                if (!el) return false;
+
+                return el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+            }
+        """, LIST_SCROLL_CONTAINER_SELECTOR));
+      } catch (Exception e) {
+         log.warn("검색 목록 바닥 판별 실패. reason={}", e.getMessage());
+         return false;
+      }
+   }
+
    private Optional<String> waitForEntryIframePlaceIdChange(Page page, Optional<String> previousId) {
-      for (int i = 0; i < 12; i++) {
+      for (int i = 0; i < 4; i++) {
          Optional<String> currentId = extractPlaceIdFromEntryIframe(page);
 
          if (currentId.isPresent()) {
@@ -262,7 +284,7 @@ public class ZonePlaceIdCollector {
             }
          }
 
-         page.waitForTimeout(200);
+         page.waitForTimeout(300);
       }
 
       return Optional.empty();
@@ -291,41 +313,24 @@ public class ZonePlaceIdCollector {
       }
    }
 
-   private Frame waitForSearchIframe(Page page, CrawlGrid grid) {
-      for (int i = 0; i < 50; i++) {
-         Frame byName = page.frame(SEARCH_IFRAME_NAME);
-         if (byName != null) {
-            log.debug("search iframe 발견(name). attempt={}, frameUrl={}", i, safeFrameUrl(byName));
-            return byName;
+   private void waitForSearchIframe(Page page) {
+      for (int i = 0; i < 10; i++) {
+         Frame frame = page.frame(SEARCH_IFRAME_NAME);
+         if (frame != null) {
+            return;
          }
-
-         for (Frame frame : page.frames()) {
-            String frameName = safeFrameName(frame);
-            String frameUrl = safeFrameUrl(frame);
-
-            if (SEARCH_IFRAME_NAME.equals(frameName)) {
-               log.debug("search iframe 발견(frame list name). attempt={}, frameUrl={}", i, frameUrl);
-               return frame;
-            }
-
-            if (frameUrl != null && frameUrl.contains("/search")) {
-               log.debug("search iframe 발견(frame url). attempt={}, frameName={}, frameUrl={}", i, frameName, frameUrl);
-               return frame;
-            }
-         }
-
-         page.waitForTimeout(200);
+         page.waitForTimeout(1_000);
       }
 
-      log.warn("search iframe 탐색 실패. row={}, col={}, currentUrl={}, title={}",
-              grid.row(), grid.col(), safePageUrl(page), safePageTitle(page));
-
-      for (Frame frame : page.frames()) {
-         log.warn("frame dump. name={}, url={}", safeFrameName(frame), safeFrameUrl(frame));
-      }
-
-      dumpDebugInfo(page, grid, "search-iframe-not-found");
       throw new IllegalStateException("search iframe not found");
+   }
+
+   private Frame getSearchFrameOrThrow(Page page) {
+      Frame frame = page.frame(SEARCH_IFRAME_NAME);
+      if (frame == null) {
+         throw new IllegalStateException("search iframe not found");
+      }
+      return frame;
    }
 
    private void clickFoodCategoryButton(Page page) {
@@ -335,8 +340,7 @@ public class ZonePlaceIdCollector {
                  new Page.GetByRoleOptions().setName(FOOD_CATEGORY_TEXT)
          );
          if (foodButton.count() > 0) {
-            foodButton.first().click(new Locator.ClickOptions().setTimeout(5_000));
-            log.debug("음식점 버튼 클릭 성공(getByRole)");
+            foodButton.first().click(new Locator.ClickOptions().setTimeout(3_000));
             return;
          }
       } catch (Exception ignored) {
@@ -345,8 +349,7 @@ public class ZonePlaceIdCollector {
       try {
          Locator foodButton = page.locator("text=" + FOOD_CATEGORY_TEXT);
          if (foodButton.count() > 0) {
-            foodButton.first().click(new Locator.ClickOptions().setTimeout(5_000));
-            log.debug("음식점 버튼 클릭 성공(text locator)");
+            foodButton.first().click(new Locator.ClickOptions().setTimeout(3_000));
             return;
          }
       } catch (Exception ignored) {
@@ -364,7 +367,6 @@ public class ZonePlaceIdCollector {
             """, FOOD_CATEGORY_TEXT);
 
          if (Boolean.TRUE.equals(raw)) {
-            log.debug("음식점 버튼 클릭 성공(js evaluate)");
             return;
          }
       } catch (Exception ignored) {
@@ -381,68 +383,15 @@ public class ZonePlaceIdCollector {
                  grid.centerLat(),
                  zoom
          );
-
-         if (!centeredUrl.equals(safePageUrl(page))) {
-            page.navigate(centeredUrl, new Page.NavigateOptions().setTimeout(10_000));
-            page.waitForLoadState(LoadState.DOMCONTENTLOADED);
-            page.waitForTimeout(1200);
-         }
-      } catch (Exception e) {
-         log.debug("그리드 중심 이동 중 예외 무시. reason={}", e.getMessage());
-      }
-   }
-
-   private void dumpDebugInfo(Page page, CrawlGrid grid, String suffix) {
-      try {
-         log.warn("debug page info. row={}, col={}, url={}, title={}",
-                 grid.row(), grid.col(), safePageUrl(page), safePageTitle(page));
-
-         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS"));
-         String fileName = String.format(
-                 "naver-map-%s-r%s-c%s-%s.png",
-                 suffix,
-                 grid.row(),
-                 grid.col(),
-                 timestamp
-         );
-
-         page.screenshot(new Page.ScreenshotOptions()
-                 .setPath(Paths.get(fileName))
-                 .setFullPage(true));
-
-         log.warn("debug screenshot saved. path={}", fileName);
-      } catch (Exception e) {
-         log.warn("debug 정보 저장 실패. reason={}", e.getMessage());
+         page.navigate(centeredUrl, new Page.NavigateOptions().setTimeout(10_000));
+         page.waitForTimeout(1_200);
+      } catch (Exception ignored) {
       }
    }
 
    private String safePageUrl(Page page) {
       try {
          return page.url();
-      } catch (Exception e) {
-         return null;
-      }
-   }
-
-   private String safePageTitle(Page page) {
-      try {
-         return page.title();
-      } catch (Exception e) {
-         return null;
-      }
-   }
-
-   private String safeFrameName(Frame frame) {
-      try {
-         return frame.name();
-      } catch (Exception e) {
-         return null;
-      }
-   }
-
-   private String safeFrameUrl(Frame frame) {
-      try {
-         return frame.url();
       } catch (Exception e) {
          return null;
       }
@@ -455,6 +404,32 @@ public class ZonePlaceIdCollector {
          return text.split("\\R", 2)[0].trim();
       } catch (Exception e) {
          return "";
+      }
+   }
+
+   private boolean isRetryableSearchIframeFailure(Exception e) {
+      Throwable current = e;
+      while (current != null) {
+         String message = current.getMessage();
+         if (message != null && message.contains("search iframe not found")) {
+            return true;
+         }
+         current = current.getCause();
+      }
+      return false;
+   }
+
+   private long retryDelayMillis(int attempt) {
+      long base = GRID_RETRY_BASE_DELAY_MS * attempt;
+      long jitter = ThreadLocalRandom.current().nextLong(0, GRID_RETRY_JITTER_MAX_MS + 1);
+      return base + jitter;
+   }
+
+   private void sleepMillis(long millis) {
+      try {
+         Thread.sleep(millis);
+      } catch (InterruptedException e) {
+         Thread.currentThread().interrupt();
       }
    }
 
