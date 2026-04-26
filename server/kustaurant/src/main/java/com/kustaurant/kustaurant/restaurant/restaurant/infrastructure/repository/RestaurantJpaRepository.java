@@ -4,6 +4,7 @@ import com.kustaurant.restaurant.entity.RestaurantEntity;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,10 @@ public interface RestaurantJpaRepository extends JpaRepository<RestaurantEntity,
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     Optional<RestaurantEntity> findByRestaurantIdAndStatus(Long id, String status);
+    Optional<RestaurantEntity> findByPlaceId(String placeId);
+    List<RestaurantEntity> findAllByStatus(String status);
+    List<RestaurantEntity> findAllByStatusAndRestaurantPosition(String status, String restaurantPosition);
+    List<RestaurantEntity> findAllByPlaceIdIn(Set<String> placeIds);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional

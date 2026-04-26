@@ -11,7 +11,6 @@ public class RestaurantMenuMapper {
                 .menuImgUrl(entity.getMenuImgUrl())
                 .menuName(entity.getMenuName())
                 .menuPrice(entity.getMenuPrice())
-                .naverType(entity.getNaverType())
                 .restaurantId(entity.getRestaurantId())
                 .build();
     }

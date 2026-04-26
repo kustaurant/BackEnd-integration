@@ -14,6 +14,7 @@
     <script src="/js/admin/admin-restaurants-list.js" defer></script>
     <script src="/js/admin/admin-partnerships.js" defer></script>
     <script src="/js/admin/admin-crawl.js" defer></script>
+    <script src="/js/admin/admin-sync.js" defer></script>
     <script src="/js/admin/admin-restaurants-init.js" defer></script>
     <script src="/js/admin/admin-feedbacks.js" defer></script>
     <script src="/js/admin/admin-modal.js" defer></script>
@@ -167,6 +168,44 @@
                     </div>
                     <div class="pagination" id="restaurants-pagination">
                         <!-- 페이징 버튼은 JavaScript로 동적 생성 -->
+                    </div>
+                </section>
+
+                <section class="restaurant-sync-management">
+                    <div class="section-header">
+                        <h2 class="section-title-accent">싱크 맞추기</h2>
+                    </div>
+                    <div class="section-tools">
+                        <div class="action-buttons">
+                            <button id="open-restaurant-sync-modal-btn" type="button">싱크 실행</button>
+                            <button id="refresh-restaurant-sync-btn" type="button">후보 새로고침</button>
+                        </div>
+                        <span id="restaurant-sync-summary" class="table-meta-text"></span>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <h3>업데이트된 식당</h3>
+                        <div id="sync-updated-list" class="sync-updated-list"></div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <h3>신규 후보</h3>
+                        <table id="sync-new-table" class="admin-table">
+                            <thead>
+                            <tr><th>후보ID</th><th>placeId</th><th>식당명</th><th>생성시각</th><th>작업</th></tr>
+                            </thead>
+                            <tbody id="sync-new-tbody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <h3>폐점 후보</h3>
+                        <table id="sync-closed-table" class="admin-table">
+                            <thead>
+                            <tr><th>후보ID</th><th>placeId</th><th>식당명</th><th>생성시각</th><th>작업</th></tr>
+                            </thead>
+                            <tbody id="sync-closed-tbody"></tbody>
+                        </table>
                     </div>
                 </section>
                 

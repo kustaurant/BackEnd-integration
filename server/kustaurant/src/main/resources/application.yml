@@ -70,6 +70,7 @@ management:
 # discord-alert
 alert:
   discord:
+    enabled: false
     webhook: ${ALERT_DISCORD_WEBHOOK}
 
 # logging level

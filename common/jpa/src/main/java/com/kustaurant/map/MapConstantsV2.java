@@ -41,10 +41,10 @@ public final class MapConstantsV2 {
                             new CoordinateV2(37.544736,127.0754595),
                             new CoordinateV2(37.5445765,127.0755668),
                             new CoordinateV2(37.5449818,127.0800863),
-                            new CoordinateV2(37.545327,127.0799778),
+                            new CoordinateV2(37.54536,127.0799778),
                             new CoordinateV2(37.5453925,127.0793721),
                             new CoordinateV2(37.5458133,127.0773484),
-                            new CoordinateV2(37.547219,127.0741961)
+                            new CoordinateV2(37.547249,127.0741961)
                     )
             ),
             new ZonePolygon( // 정문

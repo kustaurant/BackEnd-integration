@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
     await preloadAdminModals();
     await initCrawlModal();
+    initializeRestaurantSyncSection();
 
     loadRestaurants(0);
     loadPartnerships(0);

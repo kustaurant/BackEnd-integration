@@ -38,3 +38,7 @@ logging:
 
 crawler:
   base-url: http://3.39.165.6:8081
+
+alert:
+  discord:
+    enabled: true

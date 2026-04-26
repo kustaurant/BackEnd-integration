@@ -68,7 +68,7 @@ public class RestaurantDetailQuery {
                                         restaurantEntity.restaurantPosition,
                                         restaurantEntity.restaurantName,
                                         restaurantEntity.restaurantAddress,
-                                        restaurantEntity.restaurantUrl,
+                                        naverMapUrl(),
                                         set(situationEntity.situationName),
                                         restaurantEntity.partnershipInfo,
                                         Expressions.constant(getEvaluationCount(restaurantId)),
@@ -81,7 +81,6 @@ public class RestaurantDetailQuery {
                                                 restaurantMenuEntity.restaurantId,
                                                 restaurantMenuEntity.menuName,
                                                 restaurantMenuEntity.menuPrice,
-                                                restaurantMenuEntity.naverType,
                                                 restaurantMenuEntity.menuImgUrl
                                         )),
                                         restaurantEntity.restaurantType,
@@ -129,7 +128,7 @@ public class RestaurantDetailQuery {
                                         restaurantEntity.restaurantPosition,
                                         restaurantEntity.restaurantName,
                                         restaurantEntity.restaurantAddress,
-                                        restaurantEntity.restaurantUrl,
+                                        naverMapUrl(),
                                         set(situationEntity.situationName),
                                         set(partnershipText()),
                                         Expressions.constant(getEvaluationCount(restaurantId)),
@@ -142,7 +141,6 @@ public class RestaurantDetailQuery {
                                                 restaurantMenuEntity.restaurantId,
                                                 restaurantMenuEntity.menuName,
                                                 restaurantMenuEntity.menuPrice,
-                                                restaurantMenuEntity.naverType,
                                                 restaurantMenuEntity.menuImgUrl
                                         )),
                                         restaurantEntity.restaurantType,
@@ -206,6 +204,13 @@ public class RestaurantDetailQuery {
 
     private BooleanExpression situationIdEq(NumberPath<Long> situationId) {
         return isNull(situationId) ? Expressions.FALSE : situationEntity.situationId.eq(situationId);
+    }
+
+    private Expression<String> naverMapUrl() {
+        return Expressions.stringTemplate(
+                "concat('https://map.naver.com/p/entry/place/', {0})",
+                restaurantEntity.placeId
+        );
     }
 
     private Expression<String> partnershipText() {

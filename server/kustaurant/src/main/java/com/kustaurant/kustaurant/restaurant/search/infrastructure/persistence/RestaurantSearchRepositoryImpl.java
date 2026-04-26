@@ -56,7 +56,10 @@ public class RestaurantSearchRepositoryImpl implements RestaurantSearchRepositor
         return queryFactory
                 .select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
-                .where(andBuilder)
+                .where(
+                        andBuilder,
+                        restaurantEntity.status.eq("ACTIVE")
+                )
                 .limit(size)
                 .fetch();
     }
@@ -87,7 +90,10 @@ public class RestaurantSearchRepositoryImpl implements RestaurantSearchRepositor
         return queryFactory
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
-                .where(restaurantEntity.restaurantId.in(restaurantIds))
+                .where(
+                        restaurantEntity.restaurantId.in(restaurantIds),
+                        restaurantEntity.status.eq("ACTIVE")
+                )
                 .transform(groupBy(restaurantEntity.restaurantId).as(
                         com.querydsl.core.types.Projections.constructor(
                                 RestaurantForSearch.class,

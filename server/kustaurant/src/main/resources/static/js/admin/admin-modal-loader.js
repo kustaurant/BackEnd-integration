@@ -28,6 +28,11 @@ async function preloadAdminModals() {
     );
 
     await appendModalIfNotExists(
+        'restaurant-sync-run-modal',
+        '/admin/restaurant-sync-run-modal.html'
+    );
+
+    await appendModalIfNotExists(
         'partnership-edit-modal',
         '/admin/partnership-edit-modal.html'
     );

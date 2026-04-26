@@ -17,14 +17,16 @@ public class RestaurantMapper {
                 restaurant.getGeoPosition().position().getValue(),
                 restaurant.getRestaurantAddress(),
                 restaurant.getRestaurantTel(),
-                restaurant.getRestaurantUrl(),
+                restaurant.getPlaceId(),
                 restaurant.getRestaurantImgUrl(),
                 restaurant.getVisitCount(),
                 restaurant.getRestaurantCuisine().getValue(),
                 restaurant.getGeoPosition().coordinates().latitude(),
                 restaurant.getGeoPosition().coordinates().longitude(),
                 restaurant.getPartnershipInfo(),
-                restaurant.getStatus()
+                restaurant.getStatus(),
+                null,
+                null
         );
     }
 
@@ -39,7 +41,7 @@ public class RestaurantMapper {
                 .restaurantType(entity.getRestaurantType())
                 .restaurantAddress(entity.getRestaurantAddress())
                 .restaurantTel(entity.getRestaurantTel())
-                .restaurantUrl(entity.getRestaurantUrl())
+                .placeId(entity.getPlaceId())
                 .restaurantImgUrl(entity.getRestaurantImgUrl())
                 .partnershipInfo(entity.getPartnershipInfo())
                 .status(entity.getStatus())

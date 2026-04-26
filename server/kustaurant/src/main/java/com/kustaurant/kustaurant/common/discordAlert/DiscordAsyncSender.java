@@ -32,8 +32,15 @@ public class DiscordAsyncSender {
     @Value("${alert.discord.webhook:}")
     private String webhookUrl;
 
+    @Value("${alert.discord.enabled:false}")
+    private boolean alertEnabled;
+
     @Async("alertExecutor")
     public void send5xxAsync(Exception e, RequestSnapshot snapshot, String traceId, String env, int status) {
+        if (!alertEnabled) {
+            return;
+        }
+
         if (webhookUrl == null || webhookUrl.isBlank()) {
             log.warn("[Discord] webhook URL 미설정으로 알림을 건너뜁니다.");
             return;

@@ -28,8 +28,8 @@ public class RestaurantEntity extends BaseTimeEntity {
     private String restaurantPosition;
     private String restaurantAddress;
     private String restaurantTel;
-    @Column(unique = true)
-    private String restaurantUrl;
+    @Column(unique = true, nullable = false, length = 64)
+    private String placeId;
     private String restaurantImgUrl;
     private Integer visitCount;
 
@@ -39,4 +39,41 @@ public class RestaurantEntity extends BaseTimeEntity {
     private String partnershipInfo;
 
     private String status;
+    private String contentHash;
+    private String menuHash;
+
+    public void applyRaw(
+            String restaurantName,
+            String restaurantType,
+            String restaurantPosition,
+            String restaurantAddress,
+            String restaurantTel,
+            String restaurantImgUrl,
+            String restaurantCuisine,
+            Double latitude,
+            Double longitude
+    ) {
+        this.restaurantName = restaurantName;
+        this.restaurantType = restaurantType;
+        this.restaurantPosition = restaurantPosition;
+        this.restaurantAddress = restaurantAddress;
+        this.restaurantTel = restaurantTel;
+        this.restaurantImgUrl = restaurantImgUrl;
+        this.restaurantCuisine = restaurantCuisine;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
+    public void updateHashes(String contentHash, String menuHash) {
+        this.contentHash = contentHash;
+        this.menuHash = menuHash;
+    }
+
+    public void markInactive() {
+        this.status = "INACTIVE";
+    }
+
+    public void markActive() {
+        this.status = "ACTIVE";
+    }
 }

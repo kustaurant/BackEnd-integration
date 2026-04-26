@@ -150,9 +150,9 @@
                 <!-- 유효한 메뉴(id != null)만 대상으로, 초기 노출 개수 제한 -->
                 <li th:each="menu, iterStat : ${restaurantDto.restaurantMenuList.?[menuId != null]}"
                     th:if="${iterStat.index} < ${initialDisplayMenuCount}">
-                    <img th:if="${(menu.naverType == 'type1' or menu.naverType == 'type3') and menu.menuImgUrl != 'icon'}"
+                    <img th:if="${menu.menuImgUrl != null and menu.menuImgUrl != '' and menu.menuImgUrl != 'icon'}"
                          th:src="${menu.menuImgUrl}" alt="menu img">
-                    <img th:if="${(menu.naverType == 'type1' or menu.naverType == 'type3') and menu.menuImgUrl == 'icon'}"
+                    <img th:if="${menu.menuImgUrl == 'icon'}"
                          src="/img/favicon.png" alt="menu img">
 
                     <div class="menu-text-container">
