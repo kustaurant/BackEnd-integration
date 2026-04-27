@@ -44,6 +44,10 @@ public class RestaurantSyncService {
     private static final String SUCCESS = "SUCCESS";
     private static final String ACTIVE = "ACTIVE";
     private static final String UNKNOWN_CATEGORY = "기타";
+    private static final List<String> FIXED_CUISINES = List.of(
+            "한식", "일식", "중식", "양식", "아시안", "고기", "치킨",
+            "해산물", "햄버거/피자", "분식", "술집", "카페/디저트", "베이커리", "샐러드"
+    );
 
     private final RestaurantCrawlRawRepository rawRepository;
     private final RestaurantMenuRawRepository menuRawRepository;
@@ -119,13 +123,13 @@ public class RestaurantSyncService {
     }
 
     @Transactional
-    public RestaurantSyncCandidateActionResponse approve(Long candidateId, String reviewedBy) {
+    public RestaurantSyncCandidateActionResponse approve(Long candidateId, String reviewedBy, String manualCuisine) {
         RestaurantSyncCandidateEntity candidate = candidateRepository
                 .findByIdAndCandidateStatus(candidateId, SyncCandidateStatus.PENDING)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "pending candidate not found: " + candidateId));
 
         if (candidate.getCandidateType() == SyncCandidateType.NEW) {
-            applyNewRestaurant(candidate.getPlaceId());
+            applyNewRestaurant(candidate.getPlaceId(), manualCuisine);
         } else {
             applyClosedRestaurant(candidate.getPlaceId());
         }
@@ -250,7 +254,7 @@ public class RestaurantSyncService {
         return updatedPlaceIds;
     }
 
-    private void applyNewRestaurant(String placeId) {
+    private void applyNewRestaurant(String placeId, String manualCuisine) {
         RestaurantCrawlRawEntity raw = rawRepository.findBySourcePlaceId(placeId)
                 .filter(entity -> SUCCESS.equals(entity.getCrawlStatus()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "raw not found for placeId=" + placeId));
@@ -258,19 +262,21 @@ public class RestaurantSyncService {
         List<RestaurantMenuCrawlRawEntity> rawMenus = menuRawRepository.findAllByRestaurantRawIdIn(List.of(raw.getId()));
         String contentHash = computeContentHash(raw);
         String menuHash = computeMenuHash(rawMenus);
+        String rawType = normalize(raw.getCategory(), UNKNOWN_CATEGORY);
+        String mappedCuisine = resolveCuisineForNew(raw.getCategory(), manualCuisine);
 
         RestaurantEntity restaurant = restaurantRepository.findByPlaceId(placeId)
                 .orElseGet(() -> restaurantRepository.save(new RestaurantEntity(
                         null,
                         normalize(raw.getPlaceName(), "UNKNOWN_PLACE"),
-                        normalize(raw.getCategory(), UNKNOWN_CATEGORY),
+                        rawType,
                         raw.getCrawlScope() == null ? null : raw.getCrawlScope().getDescription(),
                         raw.getRestaurantAddress(),
                         raw.getPhoneNumber(),
                         raw.getSourcePlaceId(),
                         raw.getImageUrl(),
                         0,
-                        normalize(raw.getCategory(), UNKNOWN_CATEGORY),
+                        mappedCuisine,
                         raw.getLatitude(),
                         raw.getLongitude(),
                         null,
@@ -281,12 +287,12 @@ public class RestaurantSyncService {
 
         restaurant.applyRaw(
                 normalize(raw.getPlaceName(), "UNKNOWN_PLACE"),
-                normalize(raw.getCategory(), UNKNOWN_CATEGORY),
+                rawType,
                 raw.getCrawlScope() == null ? null : raw.getCrawlScope().getDescription(),
                 raw.getRestaurantAddress(),
                 raw.getPhoneNumber(),
                 raw.getImageUrl(),
-                normalize(raw.getCategory(), UNKNOWN_CATEGORY),
+                mappedCuisine,
                 raw.getLatitude(),
                 raw.getLongitude()
         );
@@ -325,12 +331,21 @@ public class RestaurantSyncService {
         String restaurantName = restaurant != null
                 ? restaurant.getRestaurantName()
                 : (raw != null ? raw.getPlaceName() : entity.getPlaceId());
+        String restaurantType = restaurant != null
+                ? restaurant.getRestaurantType()
+                : (raw != null ? raw.getCategory() : null);
+        String mappedCuisine = mapRawCategoryToFixedCuisine(restaurantType);
+        if (mappedCuisine == null && raw != null) {
+            mappedCuisine = mapRawCategoryToFixedCuisine(raw.getCategory());
+        }
         String restaurantLink = "https://map.naver.com/p/entry/place/" + entity.getPlaceId();
 
         return new RestaurantSyncCandidateResponse(
                 entity.getId(),
                 entity.getPlaceId(),
                 restaurantName,
+                normalize(restaurantType, "-"),
+                normalize(mappedCuisine, "-"),
                 restaurantLink,
                 entity.getCandidateType(),
                 entity.getCandidateStatus(),
@@ -340,6 +355,67 @@ public class RestaurantSyncService {
                 entity.getAppliedAt(),
                 entity.getCreatedAt()
         );
+    }
+
+    private String resolveCuisineForNew(String rawCategory, String manualCuisine) {
+        String normalizedManual = normalizeToNull(manualCuisine);
+        if (normalizedManual != null && !FIXED_CUISINES.contains(normalizedManual)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid manualCuisine: " + manualCuisine);
+        }
+
+        String autoMapped = mapRawCategoryToFixedCuisine(rawCategory);
+        if (autoMapped != null) {
+            return autoMapped;
+        }
+        if (normalizedManual != null) {
+            return normalizedManual;
+        }
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "자동 매핑 실패: manualCuisine(고정 식당종류) 값을 지정해주세요."
+        );
+    }
+
+    private String mapRawCategoryToFixedCuisine(String rawCategory) {
+        String normalized = normalizeToNull(rawCategory);
+        if (normalized == null) {
+            return null;
+        }
+        if (FIXED_CUISINES.contains(normalized)) {
+            return normalized;
+        }
+        if (containsAny(normalized, "찜닭", "백반", "한정식", "국밥", "냉면")) return "한식";
+        if (containsAny(normalized, "스시", "초밥", "라멘", "우동", "소바", "돈카츠", "돈까스")) return "일식";
+        if (containsAny(normalized, "중식", "중국집", "짜장", "짬뽕", "탕수육", "마라", "훠궈")) return "중식";
+        if (containsAny(normalized, "파스타", "스테이크", "리조또", "브런치", "이탈리안", "프렌치")) return "양식";
+        if (containsAny(normalized, "아시안", "태국", "타이", "베트남", "쌀국수", "인도", "동남아")) return "아시안";
+        if (containsAny(normalized, "고깃집", "삼겹살", "갈비", "곱창", "대창", "막창", "육회")) return "고기";
+        if (containsAny(normalized, "치킨", "닭강정", "통닭", "후라이드", "양념치킨", "닭꼬치")) return "치킨";
+        if (containsAny(normalized, "해산물", "횟집", "숙성회", "해물", "조개", "대게", "킹크랩")) return "해산물";
+        if (containsAny(normalized, "햄버거", "버거", "피자", "핫도그")) return "햄버거/피자";
+        if (containsAny(normalized, "분식", "떡볶이", "김밥", "쫄면", "순대", "어묵")) return "분식";
+        if (containsAny(normalized, "술집", "주점", "포차", "호프", "펍", "와인바", "이자카야")) return "술집";
+        if (containsAny(normalized, "카페", "커피", "디저트", "빙수", "도넛", "젤라또", "마카롱")) return "카페/디저트";
+        if (containsAny(normalized, "베이커리", "빵집", "제과", "제빵", "크루아상", "바게트")) return "베이커리";
+        if (containsAny(normalized, "샐러드", "포케", "그레인볼", "비건볼")) return "샐러드";
+        return null;
+    }
+
+    private boolean containsAny(String value, String... keywords) {
+        for (String keyword : keywords) {
+            if (value.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String normalizeToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private String computeContentHash(RestaurantCrawlRawEntity raw) {

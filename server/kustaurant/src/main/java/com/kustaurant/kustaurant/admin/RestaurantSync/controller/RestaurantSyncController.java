@@ -1,6 +1,7 @@
 package com.kustaurant.kustaurant.admin.RestaurantSync.controller;
 
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncCandidateActionResponse;
+import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncCandidateApproveRequest;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncCandidateResponse;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncRunRequest;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncRunResponse;
@@ -45,9 +46,14 @@ public class RestaurantSyncController {
     @PostMapping("/candidates/{candidateId}/approve")
     public RestaurantSyncCandidateActionResponse approve(
             @PathVariable Long candidateId,
+            @RequestBody(required = false) RestaurantSyncCandidateApproveRequest request,
             Principal principal
     ) {
-        return restaurantSyncService.approve(candidateId, principal == null ? "UNKNOWN_ADMIN" : principal.getName());
+        return restaurantSyncService.approve(
+                candidateId,
+                principal == null ? "UNKNOWN_ADMIN" : principal.getName(),
+                request == null ? null : request.manualCuisine()
+        );
     }
 
     @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")

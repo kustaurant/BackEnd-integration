@@ -8,6 +8,8 @@ public record RestaurantSyncCandidateResponse(
         Long id,
         String placeId,
         String restaurantName,
+        String restaurantType,
+        String mappedCuisine,
         String restaurantLink,
         SyncCandidateType candidateType,
         SyncCandidateStatus candidateStatus,

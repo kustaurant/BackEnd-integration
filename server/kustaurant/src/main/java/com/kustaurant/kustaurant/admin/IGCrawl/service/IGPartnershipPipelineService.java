@@ -19,7 +19,7 @@ public class IGPartnershipPipelineService {
 
     @Transactional
     public IgCrawlResponse crawlAndImport(String accountName, PartnershipTarget target) {
-        IgRawSaveResult rawResult = rawSaveService.crawlAndReplaceAll(accountName, target);
+        IgRawSaveResult rawResult = rawSaveService.crawlAndSaveOnlyNew(accountName, target);
         if (rawResult.rawSavedCount() == 0) {
             return new IgCrawlResponse(rawResult.crawledPages(), 0, 0, 0);
         }

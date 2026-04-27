@@ -1,16 +1,21 @@
 package com.kustaurant.kustaurant.admin.IGCrawl.service;
 
-import com.kustaurant.restaurant.IGPost;
-import com.kustaurant.restaurant.enums.PartnershipTarget;
 import com.kustaurant.kustaurant.admin.IGCrawl.controller.command.IgRawSaveResult;
 import com.kustaurant.kustaurant.admin.IGCrawl.infrastructure.IGCrawlerClient;
 import com.kustaurant.kustaurant.admin.IGCrawl.infrastructure.IgCrawlRawEntity;
 import com.kustaurant.kustaurant.admin.IGCrawl.infrastructure.IgCrawlRawRepository;
+import com.kustaurant.restaurant.IGPost;
+import com.kustaurant.restaurant.enums.PartnershipTarget;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -18,55 +23,55 @@ public class IgCrawlRawSaveService {
     private final IGCrawlerClient crawlerClient;
     private final IgCrawlRawRepository rawRepo;
 
-    public IgRawSaveResult crawlAndReplaceAll(String accountName, PartnershipTarget target) {
+    public IgRawSaveResult crawlAndSaveOnlyNew(String accountName, PartnershipTarget target) {
         List<IGPost> posts = crawlerClient.crawl(accountName, target);
-        if (posts == null || posts.isEmpty()) return new IgRawSaveResult(0,0);
-        int savedCnt = replaceAll(accountName, target, posts);
+        if (posts == null || posts.isEmpty()) return new IgRawSaveResult(0, 0);
 
+        int savedCnt = saveOnlyNew(accountName, target, posts);
         return new IgRawSaveResult(posts.size(), savedCnt);
     }
 
     @Transactional
-    protected int replaceAll(String accountName, PartnershipTarget target, List<IGPost> posts) {
-        // 1) 기존 raw 전부 삭제
-        rawRepo.deleteBySourceAccount(accountName);
-        rawRepo.flush();
+    protected int saveOnlyNew(String accountName, PartnershipTarget target, List<IGPost> posts) {
+        // Remove duplicates inside one crawl response by shortcode.
+        Map<String, IGPost> uniqueByShortCode = new LinkedHashMap<>();
+        for (IGPost post : posts) {
+            if (post == null) continue;
 
-        // 2) URL 기준 중복 제거
-        Map<String, IGPost> unique = new LinkedHashMap<>();
-        for (IGPost p : posts) {
-            if (p == null) continue;
-
-            String postUrl = p.postUrl();
+            String postUrl = post.postUrl();
             if (postUrl == null || postUrl.isBlank()) continue;
 
-            String code = extractShortCode(postUrl);
-            if (code == null || code.isBlank()) continue;
+            String shortCode = extractShortCode(postUrl);
+            if (shortCode == null || shortCode.isBlank()) continue;
 
-            unique.putIfAbsent(code, p);
+            uniqueByShortCode.putIfAbsent(shortCode, post);
         }
 
-        if (unique.isEmpty()) return 0;
+        if (uniqueByShortCode.isEmpty()) return 0;
 
-        // 3) 삽입
+        Set<String> existingShortCodes = new HashSet<>(
+                rawRepo.findExistingShortCodes(accountName, uniqueByShortCode.keySet())
+        );
+
         List<IgCrawlRawEntity> toSave = new ArrayList<>();
-        for (IGPost p : unique.values()) {
-            String postUrl = p.postUrl();
+        for (Map.Entry<String, IGPost> entry : uniqueByShortCode.entrySet()) {
+            String shortCode = entry.getKey();
+            if (existingShortCodes.contains(shortCode)) continue;
 
-            String code = extractShortCode(postUrl);
-            if (code == null || code.isBlank()) continue;
-
+            IGPost post = entry.getValue();
             toSave.add(IgCrawlRawEntity.of(
                     accountName,
-                    code,
-                    postUrl,
-                    p.restaurantName(),
-                    p.benefit(),
-                    p.location(),
-                    p.phoneNumber(),
+                    shortCode,
+                    post.postUrl(),
+                    post.restaurantName(),
+                    post.benefit(),
+                    post.location(),
+                    post.phoneNumber(),
                     target
             ));
         }
+
+        if (toSave.isEmpty()) return 0;
 
         rawRepo.saveAll(toSave);
         return toSave.size();
@@ -74,10 +79,10 @@ public class IgCrawlRawSaveService {
 
     private String extractShortCode(String postUrl) {
         String[] keys = {"/p/", "/reel/"};
-        for (String k : keys) {
-            int idx = postUrl.indexOf(k);
+        for (String key : keys) {
+            int idx = postUrl.indexOf(key);
             if (idx >= 0) {
-                String tail = postUrl.substring(idx + k.length());
+                String tail = postUrl.substring(idx + key.length());
                 int slash = tail.indexOf('/');
                 return (slash >= 0) ? tail.substring(0, slash) : tail;
             }

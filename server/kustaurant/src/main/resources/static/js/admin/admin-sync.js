@@ -1,3 +1,9 @@
+const FIXED_CUISINES = [
+    "한식", "일식", "중식", "양식", "아시안", "고기", "치킨",
+    "해산물", "햄버거/피자", "분식", "술집", "카페/디저트", "베이커리", "샐러드"
+];
+const pendingSyncCandidateById = new Map();
+
 function openRestaurantSyncRunModal() {
     document.getElementById("restaurant-sync-run-modal")?.classList.remove("hidden");
 }
@@ -32,7 +38,7 @@ function renderCandidateRows(targetBodyId, candidates) {
     const isClosedCandidateTable = targetBodyId === "sync-closed-tbody";
 
     if (!candidates || candidates.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5">대기 후보가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6">대기 후보가 없습니다.</td></tr>`;
         return;
     }
 
@@ -41,6 +47,7 @@ function renderCandidateRows(targetBodyId, candidates) {
             <td>${candidate.id}</td>
             <td>${candidate.placeId}</td>
             <td><a href="${candidate.restaurantLink}" target="_blank" rel="noopener noreferrer">${candidate.restaurantName || candidate.placeId}</a></td>
+            <td>${candidate.restaurantType || "-"}</td>
             <td>${formatDateTime(candidate.createdAt)}</td>
             <td>
                 <button type="button" data-sync-action="approve" data-id="${candidate.id}">${isClosedCandidateTable ? "폐점" : "승인"}</button>
@@ -62,6 +69,28 @@ function renderSyncSummary(runResponse, pendingCandidates) {
     summaryEl.textContent = `raw ${rawCount} / 운영 ${existingCount} / 업데이트 ${updatedCount} / 대기 신규 ${pendingNew} / 대기 폐점 ${pendingClosed}`;
 }
 
+function promptManualCuisineSelection(candidateName) {
+    const options = FIXED_CUISINES.map((cuisine, index) => `${index + 1}. ${cuisine}`).join("\n");
+    const input = window.prompt(
+        `${candidateName} 식당의 음식종류 자동 매핑에 실패했습니다.\n` +
+        `아래 번호 또는 음식종류명을 입력하세요.\n\n${options}`
+    );
+    if (input === null) return null;
+
+    const value = input.trim();
+    if (!value) return null;
+
+    const index = Number.parseInt(value, 10);
+    if (Number.isInteger(index) && index >= 1 && index <= FIXED_CUISINES.length) {
+        return FIXED_CUISINES[index - 1];
+    }
+    if (FIXED_CUISINES.includes(value)) {
+        return value;
+    }
+    alert("고정된 음식종류 목록에서만 선택 가능합니다.");
+    return null;
+}
+
 async function loadPendingSyncCandidates(runResponse = null) {
     const response = await fetch("/admin/api/sync/candidates?status=PENDING", {
         method: "GET",
@@ -72,6 +101,9 @@ async function loadPendingSyncCandidates(runResponse = null) {
         }
     });
     const candidates = await parseJsonResponse(response);
+    pendingSyncCandidateById.clear();
+    candidates.forEach(candidate => pendingSyncCandidateById.set(String(candidate.id), candidate));
+
     const newCandidates = candidates.filter(candidate => candidate.candidateType === "NEW");
     const closedCandidates = candidates.filter(candidate => candidate.candidateType === "CLOSED");
 
@@ -113,17 +145,34 @@ async function runRestaurantSync() {
 }
 
 async function handleSyncCandidateAction(action, candidateId) {
-    const actionLabel = action === "approve" ? "승인" : "반려";
-    if (!window.confirm(`${actionLabel} 처리할까요?`)) return;
-
-    const response = await fetch(`/admin/api/sync/candidates/${candidateId}/${action}`, {
+    const candidate = pendingSyncCandidateById.get(String(candidateId));
+    const headers = {
+        "Accept": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+        "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+    };
+    const request = {
         method: "POST",
-        headers: {
-            "Accept": "application/json",
-            "X-Requested-With": "XMLHttpRequest",
-            "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+        headers
+    };
+
+    if (action === "approve" && candidate?.candidateType === "NEW") {
+        let cuisine = candidate.mappedCuisine && candidate.mappedCuisine !== "-" ? candidate.mappedCuisine : null;
+        if (!cuisine) {
+            cuisine = promptManualCuisineSelection(candidate.restaurantName || candidate.placeId);
+            if (!cuisine) return;
         }
-    });
+        const name = candidate.restaurantName || candidate.placeId;
+        if (!window.confirm(`${name} 식당이 ${cuisine} 음식종류로 새로 추가됩니다. 승인하시겠습니까?`)) return;
+
+        request.headers["Content-Type"] = "application/json";
+        request.body = JSON.stringify({ manualCuisine: cuisine });
+    } else {
+        const actionLabel = action === "approve" ? "승인" : "반려";
+        if (!window.confirm(`${actionLabel} 처리할까요?`)) return;
+    }
+
+    const response = await fetch(`/admin/api/sync/candidates/${candidateId}/${action}`, request);
     await parseJsonResponse(response);
     await loadPendingSyncCandidates();
     loadRestaurants(0);
@@ -167,3 +216,4 @@ function initializeRestaurantSyncSection() {
         console.error("initial sync candidates load failed:", error);
     });
 }
+
