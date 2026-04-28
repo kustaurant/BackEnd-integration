@@ -1,7 +1,8 @@
 package com.kustaurant.kustaurant.restaurant.query.common.dto;
 
-import com.kustaurant.kustaurant.restaurant.query.chart.constants.Coordinate;
-import com.kustaurant.kustaurant.restaurant.query.chart.constants.MapConstants;
+import com.kustaurant.map.BoundingBox;
+import com.kustaurant.map.CoordinateV2;
+import com.kustaurant.map.MapConstantsV2;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +17,7 @@ import java.util.List;
 @Schema(description = "2026.04.03")
 public class RestaurantTierMapDTOV2 {
     @Schema(description = "지도의 최소 줌입니다. (활용이 힘들다면 말씀해주세요.")
-    Integer minZoom = MapConstants.MIN_ZOOM;
+    Integer minZoom = MapConstantsV2.MIN_ZOOM;
 
     @Schema(description = "즐겨찾기를 한 식당 리스트입니다.")
     List<RestaurantCoreInfoDtoV2> favoriteRestaurants = new ArrayList<>();
@@ -26,12 +27,12 @@ public class RestaurantTierMapDTOV2 {
     List<ZoomAndRestaurants> nonTieredRestaurants = new ArrayList<>();
 
     @Schema(description = "실선으로 표시되는 폴리곤 좌표 리스트의 리스트입니다.")
-    List<List<Coordinate>> solidPolygonCoordsList = new ArrayList<>();
+    List<List<CoordinateV2>> solidPolygonCoordsList = new ArrayList<>();
     @Schema(description = "점선으로 표시되는 폴리곤 좌표 리스트의 리스트입니다.")
-    List<List<Coordinate>> dashedPolygonCoordsList = new ArrayList<>();
+    List<List<CoordinateV2>> dashedPolygonCoordsList = new ArrayList<>();
 
     @Schema(description = "지도에 보여야 하는 위도와 경도 범위 입니다. (순서대로 최소 위도/최대 위도/최소 경도/ 최대 경도)")
-    List<Double> visibleBounds;
+    BoundingBox visibleBounds;
 
     @Data
     @AllArgsConstructor

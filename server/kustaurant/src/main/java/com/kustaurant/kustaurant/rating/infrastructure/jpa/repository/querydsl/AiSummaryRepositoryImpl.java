@@ -1,13 +1,12 @@
 package com.kustaurant.kustaurant.rating.infrastructure.jpa.repository.querydsl;
 
-import static com.kustaurant.jpa.rating.entity.QAiSummaryEntity.aiSummaryEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
+import static com.kustaurant.rating.entity.QAiSummaryEntity.aiSummaryEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantEntity.restaurantEntity;
 import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
 
-import com.kustaurant.jpa.rating.entity.QAiSummaryEntity;
-import com.kustaurant.jpa.rating.entity.QRatingEntity;
-import com.kustaurant.jpa.rating.repository.RatingJpaRepository;
+import com.kustaurant.rating.entity.QAiSummaryEntity;
+import com.kustaurant.rating.repository.RatingJpaRepository;
 import com.kustaurant.kustaurant.rating.domain.model.AiEvaluation;
 import com.kustaurant.kustaurant.rating.domain.model.QAiEvaluation;
 import com.kustaurant.kustaurant.rating.domain.vo.GlobalStats;

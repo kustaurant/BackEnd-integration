@@ -4,7 +4,7 @@ import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.RestaurantCoreInfoDto;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Restaurant;
-import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
+import com.kustaurant.restaurant.entity.RestaurantEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

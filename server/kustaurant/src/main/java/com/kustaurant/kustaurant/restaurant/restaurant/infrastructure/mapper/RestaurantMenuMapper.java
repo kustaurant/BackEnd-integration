@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.mapper;
 
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.RestaurantMenu;
-import com.kustaurant.jpa.restaurant.entity.RestaurantMenuEntity;
+import com.kustaurant.restaurant.entity.RestaurantMenuEntity;
 
 public class RestaurantMenuMapper {
 
@@ -11,7 +11,6 @@ public class RestaurantMenuMapper {
                 .menuImgUrl(entity.getMenuImgUrl())
                 .menuName(entity.getMenuName())
                 .menuPrice(entity.getMenuPrice())
-                .naverType(entity.getNaverType())
                 .restaurantId(entity.getRestaurantId())
                 .build();
     }

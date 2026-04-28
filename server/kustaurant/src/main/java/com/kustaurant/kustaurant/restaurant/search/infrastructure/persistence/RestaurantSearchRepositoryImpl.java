@@ -1,11 +1,10 @@
 package com.kustaurant.kustaurant.restaurant.search.infrastructure.persistence;
 
-
-import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantMenuEntity.restaurantMenuEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
+import static com.kustaurant.rating.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantEntity.restaurantEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantMenuEntity.restaurantMenuEntity;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 
@@ -57,7 +56,10 @@ public class RestaurantSearchRepositoryImpl implements RestaurantSearchRepositor
         return queryFactory
                 .select(restaurantEntity.restaurantId)
                 .from(restaurantEntity)
-                .where(andBuilder)
+                .where(
+                        andBuilder,
+                        restaurantEntity.status.eq("ACTIVE")
+                )
                 .limit(size)
                 .fetch();
     }
@@ -88,7 +90,10 @@ public class RestaurantSearchRepositoryImpl implements RestaurantSearchRepositor
         return queryFactory
                 .from(restaurantEntity)
                 .leftJoin(ratingEntity).on(ratingEntity.restaurantId.eq(restaurantEntity.restaurantId))
-                .where(restaurantEntity.restaurantId.in(restaurantIds))
+                .where(
+                        restaurantEntity.restaurantId.in(restaurantIds),
+                        restaurantEntity.status.eq("ACTIVE")
+                )
                 .transform(groupBy(restaurantEntity.restaurantId).as(
                         com.querydsl.core.types.Projections.constructor(
                                 RestaurantForSearch.class,

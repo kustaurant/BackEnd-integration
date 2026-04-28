@@ -1,12 +1,13 @@
 package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository;
 
-import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantPartnershipEntity.restaurantPartnershipEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity.restaurantSituationRelationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QSituationEntity.situationEntity;
+import static com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCommonExpressions.restaurantActive;
+import static com.kustaurant.rating.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantEntity.restaurantEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantPartnershipEntity.restaurantPartnershipEntity;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
 import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
@@ -46,7 +47,10 @@ public class RestaurantCoreInfoRepository {
                 .on(restaurantCommonExpressions.situationMatches(restaurantSituationRelationEntity, restaurantEntity.restaurantId))
                 .leftJoin(situationEntity)
                 .on(situationIdEq(restaurantSituationRelationEntity.situationId))
-                .where(restaurantEntity.restaurantId.in(ids))
+                .where(
+                        restaurantEntity.restaurantId.in(ids),
+                        restaurantActive(restaurantEntity)
+                )
                 .transform(groupBy(restaurantEntity.restaurantId).as(
                         new QRestaurantBaseInfoDto(
                                 restaurantEntity.restaurantId,
@@ -85,7 +89,10 @@ public class RestaurantCoreInfoRepository {
                 .on(situationIdEq(restaurantSituationRelationEntity.situationId))
                 .leftJoin(restaurantPartnershipEntity)
                 .on(restaurantPartnershipEntity.restaurantId.eq(restaurantEntity.restaurantId))
-                .where(restaurantEntity.restaurantId.in(ids))
+                .where(
+                        restaurantEntity.restaurantId.in(ids),
+                        restaurantActive(restaurantEntity)
+                )
                 .transform(groupBy(restaurantEntity.restaurantId).as(
                         new QRestaurantBaseInfoDtoV2(
                                 restaurantEntity.restaurantId,
@@ -171,7 +178,10 @@ public class RestaurantCoreInfoRepository {
                 .on(evaluationRestaurantIdEq(restaurantEntity.restaurantId, userId))
                 .leftJoin(restaurantFavoriteEntity)
                 .on(favoriteRestaurantIdEq(restaurantEntity.restaurantId, userId))
-                .where(restaurantEntity.restaurantId.in(restaurantIds))
+                .where(
+                        restaurantEntity.restaurantId.in(restaurantIds),
+                        restaurantActive(restaurantEntity)
+                )
                 .transform(
                         groupBy(restaurantEntity.restaurantId).as(
                                 new QRestaurantCoreInfoDto(

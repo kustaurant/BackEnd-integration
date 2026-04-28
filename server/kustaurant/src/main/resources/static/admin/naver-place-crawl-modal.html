@@ -1,0 +1,29 @@
+<div id="naver-place-crawl-modal" class="admin-modal hidden">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content naver-place-modal-content">
+        <div class="admin-modal-header">
+            <h3>네이버 식당 URL 실행</h3>
+            <button id="naver-place-crawl-modal-close" class="modal-close-btn" type="button">&times;</button>
+        </div>
+        <div class="admin-modal-body">
+            <div class="form-group">
+                <label for="naver-place-url">네이버 place ID</label>
+                <input
+                        id="naver-place-url"
+                        type="text"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        autocomplete="off"
+                        placeholder="place Id만 입력하세요. 예: 1994067514"
+                />
+                <p class="crawl-help-text">숫자 place ID만 입력하면 요청 시 https://map.naver.com/p/entry/place/{placeId} 형태로 전송됩니다.</p>
+            </div>
+            <div id="naver-place-crawl-result" class="naver-place-result hidden"></div>
+        </div>
+        <div class="admin-modal-footer">
+            <button id="naver-place-crawl-cancel-btn" type="button">취소</button>
+            <button id="naver-place-analyze-submit-btn" type="button">URL 분석하기</button>
+            <button id="naver-place-crawl-submit-btn" type="button">URL로 음식점 추가</button>
+        </div>
+    </div>
+</div>

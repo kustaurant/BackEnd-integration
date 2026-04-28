@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
 import static com.kustaurant.kustaurant.post.comment.infrastructure.entity.QPostCommentEntity.postCommentEntity;
 import static com.kustaurant.kustaurant.admin.report.QReportEntity.reportEntity;
 import static com.kustaurant.kustaurant.admin.feedback.infrastructure.QFeedbackEntity.feedbackEntity;
@@ -16,6 +15,7 @@ import static com.kustaurant.kustaurant.post.post.infrastructure.entity.QPostEnt
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
 import static com.kustaurant.kustaurant.evaluation.comment.infrastructure.entity.QEvalCommentEntity.evalCommentEntity;
 import static com.kustaurant.kustaurant.user.user.infrastructure.QUserEntity.userEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantEntity.restaurantEntity;
 
 @Repository
 @RequiredArgsConstructor

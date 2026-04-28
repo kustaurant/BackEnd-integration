@@ -1,0 +1,27 @@
+<div id="restaurant-sync-run-modal" class="admin-modal hidden">
+    <div class="admin-modal-overlay"></div>
+    <div class="admin-modal-content naver-place-sync-modal-content">
+        <div class="admin-modal-header">
+            <h3>싱크 맞추기 실행</h3>
+            <button id="restaurant-sync-run-modal-close" class="modal-close-btn" type="button">&times;</button>
+        </div>
+        <div class="admin-modal-body">
+            <div class="form-group">
+                <label for="restaurant-sync-scope">대상 구역</label>
+                <select id="restaurant-sync-scope">
+                    <option value="ALL">전체</option>
+                    <option value="ENTRANCE_TO_MIDDLE">건입~중문</option>
+                    <option value="MIDDLE_TO_PARK">중문~후문</option>
+                    <option value="BACK_GATE">후문</option>
+                    <option value="FRONT_GATE">정문</option>
+                    <option value="GUI_STATION">구의역</option>
+                </select>
+                <p class="crawl-help-text">선택 구역 기준으로 raw와 운영 데이터를 비교해 후보와 변경 대상을 계산합니다.</p>
+            </div>
+        </div>
+        <div class="admin-modal-footer">
+            <button id="restaurant-sync-run-cancel-btn" type="button">취소</button>
+            <button id="restaurant-sync-run-submit-btn" type="button">싱크 실행</button>
+        </div>
+    </div>
+</div>
