@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/ig")
-public class Controller {
+public class Controller { //
     private final Crawler crawler;
 
     @PostMapping("/crawl")
