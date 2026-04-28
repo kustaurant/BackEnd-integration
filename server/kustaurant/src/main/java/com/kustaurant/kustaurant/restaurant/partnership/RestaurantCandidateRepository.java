@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.partnership;
 
-import com.kustaurant.kustaurant.admin.crawl.dto.RestaurantMatchCandidate;
-import com.kustaurant.kustaurant.admin.crawl.dto.RestaurantPhoneMatch;
+import com.kustaurant.kustaurant.admin.IGCrawl.dto.RestaurantMatchCandidate;
+import com.kustaurant.kustaurant.admin.IGCrawl.dto.RestaurantPhoneMatch;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantEntity.restaurantEntity;
 
 @Repository
 @RequiredArgsConstructor

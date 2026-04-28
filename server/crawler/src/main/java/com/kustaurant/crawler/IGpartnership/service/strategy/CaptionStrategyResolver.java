@@ -1,6 +1,6 @@
 package com.kustaurant.crawler.IGpartnership.service.strategy;
 
-import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
+import com.kustaurant.restaurant.enums.PartnershipTarget;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

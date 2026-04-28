@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.restaurant.partnership;
 
-import com.kustaurant.jpa.restaurant.entity.RestaurantPartnershipEntity;
-import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
+import com.kustaurant.restaurant.entity.RestaurantPartnershipEntity;
+import com.kustaurant.restaurant.enums.PartnershipTarget;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

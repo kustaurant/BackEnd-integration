@@ -1,9 +1,9 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
-import com.kustaurant.jpa.restaurant.entity.QRestaurantEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QSituationEntity;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRatedRestaurantResponse;
+import com.kustaurant.restaurant.entity.QRestaurantEntity;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;

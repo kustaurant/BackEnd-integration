@@ -42,6 +42,11 @@ class TabManager {
             case 'restaurants':
                 loadRestaurants(0);
                 loadPartnerships(0);
+                if (typeof loadPendingSyncCandidates === "function") {
+                    loadPendingSyncCandidates().catch((error) => {
+                        console.error("sync candidates reload failed:", error);
+                    });
+                }
                 break;
             case 'feedback':
                 loadFeedbacks(0);

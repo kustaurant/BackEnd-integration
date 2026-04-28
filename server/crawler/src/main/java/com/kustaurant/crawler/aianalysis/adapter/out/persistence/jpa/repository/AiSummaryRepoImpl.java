@@ -3,7 +3,7 @@ package com.kustaurant.crawler.aianalysis.adapter.out.persistence.jpa.repository
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.AiSummaryRepo;
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.jpa.support.AiSummaryMapper;
 import com.kustaurant.crawler.aianalysis.domain.model.AiSummary;
-import com.kustaurant.jpa.rating.entity.AiSummaryEntity;
+import com.kustaurant.rating.entity.AiSummaryEntity;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

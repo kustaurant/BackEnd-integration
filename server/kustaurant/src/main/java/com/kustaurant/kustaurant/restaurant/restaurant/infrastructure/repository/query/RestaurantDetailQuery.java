@@ -1,13 +1,13 @@
 package com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository.query;
 
-import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantEntity.restaurantEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantMenuEntity.restaurantMenuEntity;
-import static com.kustaurant.jpa.restaurant.entity.QRestaurantPartnershipEntity.restaurantPartnershipEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity.evaluationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity.restaurantSituationRelationEntity;
 import static com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QSituationEntity.situationEntity;
+import static com.kustaurant.rating.entity.QRatingEntity.ratingEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantEntity.restaurantEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantFavoriteEntity.restaurantFavoriteEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantMenuEntity.restaurantMenuEntity;
+import static com.kustaurant.restaurant.entity.QRestaurantPartnershipEntity.restaurantPartnershipEntity;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
 import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
@@ -68,7 +68,7 @@ public class RestaurantDetailQuery {
                                         restaurantEntity.restaurantPosition,
                                         restaurantEntity.restaurantName,
                                         restaurantEntity.restaurantAddress,
-                                        restaurantEntity.restaurantUrl,
+                                        naverMapUrl(),
                                         set(situationEntity.situationName),
                                         restaurantEntity.partnershipInfo,
                                         Expressions.constant(getEvaluationCount(restaurantId)),
@@ -81,7 +81,6 @@ public class RestaurantDetailQuery {
                                                 restaurantMenuEntity.restaurantId,
                                                 restaurantMenuEntity.menuName,
                                                 restaurantMenuEntity.menuPrice,
-                                                restaurantMenuEntity.naverType,
                                                 restaurantMenuEntity.menuImgUrl
                                         )),
                                         restaurantEntity.restaurantType,
@@ -129,7 +128,7 @@ public class RestaurantDetailQuery {
                                         restaurantEntity.restaurantPosition,
                                         restaurantEntity.restaurantName,
                                         restaurantEntity.restaurantAddress,
-                                        restaurantEntity.restaurantUrl,
+                                        naverMapUrl(),
                                         set(situationEntity.situationName),
                                         set(partnershipText()),
                                         Expressions.constant(getEvaluationCount(restaurantId)),
@@ -142,7 +141,6 @@ public class RestaurantDetailQuery {
                                                 restaurantMenuEntity.restaurantId,
                                                 restaurantMenuEntity.menuName,
                                                 restaurantMenuEntity.menuPrice,
-                                                restaurantMenuEntity.naverType,
                                                 restaurantMenuEntity.menuImgUrl
                                         )),
                                         restaurantEntity.restaurantType,
@@ -206,6 +204,13 @@ public class RestaurantDetailQuery {
 
     private BooleanExpression situationIdEq(NumberPath<Long> situationId) {
         return isNull(situationId) ? Expressions.FALSE : situationEntity.situationId.eq(situationId);
+    }
+
+    private Expression<String> naverMapUrl() {
+        return Expressions.stringTemplate(
+                "concat('https://map.naver.com/p/entry/place/', {0})",
+                restaurantEntity.placeId
+        );
     }
 
     private Expression<String> partnershipText() {

@@ -3,7 +3,7 @@ package com.kustaurant.crawler.aianalysis.adapter.out.persistence.jpa.repository
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.RestaurantCrawlerRepo;
 import com.kustaurant.crawler.aianalysis.adapter.out.persistence.RestaurantCrawlingInfo;
 import com.kustaurant.crawler.aianalysis.domain.model.JobStatus;
-import com.kustaurant.jpa.restaurant.entity.RestaurantEntity;
+import com.kustaurant.restaurant.entity.RestaurantEntity;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class RestaurantCrawlerRepoImpl implements RestaurantCrawlerRepo {
+
+    private static final String NAVER_PLACE_ENTRY_URL = "https://map.naver.com/p/entry/place/";
 
     private final RestaurantJpaRepo restaurantJpaRepo;
     private final Clock clock;
@@ -27,14 +29,22 @@ public class RestaurantCrawlerRepoImpl implements RestaurantCrawlerRepo {
 
         return restaurants
                 .stream()
-                .map(r -> new RestaurantCrawlingInfo(r.getRestaurantId(), r.getRestaurantUrl()))
+                .map(r -> new RestaurantCrawlingInfo(r.getRestaurantId(), buildRestaurantUrl(r.getPlaceId())))
                 .toList();
     }
 
     @Override
     public String getRestaurantUrl(long id) {
-        return restaurantJpaRepo.findById(id)
+        RestaurantEntity entity = restaurantJpaRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("no restaurant id: " + id))
-                .getRestaurantUrl();
+                ;
+        return buildRestaurantUrl(entity.getPlaceId());
+    }
+
+    private String buildRestaurantUrl(String placeId) {
+        if (placeId == null || placeId.isBlank()) {
+            throw new RuntimeException("placeId is missing");
+        }
+        return NAVER_PLACE_ENTRY_URL + placeId.trim();
     }
 }

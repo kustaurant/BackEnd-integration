@@ -10,23 +10,12 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@OpenAPIDefinition(servers = {
-        @Server(url = "/", description = "Default Server URL")
-})
+@OpenAPIDefinition(servers = {@Server(url = "/", description = "Default Server URL")})
 @EnableScheduling
 @EnableCaching
-@SpringBootApplication(scanBasePackages = {
-        "com.kustaurant.kustaurant",
-        "com.kustaurant.jpa"
-})
-@EnableJpaRepositories(basePackages = {
-        "com.kustaurant.kustaurant",
-        "com.kustaurant.jpa"
-})
-@EntityScan(basePackages = {
-        "com.kustaurant.kustaurant",
-        "com.kustaurant.jpa"
-})
+@SpringBootApplication(scanBasePackages = "com.kustaurant")
+@EnableJpaRepositories(basePackages = "com.kustaurant")
+@EntityScan(basePackages = "com.kustaurant")
 @ConfigurationPropertiesScan
 public class KustaurantApplication {
     public static void main(String[] args) {

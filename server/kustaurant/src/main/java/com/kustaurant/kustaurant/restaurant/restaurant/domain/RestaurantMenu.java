@@ -15,17 +15,15 @@ public class RestaurantMenu {
 
     private String menuName;
     private String menuPrice;
-    private String naverType;
     private String menuImgUrl;
 
     @QueryProjection
     public RestaurantMenu(Integer menuId, Long restaurantId, String menuName, String menuPrice,
-            String naverType, String menuImgUrl) {
+            String menuImgUrl) {
         this.menuId = menuId;
         this.restaurantId = restaurantId;
         this.menuName = menuName;
         this.menuPrice = menuPrice;
-        this.naverType = naverType;
         this.menuImgUrl = menuImgUrl;
     }
 }

@@ -12,10 +12,24 @@ async function appendModalIfNotExists(modalId, url) {
 }
 
 async function preloadAdminModals() {
+    await appendModalIfNotExists(
+        'naver-place-crawl-modal',
+        '/admin/naver-place-crawl-modal.html'
+    );
+
+    await appendModalIfNotExists(
+        'naver-place-sync-modal',
+        '/admin/naver-place-sync-modal.html'
+    );
 
     await appendModalIfNotExists(
         'crawl-modal',
         '/admin/crawl-modal.html'
+    );
+
+    await appendModalIfNotExists(
+        'restaurant-sync-run-modal',
+        '/admin/restaurant-sync-run-modal.html'
     );
 
     await appendModalIfNotExists(

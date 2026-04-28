@@ -1,12 +1,14 @@
 package com.kustaurant.kustaurant.restaurant.query.chart.service;
 
 import com.kustaurant.kustaurant.global.exception.exception.ParamException;
-import com.kustaurant.kustaurant.restaurant.query.chart.constants.MapConstants;
 import com.kustaurant.kustaurant.restaurant.query.chart.service.port.RestaurantChartRepository;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.*;
 import com.kustaurant.kustaurant.restaurant.query.common.dto.ChartCondition.TierFilter;
 import com.kustaurant.kustaurant.restaurant.query.common.infrastructure.repository.RestaurantCoreInfoRepository;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Position;
+import com.kustaurant.map.MapConstantsV2;
+import com.kustaurant.map.ZonePolygon;
+import com.kustaurant.map.utils.PolygonUtils;
 import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,7 +84,6 @@ public class RestaurantChartServiceV2 {
     public RestaurantTierMapDTOV2 getRestaurantTierMapDto(
             ChartCondition condition, @Nullable Long userId
     ) {
-        // 페이징 제거
         condition = condition.removePaging();
         // 1. 음식 종류랑 위치로 식당 리스트 가져오기
         List<RestaurantCoreInfoDtoV2> tieredRestaurantCoreInfos = findByConditions(
@@ -128,22 +129,24 @@ public class RestaurantChartServiceV2 {
         // 2.4 폴리곤 좌표 리스트의 리스트
         if (condition.positions() != null && !condition.positions().contains(("ALL"))) {
             try {
-                for (int i = 0; i < MapConstants.LIST_OF_COORD_LIST.size(); i++) {
+                for (int i = 0; i < MapConstantsV2.ZONES.size(); i++) {
                     Position position = Position.valueOf("L" + (i + 1));
                     if (condition.positions().contains(position.getValue())) {
-                        response.getSolidPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
+                        response.getSolidPolygonCoordsList().add(MapConstantsV2.ZONES.get(i).coordinates());
                     } else {
-                        response.getDashedPolygonCoordsList().add(MapConstants.LIST_OF_COORD_LIST.get(i));
+                        response.getDashedPolygonCoordsList().add(MapConstantsV2.ZONES.get(i).coordinates());
                     }
                 }
-            } catch (NumberFormatException e) {
+            } catch (IllegalArgumentException e) {
                 throw new ParamException("locations 파라미터 입력이 올바르지 않습니다.");
             }
         } else {
-            response.setSolidPolygonCoordsList(MapConstants.LIST_OF_COORD_LIST);
+            response.setSolidPolygonCoordsList(MapConstantsV2.ZONES.stream()
+                    .map(ZonePolygon::coordinates)
+                    .toList());
         }
         // 2.5 지도에 보여야 하는 좌표 범위
-        response.setVisibleBounds(MapConstants.findMinMaxCoordinates(response.getSolidPolygonCoordsList()));
+        response.setVisibleBounds(PolygonUtils.getBoundingBoxFromPolygons(response.getSolidPolygonCoordsList()));
 
         return response;
     }

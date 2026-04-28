@@ -2,12 +2,11 @@ package com.kustaurant.kustaurant.restaurant.query.common.infrastructure.reposit
 
 import static java.util.Objects.isNull;
 
-import com.kustaurant.jpa.restaurant.entity.QRestaurantEntity;
-import com.kustaurant.jpa.restaurant.entity.QRestaurantPartnershipEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QEvaluationEntity;
 import com.kustaurant.kustaurant.evaluation.evaluation.infrastructure.entity.QRestaurantSituationRelationEntity;
-import com.kustaurant.kustaurant.restaurant.restaurant.constants.RestaurantConstants;
 import com.kustaurant.kustaurant.restaurant.restaurant.domain.Cuisine;
+import com.kustaurant.restaurant.entity.QRestaurantEntity;
+import com.kustaurant.restaurant.entity.QRestaurantPartnershipEntity;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberPath;

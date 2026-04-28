@@ -2,9 +2,9 @@ package com.kustaurant.kustaurant.admin.adminPage.service;
 
 import com.kustaurant.kustaurant.admin.adminPage.controller.request.HomeModalUpdateRequest;
 import com.kustaurant.kustaurant.admin.adminPage.controller.response.*;
-import com.kustaurant.kustaurant.admin.crawl.controller.query.PagedPartnershipResponse;
-import com.kustaurant.kustaurant.admin.crawl.controller.query.PagedRestaurantResponse;
-import com.kustaurant.kustaurant.admin.crawl.controller.query.PartnershipListResponse;
+import com.kustaurant.kustaurant.admin.IGCrawl.controller.query.PagedPartnershipResponse;
+import com.kustaurant.kustaurant.admin.IGCrawl.controller.query.PagedRestaurantResponse;
+import com.kustaurant.kustaurant.admin.IGCrawl.controller.query.PartnershipListResponse;
 import com.kustaurant.kustaurant.admin.adminPage.infrastructure.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

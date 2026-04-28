@@ -1,7 +1,7 @@
 package com.kustaurant.crawler.IGpartnership.service.strategy;
 
 import com.kustaurant.crawler.IGpartnership.dto.ParsedCaption;
-import com.kustaurant.jpa.restaurant.enums.PartnershipTarget;
+import com.kustaurant.restaurant.enums.PartnershipTarget;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;

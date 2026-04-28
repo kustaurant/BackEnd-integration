@@ -11,18 +11,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ConfigurationPropertiesScan
 @EnableScheduling
 @EnableRetry
-@SpringBootApplication(scanBasePackages = {
-        "com.kustaurant.crawler",
-        "com.kustaurant.jpa"
-})
-@EnableJpaRepositories(basePackages = {
-        "com.kustaurant.crawler",
-        "com.kustaurant.jpa"
-})
-@EntityScan(basePackages = {
-        "com.kustaurant.crawler",
-        "com.kustaurant.jpa"
-})
+@SpringBootApplication(scanBasePackages = "com.kustaurant")
+@EnableJpaRepositories(basePackages = "com.kustaurant")
+@EntityScan(basePackages = "com.kustaurant")
 public class CrawlerApplication {
 
     public static void main(String[] args) {

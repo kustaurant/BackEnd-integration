@@ -246,6 +246,31 @@ function openCrawlModal() {
     modal.classList.remove('hidden');
 }
 
+function openNaverPlaceModal() {
+    const modal = document.getElementById('naver-place-crawl-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+}
+
+function openNaverPlaceSyncModal() {
+    const modal = document.getElementById('naver-place-sync-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+}
+
+function closeNaverPlaceModal() {
+    const modal = document.getElementById('naver-place-crawl-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+}
+
+function closeNaverPlaceSyncModal() {
+    const modal = document.getElementById('naver-place-sync-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    stopNaverPlaceZoneCrawlPolling();
+}
+
 function closeCrawlModal() {
     const modal = document.getElementById('crawl-modal');
     if (!modal) return;
@@ -260,6 +285,334 @@ function getCookie(name) {
         return parts.pop().split(';').shift();
     }
     return null;
+}
+
+function renderNaverPlaceCrawlResult(data) {
+    const resultBox = document.getElementById('naver-place-crawl-result');
+    if (!resultBox) return;
+
+    const menus = data.menus || [];
+    const menuHtml = menus.length === 0
+        ? '<li>메뉴 정보 없음</li>'
+        : menus.map(menu => `
+            <li>
+                <strong>${menu.menuName || '-'}</strong>
+                <span>${menu.menuPrice || '-'}</span>
+            </li>
+        `).join('');
+
+    resultBox.innerHTML = `
+        <div class="naver-place-result-summary">
+            <div><strong>Raw ID:</strong> ${data.rawId}</div>
+            <div><strong>식당명:</strong> ${data.placeName || '-'}</div>
+            <div><strong>카테고리:</strong> ${data.category || '-'}</div>
+            <div><strong>도로명 주소:</strong> ${data.restaurantAddress || '-'}</div>
+            <div><strong>전화번호:</strong> ${data.phoneNumber || '-'}</div>
+            <div><strong>좌표:</strong> ${data.latitude || '-'}, ${data.longitude || '-'}</div>
+            <div><strong>메뉴 수:</strong> ${data.menuCount || 0}</div>
+        </div>
+        <div class="naver-place-result-menus">
+            <strong>메뉴 미리보기</strong>
+            <ul>${menuHtml}</ul>
+        </div>
+    `;
+    resultBox.classList.remove('hidden');
+}
+
+function executeNaverPlaceAction(options) {
+    const urlInput = document.getElementById('naver-place-url');
+    const resultBox = document.getElementById('naver-place-crawl-result');
+    const submitBtn = document.getElementById(options.submitButtonId);
+    const placeId = urlInput?.value?.trim();
+
+    if (!placeId) {
+        alert('place ID를 입력하세요.');
+        return;
+    }
+
+    if (!/^\d+$/.test(placeId)) {
+        alert('숫자로만 된 place ID를 입력하세요.');
+        return;
+    }
+
+    if (resultBox) {
+        resultBox.classList.add('hidden');
+        resultBox.innerHTML = '';
+    }
+
+    const csrfToken = getCookie('XSRF-TOKEN');
+    submitBtn.disabled = true;
+    submitBtn.textContent = options.runningText;
+
+    fetch(options.endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-XSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ placeId })
+    })
+        .then(async response => {
+            const text = await response.text();
+            let payload = null;
+            try {
+                payload = text ? JSON.parse(text) : null;
+            } catch (ignored) {
+            }
+
+            if (!response.ok) {
+                const reason = payload?.errors?.[0]?.reason;
+                const message = payload?.message || reason || text || `HTTP ${response.status}`;
+                throw new Error(message);
+            }
+            return payload || {};
+        })
+        .then(data => {
+            renderNaverPlaceCrawlResult(data);
+            if (options.reloadRestaurants) {
+                loadRestaurants(0);
+            }
+        })
+        .catch(error => {
+            console.error(options.errorLogText, error);
+            alert(`${options.errorAlertText}: ${error.message}`);
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = options.idleText;
+        });
+}
+
+function runNaverPlaceCrawl() {
+    executeNaverPlaceAction({
+        endpoint: '/admin/api/crawl/naver-place/raw',
+        submitButtonId: 'naver-place-crawl-submit-btn',
+        runningText: '추가 중..',
+        idleText: 'URL로 음식점 추가',
+        errorLogText: '네이버 식당 URL 추가 실패:',
+        errorAlertText: '네이버 식당 URL 추가 실패',
+        reloadRestaurants: true
+    });
+}
+
+function runNaverPlaceAnalyze() {
+    executeNaverPlaceAction({
+        endpoint: '/admin/api/crawl/naver-place/analyze',
+        submitButtonId: 'naver-place-analyze-submit-btn',
+        runningText: '분석 중..',
+        idleText: 'URL 분석하기',
+        errorLogText: '네이버 식당 URL 분석 실패:',
+        errorAlertText: '네이버 식당 URL 분석 실패',
+        reloadRestaurants: false
+    });
+}
+
+function renderNaverPlaceZoneCrawlResult(data) {
+    const resultBox = document.getElementById('naver-place-sync-result');
+    if (!resultBox) return;
+
+    resultBox.innerHTML = `
+        <div><strong>구역:</strong> ${data.crawlScope || '-'}</div>
+        <div><strong>발견 식당 수:</strong> ${data.discoveredPlaceCount || 0}</div>
+        <div><strong>크롤 성공 수:</strong> ${data.crawledSuccessCount || 0}</div>
+        <div><strong>raw 저장 수:</strong> ${data.savedRawCount || 0}</div>
+    `;
+    resultBox.classList.remove('hidden');
+}
+
+function runNaverPlaceZoneCrawl() {
+    const scopeSelect = document.getElementById('naver-place-sync-scope');
+    const resultBox = document.getElementById('naver-place-sync-result');
+    const submitBtn = document.getElementById('naver-place-sync-submit-btn');
+    const crawlScope = scopeSelect?.value;
+
+    if (!crawlScope) {
+        alert('크롤링할 구역을 선택하세요.');
+        return;
+    }
+
+    if (resultBox) {
+        resultBox.classList.add('hidden');
+        resultBox.innerHTML = '';
+    }
+
+    const csrfToken = getCookie('XSRF-TOKEN');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '실행 중..';
+
+    fetch('/admin/api/crawl/naver-place/crawl-zone', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-XSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ crawlScope })
+    })
+        .then(async response => {
+            const text = await response.text();
+            let payload = null;
+            try {
+                payload = text ? JSON.parse(text) : null;
+            } catch (ignored) {
+            }
+            if (!response.ok) {
+                const reason = payload?.errors?.[0]?.reason;
+                const message = payload?.message || reason || text || `HTTP ${response.status}`;
+                throw new Error(message);
+            }
+            return payload || {};
+        })
+        .then(data => {
+            renderNaverPlaceZoneCrawlResult(data);
+        })
+        .catch(error => {
+            console.error('네이버 플레이스 구역 크롤 실패:', error);
+            alert(`네이버 플레이스 구역 크롤 실패: ${error.message}`);
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '구역 크롤 시작';
+        });
+}
+
+let naverPlaceZoneCrawlPollTimer = null;
+
+function stopNaverPlaceZoneCrawlPolling() {
+    if (naverPlaceZoneCrawlPollTimer) {
+        clearTimeout(naverPlaceZoneCrawlPollTimer);
+        naverPlaceZoneCrawlPollTimer = null;
+    }
+}
+
+function isZoneCrawlJobFinished(status) {
+    return status === 'SUCCESS' || status === 'FAILED';
+}
+
+function renderNaverPlaceZoneCrawlResult(data) {
+    const resultBox = document.getElementById('naver-place-sync-result');
+    if (!resultBox) return;
+
+    resultBox.innerHTML = `
+        <div><strong>상태:</strong> ${data.status || '-'}</div>
+        <div><strong>구역:</strong> ${data.crawlScope || '-'}</div>
+        <div><strong>현재 단계:</strong> ${data.currentPhase || '-'}</div>
+        <div><strong>그리드 진행:</strong> ${(data.processedGridCount || 0)} / ${(data.totalGridCount || 0)}</div>
+        <div><strong>발견 식당 수:</strong> ${data.discoveredPlaceCount || 0}</div>
+        <div><strong>크롤 시도/성공:</strong> ${(data.attemptedPlaceCount || 0)} / ${(data.crawledSuccessCount || 0)}</div>
+        <div><strong>raw 저장 성공/실패:</strong> ${(data.savedRawCount || 0)} / ${(data.saveFailedCount || 0)}</div>
+        <div><strong>현재 grid:</strong> ${data.currentGrid || '-'}</div>
+        <div><strong>현재 placeId:</strong> ${data.currentPlaceId || '-'}</div>
+        ${data.errorMessage ? `<div><strong>오류:</strong> ${data.errorMessage}</div>` : ''}
+    `;
+    resultBox.classList.remove('hidden');
+}
+
+function runNaverPlaceZoneCrawl() {
+    const scopeSelect = document.getElementById('naver-place-sync-scope');
+    const resultBox = document.getElementById('naver-place-sync-result');
+    const submitBtn = document.getElementById('naver-place-sync-submit-btn');
+    const crawlScope = scopeSelect?.value;
+
+    if (!crawlScope) {
+        alert('크롤링할 구역을 선택하세요.');
+        return;
+    }
+
+    if (resultBox) {
+        resultBox.classList.add('hidden');
+        resultBox.innerHTML = '';
+    }
+
+    const csrfToken = getCookie('XSRF-TOKEN');
+    submitBtn.disabled = true;
+    submitBtn.textContent = '작업 시작 중..';
+    stopNaverPlaceZoneCrawlPolling();
+
+    fetch('/admin/api/crawl/naver-place/crawl-zone/jobs', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-XSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ crawlScope })
+    })
+        .then(async response => {
+            const text = await response.text();
+            let payload = null;
+            try {
+                payload = text ? JSON.parse(text) : null;
+            } catch (ignored) {
+            }
+            if (!response.ok) {
+                const reason = payload?.errors?.[0]?.reason;
+                const message = payload?.message || reason || text || `HTTP ${response.status}`;
+                throw new Error(message);
+            }
+            return payload || {};
+        })
+        .then(data => {
+            if (!data.jobId) {
+                throw new Error('zone sync job id is missing');
+            }
+            submitBtn.textContent = '진행 중..';
+            pollNaverPlaceZoneCrawlStatus(data.jobId, submitBtn);
+        })
+        .catch(error => {
+            console.error('네이버 플레이스 구역 동기화 시작 실패:', error);
+            alert(`네이버 플레이스 구역 동기화 시작 실패: ${error.message}`);
+            submitBtn.disabled = false;
+            submitBtn.textContent = '구역 크롤 시작';
+            stopNaverPlaceZoneCrawlPolling();
+        });
+}
+
+function pollNaverPlaceZoneCrawlStatus(jobId, submitBtn) {
+    const csrfToken = getCookie('XSRF-TOKEN');
+    fetch(`/admin/api/crawl/naver-place/crawl-zone/jobs/${jobId}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-XSRF-TOKEN': csrfToken
+        }
+    })
+        .then(async response => {
+            const text = await response.text();
+            let payload = null;
+            try {
+                payload = text ? JSON.parse(text) : null;
+            } catch (ignored) {
+            }
+            if (!response.ok) {
+                const reason = payload?.errors?.[0]?.reason;
+                const message = payload?.message || reason || text || `HTTP ${response.status}`;
+                throw new Error(message);
+            }
+            return payload || {};
+        })
+        .then(data => {
+            renderNaverPlaceZoneCrawlResult(data);
+            if (isZoneCrawlJobFinished(data.status)) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '구역 크롤 시작';
+                stopNaverPlaceZoneCrawlPolling();
+                return;
+            }
+            naverPlaceZoneCrawlPollTimer = setTimeout(() => pollNaverPlaceZoneCrawlStatus(jobId, submitBtn), 5000);
+        })
+        .catch(error => {
+            console.error('네이버 플레이스 구역 동기화 상태 조회 실패:', error);
+            submitBtn.disabled = false;
+            submitBtn.textContent = '구역 크롤 시작';
+            stopNaverPlaceZoneCrawlPolling();
+            alert(`구역 동기화 상태 조회 실패: ${error.message}`);
+        });
 }
 
 function runInstagramCrawl() {
@@ -341,11 +694,30 @@ function runInstagramCrawl() {
 ////////////////////////////
 
 async function initCrawlModal() {
+    const naverPlaceAddBtn = document.getElementById('naver-place-add-btn');
+    const naverPlaceSyncBtn = document.getElementById('sync-crawl');
     const instaCrawlBtn = document.getElementById('insta-crawl');
     const crawlModalCloseBtn = document.getElementById('crawl-modal-close');
     const crawlCancelBtn = document.getElementById('crawl-cancel-btn');
     const crawlSubmitBtn = document.getElementById('crawl-submit-btn');
     const crawlModalOverlay = document.querySelector('#crawl-modal .admin-modal-overlay');
+    const naverPlaceModalCloseBtn = document.getElementById('naver-place-crawl-modal-close');
+    const naverPlaceCancelBtn = document.getElementById('naver-place-crawl-cancel-btn');
+    const naverPlaceAnalyzeSubmitBtn = document.getElementById('naver-place-analyze-submit-btn');
+    const naverPlaceSubmitBtn = document.getElementById('naver-place-crawl-submit-btn');
+    const naverPlaceModalOverlay = document.querySelector('#naver-place-crawl-modal .admin-modal-overlay');
+    const naverPlaceSyncModalCloseBtn = document.getElementById('naver-place-sync-modal-close');
+    const naverPlaceSyncCancelBtn = document.getElementById('naver-place-sync-cancel-btn');
+    const naverPlaceSyncSubmitBtn = document.getElementById('naver-place-sync-submit-btn');
+    const naverPlaceSyncModalOverlay = document.querySelector('#naver-place-sync-modal .admin-modal-overlay');
+
+    if (naverPlaceAddBtn) {
+        naverPlaceAddBtn.addEventListener('click', openNaverPlaceModal);
+    }
+
+    if (naverPlaceSyncBtn) {
+        naverPlaceSyncBtn.addEventListener('click', openNaverPlaceSyncModal);
+    }
 
     if (instaCrawlBtn) {
         instaCrawlBtn.addEventListener('click', openCrawlModal);
@@ -365,6 +737,42 @@ async function initCrawlModal() {
 
     if (crawlSubmitBtn) {
         crawlSubmitBtn.addEventListener('click', runInstagramCrawl);
+    }
+
+    if (naverPlaceModalCloseBtn) {
+        naverPlaceModalCloseBtn.addEventListener('click', closeNaverPlaceModal);
+    }
+
+    if (naverPlaceCancelBtn) {
+        naverPlaceCancelBtn.addEventListener('click', closeNaverPlaceModal);
+    }
+
+    if (naverPlaceModalOverlay) {
+        naverPlaceModalOverlay.addEventListener('click', closeNaverPlaceModal);
+    }
+
+    if (naverPlaceAnalyzeSubmitBtn) {
+        naverPlaceAnalyzeSubmitBtn.addEventListener('click', runNaverPlaceAnalyze);
+    }
+
+    if (naverPlaceSubmitBtn) {
+        naverPlaceSubmitBtn.addEventListener('click', runNaverPlaceCrawl);
+    }
+
+    if (naverPlaceSyncModalCloseBtn) {
+        naverPlaceSyncModalCloseBtn.addEventListener('click', closeNaverPlaceSyncModal);
+    }
+
+    if (naverPlaceSyncCancelBtn) {
+        naverPlaceSyncCancelBtn.addEventListener('click', closeNaverPlaceSyncModal);
+    }
+
+    if (naverPlaceSyncModalOverlay) {
+        naverPlaceSyncModalOverlay.addEventListener('click', closeNaverPlaceSyncModal);
+    }
+
+    if (naverPlaceSyncSubmitBtn) {
+        naverPlaceSyncSubmitBtn.addEventListener('click', runNaverPlaceZoneCrawl);
     }
 }
 

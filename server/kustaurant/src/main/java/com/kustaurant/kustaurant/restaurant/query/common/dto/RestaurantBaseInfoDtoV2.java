@@ -26,7 +26,7 @@ public class RestaurantBaseInfoDtoV2 {
     protected Set<String> partnerships;
     protected Double restaurantScore;
     @JsonIgnore protected List<String> situations;
-    @JsonIgnore protected String restaurantType;
+    protected String restaurantType;
 
     @QueryProjection
     public RestaurantBaseInfoDtoV2(

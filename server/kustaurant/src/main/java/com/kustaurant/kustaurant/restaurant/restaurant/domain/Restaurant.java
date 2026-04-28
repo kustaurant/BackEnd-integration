@@ -16,7 +16,7 @@ public class Restaurant {
     private String restaurantType;
     private String restaurantAddress;
     private String restaurantTel;
-    private String restaurantUrl;
+    private String placeId;
     private String restaurantImgUrl;
     private String partnershipInfo;
 

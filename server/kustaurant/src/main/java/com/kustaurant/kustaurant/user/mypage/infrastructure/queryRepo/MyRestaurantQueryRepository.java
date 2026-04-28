@@ -1,10 +1,8 @@
 package com.kustaurant.kustaurant.user.mypage.infrastructure.queryRepo;
 
-import static com.kustaurant.jpa.rating.entity.QRatingEntity.ratingEntity;
-
-import com.kustaurant.jpa.restaurant.entity.QRestaurantEntity;
-import com.kustaurant.jpa.restaurant.entity.QRestaurantFavoriteEntity;
 import com.kustaurant.kustaurant.user.mypage.controller.response.api.MyRestaurantResponse;
+import com.kustaurant.restaurant.entity.QRestaurantEntity;
+import com.kustaurant.restaurant.entity.QRestaurantFavoriteEntity;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +11,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static com.kustaurant.rating.entity.QRatingEntity.ratingEntity;
 
 @Repository
 @RequiredArgsConstructor

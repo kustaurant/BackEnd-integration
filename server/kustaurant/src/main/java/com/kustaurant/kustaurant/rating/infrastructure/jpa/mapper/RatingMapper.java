@@ -1,7 +1,7 @@
 package com.kustaurant.kustaurant.rating.infrastructure.jpa.mapper;
 
 import com.kustaurant.kustaurant.rating.domain.model.Rating;
-import com.kustaurant.jpa.rating.entity.RatingEntity;
+import com.kustaurant.rating.entity.RatingEntity;
 
 public class RatingMapper {
 
