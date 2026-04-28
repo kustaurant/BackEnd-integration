@@ -30,15 +30,17 @@ function fillMenuInfo(data, num) {
     textDiv.appendChild(menuPriceContainer);
 
     const menuImgUrl = (item.menuImgUrl || "").trim();
-    if (menuImgUrl) {
-      const imgDiv = document.createElement("div");
-      imgDiv.classList.add("menu-img-container");
-      const img = document.createElement("img");
-      img.alt = "menu img";
-      img.src = menuImgUrl === "icon" ? "/img/favicon.png" : menuImgUrl;
-      imgDiv.appendChild(img);
-      menuLi.appendChild(imgDiv);
+    const imgDiv = document.createElement("div");
+    imgDiv.classList.add("menu-img-container");
+    const img = document.createElement("img");
+    img.alt = "menu img";
+    if (menuImgUrl === "icon" || menuImgUrl === "no_img" || !menuImgUrl) {
+      img.src = "/img/tier/no_img.png";
+    } else {
+      img.src = menuImgUrl;
     }
+    imgDiv.appendChild(img);
+    menuLi.appendChild(imgDiv);
 
     menuLi.appendChild(textDiv);
     menuUl.appendChild(menuLi);
