@@ -31,7 +31,7 @@ public class RestaurantCrawlController {
    private final ZoneTestCrawler testCrawler;
    private final ZoneCrawlJobService zoneCrawlJobService;
 
-   // 1. 단건 크롤 & 저장
+   // 1. 단건 크롤 & 저장 .
    @PostMapping({"/crawl-one"})
    public RestaurantRaw crawlOne(@RequestBody @Valid RestaurantCrawlRequest request) {
       return crawler.crawl(request.normalizedPlaceUrl());
