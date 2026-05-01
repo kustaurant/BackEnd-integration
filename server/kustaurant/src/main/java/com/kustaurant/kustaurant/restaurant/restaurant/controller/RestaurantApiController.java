@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class RestaurantApiController implements RestaurantApiDoc {
     private final RestaurantService restaurantService;
-
     private final ViewerKeyProvider viewerKeyProvider;
     private final ViewCountService viewCountService;
 

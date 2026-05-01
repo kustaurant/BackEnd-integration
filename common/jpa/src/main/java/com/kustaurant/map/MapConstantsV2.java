@@ -12,14 +12,14 @@ public final class MapConstantsV2 {
                     List.of(
                             new CoordinateV2(37.5401732,127.062852),
                             new CoordinateV2(37.5378977,127.0696049),
-                            new CoordinateV2(37.5422127,127.071636), //
-                            new CoordinateV2(37.5428253,127.0710213), //
-                            new CoordinateV2(37.5422656,127.0707644), //
-                            new CoordinateV2(37.5441701,127.0651452) //
+                            new CoordinateV2(37.5422127,127.071636),
+                            new CoordinateV2(37.5428253,127.0710213),
+                            new CoordinateV2(37.5422656,127.0707644),
+                            new CoordinateV2(37.5441701,127.0651452)
                     )
             ),
             new ZonePolygon( // 중문~어대
-                    com.kustaurant.map.ZoneType.MIDDLE_TO_PARK,
+                    ZoneType.MIDDLE_TO_PARK,
                     List.of(
                             new CoordinateV2(37.5422127,127.071636),
                             new CoordinateV2(37.5428253,127.0710213),
@@ -32,7 +32,7 @@ public final class MapConstantsV2 {
                     )
             ),
             new ZonePolygon( // 후문
-                    com.kustaurant.map.ZoneType.BACK_GATE,
+                    ZoneType.BACK_GATE,
                     List.of(
                             new CoordinateV2(37.5445367,127.0728555),
                             new CoordinateV2(37.5444815,127.0731477),
@@ -48,7 +48,7 @@ public final class MapConstantsV2 {
                     )
             ),
             new ZonePolygon( // 정문
-                    com.kustaurant.map.ZoneType.FRONT_GATE,
+                    ZoneType.FRONT_GATE,
                     List.of(
                             new CoordinateV2(37.5397225,127.0708216),
                             new CoordinateV2(37.5385701,127.0750329),
@@ -66,7 +66,7 @@ public final class MapConstantsV2 {
                     )
             ),
             new ZonePolygon( // 구의역
-                    com.kustaurant.map.ZoneType.GUI_STATION,
+                    ZoneType.GUI_STATION,
                     List.of(
                             new CoordinateV2(37.536197,127.0837349),
                             new CoordinateV2(37.5370672,127.0876883),
