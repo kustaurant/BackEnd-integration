@@ -3,6 +3,10 @@ package com.kustaurant.kustaurant.admin.RestaurantSync.controller;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncCandidateActionResponse;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncCandidateApproveRequest;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncCandidateResponse;
+import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.ClosedCandidateAutoProcessResponse;
+import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.ClosedCandidateAutoProcessJobStartResponse;
+import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.ClosedCandidateAutoProcessJobStatusResponse;
+import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.NewCandidateAutoApproveResponse;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncRunRequest;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncRunResponse;
 import com.kustaurant.kustaurant.admin.RestaurantSync.domain.SyncCandidateStatus;
@@ -63,5 +67,35 @@ public class RestaurantSyncController {
             Principal principal
     ) {
         return restaurantSyncService.reject(candidateId, principal == null ? "UNKNOWN_ADMIN" : principal.getName());
+    }
+
+    @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
+    @PostMapping("/candidates/closed/auto-process")
+    public ClosedCandidateAutoProcessResponse autoProcessClosedCandidates(Principal principal) {
+        return restaurantSyncService.autoProcessClosedCandidates(
+                principal == null ? "UNKNOWN_ADMIN" : principal.getName()
+        );
+    }
+
+    @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
+    @PostMapping("/candidates/closed/auto-process/jobs")
+    public ClosedCandidateAutoProcessJobStartResponse startClosedAutoProcessJob(Principal principal) {
+        return restaurantSyncService.startClosedAutoProcessJob(
+                principal == null ? "UNKNOWN_ADMIN" : principal.getName()
+        );
+    }
+
+    @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
+    @GetMapping("/candidates/closed/auto-process/jobs/{jobId}")
+    public ClosedCandidateAutoProcessJobStatusResponse getClosedAutoProcessJobStatus(@PathVariable String jobId) {
+        return restaurantSyncService.getClosedAutoProcessJobStatus(jobId);
+    }
+
+    @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
+    @PostMapping("/candidates/new/auto-approve")
+    public NewCandidateAutoApproveResponse autoApproveNewCandidates(Principal principal) {
+        return restaurantSyncService.autoApproveNewCandidates(
+                principal == null ? "UNKNOWN_ADMIN" : principal.getName()
+        );
     }
 }
