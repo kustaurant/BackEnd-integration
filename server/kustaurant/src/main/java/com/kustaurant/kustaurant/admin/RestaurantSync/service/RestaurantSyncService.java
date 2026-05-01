@@ -1,9 +1,15 @@
 package com.kustaurant.kustaurant.admin.RestaurantSync.service;
 
 import com.kustaurant.kustaurant.admin.RestaurantCrawl.infrastructure.RestaurantCrawlRawEntity;
+import com.kustaurant.kustaurant.admin.RestaurantCrawl.infrastructure.RestaurantCrawlerClient;
 import com.kustaurant.kustaurant.admin.RestaurantCrawl.infrastructure.RestaurantCrawlRawRepository;
 import com.kustaurant.kustaurant.admin.RestaurantCrawl.infrastructure.RestaurantMenuCrawlRawEntity;
 import com.kustaurant.kustaurant.admin.RestaurantCrawl.infrastructure.RestaurantMenuRawRepository;
+import com.kustaurant.kustaurant.admin.RestaurantCrawl.service.RestaurantRawSaveService;
+import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.ClosedCandidateAutoProcessJobStartResponse;
+import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.ClosedCandidateAutoProcessJobStatusResponse;
+import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.ClosedCandidateAutoProcessResponse;
+import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.NewCandidateAutoApproveResponse;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncCandidateActionResponse;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncCandidateResponse;
 import com.kustaurant.kustaurant.admin.RestaurantSync.controller.dto.RestaurantSyncRunResponse;
@@ -17,6 +23,7 @@ import com.kustaurant.kustaurant.restaurant.restaurant.infrastructure.repository
 import com.kustaurant.map.ZoneType;
 import com.kustaurant.restaurant.entity.RestaurantEntity;
 import com.kustaurant.restaurant.entity.RestaurantMenuEntity;
+import com.kustaurant.restaurantSync.RestaurantRaw;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,20 +36,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RestaurantSyncService {
 
     private static final String SUCCESS = "SUCCESS";
     private static final String ACTIVE = "ACTIVE";
+    private static final String NAVER_PLACE_NOT_FOUND_TEXT = "요청하신 페이지를 찾을 수 없습니다.";
     private static final String UNKNOWN_CATEGORY = "기타";
     private static final List<String> FIXED_CUISINES = List.of(
             "한식", "일식", "중식", "양식", "아시안", "고기", "치킨",
@@ -54,6 +67,9 @@ public class RestaurantSyncService {
     private final RestaurantJpaRepository restaurantRepository;
     private final RestaurantMenuJpaRepository restaurantMenuRepository;
     private final RestaurantSyncCandidateRepository candidateRepository;
+    private final RestaurantRawSaveService restaurantRawSaveService;
+    private final RestaurantCrawlerClient restaurantCrawlerClient;
+    private final Map<String, ClosedAutoProcessJobState> closedAutoProcessJobs = new ConcurrentHashMap<>();
 
     @Transactional
     public RestaurantSyncRunResponse generateCandidatesAndSync(ZoneType crawlScope) {
@@ -146,6 +162,149 @@ public class RestaurantSyncService {
 
         candidateRepository.delete(candidate);
         return new RestaurantSyncCandidateActionResponse(candidateId, SyncCandidateStatus.REJECTED.name());
+    }
+
+    @Transactional
+    public ClosedCandidateAutoProcessResponse autoProcessClosedCandidates(String reviewedBy) {
+        List<RestaurantSyncCandidateEntity> closedCandidates = candidateRepository.findAllByCandidateStatusOrderByCreatedAtDesc(SyncCandidateStatus.PENDING)
+                .stream()
+                .filter(candidate -> candidate.getCandidateType() == SyncCandidateType.CLOSED)
+                .toList();
+
+        int autoClosedCount = 0;
+        int recrawledCount = 0;
+        int failedCount = 0;
+
+        for (RestaurantSyncCandidateEntity candidate : closedCandidates) {
+            String originalPlaceId = candidate.getPlaceId();
+            String lookupPlaceId = toLookupPlaceId(originalPlaceId);
+            try {
+                RestaurantRaw analyzed = restaurantCrawlerClient.analyzeOne(lookupPlaceId);
+
+                if (isClosedByNotFoundMessage(analyzed)) {
+                    applyClosedRestaurant(originalPlaceId);
+                    candidateRepository.delete(candidate);
+                    autoClosedCount++;
+                    log.info("폐점 후보 자동처리: 폐점 처리 완료. candidateId={}, placeId={}, lookupPlaceId={}",
+                            candidate.getId(), originalPlaceId, lookupPlaceId);
+                    continue;
+                }
+
+                ZoneType zoneType = analyzed.crawlScope() == null ? ZoneType.OUT_OF_ZONE : analyzed.crawlScope();
+                restaurantRawSaveService.saveResult(analyzed, zoneType);
+                candidateRepository.delete(candidate);
+                recrawledCount++;
+                log.info("폐점 후보 자동처리: 재크롤 raw 저장 완료. candidateId={}, placeId={}, lookupPlaceId={}, zoneType={}",
+                        candidate.getId(), originalPlaceId, lookupPlaceId, zoneType);
+            } catch (Exception e) {
+                failedCount++;
+                log.info("폐점 후보 자동처리 실패. candidateId={}, placeId={}, lookupPlaceId={}, reason={}",
+                        candidate.getId(), originalPlaceId, lookupPlaceId, e.getMessage());
+            }
+        }
+
+        log.info("폐점 후보 자동처리 집계. totalPendingClosed={}, autoClosedCount={}, recrawledCount={}, failedCount={}",
+                closedCandidates.size(), autoClosedCount, recrawledCount, failedCount);
+
+        return new ClosedCandidateAutoProcessResponse(
+                closedCandidates.size(),
+                autoClosedCount,
+                recrawledCount,
+                failedCount
+        );
+    }
+
+    public ClosedCandidateAutoProcessJobStartResponse startClosedAutoProcessJob(String reviewedBy) {
+        String jobId = UUID.randomUUID().toString();
+        ClosedAutoProcessJobState state = new ClosedAutoProcessJobState(jobId);
+        closedAutoProcessJobs.put(jobId, state);
+
+        CompletableFuture.runAsync(() -> runClosedAutoProcessJob(state, reviewedBy));
+        return new ClosedCandidateAutoProcessJobStartResponse(jobId);
+    }
+
+    public ClosedCandidateAutoProcessJobStatusResponse getClosedAutoProcessJobStatus(String jobId) {
+        ClosedAutoProcessJobState state = closedAutoProcessJobs.get(jobId);
+        if (state == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "closed auto process job not found: " + jobId);
+        }
+        return state.toResponse();
+    }
+
+    private void runClosedAutoProcessJob(ClosedAutoProcessJobState state, String reviewedBy) {
+        state.markRunning();
+        try {
+            List<RestaurantSyncCandidateEntity> closedCandidates =
+                    candidateRepository.findAllByCandidateStatusOrderByCreatedAtDesc(SyncCandidateStatus.PENDING)
+                            .stream()
+                            .filter(candidate -> candidate.getCandidateType() == SyncCandidateType.CLOSED)
+                            .toList();
+            state.setTotal(closedCandidates.size());
+
+            for (RestaurantSyncCandidateEntity candidate : closedCandidates) {
+                String originalPlaceId = candidate.getPlaceId();
+                String lookupPlaceId = toLookupPlaceId(originalPlaceId);
+                try {
+                    RestaurantRaw analyzed = restaurantCrawlerClient.analyzeOne(lookupPlaceId);
+                    if (isClosedByNotFoundMessage(analyzed)) {
+                        applyClosedRestaurant(originalPlaceId);
+                        candidateRepository.delete(candidate);
+                        state.incAutoClosed();
+                        log.info("폐점 후보 자동처리: 폐점 처리 완료. candidateId={}, placeId={}, lookupPlaceId={}",
+                                candidate.getId(), originalPlaceId, lookupPlaceId);
+                    } else {
+                        ZoneType zoneType = analyzed.crawlScope() == null ? ZoneType.OUT_OF_ZONE : analyzed.crawlScope();
+                        restaurantRawSaveService.saveResult(analyzed, zoneType);
+                        candidateRepository.delete(candidate);
+                        state.incRecrawled();
+                        log.info("폐점 후보 자동처리: 재크롤 raw 저장 완료. candidateId={}, placeId={}, lookupPlaceId={}, zoneType={}",
+                                candidate.getId(), originalPlaceId, lookupPlaceId, zoneType);
+                    }
+                } catch (Exception e) {
+                    state.incFailed();
+                    log.info("폐점 후보 자동처리 실패. candidateId={}, placeId={}, lookupPlaceId={}, reason={}",
+                            candidate.getId(), originalPlaceId, lookupPlaceId, e.getMessage());
+                } finally {
+                    state.incProcessed();
+                }
+            }
+
+            log.info("폐점 후보 자동처리 집계. totalPendingClosed={}, autoClosedCount={}, recrawledCount={}, failedCount={}",
+                    state.total, state.autoClosedCount, state.recrawledCount, state.failedCount);
+            state.markCompleted();
+        } catch (Exception e) {
+            state.markFailed();
+            log.info("폐점 후보 자동처리 job 실패. jobId={}, reason={}", state.jobId, e.getMessage());
+        }
+    }
+
+    @Transactional
+    public NewCandidateAutoApproveResponse autoApproveNewCandidates(String reviewedBy) {
+        List<RestaurantSyncCandidateEntity> newCandidates = candidateRepository.findAllByCandidateStatusOrderByCreatedAtDesc(SyncCandidateStatus.PENDING)
+                .stream()
+                .filter(candidate -> candidate.getCandidateType() == SyncCandidateType.NEW)
+                .toList();
+
+        int approvedCount = 0;
+        int failedCount = 0;
+
+        for (RestaurantSyncCandidateEntity candidate : newCandidates) {
+            try {
+                applyNewRestaurant(candidate.getPlaceId(), null);
+                candidateRepository.delete(candidate);
+                approvedCount++;
+            } catch (Exception e) {
+                failedCount++;
+                log.warn("신규 후보 자동 승인 실패. candidateId={}, placeId={}, reason={}",
+                        candidate.getId(), candidate.getPlaceId(), e.getMessage());
+            }
+        }
+
+        return new NewCandidateAutoApproveResponse(
+                newCandidates.size(),
+                approvedCount,
+                failedCount
+        );
     }
 
     private List<RestaurantCrawlRawEntity> loadRaws(ZoneType crawlScope) {
@@ -305,6 +464,26 @@ public class RestaurantSyncService {
         RestaurantEntity restaurant = restaurantRepository.findByPlaceId(placeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "restaurant not found for placeId=" + placeId));
         restaurant.markInactive();
+        restaurantRepository.save(restaurant);
+    }
+
+    private String toLookupPlaceId(String placeId) {
+        if (placeId == null) {
+            return "";
+        }
+        int underscoreIndex = placeId.indexOf('_');
+        if (underscoreIndex <= 0) {
+            return placeId;
+        }
+        return placeId.substring(0, underscoreIndex);
+    }
+
+    private boolean isClosedByNotFoundMessage(RestaurantRaw analyzed) {
+        if (analyzed == null) {
+            return false;
+        }
+        String address = analyzed.restaurantAddress();
+        return address != null && address.contains(NAVER_PLACE_NOT_FOUND_TEXT);
     }
 
     private void replaceRestaurantMenus(Long restaurantId, Collection<RestaurantMenuCrawlRawEntity> rawMenus) {
@@ -384,17 +563,17 @@ public class RestaurantSyncService {
         if (FIXED_CUISINES.contains(normalized)) {
             return normalized;
         }
-        if (containsAny(normalized, "찜닭", "백반", "한정식", "국밥", "냉면")) return "한식";
-        if (containsAny(normalized, "스시", "초밥", "라멘", "우동", "소바", "돈카츠", "돈까스")) return "일식";
+        if (containsAny(normalized, "찜닭", "백반", "한정식", "국밥", "냉면", "삼계탕", "해장국")) return "한식";
+        if (containsAny(normalized, "스시", "초밥", "라멘", "우동", "소바", "돈카츠", "돈까스", "돈가스")) return "일식";
         if (containsAny(normalized, "중식", "중국집", "짜장", "짬뽕", "탕수육", "마라", "훠궈")) return "중식";
         if (containsAny(normalized, "파스타", "스테이크", "리조또", "브런치", "이탈리안", "프렌치")) return "양식";
         if (containsAny(normalized, "아시안", "태국", "타이", "베트남", "쌀국수", "인도", "동남아")) return "아시안";
-        if (containsAny(normalized, "고깃집", "삼겹살", "갈비", "곱창", "대창", "막창", "육회")) return "고기";
+        if (containsAny(normalized, "고깃집", "삼겹살", "갈비", "곱창", "대창", "막창", "육회", "육류", "양꼬치", "족발", "보쌈", "소고기", "돼지고기")) return "고기";
         if (containsAny(normalized, "치킨", "닭강정", "통닭", "후라이드", "양념치킨", "닭꼬치")) return "치킨";
-        if (containsAny(normalized, "해산물", "횟집", "숙성회", "해물", "조개", "대게", "킹크랩")) return "해산물";
+        if (containsAny(normalized, "해산물", "횟집", "숙성회", "해물", "조개", "대게", "킹크랩", "주꾸미", "생선회")) return "해산물";
         if (containsAny(normalized, "햄버거", "버거", "피자", "핫도그")) return "햄버거/피자";
         if (containsAny(normalized, "분식", "떡볶이", "김밥", "쫄면", "순대", "어묵")) return "분식";
-        if (containsAny(normalized, "술집", "주점", "포차", "호프", "펍", "와인바", "이자카야")) return "술집";
+        if (containsAny(normalized, "술집", "주점", "포차", "호프", "펍", "와인바", "이자카야", "바", "포장마차")) return "술집";
         if (containsAny(normalized, "카페", "커피", "디저트", "빙수", "도넛", "젤라또", "마카롱")) return "카페/디저트";
         if (containsAny(normalized, "베이커리", "빵집", "제과", "제빵", "크루아상", "바게트")) return "베이커리";
         if (containsAny(normalized, "샐러드", "포케", "그레인볼", "비건볼")) return "샐러드";
@@ -464,5 +643,35 @@ public class RestaurantSyncService {
         }
         String trimmed = value.trim();
         return trimmed.isEmpty() ? fallback : trimmed;
+    }
+
+    private static final class ClosedAutoProcessJobState {
+        private final String jobId;
+        private String status = "PENDING";
+        private int total;
+        private int processed;
+        private int autoClosedCount;
+        private int recrawledCount;
+        private int failedCount;
+        private boolean done;
+
+        private ClosedAutoProcessJobState(String jobId) {
+            this.jobId = jobId;
+        }
+
+        private synchronized void markRunning() { this.status = "RUNNING"; }
+        private synchronized void markCompleted() { this.status = "COMPLETED"; this.done = true; }
+        private synchronized void markFailed() { this.status = "FAILED"; this.done = true; }
+        private synchronized void setTotal(int total) { this.total = total; }
+        private synchronized void incProcessed() { this.processed++; }
+        private synchronized void incAutoClosed() { this.autoClosedCount++; }
+        private synchronized void incRecrawled() { this.recrawledCount++; }
+        private synchronized void incFailed() { this.failedCount++; }
+
+        private synchronized ClosedCandidateAutoProcessJobStatusResponse toResponse() {
+            return new ClosedCandidateAutoProcessJobStatusResponse(
+                    jobId, status, total, processed, autoClosedCount, recrawledCount, failedCount, done
+            );
+        }
     }
 }

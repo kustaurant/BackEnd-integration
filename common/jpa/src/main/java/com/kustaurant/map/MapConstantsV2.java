@@ -12,10 +12,10 @@ public final class MapConstantsV2 {
                     List.of(
                             new CoordinateV2(37.5401732,127.062852),
                             new CoordinateV2(37.5378977,127.0696049),
-                            new CoordinateV2(37.5422127,127.071636), //
-                            new CoordinateV2(37.5428253,127.0710213), //
-                            new CoordinateV2(37.5422656,127.0707644), //
-                            new CoordinateV2(37.5441701,127.0651452) //
+                            new CoordinateV2(37.5422127,127.071636),
+                            new CoordinateV2(37.5428253,127.0710213),
+                            new CoordinateV2(37.5422656,127.0707644),
+                            new CoordinateV2(37.5441701,127.0651452)
                     )
             ),
             new ZonePolygon( // 중문~어대

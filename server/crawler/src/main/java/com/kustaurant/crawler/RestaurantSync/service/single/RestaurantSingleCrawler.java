@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 public class RestaurantSingleCrawler {
 
    private static final int MAX_RETRIES = 2;
+   private static final String NAVER_PLACE_NOT_FOUND_TEXT = "요청하신 페이지를 찾을 수 없습니다.";
 
    private final PlaywrightManager playwrightManager;
    private final RestaurantPageDriver pageDriver;
@@ -156,9 +157,10 @@ public class RestaurantSingleCrawler {
                log.warn("home html 캡처 실패. sourcePlaceId={}, placeId={}", placeId, placeUrl);
             }
             log.info(
-                    " === 네이버플레이스 분석 완료. sourcePlaceId={}, placeName={}, category={}, restaurantAddress={}, phone={}, lat={}, lng={}, menuCount={}",
+                    " === 네이버플레이스 분석 완료. sourcePlaceId={}, placeName={}, category={}, restaurantAddress={}, phone={}, lat={}, lng={}, zoneType={}, zoneDescription={}, menuCount={}",
                     result.sourcePlaceId(), result.placeName(), result.category(), result.restaurantAddress(),
                     result.phoneNumber(), result.latitude(), result.longitude(),
+                    zoneType, zoneType == null ? null : zoneType.getDescription(),
                     result.menus() == null ? 0 : result.menus().size()
             );
          } else {
@@ -177,12 +179,18 @@ public class RestaurantSingleCrawler {
    private boolean shouldRetryWithBackoff(RestaurantRaw result, int attempt) {
       if (attempt > MAX_RETRIES) return false;
       if (result == null) return true;
+      if (isNaverPlaceNotFoundResult(result)) return false;
 
       boolean noBasic = isBlank(result.placeName()) && isBlank(result.category())
               && isBlank(result.restaurantAddress()) && isBlank(result.phoneNumber());
       int menuCount = result.menus() == null ? 0 : result.menus().size();
       boolean missingCoordinates = result.latitude() == null || result.longitude() == null;
       return (noBasic && menuCount == 0) || missingCoordinates;
+   }
+
+   private boolean isNaverPlaceNotFoundResult(RestaurantRaw result) {
+      String address = result.restaurantAddress();
+      return address != null && address.contains(NAVER_PLACE_NOT_FOUND_TEXT);
    }
 
    private long retryBackoffMillis(int attempt) {
