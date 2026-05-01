@@ -169,7 +169,8 @@ async function handleSyncCandidateAction(action, candidateId) {
         request.body = JSON.stringify({ manualCuisine: cuisine });
     } else {
         const actionLabel = action === "approve" ? "승인" : "반려";
-        if (!window.confirm(`${actionLabel} 처리할까요?`)) return;
+        const name = candidate?.restaurantName || candidate?.placeId || `후보ID ${candidateId}`;
+        if (!window.confirm(`${name} ${actionLabel} 처리할까요?`)) return;
     }
 
     const response = await fetch(`/admin/api/sync/candidates/${candidateId}/${action}`, request);
@@ -196,6 +197,138 @@ function bindSyncCandidateTableActions() {
     document.getElementById("sync-closed-tbody")?.addEventListener("click", handler);
 }
 
+async function autoProcessClosedCandidates() {
+    const button = document.getElementById("auto-process-closed-candidates-btn");
+    if (!button) return;
+    if (!window.confirm("폐점 후보를 자동 판별할까요?")) return;
+
+    button.disabled = true;
+    const previousText = button.textContent;
+    button.textContent = "처리 중...";
+
+    try {
+        const response = await fetch("/admin/api/sync/candidates/closed/auto-process", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+                "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+            }
+        });
+        const result = await parseJsonResponse(response);
+        await loadPendingSyncCandidates();
+        loadRestaurants(0);
+        alert(
+            `자동 처리 완료\n` +
+            `대상: ${result.totalPendingClosed}건\n` +
+            `자동 폐점: ${result.autoClosedCount}건\n` +
+            `재크롤 저장: ${result.recrawledCount}건\n` +
+            `실패: ${result.failedCount}건`
+        );
+    } catch (error) {
+        console.error("auto process closed candidates failed:", error);
+        alert(`폐점 후보 자동 판별 실패: ${error.message}`);
+    } finally {
+        button.disabled = false;
+        button.textContent = previousText;
+    }
+}
+
+async function autoProcessClosedCandidatesWithProgress() {
+    const button = document.getElementById("auto-process-closed-candidates-btn");
+    if (!button) return;
+    if (!window.confirm("폐점 후보를 자동 판별할까요?")) return;
+
+    button.disabled = true;
+    const previousText = button.textContent;
+    button.textContent = "(0/0) 처리 중...";
+
+    try {
+        const startResponse = await fetch("/admin/api/sync/candidates/closed/auto-process/jobs", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+                "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+            }
+        });
+        const start = await parseJsonResponse(startResponse);
+        const jobId = start.jobId;
+        if (!jobId) throw new Error("jobId missing");
+
+        let result = null;
+        while (true) {
+            const statusResponse = await fetch(`/admin/api/sync/candidates/closed/auto-process/jobs/${jobId}`, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "X-Requested-With": "XMLHttpRequest",
+                    "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+                }
+            });
+            const status = await parseJsonResponse(statusResponse);
+            button.textContent = `(${status.processed}/${status.total}) 처리 중...`;
+            if (status.done) {
+                result = status;
+                break;
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        await loadPendingSyncCandidates();
+        loadRestaurants(0);
+        alert(
+            `자동 처리 완료\n` +
+            `대상: ${result.total}건\n` +
+            `자동 폐점: ${result.autoClosedCount}건\n` +
+            `재크롤 저장: ${result.recrawledCount}건\n` +
+            `실패: ${result.failedCount}건`
+        );
+    } catch (error) {
+        console.error("auto process closed candidates failed:", error);
+        alert(`폐점 후보 자동 판별 실패: ${error.message}`);
+    } finally {
+        button.disabled = false;
+        button.textContent = previousText;
+    }
+}
+
+async function autoApproveNewCandidates() {
+    const button = document.getElementById("auto-approve-new-candidates-btn");
+    if (!button) return;
+    if (!window.confirm("신규 후보를 전체 자동승인할까요?")) return;
+
+    button.disabled = true;
+    const previousText = button.textContent;
+    button.textContent = "처리 중...";
+
+    try {
+        const response = await fetch("/admin/api/sync/candidates/new/auto-approve", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+                "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+            }
+        });
+        const result = await parseJsonResponse(response);
+        await loadPendingSyncCandidates();
+        loadRestaurants(0);
+        alert(
+            `자동 승인 완료\n` +
+            `대상: ${result.totalPendingNew}건\n` +
+            `승인: ${result.approvedCount}건\n` +
+            `실패: ${result.failedCount}건`
+        );
+    } catch (error) {
+        console.error("auto approve new candidates failed:", error);
+        alert(`신규 후보 전체 자동승인 실패: ${error.message}`);
+    } finally {
+        button.disabled = false;
+        button.textContent = previousText;
+    }
+}
+
 function initializeRestaurantSyncSection() {
     document.getElementById("open-restaurant-sync-modal-btn")?.addEventListener("click", openRestaurantSyncRunModal);
     document.getElementById("refresh-restaurant-sync-btn")?.addEventListener("click", () => {
@@ -209,6 +342,18 @@ function initializeRestaurantSyncSection() {
     document.getElementById("restaurant-sync-run-modal-close")?.addEventListener("click", closeRestaurantSyncRunModal);
     document.querySelector("#restaurant-sync-run-modal .admin-modal-overlay")
         ?.addEventListener("click", closeRestaurantSyncRunModal);
+    document.getElementById("auto-approve-new-candidates-btn")?.addEventListener("click", () => {
+        autoApproveNewCandidates().catch(error => {
+            console.error("auto approve trigger failed:", error);
+            alert(`신규 후보 전체 자동승인 실패: ${error.message}`);
+        });
+    });
+    document.getElementById("auto-process-closed-candidates-btn")?.addEventListener("click", () => {
+        autoProcessClosedCandidatesWithProgress().catch(error => {
+            console.error("auto process trigger failed:", error);
+            alert(`폐점 후보 자동 판별 실패: ${error.message}`);
+        });
+    });
 
     bindSyncCandidateTableActions();
     renderUpdatedPlaces([]);
