@@ -1,4 +1,5 @@
 let naverPlaceZoneCrawlPollTimer = null;
+let activeNaverPlaceZoneCrawlJobId = null;
 
 function stopNaverPlaceZoneCrawlPolling() {
     if (!naverPlaceZoneCrawlPollTimer) return;
@@ -47,6 +48,7 @@ function closeNaverPlaceModal() {
 
 function openNaverPlaceSyncModal() {
     document.getElementById("naver-place-sync-modal")?.classList.remove("hidden");
+    resumeNaverPlaceZoneCrawlPollingIfNeeded();
 }
 
 function closeNaverPlaceSyncModal() {
@@ -218,6 +220,7 @@ function renderNaverPlaceZoneCrawlResult(data) {
 }
 
 function pollNaverPlaceZoneCrawlStatus(jobId, submitBtn) {
+    activeNaverPlaceZoneCrawlJobId = jobId;
     fetch(`/admin/api/crawl/naver-place/crawl-zone/jobs/${jobId}`, {
         method: "GET",
         headers: {
@@ -230,6 +233,7 @@ function pollNaverPlaceZoneCrawlStatus(jobId, submitBtn) {
         .then(data => {
             renderNaverPlaceZoneCrawlResult(data);
             if (isZoneCrawlJobFinished(data.status)) {
+                activeNaverPlaceZoneCrawlJobId = null;
                 submitBtn.disabled = false;
                 submitBtn.textContent = "구역 크롤 시작";
                 stopNaverPlaceZoneCrawlPolling();
@@ -244,6 +248,17 @@ function pollNaverPlaceZoneCrawlStatus(jobId, submitBtn) {
             stopNaverPlaceZoneCrawlPolling();
             alert(`구역 크롤 상태 조회 실패: ${error.message}`);
         });
+}
+
+function resumeNaverPlaceZoneCrawlPollingIfNeeded() {
+    if (!activeNaverPlaceZoneCrawlJobId) return;
+    const submitBtn = document.getElementById("naver-place-sync-submit-btn");
+    if (!submitBtn) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "吏꾪뻾 以?..";
+    stopNaverPlaceZoneCrawlPolling();
+    pollNaverPlaceZoneCrawlStatus(activeNaverPlaceZoneCrawlJobId, submitBtn);
 }
 
 function runNaverPlaceZoneCrawl() {

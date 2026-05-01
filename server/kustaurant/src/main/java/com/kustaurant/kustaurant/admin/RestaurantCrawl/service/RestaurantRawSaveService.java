@@ -17,15 +17,21 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RestaurantRawSaveService {
+   private static final int IMAGE_URL_MAX_LENGTH = 512;
+
    private final RestaurantCrawlerClient crawlerClient;
    private final RestaurantCrawlRawRepository rawRepository;
    private final RestaurantMenuRawRepository menuRawRepository;
+   private final PlatformTransactionManager transactionManager;
 
    @Transactional
    public RestaurantCrawlResponse crawlAndSave(String placeId) {
@@ -39,6 +45,7 @@ public class RestaurantRawSaveService {
       deleteExistingRawByPlaceIdOrUrl(result);
 
       ZoneType zoneType = crawlScope != null ? crawlScope : (result.crawlScope() == null ? ZoneType.OUT_OF_ZONE : result.crawlScope());
+      String normalizedImageUrl = normalizeImageUrl(result.imageUrl());
       RestaurantCrawlRawEntity rawEntity = rawRepository.save(
               RestaurantCrawlRawEntity.success(
                       result.sourcePlaceId(),
@@ -49,7 +56,7 @@ public class RestaurantRawSaveService {
                       result.phoneNumber(),
                       result.latitude(),
                       result.longitude(),
-                      result.imageUrl(),
+                      normalizedImageUrl,
                       zoneType
               )
       );
@@ -83,7 +90,6 @@ public class RestaurantRawSaveService {
       );
    }
 
-   @Transactional
    public BatchSaveResult saveResultsBatch(List<RestaurantRaw> results, ZoneType crawlScope) {
       if (results == null || results.isEmpty()) {
          return new BatchSaveResult(0, 0, List.of());
@@ -92,6 +98,8 @@ public class RestaurantRawSaveService {
       int savedCount = 0;
       int failedCount = 0;
       Set<String> failedPlaceIds = new LinkedHashSet<>();
+      TransactionTemplate requiresNewTx = new TransactionTemplate(transactionManager);
+      requiresNewTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
       for (RestaurantRaw result : results) {
          String placeId = result == null ? null : result.sourcePlaceId();
@@ -99,7 +107,7 @@ public class RestaurantRawSaveService {
             if (result == null) {
                throw new IllegalArgumentException("naver place crawl result is null");
             }
-            saveResult(result, crawlScope);
+            requiresNewTx.executeWithoutResult(status -> saveResult(result, crawlScope));
             savedCount++;
          } catch (Exception e) {
             failedCount++;
@@ -160,6 +168,13 @@ public class RestaurantRawSaveService {
 
    private String defaultIfBlank(String value, String fallback) {
       return (value == null || value.isBlank()) ? fallback : value;
+   }
+
+   private String normalizeImageUrl(String imageUrl) {
+      if (imageUrl == null) {
+         return null;
+      }
+      return imageUrl.length() > IMAGE_URL_MAX_LENGTH ? null : imageUrl;
    }
 
    public record BatchSaveResult(
