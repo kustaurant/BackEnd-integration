@@ -123,7 +123,7 @@ public class RestaurantSyncApplyService {
                     raw.getRestaurantAddress(),
                     raw.getPhoneNumber(),
                     raw.getImageUrl(),
-                    normalize(raw.getCategory(), UNKNOWN_CATEGORY),
+                    restaurant.getRestaurantCuisine(),
                     raw.getLatitude(),
                     raw.getLongitude()
             );
