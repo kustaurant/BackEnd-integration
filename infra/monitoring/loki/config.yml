@@ -47,6 +47,7 @@ compactor:
   working_directory: /loki/boltdb-shipper-compactor
   shared_store: filesystem
   compaction_interval: 5m
+  retention_enabled: true
 
 # 로그 알람을 Loki Ruler로 쓸 때만 켜세요.
 # Alertmanager를 grafana/alertmanager로 띄운 경우 주소를 그쪽으로 변경

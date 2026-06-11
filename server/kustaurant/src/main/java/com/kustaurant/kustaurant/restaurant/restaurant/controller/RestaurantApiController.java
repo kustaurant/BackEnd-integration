@@ -34,7 +34,7 @@ public class RestaurantApiController implements RestaurantApiDoc {
             HttpServletResponse res
     ) {
         String viewerKey = viewerKeyProvider.resolveViewerKey(user, req, res);
-        viewCountService.countOncePerHour(ViewResourceType.POST, restaurantId, viewerKey);
+        viewCountService.countOncePerHour(ViewResourceType.RESTAURANT, restaurantId, viewerKey);
 
         return new ResponseEntity<>(
                 restaurantService.getRestaurantDetail(restaurantId, user.id()),
@@ -50,7 +50,7 @@ public class RestaurantApiController implements RestaurantApiDoc {
             HttpServletResponse res
     ) {
         String viewerKey = viewerKeyProvider.resolveViewerKey(user, req, res);
-        viewCountService.countOncePerHour(ViewResourceType.POST, restaurantId, viewerKey);
+        viewCountService.countOncePerHour(ViewResourceType.RESTAURANT, restaurantId, viewerKey);
 
         return new ResponseEntity<>(
                 restaurantService.getRestaurantDetailV2(restaurantId, user.id()),

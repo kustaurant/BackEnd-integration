@@ -1,3 +1,9 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "100m"
+    max-file: "3"
+
 services:
   redis:
     image: redis:7-alpine
@@ -5,6 +11,7 @@ services:
     ports:
       - "6379:6379"
     restart: always
+    logging: *default-logging
 
   prometheus:
     build: ../../monitoring/prometheus
@@ -17,6 +24,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
+    logging: *default-logging
 
   grafana:
     image: grafana/grafana:11.2.0
@@ -33,6 +41,7 @@ services:
       - ../../monitoring/grafana:/var/lib/grafana
       - ../../monitoring/grafana/provisioning:/etc/grafana/provisioning
     restart: unless-stopped
+    logging: *default-logging
 
   loki:
     image: grafana/loki:2.9.6
@@ -44,6 +53,7 @@ services:
       - ../../monitoring/loki/config.yml:/etc/loki/config.yml:ro
       - ../../monitoring/loki/data:/loki
     restart: unless-stopped
+    logging: *default-logging
 
   promtail:
     image: grafana/promtail:2.9.6
@@ -57,6 +67,7 @@ services:
     depends_on:
       - loki
     restart: unless-stopped
+    logging: *default-logging
 
   mysqld-exporter:
     image: prom/mysqld-exporter:latest
@@ -65,6 +76,7 @@ services:
       - TZ=${TZ}
       - DATA_SOURCE_NAME=${MYSQL_EXPORTER_USER}:${MYSQL_EXPORTER_PASS}@(${MYSQL_HOST}:${MYSQL_PORT})/
     restart: unless-stopped
+    logging: *default-logging
 
 # 서버 메모리 사용량이 많아져서 주석처리함
 #  zipkin:

@@ -42,7 +42,7 @@ public class RestaurantController {
             HttpServletResponse res
     ) {
         String viewerKey = viewerKeyProvider.resolveViewerKey(user, req, res);
-        viewCountService.countOncePerHour(ViewResourceType.POST, restaurantId, viewerKey);
+        viewCountService.countOncePerHour(ViewResourceType.RESTAURANT, restaurantId, viewerKey);
 
         RestaurantDetailV2 detailDto = restaurantService.getRestaurantDetailV2(restaurantId, user.id());
         boolean hasEvaluated = detailDto.getIsEvaluated();
