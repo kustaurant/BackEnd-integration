@@ -122,7 +122,6 @@ public class RestaurantSyncCandidateService {
         return new RestaurantSyncCandidateActionResponse(candidateId, SyncCandidateStatus.REJECTED.name());
     }
 
-    @Transactional
     public NewCandidateAutoApproveResponse autoApproveNewCandidates(String reviewedBy) {
         List<RestaurantSyncCandidateEntity> newCandidates = candidateRepository.findAllByCandidateStatusOrderByCreatedAtDesc(SyncCandidateStatus.PENDING)
                 .stream().filter(candidate -> candidate.getCandidateType() == SyncCandidateType.NEW).toList();
