@@ -11,7 +11,7 @@ public class CuisineMappingService {
 
     private static final List<String> FIXED_CUISINES = List.of(
             "한식", "일식", "중식", "양식", "아시안", "고기", "치킨",
-            "해산물", "패스트푸드/분식", "분식", "주점", "카페/디저트", "베이커리", "샐러드"
+            "해산물", "패스트푸드/분식", "분식", "술집", "카페/디저트", "베이커리", "샐러드"
     );
 
     public String resolveCuisineForNew(String rawCategory, String manualCuisine) {
@@ -48,7 +48,7 @@ public class CuisineMappingService {
         if (containsAny(normalized, "해산물", "횟집", "생선", "대게", "조개", "낙지", "파스타", "주꾸미")) return "해산물";
         if (containsAny(normalized, "패스트푸드", "버거", "피자", "핫도그")) return "패스트푸드/분식";
         if (containsAny(normalized, "분식", "떡볶이", "김밥", "쫄면", "순대", "튀김")) return "분식";
-        if (containsAny(normalized, "주점", "술집", "사케", "호프", "바", "와인바", "이자카야", "포차", "포장마차")) return "주점";
+        if (containsAny(normalized, "주점", "술집", "사케", "호프", "바", "와인바", "이자카야", "포차", "포장마차")) return "술집";
         if (containsAny(normalized, "카페", "커피", "디저트", "빙수", "도넛", "젤라또", "마카롱")) return "카페/디저트";
         if (containsAny(normalized, "베이커리", "빵집", "제과", "제빵", "브런치")) return "베이커리";
         if (containsAny(normalized, "샐러드", "그레인", "비건")) return "샐러드";
