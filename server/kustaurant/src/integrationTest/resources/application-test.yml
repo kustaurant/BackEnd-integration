@@ -22,3 +22,6 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+
+crawler:
+  base-url: http://localhost:8081
