@@ -75,7 +75,20 @@ public class RestaurantCrawlController {
       return zoneCrawlJobService.start(request.crawlScope());
    }
 
-   // 6. 구역 크롤 해당 job 진행상태 조회
+   // 6. 보안 인증 대기 중인 구역 크롤 작업 재개
+   @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
+   @PostMapping({"/naver-place/crawl-zone/jobs/{jobId}/resume"})
+   public CrawlJobIdResponse resumeNaverPlaceZoneCrawlJob(@PathVariable String jobId) {
+      try {
+         return zoneCrawlJobService.resume(jobId).orElseThrow(
+                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "zone crawl job not found: " + jobId)
+         );
+      } catch (IllegalStateException e) {
+         throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage(), e);
+      }
+   }
+
+   // 7. 구역 크롤 해당 job 진행상태 조회
    @PreAuthorize("isAuthenticated() and hasRole('ROLE_ADMIN')")
    @GetMapping({"/naver-place/crawl-zone/jobs/{jobId}"})
    public ZoneCrawlJobStatusResponse getNaverPlaceZoneCrawlJobStatus(

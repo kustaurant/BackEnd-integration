@@ -1,13 +1,13 @@
 package com.kustaurant.kustaurant.admin.RestaurantCrawl.controller.dto;
 
 import com.kustaurant.map.ZoneType;
-import com.kustaurant.restaurantSync.sync.ZoneJCrawlobStatus;
+import com.kustaurant.restaurantSync.sync.ZoneCrawlJobStatus;
 import java.util.List;
 
 public record ZoneCrawlJobStatusResponse(
         // 프론트 렌더링용
         ZoneType crawlScope,
-        ZoneJCrawlobStatus status,
+        ZoneCrawlJobStatus status,
         String currentPhase,
         int totalGridCount,
         int processedGridCount,

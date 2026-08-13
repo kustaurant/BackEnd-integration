@@ -27,13 +27,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Run small tests
-        run: ./gradlew --no-daemon clean smallTest
+        run: ./gradlew --no-daemon :server:kustaurant:test
 
       - name: Publish Small Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: server/kustaurant/build/test-results/smallTest/TEST-*.xml
+          files: server/kustaurant/build/test-results/test/TEST-*.xml
           check_name: 🧪 소형(단위) 테스트 결과
           check_run: false
 
@@ -42,7 +42,7 @@ jobs:
   #        uses: dorny/test-reporter@v1
   #        with:
   #          name: 🧪 소형 테스트 리포트
-  #          path: build/test-results/smallTest/*.xml
+  #          path: server/kustaurant/build/test-results/test/*.xml
   #          reporter: java-junit
 
   middle-test:
@@ -78,13 +78,13 @@ jobs:
         run: docker info
 
       - name: Run middle tests
-        run: ./gradlew --no-daemon middleTest
+        run: ./gradlew --no-daemon :server:kustaurant:integrationTest
 
       - name: Publish Middle Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: server/kustaurant/build/test-results/middleTest/TEST-*.xml
+          files: server/kustaurant/build/test-results/integrationTest/TEST-*.xml
           check_name: 🚀 중형(통합) 테스트 결과
           check_run: false
 #        작동 시간이 길어지고, 테스트 결과 표출과 리포트 남기기는 같이 적용이 안됨. 둘중 하나만 적용됨
@@ -93,5 +93,5 @@ jobs:
 #        uses: dorny/test-reporter@v1
 #        with:
 #          name: 🚀 중형 테스트 리포트
-#          path: build/test-results/middleTest/*.xml
+#          path: server/kustaurant/build/test-results/integrationTest/*.xml
 #          reporter: java-junit

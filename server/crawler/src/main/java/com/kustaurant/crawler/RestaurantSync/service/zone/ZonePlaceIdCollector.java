@@ -11,7 +11,6 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -34,89 +33,48 @@ public class ZonePlaceIdCollector {
    private static final long GRID_RETRY_JITTER_MAX_MS = 1_000L;
 
    private final PlaywrightManager playwrightManager;
-
-   public Set<String> discoverPlaceIds(
-           Iterable<CrawlGrid> grids,
-           int zoom,
-           int maxPlaceIds,
-           Consumer<GridDiscoveryProgress> progressListener
-   ) {
-      Set<String> placeIds = new LinkedHashSet<>();
-      int gridIndex = 0;
-
-      for (CrawlGrid grid : grids) {
-         gridIndex++;
-
-         if (placeIds.size() >= maxPlaceIds) {
-            log.info(
-                    "구역 크롤 placeId 수집 최대치 도달. processedGrids={}, discoveredPlaceCount={}",
-                    gridIndex - 1,
-                    placeIds.size()
-            );
-            break;
-         }
-
-         Set<String> found = discoverPlaceIdsFromGrid(grid, zoom);
-
-         int before = placeIds.size();
-         for (String id : found) {
-            placeIds.add(id);
-            if (placeIds.size() >= maxPlaceIds) {
-               break;
-            }
-         }
-
-         int after = placeIds.size();
-         int added = after - before;
-         int duplicate = found.size() - added;
-
-         log.info(
-                 "그리드 처리 완료. row={}, col={}, found={}, added={}, duplicate={}, total={}",
-                 grid.row(),
-                 grid.col(),
-                 found.size(),
-                 added,
-                 duplicate,
-                 after
-         );
-
-         progressListener.accept(new GridDiscoveryProgress(
-                 gridIndex,
-                 placeIds.size(),
-                 grid.row() + "," + grid.col()
-         ));
-      }
-
-      return placeIds;
-   }
+   private final NaverCaptchaDetector captchaDetector;
 
    public Set<String> discoverPlaceIdsFromGrid(CrawlGrid grid, int zoom) {
       for (int attempt = 1; attempt <= GRID_DISCOVERY_MAX_ATTEMPTS; attempt++) {
          try {
             return playwrightManager.crawl(page -> discoverPlaceIdsFromGridOnce(page, grid, zoom));
          } catch (Exception e) {
-            boolean retryable = isRetryableSearchIframeFailure(e);
+            boolean captchaDetected = isCaptchaFailure(e);
             boolean hasNextAttempt = attempt < GRID_DISCOVERY_MAX_ATTEMPTS;
             log.warn(
-                    "그리드 목록 placeId 수집 실패. grid({},{}), attempt={}/{}, retryable={}, reason={}",
+                    "그리드 목록 placeId 수집 실패. grid({},{}), attempt={}/{}, captcha={}, willRetry={}, reason={}",
                     grid.row(),
                     grid.col(),
                     attempt,
                     GRID_DISCOVERY_MAX_ATTEMPTS,
-                    retryable && hasNextAttempt,
+                    captchaDetected,
+                    !captchaDetected && hasNextAttempt,
                     e.getMessage(),
                     e
             );
 
-            if (!(retryable && hasNextAttempt)) {
-               return Set.of();
+            if (captchaDetected) {
+               log.warn(
+                       "네이버 보안 인증 감지. 자동 재시도 없이 작업을 일시정지합니다. grid=({}, {})",
+                       grid.row(), grid.col()
+               );
+               throw new NaverCaptchaRequiredException(grid.row(), grid.col());
+            }
+
+            if (!hasNextAttempt) {
+               throw new NaverGridDiscoveryException(grid.row(), grid.col(), e);
             }
 
             sleepMillis(retryDelayMillis(attempt));
          }
       }
 
-      return Set.of();
+      throw new NaverGridDiscoveryException(
+              grid.row(),
+              grid.col(),
+              new IllegalStateException("그리드 재시도 횟수를 소진했습니다.")
+      );
    }
 
    private Set<String> discoverPlaceIdsFromGridOnce(Page page, CrawlGrid grid, int zoom) {
@@ -141,15 +99,19 @@ public class ZonePlaceIdCollector {
       page.navigate(mapUrl, new Page.NavigateOptions().setTimeout(30_000));
       page.waitForLoadState(LoadState.DOMCONTENTLOADED);
       page.waitForTimeout(2_000);
+      throwIfCaptchaDetected(page, grid);
 
       moveMapToGridCenter(page, grid, zoom);
       page.waitForTimeout(1_000);
+      throwIfCaptchaDetected(page, grid);
 
       clickFoodCategoryButton(page);
       page.waitForTimeout(2_500);
+      throwIfCaptchaDetected(page, grid);
 
       waitForSearchIframe(page);
-      collectPlaceIdsByClickingList(page, collectedIds);
+      collectPlaceIdsByClickingList(page, collectedIds, grid);
+      throwIfCaptchaDetected(page, grid);
 
       log.info(
               "그리드 목록 placeId 수집 완료. row={}, col={}, collectedCount={}, currentUrl={}",
@@ -162,7 +124,7 @@ public class ZonePlaceIdCollector {
       return collectedIds;
    }
 
-   private void collectPlaceIdsByClickingList(Page page, Set<String> collector) {
+   private void collectPlaceIdsByClickingList(Page page, Set<String> collector, CrawlGrid grid) {
       Frame searchFrame = getSearchFrameOrThrow(page);
       waitForInitialListReady(page, searchFrame);
 
@@ -170,12 +132,14 @@ public class ZonePlaceIdCollector {
       int stableRounds = 0;
 
       for (int round = 0; round < 30; round++) {
+         throwIfCaptchaDetected(page, grid);
          Locator items = searchFrame.locator(LIST_ITEM_SELECTOR);
          int currentCount = items.count();
 
          if (currentCount > lastProcessedIndex) {
             for (int i = lastProcessedIndex; i < currentCount; i++) {
                try {
+                  throwIfCaptchaDetected(page, grid);
                   Locator item = items.nth(i);
 
                   String placeName = extractPlaceName(item);
@@ -198,6 +162,9 @@ public class ZonePlaceIdCollector {
                   });
                   page.waitForTimeout(120);
                } catch (Exception e) {
+                  if (isCaptchaFailure(e) || captchaDetector.isDetected(page)) {
+                     throw new NaverCaptchaRequiredException(grid.row(), grid.col());
+                  }
                   log.warn("목록 아이템 클릭 실패. index={}, reason={}", i, e.getMessage());
                }
             }
@@ -407,11 +374,20 @@ public class ZonePlaceIdCollector {
       }
    }
 
-   private boolean isRetryableSearchIframeFailure(Exception e) {
-      Throwable current = e;
+   private void throwIfCaptchaDetected(Page page, CrawlGrid grid) {
+      if (captchaDetector.isDetected(page)) {
+         throw new NaverCaptchaRequiredException(grid.row(), grid.col());
+      }
+   }
+
+   private boolean isCaptchaFailure(Throwable error) {
+      Throwable current = error;
       while (current != null) {
+         if (current instanceof NaverCaptchaRequiredException) {
+            return true;
+         }
          String message = current.getMessage();
-         if (message != null && message.contains("search iframe not found")) {
+         if (message != null && (message.contains("wtm-captcha-root") || message.contains("보안 인증 필요"))) {
             return true;
          }
          current = current.getCause();
@@ -433,10 +409,4 @@ public class ZonePlaceIdCollector {
       }
    }
 
-   public record GridDiscoveryProgress(
-           int processedGridCount,
-           int discoveredPlaceCount,
-           String currentGrid
-   ) {
-   }
 }

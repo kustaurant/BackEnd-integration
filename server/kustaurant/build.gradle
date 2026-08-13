@@ -95,7 +95,7 @@ sourceSets {
     integrationTest { // 중형/통합 테스트
         java.srcDirs('src/integrationTest/java')
         resources.srcDirs('src/integrationTest/resources')
-        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        compileClasspath += sourceSets.main.output
         runtimeClasspath += output + compileClasspath
     }
 }
@@ -106,33 +106,24 @@ configurations {
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
-// 실행 task 분리
-tasks.register('smallTest', Test) {
-    description = 'Run unit (small) tests'
-    group = 'verification'
-    testClassesDirs = sourceSets.test.output.classesDirs
-    classpath = sourceSets.test.runtimeClasspath
+// 소형 테스트는 Gradle 표준 test task를 사용한다.
+tasks.named('test', Test) {
+    description = 'Run small tests'
     useJUnitPlatform()
-    reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/smallTest")
-    reports.html.outputLocation     = layout.buildDirectory.dir("reports/tests/smallTest")
 }
 
-tasks.register('middleTest', Test) {
-    description = 'Run integration (middle) tests'
+// 중형/통합 테스트는 integrationTest source set과 같은 이름의 task를 사용한다.
+tasks.register('integrationTest', Test) {
+    description = 'Run middle/integration tests'
     group = 'verification'
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     useJUnitPlatform()
-    reports.junitXml.outputLocation = layout.buildDirectory.dir("test-results/middleTest")
-    reports.html.outputLocation     = layout.buildDirectory.dir("reports/tests/middleTest")
+    shouldRunAfter tasks.named('test')
 }
 
-tasks.named('test') { // 기본 test는 비활성화, 소형, 중형 개별 선택해서 해야함
-    enabled = false
-}
-
-tasks.named('check') { // check 시 둘 다 돌리고 싶으면
-    dependsOn tasks.named('smallTest'), tasks.named('middleTest')
+tasks.named('check') {
+    dependsOn tasks.named('integrationTest')
 }
 
 tasks.named('processIntegrationTestResources', Copy) {

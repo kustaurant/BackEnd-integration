@@ -1,6 +1,7 @@
 package com.kustaurant.crawler.RestaurantSync.service.single;
 
 import com.microsoft.playwright.Response;
+import java.net.URI;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.Generated;
@@ -20,6 +21,17 @@ public class RestaurantResponseCollector {
            AtomicReference<String> menuHtmlRef,
            boolean analyzeMode
    ) {
+      captureHtmlResponse(response, placeId, homeHtmlRef, menuHtmlRef, analyzeMode, true);
+   }
+
+   public void captureHtmlResponse(
+           Response response,
+           String placeId,
+           AtomicReference<String> homeHtmlRef,
+           AtomicReference<String> menuHtmlRef,
+           boolean analyzeMode,
+           boolean captureInitialPlaceDocument
+   ) {
       try {
          String url = response.url();
          String contentType = ((String) response.headers().getOrDefault("content-type", ""))
@@ -28,20 +40,47 @@ public class RestaurantResponseCollector {
             return;
          }
 
-         String homePath = "/restaurant/" + placeId + "/home";
-         String menuPath = "/restaurant/" + placeId + "/menu";
-         if (url.contains(homePath)) {
+         if (isHomeDocument(url, placeId, captureInitialPlaceDocument)) {
             captureHomeHtml(url, response, homeHtmlRef, analyzeMode);
             return;
          }
 
-         if (url.contains(menuPath)) {
+         if (isMenuDocument(url, placeId)) {
             captureMenuHtml(url, response, menuHtmlRef, analyzeMode);
          }
       } catch (Exception e) {
          if (analyzeMode) {
             log.warn("html 응답 캡처 중 오류", e);
          }
+      }
+   }
+
+   private boolean isHomeDocument(String url, String placeId, boolean captureInitialPlaceDocument) {
+      String path = pathOf(url);
+      return (captureInitialPlaceDocument && path.equals("/place/" + placeId))
+              || path.equals("/place/" + placeId + "/home")
+              || path.equals("/restaurant/" + placeId)
+              || path.equals("/restaurant/" + placeId + "/home");
+   }
+
+   private boolean isMenuDocument(String url, String placeId) {
+      String path = pathOf(url);
+      return path.equals("/place/" + placeId + "/menu")
+              || path.equals("/restaurant/" + placeId + "/menu");
+   }
+
+   private String pathOf(String url) {
+      try {
+         URI uri = URI.create(url);
+         if (!"pcmap.place.naver.com".equalsIgnoreCase(uri.getHost())) {
+            return "";
+         }
+         String path = uri.getPath() == null ? "" : uri.getPath();
+         return path.length() > 1 && path.endsWith("/")
+                 ? path.substring(0, path.length() - 1)
+                 : path;
+      } catch (IllegalArgumentException ignored) {
+         return "";
       }
    }
 
@@ -136,6 +175,7 @@ public class RestaurantResponseCollector {
               || html.contains("lnJFt")
               || html.contains("PIbes")
               || html.contains("xlx7Q")
+              || html.contains("window.__APOLLO_STATE__")
               || html.contains("주소")
               || html.contains("전화번호")
               || html.contains("og:title");

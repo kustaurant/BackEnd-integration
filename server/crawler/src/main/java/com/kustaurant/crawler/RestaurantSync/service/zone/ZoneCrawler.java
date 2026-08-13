@@ -2,6 +2,7 @@ package com.kustaurant.crawler.RestaurantSync.service.zone;
 
 import com.kustaurant.crawler.RestaurantSync.CrawlGrid;
 import com.kustaurant.crawler.RestaurantSync.GridGenerator;
+import com.kustaurant.crawler.infrastructure.crawler.playwright.PlaywrightManager;
 import com.kustaurant.crawler.RestaurantSync.service.single.RestaurantSingleCrawler;
 import com.kustaurant.map.ZonePolygon;
 import com.kustaurant.map.ZoneType;
@@ -11,64 +12,126 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class ZoneCrawler {
-   private static final double DEFAULT_LAT_STEP = 0.0014;
-   private static final double DEFAULT_LNG_STEP = 0.0028;
-   private static final int DEFAULT_ZOOM = 19;
-   private static final int MAX_PLACE_IDS = Integer.MAX_VALUE;
-   private static final long INTER_PLACE_DELAY_MIN_MS = 3_000L;
-   private static final long INTER_PLACE_DELAY_MAX_MS = 5_000L;
-
+   private final PlaywrightManager playwrightManager;
    private final RestaurantSingleCrawler restaurantSingleCrawler;
    private final ZonePlaceIdCollector zonePlaceIdCollector;
    private final ZoneResultPolicy zoneResultPolicy;
+
+   @Value("${crawler.naver-place.max-grids:2147483647}")
+   private int maxGrids = Integer.MAX_VALUE;
+
+   @Value("${crawler.naver-place.max-place-ids:2147483647}")
+   private int maxPlaceIds = Integer.MAX_VALUE;
 
    public ZoneCrawlResultPayload crawlByScope(
            ZoneType crawlScope,
            Consumer<ZoneCrawlProgress> progressListener
    ) {
+      return crawlByScope(crawlScope, new ZoneCrawlCheckpoint(), progressListener);
+   }
+
+   ZoneCrawlResultPayload crawlByScope(
+           ZoneType crawlScope,
+           ZoneCrawlCheckpoint checkpoint,
+           Consumer<ZoneCrawlProgress> progressListener
+   ) {
+      return playwrightManager.withReusableBrowser(
+              () -> crawlByScopeWithReusableBrowser(crawlScope, checkpoint, progressListener)
+      );
+   }
+
+   private ZoneCrawlResultPayload crawlByScopeWithReusableBrowser(
+           ZoneType crawlScope,
+           ZoneCrawlCheckpoint checkpoint,
+           Consumer<ZoneCrawlProgress> progressListener
+   ) {
       ZonePolygon zone = zoneResultPolicy.findZonePolygon(crawlScope)
               .orElseThrow(() -> new IllegalArgumentException("Unsupported crawl scope: " + crawlScope));
 
-      List<CrawlGrid> grids = GridGenerator.generate(zone, DEFAULT_LAT_STEP, DEFAULT_LNG_STEP);
+      List<CrawlGrid> generatedGrids = GridGenerator.generate(
+              zone,
+              ZoneCrawlDefaults.LAT_STEP,
+              ZoneCrawlDefaults.LNG_STEP
+      );
+      int gridLimit = Math.max(1, Math.min(maxGrids, generatedGrids.size()));
+      List<CrawlGrid> grids = List.copyOf(generatedGrids.subList(0, gridLimit));
       log.info(
               "구역 크롤 시작. scope={}, zoneType={}, gridCount={}, latStep={}, lngStep={}, zoom={}",
               crawlScope,
               zone.zoneType(),
               grids.size(),
-              DEFAULT_LAT_STEP,
-              DEFAULT_LNG_STEP,
-              DEFAULT_ZOOM
+              ZoneCrawlDefaults.LAT_STEP,
+              ZoneCrawlDefaults.LNG_STEP,
+              ZoneCrawlDefaults.ZOOM
       );
 
-      Set<String> placeIds = zonePlaceIdCollector.discoverPlaceIds(
-              grids,
-              DEFAULT_ZOOM,
-              MAX_PLACE_IDS,
-              progress -> progressListener.accept(new ZoneCrawlProgress(
-                      "DISCOVERING",
-                      grids.size(),
-                      progress.processedGridCount(),
-                      progress.discoveredPlaceCount(),
-                      0,
-                      0,
-                      0,
-                      0,
-                      List.of(),
-                      null,
-                      progress.currentGrid(),
-                      null
-              ))
-      );
+      int placeIdLimit = Math.max(1, maxPlaceIds);
+      int resumeGridIndex = checkpoint.nextGridIndex();
+      if (resumeGridIndex > grids.size()) {
+         throw new IllegalStateException(
+                 "체크포인트가 현재 그리드 범위를 벗어났습니다. nextGridIndex="
+                         + resumeGridIndex + ", gridCount=" + grids.size()
+         );
+      }
+
+      if (resumeGridIndex > 0) {
+         log.info(
+                 "구역 크롤 체크포인트 재개. scope={}, nextGridIndex={}, preservedPlaceCount={}",
+                 crawlScope,
+                 resumeGridIndex,
+                 checkpoint.discoveredPlaceCount()
+         );
+      }
+
+      for (int gridIndex = resumeGridIndex; gridIndex < grids.size(); gridIndex++) {
+         if (checkpoint.discoveredPlaceCount() >= placeIdLimit) {
+            break;
+         }
+
+         CrawlGrid grid = grids.get(gridIndex);
+         Set<String> found = zonePlaceIdCollector.discoverPlaceIdsFromGrid(grid, ZoneCrawlDefaults.ZOOM);
+         int before = checkpoint.discoveredPlaceCount();
+         checkpoint.completeGrid(gridIndex, found, placeIdLimit);
+         int after = checkpoint.discoveredPlaceCount();
+
+         log.info(
+                 "그리드 체크포인트 저장. scope={}, row={}, col={}, found={}, added={}, duplicate={}, total={}",
+                 crawlScope,
+                 grid.row(),
+                 grid.col(),
+                 found.size(),
+                 after - before,
+                 found.size() - (after - before),
+                 after
+         );
+
+         progressListener.accept(new ZoneCrawlProgress(
+                 "DISCOVERING",
+                 grids.size(),
+                 checkpoint.nextGridIndex(),
+                 checkpoint.discoveredPlaceCount(),
+                 0,
+                 0,
+                 0,
+                 0,
+                 List.of(),
+                 null,
+                 grid.row() + "," + grid.col(),
+                 null
+         ));
+      }
+
+      Set<String> placeIds = checkpoint.discoveredPlaceIdsSnapshot();
 
       List<RestaurantRaw> results = new ArrayList<>();
       Set<String> retryQueue = new LinkedHashSet<>();
@@ -80,7 +143,7 @@ public class ZoneCrawler {
          progressListener.accept(new ZoneCrawlProgress(
                  "CRAWLING",
                  grids.size(),
-                 grids.size(),
+                 checkpoint.nextGridIndex(),
                  placeIds.size(),
                  placeIds.size(),
                  crawlAttempt,
@@ -117,7 +180,7 @@ public class ZoneCrawler {
             progressListener.accept(new ZoneCrawlProgress(
                     "CRAWLING",
                     grids.size(),
-                    grids.size(),
+                    checkpoint.nextGridIndex(),
                     placeIds.size(),
                     placeIds.size(),
                     crawlAttempt,
@@ -131,8 +194,6 @@ public class ZoneCrawler {
          } catch (Exception e) {
             retryQueue.add(placeId);
             log.warn("구역 크롤 상세 수집 실패. placeId={}, scope={}", placeId, crawlScope, e);
-         } finally {
-            sleepMillis(randomInterPlaceDelayMs());
          }
       }
 
@@ -145,7 +206,7 @@ public class ZoneCrawler {
             progressListener.accept(new ZoneCrawlProgress(
                     "RETRYING",
                     grids.size(),
-                    grids.size(),
+                    checkpoint.nextGridIndex(),
                     placeIds.size(),
                     totalWithRetry,
                     crawlAttempt,
@@ -182,7 +243,7 @@ public class ZoneCrawler {
                progressListener.accept(new ZoneCrawlProgress(
                        "RETRYING",
                        grids.size(),
-                       grids.size(),
+                       checkpoint.nextGridIndex(),
                        placeIds.size(),
                        totalWithRetry,
                        crawlAttempt,
@@ -196,8 +257,6 @@ public class ZoneCrawler {
             } catch (Exception e) {
                finalFailedPlaceIds.add(placeId);
                log.warn("2차 리트라이 예외 최종실패. scope={}, placeId={}", crawlScope, placeId, e);
-            } finally {
-               sleepMillis(randomInterPlaceDelayMs());
             }
          }
       }
@@ -205,7 +264,7 @@ public class ZoneCrawler {
       progressListener.accept(new ZoneCrawlProgress(
               "COMPLETED",
               grids.size(),
-              grids.size(),
+              checkpoint.nextGridIndex(),
               placeIds.size(),
               placeIds.size() + retryQueue.size(),
               crawlAttempt,
@@ -220,31 +279,4 @@ public class ZoneCrawler {
       return new ZoneCrawlResultPayload(placeIds.size(), results.size(), results);
    }
 
-   private long randomInterPlaceDelayMs() {
-      return ThreadLocalRandom.current().nextLong(INTER_PLACE_DELAY_MIN_MS, INTER_PLACE_DELAY_MAX_MS + 1);
-   }
-
-   private void sleepMillis(long millis) {
-      try {
-         Thread.sleep(millis);
-      } catch (InterruptedException e) {
-         Thread.currentThread().interrupt();
-      }
-   }
-
-   public record ZoneCrawlProgress(
-           String phase,
-           int totalGridCount,
-           int processedGridCount,
-           int discoveredPlaceCount,
-           int totalPlaceCount,
-           int attemptedPlaceCount,
-           int crawledSuccessCount,
-           int finalFailedCount,
-           List<String> finalFailedPlaceIds,
-           RestaurantRaw acceptedResult,
-           String currentGrid,
-           String currentPlaceId
-   ) {
-   }
 }

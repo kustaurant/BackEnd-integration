@@ -2,6 +2,7 @@ package com.kustaurant.crawler.RestaurantSync.service.single;
 
 import com.kustaurant.crawler.infrastructure.crawler.playwright.PlaywrightManager;
 import com.kustaurant.crawler.RestaurantSync.service.zone.ZoneResultPolicy;
+import com.kustaurant.crawler.RestaurantSync.service.single.NaverApolloStateParser.NaverPlaceData;
 import com.kustaurant.map.CoordinateV2;
 import com.kustaurant.restaurantSync.RestaurantRawMenu;
 import com.kustaurant.restaurantSync.RestaurantRaw;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -22,15 +24,25 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RestaurantSingleCrawler {
 
+   enum DetailMode {
+      LEGACY,
+      APOLLO_FIRST
+   }
+
    private static final int MAX_RETRIES = 2;
    private static final String NAVER_PLACE_NOT_FOUND_TEXT = "요청하신 페이지를 찾을 수 없습니다.";
 
    private final PlaywrightManager playwrightManager;
    private final RestaurantPageDriver pageDriver;
    private final RestaurantResponseCollector responseCollector;
+   private final NaverApolloStateParser apolloStateParser;
    private final RestaurantInfoExtractor infoExtractor;
    private final RestaurantMenuExtractor menuExtractor;
+   private final RestaurantMenuDataResolver menuDataResolver;
    private final ZoneResultPolicy zoneResultPolicy;
+
+   @Value("${crawler.naver-place.detail-mode:APOLLO_FIRST}")
+   private DetailMode detailMode = DetailMode.APOLLO_FIRST;
 
    public RestaurantRaw crawl(String placeUrl) {
       return crawlWithRetry(placeUrl, false);
@@ -63,12 +75,13 @@ public class RestaurantSingleCrawler {
    private RestaurantRaw crawlInternal(String placeUrl, boolean analyzeMode) {
       return playwrightManager.crawl(page -> {
          String placeId = infoExtractor.extractPlaceId(placeUrl);
+         boolean apolloEnabled = detailMode == DetailMode.APOLLO_FIRST;
 
          AtomicReference<String> homeHtmlRef = new AtomicReference<>();
          AtomicReference<String> menuHtmlRef = new AtomicReference<>();
 
          page.onResponse(response -> responseCollector.captureHtmlResponse(
-                 response, placeId, homeHtmlRef, menuHtmlRef, analyzeMode
+                 response, placeId, homeHtmlRef, menuHtmlRef, analyzeMode, apolloEnabled
          ));
 
          if (analyzeMode) {
@@ -80,11 +93,26 @@ public class RestaurantSingleCrawler {
          waitForHomeCapture(page, homeHtmlRef, 6_000);
          hydrateHomeHtmlFromEntryFrameIfMissing(page, homeHtmlRef, analyzeMode, placeId);
 
-         boolean menuClicked = pageDriver.clickMenuTab(page);
-         if (analyzeMode) log.info("메뉴 탭 클릭 여부={}", menuClicked);
+         Optional<NaverPlaceData> initialApolloData = apolloEnabled
+                 ? apolloStateParser.parse(homeHtmlRef.get(), placeId)
+                 : Optional.empty();
+         boolean shouldLoadLegacyMenuPage = !apolloEnabled || initialApolloData
+                 .map(data -> !data.menuDataPresent())
+                 .orElse(true);
 
-
-         if (menuClicked) pageDriver.waitForMenuIdle(page);
+         boolean menuClicked = false;
+         if (shouldLoadLegacyMenuPage) {
+            menuClicked = pageDriver.clickMenuTab(page);
+            if (menuClicked) pageDriver.waitForMenuIdle(page);
+         }
+         if (analyzeMode) {
+            log.info(
+                    "Apollo 초기 데이터 감지={}, Apollo 메뉴 데이터 감지={}, 메뉴 탭 클릭 여부={}",
+                    initialApolloData.isPresent(),
+                    initialApolloData.map(NaverPlaceData::menuDataPresent).orElse(false),
+                    menuClicked
+            );
+         }
 
          waitForHomeCapture(page, homeHtmlRef, 6_000);
          hydrateHomeHtmlFromEntryFrameIfMissing(page, homeHtmlRef, analyzeMode, placeId);
@@ -100,8 +128,10 @@ public class RestaurantSingleCrawler {
          if (isBlank(liveHomeSnapshot)) liveHomeSnapshot = safePageContent(page);
 
 
-         pageDriver.navigateToDirectMenuIfNeeded(page, placeId, menuHtmlRef.get() != null);
-         waitForHtmlCapture(page, menuHtmlRef, 8_000);
+         if (shouldLoadLegacyMenuPage) {
+            pageDriver.navigateToDirectMenuIfNeeded(page, placeId, menuHtmlRef.get() != null);
+            waitForHtmlCapture(page, menuHtmlRef, 8_000);
+         }
 
          String homeHtml = homeHtmlRef.get();
          String menuHtml = menuHtmlRef.get();
@@ -109,7 +139,12 @@ public class RestaurantSingleCrawler {
          Document menuDoc = isBlank(menuHtml) ? null : Jsoup.parse(menuHtml);
 
          String sourceUrl = safePageUrl(page);
-         RestaurantInfoExtractor.NaverPlaceBasicInfo basicInfo = infoExtractor.extract(homeDoc, homeHtml);
+         Optional<NaverPlaceData> apolloData = apolloEnabled
+                 ? bestApolloData(placeId, homeHtml, menuHtml)
+                 : Optional.empty();
+         RestaurantInfoExtractor.NaverPlaceBasicInfo domBasicInfo = infoExtractor.extract(homeDoc, homeHtml);
+         boolean domBasicFallbackUsed = usesDomBasicFallback(apolloData, domBasicInfo);
+         RestaurantInfoExtractor.NaverPlaceBasicInfo basicInfo = mergeBasicInfo(apolloData, domBasicInfo);
 
          if (hasNoBasicInfo(basicInfo) && !isBlank(liveHomeSnapshot)) {
             Document liveDoc = Jsoup.parse(liveHomeSnapshot);
@@ -125,7 +160,10 @@ public class RestaurantSingleCrawler {
             }
          }
 
-         List<RestaurantRawMenu> menus = menuExtractor.extractMenus(menuDoc, page);
+         List<RestaurantRawMenu> menus = menuDataResolver.resolve(
+                 apolloData,
+                 () -> menuExtractor.extractMenus(menuDoc, page)
+         );
 
          Double latitude = basicInfo.latitude();
          Double longitude = basicInfo.longitude();
@@ -157,6 +195,14 @@ public class RestaurantSingleCrawler {
                log.warn("home html 캡처 실패. sourcePlaceId={}, placeId={}", placeId, placeUrl);
             }
             log.info(
+                    "상세 데이터 소스. sourcePlaceId={}, mode={}, apollo={}, apolloMenu={}, domFallback={}",
+                    placeId,
+                    detailMode,
+                    apolloData.isPresent(),
+                    apolloData.map(NaverPlaceData::menuDataPresent).orElse(false),
+                    domBasicFallbackUsed
+            );
+            log.info(
                     " === 네이버플레이스 분석 완료. sourcePlaceId={}, placeName={}, category={}, restaurantAddress={}, phone={}, lat={}, lng={}, zoneType={}, zoneDescription={}, menuCount={}",
                     result.sourcePlaceId(), result.placeName(), result.category(), result.restaurantAddress(),
                     result.phoneNumber(), result.latitude(), result.longitude(),
@@ -174,6 +220,64 @@ public class RestaurantSingleCrawler {
 
          return result;
       });
+   }
+
+   private Optional<NaverPlaceData> bestApolloData(String placeId, String homeHtml, String menuHtml) {
+      Optional<NaverPlaceData> homeData = apolloStateParser.parse(homeHtml, placeId);
+      if (homeData.map(NaverPlaceData::menuDataPresent).orElse(false)) {
+         return homeData;
+      }
+
+      Optional<NaverPlaceData> menuData = apolloStateParser.parse(menuHtml, placeId);
+      if (menuData.isPresent()) {
+         return menuData;
+      }
+      return homeData;
+   }
+
+   private RestaurantInfoExtractor.NaverPlaceBasicInfo mergeBasicInfo(
+           Optional<NaverPlaceData> apolloData,
+           RestaurantInfoExtractor.NaverPlaceBasicInfo domData
+   ) {
+      if (apolloData.isEmpty()) {
+         return domData;
+      }
+
+      NaverPlaceData apollo = apolloData.get();
+      return new RestaurantInfoExtractor.NaverPlaceBasicInfo(
+              firstNonBlank(apollo.placeName(), domData.placeName()),
+              firstNonBlank(apollo.category(), domData.category()),
+              firstNonBlank(apollo.restaurantAddress(), domData.restaurantAddress()),
+              firstNonBlank(apollo.phoneNumber(), domData.phoneNumber()),
+              firstNonNull(apollo.latitude(), domData.latitude()),
+              firstNonNull(apollo.longitude(), domData.longitude()),
+              firstNonBlank(apollo.imageUrl(), domData.imageUrl())
+      );
+   }
+
+   private boolean usesDomBasicFallback(
+           Optional<NaverPlaceData> apolloData,
+           RestaurantInfoExtractor.NaverPlaceBasicInfo domData
+   ) {
+      if (apolloData.isEmpty()) {
+         return true;
+      }
+      NaverPlaceData apollo = apolloData.get();
+      return (isBlank(apollo.placeName()) && !isBlank(domData.placeName()))
+              || (isBlank(apollo.category()) && !isBlank(domData.category()))
+              || (isBlank(apollo.restaurantAddress()) && !isBlank(domData.restaurantAddress()))
+              || (isBlank(apollo.phoneNumber()) && !isBlank(domData.phoneNumber()))
+              || (apollo.latitude() == null && domData.latitude() != null)
+              || (apollo.longitude() == null && domData.longitude() != null)
+              || (isBlank(apollo.imageUrl()) && !isBlank(domData.imageUrl()));
+   }
+
+   private String firstNonBlank(String primary, String fallback) {
+      return isBlank(primary) ? fallback : primary;
+   }
+
+   private <T> T firstNonNull(T primary, T fallback) {
+      return primary == null ? fallback : primary;
    }
 
    private boolean shouldRetryWithBackoff(RestaurantRaw result, int attempt) {
@@ -237,7 +341,8 @@ public class RestaurantSingleCrawler {
             if (html.contains("GHAhO")
                     || html.contains("lnJFt")
                     || html.contains("og:title")
-                    || html.contains("PIbes")) {
+                    || html.contains("PIbes")
+                    || html.contains("window.__APOLLO_STATE__")) {
                return;
             }
             lastObserved = html;
@@ -312,6 +417,7 @@ public class RestaurantSingleCrawler {
       return html.contains("GHAhO")
               || html.contains("lnJFt")
               || html.contains("PIbes")
+              || html.contains("window.__APOLLO_STATE__")
               || html.contains("og:title")
               || html.contains("address")
               || html.contains("restaurant");
