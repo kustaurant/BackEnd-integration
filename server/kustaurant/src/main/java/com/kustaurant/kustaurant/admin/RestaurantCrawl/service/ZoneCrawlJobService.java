@@ -7,7 +7,7 @@ import com.kustaurant.restaurantSync.RestaurantRaw;
 import com.kustaurant.restaurantSync.sync.CrawlJobIdResponse;
 import com.kustaurant.restaurantSync.sync.ZoneCrawlStatusPayload;
 import com.kustaurant.restaurantSync.sync.ZoneCrawlJobResultsPayload;
-import com.kustaurant.restaurantSync.sync.ZoneJCrawlobStatus;
+import com.kustaurant.restaurantSync.sync.ZoneCrawlJobStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,16 @@ public class ZoneCrawlJobService {
    private final RestaurantRawSaveService rawSaveService;
 
    private final Map<String, ZoneCrawlJobState> jobs = new ConcurrentHashMap<>();
-   private final ExecutorService executor = Executors.newCachedThreadPool();
+   private final ExecutorService executor = Executors.newSingleThreadExecutor(runnable -> {
+      Thread thread = new Thread(runnable, "zone-crawl-sync-worker");
+      thread.setDaemon(true);
+      return thread;
+   });
+
+   @PreDestroy
+   void shutdownExecutor() {
+      executor.shutdownNow();
+   }
 
    public CrawlJobIdResponse start(ZoneType crawlScope) {
       String jobId = UUID.randomUUID().toString();
@@ -48,36 +58,68 @@ public class ZoneCrawlJobService {
       return Optional.ofNullable(jobs.get(jobId)).map(ZoneCrawlJobState::toResponse);
    }
 
+   public Optional<CrawlJobIdResponse> resume(String jobId) {
+      ZoneCrawlJobState state = jobs.get(jobId);
+      if (state == null) {
+         return Optional.empty();
+      }
+
+      state.markResumeQueued();
+      executor.submit(() -> runJob(state, true));
+      log.info("구역 동기화 작업 재개 등록. jobId={}, crawlerJobId={}", jobId, state.crawlerJobId);
+      return Optional.of(new CrawlJobIdResponse(jobId));
+   }
+
    private void runJob(ZoneCrawlJobState state) {
+      runJob(state, false);
+   }
+
+   private void runJob(ZoneCrawlJobState state, boolean resume) {
       state.markRunning();
       try {
-         state.currentPhase = "CRAWL_JOB_START";
-         CrawlJobIdResponse startResponse = crawlerClient.startZoneCrawlJob(state.crawlScope);
-         state.crawlerJobId = startResponse.jobId();
+         if (resume) {
+            state.currentPhase = "CRAWL_JOB_RESUME";
+            crawlerClient.resumeZoneCrawlJob(state.crawlerJobId);
+         } else {
+            state.currentPhase = "CRAWL_JOB_START";
+            CrawlJobIdResponse startResponse = crawlerClient.startZoneCrawlJob(state.crawlScope);
+            state.crawlerJobId = startResponse.jobId();
+         }
          state.currentPhase = "CRAWL_RUNNING";
-         int nextResultIndex = 0;
 
          while (true) {
             ZoneCrawlStatusPayload crawlStatus = crawlerClient.getZoneCrawlJobStatus(state.crawlerJobId);
             state.applyCrawlerStatus(crawlStatus);
 
             state.currentPhase = "SAVE_RAW_STREAMING";
-            nextResultIndex = fetchAndSaveIncrementalResults(state, nextResultIndex);
+            state.nextResultIndex = fetchAndSaveIncrementalResults(state, state.nextResultIndex);
 
-            if (crawlStatus.status() == ZoneJCrawlobStatus.SUCCESS) {
+            if (crawlStatus.status() == ZoneCrawlJobStatus.CAPTCHA_REQUIRED) {
+               state.markCaptchaRequired(crawlStatus);
+               log.warn(
+                       "구역 동기화 작업 보안 인증 대기. jobId={}, crawlerJobId={}, grid={}, preservedPlaceCount={}",
+                       state.jobId,
+                       state.crawlerJobId,
+                       state.currentGrid,
+                       state.discoveredPlaceCount
+               );
+               return;
+            }
+
+            if (crawlStatus.status() == ZoneCrawlJobStatus.SUCCESS) {
                state.currentPhase = "SAVE_RAW_FINALIZE";
-               nextResultIndex = fetchAndSaveIncrementalResults(state, nextResultIndex);
+               state.nextResultIndex = fetchAndSaveIncrementalResults(state, state.nextResultIndex);
 
                state.markSuccess();
                log.info(
                        "구역 동기화 작업 완료. jobId={}, scope={}, discoveredPlaceCount={}, crawledSuccessCount={}, savedRawCount={}, saveFailedCount={}, lastSavedIndex={}",
                        state.jobId, state.crawlScope, state.discoveredPlaceCount, state.crawledSuccessCount,
-                       state.savedRawCount, state.saveFailedCount, nextResultIndex
+                       state.savedRawCount, state.saveFailedCount, state.nextResultIndex
                );
                break;
             }
 
-            if (crawlStatus.status() == ZoneJCrawlobStatus.FAILED) {
+            if (crawlStatus.status() == ZoneCrawlJobStatus.FAILED) {
                throw new IllegalStateException("크롤 작업 실패: " + crawlStatus.errorMessage());
             }
 
@@ -151,7 +193,7 @@ public class ZoneCrawlJobService {
       private final String jobId;
       private final ZoneType crawlScope;
 
-      private volatile ZoneJCrawlobStatus status;
+      private volatile ZoneCrawlJobStatus status;
       private volatile String crawlerJobId;
       private volatile String currentPhase;
       private volatile int totalGridCount;
@@ -163,6 +205,7 @@ public class ZoneCrawlJobService {
       private volatile List<String> finalFailedPlaceIds = List.of();
       private volatile int savedRawCount;
       private volatile int saveFailedCount;
+      private volatile int nextResultIndex;
       private volatile String currentGrid;
       private volatile String currentPlaceId;
       private volatile String errorMessage;
@@ -172,7 +215,7 @@ public class ZoneCrawlJobService {
       private ZoneCrawlJobState(String jobId, ZoneType crawlScope) {
          this.jobId = jobId;
          this.crawlScope = crawlScope;
-         this.status = ZoneJCrawlobStatus.PENDING;
+         this.status = ZoneCrawlJobStatus.PENDING;
       }
 
       private static ZoneCrawlJobState pending(String jobId, ZoneType crawlScope) {
@@ -180,19 +223,45 @@ public class ZoneCrawlJobService {
       }
 
       private void markRunning() {
-         this.status = ZoneJCrawlobStatus.RUNNING;
+         this.status = ZoneCrawlJobStatus.RUNNING;
          this.currentPhase = "QUEUED";
-         this.startedAt = LocalDateTime.now();
+         this.errorMessage = null;
+         this.finishedAt = null;
+         if (this.startedAt == null) {
+            this.startedAt = LocalDateTime.now();
+         }
+      }
+
+      private synchronized void markResumeQueued() {
+         if (status != ZoneCrawlJobStatus.CAPTCHA_REQUIRED) {
+            throw new IllegalStateException(
+                    "보안 인증 대기 상태의 작업만 재개할 수 있습니다. status=" + status
+            );
+         }
+         if (crawlerJobId == null || crawlerJobId.isBlank()) {
+            throw new IllegalStateException("재개할 크롤러 작업 ID가 없습니다.");
+         }
+         this.status = ZoneCrawlJobStatus.RUNNING;
+         this.currentPhase = "RESUME_QUEUED";
+         this.errorMessage = null;
+         this.finishedAt = null;
+      }
+
+      private void markCaptchaRequired(ZoneCrawlStatusPayload crawlStatus) {
+         this.status = ZoneCrawlJobStatus.CAPTCHA_REQUIRED;
+         this.currentPhase = "CAPTCHA_REQUIRED";
+         this.errorMessage = crawlStatus.errorMessage();
+         this.finishedAt = null;
       }
 
       private void markSuccess() {
-         this.status = ZoneJCrawlobStatus.SUCCESS;
+         this.status = ZoneCrawlJobStatus.SUCCESS;
          this.currentPhase = "COMPLETED";
          this.finishedAt = LocalDateTime.now();
       }
 
       private void markFailed(Exception e) {
-         this.status = ZoneJCrawlobStatus.FAILED;
+         this.status = ZoneCrawlJobStatus.FAILED;
          this.errorMessage = e.getMessage();
          this.finishedAt = LocalDateTime.now();
       }

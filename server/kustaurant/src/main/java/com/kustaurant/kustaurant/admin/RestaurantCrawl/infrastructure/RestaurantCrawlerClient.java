@@ -129,6 +129,24 @@ public class RestaurantCrawlerClient {
         }
     }
 
+    public CrawlJobIdResponse resumeZoneCrawlJob(String jobId) {
+        try {
+            log.info("네이버플레이스 구역 크롤 작업 재개 요청. jobId={}", jobId);
+            return webClient.post()
+                    .uri("/api/naver-place/crawl-zone/jobs/{jobId}/resume", jobId)
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::isError,
+                            res -> res.bodyToMono(String.class)
+                                    .map(body -> new IllegalStateException("네이버플레이스 구역 크롤 작업 재개 오류: " + body))
+                    )
+                    .bodyToMono(CrawlJobIdResponse.class)
+                    .block(Duration.ofSeconds(20));
+        } catch (WebClientRequestException e) {
+            throw new IllegalStateException("크롤러 서버에 연결할 수 없습니다. crawler.base-url과 서버 상태를 확인하세요.", e);
+        }
+    }
+
     public ZoneCrawlJobResultsPayload getZoneCrawlJobResults(String jobId, int fromIndex, int limit) {
         try {
             return webClient.get()

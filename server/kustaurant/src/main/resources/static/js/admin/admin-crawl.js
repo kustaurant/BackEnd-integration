@@ -215,8 +215,15 @@ function renderNaverPlaceZoneCrawlResult(data) {
         ${data.errorMessage ? `<div><strong>에러:</strong> ${data.errorMessage}</div>` : ""}
         <div><strong>최종 실패 수:</strong> ${data.finalFailedCount || 0}</div>
         <div><strong>최종 실패 placeId:</strong> ${finalFailedIds || "-"}</div>
+        ${data.status === "CAPTCHA_REQUIRED" ? `
+            <div><strong>처리:</strong> 완료된 그리드와 발견 ID는 보존되었습니다.</div>
+            <button type="button" id="naver-place-zone-resume-btn">실패 그리드부터 재시도</button>
+        ` : ""}
     `;
     resultBox.classList.remove("hidden");
+
+    document.getElementById("naver-place-zone-resume-btn")
+        ?.addEventListener("click", resumeNaverPlaceZoneCrawl);
 }
 
 function pollNaverPlaceZoneCrawlStatus(jobId, submitBtn) {
@@ -232,6 +239,11 @@ function pollNaverPlaceZoneCrawlStatus(jobId, submitBtn) {
         .then(parseJsonResponse)
         .then(data => {
             renderNaverPlaceZoneCrawlResult(data);
+            if (data.status === "CAPTCHA_REQUIRED") {
+                submitBtn.textContent = "보안 인증 대기";
+                stopNaverPlaceZoneCrawlPolling();
+                return;
+            }
             if (isZoneCrawlJobFinished(data.status)) {
                 activeNaverPlaceZoneCrawlJobId = null;
                 submitBtn.disabled = false;
@@ -247,6 +259,42 @@ function pollNaverPlaceZoneCrawlStatus(jobId, submitBtn) {
             submitBtn.textContent = "구역 크롤 시작";
             stopNaverPlaceZoneCrawlPolling();
             alert(`구역 크롤 상태 조회 실패: ${error.message}`);
+        });
+}
+
+function resumeNaverPlaceZoneCrawl() {
+    const jobId = activeNaverPlaceZoneCrawlJobId;
+    const submitBtn = document.getElementById("naver-place-sync-submit-btn");
+    const resumeBtn = document.getElementById("naver-place-zone-resume-btn");
+    if (!jobId || !submitBtn) return;
+
+    if (resumeBtn) {
+        resumeBtn.disabled = true;
+        resumeBtn.textContent = "재개 요청 중...";
+    }
+
+    fetch(`/admin/api/crawl/naver-place/crawl-zone/jobs/${jobId}/resume`, {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-XSRF-TOKEN": getCookie("XSRF-TOKEN")
+        }
+    })
+        .then(parseJsonResponse)
+        .then(() => {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "재개 중...";
+            stopNaverPlaceZoneCrawlPolling();
+            pollNaverPlaceZoneCrawlStatus(jobId, submitBtn);
+        })
+        .catch(error => {
+            console.error("zone crawl resume failed:", error);
+            if (resumeBtn) {
+                resumeBtn.disabled = false;
+                resumeBtn.textContent = "실패 그리드부터 재시도";
+            }
+            alert(`구역 크롤 재개 실패: ${error.message}`);
         });
 }
 

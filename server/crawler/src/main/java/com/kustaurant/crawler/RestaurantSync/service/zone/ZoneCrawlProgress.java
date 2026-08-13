@@ -1,7 +1,6 @@
 package com.kustaurant.crawler.RestaurantSync.service.zone;
 
 import com.kustaurant.restaurantSync.RestaurantRaw;
-
 import java.util.List;
 
 public record ZoneCrawlProgress(

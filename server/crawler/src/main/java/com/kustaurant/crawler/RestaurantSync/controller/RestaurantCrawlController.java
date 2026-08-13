@@ -53,12 +53,24 @@ public class RestaurantCrawlController {
       return zoneCrawlJobService.start(request.crawlScope());
    }
 
-   // 5. 구역 크롤 작업 상태 조회
+   // 5. 보안 인증 대기 중인 구역 크롤 작업 재개
+   @PostMapping({"/crawl-zone/jobs/{jobId}/resume"})
+   public CrawlJobIdResponse resumeZoneCrawlJob(@PathVariable String jobId) {
+      try {
+         return zoneCrawlJobService.resume(jobId).orElseThrow(
+                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "zone crawl job not found: " + jobId)
+         );
+      } catch (IllegalStateException e) {
+         throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage(), e);
+      }
+   }
+
+   // 6. 구역 크롤 작업 상태 조회
    @GetMapping({"/crawl-zone/jobs/{jobId}"})
    public ZoneCrawlStatusPayload getZoneCrawlJobStatus(@PathVariable String jobId) {
       return zoneCrawlJobService.getStatus(jobId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "zone crawl job not found: " + jobId));
    }
-   // 6. 증분 결과 조회 (구역 크롤 실시간 배치 저장용 (현재 10개씩))
+   // 7. 증분 결과 조회 (구역 크롤 실시간 배치 저장용 (현재 10개씩))
    @GetMapping({"/crawl-zone/jobs/{jobId}/results"})
    public ZoneCrawlJobResultsPayload getZoneCrawlJobResults(
            @PathVariable String jobId,
